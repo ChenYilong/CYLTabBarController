@@ -299,7 +299,7 @@ public class CYLImageCache: NSObject {
 
     private static func image(with data: Data) -> UIImage? {
         if data.count > 4, data.prefix(4) == Data("GIF8".utf8) {
-            return UIImage.cyl_animatedImage(withGIFData: data)
+            return UIImage.cylAnimatedImage(withGIFData: data)
         }
         return UIImage(data: data, scale: UIScreen.main.scale)
     }
@@ -421,15 +421,15 @@ extension UIImage {
      * [CN] 通过 `CYLImageCache` 加载 `URL` 处的图片；`completion` 在主队列执行。
      */
     @objc(cyl_loadImageWithURL:completion:)
-    public class func cyl_load(with url: URL?, completion: @escaping (UIImage?) -> Void) {
-        cyl_load(with: url, options: [], completion: completion)
+    public class func cylLoad(with url: URL?, completion: @escaping (UIImage?) -> Void) {
+        cylLoad(with: url, options: [], completion: completion)
     }
 
     /**
      * [EN] Loads the image at `URL` with options; `completion` runs on the main queue.
      * [CN] 按选项加载 `URL` 处的图片；`completion` 在主队列执行。
      */
-    public class func cyl_load(with url: URL?, options: CYLImageLoadOptions, completion: @escaping (UIImage?) -> Void) {
+    public class func cylLoad(with url: URL?, options: CYLImageLoadOptions, completion: @escaping (UIImage?) -> Void) {
         let finish: (UIImage?) -> Void = { image in
             DispatchQueue.main.async {
                 completion(image)
@@ -448,8 +448,8 @@ extension UIImage {
      * [CN] `cyl_load(with:options:completion:)` 的 Objective-C 入口：`options` 为 `CYLImageLoadOptions` 的原始值。
      */
     @objc(cyl_loadImageWithURL:options:completion:)
-    public class func cyl_load(with url: URL?, rawOptions: UInt, completion: @escaping (UIImage?) -> Void) {
-        cyl_load(with: url, options: CYLImageLoadOptions(rawValue: rawOptions), completion: completion)
+    public class func cylLoad(with url: URL?, rawOptions: UInt, completion: @escaping (UIImage?) -> Void) {
+        cylLoad(with: url, options: CYLImageLoadOptions(rawValue: rawOptions), completion: completion)
     }
 
     // MARK: - GIF
@@ -459,7 +459,7 @@ extension UIImage {
      * [CN] 一帧 GIF 的延迟（小于 11 毫秒时为 0.1 秒，与浏览器一致）。
      */
     @objc(cyl_GIFFrameDelayWithProperties:)
-    public class func cyl_GIFFrameDelay(withProperties properties: [AnyHashable: Any]) -> TimeInterval {
+    public class func cylGIFFrameDelay(withProperties properties: [AnyHashable: Any]) -> TimeInterval {
         let gif = properties[kCGImagePropertyGIFDictionary as String] as? [AnyHashable: Any]
         var delay = (gif?[kCGImagePropertyGIFUnclampedDelayTime as String] as? NSNumber)?.doubleValue ?? 0
         if delay <= 0 {
@@ -473,7 +473,7 @@ extension UIImage {
      * [CN] 由 GIF 数据生成的动图（只有一帧时为静态图片，没有帧时为 nil）。
      */
     @objc(cyl_animatedImageWithGIFData:)
-    public class func cyl_animatedImage(withGIFData data: Data) -> UIImage? {
+    public class func cylAnimatedImage(withGIFData data: Data) -> UIImage? {
         guard !data.isEmpty, let source = CGImageSourceCreateWithData(data as CFData, nil) else {
             return nil
         }
@@ -486,7 +486,7 @@ extension UIImage {
             }
             frames.append(UIImage(cgImage: imageRef, scale: scale, orientation: .up))
             let properties = CGImageSourceCopyPropertiesAtIndex(source, index, nil) as? [AnyHashable: Any] ?? [:]
-            duration += cyl_GIFFrameDelay(withProperties: properties)
+            duration += cylGIFFrameDelay(withProperties: properties)
         }
         if frames.count <= 1 {
             return frames.first
@@ -501,7 +501,7 @@ extension UIImage {
      * [CN] 单色图片（以原图渲染），没有颜色或尺寸时为 nil。
      */
     @objc(cyl_imageWithColor:size:)
-    public class func cyl_image(with color: UIColor?, size: CGSize) -> UIImage? {
+    public class func cylImage(with color: UIColor?, size: CGSize) -> UIImage? {
         guard let color, size.width > 0, size.height > 0 else {
             return nil
         }
@@ -513,7 +513,7 @@ extension UIImage {
      * [CN] 带圆角的单色图片；动态颜色会生成浅色/深色图片对。
      */
     @objc(cyl_imageWithColor:size:cornerRadius:)
-    public class func cyl_image(with color: UIColor?, size: CGSize, cornerRadius: CGFloat) -> UIImage? {
+    public class func cylImage(with color: UIColor?, size: CGSize, cornerRadius: CGFloat) -> UIImage? {
         image(with: color ?? .clear, size: size, cornerRadius: cornerRadius, renderingMode: .automatic)
     }
 
@@ -524,7 +524,7 @@ extension UIImage {
      * [CN] 浅色模式为 `lightImage`、深色模式为 `darkImage` 的图片；其中一个为 nil 时直接返回另一个。
      */
     @objc(cyl_imageWithLightImage:darkImage:)
-    public class func cyl_image(withLight lightImage: UIImage?, dark darkImage: UIImage?) -> UIImage? {
+    public class func cylImage(withLight lightImage: UIImage?, dark darkImage: UIImage?) -> UIImage? {
         guard let lightImage, let darkImage else {
             return lightImage ?? darkImage
         }
@@ -544,12 +544,12 @@ extension UIImage {
      * [CN] `imageInfo`（名称或图片）对应的图片，以及 `darkImageInfo` 对应的深色图片。
      */
     @objc(cyl_imageWithImageInfo:darkImageInfo:)
-    public class func cyl_image(withImageInfo imageInfo: Any?, darkImageInfo: Any?) -> UIImage? {
-        let image = imageInfo.flatMap { cyl_getImage(fromImageInfo: $0) }
-        guard let darkImage = darkImageInfo.flatMap({ cyl_getImage(fromImageInfo: $0) }) else {
+    public class func cylImage(withImageInfo imageInfo: Any?, darkImageInfo: Any?) -> UIImage? {
+        let image = imageInfo.flatMap { cylGetImage(fromImageInfo: $0) }
+        guard let darkImage = darkImageInfo.flatMap({ cylGetImage(fromImageInfo: $0) }) else {
             return image
         }
-        return cyl_image(withLight: image, dark: darkImage)
+        return cylImage(withLight: image, dark: darkImage)
     }
 
     /**
@@ -557,8 +557,8 @@ extension UIImage {
      * [CN] 与 `cyl_image(withLight:dark:)` 相同。
      */
     @objc(cyl_lightOrDarkModeImageWithLightImage:darkImage:)
-    public class func cyl_lightOrDarkModeImage(withLightImage lightImage: UIImage?, darkImage: UIImage?) -> UIImage? {
-        cyl_image(withLight: lightImage, dark: darkImage)
+    public class func cylLightOrDarkModeImage(withLightImage lightImage: UIImage?, darkImage: UIImage?) -> UIImage? {
+        cylImage(withLight: lightImage, dark: darkImage)
     }
 
     /**
@@ -566,9 +566,9 @@ extension UIImage {
      * [CN] 按 `owner` 的特征解析出的浅色/深色图片。
      */
     @objc(cyl_lightOrDarkModeImageWithOwner:lightImage:darkImage:)
-    public class func cyl_lightOrDarkModeImage(withOwner owner: UITraitEnvironment?, lightImage: UIImage?,
+    public class func cylLightOrDarkModeImage(withOwner owner: UITraitEnvironment?, lightImage: UIImage?,
                                                darkImage: UIImage?) -> UIImage? {
-        let image = cyl_image(withLight: lightImage, dark: darkImage)
+        let image = cylImage(withLight: lightImage, dark: darkImage)
         if let owner, let imageAsset = image?.imageAsset {
             return imageAsset.image(with: owner.traitCollection)
         }
@@ -581,14 +581,14 @@ extension UIImage {
      * [CN] 按 `owner` 解析两个名称对应的浅色/深色图片；没有深色名称时，若存在带 `cyl_darkImageNameSuffix` 后缀的图片则使用它。
      */
     @objc(cyl_lightOrDarkModeImageWithOwner:lightImageName:darkImageName:)
-    public class func cyl_lightOrDarkModeImage(withOwner owner: UITraitEnvironment?, lightImageName: String,
+    public class func cylLightOrDarkModeImage(withOwner owner: UITraitEnvironment?, lightImageName: String,
                                                darkImageName: String?) -> UIImage? {
         guard let darkImageName, !darkImageName.isEmpty else {
             let image = lightImageName.isEmpty ? nil : imageNamedFollowingDarkMode(lightImageName, renderingMode: .automatic)
-            return cyl_lightOrDarkModeImage(withOwner: owner, lightImage: image, darkImage: nil)
+            return cylLightOrDarkModeImage(withOwner: owner, lightImage: image, darkImage: nil)
         }
         let lightImage = lightImageName.isEmpty ? nil : UIImage(named: lightImageName)
-        return cyl_lightOrDarkModeImage(withOwner: owner, lightImage: lightImage, darkImage: UIImage(named: darkImageName))
+        return cylLightOrDarkModeImage(withOwner: owner, lightImage: lightImage, darkImage: UIImage(named: darkImageName))
     }
 
     /**
@@ -596,7 +596,7 @@ extension UIImage {
      * [CN] 资源图片 `assetImageName` 在某种界面风格（`UIUserInterfaceStyle` 原始值）下的图片。
      */
     @objc(cyl_assetImageName:userInterfaceStyle:)
-    public class func cyl_assetImageName(_ assetImageName: String, userInterfaceStyle: Int) -> UIImage? {
+    public class func cylAssetImageName(_ assetImageName: String, userInterfaceStyle: Int) -> UIImage? {
         let image = UIImage(named: assetImageName)
         guard let style = UIUserInterfaceStyle(rawValue: userInterfaceStyle), style != .unspecified,
               let imageAsset = image?.imageAsset else {
@@ -621,11 +621,11 @@ extension UIImage {
      * [CN] `imageInfo` 对应的图片；为 nil 时返回 TabBarItem 占位图。
      */
     @objc(cyl_imageNamed:)
-    public class func cyl_imageNamed(_ imageInfo: Any?) -> UIImage! {
+    public class func cylImageNamed(_ imageInfo: Any?) -> UIImage! {
         guard let imageInfo else {
-            return cyl_tabItemPlaceholder()
+            return cylTabItemPlaceholder()
         }
-        return cyl_getImage(fromImageInfo: imageInfo)
+        return cylGetImage(fromImageInfo: imageInfo)
     }
 
     /**
@@ -633,7 +633,7 @@ extension UIImage {
      * [CN] `imageInfo` 对应的图片：名称（含其深色版本）或图片。
      */
     @objc(cyl_getImageFromImageInfo:)
-    public class func cyl_getImage(fromImageInfo imageInfo: Any) -> UIImage? {
+    public class func cylGetImage(fromImageInfo imageInfo: Any) -> UIImage? {
         if let name = imageInfo as? String {
             return imageNamedFollowingDarkMode(name, renderingMode: .alwaysOriginal)
         }
@@ -645,8 +645,8 @@ extension UIImage {
      * [CN] 没有图标的 Tab 使用的 1 × 1 透明图片。
      */
     @objc(cyl_tabItemPlaceholderImage)
-    public class func cyl_tabItemPlaceholder() -> UIImage {
-        cyl_image(with: .clear, size: CGSize(width: 1, height: 1)) ?? UIImage()
+    public class func cylTabItemPlaceholder() -> UIImage {
+        cylImage(with: .clear, size: CGSize(width: 1, height: 1)) ?? UIImage()
     }
 
     // MARK: - Private
@@ -658,7 +658,7 @@ extension UIImage {
         if lightColor != darkColor {
             let lightImage = staticImage(with: lightColor, size: size, cornerRadius: cornerRadius)
             let darkImage = staticImage(with: darkColor, size: size, cornerRadius: cornerRadius)
-            return cyl_image(withLight: lightImage?.withRenderingMode(renderingMode),
+            return cylImage(withLight: lightImage?.withRenderingMode(renderingMode),
                              dark: darkImage?.withRenderingMode(renderingMode))
         }
         return staticImage(with: color, size: size, cornerRadius: cornerRadius)?.withRenderingMode(renderingMode)
@@ -735,6 +735,6 @@ extension UIImage {
         guard let darkImage else {
             return lightImage
         }
-        return cyl_image(withLight: lightImage, dark: darkImage.withRenderingMode(renderingMode))
+        return cylImage(withLight: lightImage, dark: darkImage.withRenderingMode(renderingMode))
     }
 }

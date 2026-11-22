@@ -45,7 +45,7 @@ func cylRememberTabBarItemSelectedTitle(_ viewController: UIViewController?, _ a
     guard let viewController else {
         return
     }
-    let selectedTitle = attributes?[CYLTabBarItemSelectedTitle] as? String
+    let selectedTitle = attributes?[cylTabBarItemSelectedTitle] as? String
     objc_setAssociatedObject(viewController, CYLSelectedTitleKeys.selectedTitle, selectedTitle, .OBJC_ASSOCIATION_COPY_NONATOMIC)
     objc_setAssociatedObject(viewController, CYLSelectedTitleKeys.normalTitle, selectedTitle != nil ? ((normalTitle as String?) ?? "") : nil,
                              .OBJC_ASSOCIATION_COPY_NONATOMIC)
@@ -80,7 +80,7 @@ func cylApplyTabBarItemSelectedTitles(_ tabBarController: CYLTabBarController?) 
         if viewController.tabBarItem.title != title {
             viewController.tabBarItem.title = title
         }
-        let contentViewController = viewController.cyl_getViewControllerInsteadOfNavigation()
+        let contentViewController = viewController.cylGetViewControllerInsteadOfNavigation()
         if contentViewController !== viewController, contentViewController.tabBarItem.title != title {
             contentViewController.tabBarItem.title = title
         }
@@ -97,14 +97,14 @@ func cylApplyTabBarItemSelectedTitles(_ tabBarController: CYLTabBarController?) 
 @_cdecl("CYLTabBarItemAnimationURLOfAnyType")
 func cylTabBarItemAnimationURLOfAnyType(_ attributes: NSDictionary?) -> NSURL? {
     let dictionary = attributes as? [AnyHashable: Any]
-    let value = CYLAnimationAttributesValue(dictionary, CYLTabBarAnimationURL)
+    let value = CYLAnimationAttributesValue(dictionary, cylTabBarAnimationURL)
     if let URL = value as? URL {
         return URL as NSURL
     }
     if let string = value as? String, !string.isEmpty {
         return NSURL(string: string)
     }
-    if let path = CYLAnimationAttributesValue(dictionary, CYLTabBarAnimationFilePath) as? String, !path.isEmpty {
+    if let path = CYLAnimationAttributesValue(dictionary, cylTabBarAnimationFilePath) as? String, !path.isEmpty {
         return NSURL(fileURLWithPath: path)
     }
     return nil
@@ -126,7 +126,7 @@ extension CYLTabBarController {
         let asset = image.imageAsset
         if let light = asset?.image(with: UITraitCollection(userInterfaceStyle: .light)),
            let dark = asset?.image(with: UITraitCollection(userInterfaceStyle: .dark)), light != dark,
-           let combined = UIImage.cyl_image(withLight: light.withRenderingMode(renderingMode), dark: dark.withRenderingMode(renderingMode)) {
+           let combined = UIImage.cylImage(withLight: light.withRenderingMode(renderingMode), dark: dark.withRenderingMode(renderingMode)) {
             return combined
         }
         return image.withRenderingMode(renderingMode)
@@ -145,13 +145,13 @@ extension CYLTabBarController {
         var normal: Any? = normalInfo
         var selected: Any? = selectedInfo
         let renderingMode: UIImage.RenderingMode
-        switch attributes[CYLTabBarItemIconRenderingMode] as? String {
+        switch attributes[cylTabBarItemIconRenderingMode] as? String {
         case "template": renderingMode = .alwaysTemplate
         case "original": renderingMode = .alwaysOriginal
         default: return [normal ?? NSNull(), selected ?? NSNull()]
         }
-        let normalImage = normal.flatMap { UIImage.cyl_imageNamed($0) }
-        var selectedImage = selected.flatMap { UIImage.cyl_imageNamed($0) }
+        let normalImage = normal.flatMap { UIImage.cylImageNamed($0) }
+        var selectedImage = selected.flatMap { UIImage.cylImageNamed($0) }
         if selectedImage == nil && renderingMode == .alwaysTemplate {
             selectedImage = normalImage
         }
@@ -189,7 +189,7 @@ extension CYLTabBarController {
         let viewControllers = self.viewControllers ?? []
         var index = viewControllers.firstIndex { $0 === viewController }
         if index == nil {
-            index = viewControllers.firstIndex { $0.cyl_getViewControllerInsteadOfNavigation() === viewController }
+            index = viewControllers.firstIndex { $0.cylGetViewControllerInsteadOfNavigation() === viewController }
         }
         guard let index else {
             return false
@@ -222,25 +222,25 @@ extension CYLTabBarController {
     @discardableResult
     open func updateTabBarItem(at index: UInt, attributes: [String : Any] = [:]) -> Bool {
         let count = UInt(viewControllers?.count ?? 0)
-        let oldTitle = index < count ? tabBarItemAttributes(at: index)?[CYLTabBarItemTitle] : nil
+        let oldTitle = index < count ? tabBarItemAttributes(at: index)?[cylTabBarItemTitle] : nil
         guard cylApplyTabBarItemUpdate(at: index, attributes: attributes) else {
             return false
         }
         // [EN] After the tab shows the change: the title and icon notifications for their keys, then one for every change.
         // [CN] Tab 显示变化之后：标题与图标 key 分别发送标题、图标通知，然后每次变化发送一次通用通知。
-        if attributes[CYLTabBarItemTitle] != nil || attributes[CYLTabBarItemSelectedTitle] != nil {
+        if attributes[cylTabBarItemTitle] != nil || attributes[cylTabBarItemSelectedTitle] != nil {
             let current = tabBarItemAttributes(at: index) ?? [:]
-            var titleInfo: [AnyHashable: Any] = [CYLTabBarItemTitle: current[CYLTabBarItemTitle] ?? ""]
-            titleInfo[CYLTabBarItemSelectedTitle] = current[CYLTabBarItemSelectedTitle]
-            titleInfo[CYLTabBarItemOldTitleKey] = oldTitle
-            titleInfo[CYLTabBarItemChangedAttributesKey] = attributes.filter { $0.key == CYLTabBarItemTitle || $0.key == CYLTabBarItemSelectedTitle }
-            cylPostTabBarItemNotification(.CYLTabBarItemTitleDidChange, at: index, extra: titleInfo)
+            var titleInfo: [AnyHashable: Any] = [cylTabBarItemTitle: current[cylTabBarItemTitle] ?? ""]
+            titleInfo[cylTabBarItemSelectedTitle] = current[cylTabBarItemSelectedTitle]
+            titleInfo[cylTabBarItemOldTitleKey] = oldTitle
+            titleInfo[cylTabBarItemChangedAttributesKey] = attributes.filter { $0.key == cylTabBarItemTitle || $0.key == cylTabBarItemSelectedTitle }
+            cylPostTabBarItemNotification(.cylTabBarItemTitleDidChange, at: index, extra: titleInfo)
         }
         let iconAttributes = Self.cylIconAttributes(of: attributes)
         if !iconAttributes.isEmpty {
-            cylPostTabBarItemNotification(.CYLTabBarItemIconDidChange, at: index, extra: [CYLTabBarItemChangedAttributesKey: iconAttributes])
+            cylPostTabBarItemNotification(.cylTabBarItemIconDidChange, at: index, extra: [cylTabBarItemChangedAttributesKey: iconAttributes])
         }
-        cylPostTabBarItemNotification(.CYLTabBarItemDidChange, at: index, extra: [CYLTabBarItemChangedAttributesKey: attributes])
+        cylPostTabBarItemNotification(.cylTabBarItemDidChange, at: index, extra: [cylTabBarItemChangedAttributesKey: attributes])
         return true
     }
 
@@ -273,9 +273,9 @@ extension CYLTabBarController {
                   (animationFilePath as String?) ?? "")
             return
         }
-        let sizeValue = cylTabBarItemAttributesAnimationValueEntryPoint(newAttributes as NSDictionary, CYLTabBarAnimationSize as NSString) as? NSValue
+        let sizeValue = cylTabBarItemAttributesAnimationValueEntryPoint(newAttributes as NSDictionary, cylTabBarAnimationSize as NSString) as? NSValue
         let tabBarItem = viewController.tabBarItem!
-        let rootTabBarItem = viewController.cyl_getViewControllerInsteadOfNavigation().tabBarItem
+        let rootTabBarItem = viewController.cylGetViewControllerInsteadOfNavigation().tabBarItem
         let urls = cylPrivate.cylTabBarItemAnimationURLs()
         let sizes = cylPrivate.cylTabBarItemAnimationSizes()
         let oldURL = tabBarItem.cyl_tabBarItemAnimationURL ?? rootTabBarItem?.cyl_tabBarItemAnimationURL
@@ -304,7 +304,7 @@ extension CYLTabBarController {
         cylFlatDesignUpdating.cylFlatDesignSetAnimationURL?(animationURL, of: viewController)
         let size = sizeValue?.cgSizeValue ?? tabBarItem.cyl_tabBarItemAnimationSizeValue?.cgSizeValue ?? .zero
         for tabButton in cylTabButtons(of: viewController) {
-            tabButton.cyl_replaceTabBarItemAnimation(with: animationURL, size: size, contentMode: tabBarItemAnimationViewContentMode())
+            tabButton.cylReplaceTabBarItemAnimation(with: animationURL, size: size, contentMode: tabBarItemAnimationViewContentMode())
         }
     }
 
@@ -343,13 +343,13 @@ extension CYLTabBarController {
         // FIX: issue #433
         // [EN] A new normal or selected title is remembered, so a later selection change shows the new ones.
         // [CN] 记录新的普通标题或选中标题，之后切换选中时显示新的标题。
-        let updatesSelectedTitle = attributes[CYLTabBarItemTitle] != nil || attributes[CYLTabBarItemSelectedTitle] != nil
+        let updatesSelectedTitle = attributes[cylTabBarItemTitle] != nil || attributes[cylTabBarItemSelectedTitle] != nil
         if updatesSelectedTitle {
-            cylRememberTabBarItemSelectedTitle(viewController, newAttributes as NSDictionary, newAttributes[CYLTabBarItemTitle] as? NSString)
+            cylRememberTabBarItemSelectedTitle(viewController, newAttributes as NSDictionary, newAttributes[cylTabBarItemTitle] as? NSString)
         }
         // [EN] Per-tab colors are applied on the next layout pass. [CN] 单个 Tab 的颜色在下一次布局时生效。
-        let colorKeys = [CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor, CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor,
-                         CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemBackgroundColor, CYLTabBarItemTitleFont, CYLTabBarItemSelectedTitleFont]
+        let colorKeys = [cylTabBarItemTitleColor, cylTabBarItemSelectedTitleColor, cylTabBarItemIconColor, cylTabBarItemSelectedIconColor,
+                         cylTabBarItemSelectedBackgroundColor, cylTabBarItemBackgroundColor, cylTabBarItemTitleFont, cylTabBarItemSelectedTitleFont]
         if isViewLoaded && colorKeys.contains(where: { attributes[$0] != nil }) {
             view.setNeedsLayout()
             cylUpdateSelectedBackgroundColorsOfTabButtons()
@@ -357,17 +357,17 @@ extension CYLTabBarController {
 
         // [EN] As when the tab was set up (`-setViewControllers:`), so a dark image is combined with its light one (#620).
         // [CN] 与设置 Tab 时相同（`-setViewControllers:`），深色图片与浅色图片合成（#620）。
-        let title = attributes[CYLTabBarItemTitle] as? String
+        let title = attributes[cylTabBarItemTitle] as? String
         // FIX: issue #787 — a new rendering mode alone redraws both images. [CN] 只更新渲染方式时也重新绘制两张图片。
-        let updatesRenderingMode = attributes[CYLTabBarItemIconRenderingMode] != nil
-        let updatesImage = attributes[CYLTabBarItemImage] != nil || attributes[CYLTabBarItemDarkImage] != nil || updatesRenderingMode
-        let updatesSelectedImage = attributes[CYLTabBarItemSelectedImage] != nil || attributes[CYLTabBarItemSelectedDarkImage] != nil || updatesRenderingMode
+        let updatesRenderingMode = attributes[cylTabBarItemIconRenderingMode] != nil
+        let updatesImage = attributes[cylTabBarItemImage] != nil || attributes[cylTabBarItemDarkImage] != nil || updatesRenderingMode
+        let updatesSelectedImage = attributes[cylTabBarItemSelectedImage] != nil || attributes[cylTabBarItemSelectedDarkImage] != nil || updatesRenderingMode
         var image: UIImage? = updatesImage
-            ? UIImage.cyl_imageNamed(UIImage.cyl_image(withImageInfo: newAttributes[CYLTabBarItemImage], darkImageInfo: newAttributes[CYLTabBarItemDarkImage]))
+            ? UIImage.cylImageNamed(UIImage.cylImage(withImageInfo: newAttributes[cylTabBarItemImage], darkImageInfo: newAttributes[cylTabBarItemDarkImage]))
             : nil
         var selectedImage: UIImage? = updatesSelectedImage
-            ? UIImage.cyl_imageNamed(UIImage.cyl_image(withImageInfo: newAttributes[CYLTabBarItemSelectedImage],
-                                                       darkImageInfo: newAttributes[CYLTabBarItemSelectedDarkImage]))
+            ? UIImage.cylImageNamed(UIImage.cylImage(withImageInfo: newAttributes[cylTabBarItemSelectedImage],
+                                                       darkImageInfo: newAttributes[cylTabBarItemSelectedDarkImage]))
             : nil
         if updatesImage || updatesSelectedImage {
             // FIX: issue #787 — the tab's rendering mode applies to images updated in place too.
@@ -379,8 +379,8 @@ extension CYLTabBarController {
         // FIX: issue #216 — an animation key (e.g. from a `CYLTabBarTheme`) replaces the tab's animation in place, in every style.
         cylUpdateAnimation(of: viewController, attributes: attributes, newAttributes: newAttributes)
 
-        let loadsImageURLs = attributes[CYLTabBarItemImageURL] != nil || attributes[CYLTabBarItemSelectedImageURL] != nil
-            || attributes[CYLTabBarItemImageURLSize] != nil
+        let loadsImageURLs = attributes[cylTabBarItemImageURL] != nil || attributes[cylTabBarItemSelectedImageURL] != nil
+            || attributes[cylTabBarItemImageURLSize] != nil
         if tabBarStyleType == .flatDesign {
             // [EN] Each change posts `CYLFlatDesignTabBarItemDidChange`, and its button lays itself out again.
             // [CN] 每次变化都会发送 `CYLFlatDesignTabBarItemDidChange`，其按钮随之重新布局。
@@ -403,7 +403,7 @@ extension CYLTabBarController {
         // [EN] Liquid Glass and the system tab bar: `UITabBarItem` redraws its tab when a property changes.
         // [CN] 液态玻璃与系统 TabBar：`UITabBarItem` 的属性变化时会重绘其 Tab。
         var tabBarItems: [UITabBarItem] = [viewController.tabBarItem]
-        if let rootTabBarItem = viewController.cyl_getViewControllerInsteadOfNavigation().tabBarItem, rootTabBarItem !== viewController.tabBarItem {
+        if let rootTabBarItem = viewController.cylGetViewControllerInsteadOfNavigation().tabBarItem, rootTabBarItem !== viewController.tabBarItem {
             tabBarItems.append(rootTabBarItem)
         }
         for tabBarItem in tabBarItems {
@@ -431,7 +431,7 @@ extension CYLTabBarController {
         }
         // [EN] Liquid Glass may keep the tab buttons' previous layout until a tab is tapped: reload them as a tap does.
         // [CN] 液态玻璃可能保持 Tab 按钮原来的布局，直到点击某个 Tab：像点击一样重新加载它们。
-        (tabBar as CYLTabBar).cyl_reloadTabButtons()
+        (tabBar as CYLTabBar).reloadTabButtons()
         // [EN] Icons from the network replace the images once downloaded. [CN] 网络图标下载完成后覆盖图片。
         if loadsImageURLs {
             cylLoadImageURLs(ofAttributes: newAttributes, at: index)
@@ -457,16 +457,16 @@ extension CYLTabBarController {
         guard attributesIndex < cylStoredTabBarItemsAttributes.count else {
             return
         }
-        if keys.contains(CYLTabBarItemTitle) {
-            updateTabBarItem(at: index, attributes: [CYLTabBarItemTitle: ""])
+        if keys.contains(cylTabBarItemTitle) {
+            updateTabBarItem(at: index, attributes: [cylTabBarItemTitle: ""])
         }
         var stored = cylStoredTabBarItemsAttributes
         var attributes = stored[attributesIndex]
         keys.forEach { attributes.removeValue(forKey: $0) }
         stored[attributesIndex] = attributes
         cylPrivate.cylReplaceTabBarItemsAttributesStorage(stored)
-        if keys.contains(CYLTabBarItemSelectedTitle) {
-            cylRememberTabBarItemSelectedTitle(viewControllers[Int(index)], attributes as NSDictionary, attributes[CYLTabBarItemTitle] as? NSString)
+        if keys.contains(cylTabBarItemSelectedTitle) {
+            cylRememberTabBarItemSelectedTitle(viewControllers[Int(index)], attributes as NSDictionary, attributes[cylTabBarItemTitle] as? NSString)
             cylApplyTabBarItemSelectedTitles(self)
         }
         if isViewLoaded {

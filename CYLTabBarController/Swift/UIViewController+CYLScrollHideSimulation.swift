@@ -137,17 +137,17 @@ enum CYLScrollHideSimulation {
         case .drawer: return ("tabBarController.view slides away and back (side menu / drawer)", .restore)
         case .safeAreaTop: return ("additionalSafeAreaInsets.top + 20 (in-call / hotspot status bar)", .restore)
         case .sceneDeactivate: return ("UISceneWillDeactivateNotification (this scene)", .restore)
-        case .manualLongPress: return (String(format: CYLLocalizedString("手动：%@"), "long press a row (context menu, drag, text selection)"), .manual)
-        case .manualTapOutside: return (String(format: CYLLocalizedString("手动：%@"), "tap a navigation bar button (UIMenu, action)"), .manual)
-        case .manualKeepDragging: return (String(format: CYLLocalizedString("手动：%@"), "after a restore, fling on without lifting; only a new drag hides it"), .manual)
-        case .realBackground: return (String(format: CYLLocalizedString("实测：%@"), "open Settings (the app really goes to the background; come back)"), .restore)
-        case .realSystemAlert: return (String(format: CYLLocalizedString("实测：%@"), "system alert: tel:// call prompt (iPhone; tap Cancel)"), .restore)
+        case .manualLongPress: return (String(format: cylLocalizedString("手动：%@"), "long press a row (context menu, drag, text selection)"), .manual)
+        case .manualTapOutside: return (String(format: cylLocalizedString("手动：%@"), "tap a navigation bar button (UIMenu, action)"), .manual)
+        case .manualKeepDragging: return (String(format: cylLocalizedString("手动：%@"), "after a restore, fling on without lifting; only a new drag hides it"), .manual)
+        case .realBackground: return (String(format: cylLocalizedString("实测：%@"), "open Settings (the app really goes to the background; come back)"), .restore)
+        case .realSystemAlert: return (String(format: cylLocalizedString("实测：%@"), "system alert: tel:// call prompt (iPhone; tap Cancel)"), .restore)
         case .otherAppKeyboard: return ("UIKeyboardWillShow of another app (UIKeyboardIsLocalUserInfoKey = NO)", .keep)
         case .guidedAccess: return ("UIAccessibilityGuidedAccessStatusDidChangeNotification", .restore)
         case .sameTabAgain: return ("selectedIndex = the same tab (no change)", .keep)
         case .turnOnAgain: return ("cyl_hidesTabBarOnScroll = YES again (no change)", .keep)
         case .appShowsTabBar: return ("App: setTabBarHidden:NO", .restore)
-        case .selfTest: return (CYLLocalizedString("自测：依次运行所有自动模拟，报告 PASS / FAIL"), .selfTest)
+        case .selfTest: return (cylLocalizedString("自测：依次运行所有自动模拟，报告 PASS / FAIL"), .selfTest)
         default: preconditionFailure("every row has a title")
         }
     }
@@ -173,7 +173,7 @@ extension UIViewController {
      * [EN] Number of simulations. [CN] 模拟的数量。
      */
     @objc(cyl_scrollHideSimulationRowCount)
-    public func cyl_scrollHideSimulationRowCount() -> Int {
+    public func cylScrollHideSimulationRowCount() -> Int {
         CYLScrollHideSimulation.Row.allCases.count
     }
 
@@ -181,7 +181,7 @@ extension UIViewController {
      * [EN] The cell of simulation `row`. [CN] 第 `row` 个模拟的 cell。
      */
     @objc(cyl_scrollHideSimulationCellForTableView:row:)
-    public func cyl_scrollHideSimulationCell(for tableView: UITableView, row: Int) -> UITableViewCell {
+    public func cylScrollHideSimulationCell(for tableView: UITableView, row: Int) -> UITableViewCell {
         let identifier = "CYLScrollHideSimulationCell"
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? {
             let cell = UITableViewCell(style: .subtitle, reuseIdentifier: identifier)
@@ -197,13 +197,13 @@ extension UIViewController {
         cell.textLabel?.text = title
         switch kind {
         case .restore:
-            cell.detailTextLabel?.text = CYLLocalizedString("点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。")
+            cell.detailTextLabel?.text = cylLocalizedString("点击后 1.5 秒触发。请先向下滚动隐藏 TabBar。预期：TabBar 立即恢复显示，惯性滚动不会再次隐藏。")
         case .keep:
-            cell.detailTextLabel?.text = CYLLocalizedString("点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。")
+            cell.detailTextLabel?.text = cylLocalizedString("点击后 1.5 秒触发。预期：TabBar 的状态不因此改变（不会被隐藏，App 隐藏的也不会被显示）。")
         case .manual:
-            cell.detailTextLabel?.text = CYLLocalizedString("手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。")
+            cell.detailTextLabel?.text = cylLocalizedString("手动操作：点击开启滚动隐藏，向下滚动隐藏 TabBar 后按标题操作。预期：TabBar 立即恢复显示。")
         case .selfTest:
-            cell.detailTextLabel?.text = CYLLocalizedString("自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。")
+            cell.detailTextLabel?.text = cylLocalizedString("自动依次运行所有可自动化的模拟并报告通过 / 失败（约 2 分钟），结果同时打印到控制台。也可以用启动参数 -CYLScrollHideSelfTest YES 运行。")
         }
         return cell
     }
@@ -213,8 +213,8 @@ extension UIViewController {
      * [CN] 1.5 秒后执行第 `row` 个模拟（手动行只开启滚动隐藏，其余由用户操作）。
      */
     @objc(cyl_didSelectScrollHideSimulationRow:)
-    public func cyl_didSelectScrollHideSimulationRow(_ row: Int) {
-        guard let tabBarController = cyl_owningTabBarController() ?? cyl_tabBarController,
+    public func cylDidSelectScrollHideSimulationRow(_ row: Int) {
+        guard let tabBarController = cylOwningTabBarController() ?? cylTabBarController,
               let simulation = CYLScrollHideSimulation.Row(rawValue: row) else {
             return
         }
@@ -223,7 +223,7 @@ extension UIViewController {
         case .manual:
             return
         case .selfTest:
-            cyl_runScrollHideSelfTest()
+            cylRunScrollHideSelfTest()
         case .restore, .keep:
             CYLScrollHideSimulation.after(CYLScrollHideSimulation.delay) { [weak self] in
                 self?.cylRunScrollHideSimulation(simulation, tabBarController: tabBarController)
@@ -236,16 +236,16 @@ extension UIViewController {
      * [CN] 用操作表列出全部模拟，所选模拟在 1.5 秒后触发。
      */
     @objc(cyl_presentScrollHideSimulationMenu)
-    public func cyl_presentScrollHideSimulationMenu() {
-        let menu = UIAlertController(title: CYLLocalizedString("滚动隐藏：模拟意外情况（issue #13）"),
-                                     message: CYLLocalizedString("选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。"),
+    public func cylPresentScrollHideSimulationMenu() {
+        let menu = UIAlertController(title: cylLocalizedString("滚动隐藏：模拟意外情况（issue #13）"),
+                                     message: cylLocalizedString("选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。"),
                                      preferredStyle: .actionSheet)
         for simulation in CYLScrollHideSimulation.Row.allCases {
             menu.addAction(UIAlertAction(title: CYLScrollHideSimulation.title(of: simulation).0, style: .default) { [weak self] _ in
-                self?.cyl_didSelectScrollHideSimulationRow(simulation.rawValue)
+                self?.cylDidSelectScrollHideSimulationRow(simulation.rawValue)
             })
         }
-        menu.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
+        menu.addAction(UIAlertAction(title: cylLocalizedString("取消"), style: .cancel))
         cylAnchorPopover(menu.popoverPresentationController)
         present(menu, animated: true)
     }
@@ -298,7 +298,7 @@ extension UIViewController {
         switch simulation {
         case .alert, .actionSheet:
             let alert = UIAlertController(title: "CYLTabBarController", message: "#13", preferredStyle: simulation == .alert ? .alert : .actionSheet)
-            alert.addAction(UIAlertAction(title: CYLLocalizedString("OK"), style: .cancel))
+            alert.addAction(UIAlertAction(title: cylLocalizedString("OK"), style: .cancel))
             cylAnchorPopover(alert.popoverPresentationController)
             present(alert, animated: true)
         case .fullScreenModal, .pageSheet:
@@ -474,8 +474,8 @@ extension UIViewController {
      *      最后显示汇总。液态玻璃无法用代码隐藏，因此其中每一行都为 SKIP。以 `-CYLScrollHideSelfTest YES` 启动 App 时会在第一个页面上运行一次。
      */
     @objc(cyl_runScrollHideSelfTest)
-    public func cyl_runScrollHideSelfTest() {
-        guard let tabBarController = cyl_owningTabBarController() ?? cyl_tabBarController else { return }
+    public func cylRunScrollHideSelfTest() {
+        guard let tabBarController = cylOwningTabBarController() ?? cylTabBarController else { return }
         tabBarController.cyl_hidesTabBarOnScroll = true
         NSLog("[CYLTabBarController] scroll hiding self-test: start (%@ simulations)", NSNumber(value: CYLScrollHideSimulation.Row.allCases.count))
         cylRunScrollHideSelfTestRow(0, tabBarController: tabBarController, results: [], attempt: 0)
@@ -588,7 +588,7 @@ extension UIViewController {
         NSLog("[CYLTabBarController] scroll hiding self-test: done: %@", summary as NSString)
         let alert = UIAlertController(title: "Scroll hiding self-test (#13)", message: summary + "\n\n" + results.joined(separator: "\n"),
                                       preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: CYLLocalizedString("OK"), style: .cancel))
+        alert.addAction(UIAlertAction(title: cylLocalizedString("OK"), style: .cancel))
         present(alert, animated: true)
     }
 }

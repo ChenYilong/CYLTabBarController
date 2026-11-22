@@ -16,40 +16,40 @@ import ObjectiveC
       step 109; Objective-C reads it through the macro of CYLPlusButton.h (`CYLPlusButtonCurrentExternPlusButton()`).
  [CN] 已注册的 PlusButton（有多个 context 时为最后注册的）。自第 109 步起为 Swift；Objective-C 通过 CYLPlusButton.h 的宏读取。
  */
-public var CYLExternPlusButton: (CYLPlusButton & CYLPlusButtonSubclassing)!
+public var cylExternPlusButton: (CYLPlusButton & CYLPlusButtonSubclassing)!
 
 /**
  [EN] The plus button's child view controller, if any. [CN] PlusButton 的子控制器（如有）。
  */
-public var CYLPlusChildViewController: UIViewController!
+public var cylPlusChildViewController: UIViewController!
 
 /**
  [EN] The plus button's width. [CN] PlusButton 的宽度。
  */
-public var CYLPlusButtonWidth: CGFloat = 0
+public var cylPlusButtonWidthValue: CGFloat = 0
 
 /**
  [EN] Objective-C's `CYLExternPlusButton` (a macro of CYLPlusButton.h). [CN] Objective-C 的 `CYLExternPlusButton`（CYLPlusButton.h 中的宏）。
  */
 @_cdecl("CYLPlusButtonCurrentExternPlusButton")
-public func CYLPlusButtonCurrentExternPlusButton() -> CYLPlusButton? {
-    CYLExternPlusButton
+public func cylPlusButtonCurrentExternPlusButton() -> CYLPlusButton? {
+    cylExternPlusButton
 }
 
 /**
  [EN] Objective-C's `CYLPlusChildViewController` (a macro of CYLPlusButton.h). [CN] Objective-C 的 `CYLPlusChildViewController`（宏）。
  */
 @_cdecl("CYLPlusButtonCurrentPlusChildViewController")
-public func CYLPlusButtonCurrentPlusChildViewController() -> UIViewController? {
-    CYLPlusChildViewController
+public func cylPlusButtonCurrentPlusChildViewController() -> UIViewController? {
+    cylPlusChildViewController
 }
 
 /**
  [EN] Objective-C's `CYLPlusButtonWidth` (a macro of CYLTabBarController.h). [CN] Objective-C 的 `CYLPlusButtonWidth`（宏）。
  */
 @_cdecl("CYLPlusButtonCurrentWidth")
-public func CYLPlusButtonCurrentWidth() -> CGFloat {
-    CYLPlusButtonWidth
+public func cylPlusButtonCurrentWidth() -> CGFloat {
+    cylPlusButtonWidthValue
 }
 
 /**
@@ -258,9 +258,9 @@ open class CYLPlusButton: UIButton {
 
     @objc(cyl_mirrorLegacyGlobalsWithPlusButton:plusChildViewController:width:)
     class func cylMirrorLegacyGlobals(plusButton: CYLPlusButton?, plusChildViewController: UIViewController?, width: CGFloat) {
-        CYLExternPlusButton = plusButton as? (CYLPlusButton & CYLPlusButtonSubclassing)
-        CYLPlusChildViewController = plusChildViewController
-        CYLPlusButtonWidth = width
+        cylExternPlusButton = plusButton as? (CYLPlusButton & CYLPlusButtonSubclassing)
+        cylPlusChildViewController = plusChildViewController
+        cylPlusButtonWidthValue = width
     }
 
     @objc(cyl_superImageForState:)
@@ -406,7 +406,7 @@ open class CYLPlusButton: UIButton {
      */
     @objc(plusChildViewControllerForTabBarContext:)
     open class func plusChildViewController(forTabBarContext tabBarContext: String?) -> UIViewController? {
-        cylPlusChildViewController(forTabBarContext: tabBarContext)
+        cylPlusChildViewControllerValue(forTabBarContext: tabBarContext)
     }
 
     /**
@@ -436,7 +436,7 @@ open class CYLPlusButton: UIButton {
      [EN] The plus child view controller of `owner`'s tab bar controller. [CN] `owner` 所属 TabBarController 的 PlusButton 子控制器。
      */
     @objc(plusChildViewControllerForOwner:)
-    open class func plusChildViewController(forOwner owner: Any?) -> UIViewController? { cylPlusChildViewController(forOwner: owner) }
+    open class func plusChildViewController(forOwner owner: Any?) -> UIViewController? { cylPlusChildViewControllerValue(forOwner: owner) }
 
     /**
      [EN] The plus button's width in `owner`'s tab bar controller. [CN] `owner` 所属 TabBarController 中 PlusButton 的宽度。
@@ -566,7 +566,7 @@ extension CYLPlusButton {
      [EN] `+indexForTabbarItemsCount:` of the runtime class, sent through the Objective-C runtime.
      [CN] 通过 Objective-C 运行时调用运行时类的 `+indexForTabbarItemsCount:`。
      */
-    func cyl_index(forTabbarItemsCount tabbarItemsCount: UInt) -> UInt {
+    func cylIndex(forTabbarItemsCount tabbarItemsCount: UInt) -> UInt {
         typealias Index = @convention(c) (AnyObject, Selector, UInt) -> UInt
         let selector = NSSelectorFromString("indexForTabbarItemsCount:")
         let cls: AnyClass = cylRuntimeClass
@@ -627,7 +627,7 @@ extension CYLPlusButton {
      */
     @objc(cyl_registerPlusButtonWithAttributes:action:context:)
     open class func cyl_register(attributes: [String: Any] = [:], action: ((CYLPlusButton) -> Void)?, context: String?) {
-        let hasImage = attributes[CYLTabBarItemImage] is UIImage || attributes[CYLPlusButtonBackgroundImage] is UIImage
+        let hasImage = attributes[cylTabBarItemImage] is UIImage || attributes[cylPlusButtonBackgroundImage] is UIImage
         guard hasImage else { return }
         cylConfigurationPlusButtonCounter += 1
         let className = "CYLConfigurationPlusButton_\(cylConfigurationPlusButtonCounter)"
@@ -685,20 +685,20 @@ final class CYLConfigurationPlusButton: CYLPlusButton, CYLPlusButtonSubclassing 
      */
     fileprivate class func cylAddClassMethods(to cls: AnyClass, attributes: [String: Any]) {
         guard let metaClass = object_getClass(cls) else { return }
-        if let index = (attributes[CYLPlusButtonIndexInTabBar] as? NSNumber)?.uintValue {
+        if let index = (attributes[cylPlusButtonIndexInTabBar] as? NSNumber)?.uintValue {
             let block: @convention(block) (AnyObject) -> UInt = { _ in index }
             class_addMethod(metaClass, NSSelectorFromString("indexOfPlusButtonInTabBar"), imp_implementationWithBlock(block), "Q@:")
         }
-        if let multiplier = (attributes[CYLPlusButtonCenterYMultiplier] as? NSNumber)?.doubleValue {
+        if let multiplier = (attributes[cylPlusButtonCenterYMultiplier] as? NSNumber)?.doubleValue {
             let block: @convention(block) (AnyObject, CGFloat) -> CGFloat = { _, _ in CGFloat(multiplier) }
             class_addMethod(metaClass, NSSelectorFromString("multiplierOfTabBarHeight:"), imp_implementationWithBlock(block), "d@:d")
         }
-        if let offset = (attributes[CYLPlusButtonCenterYOffset] as? NSNumber)?.doubleValue {
+        if let offset = (attributes[cylPlusButtonCenterYOffset] as? NSNumber)?.doubleValue {
             let block: @convention(block) (AnyObject, CGFloat) -> CGFloat = { _, _ in CGFloat(offset) }
             class_addMethod(metaClass, NSSelectorFromString("constantOfPlusButtonCenterYOffsetForTabBarHeight:"),
                             imp_implementationWithBlock(block), "d@:d")
         }
-        if let identifier = attributes[CYLTabBarItemIdentifier] as? String, !identifier.isEmpty {
+        if let identifier = attributes[cylTabBarItemIdentifier] as? String, !identifier.isEmpty {
             let block: @convention(block) (AnyObject) -> NSString = { _ in identifier as NSString }
             class_addMethod(metaClass, NSSelectorFromString("tabBarItemIdentifier"), imp_implementationWithBlock(block), "@@:")
         }

@@ -50,14 +50,14 @@ extension CYLTabBarController {
      * [CN] 将 `attributes` 中显式指定的 identifier、label、hint 写入 `element`（只写入有变化的值）。
      */
     private static func cylApplyExplicitAccessibility(_ element: CYLAccessibilityElement, _ attributes: [String: Any]) {
-        if let identifier = attributes[CYLTabBarItemAccessibilityIdentifier] as? String, element.accessibilityIdentifier != identifier {
+        if let identifier = attributes[cylTabBarItemAccessibilityIdentifier] as? String, element.accessibilityIdentifier != identifier {
             element.accessibilityIdentifier = identifier
             objc_setAssociatedObject(element, CYLTabAccessibilityKeys.identifierSetByCYL, identifier, .OBJC_ASSOCIATION_COPY_NONATOMIC)
         }
-        if let label = attributes[CYLTabBarItemAccessibilityLabel] as? String, element.accessibilityLabel != label {
+        if let label = attributes[cylTabBarItemAccessibilityLabel] as? String, element.accessibilityLabel != label {
             element.accessibilityLabel = label
         }
-        if let hint = attributes[CYLTabBarItemAccessibilityHint] as? String, element.accessibilityHint != hint {
+        if let hint = attributes[cylTabBarItemAccessibilityHint] as? String, element.accessibilityHint != hint {
             element.accessibilityHint = hint
         }
     }

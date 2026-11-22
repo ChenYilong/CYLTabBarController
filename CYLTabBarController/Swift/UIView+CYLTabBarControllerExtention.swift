@@ -42,14 +42,14 @@ extension UIView {
     // MARK: Recognizing the views of the tab bar
 
     @objc(cyl_isPlusButton)
-    public func cyl_isPlusButton() -> Bool {
+    public func cylIsPlusButton() -> Bool {
         // [EN] A plus button of any registered context, not only the one registered last.
         // [CN] 任意已注册上下文的 PlusButton，而不只是最后注册的那一个。
         CYLPlusButton.isPlusButtonView(self)
     }
 
     @objc(cyl_isRightToLeftLayout)
-    public func cyl_isRightToLeftLayout() -> Bool {
+    public func cylIsRightToLeftLayout() -> Bool {
         effectiveUserInterfaceLayoutDirection == .rightToLeft
     }
 
@@ -59,7 +59,7 @@ extension UIView {
      * [CN] Tab 按钮：`UITab…BarButton`（#641），或液态玻璃与扁平样式下的任意控件；iOS 26 以前还包括类名以 "UITabBar" 开头的控件。
      */
     @objc(cyl_isTabButton)
-    public func cyl_isTabButton() -> Bool {
+    public func cylIsTabButton() -> Bool {
         let className = cyl_className
         if className.hasSuffix("BarButton") && className.hasPrefix("UITab") {
             return true
@@ -72,7 +72,7 @@ extension UIView {
     }
 
     @objc(cyl_isPlatterView)
-    public func cyl_isPlatterView() -> Bool {
+    public func cylIsPlatterView() -> Bool {
         // [EN] Before iOS 26, or in UI compatibility mode, there is no platter. [CN] iOS 26 以前或 UI 兼容模式下没有 platter。
         guard CYLConstants.isLiquidGlassActive() else {
             return false
@@ -81,7 +81,7 @@ extension UIView {
     }
 
     @objc(cyl_isPlatterPortalView)
-    public func cyl_isPlatterPortalView() -> Bool {
+    public func cylIsPlatterPortalView() -> Bool {
         guard CYLConstants.isLiquidGlassActive(), let portalViewClass = CYLViewTabBarKeys.portalViewClass else {
             return false
         }
@@ -89,24 +89,24 @@ extension UIView {
     }
 
     @objc(cyl_isPlatterContentView)
-    public func cyl_isPlatterContentView() -> Bool {
+    public func cylIsPlatterContentView() -> Bool {
         cylIsVisibleLiquidGlassView { $0.contains("ContentView") && !$0.contains("Selected") }
     }
 
     @objc(cyl_isPlatterSelectedContentView)
-    public func cyl_isPlatterSelectedContentView() -> Bool {
+    public func cylIsPlatterSelectedContentView() -> Bool {
         cylIsVisibleLiquidGlassView { $0.hasSuffix("SelectedContentView") }
     }
 
     @objc(cyl_isPlatterVisualProviderFloatingSelectedContentView)
-    public func cyl_isPlatterVisualProviderFloatingSelectedContentView() -> Bool {
+    public func cylIsPlatterVisualProviderFloatingSelectedContentView() -> Bool {
         cylIsVisibleLiquidGlassView {
             $0.hasPrefix("_UITab") && $0.contains("VisualProvider") && $0.contains("_Floating") && $0.contains("SelectedContentView")
         }
     }
 
     @objc(cyl_isPlatterLiquidLensView)
-    public func cyl_isPlatterLiquidLensView() -> Bool {
+    public func cylIsPlatterLiquidLensView() -> Bool {
         cylIsVisibleLiquidGlassView {
             $0.hasPrefix("_UI") && $0.contains("LiquidLens") && $0.contains("View") && !$0.contains("DestOutView")
                 && !$0.contains("BackdropView")
@@ -114,22 +114,22 @@ extension UIView {
     }
 
     @objc(cyl_isPlatterLiquidLensClearGlassView)
-    public func cyl_isPlatterLiquidLensClearGlassView() -> Bool {
+    public func cylIsPlatterLiquidLensClearGlassView() -> Bool {
         cylIsVisibleLiquidGlassView { $0.hasPrefix("_UI") && $0.contains("LiquidLens") && $0.hasSuffix("ClearGlassView") }
     }
 
     @objc(cyl_isPlatterLiquidLensTabSelectionView)
-    public func cyl_isPlatterLiquidLensTabSelectionView() -> Bool {
+    public func cylIsPlatterLiquidLensTabSelectionView() -> Bool {
         cylIsVisibleLiquidGlassView { $0.hasPrefix("_UITab") && $0.hasSuffix("SelectionView") }
     }
 
     @objc(cyl_isPlatterLiquidLensBackdropView)
-    public func cyl_isPlatterLiquidLensBackdropView() -> Bool {
+    public func cylIsPlatterLiquidLensBackdropView() -> Bool {
         cylIsVisibleLiquidGlassView { $0.hasPrefix("_UI") && $0.contains("LiquidLens") && $0.hasSuffix("BackdropView") }
     }
 
     @objc(cyl_isPlatterDestOutView)
-    public func cyl_isPlatterDestOutView() -> Bool {
+    public func cylIsPlatterDestOutView() -> Bool {
         cylIsVisibleLiquidGlassView {
             $0.hasPrefix("_UI") && $0.contains("LiquidLens") && $0.contains("View") && $0.contains("DestOutView")
         }
@@ -168,7 +168,7 @@ extension UIView {
      * [CN] Tab 的图标：TabBar 中的图片视图，不是选中指示视图，也不是替换图标显示的视图或其子视图（#601）。
      */
     @objc(cyl_isTabImageView)
-    public func cyl_isTabImageView() -> Bool {
+    public func cylIsTabImageView() -> Bool {
         guard cylIsKind(of: UIImageView.self) else {
             return false
         }
@@ -183,7 +183,7 @@ extension UIView {
     }
 
     @objc(cyl_isTabLabel)
-    public func cyl_isTabLabel() -> Bool {
+    public func cylIsTabLabel() -> Bool {
         // [EN] Before iOS 26, keep the original logic. [CN] iOS 26 以前保持原逻辑。
         if !CYLConstants.isLiquidGlassActive() {
             return cylIsKind(of: UILabel.self)
@@ -196,17 +196,17 @@ extension UIView {
     }
 
     @objc(cyl_isButtonLabel)
-    public func cyl_isButtonLabel() -> Bool {
+    public func cylIsButtonLabel() -> Bool {
         cyl_className.hasSuffix("Label") && cyl_className.hasPrefix("UIButton")
     }
 
     @objc(cyl_isTabBadgeView)
-    public func cyl_isTabBadgeView() -> Bool {
+    public func cylIsTabBadgeView() -> Bool {
         type(of: self) != UIView.self && cyl_className.hasPrefix("_U" + "IB" + "adg")
     }
 
     @objc(cyl_isTabBackgroundView)
-    public func cyl_isTabBackgroundView() -> Bool {
+    public func cylIsTabBackgroundView() -> Bool {
         type(of: self) != UIView.self && cyl_className.hasPrefix("_U" + "IB" + "arBac") && cyl_className.hasSuffix("nd")
     }
 
@@ -215,30 +215,30 @@ extension UIView {
      * [CN] 任意动画库的动画视图为 YES；构建中没有 `CYLTabBarItemAnimation` 子库时为 NO（#604）。
      */
     @objc(cyl_isLottieAnimationView)
-    public func cyl_isLottieAnimationView() -> Bool {
-        CYLTabBarItemAnimationCore.service != nil && cyl_isTabBarItemAnimationView()
+    public func cylIsLottieAnimationView() -> Bool {
+        CYLTabBarItemAnimationCore.service != nil && cylIsTabBarItemAnimationView()
     }
 
     // MARK: Finding the views of a tab button
 
     @objc(cyl_imageView)
-    public func cyl_imageView() -> UIImageView? {
+    public func cylImageView() -> UIImageView? {
         subviews.first { $0 is UIImageView } as? UIImageView
     }
 
     @objc(cyl_tabImageView)
-    public func cyl_tabImageView() -> UIImageView? {
-        if let imageViewInTabBarButton = cyl_imageViewInTabBarButton() {
+    public func cylTabImageView() -> UIImageView? {
+        if let imageViewInTabBarButton = cylImageViewInTabBarButton() {
             return imageViewInTabBarButton
         }
-        return cyl_allSubviews().first { ($0 as? UIView)?.cyl_isTabImageView() ?? false } as? UIImageView
+        return cylAllSubviews().first { ($0 as? UIView)?.cylIsTabImageView() ?? false } as? UIImageView
     }
 
     /**
      * [EN] `UITabBarSwappableImageView`, which exists only while the tab is selected. [CN] 只在 Tab 选中时存在。
      */
     @objc(cyl_swappableImageViewViewInTabBarButton)
-    public func cyl_swappableImageViewViewInTabBarButton() -> UIImageView? {
+    public func cylSwappableImageViewViewInTabBarButton() -> UIImageView? {
         subviews.first {
             let className = NSStringFromClass(type(of: $0))
             return className.hasSuffix("ImageView") && className.hasPrefix("UITabB")
@@ -246,10 +246,10 @@ extension UIView {
     }
 
     @objc(cyl_imageViewInTabBarButton)
-    public func cyl_imageViewInTabBarButton() -> UIImageView? {
+    public func cylImageViewInTabBarButton() -> UIImageView? {
         // [EN] ① KVC first (iOS 13+); iOS 26's `_UITabButton` has no `imageView` key, where `valueForKey:` would throw.
         // [CN] ① 先用 KVC（iOS 13+）；iOS 26 的 `_UITabButton` 没有 `imageView` key，`valueForKey:` 会抛出异常。
-        if cyl_className != "_UITabButton", let imageView = cyl_value(forKey: "imageView") as? UIImageView {
+        if cyl_className != "_UITabButton", let imageView = cylValue(forKey: "imageView") as? UIImageView {
             return imageView
         }
         // [EN] ② The subviews: `UITabBar…SwappableImageView`, else the last image view that is not the selection indicator
@@ -273,53 +273,53 @@ extension UIView {
      * [EN] This view and all its subviews, depth first. [CN] 本视图及其所有子视图（深度优先）。
      */
     @objc(cyl_allSubviews)
-    public func cyl_allSubviews() -> [Any] {
-        [self] + subviews.flatMap { $0.cyl_allSubviews() }
+    public func cylAllSubviews() -> [Any] {
+        [self] + subviews.flatMap { $0.cylAllSubviews() }
     }
 
     @objc(cyl_tabBadgeView)
-    public func cyl_tabBadgeView() -> UIView? {
-        cyl_allSubviews().first { ($0 as? UIView)?.cyl_isTabBadgeView() ?? false } as? UIView
+    public func cylTabBadgeView() -> UIView? {
+        cylAllSubviews().first { ($0 as? UIView)?.cylIsTabBadgeView() ?? false } as? UIView
     }
 
     @objc(cyl_tabLabel)
-    public func cyl_tabLabel() -> UILabel? {
-        cyl_allSubviews().first { ($0 as? UIView)?.cyl_isTabLabel() ?? false } as? UILabel
+    public func cylTabLabel() -> UILabel? {
+        cylAllSubviews().first { ($0 as? UIView)?.cylIsTabLabel() ?? false } as? UILabel
     }
 
     @objc(cyl_tabEffectView)
-    public func cyl_tabEffectView() -> UIVisualEffectView? {
+    public func cylTabEffectView() -> UIVisualEffectView? {
         subviews.first { type(of: $0) == UIVisualEffectView.self } as? UIVisualEffectView
     }
 
     @objc(cyl_tabShadowImageView)
-    public func cyl_tabShadowImageView() -> UIImageView? {
+    public func cylTabShadowImageView() -> UIImageView? {
         // [EN] The hairline in the tab bar's background view. [CN] TabBar 背景视图中的分割线。
-        cyl_tabBackgroundView()?.subviews.first { $0.bounds.height <= 1 } as? UIImageView
+        cylTabBackgroundView()?.subviews.first { $0.bounds.height <= 1 } as? UIImageView
     }
 
     @objc(cyl_tabBackgroundView)
-    public func cyl_tabBackgroundView() -> UIView? {
-        subviews.first { $0.cyl_isTabBackgroundView() }
+    public func cylTabBackgroundView() -> UIView? {
+        subviews.first { $0.cylIsTabBackgroundView() }
     }
 
     /**
      * [EN] The `view` of a `UIBarButtonItem` or `UITabBarItem` (lazily created by UIKit once the item is shown); used by
-     *      `CYLTabBar`, which declares it. For a `UITabBar`, its content view (`UITabBar.cylContentView()`): the
+     *      `CYLTabBar`, which declares it. For a `UITabBar`, its content view (`UITabBar.cylTabBarContentView()`): the
      *      Objective-C category of `UITabBar` overrode this selector, which Swift does not allow in an extension
      *      (Xcode 26: "conflicts with method 'cyl_contentView()' from superclass 'UIView'"), so the one selector
      *      dispatches here.
      * [CN] `UIBarButtonItem` 或 `UITabBarItem` 的 `view`（UIKit 在 item 显示后才创建）；由声明它的 `CYLTabBar` 使用。对于
-     *      `UITabBar`，返回其内容视图（`UITabBar.cylContentView()`）：`UITabBar` 的 Objective-C 分类曾覆盖此 selector，
+     *      `UITabBar`，返回其内容视图（`UITabBar.cylTabBarContentView()`）：`UITabBar` 的 Objective-C 分类曾覆盖此 selector，
      *      Swift 不允许在扩展中这样做（Xcode 26：“conflicts with method 'cyl_contentView()' from superclass 'UIView'”），
      *      因此由这一个 selector 在此分派。
      */
     @objc(cyl_contentView)
-    public func cyl_contentView() -> UIView! {
+    public func cylContentView() -> UIView! {
         if let tabBar = self as? UITabBar {
-            return tabBar.cylContentView()
+            return tabBar.cylTabBarContentView()
         }
-        return responds(to: NSSelectorFromString("view")) ? cyl_value(forKey: "view") as? UIView : nil
+        return responds(to: NSSelectorFromString("view")) ? cylValue(forKey: "view") as? UIView : nil
     }
 
     // MARK: Adding views
@@ -330,19 +330,19 @@ extension UIView {
      * [CN] 有液态玻璃 platter 时把 `view` 添加到 platter 上，否则添加到本视图，然后移到最前。用 `-cyl_isViewAddedToPlatterView:` 判断添加位置。
      */
     @objc(cyl_addPlatterViewThenBringSubviewToFront:)
-    public func cyl_addPlatterViewThenBringSubview(toFront view: UIView) {
-        let tabBar = cyl_tabBarController?.tabBar as? CYLTabBar
+    public func cylAddPlatterViewThenBringSubview(toFront view: UIView) {
+        let tabBar = cylTabBarController?.tabBar as? CYLTabBar
         if tabBar?.cyl_platterContentView != nil, let platterView = tabBar?.cyl_platterView {
             platterView.addSubview(view)
         } else {
             addSubview(view)
         }
-        cyl_bringSubview(toFront: view)
+        cylBringSubview(toFront: view)
     }
 
     @objc(cyl_isViewAddedToPlatterView:)
-    public func cyl_isViewAdded(toPlatterView view: UIView) -> Bool {
-        if let platterContentView = (cyl_tabBarController?.tabBar as? CYLTabBar)?.cyl_platterContentView {
+    public func cylIsViewAdded(toPlatterView view: UIView) -> Bool {
+        if let platterContentView = (cylTabBarController?.tabBar as? CYLTabBar)?.cyl_platterContentView {
             return view.superview == platterContentView
         }
         return view.superview == self
@@ -353,16 +353,16 @@ extension UIView {
      * [CN] 有液态玻璃 platter 时把 `view` 放在 platter 下方，否则放在最上层。
      */
     @objc(cyl_bringSubviewToFront:)
-    public func cyl_bringSubview(toFront view: UIView) {
-        if let platterView = (cyl_tabBarController?.tabBar as? CYLTabBar)?.cyl_platterView {
+    public func cylBringSubview(toFront view: UIView) {
+        if let platterView = (cylTabBarController?.tabBar as? CYLTabBar)?.cyl_platterView {
             insertSubview(view, belowSubview: platterView)
         } else {
-            cyl_bringSubview(toTop: view)
+            cylBringSubview(toTop: view)
         }
     }
 
     @objc(cyl_bringSubviewToTop:)
-    public func cyl_bringSubview(toTop view: UIView) {
+    public func cylBringSubview(toTop view: UIView) {
         addSubview(view)
         bringSubviewToFront(view)
         view.layer.zPosition = .cylTopZPosition
@@ -371,11 +371,11 @@ extension UIView {
     // MARK: Snapshots
 
     @objc(cyl_takeSnapshot)
-    public func cyl_takeSnapshot() -> UIImage? {
-        guard let platterView = (cyl_tabBarController?.tabBar as? CYLTabBar)?.cyl_platterView else {
+    public func cylTakeSnapshot() -> UIImage? {
+        guard let platterView = (cylTabBarController?.tabBar as? CYLTabBar)?.cyl_platterView else {
             return nil
         }
-        return cyl_takeSnapshot(withoutViews: [platterView])
+        return cylTakeSnapshot(withoutViews: [platterView])
     }
 
     /**
@@ -383,17 +383,17 @@ extension UIView {
      * [CN] 隐藏 `hideViews` 后的本视图快照；之后逐个恢复（原本就隐藏的视图保持隐藏）。
      */
     @objc(cyl_takeSnapshotWithoutViews:)
-    public func cyl_takeSnapshot(withoutViews hideViews: [UIView]) -> UIImage? {
+    public func cylTakeSnapshot(withoutViews hideViews: [UIView]) -> UIImage? {
         let size = bounds.size
         guard size.width > 0 && size.height > 0 else {
             return nil
         }
         let viewsToRestore = hideViews.filter { !$0.isHidden }
-        viewsToRestore.forEach { $0.cyl_setHidden(true) }
+        viewsToRestore.forEach { $0.cylSetHidden(true) }
         let image = UIGraphicsImageRenderer(size: size).image { _ in
             drawHierarchy(in: bounds, afterScreenUpdates: false)
         }
-        viewsToRestore.forEach { $0.cyl_setHidden(false) }
+        viewsToRestore.forEach { $0.cylSetHidden(false) }
         return image
     }
 
@@ -404,8 +404,8 @@ extension UIView {
      * [CN] 把本视图标记为插入 `control` 的 Tab 按钮（弱引用）；nil 移除标记。
      */
     @objc(cyl_markAsInsertedForTabControl:)
-    public func cyl_markAsInserted(forTabControl control: UIControl?) {
-        cyl_setWeakAssociatedObject(control, forKey: CYLViewTabBarKeys.insertedForTabControl)
+    public func cylMarkAsInserted(forTabControl control: UIControl?) {
+        cylSetWeakAssociatedObject(control, forKey: CYLViewTabBarKeys.insertedForTabControl)
         if control != nil {
             CYLViewTabBarKeys.insertedTabControlViews.add(self)
         } else {
@@ -415,11 +415,11 @@ extension UIView {
 
     @objc(cyl_insertedForTabControl)
     public var cyl_insertedForTabControl: UIControl? {
-        cyl_weakAssociatedObject(forKey: CYLViewTabBarKeys.insertedForTabControl) as? UIControl
+        cylWeakAssociatedObject(forKey: CYLViewTabBarKeys.insertedForTabControl) as? UIControl
     }
 
     @objc(cyl_insertedTabControlViews)
-    public class func cyl_insertedTabControlViews() -> [UIView] {
+    public class func cylInsertedTabControlViews() -> [UIView] {
         CYLViewTabBarKeys.insertedTabControlViews.allObjects
     }
 
@@ -427,14 +427,14 @@ extension UIView {
 
     @available(*, deprecated, message: "Deprecated in 1.6.0. Use `+[CYLPlusButton cyl_tabBackgroundView]` instead.")
     @objc(cyl_tabBadgeBackgroundView)
-    public func cyl_tabBadgeBackgroundView() -> UIView? {
-        cyl_tabBackgroundView()
+    public func cylTabBadgeBackgroundView() -> UIView? {
+        cylTabBackgroundView()
     }
 
     @available(*, deprecated, message: "Deprecated in 1.6.0. Use `+[CYLPlusButton cyl_tabShadowImageView]` instead.")
     @objc(cyl_tabBadgeBackgroundSeparator)
-    public func cyl_tabBadgeBackgroundSeparator() -> UIView? {
-        cyl_tabShadowImageView()
+    public func cylTabBadgeBackgroundSeparator() -> UIView? {
+        cylTabShadowImageView()
     }
 
     /**
@@ -444,7 +444,7 @@ extension UIView {
      */
     @available(*, deprecated, message: "Deprecated in 1.19.0. Use method in <CYLBadgeProtocol> instead.")
     @objc(cyl_tabBadgePointViewWithClolor:radius:)
-    public class func cyl_tabBadgePointView(withClolor color: UIColor, radius: CGFloat) -> UIView {
+    public class func cylTabBadgePointView(withClolor color: UIColor, radius: CGFloat) -> UIView {
         let view = UIView(frame: CGRect(x: 0, y: 0, width: radius * 2, height: radius * 2))
         view.translatesAutoresizingMaskIntoConstraints = true
         view.backgroundColor = color
@@ -498,18 +498,18 @@ extension UIView {
      *      按 PlusButton 类（`+indexForTabbarItemsCount:`）位于 Tab 之间；没有 PlusButton 时为全局的 `CYLPlusButtonIndex`。
      */
     @objc(cyl_plusButtonIndex)
-    public func cyl_plusButtonIndex() -> UInt {
+    public func cylPlusButtonIndex() -> UInt {
         guard let plusButton = CYLPlusButton(forOwner: self) else {
             return CYLPlusButtonIndex
         }
         if let slotIndex = cylPlusSlotIndex() {
             return UInt(slotIndex)
         }
-        return plusButton.cyl_index(forTabbarItemsCount: cyl_tabbarItemsCount)
+        return plusButton.cylIndex(forTabbarItemsCount: cyl_tabbarItemsCount)
     }
 
     @objc(cyl_plusButtonWidth)
-    public func cyl_plusButtonWidth() -> CGFloat {
+    public func cylPlusButtonWidth() -> CGFloat {
         CYLPlusButton.plusButtonWidth(forOwner: self)
     }
 
@@ -544,12 +544,12 @@ extension UIView {
      *      插入），没有时为 nil。
      */
     private func cylPlusSlotIndex() -> Int? {
-        guard let tabBarController = cyl_owningTabBarController() else {
+        guard let tabBarController = cylOwningTabBarController() else {
             return nil
         }
         let plusChildViewController = CYLPlusButton.plusChildViewController(forOwner: tabBarController)
         return tabBarController.viewControllers?.firstIndex { viewController in
-            let contentViewController = viewController.cyl_getViewControllerInsteadOfNavigation()
+            let contentViewController = viewController.cylGetViewControllerInsteadOfNavigation()
             return viewController.cyl_isPlaceholder || contentViewController.cyl_isPlaceholder
                 || (plusChildViewController != nil
                     && (viewController === plusChildViewController || contentViewController === plusChildViewController))

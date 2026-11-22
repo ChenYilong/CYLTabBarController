@@ -40,13 +40,13 @@ extension CYLSettingsDemo {
 
         var name: String {
             switch self {
-            case .off: return CYLLocalizedString("无")
-            case .defaultSound: return CYLLocalizedString("默认点击声")
-            case .customSound: return CYLLocalizedString("自定义音频文件（cyl_tabButtonTapSoundURL）")
-            case .lightHaptic: return CYLLocalizedString("轻触感反馈")
-            case .mediumHaptic: return CYLLocalizedString("中等触感反馈")
-            case .heavyHaptic: return CYLLocalizedString("重触感反馈")
-            case .soundAndHaptic: return CYLLocalizedString("点击声 + 触感反馈")
+            case .off: return cylLocalizedString("无")
+            case .defaultSound: return cylLocalizedString("默认点击声")
+            case .customSound: return cylLocalizedString("自定义音频文件（cyl_tabButtonTapSoundURL）")
+            case .lightHaptic: return cylLocalizedString("轻触感反馈")
+            case .mediumHaptic: return cylLocalizedString("中等触感反馈")
+            case .heavyHaptic: return cylLocalizedString("重触感反馈")
+            case .soundAndHaptic: return cylLocalizedString("点击声 + 触感反馈")
             }
         }
     }
@@ -67,8 +67,8 @@ extension CYLSettingsDemo {
 
     static func tapFeedbackCell(_ tableView: UITableView, _ tabBarController: CYLTabBarController?) -> UITableViewCell {
         let cell = plainCell(tableView, "CYLTapFeedbackCell", symbol: "speaker.wave.2")
-        cell.textLabel?.text = CYLLocalizedString("Tab 点击声音与触感反馈（issue #535）")
-        cell.detailTextLabel?.text = String(format: CYLLocalizedString("点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@"),
+        cell.textLabel?.text = cylLocalizedString("Tab 点击声音与触感反馈（issue #535）")
+        cell.detailTextLabel?.text = String(format: cylLocalizedString("点击切换，然后点击任意 Tab 或 PlusButton 试听。触感反馈只在真机上振动。当前：%@"),
                                             tapFeedbackStep(tabBarController).name)
         return cell
     }
@@ -102,9 +102,9 @@ extension CYLSettingsDemo {
 
     static func gestureTimingCell(_ tableView: UITableView, _ tabBarController: CYLTabBarController?) -> UITableViewCell {
         let cell = plainCell(tableView, "CYLGestureTimingCell", symbol: "timer")
-        cell.textLabel?.text = CYLLocalizedString("长按时长与双击间隔（issue #535 / #152）")
+        cell.textLabel?.text = cylLocalizedString("长按时长与双击间隔（issue #535 / #152）")
         // [EN] Both long press properties are read, to show they are one value. [CN] 读取两个长按属性，说明它们是同一个值。
-        cell.detailTextLabel?.text = String(format: CYLLocalizedString("点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒"),
+        cell.detailTextLabel?.text = String(format: cylLocalizedString("点击切换。cyl_tabBarItemLongPressDuration：%@ 秒，cyl_tabButtonLongPressMinimumDuration：%@ 秒，cyl_tabBarItemDoubleTapInterval：%@ 秒"),
                                             NSNumber(value: tabBarController?.cyl_tabBarItemLongPressDuration ?? 0),
                                             NSNumber(value: tabBarController?.cyl_tabButtonLongPressMinimumDuration ?? 0),
                                             NSNumber(value: tabBarController?.cyl_tabBarItemDoubleTapInterval ?? 0))
@@ -148,8 +148,8 @@ extension CYLSettingsDemo {
     static func utilsHelpersCell(_ tableView: UITableView, _ tabBarController: CYLTabBarController?) -> UITableViewCell {
         let cell = plainCell(tableView, "CYLUtilsHelpersCell", symbol: "wrench.and.screwdriver")
         let result = tabBarController.flatMap { objc_getAssociatedObject($0, utilsHelpersResultKey) as? String }
-        cell.textLabel?.text = CYLLocalizedString("CYLUtils 弱引用关联对象与查找按钮（issue #535）")
-        cell.detailTextLabel?.text = result ?? CYLLocalizedString("点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。")
+        cell.textLabel?.text = cylLocalizedString("CYLUtils 弱引用关联对象与查找按钮（issue #535）")
+        cell.detailTextLabel?.text = result ?? cylLocalizedString("点击运行：cyl_setWeakAssociatedObject:forKey: 在对象释放后返回 nil；cyl_nearestControlBelowView: 从选中 Tab 的图标找到它的按钮。")
         return cell
     }
 
@@ -165,17 +165,17 @@ extension CYLSettingsDemo {
         var whileAlive = false
         autoreleasepool {
             let object = NSObject()
-            tabBarController.cyl_setWeakAssociatedObject(object, forKey: weakObjectKey)
-            whileAlive = tabBarController.cyl_weakAssociatedObject(forKey: weakObjectKey) as AnyObject? === object
+            tabBarController.cylSetWeakAssociatedObject(object, forKey: weakObjectKey)
+            whileAlive = tabBarController.cylWeakAssociatedObject(forKey: weakObjectKey) as AnyObject? === object
         }
-        let afterRelease = tabBarController.cyl_weakAssociatedObject(forKey: weakObjectKey) == nil
+        let afterRelease = tabBarController.cylWeakAssociatedObject(forKey: weakObjectKey) == nil
         let tabButton = tabBarController.selectedViewController?.cyl_tabButton
         // [EN] The deepest first subview, e.g. the icon's image view. [CN] 最深的第一个子视图，例如图标的图片视图。
         var innerView: UIView? = tabButton
         while let first = innerView?.subviews.first {
             innerView = first
         }
-        let foundControl = innerView?.cyl_nearestControl(below: tabBarController.tabBar)
+        let foundControl = innerView?.cylNearestControl(below: tabBarController.tabBar)
         let found: String
         if tabButton == nil {
             found = "-"
@@ -184,7 +184,7 @@ extension CYLSettingsDemo {
         } else {
             found = foundControl.map { NSStringFromClass(type(of: $0)) } ?? "nil"
         }
-        let result = String(format: CYLLocalizedString("弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@"),
+        let result = String(format: cylLocalizedString("弱引用：存活时取到 %@，释放后为 nil %@。从 %@ 找到选中的 Tab 按钮：%@"),
                             whileAlive ? "YES" : "NO", afterRelease ? "YES" : "NO",
                             innerView.map { NSStringFromClass(type(of: $0)) } ?? "-", found)
         objc_setAssociatedObject(tabBarController, utilsHelpersResultKey, result, .OBJC_ASSOCIATION_COPY_NONATOMIC)
@@ -207,8 +207,8 @@ extension CYLSettingsDemo {
     static func tabBarMinimizeCell(_ tableView: UITableView, _ tabBarController: CYLTabBarController?) -> UITableViewCell {
         let cell = subtitleCell(tableView, "CYLTabBarMinimizeCell", symbol: "arrow.up.and.down")
         let behaviorName = tabBarController.map { minimizeBehaviorName($0.cyl_tabBarMinimizeBehavior) } ?? "-"
-        cell.textLabel?.text = CYLLocalizedString("滚动时缩小 / 隐藏 TabBar（issue #13）")
-        cell.detailTextLabel?.text = String(format: CYLLocalizedString("点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。"),
+        cell.textLabel?.text = cylLocalizedString("滚动时缩小 / 隐藏 TabBar（issue #13）")
+        cell.detailTextLabel?.text = String(format: cylLocalizedString("点击切换滚动行为。当前：%@。液态玻璃（iOS 26+）由系统缩小 TabBar；扁平样式与经典样式（iOS 25 及以前、iOS 26 UI 兼容模式）隐藏 TabBar。"),
                                             behaviorName)
         return cell
     }
@@ -233,8 +233,8 @@ extension CYLSettingsDemo {
     static func scrollHideSimulationMenuCell(_ tableView: UITableView) -> UITableViewCell {
         let cell = subtitleCell(tableView, "CYLScrollHideSimulationMenuCell", symbol: "exclamationmark.triangle")
         cell.accessoryType = .disclosureIndicator
-        cell.textLabel?.text = CYLLocalizedString("滚动隐藏：模拟意外情况（issue #13）")
-        cell.detailTextLabel?.text = CYLLocalizedString("选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。")
+        cell.textLabel?.text = cylLocalizedString("滚动隐藏：模拟意外情况（issue #13）")
+        cell.detailTextLabel?.text = cylLocalizedString("选择一种意外情况，1.5 秒后触发。请先向下滚动隐藏 TabBar。")
         return cell
     }
 }
@@ -280,9 +280,9 @@ final class CYLSwitchAdjacentTabCell: UITableViewCell {
 
     func reload() {
         let result = tabBarController.flatMap { objc_getAssociatedObject($0, CYLSettingsDemo.switchAdjacentResultKey) as? NSNumber }
-        textLabel?.text = CYLLocalizedString("切换到上一个 / 下一个 Tab（issue #535）")
+        textLabel?.text = cylLocalizedString("切换到上一个 / 下一个 Tab（issue #535）")
         let resultText = result.map { $0.boolValue ? "YES" : "NO" } ?? "-"
-        detailTextLabel?.text = String(format: CYLLocalizedString("点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@"),
+        detailTextLabel?.text = String(format: cylLocalizedString("点击右侧箭头调用 cyl_switchToAdjacentTabWithStep:-1 / 1，与滑动相同会跳过 PlusButton 并检查登录。上次返回：%@"),
                                        resultText)
     }
 }

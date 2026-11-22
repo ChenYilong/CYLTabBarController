@@ -99,7 +99,7 @@ extension CYLFlatDesignTabBar {
     func cylFlatDesignCommonInit() {
         // [CN] 引入CYLFlatDesignTabBar，即表示同意 hook push行为
         // [EN] Importing CYLFlatDesignTabBar means you agree to hooking the push behavior.
-        UINavigationController.cyl_navigationBarActionHook()
+        UINavigationController.cylNavigationBarActionHook()
         let storage = cylFlatDesignStorage
         // [EN] VoiceOver announces its buttons as tabs ("tab, 2 of 5"). [CN] VoiceOver 将其中的按钮朗读为标签页。
         accessibilityTraits.insert(.tabBar)
@@ -120,13 +120,13 @@ extension CYLFlatDesignTabBar {
         storage.useLayoutSafeAreaInsets = true
         storage.respectsVerticalStatusBarSafeArea = false
 
-        NotificationCenter.default.addObserver(self, selector: #selector(cylFlatDesignTabBarItemDidChange(_:)),
-                                               name: NSNotification.Name(CYLFlatDesignTabBarItemDidChange), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(cylFlatDesignTabBarItemDidChangeValue(_:)),
+                                               name: NSNotification.Name(cylFlatDesignTabBarItemDidChange), object: nil)
         // [CN] 仅在引入动画库时监听（#604，运行时判断，以支持任意动画库）。
         // [EN] Observe only with an animation library (#604, checked at runtime so that any library works).
         if CYLTabBarItemAnimationCore.service != nil {
             storage.animationPlayingObserver = NotificationCenter.default.addObserver(
-                forName: .CYLTabBarItemAnimationPlaying, object: nil, queue: .main) { [weak self] _ in
+                forName: .cylTabBarItemAnimationPlaying, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated {
                     // Library-neutral (#604): every animation library. 与动画库无关：所有动画库。
                     self?.cylStopAllTabBarItemAnimations()
@@ -156,7 +156,7 @@ extension CYLFlatDesignTabBar {
     }
 
     @objc(_tabBarItemDidChange:)
-    func cylFlatDesignTabBarItemDidChange(_ note: Notification) {
+    func cylFlatDesignTabBarItemDidChangeValue(_ note: Notification) {
         let storage = cylFlatDesignStorage
         guard let items = storage.items, !items.isEmpty, let changedItem = note.object as? CYLFlatDesignTabBarItem,
               let index = items.firstIndex(where: { $0 == changedItem }), index < storage.buttons.count else { return }
@@ -193,7 +193,7 @@ extension CYLFlatDesignTabBar {
         // [EN] As on the system tab bar, a tab bar controller's tab bar keeps its delegate.
         // [CN] 与系统 TabBar 相同，TabBarController 的 TabBar 不允许更换代理。
         if storage.delegate != nil, cylFlatDesignOwningTabBarController != nil {
-            assert(false, CYLLocalizedString("不允许更改由 tabBarController 管理的 tabBar 的代理"))
+            assert(false, cylLocalizedString("不允许更改由 tabBarController 管理的 tabBar 的代理"))
             return
         }
         storage.delegate = delegate
@@ -489,7 +489,7 @@ extension CYLFlatDesignTabBar {
         // FIX: issue #19 — a tab that needs login, tapped while logged out: the button is not selected (no animation), the
         // tap is not reported as a selection, and the login starts instead.
         // 需要登录的 Tab 在未登录时被点击：按钮不会被选中（不播放动画），不作为选中上报，改为发起登录。
-        if let loginTabBarController = cyl_owningTabBarController(), !tabBarButton.cyl_isPlaceholder,
+        if let loginTabBarController = cylOwningTabBarController(), !tabBarButton.cyl_isPlaceholder,
            let viewControllers = loginTabBarController.viewControllers, selectedIndex < viewControllers.count {
             if loginTabBarController.cyl_interceptLoginIfNeeded(for: viewControllers[selectedIndex]) {
                 return
@@ -583,7 +583,7 @@ extension CYLFlatDesignTabBar {
         let storage = cylFlatDesignStorage
         guard storage.selectedItemIndex != selectedIndex else { return }
         // [EN] Animations are reset through this notification. [CN] 通过该通知统一重置动画。
-        NotificationCenter.default.post(name: .CYLTabBarItemAnimationPlaying, object: self)
+        NotificationCenter.default.post(name: .cylTabBarItemAnimationPlaying, object: self)
         storage.selectedItemIndex = selectedIndex
         for (index, button) in storage.buttons.enumerated() {
             button.isSelected = (index == selectedIndex)
@@ -645,7 +645,7 @@ extension CYLFlatDesignTabBar {
             }
         }
         let buttonHeight = storage.contentView.frame.height - buttonY
-        let isRightToLeft = cyl_isRightToLeftLayout()
+        let isRightToLeft = cylIsRightToLeftLayout()
         for (index, button) in storage.buttons.enumerated() {
             button.tabBarItem = items[index]
             // [CN] RTL（如阿语）下按钮从右到左排列，第 0 个 Tab 位于最右侧
@@ -665,7 +665,7 @@ extension CYLFlatDesignTabBar {
         let tabBarHeight = storage.contentView.frame.height
         let centerYOffset = plusButton.constantOfPlusButtonCenterYOffset(forTabBarHeight: tabBarHeight)
         plusButton.layer.contentsGravity = CALayerContentsGravity.center
-        if let scale = CYLGetRootWindow()?.windowScene?.screen.scale {
+        if let scale = cylGetRootWindow()?.windowScene?.screen.scale {
             plusButton.layer.contentsScale = scale
         }
         storage.plusButton = plusButton
@@ -680,7 +680,7 @@ extension CYLFlatDesignTabBar {
         // [EN] Never index past this tab bar's own buttons: the plus button index comes from the tab items count, which may
         //      describe another tab bar or be stale while the items change.
         // [CN] 不能越过本 TabBar 自己的按钮取下标：PlusButton 的 index 来自 Tab 数量，可能描述的是另一个 TabBar，或在 items 变化时已过期。
-        let plusButtonIndex = Int(cyl_plusButtonIndex())
+        let plusButtonIndex = Int(cylPlusButtonIndex())
         guard plusButtonIndex < storage.buttons.count else { return }
         let placeholder = storage.buttons[plusButtonIndex]
         guard placeholder.tabBarItem != nil else { return }
@@ -689,7 +689,7 @@ extension CYLFlatDesignTabBar {
         // 加号按钮由 frame 定位（`CYLTabButtonLayoutTracker`）；不能让它进入无约束的 Auto Layout，否则之后的布局可能恢复旧 frame
         // （iPhone Duo 折叠后加号按钮会下移）。
         plusButton.translatesAutoresizingMaskIntoConstraints = true
-        placeholder.cyl_coverVisiableTabImageViewOrTabButton(true, contentNewView: plusButton, seclectContentNewView: plusButton,
+        placeholder.cylCoverVisiableTabImageViewOrTabButton(true, contentNewView: plusButton, seclectContentNewView: plusButton,
                                                              offset: UIOffset(horizontal: 0, vertical: centerYOffset), show: true,
                                                              delayIfNeededForSeconds: 0.1) { _, tabBarButton, newView in
             newView.layoutIfNeeded()
@@ -742,7 +742,7 @@ extension CYLFlatDesignTabBar {
     @objc(stopAllTabBarItemAnimations)
     func cylStopAllTabBarItemAnimations() {
         guard CYLTabBarItemAnimationCore.service != nil else { return }
-        cylFlatDesignStorage.buttons.forEach { $0.cyl_stopTabBarItemAnimation() }
+        cylFlatDesignStorage.buttons.forEach { $0.cylStopTabBarItemAnimation() }
     }
 
     /// [EN] Kept for compatibility; any animation library (#604). [CN] 为兼容而保留；适用于任意动画库（#604）。
@@ -763,7 +763,7 @@ extension CYLFlatDesignTabBar {
     @objc(cyl_flatDesignHitTest:withEvent:)
     func cylFlatDesignHitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         // [CN] 1. 边界情况：不能响应点击事件 [EN] 1. Edge case: cannot respond to tap events
-        if cyl_canNotResponseEvent() {
+        if cylCanNotResponseEvent() {
             return super.hitTest(point, with: event)
         }
         // [CN] 2.1 clipsToBounds：子 view 超出部分没有显示出来 [EN] 2.1 clipsToBounds: parts outside the bounds are not shown
@@ -795,7 +795,7 @@ extension CYLFlatDesignTabBar {
                 return plusButton
             }
             if let plusSuperview = plusButton.superview, plusSuperview.frame.contains(point), plusSuperview.cyl_isPlaceholder,
-               plusSuperview.cyl_canNotResponseEvent(), !plusButton.cyl_canNotResponseEvent() {
+               plusSuperview.cylCanNotResponseEvent(), !plusButton.cylCanNotResponseEvent() {
                 // [CN] 防止误触PlusButton轮廓外， 且在tabBarButton范围内，否则会切换到空白 placeholder vc 上。
                 // [EN] Prevent taps outside the plus button but inside its tab button from switching to the blank placeholder page.
                 return plusButton
@@ -804,7 +804,7 @@ extension CYLFlatDesignTabBar {
         for button in storage.buttons {
             // [CN] 如果imageView超出TabBar范围，增加imageView响应区域 [EN] An image view that sticks out of the bar takes touches too
             let imageRect = button.actualBadgeSuperView().convert(button.imageView.bounds, to: self)
-            if (button.frame.contains(point) || imageRect.contains(point)) && !button.cyl_canNotResponseEvent() {
+            if (button.frame.contains(point) || imageRect.contains(point)) && !button.cylCanNotResponseEvent() {
                 return button
             }
         }
@@ -837,7 +837,7 @@ extension CYLFlatDesignTabBar {
         }
         // [EN] Not inside any CYLTabBarController (not attached yet): keep the context lookup.
         // [CN] 不在任何 CYLTabBarController 中（尚未挂上）：保留按 context 查找。
-        return cyl_owningTabBarController() != nil
+        return cylOwningTabBarController() != nil
     }
 
     @objc(cyl_flatDesignHasPlusButton)

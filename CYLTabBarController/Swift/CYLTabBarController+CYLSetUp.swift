@@ -21,9 +21,9 @@ extension CYLTabBarController {
      * [CN] 配置中页面的查找顺序：配置自己的顺序；配置关闭自动注册时去掉自动注册。
      */
     private static func cylPageLookupOrder(of normalized: [String: Any]) -> [String] {
-        var order = (normalized[CYLTabBarControllerPageLookupOrder] as? [String]) ?? CYLTabBarPageRegistry.defaultPageLookupOrder
-        if let automatic = normalized[CYLTabBarControllerAutomaticPageRegistration] as? NSNumber, !automatic.boolValue {
-            order.removeAll { $0 == CYLTabBarPageSourceAutomaticRegistration }
+        var order = (normalized[cylTabBarControllerPageLookupOrder] as? [String]) ?? CYLTabBarPageRegistry.defaultPageLookupOrder
+        if let automatic = normalized[cylTabBarControllerAutomaticPageRegistration] as? NSNumber, !automatic.boolValue {
+            order.removeAll { $0 == cylTabBarPageSourceAutomaticRegistration }
         }
         return order
     }
@@ -56,8 +56,8 @@ extension CYLTabBarController {
         }
         #endif
         let normalized = CYLTabBarController.cyl_normalizedConfiguration(configuration)
-        var tabBarItemsAttributes = (normalized[CYLTabBarControllerTabBarItemsAttributes] as? [[String: Any]]) ?? []
-        var viewControllers = normalized[CYLTabBarControllerViewControllers] as? [UIViewController]
+        var tabBarItemsAttributes = (normalized[cylTabBarControllerTabBarItemsAttributes] as? [[String: Any]]) ?? []
+        var viewControllers = normalized[cylTabBarControllerViewControllers] as? [UIViewController]
         let keepsEmpty = (normalized["_CYLTabBarControllerKeepsEmptyViewControllers"] as? NSNumber)?.boolValue ?? false
         if viewControllers?.isEmpty == true && !keepsEmpty {
             viewControllers = nil
@@ -68,8 +68,8 @@ extension CYLTabBarController {
         var pageResolver: CYLTabBarPageProvider?
         var pageLookupOrder: [String]?
         if !viewControllersFromCode {
-            pageRegistry = normalized[CYLTabBarControllerPageRegistry] as? CYLTabBarPageProviding
-            pageResolver = Self.cylPageProvider(normalized[CYLTabBarControllerPageResolver])
+            pageRegistry = normalized[cylTabBarControllerPageRegistry] as? CYLTabBarPageProviding
+            pageResolver = Self.cylPageProvider(normalized[cylTabBarControllerPageResolver])
             pageLookupOrder = Self.cylPageLookupOrder(of: normalized)
             let keptItems = NSMutableArray()
             viewControllers = CYLTabBarPageRegistry.pages(
@@ -77,32 +77,32 @@ extension CYLTabBarController {
                 lookupOrder: pageLookupOrder, keptTabs: keptItems, skipped: skippedTabs)
             tabBarItemsAttributes = (keptItems as? [[String: Any]]) ?? []
         }
-        let imageInsets = (normalized[CYLTabBarControllerImageInsets] as? NSValue)?.uiEdgeInsetsValue ?? .zero
-        let titlePositionAdjustment = (normalized[CYLTabBarControllerTitlePositionAdjustment] as? NSValue)?.uiOffsetValue ?? .zero
-        let styleType = CYLTabBarStyleType(rawValue: (normalized[CYLTabBarControllerStyleType] as? NSNumber)?.intValue ?? 0) ?? .default
-        let context = normalized[CYLTabBarControllerContext] as? String
+        let imageInsets = (normalized[cylTabBarControllerImageInsets] as? NSValue)?.uiEdgeInsetsValue ?? .zero
+        let titlePositionAdjustment = (normalized[cylTabBarControllerTitlePositionAdjustment] as? NSValue)?.uiOffsetValue ?? .zero
+        let styleType = CYLTabBarStyleType(rawValue: (normalized[cylTabBarControllerStyleType] as? NSNumber)?.intValue ?? 0) ?? .default
+        let context = normalized[cylTabBarControllerContext] as? String
         var plusButtonShowsSelection = false
-        if var plusButtonAttributes = normalized[CYLTabBarControllerPlusButton] as? [String: Any] {
-            plusButtonShowsSelection = (plusButtonAttributes[CYLPlusButtonShowsSelection] as? NSNumber)?.boolValue ?? false
+        if var plusButtonAttributes = normalized[cylTabBarControllerPlusButton] as? [String: Any] {
+            plusButtonShowsSelection = (plusButtonAttributes[cylPlusButtonShowsSelection] as? NSNumber)?.boolValue ?? false
             // [EN] The plus button's page by identifier: resolved like a tab's page. [CN] 按标识指定的 PlusButton 页面：与 Tab 的页面一样解析。
-            if let plusPageIdentifier = plusButtonAttributes[CYLTabBarItemPageIdentifier] as? String, !plusPageIdentifier.isEmpty {
+            if let plusPageIdentifier = plusButtonAttributes[cylTabBarItemPageIdentifier] as? String, !plusPageIdentifier.isEmpty {
                 let pages = CYLTabBarPageRegistry.pages(
-                    ofTabs: [[CYLTabBarItemPageIdentifier: plusPageIdentifier]],
-                    registry: normalized[CYLTabBarControllerPageRegistry] as? CYLTabBarPageProviding,
-                    resolver: Self.cylPageProvider(normalized[CYLTabBarControllerPageResolver]),
+                    ofTabs: [[cylTabBarItemPageIdentifier: plusPageIdentifier]],
+                    registry: normalized[cylTabBarControllerPageRegistry] as? CYLTabBarPageProviding,
+                    resolver: Self.cylPageProvider(normalized[cylTabBarControllerPageResolver]),
                     lookupOrder: Self.cylPageLookupOrder(of: normalized), keptTabs: nil, skipped: nil)
                 if let page = pages.first {
-                    if (page.title ?? "").isEmpty, let plusTitle = plusButtonAttributes[CYLTabBarItemTitle] as? String, !plusTitle.isEmpty {
+                    if (page.title ?? "").isEmpty, let plusTitle = plusButtonAttributes[cylTabBarItemTitle] as? String, !plusTitle.isEmpty {
                         page.title = plusTitle
                     }
                     plusButtonAttributes[cylConfigurationPlusButtonPageKey] = page
-                    if plusButtonAttributes[CYLPlusButtonIndexInTabBar] == nil {
-                        plusButtonAttributes[CYLPlusButtonIndexInTabBar] = tabBarItemsAttributes.count / 2
+                    if plusButtonAttributes[cylPlusButtonIndexInTabBar] == nil {
+                        plusButtonAttributes[cylPlusButtonIndexInTabBar] = tabBarItemsAttributes.count / 2
                     }
                 }
             }
             CYLPlusButton.cyl_register(attributes: plusButtonAttributes,
-                                       action: normalized[CYLTabBarControllerPlusButtonAction] as? ((CYLPlusButton) -> Void), context: context)
+                                       action: normalized[cylTabBarControllerPlusButtonAction] as? ((CYLPlusButton) -> Void), context: context)
         }
 
         self.imageInsets = imageInsets
@@ -151,25 +151,25 @@ extension CYLTabBarController {
         // [EN] Step 3, with the setter: after the style (the flat tab bar uses KVC). [CN] 步骤 3，必须用 setter：在样式之后（扁平 TabBar 使用 KVC）。
         self.viewControllers = viewControllers
         cylAdoptPendingPages()
-        if let animationSpeed = normalized[CYLTabBarControllerTabBarItemAnimationSpeed] as? NSNumber {
+        if let animationSpeed = normalized[cylTabBarControllerTabBarItemAnimationSpeed] as? NSNumber {
             tabBarItemAnimationSpeed = CGFloat(animationSpeed.doubleValue)
         }
-        if let userInterfaceStyle = normalized[CYLTabBarControllerUserInterfaceStyle] as? NSNumber {
+        if let userInterfaceStyle = normalized[cylTabBarControllerUserInterfaceStyle] as? NSNumber {
             overrideUserInterfaceStyle = UIUserInterfaceStyle(rawValue: userInterfaceStyle.intValue) ?? .unspecified
         }
-        if let tapAnimation = normalized[CYLTabBarControllerTabButtonTapAnimation] as? NSNumber {
+        if let tapAnimation = normalized[cylTabBarControllerTabButtonTapAnimation] as? NSNumber {
             cyl_tabButtonTapAnimationType = CYLTabButtonTapAnimationType(rawValue: tapAnimation.intValue) ?? .none
         }
-        if let swipeToSwitchTab = normalized[CYLTabBarControllerSwipeToSwitchTab] as? NSNumber {
+        if let swipeToSwitchTab = normalized[cylTabBarControllerSwipeToSwitchTab] as? NSNumber {
             cyl_swipeToSwitchTabEnabled = swipeToSwitchTab.boolValue
         }
-        if let loginRequired = normalized[CYLTabBarControllerLoginRequiredTabBarItemIdentifiers] as? [String] {
+        if let loginRequired = normalized[cylTabBarControllerLoginRequiredTabBarItemIdentifiers] as? [String] {
             cyl_loginRequiredTabBarItemIdentifiers = loginRequired
         }
-        if let unloads = normalized[CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning] as? NSNumber {
+        if let unloads = normalized[cylTabBarControllerUnloadsUnselectedViewsOnMemoryWarning] as? NSNumber {
             unloadsUnselectedViewsOnMemoryWarning = unloads.boolValue
         }
-        if let keepsLoaded = normalized[CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers] as? [String] {
+        if let keepsLoaded = normalized[cylTabBarControllerKeepsLoadedTabBarItemIdentifiers] as? [String] {
             cyl_keepsLoadedTabBarItemIdentifiers = keepsLoaded
         }
         cylApplyConfigurationThemes(normalized)
@@ -206,17 +206,17 @@ extension CYLTabBarController {
         guard tabBarStyleType != .flatDesign else {
             return
         }
-        let contentTabBarItem = viewController.cyl_getViewControllerInsteadOfNavigation().tabBarItem
+        let contentTabBarItem = viewController.cylGetViewControllerInsteadOfNavigation().tabBarItem
         viewController.tabBarItem.title = title
         contentTabBarItem?.title = title
-        let normalImage = normalImageInfo.flatMap { UIImage.cyl_imageNamed($0) }
+        let normalImage = normalImageInfo.flatMap { UIImage.cylImageNamed($0) }
         viewController.tabBarItem.image = Self.cylRestingTabBarItemImage(normalImage, for: viewController.tabBarItem, selected: false)
-        let selectedImage = selectedImageInfo.flatMap { UIImage.cyl_imageNamed($0) }
+        let selectedImage = selectedImageInfo.flatMap { UIImage.cylImageNamed($0) }
         viewController.tabBarItem.selectedImage = Self.cylRestingTabBarItemImage(selectedImage, for: viewController.tabBarItem, selected: true)
         viewController.tabBarItem.imageInsets = imageInsets == .zero ? self.imageInsets : imageInsets
-        CYLRememberItemImageInsets(viewController.tabBarItem, imageInsets)
+        cylRememberItemImageInsets(viewController.tabBarItem, imageInsets)
         let offset = titlePositionAdjustment == .zero ? self.titlePositionAdjustment : titlePositionAdjustment
-        CYLRememberItemTitlePositionAdjustment(viewController.tabBarItem, titlePositionAdjustment)
+        cylRememberItemTitlePositionAdjustment(viewController.tabBarItem, titlePositionAdjustment)
         cylApplyTitlePositionAdjustment(offset, to: viewController.tabBarItem)
         viewController.tabBarItem.cyl_imagePositionAdjustment = imagePositionAdjustment == .zero ? self.imagePositionAdjustment : imagePositionAdjustment
         if let lottieURL {

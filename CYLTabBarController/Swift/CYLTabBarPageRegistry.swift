@@ -27,19 +27,19 @@ enum CYLTabBarPageTypes {
 /**
  * [EN] The registry passed with `CYLTabBarControllerPageRegistry`. [CN] 通过 `CYLTabBarControllerPageRegistry` 传入的注册表。
  */
-public let CYLTabBarPageSourceInstanceRegistry = "instance"
+public let cylTabBarPageSourceInstanceRegistry = "instance"
 /**
  * [EN] The block passed with `CYLTabBarControllerPageResolver`. [CN] 通过 `CYLTabBarControllerPageResolver` 传入的 block。
  */
-public let CYLTabBarPageSourceResolver = "resolver"
+public let cylTabBarPageSourceResolver = "resolver"
 /**
  * [EN] `CYLTabBarPageRegistry.shared`. [CN] `CYLTabBarPageRegistry.shared`。
  */
-public let CYLTabBarPageSourceSharedRegistry = "shared"
+public let cylTabBarPageSourceSharedRegistry = "shared"
 /**
  * [EN] The classes that adopt `CYLTabBarPage`. [CN] 遵守 `CYLTabBarPage` 的类。
  */
-public let CYLTabBarPageSourceAutomaticRegistration = "automatic"
+public let cylTabBarPageSourceAutomaticRegistration = "automatic"
 
 /**
  * [EN] Why a tab got no page. [CN] Tab 没有页面的原因。
@@ -149,9 +149,9 @@ public final class CYLTabBarPageRequest: NSObject {
         self.pageIdentifier = pageIdentifier
         let publicAttributes = (attributes ?? [:]).filter { !$0.key.hasPrefix("_") }
         self.attributes = publicAttributes
-        tabIdentifier = publicAttributes[CYLTabBarItemIdentifier] as? String
-        title = publicAttributes[CYLTabBarItemTitle] as? String
-        parameters = publicAttributes[CYLTabBarItemPageParameters] as? [String: Any] ?? [:]
+        tabIdentifier = publicAttributes[cylTabBarItemIdentifier] as? String
+        title = publicAttributes[cylTabBarItemTitle] as? String
+        parameters = publicAttributes[cylTabBarItemPageParameters] as? [String: Any] ?? [:]
     }
 
     override public var description: String {
@@ -185,7 +185,7 @@ public final class CYLTabBarSkippedTab: NSObject {
         self.reason = reason
         self.pageIdentifier = pageIdentifier
         self.attributes = attributes ?? [:]
-        title = attributes?[CYLTabBarItemTitle] as? String
+        title = attributes?[cylTabBarItemTitle] as? String
         self.detail = detail
     }
 
@@ -519,8 +519,8 @@ open class CYLTabBarPageRegistry: NSObject, CYLTabBarPageProviding {
      * [EN] Instance registry, resolver, shared registry, automatic registration. [CN] 实例注册表、解析回调、全局注册表、自动注册。
      */
     @objc public class var defaultPageLookupOrder: [String] {
-        [CYLTabBarPageSourceInstanceRegistry, CYLTabBarPageSourceResolver, CYLTabBarPageSourceSharedRegistry,
-         CYLTabBarPageSourceAutomaticRegistration]
+        [cylTabBarPageSourceInstanceRegistry, cylTabBarPageSourceResolver, cylTabBarPageSourceSharedRegistry,
+         cylTabBarPageSourceAutomaticRegistration]
     }
 
     // MARK: Lookup
@@ -531,7 +531,7 @@ open class CYLTabBarPageRegistry: NSObject, CYLTabBarPageProviding {
      */
     @objc(pageIdentifierOfTab:)
     public class func pageIdentifier(ofTab tabAttributes: [String: Any]) -> String? {
-        [CYLTabBarItemPageIdentifier, CYLTabBarItemIdentifier].lazy.compactMap { CYLTabBarPageValues.identifier(tabAttributes[$0]) }.first
+        [cylTabBarItemPageIdentifier, cylTabBarItemIdentifier].lazy.compactMap { CYLTabBarPageValues.identifier(tabAttributes[$0]) }.first
     }
 
     /**
@@ -601,16 +601,16 @@ open class CYLTabBarPageRegistry: NSObject, CYLTabBarPageProviding {
                 var provider: CYLTabBarPageTypes.Provider?
                 var sourceName = source
                 switch source {
-                case CYLTabBarPageSourceInstanceRegistry:
+                case cylTabBarPageSourceInstanceRegistry:
                     provider = registry?.pageProvider(forPageIdentifier: pageIdentifier)
                     sourceName = "CYLTabBarControllerPageRegistry"
-                case CYLTabBarPageSourceResolver:
+                case cylTabBarPageSourceResolver:
                     provider = resolver
                     sourceName = "CYLTabBarControllerPageResolver"
-                case CYLTabBarPageSourceSharedRegistry:
+                case cylTabBarPageSourceSharedRegistry:
                     provider = shared.pageProvider(forPageIdentifier: pageIdentifier)
                     sourceName = "sharedRegistry"
-                case CYLTabBarPageSourceAutomaticRegistration:
+                case cylTabBarPageSourceAutomaticRegistration:
                     if let pageClass = automaticallyRegisteredPageClasses[pageIdentifier] {
                         provider = Self.provider(ofClass: pageClass)
                         sourceName = NSStringFromClass(pageClass)
@@ -634,7 +634,7 @@ open class CYLTabBarPageRegistry: NSObject, CYLTabBarPageProviding {
                 continue
             }
             let content = (page as? UINavigationController)?.viewControllers.first ?? page
-            if let title = attributes[CYLTabBarItemTitle] as? String, content.navigationItem.title == nil {
+            if let title = attributes[cylTabBarItemTitle] as? String, content.navigationItem.title == nil {
                 content.navigationItem.title = title
             }
             pages.append(page)

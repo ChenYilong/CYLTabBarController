@@ -19,7 +19,7 @@ extension UIViewController {
 
     private func cylStoreFlatDesignTabBarItem(_ item: CYLFlatDesignTabBarItem?) {
         objc_setAssociatedObject(self, Self.cylFlatDesignTabBarItemKey, item, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        objc_setAssociatedObject(cyl_getViewControllerInsteadOfNavigation(), Self.cylFlatDesignTabBarItemKey, item,
+        objc_setAssociatedObject(cylGetViewControllerInsteadOfNavigation(), Self.cylFlatDesignTabBarItemKey, item,
                                  .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
 
@@ -42,14 +42,14 @@ extension UIViewController {
             let item = newValue ?? CYLFlatDesignTabBarItem(title: title, image: nil)
             // [EN] Note: `-[CYLFlatDesignTabBarButton setTabBarItem:]` must run before this, or the item has no button yet.
             // [CN] 注意：`-[CYLFlatDesignTabBarButton setTabBarItem:]` 需要在此之前调用，否则 item 还没有按钮。
-            let contentItem = objc_getAssociatedObject(cyl_getViewControllerInsteadOfNavigation(), Self.cylFlatDesignTabBarItemKey)
+            let contentItem = objc_getAssociatedObject(cylGetViewControllerInsteadOfNavigation(), Self.cylFlatDesignTabBarItemKey)
                 as? CYLFlatDesignTabBarItem
             let oldItem: CYLFlatDesignTabBarItem = contentItem ?? cyl_tabBarItem
             // [EN] PATCH(aifirx): the item is bound to the page even when the (weak) tab bar controller is gone, else the
             //      page loses its icon and title.
             // [CN] PATCH(aifirx)：即使（弱引用的）TabBarController 已释放，也要把 item 绑定到页面，否则页面会丢失图标和标题。
             if let tabBarController = cylflatdesign_tabBarController as? CYLTabBarController,
-               tabBarController.cyl_isFlatDesignStyleTabBar() {
+               tabBarController.cylIsFlatDesignStyleTabBar() {
                 tabBarController.change(oldItem, to: item)
                 if let button = item.tabBarButton {
                     cyl_tabButton = button
@@ -82,7 +82,7 @@ extension UIViewController {
             image = UIImage(systemName: "ellipsis")
             selectedImage = image
         }
-        let placeholder = UIImage.cyl_tabItemPlaceholder()
+        let placeholder = UIImage.cylTabItemPlaceholder()
         let item = CYLFlatDesignTabBarItem(title: systemItem?.title ?? title ?? "", image: image ?? placeholder,
                                            selectedImage: selectedImage ?? image ?? placeholder)
         item.index = UInt(NSNotFound)

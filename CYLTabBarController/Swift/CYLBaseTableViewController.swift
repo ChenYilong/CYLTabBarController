@@ -18,25 +18,25 @@ open class CYLBaseTableViewController: UITableViewController {
 
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        cyl_viewWillAppearNavigationSetting(animated)
+        cylViewWillAppearNavigationSetting(animated)
     }
 
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        cyl_viewDidAppearNavigationSetting(animated)
+        cylViewDidAppearNavigationSetting(animated)
     }
 
     open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        cyl_viewWillDisappearNavigationSetting(animated)
+        cylViewWillDisappearNavigationSetting(animated)
     }
 
     open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        cyl_viewDidDisappearNavigationSetting(animated)
+        cylViewDidDisappearNavigationSetting(animated)
     }
 
     deinit {
-        cyl_deallocNavigationSetting()
+        cylDeallocNavigationSetting()
     }
 }

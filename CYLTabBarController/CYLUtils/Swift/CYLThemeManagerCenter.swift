@@ -11,7 +11,7 @@ import UIKit
  * [EN] The name of the default theme manager.
  * [CN] 默认主题管理器的名称。
  */
-public let CYLThemeManagerNameDefault = "Default"
+public let cylThemeManagerNameDefault = "Default"
 
 /**
  * [EN] Holds the theme managers by name. Translated from Objective-C (docs/Swift-Migration.md); Objective-C callers get
@@ -30,7 +30,7 @@ public class CYLThemeManagerCenter: NSObject {
      * [CN] 名为 `CYLThemeManagerNameDefault` 的管理器。
      */
     @objc public class var defaultThemeManager: CYLThemeManager {
-        themeManager(withName: CYLThemeManagerNameDefault as NSString)
+        themeManager(withName: cylThemeManagerNameDefault as NSString)
     }
 
     /**

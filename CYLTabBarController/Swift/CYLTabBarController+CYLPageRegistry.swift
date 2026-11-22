@@ -175,7 +175,7 @@ extension CYLTabBarController {
         } else if let page {
             viewControllers[index] = page
             let content = (page as? UINavigationController)?.viewControllers.first ?? page
-            if let title = attributes?[CYLTabBarItemTitle] as? String, content.navigationItem.title == nil {
+            if let title = attributes?[cylTabBarItemTitle] as? String, content.navigationItem.title == nil {
                 content.navigationItem.title = title
             }
             if let pages {
@@ -215,7 +215,7 @@ extension UIViewController {
     open var cyl_tabBarItemTitle: String? {
         let tab: UIViewController = navigationController?.viewControllers.first === self ? (navigationController ?? self) : self
         // [EN] The plus button's page: the plus button's title. [CN] PlusButton 的页面：PlusButton 的标题。
-        if let tabBarController = tab.cyl_tabBarController, tab === tabBarController.cylPrivate.cylContextPlusChildViewController() {
+        if let tabBarController = tab.cylTabBarController, tab === tabBarController.cylPrivate.cylContextPlusChildViewController() {
             return CYLPlusButton.cylPlusButton(forOwner: tabBarController)?.cyl_title()
         }
         // [EN] The normal title, also while the selected title shows (#433). [CN] 普通标题，显示选中标题时也是（#433）。
@@ -224,7 +224,7 @@ extension UIViewController {
         }
         // [EN] FlatDesign (an optional subspec): the title of the tab's own item, read at run time.
         // [CN] 扁平样式（可选子库）：Tab 自己的 item 的标题，在运行时读取。
-        if tab.cyl_tabBarController?.tabBarStyleType == .flatDesign, tab.responds(to: NSSelectorFromString("cyl_tabBarItem")),
+        if tab.cylTabBarController?.tabBarStyleType == .flatDesign, tab.responds(to: NSSelectorFromString("cyl_tabBarItem")),
            let item = tab.value(forKey: "cyl_tabBarItem") as? NSObject, let flatTitle = item.value(forKey: "title") as? String,
            !flatTitle.isEmpty {
             return flatTitle

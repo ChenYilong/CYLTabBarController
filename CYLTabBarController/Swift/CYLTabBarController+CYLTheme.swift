@@ -99,8 +99,8 @@ enum CYLThemeKeys {
     static let plusPartImage = "image"
     static let plusPartSelectedImage = "selectedImage"
     /// [EN] The icon keys of `tabBarItemsAttributes`. [CN] `tabBarItemsAttributes` 中与图标有关的 key。
-    static let iconAttributeKeys = [CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage, CYLTabBarItemSelectedDarkImage,
-                                    CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize]
+    static let iconAttributeKeys = [cylTabBarItemImage, cylTabBarItemSelectedImage, cylTabBarItemDarkImage, cylTabBarItemSelectedDarkImage,
+                                    cylTabBarItemImageURL, cylTabBarItemSelectedImageURL, cylTabBarItemImageURLSize]
 }
 
 /// [EN] `attributes` without its icon keys. [CN] 去掉图标 key 的 `attributes`。
@@ -179,7 +179,7 @@ extension CYLTabBarController {
         guard CYLTabBarItemAnimationCore.service != nil, isViewLoaded else { return }
         for viewController in viewControllers ?? [] {
             for tabButton in cylTabButtons(of: viewController) {
-                tabButton.cyl_refreshTabBarItemAnimationColors()
+                tabButton.cylRefreshTabBarItemAnimationColors()
             }
         }
     }
@@ -276,7 +276,7 @@ extension CYLTabBarController {
         for (index, viewController) in (viewControllers ?? []).enumerated()
         where !cylPrivate.cylIsPlusSlotViewController(viewController) && !viewController.cyl_isPlaceholder {
             indexes.add(index)
-            let identifier = viewController.cyl_tabBarItemIdentifier ?? viewController.cyl_getViewControllerInsteadOfNavigation().cyl_tabBarItemIdentifier ?? ""
+            let identifier = viewController.cyl_tabBarItemIdentifier ?? viewController.cylGetViewControllerInsteadOfNavigation().cyl_tabBarItemIdentifier ?? ""
             if !identifier.isEmpty {
                 identifiers.append(identifier)
             }
@@ -398,17 +398,17 @@ extension CYLTabBarController {
         var themeIcons: [(viewController: UIViewController, icon: Any, selectedIcon: Any?, size: NSValue?)] = []
         for viewController in viewControllers(of: tabAttributes) {
             let attributes = tabAttributes.object(forKey: viewController) as? [String: Any] ?? [:]
-            var icon = attributes[CYLTabBarItemImageURL]
-            var selectedIcon = attributes[CYLTabBarItemSelectedImageURL]
-            let sizeValue = attributes[CYLTabBarItemImageURLSize] as? NSValue
+            var icon = attributes[cylTabBarItemImageURL]
+            var selectedIcon = attributes[cylTabBarItemSelectedImageURL]
+            let sizeValue = attributes[cylTabBarItemImageURLSize] as? NSValue
             if icon == nil {
-                let image = attributes[CYLTabBarItemImage]
-                let selectedImage = attributes[CYLTabBarItemSelectedImage]
+                let image = attributes[cylTabBarItemImage]
+                let selectedImage = attributes[cylTabBarItemSelectedImage]
                 // [EN] With a dark image, the combined image (names and UIImages); else the source as it is.
                 // [CN] 有深色图片时为合成后的图片（图片名与 UIImage）；否则原样使用该来源。
-                icon = attributes[CYLTabBarItemDarkImage] != nil ? UIImage.cyl_image(withImageInfo: image, darkImageInfo: attributes[CYLTabBarItemDarkImage]) : image
-                selectedIcon = attributes[CYLTabBarItemSelectedDarkImage] != nil
-                    ? UIImage.cyl_image(withImageInfo: selectedImage, darkImageInfo: attributes[CYLTabBarItemSelectedDarkImage]) : selectedImage
+                icon = attributes[cylTabBarItemDarkImage] != nil ? UIImage.cylImage(withImageInfo: image, darkImageInfo: attributes[cylTabBarItemDarkImage]) : image
+                selectedIcon = attributes[cylTabBarItemSelectedDarkImage] != nil
+                    ? UIImage.cylImage(withImageInfo: selectedImage, darkImageInfo: attributes[cylTabBarItemSelectedDarkImage]) : selectedImage
                 if icon == nil {
                     icon = selectedIcon
                 }
@@ -480,15 +480,15 @@ extension CYLTabBarController {
             self?.plusButtonBackgroundImageDidChange()
         }
         var themeParts: [String: Any] = [:]
-        themeParts[CYLThemeKeys.plusPartTitle] = attributes?[CYLTabBarItemTitle]
+        themeParts[CYLThemeKeys.plusPartTitle] = attributes?[cylTabBarItemTitle]
         // [EN] A button whose picture is its background keeps it: an icon of a theme would sit beside the title, over the picture.
         // [CN] 以背景图为图片的按钮保持原样：主题图标会盖在图片上、挤在标题旁边。
         let takesThemeImages = !plusButton.cylDrawsTitleOverBackgroundImage()
         if takesThemeImages {
-            themeParts[CYLThemeKeys.plusPartImage] = attributes?[CYLTabBarItemImageURL] ?? attributes?[CYLTabBarItemImage]
-            themeParts[CYLThemeKeys.plusPartSelectedImage] = attributes?[CYLTabBarItemSelectedImageURL] ?? attributes?[CYLTabBarItemSelectedImage]
+            themeParts[CYLThemeKeys.plusPartImage] = attributes?[cylTabBarItemImageURL] ?? attributes?[cylTabBarItemImage]
+            themeParts[CYLThemeKeys.plusPartSelectedImage] = attributes?[cylTabBarItemSelectedImageURL] ?? attributes?[cylTabBarItemSelectedImage]
         }
-        let sizeValue = attributes?[CYLTabBarItemImageURLSize] as? NSValue
+        let sizeValue = attributes?[cylTabBarItemImageURLSize] as? NSValue
         for part in [CYLThemeKeys.plusPartTitle, CYLThemeKeys.plusPartImage, CYLThemeKeys.plusPartSelectedImage] {
             guard let themeValue = themeParts[part] else {
                 restoreThemePlusButtonPart(part)
@@ -498,7 +498,7 @@ extension CYLTabBarController {
             cyl_themeSettings.plusButtonRestorables[part] = value
             value.prepare(currentValue: cylThemePlusButtonCurrentPart(plusButton, part))
             if part == CYLThemeKeys.plusPartTitle {
-                if updatePlusButton(attributes: [CYLTabBarItemTitle: themeValue]) {
+                if updatePlusButton(attributes: [cylTabBarItemTitle: themeValue]) {
                     value.didInstall(cylThemePlusButtonCurrentPart(plusButton, part) ?? themeValue)
                 }
                 continue
@@ -513,9 +513,9 @@ extension CYLTabBarController {
                     self.restoreThemePlusButtonPart(part)
                     return
                 }
-                var imageAttributes: [String: Any] = [part == CYLThemeKeys.plusPartImage ? CYLTabBarItemImage : CYLTabBarItemSelectedImage: image]
+                var imageAttributes: [String: Any] = [part == CYLThemeKeys.plusPartImage ? cylTabBarItemImage : cylTabBarItemSelectedImage: image]
                 if let sizeValue {
-                    imageAttributes[CYLTabBarItemImageURLSize] = sizeValue
+                    imageAttributes[cylTabBarItemImageURLSize] = sizeValue
                 }
                 if self.updatePlusButton(attributes: imageAttributes) {
                     value.didInstall(cylThemePlusButtonCurrentPart(plusButton, part))

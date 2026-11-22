@@ -93,11 +93,11 @@ private func cylTabBarControllerMatcherForStyleType(_ styleType: CYLTabBarStyleT
 private func cylTabBarControllerExplicitReference(_ object: NSObject, _ matcher: CYLTabBarControllerLookupMatcher?) -> CYLTabBarController? {
     // [EN] Weak references set by `-cyl_setTabBarController:` / `-cylflatdesign_setTabBarController:` (CYLUtils).
     // [CN] 由 `-cyl_setTabBarController:` / `-cylflatdesign_setTabBarController:` 设置的弱引用（CYLUtils）。
-    if let found = cylTabBarControllerMatches(object.cyl_weakAssociatedObject(forKey: CYLUtilsKeys.key("cyl_tabBarController")), matcher) {
+    if let found = cylTabBarControllerMatches(object.cylWeakAssociatedObject(forKey: CYLUtilsKeys.key("cyl_tabBarController")), matcher) {
         return found
     }
     // [EN] Only a build with FlatDesign ever sets the second one. [CN] 只有包含扁平样式的构建才会设置第二个引用。
-    return cylTabBarControllerMatches(object.cyl_weakAssociatedObject(forKey: CYLUtilsKeys.key("cylflatdesign_tabBarController")), matcher)
+    return cylTabBarControllerMatches(object.cylWeakAssociatedObject(forKey: CYLUtilsKeys.key("cylflatdesign_tabBarController")), matcher)
 }
 
 /**
@@ -128,7 +128,7 @@ extension CYLTabBarController {
      * [EN] The identifier of one of this controller's tabs: the one set, else the default. [CN] 已设置的标识，否则为默认值。
      */
     @objc(cyl_tabBarItemIdentifierForViewController:)
-    func cylTabBarItemIdentifier(for viewController: UIViewController?) -> String? {
+    func cylTabBarItemIdentifierValue(for viewController: UIViewController?) -> String? {
         guard let viewController else { return nil }
         if let identifier = objc_getAssociatedObject(viewController, CYLUtilsKeys.key("cyl_tabBarItemIdentifier")) as? String {
             return identifier
@@ -149,18 +149,18 @@ extension CYLTabBarController {
     @objc(cyl_defaultTabBarItemIdentifierForViewController:)
     open func cyl_defaultTabBarItemIdentifier(for viewController: UIViewController) -> String? {
         let tabs = viewControllers ?? []
-        guard let index = tabs.firstIndex(where: { $0 === viewController || $0.cyl_getViewControllerInsteadOfNavigation() === viewController }) else {
+        guard let index = tabs.firstIndex(where: { $0 === viewController || $0.cylGetViewControllerInsteadOfNavigation() === viewController }) else {
             return nil
         }
         let tab = tabs[index]
         // [EN] The plus child view controller is the plus button's tab. [CN] PlusButton 子控制器即 PlusButton 对应的 Tab。
-        if let plusChild = cylPrivate.cylContextPlusChildViewController(), tab.cyl_isEqual(to: plusChild), let plusButton = identifiedPlusButton {
+        if let plusChild = cylPrivate.cylContextPlusChildViewController(), tab.cylIsEqual(to: plusChild), let plusButton = identifiedPlusButton {
             return plusButton.cyl_tabBarItemIdentifier
         }
-        let contentClass: AnyClass = type(of: tab.cyl_getViewControllerInsteadOfNavigation())
+        let contentClass: AnyClass = type(of: tab.cylGetViewControllerInsteadOfNavigation())
         let identifier = CYLTabBarController.cyl_defaultTabBarItemIdentifier(for: contentClass)
         // [EN] The next tabs of the same class: "_2", "_3"... [CN] 后续同类的 Tab 依次加 "_2"、"_3"……
-        let occurrence = 1 + tabs[..<index].filter { type(of: $0.cyl_getViewControllerInsteadOfNavigation()) == contentClass }.count
+        let occurrence = 1 + tabs[..<index].filter { type(of: $0.cylGetViewControllerInsteadOfNavigation()) == contentClass }.count
         return occurrence == 1 ? identifier : "\(identifier)_\(occurrence)"
     }
 
@@ -170,13 +170,13 @@ extension CYLTabBarController {
     }
 
     func cylSelectedTabBarItemIdentifier() -> String? {
-        cylTabBarItemIdentifier(for: selectedViewController)
+        cylTabBarItemIdentifierValue(for: selectedViewController)
     }
 
     @objc(cyl_indexOfTabBarItemIdentifier:)
     open func cyl_index(ofTabBarItemIdentifier identifier: String) -> UInt {
         guard !identifier.isEmpty else { return UInt(NSNotFound) }
-        let index = (viewControllers ?? []).firstIndex { cylTabBarItemIdentifier(for: $0) == identifier }
+        let index = (viewControllers ?? []).firstIndex { cylTabBarItemIdentifierValue(for: $0) == identifier }
         return index.map { UInt($0) } ?? UInt(NSNotFound)
     }
 
@@ -201,7 +201,7 @@ extension CYLTabBarController {
     }
 
     func cylTabBarItemIdentifiers() -> [String] {
-        var identifiers = (viewControllers ?? []).compactMap { cylTabBarItemIdentifier(for: $0) }
+        var identifiers = (viewControllers ?? []).compactMap { cylTabBarItemIdentifierValue(for: $0) }
         if let plusIdentifier = identifiedPlusButton?.cyl_tabBarItemIdentifier, !identifiers.contains(plusIdentifier) {
             identifiers.append(plusIdentifier)
         }
@@ -276,7 +276,7 @@ extension CYLTabBarController {
 /// [EN] Every control under `view` that hosts an animation view: the tab buttons of any style (Liquid Glass has a normal and a selected one per tab, flat design has its own buttons). [CN] `view` 下所有带动画视图的控件：各样式的 Tab 按钮（液态玻璃每个 Tab 有普通与选中两个，扁平样式有自己的按钮）。
 private func cylCollectAnimatedTabButtons(_ view: UIView, _ tabButtons: inout [UIControl]) {
     for subview in view.subviews {
-        if let control = subview as? UIControl, control.cyl_tabBarItemAnimationView() != nil {
+        if let control = subview as? UIControl, control.cylTabBarItemAnimationView() != nil {
             tabButtons.append(control)
             continue
         }
@@ -294,7 +294,7 @@ private func cylTabBarStateDescription(_ tabBarController: CYLTabBarController?)
     var tabButtons: [UIControl] = []
     cylCollectAnimatedTabButtons(tabBarController.cyl_tabBar ?? tabBarController.tabBar, &tabButtons)
     for tabButton in tabButtons {
-        let lottieView = tabButton.cyl_tabBarItemAnimationView()
+        let lottieView = tabButton.cylTabBarItemAnimationView()
         let speed: Any = lottieView?.responds(to: NSSelectorFromString("animationSpeed")) == true ? (lottieView?.value(forKey: "animationSpeed") ?? "?") : "?"
         let x = tabButton.convert(tabButton.bounds, to: nil).minX
         description += "\n  Lottie view in \(NSStringFromClass(type(of: tabButton))) at x = \(String(format: "%.0f", x)): animationSpeed \(speed)"
@@ -320,28 +320,28 @@ extension CYLTabBarController {
     }
 
     @objc(cyl_tabBarControllerForContext:matching:)
-    static func cyl_tabBarController(forContext context: String?, matching matcher: (@convention(block) (CYLTabBarController) -> Bool)?) -> CYLTabBarController? {
+    static func cylTabBarController(forContext context: String?, matching matcher: (@convention(block) (CYLTabBarController) -> Bool)?) -> CYLTabBarController? {
         CYLTabBarControllerActivationStack.mostRecent(context: context, matching: matcher)
     }
 
     @objc(cyl_tabBarControllerForContext:)
-    public static func cyl_tabBarController(forContext context: String?) -> CYLTabBarController? {
+    public static func cylTabBarController(forContext context: String?) -> CYLTabBarController? {
         CYLTabBarControllerActivationStack.mostRecent(context: context, matching: nil)
     }
 
     /// [EN] The most recently active one is the context lookup without a context. [CN] 最近活跃的就是不带 context 的查找。
     @objc(cyl_activeTabBarController)
-    public static func cyl_active() -> CYLTabBarController? {
-        cyl_tabBarController(forContext: nil)
+    public static func cylActive() -> CYLTabBarController? {
+        cylTabBarController(forContext: nil)
     }
 
     @objc(cyl_simulateMemoryWarning)
-    public static func cyl_simulateMemoryWarning() {
-        cyl_simulateMemoryWarning(for: cyl_active())
+    public static func cylSimulateMemoryWarning() {
+        cylSimulateMemoryWarning(for: cylActive())
     }
 
     @objc(cyl_simulateMemoryWarningForTabBarController:)
-    public static func cyl_simulateMemoryWarning(for tabBarController: CYLTabBarController?) {
+    public static func cylSimulateMemoryWarning(for tabBarController: CYLTabBarController?) {
         let application = UIApplication.shared
         NotificationCenter.default.post(name: UIApplication.didReceiveMemoryWarningNotification, object: application)
         application.delegate?.applicationDidReceiveMemoryWarning?(application)
@@ -360,7 +360,7 @@ extension CYLTabBarController {
 extension NSObject {
 
     func cylSetTabBarController(_ tabBarController: CYLTabBarController?) {
-        cyl_setWeakAssociatedObject(tabBarController, forKey: CYLUtilsKeys.key("cyl_tabBarController"))
+        cylSetWeakAssociatedObject(tabBarController, forKey: CYLUtilsKeys.key("cyl_tabBarController"))
     }
 
     /**
@@ -381,7 +381,7 @@ extension NSObject {
      *         因此 Tab 按钮、PlusButton 或 Tab 页面内的 View 找到的是自己的控制器，而不是根控制器；
      *      3. 若 `fallsBackToActive`，取最近活跃的那个（`+cyl_activeTabBarController`），最后才是根控制器（与以前一致）。
      */
-    func cyl_tabBarController(matching matcher: CYLTabBarControllerLookupMatcher?, fallsBackToActive: Bool) -> CYLTabBarController? {
+    func cylTabBarController(matching matcher: CYLTabBarControllerLookupMatcher?, fallsBackToActive: Bool) -> CYLTabBarController? {
         // [EN] 0. A tab bar controller it accepts is its own: `-visiableTabBarSize` and the `CYL_IS_IPHONE_X` /
         //      `CYL_NoNeed_UIDesignRequiresCompatibility` macros ask `self.cyl_tabBarController` from inside it. Asking an ancestor or the root
         //      instead gave a pushed tab bar controller the outer one's values.
@@ -428,21 +428,21 @@ extension NSObject {
         }
         // [EN] The window's root, not `CYLGetRootViewController()`: that is the topmost presented one, e.g. an alert.
         // [CN] 取 window 的根控制器，而不是 `CYLGetRootViewController()`：后者是最上层 present 的控制器，例如 alert。
-        let root = CYLGetRootWindow()?.rootViewController?.cyl_getViewControllerInsteadOfNavigation()
+        let root = cylGetRootWindow()?.rootViewController?.cylGetViewControllerInsteadOfNavigation()
         return cylTabBarControllerMatches(root, matcher)
     }
 
     @objc(cyl_owningTabBarController)
-    public func cyl_owningTabBarController() -> CYLTabBarController? {
+    public func cylOwningTabBarController() -> CYLTabBarController? {
         // [EN] Only where it is: callers decide what to fall back to (the plus button registry must not take another controller's context for a
         //      tab bar that is not attached yet).
         // [CN] 只看对象所在的位置：回退到什么由调用方决定（PlusButton 注册表不能把其他控制器的 context 当作尚未加入的 TabBar 的 context）。
-        cyl_tabBarController(matching: nil, fallsBackToActive: false)
+        cylTabBarController(matching: nil, fallsBackToActive: false)
     }
 
     @objc(cyl_tabBarControllerForStyleType:)
-    public func cyl_tabBarController(forStyleType styleType: CYLTabBarStyleType) -> CYLTabBarController? {
-        cyl_tabBarController(matching: cylTabBarControllerMatcherForStyleType(styleType), fallsBackToActive: true)
+    public func cylTabBarController(forStyleType styleType: CYLTabBarStyleType) -> CYLTabBarController? {
+        cylTabBarController(matching: cylTabBarControllerMatcherForStyleType(styleType), fallsBackToActive: true)
     }
 
     /**
@@ -451,8 +451,8 @@ extension NSObject {
      * [CN] 系统样式（除扁平样式外）。回退到最近活跃的那个，最后才是根控制器（#414：存在多个 TabBarController 时根控制器往往不是正在使用的那个）。
      */
     @objc(cyl_tabBarController)
-    public var cyl_tabBarController: CYLTabBarController? {
-        @objc(cyl_tabBarController) get { cyl_tabBarController(forStyleType: .default) }
+    public var cylTabBarController: CYLTabBarController? {
+        @objc(cyl_tabBarController) get { cylTabBarController(forStyleType: .default) }
         @objc(cyl_setTabBarController:) set { cylSetTabBarController(newValue) }
     }
 }

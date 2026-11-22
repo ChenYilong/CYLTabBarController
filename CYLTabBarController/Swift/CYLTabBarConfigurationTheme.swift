@@ -160,7 +160,7 @@ open class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
      */
     @objc(colorNamed:)
     open class func colorNamed(_ name: String) -> UIColor {
-        UIColor.cyl_color(withName: name) { manager, _, theme in
+        UIColor.cylColor(withName: name) { manager, _, theme in
             cylColor(named: name, in: manager, theme: theme)
         }
     }
@@ -171,7 +171,7 @@ open class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
      */
     @objc(colorNamed:themeManagerName:)
     open class func colorNamed(_ name: String, themeManagerName managerName: NSCopying & NSObjectProtocol) -> UIColor {
-        UIColor.cyl_color(withName: name, themeManagerName: managerName) { manager, _, theme in
+        UIColor.cylColor(withName: name, themeManagerName: managerName) { manager, _, theme in
             cylColor(named: name, in: manager, theme: theme)
         }
     }
@@ -186,7 +186,7 @@ open class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
             if (item[cylTabBarItemPlusSlotPlaceholderKey] as? NSNumber)?.boolValue == true {
                 continue
             }
-            let identifier = CYLTabBarController.cylConfigurationStringValue(item[CYLTabBarItemIdentifier]) ?? ""
+            let identifier = CYLTabBarController.cylConfigurationStringValue(item[cylTabBarItemIdentifier]) ?? ""
             let tabReferences = identifier.isEmpty ? references[NSNumber(value: position)] : references[identifier as NSString]
             position += 1
             var raw: [String: Any] = [:]
@@ -203,21 +203,21 @@ open class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
     }
 
     open func cyl_tabBarAppearance(for _: CYLTabBarController) -> UITabBarAppearance? {
-        let background = color(forName: CYLTabBarBackgroundColor)
-        let shadow = color(forName: CYLTabBarShadowColor)
-        let titleColor = color(forName: CYLTabBarItemTitleColor)
-        let selectedTitleColor = color(forName: CYLTabBarItemSelectedTitleColor)
-        let iconColor = color(forName: CYLTabBarItemIconColor)
-        let selectedIconColor = color(forName: CYLTabBarItemSelectedIconColor)
-        let titleFont = font(forName: CYLTabBarItemTitleFont)
-        let selectedTitleFont = font(forName: CYLTabBarItemSelectedTitleFont) ?? titleFont
-        let backgroundImage = image(forName: CYLTabBarBackgroundImage)
-        let shadowImage = image(forName: CYLTabBarShadowImage)
-        let positioning = CYLTabBarController.cylConfigurationStringValue(value(forName: CYLTabBarStackedItemPositioning))?.lowercased() ?? ""
-        let itemWidth = (value(forName: CYLTabBarStackedItemWidth) as? NSNumber)?.doubleValue
-            ?? (value(forName: CYLTabBarStackedItemWidth) as? NSString)?.doubleValue
-        let itemSpacing = (value(forName: CYLTabBarStackedItemSpacing) as? NSNumber)?.doubleValue
-            ?? (value(forName: CYLTabBarStackedItemSpacing) as? NSString)?.doubleValue
+        let background = color(forName: cylTabBarBackgroundColor)
+        let shadow = color(forName: cylTabBarShadowColor)
+        let titleColor = color(forName: cylTabBarItemTitleColor)
+        let selectedTitleColor = color(forName: cylTabBarItemSelectedTitleColor)
+        let iconColor = color(forName: cylTabBarItemIconColor)
+        let selectedIconColor = color(forName: cylTabBarItemSelectedIconColor)
+        let titleFont = font(forName: cylTabBarItemTitleFont)
+        let selectedTitleFont = font(forName: cylTabBarItemSelectedTitleFont) ?? titleFont
+        let backgroundImage = image(forName: cylTabBarBackgroundImage)
+        let shadowImage = image(forName: cylTabBarShadowImage)
+        let positioning = CYLTabBarController.cylConfigurationStringValue(value(forName: cylTabBarStackedItemPositioning))?.lowercased() ?? ""
+        let itemWidth = (value(forName: cylTabBarStackedItemWidth) as? NSNumber)?.doubleValue
+            ?? (value(forName: cylTabBarStackedItemWidth) as? NSString)?.doubleValue
+        let itemSpacing = (value(forName: cylTabBarStackedItemSpacing) as? NSNumber)?.doubleValue
+            ?? (value(forName: cylTabBarStackedItemSpacing) as? NSString)?.doubleValue
         let layout = !positioning.isEmpty || itemWidth != nil || itemSpacing != nil
         let hasValue: [Any?] = [background, shadow, titleColor, selectedTitleColor, iconColor, selectedIconColor, titleFont, selectedTitleFont,
                                 backgroundImage, shadowImage]
@@ -243,11 +243,11 @@ open class CYLTabBarConfigurationTheme: NSObject, CYLTabBarTheme {
         case "fill": appearance.stackedItemPositioning = .fill
         case "automatic": appearance.stackedItemPositioning = .automatic
         case "": break
-        default: CYLTabBarController.cylLogInvalidConfigurationValue(positioning, forKey: CYLTabBarStackedItemPositioning)
+        default: CYLTabBarController.cylLogInvalidConfigurationValue(positioning, forKey: cylTabBarStackedItemPositioning)
         }
         if let itemWidth { appearance.stackedItemWidth = max(itemWidth, 0) }
         if let itemSpacing { appearance.stackedItemSpacing = max(itemSpacing, 0) }
-        appearance.cyl_applyItemAppearance { itemAppearance in
+        appearance.cylApplyItemAppearance { itemAppearance in
             var normal = itemAppearance.normal.titleTextAttributes
             if let titleColor { normal[.foregroundColor] = titleColor }
             if let titleFont { normal[.font] = titleFont }
@@ -296,7 +296,7 @@ extension CYLTabBarController {
     }
 
     /// [EN] A tab bar controller of the receiving class from a loaded configuration, or the error. [CN] 由加载的配置创建接收者类的 TabBarController，或返回错误。
-    private class func cyl_tabBarController(withLoadedConfiguration configuration: [String: Any]) throws -> Self {
+    private class func cylTabBarController(withLoadedConfiguration configuration: [String: Any]) throws -> Self {
         let tabBarController = self.init(configuration: configuration)
         if let pagesError = CYLTabBarController.cylConfigurationPagesError(for: tabBarController) {
             throw pagesError
@@ -311,7 +311,7 @@ extension CYLTabBarController {
     @objc(tabBarControllerWithConfigurationFile:error:)
     open class func tabBarController(withConfigurationFile filePath: String) throws -> Self {
         guard Thread.isMainThread else { throw CYLTabBarController.cylConfigurationMainThreadError() }
-        return try cyl_tabBarController(withLoadedConfiguration: try configuration(withContentsOfFile: filePath))
+        return try cylTabBarController(withLoadedConfiguration: try configuration(withContentsOfFile: filePath))
     }
 
     /**
@@ -331,7 +331,7 @@ extension CYLTabBarController {
             return
         }
         do {
-            completion(try cyl_tabBarController(withLoadedConfiguration: configuration), nil)
+            completion(try cylTabBarController(withLoadedConfiguration: configuration), nil)
         } catch {
             completion(nil, error)
         }

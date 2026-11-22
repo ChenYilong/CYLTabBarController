@@ -72,25 +72,25 @@ enum CYLTabBarHostSupport {
      *      文字角标），与 `cyl_showBadgeValue:@""` 相同。
      */
     static func showBadge(on target: CYLBadgeProtocol, _ attributes: [String: Any], animationType: CYLBadgeAnimationType) {
-        let value = attributes[CYLTabBarHostBadgeValue]
+        let value = attributes[cylTabBarHostBadgeValue]
         let text = (value as? String) ?? (value as? NSNumber)?.stringValue ?? ""
-        if let color = color(attributes[CYLTabBarHostBadgeColor]) {
+        if let color = color(attributes[cylTabBarHostBadgeColor]) {
             target.cyl_badgeBackgroundColor = color
         }
-        if let radius = attributes[CYLTabBarHostBadgeRadius] as? NSNumber {
+        if let radius = attributes[cylTabBarHostBadgeRadius] as? NSNumber {
             target.cyl_badgeRadius = CGFloat(radius.doubleValue)
         }
-        let offset = attributes[CYLTabBarHostBadgeCenterOffset]
+        let offset = attributes[cylTabBarHostBadgeCenterOffset]
         if let pair = offset as? [Any], pair.count == 2 {
             target.cyl_badgeCenterOffset = CGPoint(x: (pair[0] as? NSNumber)?.doubleValue ?? 0, y: (pair[1] as? NSNumber)?.doubleValue ?? 0)
         } else if let point = offset as? NSValue, String(cString: point.objCType) == String(cString: NSValue(cgPoint: .zero).objCType) {
             target.cyl_badgeCenterOffset = point.cgPointValue
         }
-        let animation = animation(attributes[CYLTabBarHostBadgeAnimation], fallback: animationType)
+        let animation = animation(attributes[cylTabBarHostBadgeAnimation], fallback: animationType)
         if text.isEmpty {
             target.cyl_clearBadge()
         } else if text == "dot" {
-            if attributes[CYLTabBarHostBadgeAnimation] == nil || animation == .none {
+            if attributes[cylTabBarHostBadgeAnimation] == nil || animation == .none {
                 target.cyl_showBadge()
             } else {
                 target.cyl_showBadgeValue("", animationType: animation)
@@ -406,7 +406,7 @@ open class CYLTabBarHostView: UIView {
     @objc open var language: String? {
         didSet {
             guard language != oldValue else { return }
-            CYLSetLocalizationLanguage(language)
+            cylSetLocalizationLanguage(language)
             // [EN] Built again: the library's texts and the layout direction are set when the tab bar is created.
             // [CN] 重新创建：库的文字与布局方向在创建 TabBar 时设置。
             if tabBarController != nil, let configuration {
@@ -429,7 +429,7 @@ open class CYLTabBarHostView: UIView {
      */
     @discardableResult
     @objc open func simulateMemoryWarning() -> String {
-        CYLSimulateMemoryWarningReport(tabBarController)
+        cylSimulateMemoryWarningReport(tabBarController)
     }
 
     @objc open var titlePositionAdjustment: NSValue? {
@@ -507,8 +507,8 @@ open class CYLTabBarHostView: UIView {
 
     class func attributes(_ attributes: [String: Any], withImagesResolvedBy resolver: ((Any) -> UIImage?)?) -> [String: Any] {
         var result = attributes
-        for key in [CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage, CYLTabBarItemSelectedDarkImage,
-                    CYLPlusButtonBackgroundImage] {
+        for key in [cylTabBarItemImage, cylTabBarItemSelectedImage, cylTabBarItemDarkImage, cylTabBarItemSelectedDarkImage,
+                    cylPlusButtonBackgroundImage] {
             if let value = result[key] {
                 result[key] = image(forValue: value, resolver: resolver)
             }
@@ -518,22 +518,22 @@ open class CYLTabBarHostView: UIView {
 
     class func configuration(withImagesOf configuration: [String: Any], resolver: ((Any) -> UIImage?)?) -> [String: Any] {
         var result = configuration
-        if let items = configuration[CYLTabBarControllerTabBarItemsAttributes] as? [Any] {
-            result[CYLTabBarControllerTabBarItemsAttributes] = items.enumerated().map { index, item -> Any in
+        if let items = configuration[cylTabBarControllerTabBarItemsAttributes] as? [Any] {
+            result[cylTabBarControllerTabBarItemsAttributes] = items.enumerated().map { index, item -> Any in
                 guard let dictionary = item as? [String: Any] else { return item }
                 var attributes = self.attributes(dictionary, withImagesResolvedBy: resolver)
                 // [EN] Pages are looked up by page ID: a tab with neither a page ID nor an identifier would get no page, and no tab.
                 //      The host's pages are empty anyway, so it gets one of its own; the identifier reported stays empty.
                 // [CN] 页面按页面 ID 查找：既没有页面 ID 也没有 identifier 的 Tab 得不到页面，也就不会显示。宿主的页面本来就是空的，因此为它
                 //      指定一个页面 ID；回调中的 identifier 仍为空。
-                if ((attributes[CYLTabBarItemPageIdentifier] as? String) ?? "").isEmpty && ((attributes[CYLTabBarItemIdentifier] as? String) ?? "").isEmpty {
-                    attributes[CYLTabBarItemPageIdentifier] = "CYLTabBarHostView-tab-\(index)"
+                if ((attributes[cylTabBarItemPageIdentifier] as? String) ?? "").isEmpty && ((attributes[cylTabBarItemIdentifier] as? String) ?? "").isEmpty {
+                    attributes[cylTabBarItemPageIdentifier] = "CYLTabBarHostView-tab-\(index)"
                 }
                 return attributes
             }
         }
-        if let plusButton = configuration[CYLTabBarControllerPlusButton] as? [String: Any] {
-            result[CYLTabBarControllerPlusButton] = attributes(plusButton, withImagesResolvedBy: resolver)
+        if let plusButton = configuration[cylTabBarControllerPlusButton] as? [String: Any] {
+            result[cylTabBarControllerPlusButton] = attributes(plusButton, withImagesResolvedBy: resolver)
         }
         return result
     }
@@ -568,8 +568,8 @@ open class CYLTabBarHostView: UIView {
         removeTabBarController()
         // [EN] Every tab bar keeps its own plus button: a context of its own unless the configuration gives one.
         // [CN] 每个 TabBar 保留自己的 PlusButton：配置没有给出 context 时使用自己的 context。
-        if !(configuration[CYLTabBarControllerContext] is String) {
-            configuration[CYLTabBarControllerContext] = "CYLTabBarHostView-\(Unmanaged.passUnretained(self).toOpaque())"
+        if !(configuration[cylTabBarControllerContext] is String) {
+            configuration[cylTabBarControllerContext] = "CYLTabBarHostView-\(Unmanaged.passUnretained(self).toOpaque())"
         }
         // [EN] The pages belong to the host: each tab gets an empty, transparent one. [CN] 页面由宿主绘制：每个 Tab 得到一个透明的空页面。
         // [EN] `@convention(block)`: a plain Swift closure in a `[String: Any]` is not an Objective-C block for the controller.
@@ -579,11 +579,11 @@ open class CYLTabBarHostView: UIView {
             page.view.backgroundColor = .clear
             return page
         }
-        configuration[CYLTabBarControllerPageResolver] = resolver
-        configuration[CYLTabBarControllerPageLookupOrder] = [CYLTabBarPageSourceResolver]
-        if configuration[CYLTabBarControllerPlusButton] is [String: Any] {
+        configuration[cylTabBarControllerPageResolver] = resolver
+        configuration[cylTabBarControllerPageLookupOrder] = [cylTabBarPageSourceResolver]
+        if configuration[cylTabBarControllerPlusButton] is [String: Any] {
             let action: @convention(block) (CYLPlusButton) -> Void = { [weak self] _ in self?.didTapPlusButton?() }
-            configuration[CYLTabBarControllerPlusButtonAction] = action
+            configuration[cylTabBarControllerPlusButtonAction] = action
         }
         let tabBarController = CYLTabBarController(configuration: configuration)
         guard let pageCount = tabBarController.viewControllers?.count, pageCount > 0 else { return }
@@ -659,7 +659,7 @@ open class CYLTabBarHostView: UIView {
      * [CN] 从右到左的语言（如阿拉伯语）使用从右到左布局，与 Objective-C 示例的 `[UIView appearance]` 相同。
      */
     private func applyLayoutDirection(to tabBarController: CYLTabBarController) {
-        let rightToLeft = NSLocale.characterDirection(forLanguage: CYLLocalizationLanguage()) == .rightToLeft
+        let rightToLeft = NSLocale.characterDirection(forLanguage: cylLocalizationLanguage()) == .rightToLeft
         let attribute: UISemanticContentAttribute = rightToLeft ? .forceRightToLeft : .unspecified
         tabBarController.view.semanticContentAttribute = attribute
         tabBarController.tabBar.semanticContentAttribute = attribute
@@ -736,11 +736,11 @@ open class CYLTabBarHostView: UIView {
             guard let host = self else { return }
             let animationType = CYLBadgeAnimationType(rawValue: UInt(max(host.badgeAnimationType, 0))) ?? .none
             let plusAttributes = host.plusButtonBadgeAttributes.flatMap { $0.isEmpty ? nil : $0 }
-                ?? [CYLTabBarHostBadgeValue: host.plusButtonBadgeValue ?? ""]
+                ?? [cylTabBarHostBadgeValue: host.plusButtonBadgeValue ?? ""]
             for (index, page) in CYLTabBarHostSupport.pages(of: tabBarController).enumerated() {
                 var attributes = (host.badgeAttributes.flatMap { index < $0.count ? $0[index] : nil }) as? [String: Any]
                 if attributes?.isEmpty ?? true {
-                    attributes = [CYLTabBarHostBadgeValue: index < host.badgeValues.count ? host.badgeValues[index] : ""]
+                    attributes = [cylTabBarHostBadgeValue: index < host.badgeValues.count ? host.badgeValues[index] : ""]
                 }
                 CYLTabBarHostSupport.showBadge(on: page, attributes ?? [:], animationType: animationType)
             }
@@ -763,7 +763,7 @@ open class CYLTabBarHostView: UIView {
             for covered in host.coveredTabButtons {
                 covered.cover.removeFromSuperview()
                 covered.selectedCover.removeFromSuperview()
-                covered.button.cyl_coverVisiableTabImageViewOrTabButton(true, contentNewView: covered.cover, seclectContentNewView: covered.selectedCover,
+                covered.button.cylCoverVisiableTabImageViewOrTabButton(true, contentNewView: covered.cover, seclectContentNewView: covered.selectedCover,
                                                                          offset: .zero, show: false, delayIfNeededForSeconds: 0, completion: nil)
             }
             host.coveredTabButtons = []
@@ -786,7 +786,7 @@ open class CYLTabBarHostView: UIView {
                 }
                 let contentCover = cover()
                 let selectedCover = cover()
-                button.cyl_coverVisiableTabImageViewOrTabButton(true, contentNewView: contentCover, seclectContentNewView: selectedCover,
+                button.cylCoverVisiableTabImageViewOrTabButton(true, contentNewView: contentCover, seclectContentNewView: selectedCover,
                                                                  offset: .zero, show: true, delayIfNeededForSeconds: 0.1, completion: nil)
                 host.coveredTabButtons.append((button, contentCover, selectedCover))
             }
@@ -797,7 +797,7 @@ open class CYLTabBarHostView: UIView {
         guard let didLongPressTab else { return }
         let identifier = control.cyl_tabBarItemIdentifier ?? ""
         var index = -1
-        if !control.cyl_isPlusControl(), !identifier.isEmpty {
+        if !control.cylIsPlusControl(), !identifier.isEmpty {
             index = CYLTabBarHostSupport.pages(of: tabBarController).firstIndex { $0.cyl_tabBarItemIdentifier == identifier } ?? -1
         }
         didLongPressTab(index, identifier, control.cyl_tabBarItemDisplayName)
@@ -858,7 +858,7 @@ open class CYLTabBarHostView: UIView {
 extension CYLTabBarHostView {
 
     @objc(tabBarController:shouldSelectViewController:)
-    func cyl_tabBarController(_ tabBarController: UITabBarController, shouldSelectViewController viewController: UIViewController) -> Bool {
+    func cylTabBarController(_ tabBarController: UITabBarController, shouldSelectViewController viewController: UIViewController) -> Bool {
         guard let controller = self.tabBarController else { return true }
         // [EN] The plus button's own page is selected by the plus button (its page key), which the controller's check, made for
         //      tabs, refuses as the plus slot. [CN] PlusButton 自己的页面由 PlusButton 选中（其页面键）；controller 为 Tab 设计的检查会把它当作
@@ -876,7 +876,7 @@ extension CYLTabBarHostView {
      */
     @objc(tabBarController:didSelectControl:)
     func cyl_tabBarController(_: UITabBarController, didSelectControl control: UIControl) {
-        guard let controller = self.tabBarController, control.cyl_isTabButton(), !control.cyl_isPlusControl() else { return }
+        guard let controller = self.tabBarController, control.cylIsTabButton(), !control.cylIsPlusControl() else { return }
         if let selected = controller.selectedViewController, let index = CYLTabBarHostSupport.pages(of: controller).firstIndex(of: selected) {
             didSelectTab?(index, selected.cyl_tabBarItemIdentifier ?? "")
         }
@@ -888,7 +888,7 @@ extension CYLTabBarHostView {
      * [CN] Tab 由 `-tabBarController:didSelectControl:` 上报；这里只处理 PlusButton 自己的页面：下标 -1 与 PlusButton 的标识。
      */
     @objc(tabBarController:didSelectViewController:)
-    func cyl_tabBarController(_: UITabBarController, didSelectViewController viewController: UIViewController) {
+    func cylTabBarController(_: UITabBarController, didSelectViewController viewController: UIViewController) {
         guard let controller = self.tabBarController,
               viewController === CYLPlusButton.plusChildViewController(forTabBarContext: controller.context) else {
             return

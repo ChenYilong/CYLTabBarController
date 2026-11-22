@@ -12,7 +12,7 @@ import UIKit
  * [CN] 管理器的当前主题变化时发出（object 为该管理器）。
  */
 extension NSNotification.Name {
-    public static let CYLThemeDidChange = NSNotification.Name("CYLThemeDidChangeNotification")
+    public static let cylThemeDidChange = NSNotification.Name("CYLThemeDidChangeNotification")
 }
 
 /**
@@ -310,7 +310,7 @@ public class CYLThemeManager: NSObject {
                 snapshots.append(snapshot)
             }
         }
-        NotificationCenter.default.post(name: .CYLThemeDidChange, object: self)
+        NotificationCenter.default.post(name: .cylThemeDidChange, object: self)
         let identifier = currentThemeIdentifier
         let theme = currentTheme
         CYLThemeRuntime.beginChange()

@@ -303,7 +303,7 @@ extension UIColor {
      * [CN] 浅色模式下为 `lightColor`、深色模式下为 `darkColor` 的颜色；`darkColor` 为 nil 时直接返回 `lightColor`。
      */
     @objc(cyl_colorWithLightColor:darkColor:)
-    public class func cyl_color(withLight lightColor: UIColor, dark darkColor: UIColor?) -> UIColor {
+    public class func cylColor(withLight lightColor: UIColor, dark darkColor: UIColor?) -> UIColor {
         guard let darkColor else {
             return lightColor
         }

@@ -201,7 +201,7 @@ extension CYLTabBar {
             // controller, e.g. each time `window.rootViewController` is replaced) left an observer behind for good.
             // 保存 token 并在 `-dealloc` 中移除；以前直接丢弃，每个 TabBar（每次替换 `window.rootViewController` 都会新建）都会永久留下一个观察者。
             storage.animationPlayingObserver = NotificationCenter.default.addObserver(
-                forName: .CYLTabBarItemAnimationPlaying, object: nil, queue: .main) { [weak self] _ in
+                forName: .cylTabBarItemAnimationPlaying, object: nil, queue: .main) { [weak self] _ in
                 MainActor.assumeIsolated {
                     // Library-neutral (#604): every animation library (Lottie, PAG), from the `CYLTabBarItemAnimation` subspec.
                     // 与动画库无关：所有动画库（Lottie、PAG），由 `CYLTabBarItemAnimation` 子库处理。
@@ -226,7 +226,7 @@ extension CYLTabBar {
             // [EN] Liquid Glass does not support a custom height: the Liquid Glass system style has a fixed height.
             return size
         }
-        let tabBarController = cyl_tabBarController
+        let tabBarController = cylTabBarController
         let height = (tabBarController?.tabBarHeight ?? 0) + (tabBarController?.view.safeAreaInsets.bottom ?? 0)
         if height > 0 {
             size.height = height
@@ -276,7 +276,7 @@ extension CYLTabBar {
         didChangeValue(forKey: "tabBarItemWidth")
         NotificationCenter.default.post(name: NSNotification.Name("CYLTabBarItemWidthDidChangeNotification"), object: self)
         // [EN] `CYL_IS_IPHONE_X`: a screen of at least 375 × 812 pt. [CN] `CYL_IS_IPHONE_X`：屏幕至少为 375 × 812 pt。
-        if let size = cyl_tabBarController?.visiableTabBarSize(),
+        if let size = cylTabBarController?.visiableTabBarSize(),
            min(size.width, size.height) >= 375 && max(size.width, size.height) >= 812 {
             layoutIfNeeded()
         }
@@ -356,9 +356,9 @@ extension CYLTabBar {
         // [CN] 待改进：iOS26 考虑应该放进选中图层，而非粗暴放进最底层，这样未来可以 PlusButton 支持自定义index
         // [EN] To improve: on iOS26, consider putting this into the selected layer instead of crudely putting it at the bottom,
         //      so that PlusButton can support a custom index in the future.
-        cyl_addPlatterViewThenBringSubview(toFront: plusButton)
+        cylAddPlatterViewThenBringSubview(toFront: plusButton)
         isPlusButtonActive = true
-        plusButton.cylSetTabBarController(cyl_tabBarController)
+        plusButton.cylSetTabBarController(cylTabBarController)
     }
 
     @objc(cyl_tabBarIsPlusButtonLayoutCentered)
@@ -373,7 +373,7 @@ extension CYLTabBar {
         if let owner = delegate as? CYLTabBarController {
             return owner
         }
-        return cyl_tabBarController
+        return cylTabBarController
     }
 
     // MARK: - [EN] Classic styles and UITabBarAppearance [CN] 经典样式与 UITabBarAppearance
@@ -384,14 +384,14 @@ extension CYLTabBar {
         }
         var tabLabelTextColor = UIColor.cyl_systemGray
         for childView in cylTabBarStorage.tabBarButtonArray where !childView.isSelected {
-            if childView.cyl_tabEffectView() != nil, let label = childView.cyl_tabLabel() {
+            if childView.cylTabEffectView() != nil, let label = childView.cylTabLabel() {
                 tabLabelTextColor = label.textColor
             }
         }
         if #available(iOS 26.0, *) {
             // fix #631
             for tabButton in cylTabBarSubviews() {
-                for case let label as UILabel in tabButton.subviews where label.cyl_isTabLabel() {
+                for case let label as UILabel in tabButton.subviews where label.cylIsTabLabel() {
                     tabLabelTextColor = label.textColor
                     break
                 }
@@ -424,7 +424,7 @@ extension CYLTabBar {
         let apply: (UITabBarAppearance) -> Void = { appearance in
             barBlock?(appearance)
             if let itemBlock {
-                appearance.cyl_applyItemAppearance(itemBlock)
+                appearance.cylApplyItemAppearance(itemBlock)
             }
         }
         let standardAppearance = standardAppearance.copy()
@@ -512,7 +512,7 @@ extension CYLTabBar {
         }
         // [EN] Classic style: badges of tab buttons UIKit replaced follow to the new buttons. [CN] 经典样式：角标跟随到 UIKit 替换后的新按钮。
         for item in items ?? [] {
-            item.cyl_moveBadgeToCurrentTabButtonIfNeeded()
+            item.cylMoveBadgeToCurrentTabButtonIfNeeded()
         }
         // The tab titles may have moved: lay the plus button out again so its title follows them
         // (`+alignsTitleWithTabBarItemTitles`).
@@ -558,12 +558,12 @@ extension CYLTabBar {
         //      longer modified
         if !CYLConstants.isLiquidGlassActive() {
             cylRemoveAlphaObservers()
-            let backgroundView = cyl_tabBackgroundView()
-            cylObserveAlpha(of: cyl_tabShadowImageView()?.subviews.first)
+            let backgroundView = cylTabBackgroundView()
+            cylObserveAlpha(of: cylTabShadowImageView()?.subviews.first)
             if UITabBar.appearance().backgroundImage != nil {
-                cylObserveAlpha(of: backgroundView?.cyl_imageView())
+                cylObserveAlpha(of: backgroundView?.cylImageView())
             } else {
-                cylObserveAlpha(of: backgroundView?.cyl_tabEffectView())
+                cylObserveAlpha(of: backgroundView?.cylTabEffectView())
             }
         }
         cylCutOverflowingTabTitlesIfNeeded()
@@ -585,7 +585,7 @@ extension CYLTabBar {
             didLayoutSubViewsBlock?(self)
             return
         }
-        let plusButtonWidth = cyl_plusButtonWidth()
+        let plusButtonWidth = cylPlusButtonWidth()
         let layout = cylItemLayout(forTabCount: Int(cyl_tabbarItemsCount), plusWidth: plusButtonWidth)
         storage.itemLayoutLeading = layout.leading
         storage.itemLayoutSpacing = layout.spacing
@@ -647,7 +647,7 @@ extension CYLTabBar {
             var x = childViewX
             // [CN] RTL（如阿语）下镜像 x 坐标，使第 0 个 Tab 位于最右侧
             // [EN] Mirror the x coordinate under RTL (e.g. Arabic) so that tab 0 is on the far right
-            if cyl_isRightToLeftLayout() {
+            if cylIsRightToLeftLayout() {
                 x = cylBoundsSize().width - x - tabBarItemWidth
             }
             // [CN] 仅修改childView的x和宽度,yh值不变
@@ -781,7 +781,7 @@ extension CYLTabBar {
     /// [EN] Hides (true) or restores (false) the plus button and every inserted view inside this tab bar, in one pass.
     /// [CN] 一次性隐藏（true）或恢复（false）PlusButton 与本 TabBar 中所有被插入的视图。
     private func cylSetInsertedViewsHidden(forCustomizing hidden: Bool) {
-        var views = UIView.cyl_insertedTabControlViews().filter { $0.isDescendant(of: self) }
+        var views = UIView.cylInsertedTabControlViews().filter { $0.isDescendant(of: self) }
         if let plusButton = cylRegisteredPlusButton, plusButton.isDescendant(of: self) {
             views.append(plusButton)
         }
@@ -917,7 +917,7 @@ extension CYLTabBar {
             cylRestoreCutTabTitles()
             return
         }
-        let platterView = cylContentView()
+        let platterView = cylTabBarContentView()
         let platterWidth = platterView.bounds.width
         guard platterWidth > 0 else { return }
         if cylHasCutTabTitles() {
@@ -940,13 +940,13 @@ extension CYLTabBar {
         guard excess > 0.5 else { return }
         // [EN] The width each title shows now, in its own label's font. [CN] 每个标题当前显示的宽度，使用其标签的字体。
         let widths: [CGFloat] = items.indices.map { index in
-            guard let font = tabButtons[index].cyl_tabLabel()?.font, let title = items[index].title, !title.isEmpty else { return 0 }
+            guard let font = tabButtons[index].cylTabLabel()?.font, let title = items[index].title, !title.isEmpty else { return 0 }
             return (title as NSString).size(withAttributes: [.font: font]).width.rounded(.up)
         }
         let cap = cylTitleWidthCapRemovingWidth(widths, excess + 1)
         var didCut = false
         for (index, item) in items.enumerated() where widths[index] > cap {
-            guard let font = tabButtons[index].cyl_tabLabel()?.font,
+            guard let font = tabButtons[index].cylTabLabel()?.font,
                   let fullTitle = cylFullTitle(of: item) ?? item.title else { continue }
             let fittingTitle = cylTitleFittingWidth(fullTitle, cap, font)
             if fittingTitle == item.title {
@@ -983,14 +983,14 @@ extension CYLTabBar {
      */
     private func cylOverflow(ofTabButtons tabButtons: [UIView], inPlatterWidth platterWidth: CGFloat) -> CGFloat {
         let minimumTabTitleGap: CGFloat = 2
-        let platterView = cylContentView()
+        let platterView = cylTabBarContentView()
         var labelFrames: [CGRect] = []
         var excess: CGFloat = 0
         for tabButton in tabButtons {
             if tabButton.frame.width <= 0 {
                 return 0
             }
-            guard let label = tabButton.cyl_tabLabel(), label.text?.isEmpty == false, !label.isHidden, label.alpha > 0.01 else { continue }
+            guard let label = tabButton.cylTabLabel(), label.text?.isEmpty == false, !label.isHidden, label.alpha > 0.01 else { continue }
             let textWidth = label.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)).width
             excess += max(0, textWidth - label.bounds.width)
             labelFrames.append(label.convert(label.bounds, to: platterView))
@@ -1096,7 +1096,7 @@ extension CYLTabBar {
     @objc(cyl_tabBarPlusButtonIndex)
     func cylTabBarPlusButtonIndex() -> UInt {
         let plusButton = cylTabBarPlusButton()
-        var plusButtonIndex = plusButton.map { Int($0.cyl_index(forTabbarItemsCount: cyl_tabbarItemsCount)) } ?? 0
+        var plusButtonIndex = plusButton.map { Int($0.cylIndex(forTabbarItemsCount: cyl_tabbarItemsCount)) } ?? 0
         let tabBarWidth = cylBoundsSize().width
         let tabBarHeight = cylBoundsSize().height
         let registeredPlusButton = cylRegisteredPlusButton
@@ -1143,7 +1143,7 @@ extension CYLTabBar {
             }
             return UInt(plusButtonIndex)
         }
-        let platterView = cylContentView()
+        let platterView = cylTabBarContentView()
         // [CN] 系统默认参数
         // [EN] System default parameters
         let multiplierOfTabBarHeight = cylMultiplierOfTabBarHeight()
@@ -1336,7 +1336,7 @@ extension CYLTabBar {
      * [CN] 横向液态玻璃 TabBar 上 PlusButton 覆盖的 Tab 按钮（它的 slot），已在 platter 中布局；尚未布局时返回 nil。
      */
     private func cylLiquidGlassPlusButtonSlot(at index: Int) -> UIView? {
-        let platterView = cylContentView()
+        let platterView = cylTabBarContentView()
         platterView.layoutIfNeeded()
         guard let slot = cylTabButton(at: index), slot.bounds.width > 0, slot.superview != nil, slot.isDescendant(of: platterView) else {
             return nil
@@ -1435,10 +1435,10 @@ extension CYLTabBar {
         var tabImageViewDefaultOffset: CGFloat = 0
         let tabButtonCenterY = cylTabButtonContentCenterY(tabBarButton)
         for subview in tabBarButton.subviews {
-            if subview.cyl_isTabLabel() {
+            if subview.cylIsTabLabel() {
                 shouldCustomizeImageView = false
             }
-            let isTabImageView = subview.cyl_isTabImageView()
+            let isTabImageView = subview.cylIsTabImageView()
             if isTabImageView {
                 tabImageViewDefaultOffset = (tabButtonCenterY - subview.center.y) * 0.5
             }
@@ -1478,7 +1478,7 @@ extension CYLTabBar {
         }
         // [CN] 1. 边界情况：不能响应点击事件
         // [EN] 1. Edge cases: cannot respond to tap events
-        if cyl_canNotResponseEvent() {
+        if cylCanNotResponseEvent() {
             return superHitTest(point)
         }
         // [CN] 2. 优先处理 PlusButton （包括其突出的部分）、TabBarItems 未凸出的部分。这一步主要是在处理只有两个 TabBarItems 的场景。
@@ -1520,7 +1520,7 @@ extension CYLTabBar {
             // 液态玻璃下 Tab 按钮在 platter 内，frame 是 platter 坐标，point 是本 TabBar 坐标；iPhone Duo 展开时 platter 居中、偏移较大，
             // 点击第 2 个 Tab 被识别为其他 Tab，导致选中状态下再次点击不回调 didSelectControl。这里先把 frame 转换到本 TabBar 坐标系。
             let isTabBarButtonFrame = cylConvertFrame(of: tabBarButton).contains(point) || cylConvertFrame(of: imageView).contains(point)
-            if isTabBarButtonFrame && !tabBarButton.cyl_canNotResponseEvent() {
+            if isTabBarButtonFrame && !tabBarButton.cylCanNotResponseEvent() {
                 return tabBarButton
             }
         }
@@ -1543,17 +1543,17 @@ extension CYLTabBar {
     /// [EN] Called by `-addSubview:` before super: records the Liquid Glass views. [CN] 由 `-addSubview:` 在调用 super 之前调用：记录液态玻璃视图。
     @objc(cyl_tabBarWillAddSubview:)
     func cylTabBarWillAddSubview(_ view: UIView) {
-        if view.cyl_isPlatterView() {
+        if view.cylIsPlatterView() {
             cylSetPlatterView(view)
             // [CN] 从 PlatterView 中，找真正承载 UITabBarButton 的 ContentView
             // [EN] Find, inside the PlatterView, the ContentView that actually holds the UITabBarButton
-            if let contentView = view.subviews.first(where: { $0.cyl_isPlatterContentView() }) {
+            if let contentView = view.subviews.first(where: { $0.cylIsPlatterContentView() }) {
                 cylSetPlatterContentView(contentView)
             }
         }
         // [CN] 点击后的聚焦瞬间遮罩
         // [EN] Momentary focus overlay shown after a tap
-        if view.cyl_isPlatterPortalView() && cylPortalView() == nil {
+        if view.cylIsPlatterPortalView() && cylPortalView() == nil {
             cylSetPortalView(view)
         }
     }
@@ -1616,12 +1616,12 @@ extension CYLTabBar {
         guard CYLConstants.isLiquidGlassActive() else { return }
         // [EN] The tab bar is its own gesture delegate (declared in CYLTabBar.m). [CN] TabBar 是自己的手势代理（在 CYLTabBar.m 中声明）。
         let delegate = (self as AnyObject) as? UIGestureRecognizerDelegate
-        if gestureRecognizer.cyl_isContinuousGestureRecognizer() {
+        if gestureRecognizer.cylIsContinuousGestureRecognizer() {
             liquidGlassContinuousGestureRecognizer = gestureRecognizer
             gestureRecognizer.delegate = delegate
             gestureRecognizer.addTarget(self, action: #selector(cylLiquidGlassGestureRecognizerDidUpdate(_:)))
         }
-        if gestureRecognizer.cyl_isLongGestureRecognizer() {
+        if gestureRecognizer.cylIsLongGestureRecognizer() {
             liquidGlassLongGestureRecognizer = gestureRecognizer
             gestureRecognizer.delegate = delegate
             gestureRecognizer.addTarget(self, action: #selector(cylLiquidGlassGestureRecognizerDidUpdate(_:)))
@@ -1673,7 +1673,7 @@ extension CYLTabBar {
             for sibling in currentParent.subviews {
                 guard let childIndex = currentParent.subviews.firstIndex(of: child),
                       let siblingIndex = currentParent.subviews.firstIndex(of: sibling) else { continue }
-                if siblingIndex > childIndex && sibling.cyl_isPlatterPortalView() {
+                if siblingIndex > childIndex && sibling.cylIsPlatterPortalView() {
                     currentParent.insertSubview(sibling, belowSubview: child)
                 }
             }
@@ -1762,7 +1762,7 @@ extension CYLTabBar {
             return false
         }
         let tabBarController = cylTabBarOwningTabBarController()
-        if let control = hitView as? UIControl, let tabBarController, control.cyl_isTabButton() || control is CYLPlusButton {
+        if let control = hitView as? UIControl, let tabBarController, control.cylIsTabButton() || control is CYLPlusButton {
             // [EN] A plus button with a child view controller counts as selected while its page is: on Liquid Glass its
             //      `selected` flag is not set when it reports a tap (that left its stand-in with the old image after a theme
             //      change), and a second tap on it must still be reported.
@@ -1771,7 +1771,7 @@ extension CYLTabBar {
             var isSelected = control.isSelected
             let plusChildViewController = control is CYLPlusButton ? CYLPlusButton.plusChildViewController(forOwner: self) : nil
             if !isSelected, let plusChildViewController, let selectedViewController = tabBarController.selectedViewController {
-                isSelected = selectedViewController.cyl_isEqual(to: plusChildViewController)
+                isSelected = selectedViewController.cylIsEqual(to: plusChildViewController)
             }
             if isSelected {
                 // [CN] FIX: iOS26 无法追加点击事件， 导致无法在选中状态下， 二次点击回调, 被系统手势拦截需要禁用特定手势，因为手势优先级高于 ControlEvents;
@@ -1808,24 +1808,24 @@ extension CYLTabBar {
         // [CN] 统一使用CYLTabBarItemAnimationPlayingNotification进行动画重置， 故删除手动重置。
         // [EN] Animation reset is handled uniformly via CYLTabBarItemAnimationPlayingNotification, so the manual reset
         //      was removed.
-        selectedControl?.cyl_playTabBarItemAnimation(with: url, size: size, defaultSelected: defaultSelected, contentMode: contentMode)
+        selectedControl?.cylPlayTabBarItemAnimation(with: url, size: size, defaultSelected: defaultSelected, contentMode: contentMode)
     }
 
     @objc(cyl_stopAllTabBarItemAnimations)
     public func cylStopAllTabBarItemAnimations() {
-        cylEnumerateAnimatedControls { $0.cyl_stopTabBarItemAnimation() }
+        cylEnumerateAnimatedControls { $0.cylStopTabBarItemAnimation() }
     }
 
     @objc(cyl_restartAllTabBarItemAnimations)
     public func cylRestartAllTabBarItemAnimations() {
-        cylEnumerateAnimatedControls { $0.cyl_restartTabBarItemAnimation() }
+        cylEnumerateAnimatedControls { $0.cylRestartTabBarItemAnimation() }
     }
 
     @objc(cyl_setAllTabBarItemAnimationsSpeed:loops:)
     public func cylSetAllTabBarItemAnimations(speed: CGFloat, loops: Bool) {
         cylEnumerateAnimatedControls { control in
-            control.cyl_setTabBarItemAnimationSpeed(speed)
-            control.cyl_setTabBarItemAnimationLoops(loops)
+            control.cylSetTabBarItemAnimationSpeed(speed)
+            control.cylSetTabBarItemAnimationLoops(loops)
         }
     }
 
@@ -1850,11 +1850,11 @@ extension CYLTabBar {
 extension UITabBar {
 
     func cylBackgroundView() -> UIView? {
-        cyl_value(forKey: "_backgroundView") as? UIView
+        cylValue(forKey: "_backgroundView") as? UIView
     }
 
     func cylShadowImageView() -> UIImageView? {
-        cyl_tabShadowImageView()
+        cylTabShadowImageView()
     }
 
     func cylEffectViews() -> [UIVisualEffectView]? {

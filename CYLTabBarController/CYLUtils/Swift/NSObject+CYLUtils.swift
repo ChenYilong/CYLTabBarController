@@ -24,7 +24,7 @@ extension NSObject {
      * [CN] 对接收者没有的 key 返回 nil 而不是抛出异常的 `valueForKey:`。
      */
     @objc(cyl_valueForKey:)
-    public func cyl_value(forKey key: String) -> Any? {
+    public func cylValue(forKey key: String) -> Any? {
         guard CYLKeyValueCoding.resolves(key, of: self, setting: false, value: nil) else {
             CYLKeyValueCoding.log("KVC failed", key: key, of: self)
             return nil
@@ -38,7 +38,7 @@ extension NSObject {
      * [CN] 对接收者没有的 key（或给标量传 nil）不做任何事而不是抛出异常的 `setValue:forKey:`。
      */
     @objc(cyl_setValue:forKey:)
-    public func cyl_setValue(_ value: Any?, forKey key: String) {
+    public func cylSetValue(_ value: Any?, forKey key: String) {
         guard CYLKeyValueCoding.resolves(key, of: self, setting: true, value: value) else {
             CYLKeyValueCoding.log("KVC set failed", key: key, of: self)
             return
@@ -57,7 +57,7 @@ extension NSObject {
             guard let viewController = self as? UIViewController else {
                 return own
             }
-            let root = viewController.cyl_getViewControllerInsteadOfNavigation()
+            let root = viewController.cylGetViewControllerInsteadOfNavigation()
             let rootFlag = (objc_getAssociatedObject(root, CYLUtilsKeys.isPlaceholder) as? NSNumber)?.boolValue ?? false
             return own || rootFlag
         }
@@ -69,7 +69,7 @@ extension NSObject {
                 return
             }
             // [EN] As the Objective-C version: the root of the root view controller. [CN] 与 Objective-C 版本相同：根控制器的根控制器。
-            let root = viewController.cyl_getViewControllerInsteadOfNavigation().cyl_getViewControllerInsteadOfNavigation()
+            let root = viewController.cylGetViewControllerInsteadOfNavigation().cylGetViewControllerInsteadOfNavigation()
             objc_setAssociatedObject(root, CYLUtilsKeys.isPlaceholder, flag, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
@@ -79,7 +79,7 @@ extension NSObject {
      * [CN] 以弱引用方式在 `key` 下保存 `object`；传 nil 则移除。
      */
     @objc(cyl_setWeakAssociatedObject:forKey:)
-    public func cyl_setWeakAssociatedObject(_ object: Any?, forKey key: UnsafeRawPointer) {
+    public func cylSetWeakAssociatedObject(_ object: Any?, forKey key: UnsafeRawPointer) {
         guard let object = object as AnyObject? else {
             objc_setAssociatedObject(self, key, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             return
@@ -92,7 +92,7 @@ extension NSObject {
      * [CN] 用 `-cyl_setWeakAssociatedObject:forKey:` 保存的对象，释放后为 nil。
      */
     @objc(cyl_weakAssociatedObjectForKey:)
-    public func cyl_weakAssociatedObject(forKey key: UnsafeRawPointer) -> Any? {
+    public func cylWeakAssociatedObject(forKey key: UnsafeRawPointer) -> Any? {
         (objc_getAssociatedObject(self, key) as? CYLWeakBox)?.object
     }
 }

@@ -106,8 +106,8 @@ extension CYLTabBarController {
      * [CN] Tab 按钮对应的控制器，PlusButton 返回 nil。
      */
     @objc(cyl_viewControllerForTabControl:)
-    func cyl_viewController(forTabControl control: UIControl?) -> UIViewController? {
-        guard let control, !control.cyl_isPlusControl() else {
+    func cylViewController(forTabControl control: UIControl?) -> UIViewController? {
+        guard let control, !control.cylIsPlusControl() else {
             return nil
         }
         let viewControllers = self.viewControllers ?? []
@@ -117,14 +117,14 @@ extension CYLTabBarController {
         // [EN] Liquid Glass shows two buttons per tab; the selected layer's button stands for the normal one.
         // [CN] 液态玻璃中每个 Tab 有两个按钮；选中层的按钮对应普通层的按钮。
         var candidates: [UIControl] = [control]
-        if control.cyl_isPlatterSelectedControl() {
-            let normalControl = control.cyl_platterNormal()
+        if control.cylIsPlatterSelectedControl() {
+            let normalControl = control.cylPlatterNormal()
             if normalControl !== control {
                 candidates.append(normalControl)
             }
         }
         for viewController in viewControllers where !viewController.cyl_isPlaceholder {
-            let contentViewController = viewController.cyl_getViewControllerInsteadOfNavigation()
+            let contentViewController = viewController.cylGetViewControllerInsteadOfNavigation()
             for candidate in candidates where viewController.tabBarItem.cyl_tabButton === candidate
                 || viewController.cyl_tabButton === candidate || contentViewController.cyl_tabButton === candidate {
                 return viewController
@@ -310,21 +310,21 @@ extension CYLTabBarController {
 
     @objc(cyl_tabBarItemTitleFont)
     open var cyl_tabBarItemTitleFont: UIFont? {
-        @objc(cyl_tabBarItemTitleFont) get { cylTabBarItemTitleFont() }
+        @objc(cyl_tabBarItemTitleFont) get { cylTabBarItemTitleFontValue() }
         @objc(setCyl_tabBarItemTitleFont:) set { cylSetTabBarItemTitleFont(newValue) }
     }
 
-    func cylTabBarItemTitleFont() -> UIFont? { cylTabBarItemStyle(CYLTabBarItemStyleKey.titleFont) }
+    func cylTabBarItemTitleFontValue() -> UIFont? { cylTabBarItemStyle(CYLTabBarItemStyleKey.titleFont) }
     func cylSetTabBarItemTitleFont(_ font: UIFont?) {
         cylSetTabBarItemStyle(font, forKey: CYLTabBarItemStyleKey.titleFont)
     }
     @objc(cyl_tabBarItemSelectedTitleFont)
     open var cyl_tabBarItemSelectedTitleFont: UIFont? {
-        @objc(cyl_tabBarItemSelectedTitleFont) get { cylTabBarItemSelectedTitleFont() }
+        @objc(cyl_tabBarItemSelectedTitleFont) get { cylTabBarItemSelectedTitleFontValue() }
         @objc(setCyl_tabBarItemSelectedTitleFont:) set { cylSetTabBarItemSelectedTitleFont(newValue) }
     }
 
-    func cylTabBarItemSelectedTitleFont() -> UIFont? {
+    func cylTabBarItemSelectedTitleFontValue() -> UIFont? {
         cylTabBarItemStyle(CYLTabBarItemStyleKey.selectedTitleFont)
     }
     func cylSetTabBarItemSelectedTitleFont(_ font: UIFont?) {
@@ -332,21 +332,21 @@ extension CYLTabBarController {
     }
     @objc(cyl_tabBarItemTitleColor)
     open var cyl_tabBarItemTitleColor: UIColor? {
-        @objc(cyl_tabBarItemTitleColor) get { cylTabBarItemTitleColor() }
+        @objc(cyl_tabBarItemTitleColor) get { cylTabBarItemTitleColorValue() }
         @objc(setCyl_tabBarItemTitleColor:) set { cylSetTabBarItemTitleColor(newValue) }
     }
 
-    func cylTabBarItemTitleColor() -> UIColor? { cylTabBarItemStyle(CYLTabBarItemStyleKey.titleColor) }
+    func cylTabBarItemTitleColorValue() -> UIColor? { cylTabBarItemStyle(CYLTabBarItemStyleKey.titleColor) }
     func cylSetTabBarItemTitleColor(_ color: UIColor?) {
         cylSetTabBarItemStyle(color, forKey: CYLTabBarItemStyleKey.titleColor)
     }
     @objc(cyl_tabBarItemSelectedTitleColor)
     open var cyl_tabBarItemSelectedTitleColor: UIColor? {
-        @objc(cyl_tabBarItemSelectedTitleColor) get { cylTabBarItemSelectedTitleColor() }
+        @objc(cyl_tabBarItemSelectedTitleColor) get { cylTabBarItemSelectedTitleColorValue() }
         @objc(setCyl_tabBarItemSelectedTitleColor:) set { cylSetTabBarItemSelectedTitleColor(newValue) }
     }
 
-    func cylTabBarItemSelectedTitleColor() -> UIColor? {
+    func cylTabBarItemSelectedTitleColorValue() -> UIColor? {
         cylTabBarItemStyle(CYLTabBarItemStyleKey.selectedTitleColor)
     }
     func cylSetTabBarItemSelectedTitleColor(_ color: UIColor?) {
@@ -376,21 +376,21 @@ extension CYLTabBarController {
     }
     @objc(cyl_tabBarBackgroundColor)
     open var cyl_tabBarBackgroundColor: UIColor? {
-        @objc(cyl_tabBarBackgroundColor) get { cylTabBarBackgroundColor() }
+        @objc(cyl_tabBarBackgroundColor) get { cylTabBarBackgroundColorValue() }
         @objc(setCyl_tabBarBackgroundColor:) set { cylSetTabBarBackgroundColor(newValue) }
     }
 
-    func cylTabBarBackgroundColor() -> UIColor? { cylTabBarItemStyle(CYLTabBarItemStyleKey.backgroundColor) }
+    func cylTabBarBackgroundColorValue() -> UIColor? { cylTabBarItemStyle(CYLTabBarItemStyleKey.backgroundColor) }
     func cylSetTabBarBackgroundColor(_ color: UIColor?) {
         cylSetTabBarItemStyle(color, forKey: CYLTabBarItemStyleKey.backgroundColor)
     }
     @objc(cyl_tabBarShadowColor)
     open var cyl_tabBarShadowColor: UIColor? {
-        @objc(cyl_tabBarShadowColor) get { cylTabBarShadowColor() }
+        @objc(cyl_tabBarShadowColor) get { cylTabBarShadowColorValue() }
         @objc(setCyl_tabBarShadowColor:) set { cylSetTabBarShadowColor(newValue) }
     }
 
-    func cylTabBarShadowColor() -> UIColor? { cylTabBarItemStyle(CYLTabBarItemStyleKey.shadowColor) }
+    func cylTabBarShadowColorValue() -> UIColor? { cylTabBarItemStyle(CYLTabBarItemStyleKey.shadowColor) }
     func cylSetTabBarShadowColor(_ color: UIColor?) {
         cylSetTabBarItemStyle(color, forKey: CYLTabBarItemStyleKey.shadowColor)
     }
@@ -419,7 +419,7 @@ extension CYLTabBarController {
             if let shadowColor {
                 appearance.shadowColor = shadowColor
             }
-            appearance.cyl_applyItemAppearance { itemAppearance in
+            appearance.cylApplyItemAppearance { itemAppearance in
                 let normal = cylAttributes(itemAppearance.normal.titleTextAttributes, setting: .font, to: titleFont)
                 itemAppearance.normal.titleTextAttributes = cylAttributes(normal, setting: .foregroundColor, to: titleColor)
                 let selected = cylAttributes(itemAppearance.selected.titleTextAttributes, setting: .font, to: selectedTitleFont)

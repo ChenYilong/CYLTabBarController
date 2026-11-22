@@ -11,19 +11,19 @@ import Foundation
  * [EN] The error domain of configuration files (`CYLTabBarConfigurationErrorCode`).
  * [CN] 配置文件的错误域（`CYLTabBarConfigurationErrorCode`）。
  */
-public let CYLTabBarConfigurationErrorDomain = "CYLTabBarConfigurationErrorDomain"
+public let cylTabBarConfigurationErrorDomain = "CYLTabBarConfigurationErrorDomain"
 
 /**
  * [EN] The largest configuration accepted, in bytes (5 MB).
  * [CN] 可接受的最大配置字节数（5 MB）。
  */
-public let CYLTabBarConfigurationMaximumLength: UInt = 5 * 1024 * 1024
+public let cylTabBarConfigurationMaximumLength: UInt = 5 * 1024 * 1024
 
 /**
  * [EN] The deepest nesting accepted in a configuration.
  * [CN] 配置可接受的最大嵌套层数。
  */
-public let CYLTabBarConfigurationMaximumDepth: UInt = 64
+public let cylTabBarConfigurationMaximumDepth: UInt = 64
 
 /**
  * [EN] The format of a configuration file. Objective-C sees the same constant names (`CYLTabBarConfigurationFormatJSON` …).
@@ -365,9 +365,9 @@ public class CYLTabBarConfigurationParser: NSObject {
             && !isDirectory.boolValue
         let attributes = exists ? try? FileManager.default.attributesOfItem(atPath: path) : nil
         let size = (attributes?[.size] as? NSNumber)?.uint64Value ?? 0
-        if size > UInt64(CYLTabBarConfigurationMaximumLength) {
+        if size > UInt64(cylTabBarConfigurationMaximumLength) {
             throw Text.error(.tooLarge, "\"\((path as NSString).lastPathComponent)\" is \(size) bytes, more than the "
-                                        + "\(CYLTabBarConfigurationMaximumLength) allowed.")
+                                        + "\(cylTabBarConfigurationMaximumLength) allowed.")
         }
         guard exists, let data = FileManager.default.contents(atPath: path) else {
             throw Text.error(.fileNotFound, "No configuration file at \"\(path)\".")
@@ -379,9 +379,9 @@ public class CYLTabBarConfigurationParser: NSObject {
 
     private class func parse(_ data: Data, _ declaredFormat: CYLTabBarConfigurationFormat,
                              _ error: inout NSError?) -> [String: Any]? {
-        if data.count > Int(CYLTabBarConfigurationMaximumLength) {
+        if data.count > Int(cylTabBarConfigurationMaximumLength) {
             error = Text.error(.tooLarge, "The configuration is \(data.count) bytes, more than the "
-                                          + "\(CYLTabBarConfigurationMaximumLength) allowed.")
+                                          + "\(cylTabBarConfigurationMaximumLength) allowed.")
             return nil
         }
         let text = Text.string(from: data)

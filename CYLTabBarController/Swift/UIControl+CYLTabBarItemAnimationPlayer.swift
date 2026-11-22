@@ -31,7 +31,7 @@ extension UIControl {
      */
     @objc(cyl_tabBarItemAnimationPlayer)
     public var cyl_tabBarItemAnimationPlayer: CYLTabBarItemAnimationPlayer? {
-        CYLTabBarItemAnimationFactory.player(for: cyl_tabBarItemAnimationView())
+        CYLTabBarItemAnimationFactory.player(for: cylTabBarItemAnimationView())
     }
 }
 #endif

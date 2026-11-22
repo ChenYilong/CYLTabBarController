@@ -20,7 +20,7 @@ import CYLAnimatedItem
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemTitle = "CYLTabBarItemTitle"
+public let cylTabBarItemTitle = "CYLTabBarItemTitle"
 
 /**
  * FIX: issue #433
@@ -35,7 +35,7 @@ public let CYLTabBarItemTitle = "CYLTabBarItemTitle"
  *      以及再次点击手势（`cyl_tabBarItemGestureHandler`），实现再次点击刷新。与 `CYLTabBarItemTitle` 一样，可以通过
  *      `-updateTabBarItemAtIndex:attributes:` 原地修改。见 docs/TabBarItem-Selected-Title.md。
  */
-public let CYLTabBarItemSelectedTitle = "CYLTabBarItemSelectedTitle"
+public let cylTabBarItemSelectedTitle = "CYLTabBarItemSelectedTitle"
 
 /**
  * FIX: issue #465
@@ -49,13 +49,13 @@ public let CYLTabBarItemSelectedTitle = "CYLTabBarItemSelectedTitle"
  *      渲染模式为 `Automatic`，TabBar 会把它当作模板图着色，图标变成单色剪影，除非先调用
  *      `imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal`。
  */
-public let CYLTabBarItemImage = "CYLTabBarItemImage"
+public let cylTabBarItemImage = "CYLTabBarItemImage"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemSelectedImage = "CYLTabBarItemSelectedImage"
+public let cylTabBarItemSelectedImage = "CYLTabBarItemSelectedImage"
 
 /**
  * FIX: issue #620
@@ -67,13 +67,13 @@ public let CYLTabBarItemSelectedImage = "CYLTabBarItemSelectedImage"
  *      （系统设置或 `overrideUserInterfaceStyle`）Tab 显示这些图片，并自动切换。图片在 Asset Catalog 中自带 Dark 外观或存在
  *      「<图片名>_dark」（`UIImage.cyl_darkImageNameSuffix`）时无需设置；设置后优先于它们。
  */
-public let CYLTabBarItemDarkImage = "CYLTabBarItemDarkImage"
+public let cylTabBarItemDarkImage = "CYLTabBarItemDarkImage"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemSelectedDarkImage = "CYLTabBarItemSelectedDarkImage"
+public let cylTabBarItemSelectedDarkImage = "CYLTabBarItemSelectedDarkImage"
 
 /**
  * FIX: issue #601, #337, #215
@@ -98,19 +98,19 @@ public let CYLTabBarItemSelectedDarkImage = "CYLTabBarItemSelectedDarkImage"
  *      按原图颜色绘制，GIF 会播放动画。`CYLTabBarItemImageURLSize`（CGSize 的 NSValue）设置其尺寸，默认与占位图相同。图片缓存在内存及
  *      沙盒中，缓存时长与大小见 `CYLImageCache`。示例见上。
  */
-public let CYLTabBarItemImageURL = "CYLTabBarItemImageURL"
+public let cylTabBarItemImageURL = "CYLTabBarItemImageURL"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemSelectedImageURL = "CYLTabBarItemSelectedImageURL"
+public let cylTabBarItemSelectedImageURL = "CYLTabBarItemSelectedImageURL"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemImageURLSize = "CYLTabBarItemImageURLSize"
+public let cylTabBarItemImageURLSize = "CYLTabBarItemImageURLSize"
 
 /**
  * FIX: issue #604 — generic animation keys, for every animation library.
@@ -128,37 +128,37 @@ public let CYLTabBarItemImageURLSize = "CYLTabBarItemImageURLSize"
  *      - `CYLTabBarAnimationDarkURL` / `CYLTabBarAnimationDarkFilePath`：深色模式版本（#442）。
  *      - `CYLTabBarAnimationDarkColors`：深色模式下 keypath -> UIColor，用于支持该功能的动画库（Lottie 4.x）。
  */
-public let CYLTabBarAnimationURL = "CYLTabBarAnimationURL"
+public let cylTabBarAnimationURL = "CYLTabBarAnimationURL"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarAnimationFilePath = "CYLTabBarAnimationFilePath"
+public let cylTabBarAnimationFilePath = "CYLTabBarAnimationFilePath"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarAnimationSize = "CYLTabBarAnimationSize"
+public let cylTabBarAnimationSize = "CYLTabBarAnimationSize"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarAnimationDarkURL = "CYLTabBarAnimationDarkURL"
+public let cylTabBarAnimationDarkURL = "CYLTabBarAnimationDarkURL"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarAnimationDarkFilePath = "CYLTabBarAnimationDarkFilePath"
+public let cylTabBarAnimationDarkFilePath = "CYLTabBarAnimationDarkFilePath"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarAnimationDarkColors = "CYLTabBarAnimationDarkColors"
+public let cylTabBarAnimationDarkColors = "CYLTabBarAnimationDarkColors"
 
 /**
  * FIX: issue #216
@@ -169,25 +169,25 @@ public let CYLTabBarAnimationDarkColors = "CYLTabBarAnimationDarkColors"
  *      主题颜色（`+[UIColor cyl_colorWithThemeProvider:]`）会在每次主题切换时重新解析，使动画跟随皮肤；深色模式下再叠加
  *      `CYLTabBarAnimationDarkColors`。
  */
-public let CYLTabBarAnimationColors = "CYLTabBarAnimationColors"
+public let cylTabBarAnimationColors = "CYLTabBarAnimationColors"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemImageInsets = "CYLTabBarItemImageInsets"
+public let cylTabBarItemImageInsets = "CYLTabBarItemImageInsets"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemTitlePositionAdjustment = "CYLTabBarItemTitlePositionAdjustment"
+public let cylTabBarItemTitlePositionAdjustment = "CYLTabBarItemTitlePositionAdjustment"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemImagePositionAdjustment = "CYLTabBarItemImagePositionAdjustment"
+public let cylTabBarItemImagePositionAdjustment = "CYLTabBarItemImagePositionAdjustment"
 
 /**
  * FIX: issue #408
@@ -206,7 +206,7 @@ public let CYLTabBarItemImagePositionAdjustment = "CYLTabBarItemImagePositionAdj
  *      后续同类的 Tab 依次加 "_2"、"_3"……；PlusButton 的默认值为其类名，例如 @"CYLPlusButtonSubclass"（见
  *      `+cyl_defaultTabBarItemIdentifierForClass:`）。与下标或标题不同，类名不会因增减 Tab 或切换语言而改变。
  */
-public let CYLTabBarItemIdentifier = "CYLTabBarItemIdentifier"
+public let cylTabBarItemIdentifier = "CYLTabBarItemIdentifier"
 
 /**
  * [EN] Keys of a tab bar configuration: one dictionary that holds everything an initializer takes, for
@@ -253,61 +253,61 @@ public let CYLTabBarItemIdentifier = "CYLTabBarItemIdentifier"
  *      - `CYLTabBarControllerAutomaticPageRegistration`：NSNumber（BOOL），或 "true" / "false"；为 NO 时不在遵守 `CYLTabBarPage` 的类中
  *        查找。默认 YES。
  */
-public let CYLTabBarControllerViewControllers = "CYLTabBarControllerViewControllers"
+public let cylTabBarControllerViewControllers = "CYLTabBarControllerViewControllers"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerTabBarItemsAttributes = "CYLTabBarControllerTabBarItemsAttributes"
+public let cylTabBarControllerTabBarItemsAttributes = "CYLTabBarControllerTabBarItemsAttributes"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerImageInsets = "CYLTabBarControllerImageInsets"
+public let cylTabBarControllerImageInsets = "CYLTabBarControllerImageInsets"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerTitlePositionAdjustment = "CYLTabBarControllerTitlePositionAdjustment"
+public let cylTabBarControllerTitlePositionAdjustment = "CYLTabBarControllerTitlePositionAdjustment"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerStyleType = "CYLTabBarControllerStyleType"
+public let cylTabBarControllerStyleType = "CYLTabBarControllerStyleType"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerContext = "CYLTabBarControllerContext"
+public let cylTabBarControllerContext = "CYLTabBarControllerContext"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerPageRegistry = "CYLTabBarControllerPageRegistry"
+public let cylTabBarControllerPageRegistry = "CYLTabBarControllerPageRegistry"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerPageResolver = "CYLTabBarControllerPageResolver"
+public let cylTabBarControllerPageResolver = "CYLTabBarControllerPageResolver"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerPageLookupOrder = "CYLTabBarControllerPageLookupOrder"
+public let cylTabBarControllerPageLookupOrder = "CYLTabBarControllerPageLookupOrder"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerAutomaticPageRegistration = "CYLTabBarControllerAutomaticPageRegistration"
+public let cylTabBarControllerAutomaticPageRegistration = "CYLTabBarControllerAutomaticPageRegistration"
 
 /**
  * [EN] `CYLTabBarControllerTabBarItemAnimationSpeed`: NSNumber (or a number in a file), the playback speed of every tab
@@ -316,7 +316,7 @@ public let CYLTabBarControllerAutomaticPageRegistration = "CYLTabBarControllerAu
  * [CN] `CYLTabBarControllerTabBarItemAnimationSpeed`：NSNumber（文件中为数字），所有 Tab 动画的播放速度（`tabBarItemAnimationSpeed`）；
  *      1 为文件本身的速度。未设置时使用默认值。无效（0、负数、NaN、不是数字）时忽略并输出警告。
  */
-public let CYLTabBarControllerTabBarItemAnimationSpeed = "CYLTabBarControllerTabBarItemAnimationSpeed"
+public let cylTabBarControllerTabBarItemAnimationSpeed = "CYLTabBarControllerTabBarItemAnimationSpeed"
 
 /**
  * [EN] The plus button of a configuration, so a configuration alone (a file, a URL, React Native or Flutter) can show one:
@@ -335,13 +335,13 @@ public let CYLTabBarControllerTabBarItemAnimationSpeed = "CYLTabBarControllerTab
  *        位于中间，因此 Tab 数量应为偶数。有标题时标题与 Tab 标题对齐（`+alignsTitleWithTabBarItemTitles`）。不是字典时忽略并输出警告。
  *      - `CYLTabBarControllerPlusButtonAction`：block `void (^)(CYLPlusButton *plusButton)`（仅代码），点击 PlusButton 时执行。
  */
-public let CYLTabBarControllerPlusButton = "CYLTabBarControllerPlusButton"
+public let cylTabBarControllerPlusButton = "CYLTabBarControllerPlusButton"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerPlusButtonAction = "CYLTabBarControllerPlusButtonAction"
+public let cylTabBarControllerPlusButtonAction = "CYLTabBarControllerPlusButtonAction"
 
 /**
  * [EN] More keys of the `CYLTabBarControllerPlusButton` dictionary, for the layouts the `CYLPlusButtonSubclassing` methods
@@ -384,55 +384,55 @@ public let CYLTabBarControllerPlusButtonAction = "CYLTabBarControllerPlusButtonA
  *      - `CYLTabBarItemPageIdentifier`：PlusButton 选中自己的页面，按 Tab 页面的方式查找（配置的解析回调、注册表或全局注册表；
  *        `+plusChildViewController`）。
  */
-public let CYLPlusButtonBackgroundImage = "CYLPlusButtonBackgroundImage"
+public let cylPlusButtonBackgroundImage = "CYLPlusButtonBackgroundImage"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLPlusButtonIndexInTabBar = "CYLPlusButtonIndexInTabBar"
+public let cylPlusButtonIndexInTabBar = "CYLPlusButtonIndexInTabBar"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLPlusButtonCenterYMultiplier = "CYLPlusButtonCenterYMultiplier"
+public let cylPlusButtonCenterYMultiplier = "CYLPlusButtonCenterYMultiplier"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLPlusButtonCenterYOffset = "CYLPlusButtonCenterYOffset"
+public let cylPlusButtonCenterYOffset = "CYLPlusButtonCenterYOffset"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLPlusButtonAlignsTitle = "CYLPlusButtonAlignsTitle"
+public let cylPlusButtonAlignsTitle = "CYLPlusButtonAlignsTitle"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLPlusButtonKeepsTitleVisible = "CYLPlusButtonKeepsTitleVisible"
+public let cylPlusButtonKeepsTitleVisible = "CYLPlusButtonKeepsTitleVisible"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLPlusButtonShowsSelection = "CYLPlusButtonShowsSelection"
+public let cylPlusButtonShowsSelection = "CYLPlusButtonShowsSelection"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLPlusButtonSize = "CYLPlusButtonSize"
+public let cylPlusButtonSize = "CYLPlusButtonSize"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLPlusButtonImageSize = "CYLPlusButtonImageSize"
+public let cylPlusButtonImageSize = "CYLPlusButtonImageSize"
 
 /**
  * [EN] Interaction and appearance keys of a configuration:
@@ -462,37 +462,37 @@ public let CYLPlusButtonImageSize = "CYLPlusButtonImageSize"
  *      - `CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers`：内存警告时不卸载的 Tab 的标识（`cyl_keepsLoadedTabBarItemIdentifiers`），
  *        相当于在代码中重写 `-shouldUnloadViewOfViewController:`；字符串数组或逗号分隔的字符串。
  */
-public let CYLTabBarControllerUserInterfaceStyle = "CYLTabBarControllerUserInterfaceStyle"
+public let cylTabBarControllerUserInterfaceStyle = "CYLTabBarControllerUserInterfaceStyle"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerTabButtonTapAnimation = "CYLTabBarControllerTabButtonTapAnimation"
+public let cylTabBarControllerTabButtonTapAnimation = "CYLTabBarControllerTabButtonTapAnimation"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerSwipeToSwitchTab = "CYLTabBarControllerSwipeToSwitchTab"
+public let cylTabBarControllerSwipeToSwitchTab = "CYLTabBarControllerSwipeToSwitchTab"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerLoginRequiredTabBarItemIdentifiers = "CYLTabBarControllerLoginRequiredTabBarItemIdentifiers"
+public let cylTabBarControllerLoginRequiredTabBarItemIdentifiers = "CYLTabBarControllerLoginRequiredTabBarItemIdentifiers"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning = "CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning"
+public let cylTabBarControllerUnloadsUnselectedViewsOnMemoryWarning = "CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers = "CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers"
+public let cylTabBarControllerKeepsLoadedTabBarItemIdentifiers = "CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers"
 
 /**
  * [EN] Skins in a configuration (see docs/Configuration-File.md, "Skins"; the named values follow QMUI's skins):
@@ -527,25 +527,25 @@ public let CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers = "CYLTabBarContr
  *      每个皮肤成为该管理器的一个 `CYLTabBarConfigurationTheme`（`CYLTabBarTheme`）；用 `manager.currentThemeIdentifier = @"dark"` 切换。
  *      之前已选择的皮肤（持久化的，或 App 设置的）保持不变。
  */
-public let CYLTabBarControllerThemes = "CYLTabBarControllerThemes"
+public let cylTabBarControllerThemes = "CYLTabBarControllerThemes"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerThemeIdentifier = "CYLTabBarControllerThemeIdentifier"
+public let cylTabBarControllerThemeIdentifier = "CYLTabBarControllerThemeIdentifier"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerDarkThemeIdentifier = "CYLTabBarControllerDarkThemeIdentifier"
+public let cylTabBarControllerDarkThemeIdentifier = "CYLTabBarControllerDarkThemeIdentifier"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerThemeManagerName = "CYLTabBarControllerThemeManagerName"
+public let cylTabBarControllerThemeManagerName = "CYLTabBarControllerThemeManagerName"
 
 /**
  * [EN] Configuration key: localized texts (docs/Configuration-File.md, "Localization"). YES (or "true"), the name of a
@@ -561,7 +561,7 @@ public let CYLTabBarControllerThemeManagerName = "CYLTabBarControllerThemeManage
  *      `CYLTabBarItemAccessibilityHint` 都作为键，在本库当前语言（`CYLLocalizationLanguage()`）的 `{语言}.lproj/{表名}.strings` 中查找；
  *      没有译文的键保持原样，与 `NSLocalizedString` 相同。Android 读取同样的文件，一份配置及其字符串表适用于所有平台。
  */
-public let CYLTabBarControllerLocalization = "CYLTabBarControllerLocalization"
+public let cylTabBarControllerLocalization = "CYLTabBarControllerLocalization"
 
 /**
  * [EN] Configuration key: a resource route (`CYLResourceRoute`, docs/Resource-Routes.md) to a configuration file, built
@@ -573,7 +573,7 @@ public let CYLTabBarControllerLocalization = "CYLTabBarControllerLocalization"
  *      "bundle:Configurations?name=tabbar" 或 "sandbox:Caches/tabbar?name=tabbar&theme=dark"。先读取文件中的键，再由本配置中的其他键
  *      覆盖，因此代码（以及发送字典的 React Native 与 Flutter）可以修改文件中的少数值。没有匹配文件的路由会打印日志并被忽略。Android 读取同一个键。
  */
-public let CYLTabBarControllerConfigurationRoute = "CYLTabBarControllerConfigurationRoute"
+public let cylTabBarControllerConfigurationRoute = "CYLTabBarControllerConfigurationRoute"
 
 /**
  * [EN] Configuration key: a resource route to a tab bar manifest (`CYLTabBarManifest`, docs/Configuration-Manifest.md).
@@ -584,12 +584,12 @@ public let CYLTabBarControllerConfigurationRoute = "CYLTabBarControllerConfigura
  *      （`-[CYLTabBarManifest configuration]`），再由其他键覆盖；React Native 的 `manifestRoute` 属性与 Flutter 的 `manifestRoute` 参数写入该键。
  *      不是本 App 可以使用的清单（平台、App 版本、时间）时打印日志并忽略。Android 读取同一个键。
  */
-public let CYLTabBarControllerManifestRoute = "CYLTabBarControllerManifestRoute"
+public let cylTabBarControllerManifestRoute = "CYLTabBarControllerManifestRoute"
 
 /**
  * [EN] The strings table, without ".strings" (default "Localizable"). [CN] 字符串表名，不含 ".strings"（默认 "Localizable"）。
  */
-public let CYLTabBarLocalizationTableName = "CYLTabBarLocalizationTableName"
+public let cylTabBarLocalizationTableName = "CYLTabBarLocalizationTableName"
 
 /**
  * [EN] The folder that holds the `{language}.lproj` folders, always in the app (never in this library), as a location
@@ -602,57 +602,57 @@ public let CYLTabBarLocalizationTableName = "CYLTabBarLocalizationTableName"
  *      "file:" URL、绝对路径、"~/…"（App 主目录），或相对于配置文件所在目录的路径（配置不是来自文件时，相对于 App 资源目录）。
  *      优先于 `CYLTabBarLocalizationBundleName`。
  */
-public let CYLTabBarLocalizationPath = "CYLTabBarLocalizationPath"
+public let cylTabBarLocalizationPath = "CYLTabBarLocalizationPath"
 
 /**
  * [EN] A resource bundle in the app ("Texts" or "Texts.bundle"; Android: a folder in the assets); default the main bundle (Android: the assets root). [CN] App 中的资源包（"Texts" 或 "Texts.bundle"；Android：assets 中的文件夹）；默认 main bundle（Android：assets 根目录）。
  */
-public let CYLTabBarLocalizationBundleName = "CYLTabBarLocalizationBundleName"
+public let cylTabBarLocalizationBundleName = "CYLTabBarLocalizationBundleName"
 
 /**
  * [EN] The identifier of a skin in the list form of `CYLTabBarControllerThemes`. [CN] `CYLTabBarControllerThemes` 列表形式中皮肤的标识。
  */
-public let CYLTabBarThemeIdentifier = "CYLTabBarThemeIdentifier"
+public let cylTabBarThemeIdentifier = "CYLTabBarThemeIdentifier"
 
 /**
  * [EN] The named values of a skin in the list form of `CYLTabBarControllerThemes`. [CN] `CYLTabBarControllerThemes` 列表形式中皮肤的命名值。
  */
-public let CYLTabBarThemeValues = "CYLTabBarThemeValues"
+public let cylTabBarThemeValues = "CYLTabBarThemeValues"
 
 /**
  * [EN] Skin value name: the background color of the whole tab bar. [CN] 皮肤值名称：整个 TabBar 的背景色。
  */
-public let CYLTabBarBackgroundColor = "CYLTabBarBackgroundColor"
+public let cylTabBarBackgroundColor = "CYLTabBarBackgroundColor"
 
 /**
  * [EN] Skin value name: the separator line on top of the tab bar. [CN] 皮肤值名称：TabBar 顶部分割线的颜色。
  */
-public let CYLTabBarShadowColor = "CYLTabBarShadowColor"
+public let cylTabBarShadowColor = "CYLTabBarShadowColor"
 
 /**
  * [EN] Skin value name: an image behind the whole tab bar (`UITabBarAppearance.backgroundImage`): a name, "system:<name>" or a path. [CN] 皮肤值名称：整个 TabBar 的背景图片（`UITabBarAppearance.backgroundImage`）：名称、"system:<名称>" 或路径。
  */
-public let CYLTabBarBackgroundImage = "CYLTabBarBackgroundImage"
+public let cylTabBarBackgroundImage = "CYLTabBarBackgroundImage"
 
 /**
  * [EN] Skin value name: the image of the line on top of the tab bar (`UITabBarAppearance.shadowImage`). [CN] 皮肤值名称：TabBar 顶部线条的图片（`UITabBarAppearance.shadowImage`）。
  */
-public let CYLTabBarShadowImage = "CYLTabBarShadowImage"
+public let cylTabBarShadowImage = "CYLTabBarShadowImage"
 
 /**
  * [EN] Skin value name: how the items share the width (`stackedItemPositioning`): "centered", "fill" or "automatic". [CN] 皮肤值名称：各 Item 如何分配宽度（`stackedItemPositioning`）："centered"、"fill" 或 "automatic"。
  */
-public let CYLTabBarStackedItemPositioning = "CYLTabBarStackedItemPositioning"
+public let cylTabBarStackedItemPositioning = "CYLTabBarStackedItemPositioning"
 
 /**
  * [EN] Skin value name: the width of each item when centered, in points (`stackedItemWidth`; 0: an equal share). [CN] 皮肤值名称：居中时每个 Item 的宽度（pt，`stackedItemWidth`；0 表示平分）。
  */
-public let CYLTabBarStackedItemWidth = "CYLTabBarStackedItemWidth"
+public let cylTabBarStackedItemWidth = "CYLTabBarStackedItemWidth"
 
 /**
  * [EN] Skin value name: the space between centered items, in points (`stackedItemSpacing`). [CN] 皮肤值名称：居中的 Item 之间的间距（pt，`stackedItemSpacing`）。
  */
-public let CYLTabBarStackedItemSpacing = "CYLTabBarStackedItemSpacing"
+public let cylTabBarStackedItemSpacing = "CYLTabBarStackedItemSpacing"
 
 /**
  * [EN] Item keys of the pages and of remote configurations (see docs/Tab-Page-Registry.md):
@@ -684,25 +684,25 @@ public let CYLTabBarStackedItemSpacing = "CYLTabBarStackedItemSpacing"
  *      例如 "system:house.fill"；Lottie URL 键支持 http(s) URL、路径或 main bundle 中的文件名；`CYLTabBarItemImageURLSize` /
  *      `CYLTabBarLottieSize` 支持 "{width, height}"；`CYLTabBarLottieDarkColors` 支持 "#RRGGBB" 或 "#RRGGBBAA" 颜色。
  */
-public let CYLTabBarItemPageIdentifier = "CYLTabBarItemPageIdentifier"
+public let cylTabBarItemPageIdentifier = "CYLTabBarItemPageIdentifier"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemPageParameters = "CYLTabBarItemPageParameters"
+public let cylTabBarItemPageParameters = "CYLTabBarItemPageParameters"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemPlatforms = "CYLTabBarItemPlatforms"
+public let cylTabBarItemPlatforms = "CYLTabBarItemPlatforms"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemMinimumAppVersion = "CYLTabBarItemMinimumAppVersion"
+public let cylTabBarItemMinimumAppVersion = "CYLTabBarItemMinimumAppVersion"
 
 /**
  * [EN] `CYLTabBarAnimationOptions`: the options of the tab's animation as a dictionary, option name -> string, for
@@ -719,7 +719,7 @@ public let CYLTabBarItemMinimumAppVersion = "CYLTabBarItemMinimumAppVersion"
  *      fragment；只有文件路径的 Tab 会得到带选项的 file URL，因此文件中可以写与代码相同的选项。名称为选项字符串，例如 Rive 的
  *      "artboard"、"stateMachine"、"input"（`CYLTabBarAnimationOptionRive…`）。不是字典时忽略并输出警告。示例见上。
  */
-public let CYLTabBarAnimationOptions = "CYLTabBarAnimationOptions"
+public let cylTabBarAnimationOptions = "CYLTabBarAnimationOptions"
 
 /**
  * [EN] Optional per-tab colors (UIColor), in `tabBarItemsAttributes` (or `-updateTabBarItemAtIndex:attributes:`). See
@@ -745,25 +745,25 @@ public let CYLTabBarAnimationOptions = "CYLTabBarAnimationOptions"
  *      appearance 的副本，TabBar 的 appearance 改变时会重建，与 `CYLTabBarItemTitlePositionAdjustment` 相同；你在 item 上设置的
  *      appearance 会作为基础保留。扁平样式：写入扁平 item 的标题属性与 `selectedBackgroundColor`。
  */
-public let CYLTabBarItemTitleColor = "CYLTabBarItemTitleColor"
+public let cylTabBarItemTitleColor = "CYLTabBarItemTitleColor"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemSelectedTitleColor = "CYLTabBarItemSelectedTitleColor"
+public let cylTabBarItemSelectedTitleColor = "CYLTabBarItemSelectedTitleColor"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemIconColor = "CYLTabBarItemIconColor"
+public let cylTabBarItemIconColor = "CYLTabBarItemIconColor"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemSelectedIconColor = "CYLTabBarItemSelectedIconColor"
+public let cylTabBarItemSelectedIconColor = "CYLTabBarItemSelectedIconColor"
 
 /**
  * [EN] FIX: issue #787 (and #159, #465, #588). How a tab's icon takes its colors, after Kongzue Tabbar's `noDyeing` and
@@ -786,31 +786,31 @@ public let CYLTabBarItemSelectedIconColor = "CYLTabBarItemSelectedIconColor"
  *        或 UIColor），相当于 Kongzue Tabbar 中用于图标的 `normalColor` / `focusColor`。
  *      iOS 与 Android（`CYLConstants`，键相同）已支持；React Native 与 Flutter 见 docs/Tab-Item-Colors.md 的 TODO。
  */
-public let CYLTabBarItemIconRenderingMode = "CYLTabBarItemIconRenderingMode"
+public let cylTabBarItemIconRenderingMode = "CYLTabBarItemIconRenderingMode"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerIconRenderingMode = "CYLTabBarControllerIconRenderingMode"
+public let cylTabBarControllerIconRenderingMode = "CYLTabBarControllerIconRenderingMode"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerIconColor = "CYLTabBarControllerIconColor"
+public let cylTabBarControllerIconColor = "CYLTabBarControllerIconColor"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarControllerSelectedIconColor = "CYLTabBarControllerSelectedIconColor"
+public let cylTabBarControllerSelectedIconColor = "CYLTabBarControllerSelectedIconColor"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemSelectedBackgroundColor = "CYLTabBarItemSelectedBackgroundColor"
+public let cylTabBarItemSelectedBackgroundColor = "CYLTabBarItemSelectedBackgroundColor"
 
 /**
  * [EN] Optional background of the tab while NOT selected (UIColor), the counterpart of
@@ -821,7 +821,7 @@ public let CYLTabBarItemSelectedBackgroundColor = "CYLTabBarItemSelectedBackgrou
  *      一样适用于经典 TabBar 与扁平样式。配合 `itemSpacing`（且未设置 item 宽度）时，TabBar 的背景透过间隙显示为分隔线。见
  *      docs/Tab-Item-Colors.md。
  */
-public let CYLTabBarItemBackgroundColor = "CYLTabBarItemBackgroundColor"
+public let cylTabBarItemBackgroundColor = "CYLTabBarItemBackgroundColor"
 
 /**
  * [EN] Optional per-tab title fonts (UIFont), unselected / selected; the selected state uses the unselected font unless
@@ -830,13 +830,13 @@ public let CYLTabBarItemBackgroundColor = "CYLTabBarItemBackgroundColor"
  * [CN] 可选的单个 Tab 标题字体（UIFont），未选中 / 选中；选中状态没有单独设置时使用未选中的字体。与上面的颜色一样生效（iOS 13+），
  *      扁平样式同样支持。例如为某个 Tab 使用更大的字体，或只在选中时加粗。见 docs/Tab-Item-Colors.md。
  */
-public let CYLTabBarItemTitleFont = "CYLTabBarItemTitleFont"
+public let cylTabBarItemTitleFont = "CYLTabBarItemTitleFont"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemSelectedTitleFont = "CYLTabBarItemSelectedTitleFont"
+public let cylTabBarItemSelectedTitleFont = "CYLTabBarItemSelectedTitleFont"
 
 /**
  * [EN] Accessibility of a tab, for VoiceOver and UI tests (`app.tabBars.buttons["home"]`). See docs/Tab-Accessibility.md.
@@ -855,25 +855,25 @@ public let CYLTabBarItemSelectedTitleFont = "CYLTabBarItemSelectedTitleFont"
  *      经典与液态玻璃：写入该 Tab 的 UITabBarItem，UIKit 的 Tab 按钮会读取它。扁平样式：写入扁平 Tab 按钮。布局时生效，因此
  *      重新加载或原地更新后都会更新。
  */
-public let CYLTabBarItemAccessibilityIdentifier = "CYLTabBarItemAccessibilityIdentifier"
+public let cylTabBarItemAccessibilityIdentifier = "CYLTabBarItemAccessibilityIdentifier"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemAccessibilityLabel = "CYLTabBarItemAccessibilityLabel"
+public let cylTabBarItemAccessibilityLabel = "CYLTabBarItemAccessibilityLabel"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemAccessibilityHint = "CYLTabBarItemAccessibilityHint"
+public let cylTabBarItemAccessibilityHint = "CYLTabBarItemAccessibilityHint"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemWidthDidChangeNotification = "CYLTabBarItemWidthDidChangeNotification"
+public let cylTabBarItemWidthDidChangeNotification = "CYLTabBarItemWidthDidChangeNotification"
 
 /**
  * [EN] userInfo of the tab notifications below (`CYLTabBarItemTitleDidChangeNotification`, `CYLTabBarItemIconDidChangeNotification`,
@@ -894,19 +894,19 @@ public let CYLTabBarItemWidthDidChangeNotification = "CYLTabBarItemWidthDidChang
  *      - `CYLTabBarItemKey`：Tab 的 item（`UITabBarItem`；扁平样式为 `CYLFlatDesignTabBarItem`）。
  *      - `CYLTabBarItemChangedAttributesKey`：变化的 attributes，key 与新值（变化来自 attributes 时）。
  */
-public let CYLTabBarControllerKey = "CYLTabBarControllerKey"
+public let cylTabBarControllerKey = "CYLTabBarControllerKey"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemViewControllerKey = "CYLTabBarItemViewControllerKey"
+public let cylTabBarItemViewControllerKey = "CYLTabBarItemViewControllerKey"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarItemKey = "CYLTabBarItemKey"
+public let cylTabBarItemKey = "CYLTabBarItemKey"
 
 /**
  * [EN] userInfo key when the plus button changed (`-updatePlusButtonWithAttributes:`, skins): the plus button. The same three
@@ -915,32 +915,32 @@ public let CYLTabBarItemKey = "CYLTabBarItemKey"
  * [CN] PlusButton 变化时（`-updatePlusButtonWithAttributes:`、换肤）的 userInfo key：PlusButton。发送同样的三个通知；object 为 PlusButton 的
  *      页面（PlusButton 子控制器），没有页面时为 PlusButton。其页面与其他 Tab 一样跟随新标题（`CYL_NAVIGATION_TITLE_FOLLOWS_TAB_BAR_ITEM`）。
  */
-public let CYLPlusButtonKey = "CYLPlusButtonKey"
+public let cylPlusButtonKey = "CYLPlusButtonKey"
 
 /**
  * [EN] userInfo key of the title notification: the title before the change. [CN] 标题通知的 userInfo key：变化前的标题。
  */
-public let CYLTabBarItemOldTitleKey = "CYLTabBarItemOldTitleKey"
+public let cylTabBarItemOldTitleKey = "CYLTabBarItemOldTitleKey"
 
 /**
  * [EN] userInfo key: the changed attributes (NSDictionary). [CN] userInfo key：变化的 attributes（NSDictionary）。
  */
-public let CYLTabBarItemChangedAttributesKey = "CYLTabBarItemChangedAttributesKey"
+public let cylTabBarItemChangedAttributesKey = "CYLTabBarItemChangedAttributesKey"
 
 /**
  * [EN] userInfo key: the tab's index in `viewControllers` (NSNumber). [CN] userInfo key：Tab 在 `viewControllers` 中的下标（NSNumber）。
  */
-public let CYLTabBarItemIndexKey = "CYLTabBarItemIndexKey"
+public let cylTabBarItemIndexKey = "CYLTabBarItemIndexKey"
 
 /**
  * [EN] userInfo key of the icon notification: the `CYLTabBarItemIconViewProvider` now shown in place of the icon. [CN] 图标通知的 userInfo key：当前替换图标显示的 `CYLTabBarItemIconViewProvider`。
  */
-public let CYLTabBarItemIconViewProviderKey = "CYLTabBarItemIconViewProviderKey"
+public let cylTabBarItemIconViewProviderKey = "CYLTabBarItemIconViewProviderKey"
 
 /**
  * [EN] userInfo key: the applied theme. [CN] userInfo key：应用的主题。
  */
-public let CYLTabBarThemeKey = "CYLTabBarThemeKey"
+public let cylTabBarThemeKey = "CYLTabBarThemeKey"
 
 /**
  * [EN] userInfo key of `CYLTabBarControllerThemeDidApplyNotification`: the indexes (in `viewControllers`) of the tabs a skin
@@ -948,7 +948,7 @@ public let CYLTabBarThemeKey = "CYLTabBarThemeKey"
  * [CN] `CYLTabBarControllerThemeDidApplyNotification` 的 userInfo key：皮肤修改的 Tab 下标（`viewControllers` 中，NSIndexSet）；默认为全部 Tab，
  *      PlusButton 的 Tab 除外。
  */
-public let CYLTabBarItemIndexesKey = "CYLTabBarItemIndexesKey"
+public let cylTabBarItemIndexesKey = "CYLTabBarItemIndexesKey"
 
 /**
  * [EN] userInfo key of `CYLTabBarControllerThemeDidApplyNotification`: the identifiers (`CYLTabBarItemIdentifier`) of the
@@ -956,7 +956,7 @@ public let CYLTabBarItemIndexesKey = "CYLTabBarItemIndexesKey"
  * [CN] `CYLTabBarControllerThemeDidApplyNotification` 的 userInfo key：修改的 Tab 的 ID（`CYLTabBarItemIdentifier`），按 Tab 顺序
  *      （NSArray<NSString *>）；没有 ID 的 Tab 不在其中。
  */
-public let CYLTabBarItemIdentifiersKey = "CYLTabBarItemIdentifiersKey"
+public let cylTabBarItemIdentifiersKey = "CYLTabBarItemIdentifiersKey"
 
 /**
  * [EN] A view that shows only the tab bar of a CYLTabBarController made from a configuration
@@ -987,44 +987,44 @@ public let CYLTabBarItemIdentifiersKey = "CYLTabBarItemIdentifiersKey"
  *      - 下标（`selectedIndex`、`badgeValues`、`didSelectTab`）按配置中的 Tab 计算，不含 PlusButton。
  * [EN] Keys of `badgeAttributes` / `plusButtonBadgeAttributes`. [CN] `badgeAttributes` / `plusButtonBadgeAttributes` 的键。
  */
-public let CYLTabBarHostBadgeValue = "value"
+public let cylTabBarHostBadgeValue = "value"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarHostBadgeColor = "color"
+public let cylTabBarHostBadgeColor = "color"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarHostBadgeAnimation = "animation"
+public let cylTabBarHostBadgeAnimation = "animation"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarHostBadgeRadius = "radius"
+public let cylTabBarHostBadgeRadius = "radius"
 
 /**
  * [EN] See the Objective-C header.
  * [CN] 见 Objective-C 头文件。
  */
-public let CYLTabBarHostBadgeCenterOffset = "centerOffset"
+public let cylTabBarHostBadgeCenterOffset = "centerOffset"
 
 /**
  * [EN] The URL of a sample configuration on GitHub, used by the demo's "load from a URL" action.
  * [CN] GitHub 上示例配置文件的 URL，用于演示中的“从网络 URL 加载”。
  */
-public let CYLSampleConfigurationURLString = "https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/Example-Shared/Configurations/cyl_tabbar_configuration.yaml"
+public let cylSampleConfigurationURLString = "https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/Example-Shared/Configurations/cyl_tabbar_configuration.yaml"
 
 extension NSNotification.Name {
     /**
      * [EN] Posted when `-[CYLTabBarController cyl_loggedIn]` is set; `object` is the tab bar controller it was set on.
      * [CN] 设置 `-[CYLTabBarController cyl_loggedIn]` 时发送；`object` 为被设置的 TabBarController。
      */
-    public static let CYLTabBarLoginStateDidChange = NSNotification.Name("CYLTabBarLoginStateDidChangeNotification")
+    public static let cylTabBarLoginStateDidChange = NSNotification.Name("CYLTabBarLoginStateDidChangeNotification")
 
     /**
      * FIX: issue #604
@@ -1032,13 +1032,13 @@ extension NSNotification.Name {
      *      same values, so an observer of either name gets the notification; the Lottie names stay for compatibility.
      * [CN] 上面两个通知的通用名称，适用于任意动画库（Lottie、PAG、Rive…）。取值相同，因此观察任一名称都能收到通知；Lottie 名称为兼容而保留。
      */
-    public static let CYLTabBarItemAnimationPlaying = NSNotification.Name("CYLTabBarItemLottieAnimationPlayingNotification")
+    public static let cylTabBarItemAnimationPlaying = NSNotification.Name("CYLTabBarItemLottieAnimationPlayingNotification")
 
     /**
      * [EN] See the Objective-C header.
      * [CN] 见 Objective-C 头文件。
      */
-    public static let CYLTabBarItemAnimationViewDidAdd = NSNotification.Name("CYLTabBarItemLottieAnimationViewDidAddNotification")
+    public static let cylTabBarItemAnimationViewDidAdd = NSNotification.Name("CYLTabBarItemLottieAnimationViewDidAddNotification")
 
     /**
      * [EN] Posted when a tab's title or selected title changes in place (`-updateTabBarItemsWithAttributes:`,
@@ -1049,7 +1049,7 @@ extension NSNotification.Name {
      *      userInfo：上述 key，以及 `CYLTabBarItemTitle`（新标题）、`CYLTabBarItemSelectedTitle`（有选中标题时）、
      *      `CYLTabBarItemOldTitleKey`（之前的标题，有时）。
      */
-    public static let CYLTabBarItemTitleDidChange = NSNotification.Name("CYLTabBarItemTitleDidChangeNotification")
+    public static let cylTabBarItemTitleDidChange = NSNotification.Name("CYLTabBarItemTitleDidChangeNotification")
 
     /**
      * [EN] Posted after any in-place change of a tab (`-updateTabBarItemAtIndex:attributes:`, `-updateTabBarItemsWithAttributes:`,
@@ -1062,7 +1062,7 @@ extension NSNotification.Name {
      *      attributes（key 与新值），`userInfo[CYLTabBarItemIndexKey]` 为该 Tab 在 `viewControllers` 中的下标。标题变化时也会发送
      *      `CYLTabBarItemTitleDidChangeNotification`。
      */
-    public static let CYLTabBarItemDidChange = NSNotification.Name("CYLTabBarItemDidChangeNotification")
+    public static let cylTabBarItemDidChange = NSNotification.Name("CYLTabBarItemDidChangeNotification")
 
     /**
      * [EN] Posted when a tab's icon changes in place: image keys (`CYLTabBarItemImage`, `CYLTabBarItemSelectedImage`, their dark
@@ -1076,7 +1076,7 @@ extension NSNotification.Name {
      *      `-setTabBarItemIconWithURL:…`、换肤、恢复）。userInfo：上述 key（`CYLTabBarItemChangedAttributesKey` 为变化的图片 key），以及替换图标的
      *      视图的 `CYLTabBarItemIconViewProviderKey`（恢复 Tab 自己的图标时不存在）。从 `CYLTabBarItemImageURL` 加载的图片稍后才到。
      */
-    public static let CYLTabBarItemIconDidChange = NSNotification.Name("CYLTabBarItemIconDidChangeNotification")
+    public static let cylTabBarItemIconDidChange = NSNotification.Name("CYLTabBarItemIconDidChangeNotification")
 
     /**
      * [EN] Posted by a tab bar controller after it applied a skin (`CYLThemeManager`, a `CYLTabBarTheme` or none to restore):
@@ -1089,5 +1089,5 @@ extension NSNotification.Name {
      *      `userInfo[CYLTabBarItemIndexesKey]` / `userInfo[CYLTabBarItemIdentifiersKey]` 为修改的 Tab（默认全部）。`CYLThemeDidChangeNotification`
      *      由管理器发送，早于 TabBar 应用皮肤。
      */
-    public static let CYLTabBarControllerThemeDidApply = NSNotification.Name("CYLTabBarControllerThemeDidApplyNotification")
+    public static let cylTabBarControllerThemeDidApply = NSNotification.Name("CYLTabBarControllerThemeDidApplyNotification")
 }

@@ -78,7 +78,7 @@ extension UIViewController {
      * [CN] `self` 为使用系统 TabBar（经典或液态玻璃）的 CYLTabBarController 时为 YES。
      */
     @objc(cyl_isSystemStyleTabBar)
-    public func cyl_isSystemStyleTabBar() -> Bool {
+    public func cylIsSystemStyleTabBar() -> Bool {
         guard let tabBarController = self as? CYLTabBarController else { return false }
         return tabBarController.tabBarStyleType != .flatDesign
     }
@@ -88,7 +88,7 @@ extension UIViewController {
      * [CN] `self` 为使用扁平样式 TabBar 的 CYLTabBarController 时为 YES。
      */
     @objc(cyl_isFlatDesignStyleTabBar)
-    public func cyl_isFlatDesignStyleTabBar() -> Bool {
+    public func cylIsFlatDesignStyleTabBar() -> Bool {
         (self as? CYLTabBarController)?.tabBarStyleType == .flatDesign
     }
 
@@ -102,11 +102,11 @@ extension UIViewController {
     @objc(cyl_embedInTabBarController)
     public var cyl_embedInTabBarController: Bool {
         @objc(cyl_isEmbedInTabBarController) get {
-            let contentViewController = cyl_getViewControllerInsteadOfNavigation()
-            guard cyl_tabBarController != nil || contentViewController.cyl_tabBarController != nil,
+            let contentViewController = cylGetViewControllerInsteadOfNavigation()
+            guard cylTabBarController != nil || contentViewController.cylTabBarController != nil,
                   !cyl_isPlusChildViewController, !cyl_isPlaceholder, !contentViewController.cyl_isPlaceholder,
-                  let viewControllers = cyl_tabBarController?.viewControllers,
-                  let index = viewControllers.firstIndex(where: { $0.cyl_getViewControllerInsteadOfNavigation() === contentViewController }) else {
+                  let viewControllers = cylTabBarController?.viewControllers,
+                  let index = viewControllers.firstIndex(where: { $0.cylGetViewControllerInsteadOfNavigation() === contentViewController }) else {
                 return false
             }
             objc_setAssociatedObject(self, CYLViewControllerTabBarKeys.tabIndex, NSNumber(value: index), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
@@ -137,11 +137,11 @@ extension UIViewController {
             if let identifier = objc_getAssociatedObject(self, CYLViewControllerTabBarKeys.tabBarItemIdentifier) as? String {
                 return identifier
             }
-            return cyl_owningTabBarController()?.cyl_defaultTabBarItemIdentifier(for: self)
+            return cylOwningTabBarController()?.cyl_defaultTabBarItemIdentifier(for: self)
         }
         @objc(cyl_setTabBarItemIdentifier:) set {
             objc_setAssociatedObject(self, CYLViewControllerTabBarKeys.tabBarItemIdentifier, newValue, .OBJC_ASSOCIATION_COPY_NONATOMIC)
-            let contentViewController = cyl_getViewControllerInsteadOfNavigation()
+            let contentViewController = cylGetViewControllerInsteadOfNavigation()
             if contentViewController !== self {
                 objc_setAssociatedObject(contentViewController, CYLViewControllerTabBarKeys.tabBarItemIdentifier, newValue,
                                          .OBJC_ASSOCIATION_COPY_NONATOMIC)
@@ -163,8 +163,8 @@ extension UIViewController {
             //      title changes): look up the current one below.
             // [CN] 已离开 TabBar 的已存储按钮被 UIKit 替换了（经典 TabBar 在 Tab 标题变化时会这样）：在下面查找当前按钮。
             if let stored {
-                let isReplaced = stored.superview == nil && stored.cyl_isTabButton() && !CYLConstants.isLiquidGlassActive()
-                    && cyl_tabBarController?.tabBarStyleType != .flatDesign
+                let isReplaced = stored.superview == nil && stored.cylIsTabButton() && !CYLConstants.isLiquidGlassActive()
+                    && cylTabBarController?.tabBarStyleType != .flatDesign
                 if !isReplaced {
                     return stored
                 }
@@ -173,14 +173,14 @@ extension UIViewController {
         }
         @objc(cyl_setTabButton:) set {
             objc_setAssociatedObject(self, CYLViewControllerTabBarKeys.tabButton, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            objc_setAssociatedObject(cyl_getViewControllerInsteadOfNavigation(), CYLViewControllerTabBarKeys.tabButton, newValue,
+            objc_setAssociatedObject(cylGetViewControllerInsteadOfNavigation(), CYLViewControllerTabBarKeys.tabButton, newValue,
                                      .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             // [EN] A button that is not UIKit's own (the FlatDesign tab button) also becomes the item's button, so badges set on
             //      `tabBarItem` reach it: UIKit's button is hidden then (iOS 27, every FlatDesign tab).
             // [CN] 不是 UIKit 自身的按钮（扁平样式的 Tab 按钮）同时成为 item 的按钮，使设置在 `tabBarItem` 上的角标到达它：此时 UIKit 的按钮是隐藏的
             //      （iOS 27，扁平样式的每个 Tab）。
-            for item in [tabBarItem, cyl_getViewControllerInsteadOfNavigation().tabBarItem].compactMap({ $0 }) {
-                let systemButton = item.cyl_view()
+            for item in [tabBarItem, cylGetViewControllerInsteadOfNavigation().tabBarItem].compactMap({ $0 }) {
+                let systemButton = item.cylView()
                 item.cyl_replacementTabButton = (newValue != nil && newValue !== systemButton) ? newValue : nil
             }
         }
@@ -206,7 +206,7 @@ extension UIViewController {
      * [CN] 当前显示页面所在 Tab 的按钮：液态玻璃下为选中态按钮，否则为 `cyl_tabButton`。
      */
     @objc(cyl_visiableTabButton)
-    public func cyl_visiableTabButton() -> UIControl? {
+    public func cylVisiableTabButton() -> UIControl? {
         if CYLConstants.isLiquidGlassActive() {
             return tabBarItem.cyl_selectedTabButton
         }
@@ -218,9 +218,9 @@ extension UIViewController {
      * [CN] 两个页面相同，或内容页面相同（导航控制器比较其根页面）时为 YES。
      */
     @objc(cyl_isEqualToViewController:)
-    public func cyl_isEqual(to compairedViewController: UIViewController) -> Bool {
+    public func cylIsEqual(to compairedViewController: UIViewController) -> Bool {
         self == compairedViewController
-            || cyl_getViewControllerInsteadOfNavigation() == compairedViewController.cyl_getViewControllerInsteadOfNavigation()
+            || cylGetViewControllerInsteadOfNavigation() == compairedViewController.cylGetViewControllerInsteadOfNavigation()
     }
 
     /**
@@ -228,9 +228,9 @@ extension UIViewController {
      * [CN] 忽略非页面对象与占位页面的 `-addChildViewController:`。
      */
     @objc(cyl_addChildViewController:)
-    public func cyl_addChildViewController(_ childController: Any) {
+    public func cylAddChildViewController(_ childController: Any) {
         guard let viewController = childController as? UIViewController, !viewController.cyl_isPlaceholder,
-              !viewController.cyl_getViewControllerInsteadOfNavigation().cyl_isPlaceholder else {
+              !viewController.cylGetViewControllerInsteadOfNavigation().cyl_isPlaceholder else {
             return
         }
         addChild(viewController)
@@ -269,8 +269,8 @@ extension UIViewController {
      */
     @objc(cyl_popSelectTabBarChildViewControllerAtIndex:)
     @discardableResult
-    public func cyl_popSelectTabBarChildViewController(at index: UInt) -> UIViewController? {
-        cyl_popSelectTabBarChildViewController(at: index, animated: false)
+    public func cylPopSelectTabBarChildViewController(at index: UInt) -> UIViewController? {
+        cylPopSelectTabBarChildViewController(at: index, animated: false)
     }
 
     /**
@@ -284,8 +284,8 @@ extension UIViewController {
      */
     @objc(cyl_popSelectTabBarChildViewControllerAtIndex:animated:)
     @discardableResult
-    public func cyl_popSelectTabBarChildViewController(at index: UInt, animated: Bool) -> UIViewController? {
-        let viewController = cyl_getViewControllerInsteadOfNavigation()
+    public func cylPopSelectTabBarChildViewController(at index: UInt, animated: Bool) -> UIViewController? {
+        let viewController = cylGetViewControllerInsteadOfNavigation()
         guard let tabBarController = viewController.cyl_popSelectTabBarController,
               let viewControllers = tabBarController.viewControllers, index < viewControllers.count else {
             cylLogInvalidTabIndex()
@@ -300,7 +300,7 @@ extension UIViewController {
         let selectedViewController = tabBarController.selectedViewController
         selectedViewController?.view.setNeedsLayout()
         selectedViewController?.view.layoutIfNeeded()
-        return selectedViewController?.cyl_getViewControllerInsteadOfNavigation()
+        return selectedViewController?.cylGetViewControllerInsteadOfNavigation()
     }
 
     /**
@@ -308,9 +308,9 @@ extension UIViewController {
      * [CN] 同上，在下一次主队列循环中以选中的页面调用 `completion`。
      */
     @objc(cyl_popSelectTabBarChildViewControllerAtIndex:completion:)
-    public func cyl_popSelectTabBarChildViewController(at index: UInt,
+    public func cylPopSelectTabBarChildViewController(at index: UInt,
                                                         completion: CYLPopSelectCompletion?) {
-        let selected = cyl_popSelectTabBarChildViewController(at: index)
+        let selected = cylPopSelectTabBarChildViewController(at: index)
         cylCallOnMainQueue(completion, with: selected)
     }
 
@@ -320,13 +320,13 @@ extension UIViewController {
      */
     @objc(cyl_popSelectTabBarChildViewControllerForClassType:)
     @discardableResult
-    public func cyl_popSelectTabBarChildViewController(forClassType classType: AnyClass) -> UIViewController? {
-        let viewControllers = cyl_getViewControllerInsteadOfNavigation().cyl_popSelectTabBarController?.viewControllers ?? []
-        guard let index = viewControllers.firstIndex(where: { $0.cyl_getViewControllerInsteadOfNavigation().isKind(of: classType) }) else {
+    public func cylPopSelectTabBarChildViewController(forClassType classType: AnyClass) -> UIViewController? {
+        let viewControllers = cylGetViewControllerInsteadOfNavigation().cyl_popSelectTabBarController?.viewControllers ?? []
+        guard let index = viewControllers.firstIndex(where: { $0.cylGetViewControllerInsteadOfNavigation().isKind(of: classType) }) else {
             cylLogInvalidTabIndex()
             return nil
         }
-        return cyl_popSelectTabBarChildViewController(at: UInt(index))
+        return cylPopSelectTabBarChildViewController(at: UInt(index))
     }
 
     /**
@@ -334,9 +334,9 @@ extension UIViewController {
      * [CN] 同上，在下一次主队列循环中以选中的页面调用 `completion`。
      */
     @objc(cyl_popSelectTabBarChildViewControllerForClassType:completion:)
-    public func cyl_popSelectTabBarChildViewController(forClassType classType: AnyClass,
+    public func cylPopSelectTabBarChildViewController(forClassType classType: AnyClass,
                                                         completion: CYLPopSelectCompletion?) {
-        let selected = cyl_popSelectTabBarChildViewController(forClassType: classType)
+        let selected = cylPopSelectTabBarChildViewController(forClassType: classType)
         cylCallOnMainQueue(completion, with: selected)
     }
 
@@ -349,8 +349,8 @@ extension UIViewController {
      */
     @objc(cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:)
     @discardableResult
-    public func cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier identifier: String) -> UIViewController? {
-        cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier: identifier, animated: false)
+    public func cylPopSelectTabBarChildViewController(forTabBarItemIdentifier identifier: String) -> UIViewController? {
+        cylPopSelectTabBarChildViewController(forTabBarItemIdentifier: identifier, animated: false)
     }
 
     /**
@@ -359,13 +359,13 @@ extension UIViewController {
      */
     @objc(cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:animated:)
     @discardableResult
-    public func cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier identifier: String,
+    public func cylPopSelectTabBarChildViewController(forTabBarItemIdentifier identifier: String,
                                                         animated: Bool) -> UIViewController? {
         // [EN] NSNotFound for an unknown identifier: rejected by the index version. [CN] 标识不存在时为 NSNotFound，由 index 版本拒绝。
-        guard let tabBarController = cyl_getViewControllerInsteadOfNavigation().cyl_popSelectTabBarController else {
+        guard let tabBarController = cylGetViewControllerInsteadOfNavigation().cyl_popSelectTabBarController else {
             return nil
         }
-        return cyl_popSelectTabBarChildViewController(at: tabBarController.cyl_index(ofTabBarItemIdentifier: identifier),
+        return cylPopSelectTabBarChildViewController(at: tabBarController.cyl_index(ofTabBarItemIdentifier: identifier),
                                                       animated: animated)
     }
 
@@ -374,9 +374,9 @@ extension UIViewController {
      * [CN] 同上，在下一次主队列循环中以选中的页面调用 `completion`。
      */
     @objc(cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier:completion:)
-    public func cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier identifier: String,
+    public func cylPopSelectTabBarChildViewController(forTabBarItemIdentifier identifier: String,
                                                         completion: CYLPopSelectCompletion?) {
-        let selected = cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier: identifier)
+        let selected = cylPopSelectTabBarChildViewController(forTabBarItemIdentifier: identifier)
         cylCallOnMainQueue(completion, with: selected)
     }
 
@@ -390,8 +390,8 @@ extension UIViewController {
      *      回的页面、是否先选中某个 Tab 及其下标）。`callback` 为 nil 时直接 push。
      */
     @objc(cyl_pushOrPopToViewController:animated:callback:)
-    public func cyl_pushOrPop(to viewController: UIViewController, animated: Bool, callback: CYLPushOrPopDecision?) {
-        cyl_pushOrPop(to: viewController, animated: animated, popSelectIdentifier: nil, callback: callback)
+    public func cylPushOrPop(to viewController: UIViewController, animated: Bool, callback: CYLPushOrPopDecision?) {
+        cylPushOrPop(to: viewController, animated: animated, popSelectIdentifier: nil, callback: callback)
     }
 
     /**
@@ -400,9 +400,9 @@ extension UIViewController {
      * [CN] 同上，按 `identifier` 选中 Tab，而不是 completion handler 传入的下标。
      */
     @objc(cyl_pushOrPopToViewController:animated:tabBarItemIdentifier:callback:)
-    public func cyl_pushOrPop(to viewController: UIViewController, animated: Bool, tabBarItemIdentifier identifier: String,
+    public func cylPushOrPop(to viewController: UIViewController, animated: Bool, tabBarItemIdentifier identifier: String,
                               callback: CYLPushOrPopDecision?) {
-        cyl_pushOrPop(to: viewController, animated: animated, popSelectIdentifier: identifier, callback: callback)
+        cylPushOrPop(to: viewController, animated: animated, popSelectIdentifier: identifier, callback: callback)
     }
 
     /**
@@ -411,8 +411,8 @@ extension UIViewController {
      * [CN] push `viewController`，除非它已在栈中，或栈顶已是同类页面（同一实例重复 push 时 UIKit 会抛异常）。
      */
     @objc(cyl_pushViewController:animated:)
-    public func cyl_push(_ viewController: UIViewController, animated: Bool) {
-        let navigationController = cyl_getViewControllerInsteadOfNavigation().navigationController
+    public func cylPush(_ viewController: UIViewController, animated: Bool) {
+        let navigationController = cylGetViewControllerInsteadOfNavigation().navigationController
         let stack = navigationController?.children ?? []
         if stack.contains(viewController) || stack.last?.isKind(of: type(of: viewController)) == true {
             return
@@ -425,8 +425,8 @@ extension UIViewController {
      * [CN] 返回（带动画）：pop；以模态方式显示且为栈底的页面则 dismiss。
      */
     @objc(cyl_handleNavigationBackAction)
-    public func cyl_handleNavigationBackAction() {
-        cyl_handleNavigationBackAction(withAnimated: true)
+    public func cylHandleNavigationBackAction() {
+        cylHandleNavigationBackAction(withAnimated: true)
     }
 
     /**
@@ -434,7 +434,7 @@ extension UIViewController {
      * [CN] 同上，带 `animated`。
      */
     @objc(cyl_handleNavigationBackActionWithAnimated:)
-    public func cyl_handleNavigationBackAction(withAnimated animated: Bool) {
+    public func cylHandleNavigationBackAction(withAnimated animated: Bool) {
         if presentationController == nil || (navigationController?.viewControllers.count ?? 0) > 1 {
             navigationController?.popViewController(animated: animated)
         } else {
@@ -455,7 +455,7 @@ extension UIViewController {
      * [CN] `cyl_popSelect…` 切换的 TabBarController：`self` 所在的那个（任意样式），否则取 `cyl_tabBarController`（它只能找到系统样式）。
      */
     private var cyl_popSelectTabBarController: CYLTabBarController? {
-        cyl_owningTabBarController() ?? cyl_tabBarController
+        cylOwningTabBarController() ?? cylTabBarController
     }
 
     /**
@@ -480,7 +480,7 @@ extension UIViewController {
               let viewControllers = tabBarController.viewControllers, index < viewControllers.count else {
             return
         }
-        let plusButtonIndex = (tabBarController.cyl_tabBar as UIView?)?.cyl_plusButtonIndex() ?? 0
+        let plusButtonIndex = (tabBarController.cyl_tabBar as UIView?)?.cylPlusButtonIndex() ?? 0
         if UInt(index) != plusButtonIndex && viewControllers[index] !== plusChildViewController {
             CYLPlusButton(forOwner: tabBarController)?.isSelected = false
         }
@@ -490,7 +490,7 @@ extension UIViewController {
 #if DEBUG
         let reason = "The class type, index or navigation controller passed to `-cyl_popSelectTabBarChildViewController…` "
             + "is not a tab of the CYLTabBarController."
-        NSLog(CYLLocalizedString("🔴类名与方法名：%@（在第%@行）, 描述：%@"), "\(type(of: self)) \(#function)" as NSString,
+        NSLog(cylLocalizedString("🔴类名与方法名：%@（在第%@行）, 描述：%@"), "\(type(of: self)) \(#function)" as NSString,
               "\(#line)" as NSString, reason as NSString)
 #endif
     }
@@ -505,11 +505,11 @@ extension UIViewController {
      * [EN] The shared push-or-pop: `identifier` nil selects by the index the completion handler passes, else by identifier.
      * [CN] 共用的 push 或 pop 实现：`identifier` 为 nil 时按 completion handler 传入的下标选中，否则按标识。
      */
-    private func cyl_pushOrPop(to viewController: UIViewController, animated: Bool, popSelectIdentifier identifier: String?,
+    private func cylPushOrPop(to viewController: UIViewController, animated: Bool, popSelectIdentifier identifier: String?,
                                callback: CYLPushOrPopDecision?) {
         // [EN] `self` may be the navigation controller itself, whose `navigationController` is nil: nothing is pushed then.
         // [CN] `self` 可能就是导航控制器本身，它的 `navigationController` 为 nil，此时什么都不会 push。
-        let currentNavigationController = cyl_getViewControllerInsteadOfNavigation().navigationController
+        let currentNavigationController = cylGetViewControllerInsteadOfNavigation().navigationController
         guard let callback else {
             currentNavigationController?.pushViewController(viewController, animated: animated)
             return
@@ -536,9 +536,9 @@ extension UIViewController {
                     return
                 }
                 if let identifier {
-                    self.cyl_popSelectTabBarChildViewController(forTabBarItemIdentifier: identifier, completion: pushAfterSelecting)
+                    self.cylPopSelectTabBarChildViewController(forTabBarItemIdentifier: identifier, completion: pushAfterSelecting)
                 } else {
-                    self.cyl_popSelectTabBarChildViewController(at: index, completion: pushAfterSelecting)
+                    self.cylPopSelectTabBarChildViewController(at: index, completion: pushAfterSelecting)
                 }
             }
         }
@@ -550,7 +550,7 @@ extension UIViewController {
      * [CN] 当前导航栈中除本页面以外、与 `viewController` 同类的页面。
      */
     private func cylOtherViewControllersInStack(ofClassOf viewController: UIViewController) -> [UIViewController] {
-        let contentViewController = cyl_getViewControllerInsteadOfNavigation()
+        let contentViewController = cylGetViewControllerInsteadOfNavigation()
         let stack = contentViewController.navigationController?.children ?? []
         guard stack.count >= 2 else { return [] }
         return stack.filter { $0 !== contentViewController && $0.isKind(of: type(of: viewController)) }
@@ -563,21 +563,21 @@ extension UIViewController {
      */
     private func cylLookUpTabButton() -> UIControl? {
         let tabIndex = cyl_tabIndex
-        if tabIndex != NSNotFound, let items = cyl_tabBarController?.tabBar.items, tabIndex < items.count,
+        if tabIndex != NSNotFound, let items = cylTabBarController?.tabBar.items, tabIndex < items.count,
            let control = items[tabIndex].cyl_tabButton {
             return control
         }
         // [EN] The plus child view controller: its tab button is the plus button.
         // [CN] PlusButton 子控制器：其 Tab 按钮为 PlusButton。
-        if tabIndex == NSNotFound || (cyl_tabBarController?.tabBar.items?.count ?? 0) <= tabIndex,
-           cyl_isPlaceholder || cyl_getViewControllerInsteadOfNavigation().cyl_isPlaceholder,
+        if tabIndex == NSNotFound || (cylTabBarController?.tabBar.items?.count ?? 0) <= tabIndex,
+           cyl_isPlaceholder || cylGetViewControllerInsteadOfNavigation().cyl_isPlaceholder,
            let plusButton = CYLPlusButton(forOwner: self) {
             return plusButton
         }
         if let control = CYLFlatDesignLookup.object(CYLFlatDesignLookup.tabBarItem(of: self), "tabBarButton") as? UIControl {
             return control
         }
-        return tabBarItem.cyl_tabButton ?? cyl_getViewControllerInsteadOfNavigation().tabBarItem.cyl_tabButton
+        return tabBarItem.cyl_tabButton ?? cylGetViewControllerInsteadOfNavigation().tabBarItem.cyl_tabButton
     }
 }
 
@@ -591,7 +591,7 @@ extension UIViewController {
      */
     @available(*, deprecated, message: "Deprecated in 1.19.0. Use method in <CYLBadgeProtocol>, such as `-[UIViewController cyl_showBadgeValue:animationType:]` instead.")
     @objc(cyl_showTabBadgePoint)
-    public func cyl_showTabBadgePoint() {
+    public func cylShowTabBadgePoint() {
         if !cyl_isPlusChildViewController {
             cyl_showBadge()
         }
@@ -603,7 +603,7 @@ extension UIViewController {
      */
     @available(*, deprecated, message: "Deprecated in 1.19.0. Use method in <CYLBadgeProtocol>, such as `-[UIViewController cyl_clearBadge]` instead.")
     @objc(cyl_removeTabBadgePoint)
-    public func cyl_removeTabBadgePoint() {
+    public func cylRemoveTabBadgePoint() {
         if !cyl_isPlusChildViewController {
             cyl_clearBadge()
         }
@@ -615,7 +615,7 @@ extension UIViewController {
      */
     @available(*, deprecated, message: "Deprecated in 1.19.0. Use method in <CYLBadgeProtocol>, such as `-[UIViewController cyl_isShowBadge]` instead.")
     @objc(cyl_isShowTabBadgePoint)
-    public func cyl_isShowTabBadgePoint() -> Bool {
+    public func cylIsShowTabBadgePoint() -> Bool {
         !cyl_isPlusChildViewController && cyl_isShowBadge()
     }
 
@@ -667,7 +667,7 @@ extension UIViewController {
      * [CN] 承载页面所在 Tab 角标的视图或 item（Objective-C 中的 `kActualView`）。
      */
     private var cyl_badgeHost: NSObject? {
-        cyl_getViewControllerInsteadOfNavigation().cyl_getActualBadgeSuperView() as? NSObject
+        cylGetViewControllerInsteadOfNavigation().cyl_getActualBadgeSuperView() as? NSObject
     }
 
     private func cylForwardToBadgeHost(_ selectorName: String, _ object: Any? = nil) {
@@ -703,7 +703,7 @@ extension UIViewController {
         if cyl_isPlaceholder {
             return nil
         }
-        let viewController = cyl_getViewControllerInsteadOfNavigation()
+        let viewController = cylGetViewControllerInsteadOfNavigation()
         if let flatDesignHost = cylFlatDesignBadgeHost(of: viewController) {
             return flatDesignHost
         }

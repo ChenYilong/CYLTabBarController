@@ -90,22 +90,22 @@ enum CYLTabBarItemAnimationCore {
 public final class CYLTabBarItemAnimationCoreHost: NSObject, CYLTabBarItemAnimationHost {
 
     public func isPlusControl(_ control: UIControl) -> Bool {
-        control.cyl_isPlusControl()
+        control.cylIsPlusControl()
     }
 
     public func isAnimationView(_ animationView: UIView?, readyIn control: UIControl) -> Bool {
-        if let tabBarController = control.cyl_tabBarController, tabBarController.tabBarItemAnimationURLs.count > 0 {
+        if let tabBarController = control.cylTabBarController, tabBarController.tabBarItemAnimationURLs.count > 0 {
             return tabBarController.isTabBarItemAnimationViewAdded
         }
         return (animationView?.frame.size.width ?? 0) > 10
     }
 
     public func defaultAnimationSize() -> CGSize {
-        CGSize(width: CYLTabBarItemImagePlaceholderWidth, height: CYLTabBarItemImagePlaceholderHeight)
+        CGSize(width: cylTabBarItemImagePlaceholderWidth, height: cylTabBarItemImagePlaceholderHeight)
     }
 
     public func showAnimationView(_ animationView: UIView, in control: UIControl) {
-        control.cyl_replaceTabImageView(withNewView: animationView, show: true)
+        control.cylReplaceTabImageView(withNewView: animationView, show: true)
     }
 
     public func replaceTrackedSubview(_ view: UIView, with newView: UIView, inSuperview superview: UIView) {
@@ -118,11 +118,11 @@ public final class CYLTabBarItemAnimationCoreHost: NSObject, CYLTabBarItemAnimat
     }
 
     public func animationViewDidAdd(in control: UIControl) {
-        NotificationCenter.default.post(name: .CYLTabBarItemAnimationViewDidAdd, object: control)
+        NotificationCenter.default.post(name: .cylTabBarItemAnimationViewDidAdd, object: control)
     }
 
     public func animationWillPlay(in control: UIControl) {
-        NotificationCenter.default.post(name: .CYLTabBarItemAnimationPlaying, object: control)
+        NotificationCenter.default.post(name: .cylTabBarItemAnimationPlaying, object: control)
     }
 }
 
@@ -179,8 +179,8 @@ public func cylTabBarItemAttributesAddingAnimationFileEntryPoint(_ attributes: N
         return attributes
     }
     let result = CYLTabBarItemAnimationCore.attributes([item], addingFiles: [resourceName], bundle: bundle, fileType: fileType,
-                                                       filePathKey: CYLTabBarAnimationFilePath,
-                                                       darkFilePathKey: CYLTabBarAnimationDarkFilePath)
+                                                       filePathKey: cylTabBarAnimationFilePath,
+                                                       darkFilePathKey: cylTabBarAnimationDarkFilePath)
     return (result.first ?? item) as NSDictionary
 }
 
@@ -208,7 +208,7 @@ extension UIControl {
      * [CN] 本控件中的动画视图。
      */
     @objc(cyl_tabBarItemAnimationView)
-    public func cyl_tabBarItemAnimationView() -> UIView? {
+    public func cylTabBarItemAnimationView() -> UIView? {
         CYLTabBarItemAnimationCore.service?.animationView(in: self)
     }
 
@@ -217,11 +217,11 @@ extension UIControl {
      * [CN] 本控件的动画是否已加载。
      */
     @objc(cyl_isTabBarItemAnimationReady)
-    public func cyl_isTabBarItemAnimationReady() -> Bool {
+    public func cylIsTabBarItemAnimationReady() -> Bool {
         if let service = CYLTabBarItemAnimationCore.service {
             return service.isAnimationReady(in: self)
         }
-        guard let tabBarController = cyl_tabBarController else {
+        guard let tabBarController = cylTabBarController else {
             return false
         }
         return tabBarController.tabBarItemAnimationURLs.count > 0 && tabBarController.isTabBarItemAnimationViewAdded
@@ -232,7 +232,7 @@ extension UIControl {
      * [CN] 向本控件添加 `URL` 处的动画。
      */
     @objc(cyl_addTabBarItemAnimationWithURL:size:contentMode:)
-    public func cyl_addTabBarItemAnimation(with url: URL?, size: CGSize, contentMode: UIView.ContentMode) {
+    public func cylAddTabBarItemAnimation(with url: URL?, size: CGSize, contentMode: UIView.ContentMode) {
         CYLTabBarItemAnimationCore.service?.addAnimation(with: url, size: size, contentMode: contentMode, animationSpeed: 0, to: self)
     }
 
@@ -241,7 +241,7 @@ extension UIControl {
      * [CN] 以指定速度向本控件添加 `URL` 处的动画。
      */
     @objc(cyl_addTabBarItemAnimationWithURL:size:contentMode:animationSpeed:)
-    public func cyl_addTabBarItemAnimation(with url: URL?, size: CGSize, contentMode: UIView.ContentMode,
+    public func cylAddTabBarItemAnimation(with url: URL?, size: CGSize, contentMode: UIView.ContentMode,
                                            animationSpeed: CGFloat) {
         CYLTabBarItemAnimationCore.service?.addAnimation(with: url, size: size, contentMode: contentMode,
                                                          animationSpeed: animationSpeed, to: self)
@@ -252,7 +252,7 @@ extension UIControl {
      * [CN] 修改本控件动画的速度。
      */
     @objc(cyl_setTabBarItemAnimationSpeed:)
-    public func cyl_setTabBarItemAnimationSpeed(_ animationSpeed: CGFloat) {
+    public func cylSetTabBarItemAnimationSpeed(_ animationSpeed: CGFloat) {
         CYLTabBarItemAnimationCore.service?.setAnimationSpeed(animationSpeed, in: self)
     }
 
@@ -261,7 +261,7 @@ extension UIControl {
      * [CN] 让本控件的动画循环播放（`loops`）或只播放一次，对正在播放的动画立即生效。
      */
     @objc(cyl_setTabBarItemAnimationLoops:)
-    public func cyl_setTabBarItemAnimationLoops(_ loops: Bool) {
+    public func cylSetTabBarItemAnimationLoops(_ loops: Bool) {
         CYLTabBarItemAnimationCore.service?.setAnimationLoops?(loops, in: self)
     }
 
@@ -270,7 +270,7 @@ extension UIControl {
      * [CN] 从进度 0 重新播放本控件的动画，不重置其他 Tab。
      */
     @objc(cyl_restartTabBarItemAnimation)
-    public func cyl_restartTabBarItemAnimation() {
+    public func cylRestartTabBarItemAnimation() {
         CYLTabBarItemAnimationCore.service?.restartAnimation?(in: self)
     }
 
@@ -279,7 +279,7 @@ extension UIControl {
      * [CN] 按当前浅色/深色风格重新加载本控件的动画。
      */
     @objc(cyl_reloadTabBarItemAnimationViewForCurrentStyle)
-    public func cyl_reloadTabBarItemAnimationViewForCurrentStyle() {
+    public func cylReloadTabBarItemAnimationViewForCurrentStyle() {
         CYLTabBarItemAnimationCore.service?.reloadAnimationForCurrentStyle(in: self)
     }
 
@@ -288,7 +288,7 @@ extension UIControl {
      * [CN] 用 `URL` 处的动画替换本控件的动画。
      */
     @objc(cyl_replaceTabBarItemAnimationWithURL:size:contentMode:)
-    public func cyl_replaceTabBarItemAnimation(with url: URL, size: CGSize, contentMode: UIView.ContentMode) {
+    public func cylReplaceTabBarItemAnimation(with url: URL, size: CGSize, contentMode: UIView.ContentMode) {
         guard let service = CYLTabBarItemAnimationCore.service else {
             return
         }
@@ -304,7 +304,7 @@ extension UIControl {
      * [CN] 将当前颜色应用到本控件的动画。
      */
     @objc(cyl_refreshTabBarItemAnimationColors)
-    public func cyl_refreshTabBarItemAnimationColors() {
+    public func cylRefreshTabBarItemAnimationColors() {
         CYLTabBarItemAnimationCore.service?.refreshAnimationColors?(in: self)
     }
 
@@ -313,7 +313,7 @@ extension UIControl {
      * [CN] 在本控件中播放 `URL` 处的动画。
      */
     @objc(cyl_playTabBarItemAnimationWithURL:size:defaultSelected:contentMode:)
-    public func cyl_playTabBarItemAnimation(with url: URL, size: CGSize, defaultSelected: Bool,
+    public func cylPlayTabBarItemAnimation(with url: URL, size: CGSize, defaultSelected: Bool,
                                             contentMode: UIView.ContentMode) {
         CYLTabBarItemAnimationCore.service?.playAnimation(with: url, size: size, defaultSelected: defaultSelected,
                                                           contentMode: contentMode, in: self)
@@ -324,7 +324,7 @@ extension UIControl {
      * [CN] 停止本控件的动画。
      */
     @objc(cyl_stopTabBarItemAnimation)
-    public func cyl_stopTabBarItemAnimation() {
+    public func cylStopTabBarItemAnimation() {
         CYLTabBarItemAnimationCore.service?.stopAnimation(in: self)
     }
 }
@@ -336,7 +336,7 @@ extension UIView {
      * [CN] 本视图是否为动画库的动画视图（内部使用）。
      */
     @objc(cyl_isTabBarItemAnimationView)
-    public func cyl_isTabBarItemAnimationView() -> Bool {
+    public func cylIsTabBarItemAnimationView() -> Bool {
         CYLTabBarItemAnimationCore.service?.isAnimationView(self) ?? false
     }
 }

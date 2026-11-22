@@ -37,7 +37,7 @@ extension CYLTabBarController {
     @objc(cyl_isPlusSlotViewController:)
     func cylIsPlusSlotViewController(_ viewController: UIViewController?) -> Bool {
         guard let viewController else { return false }
-        let content = viewController.cyl_getViewControllerInsteadOfNavigation()
+        let content = viewController.cylGetViewControllerInsteadOfNavigation()
         if viewController.cyl_isPlaceholder || content.cyl_isPlaceholder {
             return true
         }
@@ -116,13 +116,13 @@ extension CYLTabBarController {
         // [EN] `+indexForTabbarItemsCount:` asserts for an odd count without a custom index: only ask when it can answer.
         // [CN] Tab 数为奇数且没有自定义下标时 `+indexForTabbarItemsCount:` 会断言：只在它能给出结果时调用。
         guard implementsCustomIndex || tabCount % 2 == 0 else { return middle }
-        let customIndex = Int(plusButton.cyl_index(forTabbarItemsCount: UInt(tabCount)))
+        let customIndex = Int(plusButton.cylIndex(forTabbarItemsCount: UInt(tabCount)))
         return customIndex != NSNotFound && customIndex <= tabCount ? customIndex : middle
     }
 
     /// [EN] The attributes of the slot's tab item. [CN] slot 对应 TabBarItem 的属性。
     private func cylPlusSlotTabBarItemAttributes() -> [AnyHashable: Any] {
-        [CYLTabBarItemTitle: "", CYLTabBarItemImage: UIImage.cyl_tabItemPlaceholder(), CYLTabBarItemSelectedImage: UIImage.cyl_tabItemPlaceholder(),
+        [cylTabBarItemTitle: "", cylTabBarItemImage: UIImage.cylTabItemPlaceholder(), cylTabBarItemSelectedImage: UIImage.cylTabItemPlaceholder(),
          cylTabBarItemPlusSlotPlaceholderKey: true]
     }
 
@@ -149,7 +149,7 @@ extension CYLTabBarController {
         let slotIndex = min(cylPlusSlotIndex(forTabCount: tabs.count), tabs.count)
         var aligned = tabs
         aligned.insert(slot, at: slotIndex)
-        cyl_addChildViewController(slot)
+        cylAddChildViewController(slot)
         plusButton?.cyl_tabBarItemVisibleIndex = slotIndex
         // [EN] As the tab bars set it on layout: the slot's index, placeholder or not. [CN] 与 TabBar 布局时一致：slot 的下标，无论是否为占位。
         plusButton?.cyl_tabBarChildViewControllerIndex = slotIndex
@@ -169,7 +169,7 @@ extension CYLTabBarController {
     private func cylDoubleCheckTabControlAlign(with tabs: [UIViewController]) {
         #if DEBUG
         if tabBarItemsAttributes.count != tabs.count {
-            assertionFailure(CYLLocalizedString("[DEBUG] 设置 tabBarItemsAttributes 时，请确保元素个数与控制器的个数相同，并在 `-setViewControllers:` 之前设置。"))
+            assertionFailure(cylLocalizedString("[DEBUG] 设置 tabBarItemsAttributes 时，请确保元素个数与控制器的个数相同，并在 `-setViewControllers:` 之前设置。"))
         }
         #endif
     }

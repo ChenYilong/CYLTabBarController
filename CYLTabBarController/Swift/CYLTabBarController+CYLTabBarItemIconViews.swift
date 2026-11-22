@@ -79,7 +79,7 @@ extension CYLTabBarController {
             return []
         }
         let isLiquidGlassTabBar = !isFlatDesign && CYLConstants.isLiquidGlassActive()
-        if isLiquidGlassTabBar, let selectedLayerButton = tabButton.cyl_platterSelected(), selectedLayerButton !== tabButton {
+        if isLiquidGlassTabBar, let selectedLayerButton = tabButton.cylPlatterSelected(), selectedLayerButton !== tabButton {
             return [tabButton, selectedLayerButton]
         }
         return [tabButton]
@@ -144,10 +144,10 @@ extension CYLTabBarController {
                                     selectedLayer: Bool?, isSelected: Bool) {
         var iconViews = objc_getAssociatedObject(tabButton, CYLTabBarItemIconViewKeys.iconViews) as? [Bool: UIView]
         let installedProvider = objc_getAssociatedObject(tabButton, CYLTabBarItemIconViewKeys.installedProvider) as AnyObject?
-        let lottieView = tabButton.cyl_tabBarItemAnimationView()
+        let lottieView = tabButton.cylTabBarItemAnimationView()
         // [EN] A cover over the tab button (e.g. a logo over the first tab) hides its other views, the tab's own icon too.
         // [CN] 覆盖 Tab 按钮的封面（如第一个 Tab 上的 Logo）会隐藏按钮中的其他视图，包括 Tab 自身的图标。
-        let isCovered = tabButton.subviews.contains { $0.cyl_tabButtonCoverView && !$0.cyl_isInvisiable() }
+        let isCovered = tabButton.subviews.contains { $0.cyl_tabButtonCoverView && !$0.cylIsInvisiable() }
         if installedProvider !== providerObject {
             // [EN] Another provider, or none: remove the views of the previous one. [CN] 换了 provider 或已移除：移除之前的视图。
             iconViews?.values.forEach { $0.removeFromSuperview() }
@@ -156,10 +156,10 @@ extension CYLTabBarController {
             objc_setAssociatedObject(tabButton, CYLTabBarItemIconViewKeys.installedProvider, providerObject, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             if provider == nil {
                 // [EN] The tab's own icon and its badge come back, unless the cover hides them. [CN] Tab 自身的图标及其角标恢复，除非被封面隐藏。
-                cylSetTabImageView(tabButton.cyl_tabImageView(), lottieView: lottieView, replacedByIconView: false)
+                cylSetTabImageView(tabButton.cylTabImageView(), lottieView: lottieView, replacedByIconView: false)
                 Self.cylSetAnimatedItemIconHidden(tabButton, false)
                 if !isCovered {
-                    tabButton.cyl_tabImageView()?.isHidden = lottieView != nil
+                    tabButton.cylTabImageView()?.isHidden = lottieView != nil
                     lottieView?.isHidden = false
                 }
                 return
@@ -176,15 +176,15 @@ extension CYLTabBarController {
         //      above it. A CYLAnimatedItemView (FlatDesign) shows its icon again on its own updates unless told.
         // [CN] Tab 自身图标保持隐藏（切换 Tab 时系统可能重新显示它）；其角标仍显示在它上方。CYLAnimatedItemView（扁平样式）在自身更新时会重新显示图标，
         //      除非被告知。
-        tabButton.cyl_tabImageView()?.isHidden = true
+        tabButton.cylTabImageView()?.isHidden = true
         lottieView?.isHidden = true
         Self.cylSetAnimatedItemIconHidden(tabButton, true)
         // [EN] Under a cover the badge stays as the cover left it (cleared). [CN] 有封面时角标保持封面设置的状态（已清除）。
-        cylSetTabImageView(tabButton.cyl_tabImageView(), lottieView: lottieView, replacedByIconView: !isCovered)
+        cylSetTabImageView(tabButton.cylTabImageView(), lottieView: lottieView, replacedByIconView: !isCovered)
         // [EN] Below the tab's own icon, or the subview of the tab button holding it (Liquid Glass), so the badge shown above
         //      that icon stays above this view too.
         // [CN] 位于 Tab 自身图标（或液态玻璃中包含它的 Tab 按钮子视图）之下，使该图标上方的角标也位于此视图之上。
-        var iconHolder: UIView? = lottieView ?? tabButton.cyl_tabImageView()
+        var iconHolder: UIView? = lottieView ?? tabButton.cylTabImageView()
         while let holder = iconHolder, holder.superview !== tabButton {
             iconHolder = holder.superview
         }
@@ -212,7 +212,7 @@ extension CYLTabBarController {
             }
             iconView.isUserInteractionEnabled = false
             iconView.cyl_tabBarItemIconView = true
-            tabButton.cyl_replaceTabImageView(withNewView: iconView, show: true)
+            tabButton.cylReplaceTabImageView(withNewView: iconView, show: true)
             if iconView.superview === tabButton {
                 views[look] = iconView
             }
@@ -230,7 +230,7 @@ extension CYLTabBarController {
     func cylSetTabImageView(_ tabImageView: UIView?, lottieView: UIView?, replacedByIconView replaced: Bool) {
         for host in [tabImageView, lottieView].compactMap({ $0 }) where host.cyl_badgeHostReplacedByIconView != replaced {
             host.cyl_badgeHostReplacedByIconView = replaced
-            host.cyl_refreshBadge()
+            host.cylRefreshBadge()
         }
     }
 }
@@ -260,20 +260,20 @@ extension CYLTabBarController {
             return
         }
         let viewController = viewControllers[Int(index)]
-        let page = viewController.cyl_getViewControllerInsteadOfNavigation()
+        let page = viewController.cylGetViewControllerInsteadOfNavigation()
         var userInfo: [AnyHashable: Any] = [
-            CYLTabBarControllerKey: self,
-            CYLTabBarItemIndexKey: NSNumber(value: index),
-            CYLTabBarItemViewControllerKey: viewController,
+            cylTabBarControllerKey: self,
+            cylTabBarItemIndexKey: NSNumber(value: index),
+            cylTabBarItemViewControllerKey: viewController,
         ]
         // [EN] The tab's identifier (`CYLTabBarItemIdentifier`), more exact than its index. [CN] Tab 的 ID，比下标更精确。
         if let identifier = viewController.cyl_tabBarItemIdentifier ?? page.cyl_tabBarItemIdentifier, !identifier.isEmpty {
-            userInfo[CYLTabBarItemIdentifier] = identifier
+            userInfo[cylTabBarItemIdentifier] = identifier
         }
         // [EN] FlatDesign (an optional subspec): its own item, read at run time. [CN] 扁平样式（可选子库）：其自己的 item，在运行时读取。
         let flatItem = tabBarStyleType == .flatDesign ? CYLFlatDesignLookup.tabBarItem(of: viewController) : nil
         if let tabBarItem = flatItem ?? viewController.tabBarItem {
-            userInfo[CYLTabBarItemKey] = tabBarItem
+            userInfo[cylTabBarItemKey] = tabBarItem
         }
         extra?.forEach { userInfo[$0.key] = $0.value }
         NotificationCenter.default.post(name: name, object: page, userInfo: userInfo)
@@ -296,10 +296,10 @@ extension CYLTabBarController {
             url = URL(string: string)
         }
         if let url {
-            UIImage.cyl_load(with: url, completion: completion)
+            UIImage.cylLoad(with: url, completion: completion)
             return
         }
-        completion((icon as? String).flatMap { UIImage.cyl_imageNamed($0) })
+        completion((icon as? String).flatMap { UIImage.cylImageNamed($0) })
     }
 
     /// [EN] The tab at `index` takes icons: not the plus button's slot or page. [CN] 第 `index` 个 Tab 可以设置图标：不是 PlusButton 的位置或页面。
@@ -335,8 +335,8 @@ extension CYLTabBarController {
         // [EN] The tab bar lays its buttons out again, as when a tab is selected. [CN] TabBar 重新布局其按钮，与选中 Tab 时相同。
         tabBar.setNeedsLayout()
         cylSetNeedsUpdateTabBarItemIconViews()
-        cylPostTabBarItemNotification(.CYLTabBarItemIconDidChange, at: index,
-                                      extra: block.map { [CYLTabBarItemIconViewProviderKey: $0] })
+        cylPostTabBarItemNotification(.cylTabBarItemIconDidChange, at: index,
+                                      extra: block.map { [cylTabBarItemIconViewProviderKey: $0] })
         return true
     }
 
@@ -402,7 +402,7 @@ extension CYLTabBarController {
             iconView.animationRepeatCount = 1
         }
         iconView.contentMode = .scaleAspectFit
-        let iconSize = size == .zero ? CGSize(width: CYLTabBarItemImagePlaceholderWidth, height: CYLTabBarItemImagePlaceholderHeight) : size
+        let iconSize = size == .zero ? CGSize(width: cylTabBarItemImagePlaceholderWidth, height: cylTabBarItemImagePlaceholderHeight) : size
         iconView.frame = CGRect(origin: .zero, size: iconSize)
         return iconView
     }
@@ -419,8 +419,8 @@ extension CYLTabBarController {
 extension CYLTabBarController {
 
     /// [EN] The image keys of an icon change. [CN] 图标变化涉及的图片 key。
-    private static let cylIconKeys = [CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage, CYLTabBarItemSelectedDarkImage,
-                                      CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize]
+    private static let cylIconKeys = [cylTabBarItemImage, cylTabBarItemSelectedImage, cylTabBarItemDarkImage, cylTabBarItemSelectedDarkImage,
+                                      cylTabBarItemImageURL, cylTabBarItemSelectedImageURL, cylTabBarItemImageURLSize]
 
     /**
      * [EN] The image keys of `attributes` (an icon change), empty when there is none.
@@ -437,7 +437,7 @@ extension CYLTabBarController {
      */
     @objc(cyl_applyNavigationTitleOfFollowingPage:title:)
     static func cylApplyNavigationTitle(ofFollowingPage viewController: UIViewController, title: String?) {
-        let page = viewController.cyl_getViewControllerInsteadOfNavigation()
+        let page = viewController.cylGetViewControllerInsteadOfNavigation()
         guard let title, !title.isEmpty, page.cyl_navigationTitleFollowsTabBarItemTitle else {
             return
         }
@@ -475,16 +475,16 @@ extension CYLTabBarController {
     @objc(cyl_plusButton:didChangeWithNotification:info:)
     func cylPlusButton(_ plusButton: CYLPlusButton, didChangeWith name: NSNotification.Name, info: [AnyHashable: Any]) {
         var extra = info
-        extra[CYLPlusButtonKey] = plusButton
+        extra[cylPlusButtonKey] = plusButton
         let plusChild = cylPrivate.cylContextPlusChildViewController()
-        if name == .CYLTabBarItemTitleDidChange, let plusChild {
-            Self.cylApplyNavigationTitle(ofFollowingPage: plusChild, title: info[CYLTabBarItemTitle] as? String)
+        if name == .cylTabBarItemTitleDidChange, let plusChild {
+            Self.cylApplyNavigationTitle(ofFollowingPage: plusChild, title: info[cylTabBarItemTitle] as? String)
         }
         if let plusChild, let index = viewControllers?.firstIndex(of: plusChild) {
             cylPostTabBarItemNotification(name, at: UInt(index), extra: extra)
             return
         }
-        extra[CYLTabBarControllerKey] = self
+        extra[cylTabBarControllerKey] = self
         NotificationCenter.default.post(name: name, object: plusButton, userInfo: extra)
     }
 
@@ -501,23 +501,23 @@ extension CYLTabBarController {
         guard let plusButton = CYLPlusButton(forOwner: self), !attributes.isEmpty else {
             return false
         }
-        if let title = attributes[CYLTabBarItemTitle] as? String {
+        if let title = attributes[cylTabBarItemTitle] as? String {
             let oldTitle = plusButton.cyl_title()
             plusButton.cyl_updateTitle(title, image: nil, selectedImage: nil)
             // [EN] The plus button's page follows its title like any tab. [CN] PlusButton 的页面与其他 Tab 一样跟随其标题。
-            var titleInfo: [AnyHashable: Any] = [CYLTabBarItemTitle: title, CYLTabBarItemChangedAttributesKey: [CYLTabBarItemTitle: title]]
-            titleInfo[CYLTabBarItemOldTitleKey] = oldTitle
-            cylPlusButton(plusButton, didChangeWith: .CYLTabBarItemTitleDidChange, info: titleInfo)
+            var titleInfo: [AnyHashable: Any] = [cylTabBarItemTitle: title, cylTabBarItemChangedAttributesKey: [cylTabBarItemTitle: title]]
+            titleInfo[cylTabBarItemOldTitleKey] = oldTitle
+            cylPlusButton(plusButton, didChangeWith: .cylTabBarItemTitleDidChange, info: titleInfo)
         }
         let iconAttributes = Self.cylIconAttributes(of: attributes)
-        if attributes[CYLTabBarItemImage] != nil || attributes[CYLTabBarItemSelectedImage] != nil ||
-            attributes[CYLTabBarItemImageURL] != nil || attributes[CYLTabBarItemSelectedImageURL] != nil {
-            cylPlusButton(plusButton, didChangeWith: .CYLTabBarItemIconDidChange, info: [CYLTabBarItemChangedAttributesKey: iconAttributes])
+        if attributes[cylTabBarItemImage] != nil || attributes[cylTabBarItemSelectedImage] != nil ||
+            attributes[cylTabBarItemImageURL] != nil || attributes[cylTabBarItemSelectedImageURL] != nil {
+            cylPlusButton(plusButton, didChangeWith: .cylTabBarItemIconDidChange, info: [cylTabBarItemChangedAttributesKey: iconAttributes])
         }
-        cylPlusButton(plusButton, didChangeWith: .CYLTabBarItemDidChange, info: [CYLTabBarItemChangedAttributesKey: attributes])
-        let icon = attributes[CYLTabBarItemImageURL] ?? attributes[CYLTabBarItemImage]
-        let selectedIcon = attributes[CYLTabBarItemSelectedImageURL] ?? attributes[CYLTabBarItemSelectedImage]
-        var size = (attributes[CYLTabBarItemImageURLSize] as? NSValue)?.cgSizeValue ?? plusButton.image(for: .normal)?.size ?? .zero
+        cylPlusButton(plusButton, didChangeWith: .cylTabBarItemDidChange, info: [cylTabBarItemChangedAttributesKey: attributes])
+        let icon = attributes[cylTabBarItemImageURL] ?? attributes[cylTabBarItemImage]
+        let selectedIcon = attributes[cylTabBarItemSelectedImageURL] ?? attributes[cylTabBarItemSelectedImage]
+        var size = (attributes[cylTabBarItemImageURLSize] as? NSValue)?.cgSizeValue ?? plusButton.image(for: .normal)?.size ?? .zero
         // FIX: issue #601
         // [EN] Never left unscaled: a downloaded image keeps its own size (a 512 px icon is about 170 pt), which resizes the
         //      plus button and moves it. Without a size, the image view's, else the tab icon's.
@@ -527,7 +527,7 @@ extension CYLTabBarController {
             size = plusButton.imageView?.bounds.size ?? .zero
         }
         if size.width <= 0 || size.height <= 0 {
-            size = CGSize(width: CYLTabBarItemImagePlaceholderWidth, height: CYLTabBarItemImagePlaceholderHeight)
+            size = CGSize(width: cylTabBarItemImagePlaceholderWidth, height: cylTabBarItemImagePlaceholderHeight)
         }
         if let icon {
             Self.cylLoadTabBarItemIcon(icon) { [weak self, weak plusButton] image in

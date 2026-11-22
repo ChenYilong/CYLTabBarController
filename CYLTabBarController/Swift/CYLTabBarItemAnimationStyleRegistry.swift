@@ -108,9 +108,9 @@ enum CYLTabBarItemAnimationAttributes {
         func value(_ key: String) -> Any? {
             cylTabBarItemAttributesAnimationValueEntryPoint(attributes, key as NSString)
         }
-        let darkURL = (value(CYLTabBarAnimationDarkURL) as? URL) ?? fileURL((value(CYLTabBarAnimationDarkFilePath) as? String).flatMap { $0.isEmpty ? nil : $0 })
-        let darkColors = (value(CYLTabBarAnimationDarkColors) as? NSDictionary).flatMap { $0.count > 0 ? $0 : nil }
-        let colors = (value(CYLTabBarAnimationColors) as? NSDictionary).flatMap { $0.count > 0 ? $0 : nil }
+        let darkURL = (value(cylTabBarAnimationDarkURL) as? URL) ?? fileURL((value(cylTabBarAnimationDarkFilePath) as? String).flatMap { $0.isEmpty ? nil : $0 })
+        let darkColors = (value(cylTabBarAnimationDarkColors) as? NSDictionary).flatMap { $0.count > 0 ? $0 : nil }
+        let colors = (value(cylTabBarAnimationColors) as? NSDictionary).flatMap { $0.count > 0 ? $0 : nil }
         let registry = CYLTabBarItemAnimationStyleRegistry.shared
         if darkURL == nil, darkColors == nil, colors == nil, !registry.hasStyleVariant(for: animationURL) {
             return
@@ -169,8 +169,8 @@ public func cylTabBarItemAnimationRegisterDarkColorsEntryPoint(_ url: NSURL?, _ 
 @_cdecl("CYLTabBarItemAnimationURLFromAttributes")
 public func cylTabBarItemAnimationURLFromAttributesEntryPoint(_ attributes: NSDictionary?,
                                                               _ filePath: AutoreleasingUnsafeMutablePointer<NSString?>?) -> NSURL? {
-    let urlValue = cylTabBarItemAttributesAnimationValueEntryPoint(attributes, CYLTabBarAnimationURL as NSString)
-    let path = cylTabBarItemAttributesAnimationValueEntryPoint(attributes, CYLTabBarAnimationFilePath as NSString) as? String
+    let urlValue = cylTabBarItemAttributesAnimationValueEntryPoint(attributes, cylTabBarAnimationURL as NSString)
+    let path = cylTabBarItemAttributesAnimationValueEntryPoint(attributes, cylTabBarAnimationFilePath as NSString) as? String
     filePath?.pointee = path as NSString?
     let animationURL = (urlValue as? URL) ?? CYLTabBarItemAnimationAttributes.fileURL(path)
     // [EN] FIX: issue #415 — a file given with a generic key (`CYLTabBarAnimationURL`, `CYLTabBarAnimationFilePath`)
@@ -180,7 +180,7 @@ public func cylTabBarItemAnimationURLFromAttributesEntryPoint(_ attributes: NSDi
     // [CN] 通过通用 key（`CYLTabBarAnimationURL`、`CYLTabBarAnimationFilePath`）传入、且扩展名被某个已注册动画库认领的文件，按扩展名匹配，
     //      不再绑定到 Tab 属性中其他 key 所属的动画库（例如在 Rive Tab 上原地设置 SVGA 文件）。通过动画库自己的 key 传入、或没有已知扩展名
     //      （远程 URL）的文件，仍绑定到其 key 选择的动画库。
-    let genericKey = (urlValue as? URL) != nil ? CYLTabBarAnimationURL : CYLTabBarAnimationFilePath
+    let genericKey = (urlValue as? URL) != nil ? cylTabBarAnimationURL : cylTabBarAnimationFilePath
     let extensions = CYLTabBarItemAnimationCore.service?.animationFileExtensions?() ?? []
     let matchedByExtension = attributes?[genericKey] != nil
         && animationURL.map { extensions.contains($0.pathExtension.lowercased()) } == true
