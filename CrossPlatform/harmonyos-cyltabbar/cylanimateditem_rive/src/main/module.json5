@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "cylanimateditem_rive",
+    "type": "har",
+    "deviceTypes": [
+      "phone",
+      "tablet"
+    ]
+  }
+}
