@@ -10,6 +10,7 @@ import { CYLSVGAView } from './svga/CYLSVGAView';
 import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint,
   CYLTabBarAnimationTintTitle } from './CYLRiveTabBarItemAnimator';
 import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines } from 'cylanimateditem';
+import { CYLAnimatedItemLottie } from 'cylanimateditem_lottie';
 import { CYLLocalizedString, cyl_textOf } from './CYLLocalization';
 import { CYLTabButtonAnimation, CYLTabButtonProperty, CYLTabButtonView, CYLTabButtonViewImpl } from './CYLTabButtonAnimation';
 
@@ -503,7 +504,10 @@ export struct CYLTabBarController {
   aboutToAppear(): void {
     // [EN] cyltabbar plays Lottie (@ohos/lottie), Rive (@ohos/rive) and SVGA (its own player): CYLAnimatedItemView draws them.
     // [CN] cyltabbar 播放 Lottie、Rive 与 SVGA（自带播放器）：由 CYLAnimatedItemView 绘制。
-    ['Lottie', 'Rive', 'SVGA'].forEach((type: string) => CYLAnimatedItemEngines.register(type));
+    // [EN] Lottie plays through the component's engine (cylanimateditem_lottie); Rive and SVGA through cyltabbar's views.
+    // [CN] Lottie 通过组件的引擎（cylanimateditem_lottie）播放；Rive 与 SVGA 通过 cyltabbar 的视图播放。
+    CYLAnimatedItemLottie.register();
+    ['Rive', 'SVGA'].forEach((type: string) => CYLAnimatedItemEngines.register(type));
     // [EN] Debug builds installed with the x86_64 debug engine kit: Rive also plays on the x86_64 emulator.
     // [CN] 安装了 x86_64 调试引擎包的 debug 构建：Rive 也能在 x86_64 模拟器上播放。
     CYLAnimatedItemEngines.loadX86_64DebugEngines(this.getUIContext().getHostContext());
@@ -1466,6 +1470,15 @@ export struct CYLTabBarController {
     return item.svgaSize ?? this.imageSize;
   }
 
+  /**
+   * [EN] A Lottie tab (the first branch of `cylTabEngine`): played by cylanimateditem_lottie through the component.
+   * [CN] Lottie Tab（`cylTabEngine` 的第一个分支）：由 cylanimateditem_lottie 经组件播放。
+   */
+  cylTabIsLottie(index: number): boolean {
+    const item = this.tabBarItemsAttributes[index];
+    return item.lottieFilePath !== undefined && item.gifFilePath === undefined && item.imageURL === undefined;
+  }
+
   /** [EN] The engine view CYLAnimatedItemView shows for a tab. [CN] CYLAnimatedItemView 为 Tab 显示的引擎视图。 */
   @Builder
   cylTabEngine(index: number, context: CYLAnimatedItemAnimationContext) {
@@ -1534,6 +1547,21 @@ export struct CYLTabBarController {
           // [EN] The animated icon is CYLAnimatedItemView (docs/Animated-Item.md, TODO 5): the static image (else the
           //      placeholder) until the engine view reports it is drawn, and again when it fails.
           // [CN] 动效图标由 CYLAnimatedItemView 绘制（docs/Animated-Item.md，TODO 5）：引擎视图报告绘制完成之前，以及失败之后，显示静态图片（没有时为占位图）。
+          if (this.cylTabIsLottie(index)) {
+            // [EN] A Lottie tab: the component's own engine view (no animationBuilder), with the same playback.
+            // [CN] Lottie Tab：组件自身的引擎视图（不传 animationBuilder），播放设置相同。
+            CYLAnimatedItemView({
+              isBare: true,
+              image: this.cylIcon(index) ?? '',
+              animationUrl: this.cylTabAnimationPath(index),
+              iconSize: this.cylTabAnimationSize(index),
+              isItemSelected: this.selectedIndex === index,
+              animationTintColor: this.cylTabAnimationTint(index),
+              animationSpeed: this.tabBarItemAnimationSpeed,
+              animationLoops: this.tabBarItemAnimationLoops,
+              animationRestartToken: this.replayTokens[index] ?? 0,
+            })
+          } else {
           CYLAnimatedItemView({
             isBare: true,
             image: this.cylIcon(index) ?? '',
@@ -1550,6 +1578,7 @@ export struct CYLTabBarController {
               this.cylTabEngine(index, context)
             },
           })
+          }
         } else {
         Image(this.tapFrameImages[index] ?? this.cylGIFImageSource(index) ?? this.cylIcon(index))
           .width(this.imageSize)

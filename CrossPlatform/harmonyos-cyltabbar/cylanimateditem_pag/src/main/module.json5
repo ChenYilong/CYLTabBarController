@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "cylanimateditem_pag",
+    "type": "har",
+    "deviceTypes": [
+      "phone",
+      "tablet"
+    ]
+  }
+}

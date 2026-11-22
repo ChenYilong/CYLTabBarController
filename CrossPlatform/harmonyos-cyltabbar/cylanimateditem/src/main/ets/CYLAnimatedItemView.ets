@@ -836,6 +836,7 @@ export struct CYLAnimatedItemView {
     // [EN] Last, so the engine view reads the playback above when it reacts. [CN] 最后设置，使引擎视图响应时读到上面的播放设置。
     state.selected = context.selected;
     state.restartToken = context.restartToken;
+    state.changed();
   }
 
   /** [EN] Turned off: the animation shows again. [CN] 关闭时重新显示动画。 */

@@ -16,12 +16,13 @@ import { CYLAnimatedItemTypeRegistry } from './CYLAnimatedItemTypes';
 
 /**
  * [EN] What an engine view gets from its item: the file, the icon's size, the playback, and the callbacks. The item owns
- *      it and updates it in place, so an engine view that holds it as `@ObjectLink` sees each change (selection, speed,
- *      loop, restart) without being rebuilt.
- * [CN] 引擎视图从条目得到的内容：文件、图标尺寸、播放设置与回调。条目持有它并原地更新，因此以 `@ObjectLink` 持有它的引擎视图无需重建
- *      即可看到每次变化（选中、速度、循环、重播）。
+ *      it, updates it in place and calls `changed()`; an engine view listens (`listen`) and reacts to each change (a new
+ *      file, selection, speed, loop, restart) without being rebuilt. Plain listeners, not ArkUI state: the view is reached
+ *      through a wrapped builder, where `@ObjectLink` / `@Watch` did not fire on the emulator (2026-11-22).
+ * [CN] 引擎视图从条目得到的内容：文件、图标尺寸、播放设置与回调。条目持有它、原地更新并调用 `changed()`；引擎视图监听（`listen`）并响应每次变化
+ *      （新文件、选中、速度、循环、重播），无需重建。使用普通监听而不是 ArkUI 状态：视图经由 wrapBuilder 到达，在模拟器上 `@ObjectLink` / `@Watch`
+ *      没有触发（2026-11-22）。
  */
-@Observed
 export class CYLAnimatedItemEngineState implements CYLAnimatedItemEngineHost {
   source: CYLAnimatedItemSource = new CYLAnimatedItemSource();
   /** [EN] The icon's width and height in vp. [CN] 图标的宽与高（vp）。 */
@@ -48,6 +49,26 @@ export class CYLAnimatedItemEngineState implements CYLAnimatedItemEngineHost {
   };
   onPlayer: (player: CYLAnimatedItemPlayer | undefined) => void = (_player: CYLAnimatedItemPlayer | undefined) => {
   };
+
+  private listeners: (() => void)[] = [];
+
+  /**
+   * [EN] Calls `listener` after each change; returns the function that stops it. [CN] 每次变化后调用 `listener`；返回停止监听的函数。
+   */
+  listen(listener: () => void): () => void {
+    this.listeners.push(listener);
+    return () => {
+      const index = this.listeners.indexOf(listener);
+      if (index >= 0) {
+        this.listeners.splice(index, 1);
+      }
+    };
+  }
+
+  /** [EN] Called by the item after it changed the state. [CN] 条目修改 state 后调用。 */
+  changed(): void {
+    this.listeners.slice().forEach((listener: () => void) => listener());
+  }
 
   /** [EN] The playback as the driver reads it. [CN] 驱动读取的播放设置。 */
   playback(): CYLAnimatedItemPlayback {
@@ -129,26 +150,40 @@ function cylDequeueCreate(create: () => void): void {
  */
 @Component
 export struct CYLAnimatedItemEngineView {
-  @ObjectLink state: CYLAnimatedItemEngineState;
+  state: CYLAnimatedItemEngineState = new CYLAnimatedItemEngineState();
   @State private created: boolean = false;
+  /** [EN] The file's type and the size, kept from the state so a new type or size rebuilds. [CN] 文件类型与尺寸，从 state 同步，类型或尺寸变化时重建。 */
+  @State private type: string = '';
+  @State private viewWidth: number = 0;
+  @State private viewHeight: number = 0;
+  private unlisten?: () => void;
   private create: () => void = () => {
     this.created = true;
   };
 
   aboutToAppear(): void {
+    this.cylSync();
+    this.unlisten = this.state.listen(() => this.cylSync());
     cylEnqueueCreate(this.create);
   }
 
   aboutToDisappear(): void {
     cylDequeueCreate(this.create);
+    this.unlisten?.();
+  }
+
+  private cylSync(): void {
+    this.type = this.state.source.type;
+    this.viewWidth = this.state.width;
+    this.viewHeight = this.state.height;
   }
 
   hasView(): boolean {
-    return CYLAnimatedItemEngineViews.hasView(this.state.source.type);
+    return CYLAnimatedItemEngineViews.hasView(this.type);
   }
 
   view(): WrappedBuilder<[CYLAnimatedItemEngineState]> {
-    return CYLAnimatedItemEngineViews.viewFor(this.state.source.type) ?? wrapBuilder(cylNoEngineView);
+    return CYLAnimatedItemEngineViews.viewFor(this.type) ?? wrapBuilder(cylNoEngineView);
   }
 
   build() {
@@ -157,8 +192,8 @@ export struct CYLAnimatedItemEngineView {
         this.view().builder(this.state)
       }
     }
-    .width(this.state.width)
-    .height(this.state.height)
+    .width(this.viewWidth)
+    .height(this.viewHeight)
     .hitTestBehavior(HitTestMode.Transparent)
     .accessibilityLevel('no')
   }

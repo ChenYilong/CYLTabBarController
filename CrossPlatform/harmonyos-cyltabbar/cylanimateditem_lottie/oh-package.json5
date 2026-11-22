@@ -1,0 +1,12 @@
+{
+  "name": "cylanimateditem_lottie",
+  "version": "1.0.0",
+  "description": "The Lottie engine of CYLAnimatedItemView for HarmonyOS NEXT (@ohos/lottie): CYLAnimatedItemLottie.register() makes every CYLAnimatedItemView play Lottie JSON files.",
+  "main": "Index.ets",
+  "author": "ChenYilong",
+  "license": "MIT",
+  "dependencies": {
+    "@ohos/lottie": "^2.0.38",
+    "cylanimateditem": "file:../cylanimateditem"
+  }
+}

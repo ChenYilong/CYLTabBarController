@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "cylanimateditem_lottie",
+    "type": "har",
+    "deviceTypes": [
+      "phone",
+      "tablet"
+    ]
+  }
+}

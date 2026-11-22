@@ -54,6 +54,14 @@
     {
       "name": "cylanimateditem",
       "srcPath": "./cylanimateditem"
+    },
+    {
+      "name": "cylanimateditem_lottie",
+      "srcPath": "./cylanimateditem_lottie"
+    },
+    {
+      "name": "cylanimateditem_pag",
+      "srcPath": "./cylanimateditem_pag"
     }
   ]
 }

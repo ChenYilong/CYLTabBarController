@@ -24,11 +24,11 @@ types by its selection and playback (selected: once from the start; unselected: 
 - A host that drives playback itself (resting progress, Play all) sets `drivesAnimationPlayback: false` and gets the
   player in `onAnimationPlayer`: `CYLAnimatedItemPlayer` (`play()`, `stopAtProgress(p)`, `speed`, `loops`,
   `supportsSpeed` / `supportsLoops` / `supportsProgress`, `isPlaying`, `progress`, `onEnded`).
-- Writing an engine: a `@Component` that holds `@ObjectLink state: CYLAnimatedItemEngineState` (the parsed
+- Writing an engine: a `@Component` that gets `state: CYLAnimatedItemEngineState` (the parsed
   `CYLAnimatedItemSource` with its `#` options, the size, the playback, the callbacks), makes a player (subclass
   `CYLAnimatedItemPlayer`, or `CYLAnimatedItemTimedPlayer` for an engine without speed), and calls
-  `CYLAnimatedItemEngineBinding.ready(state, player)` / `failed(state)` / `update(state)` (from a `@Watch` on the state) /
-  `release()`; then `CYLAnimatedItemEngineViews.register(type, wrapBuilder(globalBuilder))`. `CYLAnimatedItemGIF.ets` is
+  `CYLAnimatedItemEngineBinding.ready(state, player)` / `failed(state)` / `update(state)` /
+  `release()`, listening with `state.listen(...)` in `aboutToAppear` (and calling the returned function in `aboutToDisappear`); then `CYLAnimatedItemEngineViews.register(type, wrapBuilder(globalBuilder))`. `CYLAnimatedItemGIF.ets` is
   the smallest example.
 - Engine views are created one at a time, 50 ms apart (a screen full of animated items froze while decoding all of them
   at once: CollectionViewClassifyMenu Z5).

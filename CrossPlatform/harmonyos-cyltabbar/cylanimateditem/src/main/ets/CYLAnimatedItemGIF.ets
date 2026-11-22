@@ -62,7 +62,8 @@ export class CYLAnimatedItemGIFPlayer extends CYLAnimatedItemTimedPlayer {
 /** [EN] The GIF engine view. [CN] GIF 引擎视图。 */
 @Component
 export struct CYLAnimatedItemGIFView {
-  @ObjectLink @Watch('cylStateChanged') state: CYLAnimatedItemEngineState;
+  state: CYLAnimatedItemEngineState = new CYLAnimatedItemEngineState();
+  private unlisten?: () => void;
   @State private frame: image.PixelMap | undefined = undefined;
   /** [EN] The "file://" cache copy ArkUI's Image draws when ImageKit cannot decode the file, else ''. [CN] ImageKit 无法解码时由 ArkUI Image 绘制的缓存副本（"file://"），否则为 ''。 */
   @State private systemImagePath: string = '';
@@ -70,10 +71,12 @@ export struct CYLAnimatedItemGIFView {
   private loadedUrl: string = '';
 
   aboutToAppear(): void {
+    this.unlisten = this.state.listen(() => this.cylStateChanged());
     this.cylLoad();
   }
 
   aboutToDisappear(): void {
+    this.unlisten?.();
     this.binding.release();
   }
 
