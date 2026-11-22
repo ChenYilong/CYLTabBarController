@@ -675,7 +675,7 @@ final class CYLConfigurationPlusButton: CYLPlusButton, CYLPlusButtonSubclassing 
         cylConfigurationPlusButtonAlignsTitle(attributes: cylConfigurationEntry[cylConfigurationPlusButtonAttributesKey] as? [String: Any])
     }
 
-    @objc func cyl_configurationPlusButtonTapped() {
+    @objc(cyl_configurationPlusButtonTapped) func configurationPlusButtonTapped() {
         let action = (object_getClass(self) as? CYLConfigurationPlusButton.Type)?.cylConfigurationEntry[cylConfigurationPlusButtonActionKey]
         (action as? (CYLPlusButton) -> Void)?(self)
     }

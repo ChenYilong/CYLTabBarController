@@ -161,7 +161,7 @@ extension UIBarButtonItem {
             cyl_showBadgeValue("", animationType: .none)
             return
         }
-        swizzling_willMoveToSuperview()
+        swizzlingWillMoveToSuperview()
         DispatchQueue.main.asyncAfter(deadline: .now() + (cyl_isReady() ? 0 : 0.5)) { [self] in
             cyl_actualBadgeView?.cyl_showBadge()
         }
@@ -188,7 +188,7 @@ extension UIBarButtonItem {
             }
             return
         }
-        swizzling_willMoveToSuperview()
+        swizzlingWillMoveToSuperview()
         DispatchQueue.main.asyncAfter(deadline: .now() + (cyl_isReady() ? 0 : 0.5)) { [self] in
             cyl_actualBadgeView?.cyl_showBadgeValue(value, animationType: animationType)
         }
@@ -488,7 +488,7 @@ extension UIBarButtonItem {
      *      与 `UIView` 的方法交换会影响所有视图。
      */
     @objc(swizzling_willMoveToSuperview)
-    dynamic func swizzling_willMoveToSuperview() {
+    dynamic func swizzlingWillMoveToSuperview() {
         _ = CYLBarButtonItemBadgeSupport.willMoveToSuperviewSwizzle
     }
 }

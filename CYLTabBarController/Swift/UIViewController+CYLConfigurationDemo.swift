@@ -364,7 +364,7 @@ extension UIViewController {
         // [EN] The bar button item keeps its target weak, so the tab bar controller is not retained.
         // [CN] UIBarButtonItem 弱引用 target，不会造成循环引用。
         page.navigationItem.leftBarButtonItem = UIBarButtonItem(title: CYLLocalizedString("关闭"), style: .plain, target: tabBarController,
-                                                                action: #selector(UIViewController.cyl_dismissConfigurationDemo))
+                                                                action: #selector(UIViewController.cylDismissConfigurationDemo))
         let header = UILabel()
         header.numberOfLines = 0
         header.font = .boldSystemFont(ofSize: 15)
@@ -394,7 +394,7 @@ extension UIViewController {
      * [CN] 配置文件演示页的关闭按钮：关闭本控制器所展示的内容，或它自己。
      */
     @objc(cyl_dismissConfigurationDemo)
-    func cyl_dismissConfigurationDemo() {
+    func cylDismissConfigurationDemo() {
         dismiss(animated: true)
     }
 }
@@ -877,7 +877,7 @@ extension UIViewController {
         let navigationController = UINavigationController(rootViewController: container)
         container.navigationItem.title = CYLLocalizedString("两个 TabBar，同一个页面 ID")
         container.navigationItem.leftBarButtonItem = UIBarButtonItem(title: CYLLocalizedString("关闭"), style: .plain, target: navigationController,
-                                                                     action: #selector(UIViewController.cyl_dismissConfigurationDemo))
+                                                                     action: #selector(UIViewController.cylDismissConfigurationDemo))
         navigationController.modalPresentationStyle = .fullScreen
         present(navigationController, animated: true)
     }

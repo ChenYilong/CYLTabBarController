@@ -363,9 +363,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                 accessory.isAccessibilityElement = true
                 accessory.accessibilityTraits.insert(.button)
                 if let control = accessory as? UIControl {
-                    control.addTarget(self, action: #selector(cyl_handleAccessoryTap), for: .touchUpInside)
+                    control.addTarget(self, action: #selector(handleAccessoryTap), for: .touchUpInside)
                 } else {
-                    accessory.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(cyl_handleAccessoryTap)))
+                    accessory.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleAccessoryTap)))
                 }
                 addSubview(accessory)
             }
@@ -682,18 +682,18 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         titleLabel.isAccessibilityElement = false
         addSubview(titleLabel)
 
-        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(cyl_handleLongPress(_:)))
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
         longPress.delegate = self
         addGestureRecognizer(longPress)
         longPressGestureRecognizer = longPress
 
-        let pan = UIPanGestureRecognizer(target: self, action: #selector(cyl_handlePan(_:)))
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
         pan.delegate = self
         pan.isEnabled = false
         addGestureRecognizer(pan)
         panGestureRecognizer = pan
 
-        addTarget(self, action: #selector(cyl_handleTap), for: .touchUpInside)
+        addTarget(self, action: #selector(handleTap), for: .touchUpInside)
 
         isAccessibilityElement = true
         accessibilityTraits = .button
@@ -1116,22 +1116,22 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     // MARK: - Gesture handling 手势处理
 
-    @objc private func cyl_handleTap() {
+    @objc(cyl_handleTap) private func handleTap() {
         delegate?.animatedItemViewDidTap?(self)
         if itemStyle == .countdown, startsCountdownOnTap, countdownState != .running {
             startCountdown()
         }
     }
 
-    @objc private func cyl_handleAccessoryTap() {
+    @objc(cyl_handleAccessoryTap) private func handleAccessoryTap() {
         delegate?.animatedItemViewDidTapAccessory?(self)
     }
 
-    @objc private func cyl_handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
+    @objc(cyl_handleLongPress:) private func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
         if recognizer.state == .began { delegate?.animatedItemViewDidLongPress?(self) }
     }
 
-    @objc private func cyl_handlePan(_ recognizer: UIPanGestureRecognizer) {
+    @objc(cyl_handlePan:) private func handlePan(_ recognizer: UIPanGestureRecognizer) {
         let translation = recognizer.translation(in: superview)
         switch recognizer.state {
         case .began:
@@ -1436,14 +1436,14 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             guard let accessory = accessoryView, let label = accessory.accessibilityLabel, !label.isEmpty else { return existing }
             // [EN] VoiceOver reaches the accessory from the control's actions, since the control is one element.
             // [CN] 控件是一个无障碍元素，VoiceOver 通过控件的操作访问附加图标。
-            let action = UIAccessibilityCustomAction(name: label, target: self, selector: #selector(cyl_performAccessoryAction(_:)))
+            let action = UIAccessibilityCustomAction(name: label, target: self, selector: #selector(performAccessoryAction(_:)))
             return (existing ?? []) + [action]
         }
         set { super.accessibilityCustomActions = newValue }
     }
 
-    @objc private func cyl_performAccessoryAction(_: UIAccessibilityCustomAction) -> Bool {
-        cyl_handleAccessoryTap()
+    @objc(cyl_performAccessoryAction:) private func performAccessoryAction(_: UIAccessibilityCustomAction) -> Bool {
+        handleAccessoryTap()
         return true
     }
 }

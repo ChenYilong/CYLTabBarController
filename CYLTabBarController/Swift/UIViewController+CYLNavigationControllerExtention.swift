@@ -45,10 +45,10 @@ enum CYLNavigationSettingKeys {
      */
     static let installAutomaticNavigationSetting: Void = {
         let pairs: [(Selector, Selector)] = [
-            (#selector(UIViewController.viewWillAppear(_:)), #selector(UIViewController.cyl_automaticNavigationViewWillAppear(_:))),
-            (#selector(UIViewController.viewDidAppear(_:)), #selector(UIViewController.cyl_automaticNavigationViewDidAppear(_:))),
-            (#selector(UIViewController.viewWillDisappear(_:)), #selector(UIViewController.cyl_automaticNavigationViewWillDisappear(_:))),
-            (#selector(UIViewController.viewDidDisappear(_:)), #selector(UIViewController.cyl_automaticNavigationViewDidDisappear(_:))),
+            (#selector(UIViewController.viewWillAppear(_:)), #selector(UIViewController.cylAutomaticNavigationViewWillAppear(_:))),
+            (#selector(UIViewController.viewDidAppear(_:)), #selector(UIViewController.cylAutomaticNavigationViewDidAppear(_:))),
+            (#selector(UIViewController.viewWillDisappear(_:)), #selector(UIViewController.cylAutomaticNavigationViewWillDisappear(_:))),
+            (#selector(UIViewController.viewDidDisappear(_:)), #selector(UIViewController.cylAutomaticNavigationViewDidDisappear(_:))),
         ]
         for (original, swizzled) in pairs {
             if let originalMethod = class_getInstanceMethod(UIViewController.self, original),
@@ -378,32 +378,32 @@ extension UIViewController {
     // [CN] 交换后它们作为 UIViewController 的方法执行；调用同名 selector（dynamic）即调用原实现。
 
     @objc(cyl_automaticNavigationViewWillAppear:)
-    dynamic func cyl_automaticNavigationViewWillAppear(_ animated: Bool) {
-        cyl_automaticNavigationViewWillAppear(animated)
+    dynamic func cylAutomaticNavigationViewWillAppear(_ animated: Bool) {
+        cylAutomaticNavigationViewWillAppear(animated)
         if cyl_needsAutomaticNavigationSetting {
             cyl_viewWillAppearNavigationSetting(animated)
         }
     }
 
     @objc(cyl_automaticNavigationViewDidAppear:)
-    dynamic func cyl_automaticNavigationViewDidAppear(_ animated: Bool) {
-        cyl_automaticNavigationViewDidAppear(animated)
+    dynamic func cylAutomaticNavigationViewDidAppear(_ animated: Bool) {
+        cylAutomaticNavigationViewDidAppear(animated)
         if cyl_needsAutomaticNavigationSetting {
             cyl_viewDidAppearNavigationSetting(animated)
         }
     }
 
     @objc(cyl_automaticNavigationViewWillDisappear:)
-    dynamic func cyl_automaticNavigationViewWillDisappear(_ animated: Bool) {
-        cyl_automaticNavigationViewWillDisappear(animated)
+    dynamic func cylAutomaticNavigationViewWillDisappear(_ animated: Bool) {
+        cylAutomaticNavigationViewWillDisappear(animated)
         if cyl_needsAutomaticNavigationSetting {
             cyl_viewWillDisappearNavigationSetting(animated)
         }
     }
 
     @objc(cyl_automaticNavigationViewDidDisappear:)
-    dynamic func cyl_automaticNavigationViewDidDisappear(_ animated: Bool) {
-        cyl_automaticNavigationViewDidDisappear(animated)
+    dynamic func cylAutomaticNavigationViewDidDisappear(_ animated: Bool) {
+        cylAutomaticNavigationViewDidDisappear(animated)
         if cyl_needsAutomaticNavigationSetting {
             cyl_viewDidDisappearNavigationSetting(animated)
         }

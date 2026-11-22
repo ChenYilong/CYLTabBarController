@@ -719,7 +719,7 @@ extension CYLPlusButton {
         guard let value = storage.requestedBadgeValue else { return }
         let animationType = storage.requestedBadgeAnimationType ?? NSNumber(value: 0)
         for control in cylPlusButtonBadgeLayerControls() where control.cyl_badge?.superview == nil {
-            control.cyl_showBadgeValueInThisLayer(value, animationTypeValue: animationType)
+            control.cylShowBadgeValueInThisLayer(value, animationTypeValue: animationType)
         }
     }
 
@@ -2455,8 +2455,8 @@ extension CYLPlusButton {
         if (attributes[CYLPlusButtonKeepsTitleVisible] as? NSNumber)?.boolValue == true {
             cyl_keepShowingPlusButtonLabel = true
         }
-        // [EN] Taps reach `cyl_configurationPlusButtonTapped` through the tab bar controller's tap report, once per tap in every style.
-        // [CN] 点击通过 TabBarController 的点击上报到达 `cyl_configurationPlusButtonTapped`：所有样式下每次点击一次。
+        // [EN] Taps reach `configurationPlusButtonTapped` through the tab bar controller's tap report, once per tap in every style.
+        // [CN] 点击通过 TabBarController 的点击上报到达 `configurationPlusButtonTapped`：所有样式下每次点击一次。
     }
 
     /**

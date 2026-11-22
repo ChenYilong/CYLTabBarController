@@ -106,7 +106,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         didSet {
             if backgroundAction?.isEmpty == true { backgroundAction = nil; return }
             if backgroundAction != nil && backgroundTapRecognizer == nil {
-                let recognizer = UITapGestureRecognizer(target: self, action: #selector(cyl_backgroundTapped(_:)))
+                let recognizer = UITapGestureRecognizer(target: self, action: #selector(backgroundTapped(_:)))
                 recognizer.delegate = self
                 addGestureRecognizer(recognizer)
                 backgroundTapRecognizer = recognizer
@@ -245,7 +245,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         let entry = Entry(view: itemView)
         entry.usesStackAppearance = itemView.itemAppearance == nil
         entries.append(entry)
-        itemView.addTarget(self, action: #selector(cyl_itemTapped(_:)), for: .touchUpInside)
+        itemView.addTarget(self, action: #selector(itemTapped(_:)), for: .touchUpInside)
         observe(entry)
         setAction(action, for: itemView)
         applyStackAppearance(to: entry)
@@ -285,7 +285,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         guard let index = entries.firstIndex(where: { $0.view === itemView }) else { return }
         let entry = entries.remove(at: index)
         entry.observations.forEach { $0.invalidate() }
-        itemView.removeTarget(self, action: #selector(cyl_itemTapped(_:)), for: .touchUpInside)
+        itemView.removeTarget(self, action: #selector(itemTapped(_:)), for: .touchUpInside)
         NSLayoutConstraint.deactivate([entry.width, entry.height])
         stackView.removeArrangedSubview(itemView)
         itemView.removeFromSuperview()
@@ -406,12 +406,12 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         return true
     }
 
-    @objc private func cyl_itemTapped(_ itemView: CYLAnimatedItemView) {
+    @objc(cyl_itemTapped:) private func itemTapped(_ itemView: CYLAnimatedItemView) {
         guard dispatchesItemTaps, isItemViewInteractive(itemView) else { return }
         if let action = action(for: itemView) { performAction(action) }
     }
 
-    @objc private func cyl_backgroundTapped(_: UITapGestureRecognizer) {
+    @objc(cyl_backgroundTapped:) private func backgroundTapped(_: UITapGestureRecognizer) {
         if let action = backgroundAction { performAction(action) }
     }
 

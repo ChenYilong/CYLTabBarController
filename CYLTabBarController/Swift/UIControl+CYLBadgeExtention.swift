@@ -30,8 +30,8 @@ enum CYLControlBadgeKeys {
     static let delayIfNeededForSeconds = CYLUtilsKeys.key("cyl_delayIfNeededForSeconds")
     static let opaqueUnitRect = CYLUtilsKeys.key("cyl_badgeOpaqueUnitRect")
     /**
-     * [EN] Above 0 while `-cyl_performOnBadgeLayers:` runs (UIKit, so the main thread only).
-     * [CN] `-cyl_performOnBadgeLayers:` 执行期间大于 0（UIKit，只在主线程）。
+     * [EN] Above 0 while `-cylPerformOnBadgeLayers:` runs (UIKit, so the main thread only).
+     * [CN] `-cylPerformOnBadgeLayers:` 执行期间大于 0（UIKit，只在主线程）。
      */
     static var layerPerformDepth = 0
 }
@@ -63,7 +63,7 @@ final class CYLBadgeAnchorView: UIView {
         if let constraint = topConstraint, abs(constraint.constant - top) > 0.01 {
             constraint.constant = top
         }
-        cyl_layoutBadgeAtTopRightCorner()
+        cylLayoutBadgeAtTopRightCorner()
     }
 }
 
@@ -156,7 +156,7 @@ extension UIControl {
     }
 
     @objc(cyl_setBadgeValue:)
-    dynamic func cyl_setBadgeValue(_ badgeValue: String) {
+    dynamic func cylSetBadgeValue(_ badgeValue: String) {
         // [EN] No longer required (the deprecated system badge point), kept for apps that still add one.
         // [CN] 已不再必需（废弃的系统角标点），为仍在添加它的 App 保留。
         let removeSelector = NSSelectorFromString("cyl_removeTabBadgePoint")
@@ -236,7 +236,7 @@ extension UIControl {
             cyl_asView.cyl_perform(#selector(UIView.cyl_showBadgeValue(_:animationTypeValue:)), with: value, with: animationTypeValue)
             return
         }
-        cyl_showBadgeValueInThisLayer(value, animationTypeValue: animationTypeValue)
+        cylShowBadgeValueInThisLayer(value, animationTypeValue: animationTypeValue)
     }
 
     /**
@@ -244,7 +244,7 @@ extension UIControl {
      * [CN] 只在本控件（液态玻璃的一个图层）上显示角标。由 `CYLPlusButton` 调用。
      */
     @objc(cyl_showBadgeValueInThisLayer:animationTypeValue:)
-    dynamic func cyl_showBadgeValueInThisLayer(_ value: String, animationTypeValue: NSNumber) {
+    dynamic func cylShowBadgeValueInThisLayer(_ value: String, animationTypeValue: NSNumber) {
         cyl_actualBadgeView?.cyl_showBadgeValue(value, animationType: CYLBadgeAnimationType(rawValue: animationTypeValue.uintValue) ?? .none)
     }
 
@@ -317,7 +317,7 @@ extension UIControl {
         // [EN] An animated item, a tab or not: the badge goes on its icon subview itself (animation or image view), never on
         //      the item or on an anchor. [CN] 动效 item（无论是否为 Tab）：角标直接放在其图标子视图（动画或图片视图）上，而不是 item 或锚点上。
         if !isTabBarButton && cyl_animatedItemBadgeHost() == nil {
-            return cyl_badgeAnchorViewAligned(to: actualBadgeSuperView)
+            return cylBadgeAnchorViewAligned(to: actualBadgeSuperView)
         }
         if let actualBadgeSuperView {
             actualBadgeSuperView.clipsToBounds = false
@@ -335,7 +335,7 @@ extension UIControl {
      *      放在父视图中、紧贴控件之上。
      */
     @objc(cyl_badgeAnchorViewAlignedToView:)
-    dynamic func cyl_badgeAnchorViewAligned(to referenceView: UIView?) -> UIView {
+    dynamic func cylBadgeAnchorViewAligned(to referenceView: UIView?) -> UIView {
         let anchorView: UIView
         if let existing = objc_getAssociatedObject(self, CYLControlBadgeKeys.anchorView) as? UIView {
             anchorView = existing
@@ -429,7 +429,7 @@ extension UIControl {
     }
 
     public override func cyl_perform(_ aSelector: Selector, with object1: Any?, with object2: Any?) {
-        cyl_performOnBadgeLayers { control in
+        cylPerformOnBadgeLayers { control in
             _ = control.perform(aSelector, with: object1, with: object2)
         }
     }
@@ -460,7 +460,7 @@ extension UIControl {
      *      调用，都恰好作用于两个图层各一次。
      */
     @objc(cyl_performOnBadgeLayers:)
-    dynamic func cyl_performOnBadgeLayers(_ block: (UIControl) -> Void) {
+    dynamic func cylPerformOnBadgeLayers(_ block: (UIControl) -> Void) {
         if CYLControlBadgeKeys.layerPerformDepth > 0 {
             block(self)
             return
@@ -500,66 +500,66 @@ extension UIControl {
 
     public override var cyl_badgeFont: UIFont! {
         get { cyl_actualBadgeView?.cyl_badgeFont ?? CYLBadgeAppearance.global.font }
-        set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeFont = newValue } }
+        set { cylPerformOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeFont = newValue } }
     }
 
     public override var cyl_badgeBackgroundColor: UIColor! {
         get { cyl_actualBadgeView?.cyl_badgeBackgroundColor ?? CYLBadgeAppearance.global.backgroundColor }
-        set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeBackgroundColor = newValue } }
+        set { cylPerformOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeBackgroundColor = newValue } }
     }
 
     public override var cyl_badgeTextColor: UIColor! {
         get { cyl_actualBadgeView?.cyl_badgeTextColor ?? CYLBadgeAppearance.global.textColor }
-        set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeTextColor = newValue } }
+        set { cylPerformOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeTextColor = newValue } }
     }
 
     public override var cyl_badgeAnimationType: CYLBadgeAnimationType {
         get { cyl_actualBadgeView?.cyl_badgeAnimationType ?? .none }
-        set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeAnimationType = newValue } }
+        set { cylPerformOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeAnimationType = newValue } }
     }
 
     public override var cyl_badgeBorderColor: UIColor? {
         get { cyl_actualBadgeView?.cyl_badgeBorderColor }
-        set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeBorderColor = newValue } }
+        set { cylPerformOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeBorderColor = newValue } }
     }
 
     public override var cyl_badgeBorderWidth: CGFloat {
         get { cyl_actualBadgeView?.cyl_badgeBorderWidth ?? 0 }
-        set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeBorderWidth = newValue } }
+        set { cylPerformOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeBorderWidth = newValue } }
     }
 
     public override var cyl_badgeRespectsReduceMotion: Bool {
         get { cyl_actualBadgeView?.cyl_badgeRespectsReduceMotion ?? false }
-        set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeRespectsReduceMotion = newValue } }
+        set { cylPerformOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeRespectsReduceMotion = newValue } }
     }
 
     public override var cyl_badgeFrame: CGRect {
         get { cyl_actualBadgeView?.cyl_badgeFrame ?? .zero }
-        set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeFrame = newValue } }
+        set { cylPerformOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeFrame = newValue } }
     }
 
     public override var cyl_badgeCenterOffset: CGPoint {
         get { cyl_actualBadgeView?.cyl_badgeCenterOffset ?? .zero }
-        set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeCenterOffset = newValue } }
+        set { cylPerformOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeCenterOffset = newValue } }
     }
 
     public override var cyl_badgeMaximumBadgeNumber: Int {
         get { cyl_actualBadgeView?.cyl_badgeMaximumBadgeNumber ?? 0 }
-        set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeMaximumBadgeNumber = newValue } }
+        set { cylPerformOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeMaximumBadgeNumber = newValue } }
     }
 
     public override var cyl_badgeMargin: CGFloat {
         get { cyl_actualBadgeView?.cyl_badgeMargin ?? 0 }
-        set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeMargin = newValue } }
+        set { cylPerformOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeMargin = newValue } }
     }
 
     public override var cyl_badgeRadius: CGFloat {
         get { cyl_actualBadgeView?.cyl_badgeRadius ?? 0 }
-        set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeRadius = newValue } }
+        set { cylPerformOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeRadius = newValue } }
     }
 
     public override var cyl_badgeCornerRadius: CGFloat {
         get { cyl_actualBadgeView?.cyl_badgeCornerRadius ?? 0 }
-        set { cyl_performOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeCornerRadius = newValue } }
+        set { cylPerformOnBadgeLayers { (($0 as UIView).cyl_getActualBadgeSuperView() as? UIView)?.cyl_badgeCornerRadius = newValue } }
     }
 }

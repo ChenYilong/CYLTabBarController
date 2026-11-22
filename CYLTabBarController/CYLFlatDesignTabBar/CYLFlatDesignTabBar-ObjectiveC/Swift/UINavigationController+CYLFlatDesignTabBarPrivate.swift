@@ -98,13 +98,13 @@ extension UINavigationController {
 
     private static let cylflatdesignHookInstalled: Void = {
         let pairs: [(Selector, Selector)] = [
-            (#selector(popViewController(animated:)), #selector(cylflatdesign_popViewController(animated:))),
-            (#selector(popToViewController(_:animated:)), #selector(cylflatdesign_popToViewController(_:animated:))),
-            (#selector(popToRootViewController(animated:)), #selector(cylflatdesign_popToRootViewController(animated:))),
-            (#selector(pushViewController(_:animated:)), #selector(cylflatdesign_pushViewController(_:animated:))),
-            (#selector(setViewControllers(_:animated:)), #selector(cylflatdesign_setViewControllers(_:animated:))),
-            (#selector(didMove(toParent:)), #selector(cylflatdesign_didMove(toParent:))),
-            (#selector(viewDidLayoutSubviews), #selector(cylflatdesign_viewDidLayoutSubviews)),
+            (#selector(popViewController(animated:)), #selector(cylFlatDesignPopViewController(animated:))),
+            (#selector(popToViewController(_:animated:)), #selector(cylFlatDesignPopToViewController(_:animated:))),
+            (#selector(popToRootViewController(animated:)), #selector(cylFlatDesignPopToRootViewController(animated:))),
+            (#selector(pushViewController(_:animated:)), #selector(cylFlatDesignPushViewController(_:animated:))),
+            (#selector(setViewControllers(_:animated:)), #selector(cylFlatDesignSetViewControllers(_:animated:))),
+            (#selector(didMove(toParent:)), #selector(cylFlatDesignDidMove(toParent:))),
+            (#selector(viewDidLayoutSubviews), #selector(cylFlatDesignViewDidLayoutSubviews)),
         ]
         for (original, swizzled) in pairs {
             cylflatdesignSwizzle(UINavigationController.self, original, swizzled)
@@ -123,52 +123,52 @@ extension UINavigationController {
 
     // MARK: Pop and push (after the swap, `cylflatdesign_…` runs the original)
 
-    @objc dynamic func cylflatdesign_popViewController(animated: Bool) -> UIViewController? {
-        let previous = cylflatdesign_popViewController(animated: animated)
+    @objc(cylflatdesign_popViewControllerWithAnimated:) dynamic func cylFlatDesignPopViewController(animated: Bool) -> UIViewController? {
+        let previous = cylFlatDesignPopViewController(animated: animated)
         if cylflatdesignState.nestedInFlatDesignTabBarController {
             cylflatdesignPop(from: previous, to: topViewController, animated: animated)
         }
         return previous
     }
 
-    @objc dynamic func cylflatdesign_popToViewController(_ viewController: UIViewController, animated: Bool) -> [UIViewController]? {
+    @objc(cylflatdesign_popToViewController:animated:) dynamic func cylFlatDesignPopToViewController(_ viewController: UIViewController, animated: Bool) -> [UIViewController]? {
         let previous = topViewController
-        let popped = cylflatdesign_popToViewController(viewController, animated: animated)
+        let popped = cylFlatDesignPopToViewController(viewController, animated: animated)
         if cylflatdesignState.nestedInFlatDesignTabBarController {
             cylflatdesignPop(from: previous, to: viewController, animated: animated)
         }
         return popped
     }
 
-    @objc dynamic func cylflatdesign_popToRootViewController(animated: Bool) -> [UIViewController]? {
+    @objc(cylflatdesign_popToRootViewControllerWithAnimated:) dynamic func cylFlatDesignPopToRootViewController(animated: Bool) -> [UIViewController]? {
         let previous = topViewController
-        let popped = cylflatdesign_popToRootViewController(animated: animated)
+        let popped = cylFlatDesignPopToRootViewController(animated: animated)
         if cylflatdesignState.nestedInFlatDesignTabBarController, let popped, !popped.isEmpty {
             cylflatdesignPop(from: previous, to: topViewController, animated: animated)
         }
         return popped
     }
 
-    @objc dynamic func cylflatdesign_pushViewController(_ viewController: UIViewController, animated: Bool) {
+    @objc(cylflatdesign_pushViewController:animated:) dynamic func cylFlatDesignPushViewController(_ viewController: UIViewController, animated: Bool) {
         guard cylflatdesignState.nestedInFlatDesignTabBarController else {
-            cylflatdesign_pushViewController(viewController, animated: animated)
+            cylFlatDesignPushViewController(viewController, animated: animated)
             return
         }
         let previous = topViewController
-        cylflatdesign_pushViewController(viewController, animated: animated)
+        cylFlatDesignPushViewController(viewController, animated: animated)
         cylflatdesignPush(from: previous, to: viewController, animated: animated)
     }
 
-    @objc dynamic func cylflatdesign_setViewControllers(_ viewControllers: [UIViewController], animated: Bool) {
+    @objc(cylflatdesign_setViewControllers:animated:) dynamic func cylFlatDesignSetViewControllers(_ viewControllers: [UIViewController], animated: Bool) {
         guard cylflatdesignState.nestedInFlatDesignTabBarController else {
-            cylflatdesign_setViewControllers(viewControllers, animated: animated)
+            cylFlatDesignSetViewControllers(viewControllers, animated: animated)
             return
         }
         let previous = topViewController
         let target = viewControllers.last
         // [EN] A new top view controller counts as a push, as before (not always exact). [CN] 新的顶层控制器视为 push，与以前相同（不一定准确）。
         let isPush = target.map { !self.viewControllers.contains($0) } ?? true
-        cylflatdesign_setViewControllers(viewControllers, animated: animated)
+        cylFlatDesignSetViewControllers(viewControllers, animated: animated)
         if isPush {
             cylflatdesignPush(from: previous, to: target, animated: animated)
         } else {
@@ -176,8 +176,8 @@ extension UINavigationController {
         }
     }
 
-    @objc dynamic func cylflatdesign_didMove(toParent parent: UIViewController?) {
-        cylflatdesign_didMove(toParent: parent)
+    @objc(cylflatdesign_didMoveToParent:) dynamic func cylFlatDesignDidMove(toParent parent: UIViewController?) {
+        cylFlatDesignDidMove(toParent: parent)
         let state = cylflatdesignState
         if parent == nil, state.nestedInFlatDesignTabBarController {
             state.extensionDelegate = nil
@@ -191,8 +191,8 @@ extension UINavigationController {
         }
     }
 
-    @objc dynamic func cylflatdesign_viewDidLayoutSubviews() {
-        cylflatdesign_viewDidLayoutSubviews()
+    @objc(cylflatdesign_viewDidLayoutSubviews) dynamic func cylFlatDesignViewDidLayoutSubviews() {
+        cylFlatDesignViewDidLayoutSubviews()
         if cylflatdesignState.nestedInFlatDesignTabBarController {
             cylflatdesignUpdateNavigationBarHeight()
         }
