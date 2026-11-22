@@ -693,7 +693,8 @@ docs/
 │   ├── wechat-miniprogram-tab-item-badges.png
 │   ├── wechat-miniprogram-two-icon-layers-user-1-devtools.jpg
 │   ├── wechat-miniprogram-two-icon-layers-user-2-devtools.jpg
-│   └── wechat-miniprogram-visibility-hidden-identifiers-devtools-sdk3.17.6-49df44f.png
+│   ├── wechat-miniprogram-visibility-hidden-identifiers-devtools-sdk3.17.6-49df44f.png
+│   └── x86-64-emulators-pag-rive-display.png
 ├── commit-readiness-2026-11-09.md
 ├── instructions/
 │   ├── accessibility-localization.md
