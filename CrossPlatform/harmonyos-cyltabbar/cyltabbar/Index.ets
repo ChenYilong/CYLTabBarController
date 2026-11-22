@@ -22,6 +22,12 @@ export { CYLLottieIcon } from './src/main/ets/CYLLottieIcon';
  * [CN] 动效条目组件，供在 TabBar 之外放置它的 App 使用（App 只导入 cyltabbar）。
  */
 export { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines } from 'cylanimateditem';
+/**
+ * [EN] Rive for those apps: the loop policy, a ready `animationBuilder` and the engine registration (module `cylanimateditemrive`;
+ *      `CYLRiveIcon` and the Rive options below are re-exported from it too).
+ * [CN] 供这些 App 使用的 Rive：循环策略、可直接使用的 `animationBuilder` 与引擎注册（模块 `cylanimateditemrive`；下方的 `CYLRiveIcon` 与 Rive 选项也从它重新导出）。
+ */
+export { CYLRiveLoopPolicy, CYLRiveAnimationBuilder, cylRegisterRiveEngine } from 'cylanimateditemrive';
 export { CYLSVGAView } from './src/main/ets/svga/CYLSVGAView';
 export { CYLSVGAMovie, cylLoadSVGAMovie, cylDecodeSVGAMovie } from './src/main/ets/svga/CYLSVGAMovie';
 export { cylDrawSVGAFrame, cylParseSVGAPath } from './src/main/ets/svga/CYLSVGARenderer';
