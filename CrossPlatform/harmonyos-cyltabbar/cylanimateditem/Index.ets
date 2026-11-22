@@ -18,3 +18,10 @@ export {
   CYLAnimatedItemCountdown, CYLAnimatedItemCountdownStorage, CYLAnimatedItemCountdownListener, CYLCountdownIdle, CYLCountdownRunning,
   CYLCountdownFinished, cylCountdownText, cylCountdownTitleWidth
 } from './src/main/ets/CYLAnimatedItemCountdown';
+export { CYLAnimatedItemSource, CYLAnimatedItemRawFileReader, cylAnimatedItemFileAndOptions } from './src/main/ets/CYLAnimatedItemSource';
+export {
+  CYLAnimatedItemPlayer, CYLAnimatedItemTimedPlayer, CYLAnimatedItemClock, CYL_ANIMATED_ITEM_SYSTEM_CLOCK, CYLAnimatedItemPlayback,
+  CYLAnimatedItemPlaybackDriver, CYLAnimatedItemEngineHost, CYLAnimatedItemEngineBinding
+} from './src/main/ets/CYLAnimatedItemPlayer';
+export { CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemEngineView } from './src/main/ets/CYLAnimatedItemEngine';
+export { CYLAnimatedItemGIF, CYLAnimatedItemGIFPlayer, CYLAnimatedItemGIFView } from './src/main/ets/CYLAnimatedItemGIF';

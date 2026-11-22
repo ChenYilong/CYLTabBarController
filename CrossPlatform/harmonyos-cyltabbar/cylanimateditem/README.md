@@ -4,6 +4,36 @@ The animated icon + title component of CYLTabBarController for HarmonyOS NEXT (`
 `CYLAnimatedItemStackView`, `CYLAnimatedItemEngines`). It depends on no other package and on no animation library.
 Guide: [docs/Animated-Item.md](../../../docs/Animated-Item.md) in CYLTabBarController.
 
+## Engine views (no `animationBuilder` needed)
+
+[EN] The component carries the engine views, so an app no longer writes its own players. Register the engines once (for
+example in `EntryAbility.onCreate`); every `CYLAnimatedItemView` without an `animationBuilder` then plays files of those
+types by its selection and playback (selected: once from the start; unselected: progress 0; `animationRestartToken` /
+`controller.restartAnimation()`: again; `animationSpeed`, `animationLoops` at once; `onAnimationEnd`).
+[CN] 组件自带引擎视图，App 不再编写自己的播放器。注册一次引擎（例如在 `EntryAbility.onCreate` 中）后，所有未传入 `animationBuilder` 的
+`CYLAnimatedItemView` 都按其选中状态与播放设置播放这些类型的文件。
+
+| Type | Where | Register |
+|:---|:---|:---|
+| GIF | this module (ImageKit, no library) | `CYLAnimatedItemGIF.register()` |
+| SVGA | this module (no library) | in progress (chen-yilong-3a) |
+| Lottie | module `cylanimateditem_lottie` (`@ohos/lottie`) | in progress |
+| PAG | module `cylanimateditem_pag` (`@tencent/libpag`) | in progress |
+| Rive | module `cylanimateditem_rive` (`@ohos/rive`) | in progress (chen-yilong-3a) |
+
+- A host that drives playback itself (resting progress, Play all) sets `drivesAnimationPlayback: false` and gets the
+  player in `onAnimationPlayer`: `CYLAnimatedItemPlayer` (`play()`, `stopAtProgress(p)`, `speed`, `loops`,
+  `supportsSpeed` / `supportsLoops` / `supportsProgress`, `isPlaying`, `progress`, `onEnded`).
+- Writing an engine: a `@Component` that holds `@ObjectLink state: CYLAnimatedItemEngineState` (the parsed
+  `CYLAnimatedItemSource` with its `#` options, the size, the playback, the callbacks), makes a player (subclass
+  `CYLAnimatedItemPlayer`, or `CYLAnimatedItemTimedPlayer` for an engine without speed), and calls
+  `CYLAnimatedItemEngineBinding.ready(state, player)` / `failed(state)` / `update(state)` (from a `@Watch` on the state) /
+  `release()`; then `CYLAnimatedItemEngineViews.register(type, wrapBuilder(globalBuilder))`. `CYLAnimatedItemGIF.ets` is
+  the smallest example.
+- Engine views are created one at a time, 50 ms apart (a screen full of animated items froze while decoding all of them
+  at once: CollectionViewClassifyMenu Z5).
+- Tests: `node --test test/*.test.mjs` (`CYLAnimatedItemSource`, `CYLAnimatedItemPlayer`, GIF timing).
+
 ## x86_64 emulator
 
 The local HarmonyOS emulator (Mate 70 Pro image, HarmonyOS 6.0.1) is x86_64. `@ohos/rive` 1.0.4 (`libohos_rive.so`) and

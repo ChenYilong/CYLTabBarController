@@ -8,6 +8,9 @@ import { preferences } from '@kit.ArkData';
 import { ApplicationStateChangeCallback, common } from '@kit.AbilityKit';
 import BuildProfile from '../../../BuildProfile';
 import { deviceInfo } from '@kit.BasicServicesKit';
+import { CYLAnimatedItemEngineState, CYLAnimatedItemEngineView } from './CYLAnimatedItemEngine';
+import { CYLAnimatedItemPlayer } from './CYLAnimatedItemPlayer';
+import { CYLAnimatedItemSource } from './CYLAnimatedItemSource';
 
 /** [EN] `maxLines` for a title without a line limit (`titleLines` 0). [CN] 标题不限行数（`titleLines` 为 0）时的 `maxLines`。 */
 const CYL_UNLIMITED_LINES: number = 1000;
@@ -555,7 +558,31 @@ export struct CYLAnimatedItemView {
   @Prop sizesToContent: boolean = false;
   @State animationLoaded: boolean = false;
   @State animationFailed: boolean = false;
-  @BuilderParam animationBuilder: (context: CYLAnimatedItemAnimationContext) => void = this.cylNoAnimation;
+  /**
+   * [EN] The engine view of the animation. Default: the view an engine registered for the file's type
+   *      (`CYLAnimatedItemEngineViews`: GIF and SVGA in this module, Lottie, PAG and Rive in cylanimateditem_lottie,
+   *      cylanimateditem_pag and cylanimateditem_rive), which plays by the item's selection and playback. An app or library
+   *      with its own engine views passes them here instead.
+   * [CN] 动画的引擎视图。默认：引擎为文件类型注册的视图（`CYLAnimatedItemEngineViews`：本模块的 GIF 与 SVGA，cylanimateditem_lottie、
+   *      cylanimateditem_pag、cylanimateditem_rive 中的 Lottie、PAG 与 Rive），按条目的选中状态与播放设置播放。有自己引擎视图的 App 或库
+   *      在这里传入。
+   */
+  @BuilderParam animationBuilder: (context: CYLAnimatedItemAnimationContext) => void = this.cylEngineAnimation;
+  /**
+   * [EN] true (default): the default engine view plays its animation by the item's selection and playback. false: the host
+   *      drives the player it gets in `onAnimationPlayer` (play, stop at a progress, speed, loop), as
+   *      CollectionViewClassifyMenu's tags do.
+   * [CN] true（默认）：默认引擎视图按条目的选中状态与播放设置播放动画。false：宿主驱动它在 `onAnimationPlayer` 中得到的播放器（播放、停在某进度、
+   *      速度、循环），如 CollectionViewClassifyMenu 的标签。
+   */
+  @Prop @Watch('cylPlaybackDidChange') drivesAnimationPlayback: boolean = true;
+  /**
+   * [EN] The default engine view's player once it plays the file, undefined when it goes away.
+   * [CN] 默认引擎视图播放文件时的播放器，视图消失时为 undefined。
+   */
+  onAnimationPlayer?: (player: CYLAnimatedItemPlayer | undefined) => void;
+  /** [EN] What the default engine view reads, updated in place. [CN] 默认引擎视图读取的内容，原地更新。 */
+  @State private cylEngineState: CYLAnimatedItemEngineState = new CYLAnimatedItemEngineState();
   onItemTap?: () => void;
   onItemLongPress?: () => void;
   onAccessoryTap?: () => void;
@@ -716,6 +743,12 @@ export struct CYLAnimatedItemView {
   cylNoAnimation(context: CYLAnimatedItemAnimationContext) {
   }
 
+  /** [EN] The default engine view (see `animationBuilder`). [CN] 默认引擎视图（见 `animationBuilder`）。 */
+  @Builder
+  cylEngineAnimation(context: CYLAnimatedItemAnimationContext) {
+    CYLAnimatedItemEngineView({ state: this.cylEngineState })
+  }
+
   /**
    * [EN] A new file starts over: not loaded, not failed; a type nobody registered says so in debug builds.
    * [CN] 新文件重新开始：未加载、未失败；没有注册的类型在 debug 构建中给出提示。
@@ -778,6 +811,31 @@ export struct CYLAnimatedItemView {
       this.onAnimationEnd?.();
     };
     this.animationContext = context;
+    this.cylUpdateEngineState(context);
+  }
+
+  /**
+   * [EN] The default engine view's state, updated in place so the engine view sees each change; a new file gets a new
+   *      source. [CN] 默认引擎视图的 state，原地更新使引擎视图看到每次变化；新文件得到新的 source。
+   */
+  private cylUpdateEngineState(context: CYLAnimatedItemAnimationContext): void {
+    const state = this.cylEngineState;
+    if (state.source.url !== this.animationUrl) {
+      state.source = CYLAnimatedItemSource.parse(this.animationUrl);
+    }
+    state.width = this.iconSize;
+    state.height = this.iconSize;
+    state.speed = context.speed;
+    state.loops = context.loops;
+    state.drivesPlayback = this.drivesAnimationPlayback;
+    state.tintColor = this.animationTintColor;
+    state.onLoaded = context.onLoaded;
+    state.onFailed = context.onFailed;
+    state.onEnded = context.onEnded;
+    state.onPlayer = (player: CYLAnimatedItemPlayer | undefined) => this.onAnimationPlayer?.(player);
+    // [EN] Last, so the engine view reads the playback above when it reacts. [CN] 最后设置，使引擎视图响应时读到上面的播放设置。
+    state.selected = context.selected;
+    state.restartToken = context.restartToken;
   }
 
   /** [EN] Turned off: the animation shows again. [CN] 关闭时重新显示动画。 */
