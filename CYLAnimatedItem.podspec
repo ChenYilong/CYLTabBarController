@@ -87,7 +87,7 @@ Pod::Spec.new do |s|
 
   s.subspec 'PAG' do |pag|
     pag.dependency 'CYLAnimatedItem/Engine'
-    pag.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m}'
+    pag.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m,swift}'
     pag.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
     pag.dependency 'libpag', '>= 4.0'
     pag.pod_target_xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) GLES_SILENCE_DEPRECATION=1' }
@@ -95,7 +95,7 @@ Pod::Spec.new do |s|
 
   s.subspec 'PAGEnterprise' do |pagenterprise|
     pagenterprise.dependency 'CYLAnimatedItem/Engine'
-    pagenterprise.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m}'
+    pagenterprise.source_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.{h,m,swift}'
     pagenterprise.public_header_files = 'CYLTabBarController/CYLTabBarItemAnimation/PAG/*.h'
     pagenterprise.dependency 'libpag-enterprise', '>= 4.0'
     pagenterprise.compiler_flags = '-fno-modules'

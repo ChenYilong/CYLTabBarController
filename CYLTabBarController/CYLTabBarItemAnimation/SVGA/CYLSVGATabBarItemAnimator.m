@@ -5,6 +5,8 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// TODO (Swift migration, still counted by scripts/swift-migration-score.py): [EN] The SVGA view subclasses `SVGAPlayer`, which has a `-stopAnimation` method; the playable view protocol's Swift name for `-cyl_stopAnimationView` is also `stopAnimation()`, and a Swift class cannot have both (tried 2026-11-22: "Objective-C method 'stopAnimation' ... does not match the requirement's selector"). Renaming the protocol's Swift name would change a public API; a Swift view that holds an `SVGAPlayer` instead of being one is the way out (docs/Swift-Migration.md, engine steps 4–5). The `+load` registration is required Objective-C anyway. [CN] SVGA 视图继承 `SVGAPlayer`，后者有 `-stopAnimation` 方法；可播放视图协议中 `-cyl_stopAnimationView` 的 Swift 名称也是 `stopAnimation()`，Swift 类无法同时拥有二者。修改协议的 Swift 名称会改变公开 API；改为持有 `SVGAPlayer` 的 Swift 视图才是出路。`+load` 注册本身也必须是 Objective-C。
+
 #import "CYLSVGATabBarItemAnimator.h"
 // [EN] The registry and the playable view protocol of the `CYLTabBarItemAnimation` subspec.
 // [CN] `CYLTabBarItemAnimation` 子库的注册表与可播放视图协议。
