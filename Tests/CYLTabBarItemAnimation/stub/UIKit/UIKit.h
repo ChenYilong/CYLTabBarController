@@ -29,6 +29,7 @@ typedef NS_ENUM(NSInteger, UIUserInterfaceStyle) {
 
 @interface UITraitCollection : NSObject
 @property (nonatomic) UIUserInterfaceStyle userInterfaceStyle;
++ (UITraitCollection *)currentTraitCollection;
 @end
 
 @interface UIColor : NSObject

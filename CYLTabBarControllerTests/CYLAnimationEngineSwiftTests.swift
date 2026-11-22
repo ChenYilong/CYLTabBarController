@@ -228,7 +228,7 @@ final class CYLAnimatedItemSourceOptionsTests: XCTestCase {
             let received = try XCTUnwrap(CYLRecordingOptionsProvider.received, item.input)
             XCTAssertEqual(received.options, item.options, item.input)
             XCTAssertEqual(received.fileURL.path, fileURL.path, item.input)
-            XCTAssertEqual(CYLTabBarAnimationOptionsFromURL(url), item.options, item.input)
+            XCTAssertEqual(CYLTabBarAnimationOptionsFromURL(url) as? [String: String], item.options, item.input)
         }
     }
 

@@ -70,7 +70,9 @@ static const void *CYLTabBarItemAnimationTintOriginalFramesKey = &CYLTabBarItemA
 /// [EN] The options in a URL's fragment ("name=value&…", percent-encoded). [CN] URL fragment 中的选项（「名称=值&…」，百分号编码）。
 static NSDictionary<NSString *, NSString *> *CYLTabBarItemAnimationTintOptionsFromURL(NSURL *URL) {
     NSMutableDictionary<NSString *, NSString *> *options = [NSMutableDictionary dictionary];
-    [CYLTabBarAnimationOptionsFromURL(URL) enumerateKeysAndObjectsUsingBlock:^(NSString *name, NSString *value, BOOL *stop) {
+    // [EN] Keys and values are strings (CYLAnimationKeys.h). [CN] 键与值都是字符串（CYLAnimationKeys.h）。
+    NSDictionary<NSString *, NSString *> *parsed = CYLTabBarAnimationOptionsFromURL(URL);
+    [parsed enumerateKeysAndObjectsUsingBlock:^(NSString *name, NSString *value, BOOL *stop) {
         NSString *trimmed = [value stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
         if (trimmed.length > 0) {
             options[name] = trimmed;

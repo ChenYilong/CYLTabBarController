@@ -1,6 +1,9 @@
 #import <UIKit/UIKit.h>
 
 @implementation UITraitCollection
++ (UITraitCollection *)currentTraitCollection {
+    return [[UITraitCollection alloc] init];
+}
 @end
 
 @implementation UIColor
