@@ -46,6 +46,8 @@
 | 中文 | English |
 |:---|:---|
 | 进度（2026-11-22，提交 6994a0ca）：见右列。 | Progress (2026-11-22, commit 6994a0ca): CocoaPods (Core subspec `'CYLDeallocBlockExecutor', '~> 1.4'`, 17 Podfiles pin the branch), Swift Package Manager (`Package.swift` + `Package.resolved`, branch `feat/lifecycle-callbacks` at d6db301) and the Xcode framework target (SPM package reference, `SWIFT_INCLUDE_PATHS`, `internal import`, linked statically, so the Carthage XCFramework needs no extra framework) depend on the library. Call site: the one-time layout block is the keyed block `cyl.core.layoutBlock` with `.end` dispatched by the core. Local checks (macOS 27.3, Xcode 27.2, iPhone 18 Pro simulator iOS 27.2): `scripts/unit-tests.sh` 217 tests, 0 failures, 2 skipped, including the new `CYLLayoutBlockTests` (3); the ObjC Example and Example-Swift build; the ObjC Example launches with its tab bar, plus button and badges. |
-| 得分：85 / 100。 | Score: 85 / 100. |
+| 截图：见右列。 | Screenshot: ![iOS 27.2, iPhone 18 Pro simulator, macOS 27.3, Xcode 27.2 (27B52), CYLTabBarController 6994a0ca, feat/dealloc-block-executor-dependency, 2026-11-22. Purpose: the core runs its layout block through CYLDeallocBlockExecutor](assets/ios-layout-block-dealloc-executor.png) |
+| 得分：80 / 100。 | Score: 80 / 100. |
+| TODO（-5）：见右列。 | TODO (-5) Carthage: the framework target links CYLDeallocBlockExecutor statically, so an app that also adds CYLDeallocBlockExecutor gets two copies (two UIViewController hook installs, duplicate class warnings). Fix: ship `CYLDeallocBlockExecutor.xcframework` next to `CYLAnimatedItem.xcframework` and link it dynamically. |
 | TODO（-10）：见右列。 | TODO (-10) CI on this pull request: `pod lib lint` fails until 1.4.0 is on trunk; the other jobs are to be checked. |
 | TODO（-5）：见右列。 | TODO (-5) After 1.4.0 is published: replace the branch pins with `~> 1.4` / `from: "1.4.0"`, take the pull request out of draft. |
