@@ -96,7 +96,7 @@ extension UIViewController {
      * [EN] Number of the rows. [CN] 行数。
      */
     @objc(cyl_tabBarItemUpdateRowCount)
-    public func cyl_tabBarItemUpdateRowCount() -> Int {
+    public func cylTabBarItemUpdateRowCount() -> Int {
         CYLTabBarItemUpdateRow.count.rawValue
     }
 
@@ -104,7 +104,7 @@ extension UIViewController {
      * [EN] Cell of row `row`, in the app's language. [CN] 第 `row` 行的 cell，使用 App 语言。
      */
     @objc(cyl_tabBarItemUpdateCellForTableView:row:)
-    public func cyl_tabBarItemUpdateCell(for tableView: UITableView, row: Int) -> UITableViewCell {
+    public func cylTabBarItemUpdateCell(for tableView: UITableView, row: Int) -> UITableViewCell {
         let identifier = CYLTabBarItemUpdateKeys.cellIdentifier
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? {
             let cell = UITableViewCell(style: .subtitle, reuseIdentifier: identifier)
@@ -125,7 +125,7 @@ extension UIViewController {
      * [CN] 执行第 `row` 行：对当前页面所在的 Tab 应用该项更改，或恢复。
      */
     @objc(cyl_didSelectTabBarItemUpdateRow:)
-    public func cyl_didSelectTabBarItemUpdateRow(_ row: Int) {
+    public func cylDidSelectTabBarItemUpdateRow(_ row: Int) {
         let tabViewController = cyl_tabBarItemUpdateTabViewController
         guard let tabBarController = cyl_tabBarItemUpdateTabBarController,
               let index = tabBarController.viewControllers?.firstIndex(of: tabViewController) else {
@@ -153,25 +153,25 @@ extension UIViewController {
     private static func cylTabBarItemUpdateTexts(of row: CYLTabBarItemUpdateRow) -> (String, String, String) {
         switch row {
         case .title:
-            return (CYLLocalizedString("更换 Tab 标题"), CYLLocalizedString("原地更换当前页 Tab 的标题，再点恢复"), "textformat")
+            return (cylLocalizedString("更换 Tab 标题"), cylLocalizedString("原地更换当前页 Tab 的标题，再点恢复"), "textformat")
         case .iconView:
-            return (CYLLocalizedString("切换 Tab 图标"), CYLLocalizedString("用自定义视图替换当前页 Tab 的图标，再点恢复"), "star")
+            return (cylLocalizedString("切换 Tab 图标"), cylLocalizedString("用自定义视图替换当前页 Tab 的图标，再点恢复"), "star")
         case .networkIcon:
-            return (CYLLocalizedString("下载网络图标"), CYLLocalizedString("从网络下载当前页 Tab 的图标（带缓存），再点恢复"),
+            return (cylLocalizedString("下载网络图标"), cylLocalizedString("从网络下载当前页 Tab 的图标（带缓存），再点恢复"),
                     "icloud.and.arrow.down")
         case .allNetworkIcons:
-            return (CYLLocalizedString("批量下载网络图标"), CYLLocalizedString("下载并更新所有 Tab 的图标，再点恢复"),
+            return (cylLocalizedString("批量下载网络图标"), cylLocalizedString("下载并更新所有 Tab 的图标，再点恢复"),
                     "square.and.arrow.down.on.square")
         case .allLocalIcons:
-            return (CYLLocalizedString("批量使用本地图标"),
-                    CYLLocalizedString("用本地图片（图片名、文件路径、UIImage、文件 URL）更新所有 Tab 的图标，再点恢复"), "photo.on.rectangle")
+            return (cylLocalizedString("批量使用本地图标"),
+                    cylLocalizedString("用本地图片（图片名、文件路径、UIImage、文件 URL）更新所有 Tab 的图标，再点恢复"), "photo.on.rectangle")
         case .GIFIcon:
-            return (CYLLocalizedString("GIF 动图图标"), CYLLocalizedString("当前页 Tab 显示 GIF 动图，再点恢复"), "sparkles")
+            return (cylLocalizedString("GIF 动图图标"), cylLocalizedString("当前页 Tab 显示 GIF 动图，再点恢复"), "sparkles")
         case .replaceNeighbors:
-            return (CYLLocalizedString("替换相邻 Tab 的页面"), CYLLocalizedString("把当前 Tab 两侧的 Tab 换成其他页面（issue #481），再点恢复"),
+            return (cylLocalizedString("替换相邻 Tab 的页面"), cylLocalizedString("把当前 Tab 两侧的 Tab 换成其他页面（issue #481），再点恢复"),
                     "arrow.left.arrow.right")
         case .allTitles, .count:
-            return (CYLLocalizedString("批量更换标题"), CYLLocalizedString("一次更新所有 Tab 的标题，再点恢复"), "list.bullet")
+            return (cylLocalizedString("批量更换标题"), cylLocalizedString("一次更新所有 Tab 的标题，再点恢复"), "list.bullet")
         }
     }
 
@@ -200,8 +200,8 @@ extension UIViewController {
      */
     private func cylToggleTitle(of tabViewController: UIViewController, in tabBarController: CYLTabBarController) {
         let isUpdated = Self.cylFlag(tabViewController, CYLTabBarItemUpdateKeys.titleUpdated)
-        let title = isUpdated ? cylInitialTitle(of: tabViewController, in: tabBarController) : CYLLocalizedString("已购课程")
-        if tabBarController.updateTabBarItem(for: tabViewController, attributes: [CYLTabBarItemTitle: title ?? ""]) {
+        let title = isUpdated ? cylInitialTitle(of: tabViewController, in: tabBarController) : cylLocalizedString("已购课程")
+        if tabBarController.updateTabBarItem(for: tabViewController, attributes: [cylTabBarItemTitle: title ?? ""]) {
             Self.cylSetFlag(tabViewController, CYLTabBarItemUpdateKeys.titleUpdated, !isUpdated)
         }
     }
@@ -239,7 +239,7 @@ extension UIViewController {
             } ?? false
         default:
             // [EN] Any URL, a file one here. [CN] 任何 URL 都可以，这里使用本地文件 URL。
-            let gifURL = CYLResourceBundle().url(forResource: "cyl_tab_sample_animated", withExtension: "gif")
+            let gifURL = cylResourceBundle().url(forResource: "cyl_tab_sample_animated", withExtension: "gif")
             isSet = gifURL.map {
                 tabBarController.setTabBarItemIconWith($0, selectedURL: nil, size: CYLTabBarItemUpdateKeys.iconSize, at: UInt(index))
             } ?? false
@@ -263,17 +263,17 @@ extension UIViewController {
                 // [EN] Every title is the initial one again, also the one of "Change tab title". [CN] 所有标题都已恢复。
                 Self.cylSetFlag(viewController, CYLTabBarItemUpdateKeys.titleUpdated, false)
             } else {
-                title = "★ " + (cyl_title(of: viewController, in: tabBarController) ?? "")
+                title = "★ " + (cylTitle(of: viewController, in: tabBarController) ?? "")
             }
-            return [CYLTabBarItemTitle: title ?? ""]
+            return [cylTabBarItemTitle: title ?? ""]
         }
         tabBarController.updateTabBarItems(withAttributes: attributes)
         let plusTitle = CYLPlusButton(forOwner: tabBarController)?.cyl_title()
-        let initialPlusTitle = cylInitialPlusButtonAttributes(of: tabBarController)[CYLTabBarItemTitle]
+        let initialPlusTitle = cylInitialPlusButtonAttributes(of: tabBarController)[cylTabBarItemTitle]
         if isUpdated, let initialPlusTitle {
-            tabBarController.updatePlusButton(attributes: [CYLTabBarItemTitle: initialPlusTitle])
+            tabBarController.updatePlusButton(attributes: [cylTabBarItemTitle: initialPlusTitle])
         } else if !isUpdated, let plusTitle {
-            tabBarController.updatePlusButton(attributes: [CYLTabBarItemTitle: "★ " + plusTitle])
+            tabBarController.updatePlusButton(attributes: [cylTabBarItemTitle: "★ " + plusTitle])
         }
         Self.cylSetFlag(tabBarController, CYLTabBarItemUpdateKeys.allTitlesUpdated, !isUpdated)
     }
@@ -305,7 +305,7 @@ extension UIViewController {
         let path: Any = Bundle.main.path(forResource: "img_tab_message_0", ofType: "png") ?? symbol("envelope", .systemGray)
         let pathSelected: Any = Bundle.main.path(forResource: "img_tab_message_1", ofType: "png") ?? symbol("envelope.fill", .systemOrange)
         // [EN] A file URL of a GIF, in the library's resource bundle. [CN] 本库资源包中 GIF 的文件 URL。
-        let fileURL: Any = CYLResourceBundle().url(forResource: "cyl_tab_sample_animated", withExtension: "gif") ?? symbol("sparkles", .systemPurple)
+        let fileURL: Any = cylResourceBundle().url(forResource: "cyl_tab_sample_animated", withExtension: "gif") ?? symbol("sparkles", .systemPurple)
         return [
             [named, namedSelected],
             [path, pathSelected],
@@ -350,7 +350,7 @@ extension UIViewController {
                                            in tabBarController: CYLTabBarController) {
         if restoring {
             var imageAttributes = cylInitialPlusButtonAttributes(of: tabBarController)
-            imageAttributes[CYLTabBarItemTitle] = nil
+            imageAttributes[cylTabBarItemTitle] = nil
             if !imageAttributes.isEmpty {
                 tabBarController.updatePlusButton(attributes: imageAttributes)
             }
@@ -364,7 +364,7 @@ extension UIViewController {
                 UIImage(systemName: $0)?.withTintColor(.systemOrange, renderingMode: .alwaysOriginal) as Any
             }
         }
-        tabBarController.updatePlusButton(attributes: [CYLTabBarItemImageURL: icons[0], CYLTabBarItemSelectedImageURL: icons[1]])
+        tabBarController.updatePlusButton(attributes: [cylTabBarItemImageURL: icons[0], cylTabBarItemSelectedImageURL: icons[1]])
     }
 
     /**
@@ -392,14 +392,14 @@ extension UIViewController {
                 continue
             }
             let originalAttributes = tabBarController.tabBarItemAttributes(at: UInt(neighborIndex)) ?? [:]
-            let title = String(format: CYLLocalizedString("替换页 %@"), name)
+            let title = String(format: cylLocalizedString("替换页 %@"), name)
             let page = UIViewController()
             page.title = title
             page.view.backgroundColor = side == 0 ? .systemTeal : .systemPink
             let replacement = UINavigationController(rootViewController: page)
-            var attributes: [String: Any] = [CYLTabBarItemTitle: title]
-            attributes[CYLTabBarItemImage] = UIImage(systemName: symbolName)
-            attributes[CYLTabBarItemSelectedImage] = UIImage(systemName: symbolName + ".fill")
+            var attributes: [String: Any] = [cylTabBarItemTitle: title]
+            attributes[cylTabBarItemImage] = UIImage(systemName: symbolName)
+            attributes[cylTabBarItemSelectedImage] = UIImage(systemName: symbolName + ".fill")
             if tabBarController.replaceViewController(at: UInt(neighborIndex), with: replacement, attributes: attributes) {
                 entries.append(CYLReplacedNeighbor(original: original, attributes: originalAttributes, replacement: replacement))
             }
@@ -487,16 +487,16 @@ extension UIViewController {
         }
         guard let plusButton = CYLPlusButton(forOwner: tabBarController) else { return [:] }
         var attributes: [String: Any] = [:]
-        attributes[CYLTabBarItemTitle] = plusButton.cyl_title()
-        attributes[CYLTabBarItemImage] = plusButton.image(for: .normal)
-        attributes[CYLTabBarItemSelectedImage] = plusButton.image(for: .selected)
+        attributes[cylTabBarItemTitle] = plusButton.cyl_title()
+        attributes[cylTabBarItemImage] = plusButton.image(for: .normal)
+        attributes[cylTabBarItemSelectedImage] = plusButton.image(for: .selected)
         objc_setAssociatedObject(tabBarController, key, attributes, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         return attributes
     }
 
     private func cylInitialTitle(of tabViewController: UIViewController, in tabBarController: CYLTabBarController) -> String? {
         let attributes = cylInitialTabBarItemsAttributes(of: tabBarController).object(forKey: tabViewController)
-        return attributes?[CYLTabBarItemTitle] as? String ?? cyl_title(of: tabViewController, in: tabBarController)
+        return attributes?[cylTabBarItemTitle] as? String ?? cylTitle(of: tabViewController, in: tabBarController)
     }
 
     /**
@@ -506,10 +506,10 @@ extension UIViewController {
     private func cylRestoreInitialIcon(of tabViewController: UIViewController, at index: Int, in tabBarController: CYLTabBarController) {
         let attributes = cylInitialTabBarItemsAttributes(of: tabBarController).object(forKey: tabViewController)
         var urlAttributes: [String: Any] = [:]
-        for key in [CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize] {
+        for key in [cylTabBarItemImageURL, cylTabBarItemSelectedImageURL, cylTabBarItemImageURLSize] {
             urlAttributes[key] = attributes?[key]
         }
-        if urlAttributes[CYLTabBarItemImageURL] != nil {
+        if urlAttributes[cylTabBarItemImageURL] != nil {
             tabBarController.updateTabBarItem(at: UInt(index), attributes: urlAttributes)
         } else {
             tabBarController.setTabBarItemIconViewProvider(nil, at: UInt(index))
@@ -517,7 +517,7 @@ extension UIViewController {
     }
 
     private var cyl_tabBarItemUpdateTabBarController: CYLTabBarController? {
-        cyl_owningTabBarController() ?? cyl_tabBarController
+        cylOwningTabBarController() ?? cylTabBarController
     }
 
     /**
@@ -531,7 +531,7 @@ extension UIViewController {
      * [EN] The title a tab shows: FlatDesign shows `cyl_tabBarItem` (reached by selector), the other styles `tabBarItem`.
      * [CN] Tab 显示的标题：扁平样式显示 `cyl_tabBarItem`（通过 selector 访问），其他样式显示 `tabBarItem`。
      */
-    private func cyl_title(of tabViewController: UIViewController, in tabBarController: CYLTabBarController) -> String? {
+    private func cylTitle(of tabViewController: UIViewController, in tabBarController: CYLTabBarController) -> String? {
         if tabBarController.tabBarStyleType == .flatDesign,
            let item = CYLFlatDesignLookup.tabBarItem(of: tabViewController) {
             return item.value(forKey: "title") as? String

@@ -68,7 +68,7 @@ extension CYLTabBarController {
         if plusButton?.isSelected == true {
             plusButton?.isSelected = false
         }
-        if let plusChildViewController = cylPrivate.cylContextPlusChildViewController(), target.cyl_isEqual(to: plusChildViewController) {
+        if let plusChildViewController = cylPrivate.cylContextPlusChildViewController(), target.cylIsEqual(to: plusChildViewController) {
             NotificationCenter.default.post(name: Self.cylTabBarItemAnimationPlayingNotification, object: self)
         }
     }
@@ -85,7 +85,7 @@ extension CYLTabBarController {
     // [CN] 由 Objective-C 的 `-tabBarController:shouldSelectViewController:`（转发方法）调用：类的代理协议声明在 Objective-C 中时，Swift
     //      无法在该类上定义这个 UIKit selector。
     @objc(cyl_tabBarController:shouldSelectViewController:)
-    func cyl_tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+    func cylTabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         // FIX: issue #152 — one user tap on a tab button, before the selection changes (also for a tab that needs login).
         // [CN] 一次用户点击 Tab 按钮，在选中变化之前（需要登录的 Tab 也算）。
         cylRecognizeTabBarItemTapWillSelect(viewController)

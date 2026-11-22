@@ -53,7 +53,7 @@ extension NSObject {
      * [CN] App 代理。
      */
     @objc(cyl_sharedAppDelegate)
-    public func cyl_sharedAppDelegate() -> (UIResponder & UIApplicationDelegate)! {
+    public func cylSharedAppDelegate() -> (UIResponder & UIApplicationDelegate)! {
         UIApplication.shared.delegate as? UIResponder & UIApplicationDelegate
     }
 
@@ -63,12 +63,12 @@ extension NSObject {
      * [CN] 将界面旋转到 `orientation`（iOS 16+：对窗口场景请求几何更新，限于最顶层控制器支持的方向）。
      */
     @objc(cyl_forceUpdateInterfaceOrientation:)
-    public func cyl_forceUpdateInterfaceOrientation(_ orientation: UIInterfaceOrientation) {
-        let appDelegate = cyl_sharedAppDelegate()
+    public func cylForceUpdateInterfaceOrientation(_ orientation: UIInterfaceOrientation) {
+        let appDelegate = cylSharedAppDelegate()
         appDelegate?.cyl_isForceLandscape = orientation == .landscapeLeft || orientation == .landscapeRight
-        _ = appDelegate?.application?(UIApplication.shared, supportedInterfaceOrientationsFor: CYLGetRootWindow())
+        _ = appDelegate?.application?(UIApplication.shared, supportedInterfaceOrientationsFor: cylGetRootWindow())
         if #available(iOS 16.0, *) {
-            guard let windowScene = CYLGetWindowScene() else {
+            guard let windowScene = cylGetWindowScene() else {
                 return
             }
             var topViewController = windowScene.keyWindow?.rootViewController
@@ -137,8 +137,8 @@ extension NSObject {
      * [CN] 根窗口中最顶层的控制器（被 present 的、导航栈顶、选中的 Tab）。
      */
     @objc(cyl_topmostViewController)
-    public class func cyl_topmostViewController() -> UIViewController? {
-        topmost(from: CYLGetRootWindow()?.rootViewController, forNavigation: false)
+    public class func cylTopmostViewController() -> UIViewController? {
+        topmost(from: cylGetRootWindow()?.rootViewController, forNavigation: false)
     }
 
     /**
@@ -146,8 +146,8 @@ extension NSObject {
      * [CN] 最顶层控制器所在的导航控制器（跳过 alert 与正在关闭的页面）。
      */
     @objc(cyl_currentNavigationController)
-    public class func cyl_currentNavigationController() -> UINavigationController? {
-        let top = topmost(from: CYLGetRootWindow()?.rootViewController, forNavigation: true)
+    public class func cylCurrentNavigationController() -> UINavigationController? {
+        let top = topmost(from: cylGetRootWindow()?.rootViewController, forNavigation: true)
         return top as? UINavigationController ?? top?.navigationController
     }
 
@@ -157,8 +157,8 @@ extension NSObject {
      * [CN] 无动画关闭所有被 present 的控制器（被 present 的导航控制器先回到根页面），然后调用 `completion`。
      */
     @objc(cyl_dismissAll:)
-    public class func cyl_dismissAll(_ completion: (() -> Void)?) {
-        guard var top = CYLGetRootViewController() else {
+    public class func cylDismissAll(_ completion: (() -> Void)?) {
+        guard var top = cylGetRootViewController() else {
             completion?()
             return
         }
@@ -192,7 +192,7 @@ extension NSObject {
      * [CN] 对象的实例变量及其偏移（来自 `-_ivarDescription`），用于调试。
      */
     @objc(cyl_ivarList)
-    public func cyl_ivarList() -> String {
+    public func cylIvarList() -> String {
         let selector = NSSelectorFromString("_ivarDescription")
         guard responds(to: selector), let description = perform(selector)?.takeUnretainedValue() as? String else {
             return ""
@@ -261,7 +261,7 @@ extension NSObject {
      * [CN] 对象是否为 UIKit 私有的连续手势识别器（`_UIContinuous…tionGestureRecognizer`）。
      */
     @objc(cyl_isContinuousGestureRecognizer)
-    public func cyl_isContinuousGestureRecognizer() -> Bool {
+    public func cylIsContinuousGestureRecognizer() -> Bool {
         let name = NSStringFromClass(type(of: self))
         return name.hasPrefix("_UIContinuous") && name.hasSuffix("tionGestureRecognizer")
     }
@@ -271,7 +271,7 @@ extension NSObject {
      * [CN] 对象是否为长按手势识别器。
      */
     @objc(cyl_isLongGestureRecognizer)
-    public func cyl_isLongGestureRecognizer() -> Bool {
+    public func cylIsLongGestureRecognizer() -> Bool {
         let name = NSStringFromClass(type(of: self))
         return name.hasPrefix("UILongPr") && name.hasSuffix("essGestureRecognizer")
     }
@@ -281,7 +281,7 @@ extension NSObject {
      * [CN] 接收者上下文的 PlusChildViewController 是否在 `viewControllers` 中。
      */
     @objc(cyl_isPlusViewControllerAdded:)
-    public func cyl_isPlusViewControllerAdded(_ viewControllers: [Any]?) -> Bool {
+    public func cylIsPlusViewControllerAdded(_ viewControllers: [Any]?) -> Bool {
         guard let plusViewController = CYLPlusButton.plusChildViewController(forOwner: self) else {
             return false
         }
@@ -289,7 +289,7 @@ extension NSObject {
             guard let viewController = element as? UIViewController else {
                 return false
             }
-            return viewController === plusViewController || viewController.cyl_isEqual(to: plusViewController)
+            return viewController === plusViewController || viewController.cylIsEqual(to: plusViewController)
         }
     }
 }

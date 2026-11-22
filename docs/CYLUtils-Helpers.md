@@ -69,7 +69,7 @@ self.raisedButton.cyl_respondsOutsideSuperviewBounds = YES;
 
 ```swift
 raisedButton.cyl_respondsOutsideSuperviewBounds = true
-raisedButton.cyl_addScaleBounceAnimation(completion: nil)
+raisedButton.cylAddScaleBounceAnimation(completion: nil)
 ```
 
 ## [CN]图片加载

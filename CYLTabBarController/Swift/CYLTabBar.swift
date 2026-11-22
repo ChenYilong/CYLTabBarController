@@ -264,7 +264,7 @@ open class CYLTabBar: UITabBar, UIGestureRecognizerDelegate {
      [EN] Space kept free at the two ends of the classic tab bar (`left` / `right`; docs/Tab-Item-Positioning.md).
      [CN] 经典 TabBar 两端留出的空白（`left` / `right`；docs/Tab-Item-Positioning.md）。
      */
-    @objc(cyl_itemEdgeInsets) public var cyl_itemEdgeInsets: UIEdgeInsets {
+    @objc(cyl_itemEdgeInsets) public var cylItemEdgeInsets: UIEdgeInsets {
         @objc(cyl_itemEdgeInsets) get { cylTabBarItemEdgeInsets() }
         @objc(setCyl_itemEdgeInsets:) set { cylTabBarSetItemEdgeInsets(newValue) }
     }
@@ -287,7 +287,7 @@ open class CYLTabBar: UITabBar, UIGestureRecognizerDelegate {
     /**
      [EN] Lays the tab buttons out again on the next run loop and 0.5 s later (merged). [CN] 在下一个 run loop 与 0.5 秒后重新布局 Tab 按钮（会合并）。
      */
-    @objc(cyl_reloadTabButtons) public func cyl_reloadTabButtons() {
+    @objc(cyl_reloadTabButtons) public func reloadTabButtons() {
         cylTabBarReloadTabButtons()
     }
 

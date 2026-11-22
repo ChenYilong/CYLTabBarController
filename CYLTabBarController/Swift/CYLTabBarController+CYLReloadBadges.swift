@@ -104,7 +104,7 @@ extension CYLTabBarController {
             viewController.cyl_tabButton = tabButton
         }
         guard isTabBarItemAnimationViewAdded, let animationURL = item.cyl_tabBarItemAnimationURL,
-              tabButton.cyl_tabBarItemAnimationView() == nil else { return }
+              tabButton.cylTabBarItemAnimationView() == nil else { return }
         let isSelected = item === selectedViewController?.tabBarItem
         cylAddLottieImage(withControl: tabButton, lottieURL: animationURL,
                                      lottieSizeValue: item.cyl_tabBarItemAnimationSizeValue,
@@ -116,7 +116,7 @@ extension CYLTabBarController {
     /// [CN] #605：点击后继续使用的按钮；在经典 TabBar 上，UIKit 可能已替换被点击的按钮（页面在加载时修改了 Tab 标题）；布局 TabBar 时接管新按钮。
     @objc(cyl_tabButtonReplacingTappedControl:)
     func cylTabButtonReplacingTappedControl(_ control: UIControl?) -> UIControl? {
-        guard let control = control, control.superview == nil, control.cyl_isTabButton(), !CYLConstants.isLiquidGlassActive() else {
+        guard let control = control, control.superview == nil, control.cylIsTabButton(), !CYLConstants.isLiquidGlassActive() else {
             return control
         }
         cyl_tabBar?.layoutIfNeeded()
@@ -132,17 +132,17 @@ extension CYLTabBarController {
         let action = #selector(CYLTabBarController.tabChanged(to:))
         var tabIndex = 0
         for control in tabBar.cylVisibleControls() ?? [] {
-            let isTabButton = control.cyl_isTabButton()
+            let isTabButton = control.cylIsTabButton()
             let controlTabIndex = isTabButton ? tabIndex : NSNotFound
             if isTabButton {
                 tabIndex += 1
                 control.cyl_tabBarChildViewControllerIndex = controlTabIndex
             }
-            if control.cyl_isChildViewControllerPlusButton() {
+            if control.cylIsChildViewControllerPlusButton() {
                 control.removeTarget(self, action: action, for: .touchUpInside)
                 continue
             }
-            control.cyl_tabLabel()?.textAlignment = .center
+            control.cylTabLabel()?.textAlignment = .center
             cylAddTabControlActionOnce(control, action, .touchUpInside)
             if isTabButton {
                 cylAdoptTabButton(control, forTabBarItem: cylTabBarItem(forTabButton: control))

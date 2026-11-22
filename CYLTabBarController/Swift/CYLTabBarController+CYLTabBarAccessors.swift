@@ -103,7 +103,7 @@ extension CYLTabBarController {
             return
         }
         cyl_context = context
-        cyl_tabBar?.cyl_setValue(cyl_context, forKey: "context")
+        cyl_tabBar?.cylSetValue(cyl_context, forKey: "context")
     }
 
     /// [EN] The `tabBarHeight` getter: the system height until one is set. [CN] `tabBarHeight` 的 getter：未设置时为系统高度。

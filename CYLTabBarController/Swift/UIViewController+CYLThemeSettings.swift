@@ -54,7 +54,7 @@ final class CYLDemoTheme: NSObject, CYLTabBarTheme {
             "Christmas": "圣诞节", "Halloween": "万圣节", "Valentine's Day": "情人节", "Mid-Autumn": "中秋节", "Easter": "复活节",
             "New Year": "新年", "Summer": "夏日", "Birthday": "生日", "Space": "太空", "Ocean": "海洋", "Network": "网络图标",
         ]
-        return CYLLocalizedString(names[identifier] ?? "默认")
+        return cylLocalizedString(names[identifier] ?? "默认")
     }
 
     /**
@@ -62,9 +62,9 @@ final class CYLDemoTheme: NSObject, CYLTabBarTheme {
      */
     var localizedSummary: String {
         if !iconURLs.isEmpty {
-            return CYLLocalizedString("网络图标、标题与配色")
+            return cylLocalizedString("网络图标、标题与配色")
         }
-        return iconNames.isEmpty ? CYLLocalizedString("仅配色") : CYLLocalizedString("节日图标与配色")
+        return iconNames.isEmpty ? cylLocalizedString("仅配色") : cylLocalizedString("节日图标与配色")
     }
 
     /**
@@ -129,7 +129,7 @@ final class CYLDemoTheme: NSObject, CYLTabBarTheme {
         var itemsAttributes: [[String: Any]] = []
         for index in 0..<Self.realTabsAttributes(tabBarController).count {
             guard let selectedImage = icon(named: iconNames[index % iconNames.count]) else { return nil }
-            itemsAttributes.append([CYLTabBarItemImage: Self.faded(selectedImage), CYLTabBarItemSelectedImage: selectedImage])
+            itemsAttributes.append([cylTabBarItemImage: Self.faded(selectedImage), cylTabBarItemSelectedImage: selectedImage])
         }
         return itemsAttributes
     }
@@ -144,15 +144,15 @@ final class CYLDemoTheme: NSObject, CYLTabBarTheme {
         return Self.realTabsAttributes(tabBarController).enumerated().map { index, current in
             let urls = iconURLs[index % iconURLs.count]
             var attributes: [String: Any] = [
-                CYLTabBarItemImageURLSize: NSValue(cgSize: CGSize(width: 24, height: 24)),
+                cylTabBarItemImageURLSize: NSValue(cgSize: CGSize(width: 24, height: 24)),
             ]
-            attributes[CYLTabBarItemImageURL] = urls.first
-            attributes[CYLTabBarItemSelectedImageURL] = urls.last
-            if var title = current[CYLTabBarItemTitle] as? String, !title.isEmpty {
+            attributes[cylTabBarItemImageURL] = urls.first
+            attributes[cylTabBarItemSelectedImageURL] = urls.last
+            if var title = current[cylTabBarItemTitle] as? String, !title.isEmpty {
                 while !(titlePrefix ?? "").isEmpty && title.hasPrefix(prefix) {
                     title.removeFirst(prefix.count)
                 }
-                attributes[CYLTabBarItemTitle] = prefix + title
+                attributes[cylTabBarItemTitle] = prefix + title
             }
             return attributes
         }
@@ -165,10 +165,10 @@ final class CYLDemoTheme: NSObject, CYLTabBarTheme {
      */
     func cyl_plusButtonAttributes(for _: CYLTabBarController) -> [String: Any]? {
         if let first = plusButtonIconURLs.first, let last = plusButtonIconURLs.last {
-            return [CYLTabBarItemImageURL: first, CYLTabBarItemSelectedImageURL: last]
+            return [cylTabBarItemImageURL: first, cylTabBarItemSelectedImageURL: last]
         }
         guard let icon = iconNames.last.flatMap(icon(named:)) else { return nil }
-        return [CYLTabBarItemImage: icon, CYLTabBarItemSelectedImage: icon]
+        return [cylTabBarItemImage: icon, cylTabBarItemSelectedImage: icon]
     }
 
     func cyl_tabBarAppearance(for _: CYLTabBarController) -> UITabBarAppearance? {
@@ -339,8 +339,8 @@ enum CYLDemoThemes {
             let hasSaved = saved.map { manager.theme(forIdentifier: $0 as NSString) != nil } ?? false
             manager.currentThemeIdentifier = (hasSaved ? saved! : defaultIdentifier) as NSString
         }
-        NotificationCenter.default.addObserver(forName: .CYLThemeDidChange, object: nil, queue: nil) { notification in
-            guard let changed = notification.object as? CYLThemeManager, changed.name.isEqual(CYLThemeManagerNameDefault),
+        NotificationCenter.default.addObserver(forName: .cylThemeDidChange, object: nil, queue: nil) { notification in
+            guard let changed = notification.object as? CYLThemeManager, changed.name.isEqual(cylThemeManagerNameDefault),
                   let identifier = changed.currentThemeIdentifier as? String else {
                 return
             }
@@ -384,7 +384,7 @@ enum CYLPlusChildThemeTest {
         let selectIndex = defaults.integer(forKey: "CYLDemoSelectIndex")
         log("plus child theme test: launch theme=\(String(describing: CYLDemoThemes.manager.currentThemeIdentifier))")
         after(2) {
-            if let tabBarController = CYLTabBarController.cyl_active(), selectIndex >= 0,
+            if let tabBarController = CYLTabBarController.cylActive(), selectIndex >= 0,
                selectIndex < (tabBarController.viewControllers?.count ?? 0) {
                 tabBarController.selectedIndex = selectIndex
             }
@@ -497,7 +497,7 @@ enum CYLPlusChildThemeTest {
      *      已经没有的图片，就是过期、模糊的替身。输出 "plus child theme test: PASS|FAIL|SKIP <阶段> …" 及几何信息；替身已显示时返回 PlusButton。
      */
     private static func checkStandIn(_ phase: String) -> UIButton? {
-        let tabBarController = CYLTabBarController.cyl_active()
+        let tabBarController = CYLTabBarController.cylActive()
         let theme = String(describing: CYLDemoThemes.manager.currentThemeIdentifier)
         guard let tabBarController, let plusButton = CYLPlusButton(forOwner: tabBarController) else {
             log("plus child theme test: SKIP \(phase) theme=\(theme): no plus button")
@@ -587,7 +587,7 @@ extension UIViewController {
      * [CN] 一次性在默认主题管理器上注册演示主题，并恢复保存的主题。
      */
     @objc(cyl_setUpThemeSettings)
-    public class func cyl_setUpThemeSettings() {
+    public class func cylSetUpThemeSettings() {
         CYLDemoThemes.setUp
     }
 
@@ -595,8 +595,8 @@ extension UIViewController {
      * [EN] The cell that opens the theme picker, with the current theme. [CN] 打开主题选择器的 cell，显示当前主题。
      */
     @objc(cyl_themeSettingsCellForTableView:)
-    public func cyl_themeSettingsCell(for tableView: UITableView) -> UITableViewCell {
-        UIViewController.cyl_setUpThemeSettings()
+    public func cylThemeSettingsCell(for tableView: UITableView) -> UITableViewCell {
+        UIViewController.cylSetUpThemeSettings()
         let identifier = "CYLThemeSettingsCell"
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? {
             let cell = UITableViewCell(style: .subtitle, reuseIdentifier: identifier)
@@ -608,10 +608,10 @@ extension UIViewController {
         }()
         var themeName = CYLDemoThemes.current.localizedName
         if CYLDemoThemes.followsSystem {
-            themeName += " · " + CYLLocalizedString("跟随系统深色模式")
+            themeName += " · " + cylLocalizedString("跟随系统深色模式")
         }
-        cell.textLabel?.text = CYLLocalizedString("换肤（主题，issue #216）")
-        cell.detailTextLabel?.text = String(format: CYLLocalizedString("点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@"),
+        cell.textLabel?.text = cylLocalizedString("换肤（主题，issue #216）")
+        cell.detailTextLabel?.text = String(format: cylLocalizedString("点击选择主题：TabBar 的背景、图标与文字颜色原地切换，所有 TabBar 样式均适用。当前：%@"),
                                             themeName)
         return cell
     }
@@ -621,9 +621,9 @@ extension UIViewController {
      * [CN] 以 action sheet 显示主题选择器（iPad 上从 `sourceView` 弹出）；选择后执行 `completion`。
      */
     @objc(cyl_presentThemePickerFromView:completion:)
-    public func cyl_presentThemePicker(from sourceView: UIView?, completion: (() -> Void)?) {
-        UIViewController.cyl_setUpThemeSettings()
-        let picker = UIAlertController(title: CYLLocalizedString("选择主题"), message: nil, preferredStyle: .actionSheet)
+    public func cylPresentThemePicker(from sourceView: UIView?, completion: (() -> Void)?) {
+        UIViewController.cylSetUpThemeSettings()
+        let picker = UIAlertController(title: cylLocalizedString("选择主题"), message: nil, preferredStyle: .actionSheet)
         let currentIdentifier = CYLDemoThemes.current.identifier
         for theme in CYLDemoThemes.all {
             let title = theme.identifier == currentIdentifier ? "✓ " + theme.localizedName : theme.localizedName
@@ -633,12 +633,12 @@ extension UIViewController {
             })
         }
         let followsSystem = CYLDemoThemes.followsSystem
-        let followTitle = CYLLocalizedString("跟随系统深色模式")
+        let followTitle = cylLocalizedString("跟随系统深色模式")
         picker.addAction(UIAlertAction(title: followsSystem ? "✓ " + followTitle : followTitle, style: .default) { _ in
             CYLDemoThemes.setFollowsSystem(!followsSystem)
             completion?()
         })
-        picker.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
+        picker.addAction(UIAlertAction(title: cylLocalizedString("取消"), style: .cancel))
         // [EN] iPad shows an action sheet as a popover. [CN] iPad 上 action sheet 以弹出框显示。
         if let popover = picker.popoverPresentationController {
             let anchorView = sourceView ?? view!
@@ -653,12 +653,12 @@ extension UIViewController {
      * [CN] 主题菜单，每次打开时重新生成，勾号随当前主题变化。
      */
     @objc(cyl_themeMenuWithCompletion:)
-    public func cyl_themeMenu(withCompletion completion: (() -> Void)?) -> UIMenu {
-        UIViewController.cyl_setUpThemeSettings()
+    public func cylThemeMenu(withCompletion completion: (() -> Void)?) -> UIMenu {
+        UIViewController.cylSetUpThemeSettings()
         let deferred = UIDeferredMenuElement.uncached { provide in
             provide(UIViewController.cylThemeMenuElements(completion))
         }
-        return UIMenu(title: CYLLocalizedString("选择主题"), children: [deferred])
+        return UIMenu(title: cylLocalizedString("选择主题"), children: [deferred])
     }
 
     private static func cylThemeMenuElements(_ completion: (() -> Void)?) -> [UIMenuElement] {
@@ -672,7 +672,7 @@ extension UIViewController {
             return action
         }
         let followsSystem = CYLDemoThemes.followsSystem
-        let followAction = UIAction(title: CYLLocalizedString("跟随系统深色模式"), image: UIImage(systemName: "circle.lefthalf.filled")) { _ in
+        let followAction = UIAction(title: cylLocalizedString("跟随系统深色模式"), image: UIImage(systemName: "circle.lefthalf.filled")) { _ in
             CYLDemoThemes.setFollowsSystem(!followsSystem)
             completion?()
         }
@@ -687,15 +687,15 @@ extension UIViewController {
      * [EN] The title of the theme list section, with the number of themes. [CN] 主题列表分组的标题，含主题数量。
      */
     @objc(cyl_themeListSectionTitle)
-    public func cyl_themeListSectionTitle() -> String {
-        String(format: CYLLocalizedString("换肤：节日与配色主题（%@ 种）"), NSNumber(value: CYLDemoThemes.all.count))
+    public func cylThemeListSectionTitle() -> String {
+        String(format: cylLocalizedString("换肤：节日与配色主题（%@ 种）"), NSNumber(value: CYLDemoThemes.all.count))
     }
 
     /**
      * [EN] The number of themes. [CN] 主题数量。
      */
     @objc(cyl_themeListRowCount)
-    public func cyl_themeListRowCount() -> Int {
+    public func cylThemeListRowCount() -> Int {
         CYLDemoThemes.all.count
     }
 
@@ -704,8 +704,8 @@ extension UIViewController {
      * [CN] 第 `row` 个主题的 cell：名字、说明、图标或色块，当前主题带勾号。
      */
     @objc(cyl_themeListCellForTableView:row:)
-    public func cyl_themeListCell(for tableView: UITableView, row: Int) -> UITableViewCell {
-        UIViewController.cyl_setUpThemeSettings()
+    public func cylThemeListCell(for tableView: UITableView, row: Int) -> UITableViewCell {
+        UIViewController.cylSetUpThemeSettings()
         let identifier = "CYLThemeListCell"
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? {
             let cell = UITableViewCell(style: .subtitle, reuseIdentifier: identifier)
@@ -726,8 +726,8 @@ extension UIViewController {
      * [EN] Applies theme `row`. [CN] 应用第 `row` 个主题。
      */
     @objc(cyl_didSelectThemeListRow:)
-    public func cyl_didSelectThemeListRow(_ row: Int) {
-        UIViewController.cyl_setUpThemeSettings()
+    public func cylDidSelectThemeListRow(_ row: Int) {
+        UIViewController.cylSetUpThemeSettings()
         guard CYLDemoThemes.all.indices.contains(row) else { return }
         CYLDemoThemes.apply(CYLDemoThemes.all[row])
     }

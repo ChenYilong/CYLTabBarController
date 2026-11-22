@@ -156,7 +156,7 @@ extension CYLTabBarController {
             return
         }
         let didSelectViewController = viewControllers[index]
-        if didSelectViewController.cyl_isPlaceholder || didSelectViewController.cyl_getViewControllerInsteadOfNavigation().cyl_isPlaceholder {
+        if didSelectViewController.cyl_isPlaceholder || didSelectViewController.cylGetViewControllerInsteadOfNavigation().cyl_isPlaceholder {
             return
         }
         // FIX: issue #610 — already reported by `-[CYLFlatDesignTabBar _tabBarDidSelectButton:]`, which every tap goes through.
@@ -184,13 +184,13 @@ extension CYLTabBarController {
         let plusButton = cylPrivate.cylContextPlusButton()
         let isPlusChild: Bool
         if let viewController, let plusChild = cylPrivate.cylContextPlusChildViewController() {
-            isPlusChild = viewController.cyl_isEqual(to: plusChild)
+            isPlusChild = viewController.cylIsEqual(to: plusChild)
         } else {
             isPlusChild = false
         }
         plusButton?.isSelected = isPlusChild
         if isPlusChild {
-            NotificationCenter.default.post(name: .CYLTabBarItemAnimationPlaying, object: self)
+            NotificationCenter.default.post(name: .cylTabBarItemAnimationPlaying, object: self)
         }
     }
 
@@ -540,8 +540,8 @@ extension CYLTabBarController {
 
     /// [EN] The tab's FlatDesign item plays `URL`. [CN] 该 Tab 的扁平样式 item 播放 `URL`。
     @objc(cyl_flatDesignSetAnimationURL:ofViewController:)
-    func cylFlatDesignSetAnimationURL(_ URL: URL, of viewController: UIViewController) {
-        viewController.cyl_tabBarItem?.lottieURL = URL
+    func cylFlatDesignSetAnimationURL(_ url: URL, of viewController: UIViewController) {
+        viewController.cyl_tabBarItem?.lottieURL = url
     }
 
     // MARK: - System tab bar visibility (docs/Swift-Migration.md, step 74)
@@ -880,8 +880,8 @@ extension CYLTabBarController {
         guard cylFlatDesignTabBar != nil else {
             return
         }
-        let normalImage = normalImageInfo.flatMap { UIImage.cyl_imageNamed($0) }
-        let selectedImage = selectedImageInfo.flatMap { UIImage.cyl_imageNamed($0) }
+        let normalImage = normalImageInfo.flatMap { UIImage.cylImageNamed($0) }
+        let selectedImage = selectedImageInfo.flatMap { UIImage.cylImageNamed($0) }
         let insets = imageInsets == .zero ? self.imageInsets : imageInsets
         let titleOffset = titlePositionAdjustment == .zero ? self.titlePositionAdjustment : titlePositionAdjustment
         let imageOffset = imagePositionAdjustment == .zero ? self.imagePositionAdjustment : imagePositionAdjustment
@@ -895,8 +895,8 @@ extension CYLTabBarController {
                                            titlePositionAdjustment: titleOffset, imagePositionAdjustment: imageOffset, imageInsets: insets,
                                            lottieFilePath: lottieFilePath, lottieSizeValue: lottieSizeValue)
         item.lottieURL = lottieURL
-        CYLRememberItemTitlePositionAdjustment(item, titlePositionAdjustment)
-        CYLRememberItemImageInsets(item, imageInsets)
+        cylRememberItemTitlePositionAdjustment(item, titlePositionAdjustment)
+        cylRememberItemImageInsets(item, imageInsets)
         item.cylFlatDesignSetTabBarController(self)
         item.childViewController = viewController
         item.setTitleTextAttributes([.foregroundColor: UIColor.systemYellow], for: .selected)

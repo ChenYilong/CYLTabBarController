@@ -161,7 +161,7 @@ extension CYLTabBarController {
      */
     private func doubleTapBlock(for viewController: UIViewController?) -> (@convention(block) (UITabBarItem, Int) -> Void)? {
         guard let viewController else { return nil }
-        return viewController.tabBarItem.cyl_doubleTapBlock ?? viewController.cyl_getViewControllerInsteadOfNavigation().tabBarItem.cyl_doubleTapBlock
+        return viewController.tabBarItem.cyl_doubleTapBlock ?? viewController.cylGetViewControllerInsteadOfNavigation().tabBarItem.cyl_doubleTapBlock
     }
 
     /**
@@ -173,7 +173,7 @@ extension CYLTabBarController {
     func cylIsTabBarItemGestureControl(_ control: UIControl?, viewController: AutoreleasingUnsafeMutablePointer<UIViewController?>?) -> Bool {
         guard let control else { return false }
         // [EN] Guard: the plus button only when there is one. [CN] 仅在有 PlusButton 时处理 PlusButton。
-        if hasPlusButton() && control.cyl_isPlusButton() {
+        if hasPlusButton() && control.cylIsPlusButton() {
             // [EN] Guard: the child view controller only when there is one. [CN] 仅在有子控制器时取子控制器。
             viewController?.pointee = hasPlusChildViewController() ? CYLPlusButton.plusChildViewController(forOwner: self) : nil
             return true
@@ -219,7 +219,7 @@ extension CYLTabBarController {
         if control is CYLPlusButton { return }
         guard let (control, viewController) = gestureControl(control) else { return }
         let state = gestureState
-        let isPlusButton = hasPlusButton() && control.cyl_isPlusButton()
+        let isPlusButton = hasPlusButton() && control.cylIsPlusButton()
         if !isPlusButton && state.receivesTabTapsBeforeSelection { return }
         let isReselect = viewController != nil && viewController === state.selectedViewControllerBeforeTap
         cylRecognizeTabBarItemTap(on: control, viewController: viewController, isReselect: isReselect)
@@ -260,7 +260,7 @@ extension CYLTabBarController {
         //      knows whether the press was a tap, a long press or a drag. The plus child view controller is still counted here.
         // [CN] 液态玻璃：Tab 的点击在系统手势结束时计数（`-cyl_recognizeLiquidGlassTapOnControl:…`），那里知道这次是点击、长按还是拖动。PlusButton
         //      子控制器仍在这里计数。
-        if !control.cyl_isPlusButton() && cylLiquidGlassTakesTabTaps() { return }
+        if !control.cylIsPlusButton() && cylLiquidGlassTakesTabTaps() { return }
         let state = gestureState
         let isFirstTapFromHere = !state.receivesTabTapsBeforeSelection
         state.receivesTabTapsBeforeSelection = true

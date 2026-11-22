@@ -60,7 +60,7 @@ import UIKit
  [EN] The layer animation key of an animation type, nil for `none` (the strings of the macros in CYLBadgeProtocol.h).
  [CN] 动画类型对应的图层动画 key，`none` 为 nil（与 CYLBadgeProtocol.h 中宏的字符串相同）。
  */
-public func CYLBadgeAnimationKeyForType(_ animationType: CYLBadgeAnimationType) -> String? {
+public func cylBadgeAnimationKeyForType(_ animationType: CYLBadgeAnimationType) -> String? {
     switch animationType {
     case .scale: return "cyl.badge.scale"
     case .shake: return "cyl.badge.shake"
@@ -79,14 +79,14 @@ public func CYLBadgeAnimationKeyForType(_ animationType: CYLBadgeAnimationType) 
 /**
  [EN] Whether an animation type repeats (scale, shake, bounce, breathe). [CN] 动画类型是否重复播放（缩放、摇晃、弹跳、呼吸）。
  */
-public func CYLBadgeAnimationTypeRepeats(_ animationType: CYLBadgeAnimationType) -> Bool {
+public func cylBadgeAnimationTypeRepeats(_ animationType: CYLBadgeAnimationType) -> Bool {
     [.scale, .shake, .bounce, .breathe].contains(animationType)
 }
 
 /**
  [EN] Every badge animation key, the rotation included. [CN] 所有角标动画 key，包括旋转。
  */
-public func CYLBadgeAllAnimationKeys() -> [String] {
+public func cylBadgeAllAnimationKeys() -> [String] {
     ["cyl.badge.scale", "cyl.badge.shake", "cyl.badge.bounce", "cyl.badge.breathe", "cyl.badge.rotate", "cyl.badge.LeftRightOnce",
      "cyl.badge.RightLeftOnce", "cyl.badge.FadeInOnce", "cyl.badge.RollingOnce", "cyl.badge.ScaleOnce"]
 }

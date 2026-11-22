@@ -31,7 +31,7 @@ final class HomeViewController: UIViewController {
     }
 
     private func updateSelectedSegment() {
-        let isFlatDesign = cyl_owningTabBarController()?.tabBarStyleType == .flatDesign
+        let isFlatDesign = cylOwningTabBarController()?.tabBarStyleType == .flatDesign
         styleControl.selectedSegmentIndex = isFlatDesign ? 1 : 0
     }
 

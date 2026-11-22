@@ -19,11 +19,11 @@ extension UIBarItem {
      * [CN] `UIBarButtonItem` 或 `UITabBarItem` 的视图（UIKit 延迟创建：显示之前为 nil）。
      */
     @objc(cyl_view)
-    public func cyl_view() -> UIView? {
+    public func cylView() -> UIView? {
         guard responds(to: CYLBarItemSelectors.view) else {
             return nil
         }
-        return cyl_value(forKey: "view") as? UIView
+        return cylValue(forKey: "view") as? UIView
     }
 }
 
@@ -34,7 +34,7 @@ extension UITabBarItem {
      * [CN] 该 item 的 Tab 按钮（`UITabBarButton`，液态玻璃下为 `_UITabButton`）。
      */
     @objc public var cyl_tabButton: UIControl? {
-        cyl_replacementTabButton ?? cyl_view() as? UIControl
+        cyl_replacementTabButton ?? cylView() as? UIControl
     }
 
     /**
@@ -46,8 +46,8 @@ extension UITabBarItem {
      *      由 TabBar 通过 `-[UIViewController cyl_setTabButton:]` 设置，使设置在 item 上的角标（`-cyl_showBadgeValue:…`）到达可见的按钮，而不是隐藏的按钮。
      */
     @objc public var cyl_replacementTabButton: UIControl? {
-        get { cyl_weakAssociatedObject(forKey: &CYLBarItemKeys.replacementTabButton) as? UIControl }
-        set { cyl_setWeakAssociatedObject(newValue, forKey: &CYLBarItemKeys.replacementTabButton) }
+        get { cylWeakAssociatedObject(forKey: &CYLBarItemKeys.replacementTabButton) as? UIControl }
+        set { cylSetWeakAssociatedObject(newValue, forKey: &CYLBarItemKeys.replacementTabButton) }
     }
 }
 

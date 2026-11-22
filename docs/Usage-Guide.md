@@ -298,13 +298,13 @@ final class MainTabBarController: CYLTabBarController {
     }
 
     private static func makeTabBarItemsAttributes() -> [[AnyHashable: Any]] {
-        [[CYLTabBarItemTitle: "Home",
-          CYLTabBarItemImage: "home_normal",            // an image name (String) or a UIImage
-          CYLTabBarItemDarkImage: "home_normal_night",  // optional: Dark Mode
-          CYLTabBarItemSelectedImage: "home_highlight"],
-         [CYLTabBarItemTitle: "Nearby",
-          CYLTabBarItemImage: "fishpond_normal",
-          CYLTabBarItemSelectedImage: "fishpond_highlight"]]
+        [[cylTabBarItemTitle: "Home",
+          cylTabBarItemImage: "home_normal",            // an image name (String) or a UIImage
+          cylTabBarItemDarkImage: "home_normal_night",  // optional: Dark Mode
+          cylTabBarItemSelectedImage: "home_highlight"],
+         [cylTabBarItemTitle: "Nearby",
+          cylTabBarItemImage: "fishpond_normal",
+          cylTabBarItemSelectedImage: "fishpond_highlight"]]
     }
 }
 ```
@@ -364,7 +364,7 @@ func scene(_ scene: UIScene, willConnectTo session: UISceneSession,
            options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = scene as? UIWindowScene else { return }
     let window = UIWindow(windowScene: windowScene)
-    window.cyl_setRootViewControllerProvider { MainTabBarController() }
+    window.cylSetRootViewControllerProvider { MainTabBarController() }
     window.makeKeyAndVisible()
     self.window = window
 }
@@ -612,7 +612,7 @@ optional func tabBarController(_ tabBarController: UITabBarController,
 
 ```swift
 func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-    cyl_tabBarController?.updateSelectionStatusIfNeeded(for: tabBarController, shouldSelect: viewController)
+    cylTabBarController?.updateSelectionStatusIfNeeded(for: tabBarController, shouldSelect: viewController)
     return true
 }
 ```
@@ -706,7 +706,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, UITabBarControllerD
 func tabBarController(_ tabBarController: CYLTabBarController, didSelect control: UIControl) {
     var animationView: UIView?
     // If the plus button has its own action, this method is not called for it.
-    if control.cyl_isPlusButton() {
+    if control.cylIsPlusButton() {
         // The plus button of this tab bar controller's context.
         animationView = CYLPlusButton(forOwner: tabBarController)?.imageView
     } else if control.isKind(of: NSClassFromString("UITabBarButton") ?? UIControl.self) {
@@ -833,18 +833,18 @@ func reloadBadge() {
 
 ```swift
 let homeAttributes: [AnyHashable: Any] = [
-    CYLTabBarItemTitle: "Home",
-    CYLTabBarItemImage: "home_normal",            // 2. also loads home_normal_dark, if it exists
-    CYLTabBarItemSelectedImage: "home_highlight", // 1. an asset catalog image with a Dark appearance
+    cylTabBarItemTitle: "Home",
+    cylTabBarItemImage: "home_normal",            // 2. also loads home_normal_dark, if it exists
+    cylTabBarItemSelectedImage: "home_highlight", // 1. an asset catalog image with a Dark appearance
 ]
 let messageAttributes: [AnyHashable: Any] = [
-    CYLTabBarItemTitle: "Messages",
-    CYLTabBarItemImage: "message_normal",
-    CYLTabBarItemDarkImage: "message_normal_night", // 3. a dark image under any name
+    cylTabBarItemTitle: "Messages",
+    cylTabBarItemImage: "message_normal",
+    cylTabBarItemDarkImage: "message_normal_night", // 3. a dark image under any name
 ]
 // 3. or one UIImage holding a light and a dark image
-let messageImage = UIImage.cyl_image(withImageInfo: "message_normal", darkImageInfo: "message_normal_night")
-tabBarController.tabBar.backgroundColor = UIColor.cyl_color(withLight: .white, dark: .black)
+let messageImage = UIImage.cylImage(withImageInfo: "message_normal", darkImageInfo: "message_normal_night")
+tabBarController.tabBar.backgroundColor = UIColor.cylColor(withLight: .white, dark: .black)
 ```
 
 | 中文 | English |
@@ -967,13 +967,13 @@ private var tabBarItemWidthObserver: NSObjectProtocol?
 
 func updateTabBarCustomizationWhenTabBarItemWidthDidUpdate() {
     tabBarItemWidthObserver = NotificationCenter.default.addObserver(
-        forName: NSNotification.Name(CYLTabBarItemWidthDidChangeNotification), object: nil, queue: .main) { [weak self] _ in
+        forName: NSNotification.Name(cylTabBarItemWidthDidChangeNotification), object: nil, queue: .main) { [weak self] _ in
         self?.tabBarItemWidthDidUpdate()
     }
 }
 
 private func tabBarItemWidthDidUpdate() {
-    guard let tabBarController = cyl_tabBarController else { return }
+    guard let tabBarController = cylTabBarController else { return }
     // The selection indicator is as wide as one tab, in portrait and in landscape.
     let size = CGSize(width: cyl_tabBar?.cyl_tabBarItemWidth ?? 0, height: tabBarController.tabBar.bounds.height)
     tabBarController.tabBar.selectionIndicatorImage = UIGraphicsImageRenderer(size: size).image { context in
@@ -1005,7 +1005,7 @@ private func tabBarItemWidthDidUpdate() {
 // On any object: for a view controller, the nearest ancestor that is a tab bar controller; otherwise the
 // root view controller of the app's key window when it is a tab bar controller.
 extension NSObject {
-    var cyl_tabBarController: CYLTabBarController? { get }
+    var cylTabBarController: CYLTabBarController? { get }
 }
 ```
 
@@ -1018,7 +1018,7 @@ import CYLTabBarController
 
 override func viewDidLoad() {
     super.viewDidLoad()
-    let tabBarController = cyl_tabBarController
+    let tabBarController = cylTabBarController
     // ...
 }
 ```

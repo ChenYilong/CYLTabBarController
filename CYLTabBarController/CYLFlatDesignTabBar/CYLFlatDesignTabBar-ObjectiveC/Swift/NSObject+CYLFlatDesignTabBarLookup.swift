@@ -26,9 +26,9 @@ extension NSObject {
      */
     func cylFlatDesignSetTabBarController(_ tabBarController: UIViewController?) {
         let key = CYLUtilsKeys.key("cylflatdesign_tabBarController")
-        cyl_setWeakAssociatedObject(tabBarController, forKey: key)
+        cylSetWeakAssociatedObject(tabBarController, forKey: key)
         guard let viewController = self as? UIViewController else { return }
-        viewController.cyl_getViewControllerInsteadOfNavigation().cyl_setWeakAssociatedObject(tabBarController, forKey: key)
+        viewController.cylGetViewControllerInsteadOfNavigation().cylSetWeakAssociatedObject(tabBarController, forKey: key)
     }
 
     /**
@@ -46,10 +46,10 @@ extension NSObject {
     }
 
     func cylFlatDesignTabBarController() -> UIViewController? {
-        if let reference = cyl_weakAssociatedObject(forKey: CYLUtilsKeys.key("cylflatdesign_tabBarController")) as? UIViewController {
+        if let reference = cylWeakAssociatedObject(forKey: CYLUtilsKeys.key("cylflatdesign_tabBarController")) as? UIViewController {
             return reference
         }
-        return cyl_tabBarController(matching: { $0.tabBarStyleType == .flatDesign }, fallsBackToActive: false)
+        return cylTabBarController(matching: { $0.tabBarStyleType == .flatDesign }, fallsBackToActive: false)
     }
 
     @objc(cyl_nearestParentViewControllerThatIsKindOf:)

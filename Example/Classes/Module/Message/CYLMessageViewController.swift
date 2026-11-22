@@ -34,13 +34,13 @@ class CYLMessageViewController: CYLDemoBadgeTableViewController {
     }
 
     override func configure(_ cell: UITableViewCell, for indexPath: IndexPath) {
-        cell.cyl_showBadge(forRow: indexPath.row)
-        cell.cyl_wrapsTextLabels()
+        cell.cylShowBadge(forRow: indexPath.row)
+        cell.cylWrapsTextLabels()
         switch indexPath.row {
         case 0:
             // [EN] Pushes a tab bar controller of the SAME context. [CN] 推入同一个 context 的 TabBarController。
             cell.textLabel?.text = cylDemoLocalizedString("Push 同一个 context 的 TabBarController（同一个 PlusButton 类）")
-            cell.detailTextLabel?.text = UITableViewCell.cyl_badgeTitle(forRow: indexPath.row)
+            cell.detailTextLabel?.text = UITableViewCell.cylBadgeTitle(forRow: indexPath.row)
         case 1:
             // [EN] Issue #202: the plus button has a tappable X subview. [CN] Issue #202：PlusButton 带可点击的 X 子按钮。
             cell.textLabel?.text = cylDemoLocalizedString("Push 新 context 的 TabBarController（PlusButton 带可点击的 X 子按钮，issue #202）")
@@ -58,7 +58,7 @@ class CYLMessageViewController: CYLDemoBadgeTableViewController {
         case 0:
             // [EN] The SAME context, without registering again: another instance of the same plus button class.
             // [CN] 相同的 context，不重新注册：同一个 PlusButton 类的另一个实例。
-            tabBarController = MainTabBarController(context: cyl_tabBarController?.cyl_context ?? "")
+            tabBarController = MainTabBarController(context: cylTabBarController?.cyl_context ?? "")
             tabBarController.allowsVerticalBar = true
         case 1:
             tabBarController = CYLMainRootViewController.newLiquidGlassTabBarController(withPlusButtonClass: CYLCloseSubviewPlusButtonSubclass.self)

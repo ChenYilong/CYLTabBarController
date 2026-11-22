@@ -79,30 +79,30 @@ public func cylBadgeAnimationForTypeEntryPoint(_ animationType: CYLBadgeAnimatio
     let moveDistance = badgeSize.width * 1.5
     switch animationType {
     case .breathe:
-        return CAAnimation.cyl_opacityForeverAnimation(withDuration: 1.4)
+        return CAAnimation.cylOpacityForeverAnimation(withDuration: 1.4)
     case .shake:
         // [EN] Relative (`transform.translation.x`), so an anchored badge can still move with its host while shaking.
         // [CN] 相对位移（`transform.translation.x`），因此固定位置的角标抖动时仍可随宿主移动。
-        let animation = CAAnimation.cyl_shakeAnimationRepeatTimes(.infinity, duration: 1, offset: badgeSize.width / 4)
+        let animation = CAAnimation.cylShakeAnimationRepeatTimes(.infinity, duration: 1, offset: badgeSize.width / 4)
         animation.isRemovedOnCompletion = false
         return animation
     case .scale:
-        return CAAnimation.cyl_scale(fromScale: 1.4, toScale: 0.6, duration: 1, repeatTimes: .greatestFiniteMagnitude)
+        return CAAnimation.cylScale(fromScale: 1.4, toScale: 0.6, duration: 1, repeatTimes: .greatestFiniteMagnitude)
     case .bounce:
         // [EN] Relative (`transform.translation.y`), see Shake. [CN] 相对位移，见 Shake。
-        let animation = CAAnimation.cyl_bounceRepeatTimes(.infinity, duration: 1, offset: badgeSize.height / 4)
+        let animation = CAAnimation.cylBounceRepeatTimes(.infinity, duration: 1, offset: badgeSize.height / 4)
         animation.isRemovedOnCompletion = false
         return animation
     case .leftRightOnce:
-        return CAAnimation.cyl_badge_once_leftRight_AnimationMoveDistance(moveDistance, repeatTimes: 1, duration: 0.5)
+        return CAAnimation.cylBadgeOnceLeftRightAnimationMoveDistance(moveDistance, repeatTimes: 1, duration: 0.5)
     case .rightLeftOnce:
-        return CAAnimation.cyl_badge_once_rightLeft_AnimationMoveDistance(moveDistance, repeatTimes: 1, duration: 0.5)
+        return CAAnimation.cylBadgeOnceRightLeftAnimationMoveDistance(moveDistance, repeatTimes: 1, duration: 0.5)
     case .fadeInOnce:
-        return CAAnimation.cyl_badge_once_fade(in_AnimationRepeatTimes: 1, duration: 1.5)
+        return CAAnimation.cylBadgeOnceFade(inAnimationRepeatTimes: 1, duration: 1.5)
     case .rollingOnce:
-        return CAAnimation.cyl_badge_once_rolling_AnimationRepeatTimes(1, duration: 0.5)
+        return CAAnimation.cylBadgeOnceRollingAnimationRepeatTimes(1, duration: 0.5)
     case .scaleOnce:
-        return CAAnimation.cyl_badge_once_scale_AnimationRepeatTimes(1, duration: 0.5)
+        return CAAnimation.cylBadgeOnceScaleAnimationRepeatTimes(1, duration: 0.5)
     default:
         return nil
     }
@@ -120,13 +120,13 @@ public func cylBadgeAccessibilityDescriptionEntryPoint(_ value: NSString?) -> NS
         return nil
     }
     if value.isEmpty {
-        return CYLLocalizedString("有新内容") as NSString
+        return cylLocalizedString("有新内容") as NSString
     }
     if value.range(of: "^[0-9]+\\+?$", options: .regularExpression) != nil {
         let number = (value as NSString).integerValue
-        return number > 0 ? String(format: CYLLocalizedString("%@ 条新消息"), value) as NSString : nil
+        return number > 0 ? String(format: cylLocalizedString("%@ 条新消息"), value) as NSString : nil
     }
-    return CYLLocalizedString(value) as NSString
+    return cylLocalizedString(value) as NSString
 }
 
 // MARK: - The overlay above a host that clips
@@ -344,7 +344,7 @@ extension UIView {
         }
         let generation = cylInvalidatePendingBadgeValue()
         if cylShouldWaitForLayoutBeforeShowingBadgeValue(value) {
-            cyl_showBadgeValue(value, animationTypeValue: animationTypeValue, afterLayoutWithGeneration: generation, attempt: 0)
+            cylShowBadgeValue(value, animationTypeValue: animationTypeValue, afterLayoutWithGeneration: generation, attempt: 0)
             return
         }
         cylShowBadgeValueNow(value, animationTypeValue: animationTypeValue)
@@ -372,7 +372,7 @@ extension UIView {
         return !cyl_isReady()
     }
 
-    private func cyl_showBadgeValue(_ value: String, animationTypeValue: NSNumber, afterLayoutWithGeneration generation: UInt,
+    private func cylShowBadgeValue(_ value: String, animationTypeValue: NSNumber, afterLayoutWithGeneration generation: UInt,
                                     attempt: Int) {
         let delay = attempt == 0 ? 0 : max(Double(cyl_delayIfNeededForSeconds), 0.1)
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
@@ -380,7 +380,7 @@ extension UIView {
                 return
             }
             if attempt + 1 < CYLBadgeViewKeys.maximumLayoutRetryCount && self.cylShouldWaitForLayoutBeforeShowingBadgeValue(value) {
-                self.cyl_showBadgeValue(value, animationTypeValue: animationTypeValue, afterLayoutWithGeneration: generation,
+                self.cylShowBadgeValue(value, animationTypeValue: animationTypeValue, afterLayoutWithGeneration: generation,
                                         attempt: attempt + 1)
                 return
             }
@@ -411,7 +411,7 @@ extension UIView {
         }
         let animationType = CYLBadgeAnimationType(rawValue: animationTypeValue.uintValue) ?? .none
         cyl_badgeAnimationTypeValue = NSNumber(value: animationType.rawValue)
-        cyl_showBadge(withValue: value)
+        cylShowBadge(withValue: value)
         if animationType != .none {
             cylBeginAnimation()
         }
@@ -423,7 +423,7 @@ extension UIView {
     }
 
     @objc(cyl_showBadgeValue:)
-    public dynamic func cyl_showBadgeValue(_ value: String) {
+    public dynamic func cylShowBadgeValue(_ value: String) {
         cyl_showBadgeValue(value, animationType: .none)
     }
 
@@ -457,7 +457,7 @@ extension UIView {
     }
 
     @objc(cyl_showBadgeWithValue:)
-    public dynamic func cyl_showBadge(withValue value: String?) {
+    public dynamic func cylShowBadge(withValue value: String?) {
         guard let value else {
             return
         }
@@ -472,7 +472,7 @@ extension UIView {
         // [EN] Only spaces or line breaks: nothing to read, so hide instead of showing an empty pill.
         // [CN] 只有空格或换行：没有内容可读，因此隐藏，而不是显示空的胶囊。
         if value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            cyl_badge?.cyl_setHidden(true)
+            cyl_badge?.cylSetHidden(true)
             return
         }
         if value == "new" || value == "NEW" {
@@ -491,20 +491,20 @@ extension UIView {
             return
         }
         cylInvalidatePendingBadgeValue()
-        cyl_badge?.cyl_setHidden(true)
+        cyl_badge?.cylSetHidden(true)
         cylUpdateBadgeAccessibility()
     }
 
     @objc(cyl_isShowBadge)
     public dynamic func cyl_isShowBadge() -> Bool {
         // [EN] An animated item's badge is on its icon subview. [CN] 动效 item 的角标在其图标子视图上。
-        if let icon = cyl_animatedItemBadgeHost(), icon !== self {
+        if let icon = cylAnimatedItemBadgeHost(), icon !== self {
             return icon.cyl_isShowBadge()
         }
         guard let badge = cyl_badge else {
             return false
         }
-        return !badge.cyl_isHidden()
+        return !badge.cylIsHidden()
     }
 
     /**
@@ -516,20 +516,20 @@ extension UIView {
             return
         }
         if cyl_isPauseBadge() {
-            cyl_badge?.cyl_setHidden(false)
+            cyl_badge?.cylSetHidden(false)
             cylBadgeEnvironmentDidChange()
         }
     }
 
     @objc(cyl_isPauseBadge)
     public dynamic func cyl_isPauseBadge() -> Bool {
-        if let icon = cyl_animatedItemBadgeHost(), icon !== self {
+        if let icon = cylAnimatedItemBadgeHost(), icon !== self {
             return icon.cyl_isPauseBadge()
         }
         guard let badge = cyl_badge else {
             return false
         }
-        return badge.cyl_isHidden()
+        return badge.cylIsHidden()
     }
 
     @objc(cyl_getActualBadgeSuperView)
@@ -561,7 +561,7 @@ extension UIView {
      *      转发给其图标子视图，角标添加在那里。已转发时返回 true；其他视图及图标本身返回 false。
      */
     private func cylForwardBadgeToAnimatedItemIcon(_ selector: Selector, _ object1: Any? = nil, _ object2: Any? = nil) -> Bool {
-        guard let icon = cyl_animatedItemBadgeHost(), icon !== self else {
+        guard let icon = cylAnimatedItemBadgeHost(), icon !== self else {
             return false
         }
         icon.clipsToBounds = false
@@ -580,7 +580,7 @@ extension UIView {
      *      新视图替换时（另一个文件、深色文件、皮肤），旧视图承载着角标。
      */
     @objc(cyl_moveBadgeToView:)
-    public func cyl_moveBadge(to newHost: UIView) {
+    public func cylMoveBadge(to newHost: UIView) {
         guard newHost !== self, let badge = cyl_badge, cyl_isShowBadge() else {
             return
         }
@@ -604,7 +604,7 @@ extension UIView {
     }
 
     @objc(cyl_animatedItemBadgeHost)
-    public func cyl_animatedItemBadgeHost() -> UIView? {
+    public func cylAnimatedItemBadgeHost() -> UIView? {
         guard let componentClass = NSClassFromString("CYLAnimatedItemView"), isKind(of: componentClass) else {
             return nil
         }
@@ -657,7 +657,7 @@ extension UIView {
             badge.layer.cornerRadius = badge.frame.width / 2
         }
         cylApplyBadgeBorder()
-        cyl_badge?.cyl_setHidden(false)
+        cyl_badge?.cylSetHidden(false)
         cylUpdateBadgeAccessibility()
     }
 
@@ -666,7 +666,7 @@ extension UIView {
             return
         }
         // [EN] "new" / "NEW" are tokens; show them in the app's language. [CN] "new" / "NEW" 是标记，按 App 的语言显示。
-        let localized = CYLLocalizedString(value)
+        let localized = cylLocalizedString(value)
         let size = (localized as NSString).size(withAttributes: [.font: cyl_badgeFont as UIFont])
         let labelHeight = ceil(size.height) + cyl_badgeMargin
         cyl_badgeCornerRadius = labelHeight / 3
@@ -678,7 +678,7 @@ extension UIView {
             return
         }
         guard let value, !value.isEmpty else {
-            cyl_badge?.cyl_setHidden(true)
+            cyl_badge?.cylSetHidden(true)
             cylUpdateBadgeAccessibility()
             return
         }
@@ -694,7 +694,7 @@ extension UIView {
         cylLayoutBadgeAtTopRightCorner()
         badge.layer.cornerRadius = cylTextBadgeCornerRadius()
         cylApplyBadgeBorder()
-        badge.cyl_setHidden(false)
+        badge.cylSetHidden(false)
         cylUpdateBadgeAccessibility()
     }
 
@@ -711,7 +711,7 @@ extension UIView {
     dynamic func cylUpdateBadgeAccessibility() {
         let badge = cyl_badge
         var description: String?
-        if let badge, !badge.cyl_isHidden() {
+        if let badge, !badge.cylIsHidden() {
             let text = badge.tag == Int(CYLBadgeStyle.redDot.rawValue) ? "" : (badge.text ?? "")
             description = cylBadgeAccessibilityDescriptionEntryPoint(text as NSString) as String?
         }
@@ -748,11 +748,11 @@ extension UIView {
             return
         }
         if value <= 0 {
-            cyl_badge?.cyl_setHidden(true)
+            cyl_badge?.cylSetHidden(true)
             return
         }
         cylBadgeInit()
-        cyl_badge?.cyl_setHidden(value == 0)
+        cyl_badge?.cylSetHidden(value == 0)
         cyl_badge?.tag = Int(CYLBadgeStyle.number.rawValue)
         // [EN] A maximum below 1 would turn every number into "0+". [CN] 小于 1 的上限会把所有数字变成 "0+"。
         let maximumBadgeNumber = max(1, cyl_badgeMaximumBadgeNumber)
@@ -785,7 +785,7 @@ extension UIView {
         badge.text = ""
         badge.layer.cornerRadius = badge.frame.width / 2
         badge.layer.masksToBounds = true
-        badge.cyl_setHidden(true)
+        badge.cylSetHidden(true)
         badge.isAccessibilityElement = false
         badge.backgroundColor = cyl_badgeBackgroundColor
         cylApplyBadgeBorder()
@@ -904,7 +904,7 @@ extension UIView {
         }
         cylApplyBadgeBorder()
         let animationType = cyl_badgeAnimationType
-        guard CYLBadgeAnimationTypeRepeats(animationType), let key = CYLBadgeAnimationKeyForType(animationType),
+        guard cylBadgeAnimationTypeRepeats(animationType), let key = cylBadgeAnimationKeyForType(animationType),
               badge.window != nil, !badge.isHidden, badge.alpha > 0.01 else {
             return
         }
@@ -921,8 +921,8 @@ extension UIView {
      * [EN] Puts the badge back on top of its host and lays it out again. [CN] 把角标重新放到宿主最上层并重新布局。
      */
     @objc(cyl_refreshBadge)
-    public dynamic func cyl_refreshBadge() {
-        if cylForwardBadgeToAnimatedItemIcon(#selector(UIView.cyl_refreshBadge)) {
+    public dynamic func cylRefreshBadge() {
+        if cylForwardBadgeToAnimatedItemIcon(#selector(UIView.cylRefreshBadge)) {
             return
         }
         guard let badge = cyl_badge else {
@@ -961,7 +961,7 @@ extension UIView {
      * [CN] 移除本视图上设置的所有外观，使其重新跟随 `CYLBadgeAppearance`。
      */
     @objc(cyl_resetBadgeAppearance)
-    public dynamic func cyl_resetBadgeAppearance() {
+    public dynamic func cylResetBadgeAppearance() {
         for key in [CYLBadgeViewKeys.font, CYLBadgeViewKeys.backgroundColor, CYLBadgeViewKeys.textColor,
                     CYLBadgeViewKeys.centerOffset, CYLBadgeViewKeys.radius, CYLBadgeViewKeys.margin,
                     CYLBadgeViewKeys.cornerRadius, CYLBadgeViewKeys.maximumBadgeNumber, CYLBadgeViewKeys.borderColor,
@@ -985,7 +985,7 @@ extension UIView {
         guard let layer = cyl_badge?.layer else {
             return
         }
-        CYLBadgeAllAnimationKeys().forEach { layer.removeAnimation(forKey: $0) }
+        cylBadgeAllAnimationKeys().forEach { layer.removeAnimation(forKey: $0) }
     }
 
     // MARK: Other private methods
@@ -1057,7 +1057,7 @@ extension UIView {
         #endif
         let animationType = cyl_badgeAnimationType
         if let animation = cylBadgeAnimationForTypeEntryPoint(animationType, badge.bounds.size),
-           let key = CYLBadgeAnimationKeyForType(animationType) {
+           let key = cylBadgeAnimationKeyForType(animationType) {
             badge.layer.add(animation, forKey: key)
         }
     }
@@ -1367,8 +1367,8 @@ extension UIView {
     }
 
     @objc(cyl_isHidden)
-    public dynamic func cyl_isHidden() -> Bool {
-        cyl_isInvisiable()
+    public dynamic func cylIsHidden() -> Bool {
+        cylIsInvisiable()
     }
 
     /**
@@ -1377,7 +1377,7 @@ extension UIView {
      * [CN] 导航栏或 Tab 按钮的角标所在的视图：Tab 按钮的图片视图、导航栏按钮内部的按钮，否则为本视图。
      */
     @objc(cyl_findBarButtonContentView)
-    public dynamic func cyl_findBarButtonContentView() -> UIView {
+    public dynamic func cylFindBarButtonContentView() -> UIView {
         let className = NSStringFromClass(type(of: self))
         if className == "UITabBarButton" || className == "_UITabButton" {
             // [EN] With Core, the tab image view it tracks (`-cyl_tabImageView`, called by selector: CYLBadgeView builds without

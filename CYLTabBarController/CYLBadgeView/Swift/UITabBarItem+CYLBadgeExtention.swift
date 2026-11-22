@@ -62,7 +62,7 @@ enum CYLTabBarItemBadgeSupport {
      */
     static func iconView(in view: UIView) -> UIView {
         // [EN] An animated item tab button: its animation view or image (any format). [CN] 动效 item Tab 按钮：其动画视图或图片（任何格式）。
-        if let iconHost = view.cyl_animatedItemBadgeHost() {
+        if let iconHost = view.cylAnimatedItemBadgeHost() {
             return iconHost
         }
         for subview in view.subviews {
@@ -183,7 +183,7 @@ extension UITabBarItem {
     }
 
     @objc(cyl_getActualBadgeSuperViewFromControl:)
-    public dynamic func cyl_getActualBadgeSuperView(fromControl tabButton: UIControl) -> UIView? {
+    public dynamic func cylGetActualBadgeSuperView(fromControl tabButton: UIControl) -> UIView? {
         (tabButton as UIView).cyl_getActualBadgeSuperView() as? UIView
     }
 
@@ -221,7 +221,7 @@ extension UITabBarItem {
         let counterpart: UIControl? = CYLTabBarItemBadgeSupport.object(
             tabButton, isSelectedLayer ? "cyl_platterNormalControl" : "cyl_platterSelectedControl")
         for control in [tabButton, counterpart].compactMap({ $0 }) {
-            _ = (cyl_getActualBadgeSuperView(fromControl: control) as NSObject?)?.perform(aSelector, with: object1, with: object2)
+            _ = (cylGetActualBadgeSuperView(fromControl: control) as NSObject?)?.perform(aSelector, with: object1, with: object2)
         }
     }
 
@@ -235,7 +235,7 @@ extension UITabBarItem {
      *      液态玻璃会保留自己的角标。
      */
     @objc(cyl_moveBadgeToCurrentTabButtonIfNeeded)
-    public dynamic func cyl_moveBadgeToCurrentTabButtonIfNeeded() {
+    public dynamic func cylMoveBadgeToCurrentTabButtonIfNeeded() {
         guard CYLTabBarItemBadgeSupport.isCoreAvailable,
               let oldButton = objc_getAssociatedObject(self, CYLTabBarItemBadgeSupport.lastBadgeButton) as? UIControl,
               let currentButton = cyl_tabButton, oldButton !== currentButton, !CYLUtils.isLiquidGlassActive(),
@@ -275,7 +275,7 @@ extension UITabBarItem {
             return (cyl_tabButton as UIView?)?.cyl_isReady() ?? false
         }
         let imageView: UIView? = CYLTabBarItemBadgeSupport.object(self, "cyl_imageView")
-        let tabLabel: UIView? = CYLTabBarItemBadgeSupport.object(cyl_view(), "cyl_tabLabel")
+        let tabLabel: UIView? = CYLTabBarItemBadgeSupport.object(cylView(), "cyl_tabLabel")
         return (imageView?.frame.size.width ?? 0) > 10 || (tabLabel?.frame.size.width ?? 0) > 10
     }
 

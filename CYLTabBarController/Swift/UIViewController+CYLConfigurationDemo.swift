@@ -47,7 +47,7 @@ enum CYLConfigurationDemo {
      * [EN] The title of a tab, from its configuration, or its page ID. [CN] Tab 的标题（来自其配置），否则为页面 ID。
      */
     static func title(_ pageIdentifier: String, _ tabAttributes: [String: Any]) -> String {
-        (tabAttributes[CYLTabBarItemTitle] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? pageIdentifier
+        (tabAttributes[cylTabBarItemTitle] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? pageIdentifier
     }
 
     /**
@@ -83,7 +83,7 @@ enum CYLConfigurationDemo {
             page(title(pageIdentifier, tabAttributes), "page ID: \(pageIdentifier)")
         }, forPageIdentifiers: ["home", "message", "discover", "me", "tab", "publish"])
         registry.register({ pageIdentifier, tabAttributes in
-            let url = (tabAttributes[CYLTabBarItemPageParameters] as? [String: Any])?["url"] as? String ?? "(no url)"
+            let url = (tabAttributes[cylTabBarItemPageParameters] as? [String: Any])?["url"] as? String ?? "(no url)"
             return page(title(pageIdentifier, tabAttributes), "page ID: \(pageIdentifier)\nCYLTabBarItemPageParameters.url:\n\(url)")
         }, forPageIdentifier: "web")
     }()
@@ -151,7 +151,7 @@ extension UIViewController {
      * [CN] App 的示例配置文件（Example-Shared/Configurations，以 "Configurations" 打包），已排序；只含配置文件，不含 .proto 结构定义。
      */
     @objc(cyl_sampleConfigurationFilePaths)
-    public class func cyl_sampleConfigurationFilePaths() -> [String] {
+    public class func cylSampleConfigurationFilePaths() -> [String] {
         guard let directory = CYLResourceRoute.path(forRoute: "bundle:Configurations", baseDirectory: nil) else { return [] }
         let extensions = CYLTabBarConfigurationParser.supportedPathExtensions()
         return ((try? FileManager.default.contentsOfDirectory(atPath: directory)) ?? []).sorted().filter {
@@ -163,7 +163,7 @@ extension UIViewController {
      * [EN] The cell that opens the configuration demo. [CN] 打开配置文件演示的 cell。
      */
     @objc(cyl_configurationDemoCellForTableView:)
-    public func cyl_configurationDemoCell(for tableView: UITableView) -> UITableViewCell {
+    public func cylConfigurationDemoCell(for tableView: UITableView) -> UITableViewCell {
         let identifier = "CYLConfigurationDemoCell"
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? {
             let cell = UITableViewCell(style: .subtitle, reuseIdentifier: identifier)
@@ -174,8 +174,8 @@ extension UIViewController {
             cell.imageView?.image = UIImage(systemName: "doc.text")
             return cell
         }()
-        cell.textLabel?.text = CYLLocalizedString("从配置文件创建 TabBarController")
-        cell.detailTextLabel?.text = CYLLocalizedString("一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。")
+        cell.textLabel?.text = cylLocalizedString("从配置文件创建 TabBarController")
+        cell.detailTextLabel?.text = cylLocalizedString("一个文件生成整个 TabBar：可选 JSON、YAML、TOML、plist、XML、INI 等格式，或从网络 URL 加载。")
         return cell
     }
 
@@ -185,17 +185,17 @@ extension UIViewController {
      * [CN] 选择来源的操作表：每个示例文件、资源路由、沙盒路由、清单（内置、下载、资源错误的下载）与网络 URL。
      */
     @objc(cyl_presentConfigurationDemo)
-    public func cyl_presentConfigurationDemo() {
+    public func cylPresentConfigurationDemo() {
         CYLConfigurationDemo.registerPages
-        let sheet = UIAlertController(title: CYLLocalizedString("选择配置文件"), message: nil, preferredStyle: .actionSheet)
+        let sheet = UIAlertController(title: cylLocalizedString("选择配置文件"), message: nil, preferredStyle: .actionSheet)
         func add(_ title: String, _ handler: @escaping () -> Void) {
             sheet.addAction(UIAlertAction(title: title, style: .default) { _ in handler() })
         }
-        for path in UIViewController.cyl_sampleConfigurationFilePaths() {
+        for path in UIViewController.cylSampleConfigurationFilePaths() {
             let name = (path as NSString).lastPathComponent
             add(name) { [weak self] in
                 var error: NSError?
-                let tabBarController = Self.cyl_tabBarController { try CYLTabBarController(configurationFile: path) } error: { error = $0 }
+                let tabBarController = Self.cylTabBarController { try CYLTabBarController(configurationFile: path) } error: { error = $0 }
                 let configuration = try? CYLTabBarController.configuration(withContentsOfFile: path)
                 self?.cylPresentConfigurationDemoTabBarController(tabBarController, source: name,
                                                                     sourceText: CYLConfigurationDemo.sourceText(path, configuration), error: error)
@@ -206,7 +206,7 @@ extension UIViewController {
         if let routedPath = CYLResourceRoute.path(forRoute: route, baseDirectory: nil) {
             add(CYLConfigurationDemo.untranslated(route)) { [weak self] in
                 var error: NSError?
-                let tabBarController = Self.cyl_tabBarController { try CYLTabBarController(configurationRoute: route) } error: { error = $0 }
+                let tabBarController = Self.cylTabBarController { try CYLTabBarController(configurationRoute: route) } error: { error = $0 }
                 let configuration = try? CYLTabBarController.configuration(withRoute: route)
                 self?.cylPresentConfigurationDemoTabBarController(tabBarController, source: "\(route)\n→ \((routedPath as NSString).lastPathComponent)",
                                                                     sourceText: CYLConfigurationDemo.sourceText(routedPath, configuration), error: error)
@@ -217,7 +217,7 @@ extension UIViewController {
             add(CYLConfigurationDemo.untranslated(sandboxRoute)) { [weak self] in
                 CYLConfigurationDemo.copySamplesIntoSandbox((routedPath as NSString).deletingLastPathComponent)
                 var error: NSError?
-                let tabBarController = Self.cyl_tabBarController { try CYLTabBarController(configurationRoute: sandboxRoute) } error: { error = $0 }
+                let tabBarController = Self.cylTabBarController { try CYLTabBarController(configurationRoute: sandboxRoute) } error: { error = $0 }
                 let path = CYLResourceRoute.path(forRoute: sandboxRoute, baseDirectory: nil)
                 let configuration = path.flatMap { try? CYLTabBarController.configuration(withContentsOfFile: $0) }
                 self?.cylPresentConfigurationDemoTabBarController(
@@ -226,7 +226,7 @@ extension UIViewController {
             }
         }
         cylAddManifestActions(add)
-        add(CYLLocalizedString("从网络 URL 加载")) { [weak self] in
+        add(cylLocalizedString("从网络 URL 加载")) { [weak self] in
             guard let url = URL(string: CYLConfigurationDemo.sampleURLString) else { return }
             CYLTabBarController.loadConfiguration(with: url) { configuration, error in
                 var tabBarController: CYLTabBarController?
@@ -241,7 +241,7 @@ extension UIViewController {
                                                                     error: error as NSError?)
             }
         }
-        sheet.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
+        sheet.addAction(UIAlertAction(title: cylLocalizedString("取消"), style: .cancel))
         // [EN] iPad: an action sheet needs an anchor. [CN] iPad 上的操作表需要锚点。
         sheet.popoverPresentationController?.sourceView = view
         sheet.popoverPresentationController?.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 1, height: 1)
@@ -328,7 +328,7 @@ extension UIViewController {
         return page
     }
 
-    static func cyl_tabBarController(_ make: () throws -> CYLTabBarController, error report: (NSError) -> Void) -> CYLTabBarController? {
+    static func cylTabBarController(_ make: () throws -> CYLTabBarController, error report: (NSError) -> Void) -> CYLTabBarController? {
         do {
             return try make()
         } catch let error as NSError {
@@ -344,9 +344,9 @@ extension UIViewController {
     func cylPresentConfigurationDemoTabBarController(_ tabBarController: CYLTabBarController?, source: String, sourceText: String,
                                                       error: NSError?) {
         guard let tabBarController else {
-            let alert = UIAlertController(title: CYLLocalizedString("无法创建 TabBarController"), message: error?.localizedDescription,
+            let alert = UIAlertController(title: cylLocalizedString("无法创建 TabBarController"), message: error?.localizedDescription,
                                           preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: CYLLocalizedString("关闭"), style: .cancel))
+            alert.addAction(UIAlertAction(title: cylLocalizedString("关闭"), style: .cancel))
             present(alert, animated: true)
             return
         }
@@ -363,12 +363,12 @@ extension UIViewController {
         page.view.backgroundColor = .systemBackground
         // [EN] The bar button item keeps its target weak, so the tab bar controller is not retained.
         // [CN] UIBarButtonItem 弱引用 target，不会造成循环引用。
-        page.navigationItem.leftBarButtonItem = UIBarButtonItem(title: CYLLocalizedString("关闭"), style: .plain, target: tabBarController,
+        page.navigationItem.leftBarButtonItem = UIBarButtonItem(title: cylLocalizedString("关闭"), style: .plain, target: tabBarController,
                                                                 action: #selector(UIViewController.cylDismissConfigurationDemo))
         let header = UILabel()
         header.numberOfLines = 0
         header.font = .boldSystemFont(ofSize: 15)
-        header.text = String(format: CYLLocalizedString("本页由配置文件 %@ 创建："), source)
+        header.text = String(format: cylLocalizedString("本页由配置文件 %@ 创建："), source)
         let textView = UITextView()
         textView.isEditable = false
         textView.text = sourceText
@@ -438,8 +438,8 @@ enum CYLConfigurationEdgeCases {
     static let tabsJSON = #"[{"CYLTabBarItemTitle": "Home", "CYLTabBarItemImage": "system:house", "CYLTabBarItemIdentifier": "home"}, {"CYLTabBarItemTitle": "Me", "CYLTabBarItemImage": "system:person", "CYLTabBarItemIdentifier": "me"}]"#
 
     static let twoTabs: [[String: Any]] = [
-        [CYLTabBarItemTitle: "Home", CYLTabBarItemImage: "system:house", CYLTabBarItemIdentifier: "home"],
-        [CYLTabBarItemTitle: "Me", CYLTabBarItemImage: "system:person", CYLTabBarItemIdentifier: "me"],
+        [cylTabBarItemTitle: "Home", cylTabBarItemImage: "system:house", cylTabBarItemIdentifier: "home"],
+        [cylTabBarItemTitle: "Me", cylTabBarItemImage: "system:person", cylTabBarItemIdentifier: "me"],
     ]
 
     /**
@@ -551,15 +551,15 @@ extension UIViewController {
      * [EN] The title of the simulated failures section. [CN] 模拟意外情况分组的标题。
      */
     @objc(cyl_configurationEdgeCaseSectionTitle)
-    public class func cyl_configurationEdgeCaseSectionTitle() -> String {
-        CYLLocalizedString("配置文件：模拟意外情况")
+    public class func cylConfigurationEdgeCaseSectionTitle() -> String {
+        cylLocalizedString("配置文件：模拟意外情况")
     }
 
     /**
      * [EN] The number of simulated failures. [CN] 模拟意外情况的数量。
      */
     @objc(cyl_configurationEdgeCaseRowCount)
-    public func cyl_configurationEdgeCaseRowCount() -> Int {
+    public func cylConfigurationEdgeCaseRowCount() -> Int {
         CYLConfigurationEdgeCases.all.count
     }
 
@@ -576,7 +576,7 @@ extension UIViewController {
      * [EN] The cell of case `row`: its ID and title, and its last result. [CN] 第 `row` 个情况的 cell：编号与标题，以及最近一次结果。
      */
     @objc(cyl_configurationEdgeCaseCellForTableView:row:)
-    public func cyl_configurationEdgeCaseCell(for tableView: UITableView, row: Int) -> UITableViewCell {
+    public func cylConfigurationEdgeCaseCell(for tableView: UITableView, row: Int) -> UITableViewCell {
         objc_setAssociatedObject(self, CYLConfigurationEdgeCases.tableViewKey, CYLWeakTableView(tableView), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         let identifier = "CYLConfigurationEdgeCaseCell"
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? {
@@ -599,7 +599,7 @@ extension UIViewController {
      * [CN] 执行第 `row` 个情况，并在该行与弹窗中显示结果（“查看”打开创建的控制器）。
      */
     @objc(cyl_runConfigurationEdgeCaseAtRow:)
-    public func cyl_runConfigurationEdgeCase(atRow row: Int) {
+    public func cylRunConfigurationEdgeCase(atRow row: Int) {
         CYLConfigurationDemo.registerPages
         let cases = CYLConfigurationEdgeCases.all
         guard cases.indices.contains(row) else { return }
@@ -610,7 +610,7 @@ extension UIViewController {
         let fromFile: (String, Data) -> Void = { name, data in
             let path = CYLConfigurationEdgeCases.file(name, data)
             var error: NSError?
-            let tabBarController = UIViewController.cyl_tabBarController { try CYLTabBarController(configurationFile: path) } error: { error = $0 }
+            let tabBarController = UIViewController.cylTabBarController { try CYLTabBarController(configurationFile: path) } error: { error = $0 }
             let text = String(data: data, encoding: .utf8)
             let shown = text.map { $0.count > 2000 ? String($0.prefix(2000)) + "…" : $0 } ?? "(binary)"
             finish(tabBarController, error, shown)
@@ -657,16 +657,16 @@ extension UIViewController {
             fromFile("gif.json", CYLConfigurationEdgeCases.data(gifJSON))
         case "Two tab bars, one page ID":
             cylPresentTwoTabBarsDemo()
-            cyl_configurationEdgeCaseResults[row] = CYLLocalizedString("两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。")
+            cyl_configurationEdgeCaseResults[row] = cylLocalizedString("两个 TabBar 使用同一份配置，各自的注册表把相同的页面 ID 对应到不同页面。")
         case "Missing file":
             var error: NSError?
-            let tabBarController = UIViewController.cyl_tabBarController { try CYLTabBarController(configurationFile: "no_such_configuration.yaml") } error: { error = $0 }
+            let tabBarController = UIViewController.cylTabBarController { try CYLTabBarController(configurationFile: "no_such_configuration.yaml") } error: { error = $0 }
             finish(tabBarController, error, "no_such_configuration.yaml")
         case "Created on a background thread":
             let path = CYLConfigurationEdgeCases.file("background.json", CYLConfigurationEdgeCases.data(json))
             DispatchQueue.global(qos: .utility).async {
                 var error: NSError?
-                let tabBarController = UIViewController.cyl_tabBarController { try CYLTabBarController(configurationFile: path) } error: { error = $0 }
+                let tabBarController = UIViewController.cylTabBarController { try CYLTabBarController(configurationFile: path) } error: { error = $0 }
                 DispatchQueue.main.async { finish(tabBarController, error, json) }
             }
         case "Localized texts (tables in the sandbox)":
@@ -689,9 +689,9 @@ extension UIViewController {
                 return nil
             }, forPageIdentifier: "raises")
             finish(CYLTabBarController(configuration: [
-                CYLTabBarControllerPageRegistry: registry,
-                CYLTabBarControllerTabBarItemsAttributes: [[CYLTabBarItemTitle: "Raises", CYLTabBarItemPageIdentifier: "raises"],
-                                                           [CYLTabBarItemTitle: "Home", CYLTabBarItemIdentifier: "home"]],
+                cylTabBarControllerPageRegistry: registry,
+                cylTabBarControllerTabBarItemsAttributes: [[cylTabBarItemTitle: "Raises", cylTabBarItemPageIdentifier: "raises"],
+                                                           [cylTabBarItemTitle: "Home", cylTabBarItemIdentifier: "home"]],
             ]), nil, "provider of \"raises\": [NSException raise:...]")
         case "Pages that cannot be tabs (code)":
             // [EN] C13: nil, a string, a tab bar controller, a page inside another navigation controller and one page for two
@@ -707,20 +707,20 @@ extension UIViewController {
             ]
             let resolver: CYLTabBarPageProvider = { pageIdentifier, _ in pages[pageIdentifier]?() ?? nil }
             let attributes = ["nil", "string", "tabBar", "owned", "sharedA", "sharedB", "home"].map {
-                [CYLTabBarItemTitle: $0, CYLTabBarItemPageIdentifier: $0]
+                [cylTabBarItemTitle: $0, cylTabBarItemPageIdentifier: $0]
             }
-            finish(CYLTabBarController(configuration: [CYLTabBarControllerPageResolver: resolver, CYLTabBarControllerTabBarItemsAttributes: attributes]),
+            finish(CYLTabBarController(configuration: [cylTabBarControllerPageResolver: resolver, cylTabBarControllerTabBarItemsAttributes: attributes]),
                    nil, "CYLTabBarControllerPageResolver: nil, a string, a UITabBarController, a page inside a UINavigationController, one page for two tabs")
         case "Reload with new tabs (code)":
             // [EN] B27: `-reloadTabBarItemsWithAttributes:` creates the page of "message", reuses the page of "home" (same
             //      object, state kept) and skips "no_such_page".
             // [CN] B27：`-reloadTabBarItemsWithAttributes:` 创建 "message" 的页面、复用 "home" 的页面（同一对象，状态保留）、跳过 "no_such_page"。
-            let tabBarController = CYLTabBarController(configuration: [CYLTabBarControllerTabBarItemsAttributes: twoTabs])
+            let tabBarController = CYLTabBarController(configuration: [cylTabBarControllerTabBarItemsAttributes: twoTabs])
             let home = tabBarController.viewControllers?.first
             tabBarController.reloadTabBarItems(withAttributes: [
-                [CYLTabBarItemTitle: "Message", CYLTabBarItemImage: "system:message", CYLTabBarItemIdentifier: "message"],
-                [CYLTabBarItemTitle: "Home", CYLTabBarItemImage: "system:house", CYLTabBarItemIdentifier: "home"],
-                [CYLTabBarItemTitle: "Unknown", CYLTabBarItemPageIdentifier: "no_such_page"],
+                [cylTabBarItemTitle: "Message", cylTabBarItemImage: "system:message", cylTabBarItemIdentifier: "message"],
+                [cylTabBarItemTitle: "Home", cylTabBarItemImage: "system:house", cylTabBarItemIdentifier: "home"],
+                [cylTabBarItemTitle: "Unknown", cylTabBarItemPageIdentifier: "no_such_page"],
             ])
             let viewControllers = tabBarController.viewControllers ?? []
             let reused = viewControllers.count > 1 && viewControllers[1] === home
@@ -742,26 +742,26 @@ extension UIViewController {
                 return nil
             }, forPageIdentifiers: ["later", "never"])
             finish(CYLTabBarController(configuration: [
-                CYLTabBarControllerPageRegistry: registry,
-                CYLTabBarControllerTabBarItemsAttributes: [
-                    [CYLTabBarItemTitle: "Later", CYLTabBarItemImage: "system:clock", CYLTabBarItemPageIdentifier: "later"],
-                    [CYLTabBarItemTitle: "Home", CYLTabBarItemImage: "system:house", CYLTabBarItemIdentifier: "home"],
-                    [CYLTabBarItemTitle: "Never", CYLTabBarItemImage: "system:xmark", CYLTabBarItemPageIdentifier: "never"],
+                cylTabBarControllerPageRegistry: registry,
+                cylTabBarControllerTabBarItemsAttributes: [
+                    [cylTabBarItemTitle: "Later", cylTabBarItemImage: "system:clock", cylTabBarItemPageIdentifier: "later"],
+                    [cylTabBarItemTitle: "Home", cylTabBarItemImage: "system:house", cylTabBarItemIdentifier: "home"],
+                    [cylTabBarItemTitle: "Never", cylTabBarItemImage: "system:xmark", cylTabBarItemPageIdentifier: "never"],
                 ],
             ]), nil, "registerAsyncPageFactory: \"later\" -> a page after 2 s, \"never\" -> nil after 2 s (the tab is removed)")
         case "Non-controllers and duplicates (code)":
             let page = UIViewController()
             finish(CYLTabBarController(configuration: [
-                CYLTabBarControllerViewControllers: ["not a view controller", page, page],
-                CYLTabBarControllerTabBarItemsAttributes: twoTabs,
+                cylTabBarControllerViewControllers: ["not a view controller", page, page],
+                cylTabBarControllerTabBarItemsAttributes: twoTabs,
             ]), nil, #"CYLTabBarControllerViewControllers : @[ @"not a view controller", page, page ]"#)
         case "Configuration is not a dictionary (code)":
             // [EN] An array where a dictionary is expected, as Objective-C code could pass it. [CN] 在需要字典的位置传入数组，与 Objective-C 代码可能的写法相同。
             let make = CYLTabBarController.perform(NSSelectorFromString("tabBarControllerWithConfiguration:"), with: [1, 2] as NSArray)
             finish(make?.takeUnretainedValue() as? CYLTabBarController, nil, "[CYLTabBarController tabBarControllerWithConfiguration:@[ @1, @2 ]]")
         case "Empty view controller list (code)":
-            finish(CYLTabBarController(configuration: [CYLTabBarControllerViewControllers: [UIViewController](),
-                                                       CYLTabBarControllerTabBarItemsAttributes: twoTabs]),
+            finish(CYLTabBarController(configuration: [cylTabBarControllerViewControllers: [UIViewController](),
+                                                       cylTabBarControllerTabBarItemsAttributes: twoTabs]),
                    nil, "CYLTabBarControllerViewControllers : @[]")
         default:
             break
@@ -794,7 +794,7 @@ extension UIViewController {
         let path = (folder as NSString).appendingPathComponent("localized.json")
         try? CYLConfigurationEdgeCases.data(text).write(to: URL(fileURLWithPath: path), options: .atomic)
         var error: NSError?
-        let tabBarController = UIViewController.cyl_tabBarController { try CYLTabBarController(configurationFile: path) } error: { error = $0 }
+        let tabBarController = UIViewController.cylTabBarController { try CYLTabBarController(configurationFile: path) } error: { error = $0 }
         finish(tabBarController, error, text)
     }
 
@@ -802,7 +802,7 @@ extension UIViewController {
                                                   source: String) {
         var result: String
         if let tabBarController {
-            result = "✅ " + String(format: CYLLocalizedString("已安全创建 TabBarController：%@ 个 Tab"),
+            result = "✅ " + String(format: cylLocalizedString("已安全创建 TabBarController：%@ 个 Tab"),
                                    NSNumber(value: tabBarController.viewControllers?.count ?? 0))
         } else {
             result = "❌ \(error?.localizedDescription ?? "") (\(error?.code ?? 0))"
@@ -810,7 +810,7 @@ extension UIViewController {
         if let skipped = tabBarController?.cyl_skippedTabs, !skipped.isEmpty {
             // [EN] The tabs that got no page, with the reason (docs/Tab-Page-Registry.md). [CN] 没有页面的 Tab 及原因（docs/Tab-Page-Registry.md）。
             let names = skipped.map { "\($0.title ?? $0.pageIdentifier ?? "?") (\(CYLConfigurationEdgeCases.name(of: $0.reason)))" }
-            result += "\n" + String(format: CYLLocalizedString("跳过 %1$@ 个 Tab：%2$@"), NSNumber(value: names.count), names.joined(separator: ", "))
+            result += "\n" + String(format: cylLocalizedString("跳过 %1$@ 个 Tab：%2$@"), NSNumber(value: names.count), names.joined(separator: ", "))
         }
         cyl_configurationEdgeCaseResults[row] = result
         if let tableView = (objc_getAssociatedObject(self, CYLConfigurationEdgeCases.tableViewKey) as? CYLWeakTableView)?.tableView,
@@ -819,9 +819,9 @@ extension UIViewController {
         }
         guard view.window != nil, presentedViewController == nil else { return }
         let alert = UIAlertController(title: title, message: result, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: CYLLocalizedString("关闭"), style: .cancel))
+        alert.addAction(UIAlertAction(title: cylLocalizedString("关闭"), style: .cancel))
         if let tabBarController, (tabBarController.viewControllers?.count ?? 0) > 0 {
-            alert.addAction(UIAlertAction(title: CYLLocalizedString("查看"), style: .default) { [weak self] _ in
+            alert.addAction(UIAlertAction(title: cylLocalizedString("查看"), style: .default) { [weak self] _ in
                 self?.cylPresentConfigurationDemoTabBarController(tabBarController, source: title, sourceText: source, error: nil)
             })
         }
@@ -853,9 +853,9 @@ extension UIViewController {
                 return page
             }, forPageIdentifiers: ["home", "me"])
             let tabBarController = CYLTabBarController(configuration: [
-                CYLTabBarControllerTabBarItemsAttributes: CYLConfigurationEdgeCases.twoTabs,
-                CYLTabBarControllerPageRegistry: registry,
-                CYLTabBarControllerContext: name,
+                cylTabBarControllerTabBarItemsAttributes: CYLConfigurationEdgeCases.twoTabs,
+                cylTabBarControllerPageRegistry: registry,
+                cylTabBarControllerContext: name,
             ])
             container.addChild(tabBarController)
             tabBarController.view.translatesAutoresizingMaskIntoConstraints = false
@@ -875,8 +875,8 @@ extension UIViewController {
             views[1].bottomAnchor.constraint(equalTo: container.view.bottomAnchor),
         ])
         let navigationController = UINavigationController(rootViewController: container)
-        container.navigationItem.title = CYLLocalizedString("两个 TabBar，同一个页面 ID")
-        container.navigationItem.leftBarButtonItem = UIBarButtonItem(title: CYLLocalizedString("关闭"), style: .plain, target: navigationController,
+        container.navigationItem.title = cylLocalizedString("两个 TabBar，同一个页面 ID")
+        container.navigationItem.leftBarButtonItem = UIBarButtonItem(title: cylLocalizedString("关闭"), style: .plain, target: navigationController,
                                                                      action: #selector(UIViewController.cylDismissConfigurationDemo))
         navigationController.modalPresentationStyle = .fullScreen
         present(navigationController, animated: true)

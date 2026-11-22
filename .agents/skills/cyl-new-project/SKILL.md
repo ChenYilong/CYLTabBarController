@@ -59,7 +59,7 @@ func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene
     guard let windowScene = scene as? UIWindowScene else { return }
     let window = UIWindow(windowScene: windowScene)
     // The provider rebuilds the root after an in-app language change.
-    window.cyl_setRootViewControllerProvider {
+    window.cylSetRootViewControllerProvider {
         CYLTabBarController(viewControllers: makeViewControllers(), tabBarItemsAttributes: makeAttributes())
     }
     window.makeKeyAndVisible()

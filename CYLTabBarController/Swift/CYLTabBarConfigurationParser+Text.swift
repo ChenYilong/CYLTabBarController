@@ -22,12 +22,12 @@ enum CYLConfigurationText {
      * [EN] `CYLTabBarConfigurationMaximumDepth` as an `Int`, for the depth checks.
      * [CN] 以 `Int` 表示的 `CYLTabBarConfigurationMaximumDepth`，用于嵌套检查。
      */
-    static let maximumDepth = Int(CYLTabBarConfigurationMaximumDepth)
+    static let maximumDepth = Int(cylTabBarConfigurationMaximumDepth)
 
     // MARK: - Errors
 
     static func error(_ code: CYLTabBarConfigurationErrorCode, _ description: String) -> NSError {
-        NSError(domain: CYLTabBarConfigurationErrorDomain, code: code.rawValue,
+        NSError(domain: cylTabBarConfigurationErrorDomain, code: code.rawValue,
                 userInfo: [NSLocalizedDescriptionKey: description])
     }
 

@@ -42,6 +42,6 @@ extension CYLTabBarController {
     //      非可选的返回值曾使 Objective-C 示例启动即崩溃（第 104 步引入，第 109 步修复）。
     @objc(rootWindow)
     open func rootWindow() -> UIWindow! {
-        CYLGetRootWindow()
+        cylGetRootWindow()
     }
 }

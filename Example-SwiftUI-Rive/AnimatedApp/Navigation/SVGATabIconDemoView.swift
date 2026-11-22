@@ -144,13 +144,13 @@ final class SVGATabIconDemoView: UIView {
             self.savedRiveURL = nil
         } else {
             let attributes = tabBarController.tabBarItemAttributes(at: UInt(index))
-            savedRiveURL = (attributes?[CYLTabBarAnimationURL] ?? attributes?[CYLTabBarRiveURL]) as? URL
+            savedRiveURL = (attributes?[cylTabBarAnimationURL] ?? attributes?[CYLTabBarRiveURL]) as? URL
             url = Bundle.main.url(forResource: "tab_profile", withExtension: "svga")
         }
         guard let url else { return }
         tabBarController.updateTabBarItem(for: viewController, attributes: [
-            CYLTabBarAnimationURL: url,
-            CYLTabBarAnimationSize: NSValue(cgSize: CGSize(width: 32, height: 32)),
+            cylTabBarAnimationURL: url,
+            cylTabBarAnimationSize: NSValue(cgSize: CGSize(width: 32, height: 32)),
         ])
     }
 }

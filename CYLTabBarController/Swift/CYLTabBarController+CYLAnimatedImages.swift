@@ -86,7 +86,7 @@ extension CYLTabBarController {
      */
     @objc(cyl_tabBarItemForTabButton:)
     func cylTabBarItem(forTabButton control: UIControl?) -> UITabBarItem? {
-        guard let control, !control.cyl_isPlusControl() else {
+        guard let control, !control.cylIsPlusControl() else {
             return nil
         }
         return (viewControllers ?? []).first { viewController in
@@ -100,7 +100,7 @@ extension CYLTabBarController {
         guard let tabBar = cyl_tabBar as? CYLTabBar else {
             return []
         }
-        return (tabBar.cyl_visibleControls() ?? []) + (tabBar.cylPlatterSelectedContentViews() ?? [])
+        return (tabBar.cylVisibleControls() ?? []) + (tabBar.cylPlatterSelectedContentViews() ?? [])
     }
 
     // MARK: - Animated images
@@ -112,7 +112,7 @@ extension CYLTabBarController {
      */
     @objc(cyl_playAnimatedImagesOfTabButton:)
     func cylPlayAnimatedImages(ofTabButton control: UIControl?) {
-        guard let control, !control.cyl_isPlusControl() else {
+        guard let control, !control.cylIsPlusControl() else {
             return
         }
         var animatedImage: UIImage?
@@ -121,7 +121,7 @@ extension CYLTabBarController {
             animatedImage = objc_getAssociatedObject(item, selected ? CYLAnimatedImageKeys.selectedImage : CYLAnimatedImageKeys.image) as? UIImage
                 ?? objc_getAssociatedObject(item, CYLAnimatedImageKeys.image) as? UIImage
         }
-        let tabImageView = control.cyl_tabImageView()
+        let tabImageView = control.cylTabImageView()
         Self.cylPlayAnimatedImage(animatedImage, on: tabImageView, loops: tabBarItemAnimationLoops)
         for iconView in Self.cylAnimatedIconViews(in: control) where !(iconView === tabImageView && animatedImage != nil) {
             iconView.stopAnimating()
@@ -139,7 +139,7 @@ extension CYLTabBarController {
     func cylApplyAnimatedImagesLoops(_ loops: Bool) {
         for control in cylAllTabButtonsForAnimatedImages() {
             var iconViews = Self.cylAnimatedIconViews(in: control)
-            if let tabImageView = control.cyl_tabImageView(), (tabImageView.animationImages?.count ?? 0) > 1,
+            if let tabImageView = control.cylTabImageView(), (tabImageView.animationImages?.count ?? 0) > 1,
                !iconViews.contains(where: { $0 === tabImageView }) {
                 iconViews.append(tabImageView)
             }

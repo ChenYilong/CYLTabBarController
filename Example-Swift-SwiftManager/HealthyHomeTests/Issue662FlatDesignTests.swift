@@ -260,7 +260,7 @@ final class Issue662FlatDesignTests: XCTestCase {
         let icon = try XCTUnwrap(UIImage(systemName: "circle"))
         let pages = (0..<6).map { _ in UINavigationController(rootViewController: Page()) }
         let attributes: [[String: Any]] = (0..<6).map { index in
-            [CYLTabBarItemTitle: "Tab \(index)", CYLTabBarItemImage: icon, CYLTabBarItemSelectedImage: icon]
+            [cylTabBarItemTitle: "Tab \(index)", cylTabBarItemImage: icon, cylTabBarItemSelectedImage: icon]
         }
         let controller = CYLTabBarController(viewControllers: pages, tabBarItemsAttributes: attributes,
                                              styleType: .flatDesign, context: "Issue662More-\(UUID().uuidString)")
@@ -632,7 +632,7 @@ private final class Fixture {
         }
         let icon = try XCTUnwrap(UIImage(systemName: "circle"))
         let attributes: [[String: Any]] = ["First", "Second"].map {
-            [CYLTabBarItemTitle: $0, CYLTabBarItemImage: icon, CYLTabBarItemSelectedImage: icon]
+            [cylTabBarItemTitle: $0, cylTabBarItemImage: icon, cylTabBarItemSelectedImage: icon]
         }
         // A separate context prevents the host app's globally registered plus button
         // from turning this two-tab fixture into a three-tab fixture.

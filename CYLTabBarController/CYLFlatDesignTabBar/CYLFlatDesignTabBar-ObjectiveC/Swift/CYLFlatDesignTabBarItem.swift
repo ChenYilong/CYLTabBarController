@@ -15,7 +15,7 @@ import UIKit
  [CN] `CYLFlatDesignTabBarItem` 显示的值每次变化时发送，object 为该 item。自第 118 步起为 Swift（原为 CYLFlatDesignTabBar.m 的唯一内容）；
       Objective-C 通过 CYLFlatDesignTabBarItem.h 中的宏读取同一字符串。
  */
-public let CYLFlatDesignTabBarItemDidChange = "CYLFlatDesignTabBarItemDidChange"
+public let cylFlatDesignTabBarItemDidChange = "CYLFlatDesignTabBarItemDidChange"
 
 // [EN] The item of a FlatDesign tab, translated from Objective-C together with its button (docs/Swift-Migration.md,
 //      step 49): each interface names the other. Objective-C names, selectors and Swift names are kept;
@@ -362,7 +362,7 @@ open class CYLFlatDesignTabBarItem: NSObject {
     // MARK: - [EN] Change notification [CN] 变化通知
 
     private func postDidChange() {
-        NotificationCenter.default.post(name: NSNotification.Name(CYLFlatDesignTabBarItemDidChange), object: self)
+        NotificationCenter.default.post(name: NSNotification.Name(cylFlatDesignTabBarItemDidChange), object: self)
     }
 
     /// [EN] As before: a change from nil always posts. [CN] 与以前相同：从 nil 变化时总会发送。

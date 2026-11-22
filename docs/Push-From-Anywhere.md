@@ -76,7 +76,7 @@ import CYLTabBarController
 
 let detail = DetailViewController()
 detail.hidesBottomBarWhenPushed = true
-UIViewController.cyl_currentNavigationController()?.pushViewController(detail, animated: true)
+UIViewController.cylCurrentNavigationController()?.pushViewController(detail, animated: true)
 ```
 
 | 中文 | English |

@@ -115,7 +115,7 @@ class MainTabBarController: CYLTabBarController {
     /// Tab buttons that report taps through CYLTabBarController's target-action. The plus button and the plus child
     /// view controller's button report through the plus button instead, so they are left out.
     private func issue610TabControls() -> [UIControl] {
-        return tabBar.cyl_visibleControls()?.filter { !$0.cyl_isPlusControl() } ?? []
+        return tabBar.cylVisibleControls()?.filter { !$0.cylIsPlusControl() } ?? []
     }
 
     /// "1" / "0" per control: does it carry CYLTabBarController's tap action right now?
@@ -141,7 +141,7 @@ class MainTabBarController: CYLTabBarController {
         let icons = Self.issue610IconSets[issue610IconSetIndex]
         // `tabBar.items` also holds the plus button's item; skip it.
         let items = (viewControllers ?? [])
-            .filter { !$0.cyl_isPlaceholder && $0 !== CYLPlusChildViewController }
+            .filter { !$0.cyl_isPlaceholder && $0 !== cylPlusChildViewController }
             .map { $0.tabBarItem! }
         for (index, item) in items.enumerated() where index < icons.count {
             item.image = UIImage(named: icons[index].normal)
@@ -165,7 +165,7 @@ class MainTabBarController: CYLTabBarController {
         let identifier = control.cyl_tabBarItemIdentifier
         NSLog("[#408] tapped \"%@\" (selected \"%@\")", identifier ?? "nil", cyl_selectedTabBarItemIdentifier ?? "nil")
         for eachIdentifier in cyl_tabBarItemIdentifiers {
-            let isPlusButton = cyl_control(withTabBarItemIdentifier: eachIdentifier)?.cyl_isPlusButton() ?? false
+            let isPlusButton = cyl_control(withTabBarItemIdentifier: eachIdentifier)?.cylIsPlusButton() ?? false
             NSLog("   \"%@\": index %lu, %@", eachIdentifier, cyl_index(ofTabBarItemIdentifier: eachIdentifier), isPlusButton ? "plus button" : "tab button")
         }
         switch identifier {

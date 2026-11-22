@@ -44,10 +44,10 @@ final class CYLFlatDesignDelegateTests: XCTestCase {
         XCTAssertTrue(CYLTabBarController.conforms(to: delegateProtocol), "CYLTabBarController adopts CYLFlatDesignTabBarDelegate")
 
         let context = UUID().uuidString
-        CYLPlusButton.cyl_register(attributes: [CYLTabBarItemTitle: "Post", CYLTabBarItemImage: icon()], action: nil, context: context)
+        CYLPlusButton.cyl_register(attributes: [cylTabBarItemTitle: "Post", cylTabBarItemImage: icon()], action: nil, context: context)
         let attributes: [[AnyHashable: Any]] = [
-            [CYLTabBarItemTitle: "A", CYLTabBarItemImage: icon()],
-            [CYLTabBarItemTitle: "B", CYLTabBarItemImage: icon()],
+            [cylTabBarItemTitle: "A", cylTabBarItemImage: icon()],
+            [cylTabBarItemTitle: "B", cylTabBarItemImage: icon()],
         ]
         let controller = CYLTabBarController(viewControllers: [UIViewController(), UIViewController()],
                                              tabBarItemsAttributes: attributes, styleType: .flatDesign, context: context)

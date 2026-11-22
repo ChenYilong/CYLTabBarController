@@ -81,12 +81,12 @@ enum Gallery {
         return (0..<count).map { index in
             let tab = tabs[index]
             var item: [String: Any] = [
-                CYLTabBarItemImage: symbol(tab.symbol, filled: false, pointSize: pointSize),
-                CYLTabBarItemSelectedImage: symbol(tab.symbol, filled: true, pointSize: pointSize),
-                CYLTabBarItemIdentifier: tab.identifier,
+                cylTabBarItemImage: symbol(tab.symbol, filled: false, pointSize: pointSize),
+                cylTabBarItemSelectedImage: symbol(tab.symbol, filled: true, pointSize: pointSize),
+                cylTabBarItemIdentifier: tab.identifier,
             ]
             if showsTitles {
-                item[CYLTabBarItemTitle] = tab.title
+                item[cylTabBarItemTitle] = tab.title
             }
             extra?(index).forEach { item[$0.key] = $0.value }
             return item
@@ -168,7 +168,7 @@ enum Gallery {
         guard let viewControllers = tabBarController.viewControllers, index < viewControllers.count else {
             return nil
         }
-        return tabButton(of: viewControllers[index])?.cyl_tabImageView()
+        return tabButton(of: viewControllers[index])?.cylTabImageView()
     }
 
     // MARK: Drawing and animation

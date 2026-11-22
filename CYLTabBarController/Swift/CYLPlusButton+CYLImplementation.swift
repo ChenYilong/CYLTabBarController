@@ -169,7 +169,7 @@ private func cylPlusButtonUpdateRegisteredWidth(_ plusButton: CYLPlusButton) {
         where registration.plusButton === plusButton || registration.boundCopies.contains(plusButton) {
             registration.plusButtonWidth = plusButton.bounds.width
             if registration.context == registry.latestContext {
-                CYLPlusButtonWidth = registration.plusButtonWidth
+                cylPlusButtonWidthValue = registration.plusButtonWidth
             }
         }
     }
@@ -256,8 +256,8 @@ private func cylPlusButtonCenterOfStandIn(_ plusButton: CYLPlusButton, _ standIn
  */
 private func cylPlusButtonIsInLiquidGlassTabBar(_ plusButton: CYLPlusButton) -> Bool {
     guard CYLConstants.isLiquidGlassActive() else { return false }
-    let tabBarController = plusButton.cyl_owningTabBarController()
-        ?? CYLTabBarController.cyl_tabBarController(forContext: CYLPlusButton.cylPlusButtonTabBarContext(forOwner: plusButton))
+    let tabBarController = plusButton.cylOwningTabBarController()
+        ?? CYLTabBarController.cylTabBarController(forContext: CYLPlusButton.cylPlusButtonTabBarContext(forOwner: plusButton))
     guard let tabBarController else { return false }
     return tabBarController.tabBarStyleType != .flatDesign
 }
@@ -412,7 +412,7 @@ extension CYLPlusButton {
         if let title, !title.isEmpty {
             return title
         }
-        return CYLLocalizedString("加号按钮")
+        return cylLocalizedString("加号按钮")
     }
 
     @objc(cyl_plusButtonSetAccessibilityLabel:)
@@ -482,9 +482,9 @@ extension CYLPlusButton {
         }
         titleLabel?.textAlignment = .center
         titleLabel?.font = UIFont.systemFont(ofSize: 10)
-        setTitle(CYLLocalizedString(title ?? ""), for: .normal)
+        setTitle(cylLocalizedString(title ?? ""), for: .normal)
         setTitleColor(.gray, for: .normal)
-        setTitle(CYLLocalizedString(selectedTitle ?? title ?? ""), for: .selected)
+        setTitle(cylLocalizedString(selectedTitle ?? title ?? ""), for: .selected)
         setTitleColor(selectedTitleColor ?? .blue, for: .selected)
         cylPlusButtonStorage.isMadeWithImageAndTitle = true
         sizeToFit()
@@ -548,7 +548,7 @@ extension CYLPlusButton {
 
     /** [EN] Liquid Glass with a plus child view controller. [CN] 液态玻璃且有 PlusButton 子控制器。 */
     private func cylStandInShowsNormalImageOnly() -> Bool {
-        cylPlusButtonIsInLiquidGlassTabBar(self) && CYLPlusButton.cylPlusChildViewController(forOwner: self) != nil
+        cylPlusButtonIsInLiquidGlassTabBar(self) && CYLPlusButton.cylPlusChildViewControllerValue(forOwner: self) != nil
     }
 
     /**
@@ -687,7 +687,7 @@ extension CYLPlusButton {
         cylRestoreOriginalTitleFontBeforeTitleMoves()
         cylGrowToFitContentIfNeeded()
         if objc_getAssociatedObject(self, unsafeBitCast(NSSelectorFromString("cyl_badgeAnchorViewAlignedToView:"), to: UnsafeRawPointer.self)) != nil {
-            cyl_refreshBadge()
+            cylRefreshBadge()
         }
         cylShowRequestedBadgeIfNeeded()
     }
@@ -841,7 +841,7 @@ extension CYLPlusButton {
     private func cylCenterOfStandIn(forCenter center: CGPoint) -> CGPoint {
         guard superview != nil, CYLConstants.isLiquidGlassActive(), cylIsInPlatterSelectedLayer(),
               let plusButton = CYLPlusButton.cylPlusButton(forOwner: self), plusButton !== self, plusButton.superview != nil,
-              CYLPlusButton.cylPlusChildViewController(forOwner: self) != nil, plusButton.cylStandInFollowsPlusButton() else {
+              CYLPlusButton.cylPlusChildViewControllerValue(forOwner: self) != nil, plusButton.cylStandInFollowsPlusButton() else {
             return center
         }
         return cylPlusButtonCenterOfStandIn(plusButton, self)
@@ -902,10 +902,10 @@ extension CYLPlusButton {
      * [CN] PlusButton 下方 TabBarItem 的控制器：PlusButton 的子控制器，没有时为占位控制器。
      */
     private func cylViewControllerOfTabBarItem() -> UIViewController? {
-        if let plusChildViewController = CYLPlusButton.cylPlusChildViewController(forOwner: self) {
+        if let plusChildViewController = CYLPlusButton.cylPlusChildViewControllerValue(forOwner: self) {
             return plusChildViewController
         }
-        return cyl_owningTabBarController()?.viewControllers?.first { $0.cyl_isPlaceholder }
+        return cylOwningTabBarController()?.viewControllers?.first { $0.cyl_isPlaceholder }
     }
 
     private func cylLayOutForTitleInTabBarItem() {
@@ -1071,7 +1071,7 @@ extension CYLPlusButton {
         while !views.isEmpty {
             let view = views.removeFirst()
             // [EN] Not the plus button, nor anything in the selected layer. [CN] 跳过 PlusButton 及选中图层中的一切。
-            if view === self || view.cyl_isPlatterSelectedContentView() {
+            if view === self || view.cylIsPlatterSelectedContentView() {
                 continue
             }
             if let label = view as? UILabel {
@@ -1101,13 +1101,13 @@ extension CYLPlusButton {
               slotTabButton !== self else {
             return nil
         }
-        if CYLConstants.isLiquidGlassActive() && !slotTabButton.cyl_isPlatterNormalControl() {
+        if CYLConstants.isLiquidGlassActive() && !slotTabButton.cylIsPlatterNormalControl() {
             return nil
         }
         var views: [UIView] = [slotTabButton]
         while !views.isEmpty {
             let view = views.removeFirst()
-            if view === self || view.cyl_isPlatterSelectedContentView() {
+            if view === self || view.cylIsPlatterSelectedContentView() {
                 continue
             }
             if let label = view as? UILabel {
@@ -1132,12 +1132,12 @@ extension CYLPlusButton {
         guard CYLConstants.isLiquidGlassActive() else { return true }
         var ancestor = view.superview
         while let candidate = ancestor {
-            if candidate.cyl_isPlatterSelectedContentView() {
+            if candidate.cylIsPlatterSelectedContentView() {
                 return false
             }
             ancestor = candidate.superview
         }
-        return cylTabButton(ofTabBarItemTitleLabel: view)?.cyl_isPlatterNormalControl() ?? false
+        return cylTabButton(ofTabBarItemTitleLabel: view)?.cylIsPlatterNormalControl() ?? false
     }
 
     /**
@@ -1234,8 +1234,8 @@ extension CYLPlusButton {
         let standInTabButton = standIn?.cyl_insertedForTabControl ?? (standIn?.superview as? UIControl)
         // [EN] The plus button's own `selected` flag stays NO while its page is selected: ask the tab bar controller.
         // [CN] PlusButton 的页面被选中时，按钮自身的 `selected` 仍为 NO：以 TabBarController 的选中为准。
-        let plusPage = CYLPlusButton.cylPlusChildViewController(forOwner: self)
-        let selectedPage = cyl_owningTabBarController()?.selectedViewController
+        let plusPage = CYLPlusButton.cylPlusChildViewControllerValue(forOwner: self)
+        let selectedPage = cylOwningTabBarController()?.selectedViewController
         let plusPageSelected = plusPage != nil && (selectedPage === plusPage || (selectedPage != nil && selectedPage === plusPage?.navigationController))
         var masks = plusPageSelected && standIn != nil && standIn !== self && standIn?.window != nil && standIn?.window === window &&
             standIn?.isHidden == false && standInTabButton != nil && !cylIsInPlatterSelectedLayer() && cylPlusButtonIsInLiquidGlassTabBar(self)
@@ -1423,7 +1423,7 @@ extension CYLPlusButton {
     private func cylTitleColors(ofTabBarItemTitleLabels labels: [UILabel]) -> (normal: UIColor?, selected: UIColor?) {
         if CYLConstants.isLiquidGlassActive(), cylPlusButtonSystemTabBar(of: superview) != nil {
             let normalColor = cylColor(.label, resolvedFor: labels.first)
-            let selectedLabel = labels.first { cylTabButton(ofTabBarItemTitleLabel: $0)?.cyl_isPlatterSelectedControl() ?? false }
+            let selectedLabel = labels.first { cylTabButton(ofTabBarItemTitleLabel: $0)?.cylIsPlatterSelectedControl() ?? false }
             return (normalColor, selectedLabel.flatMap { cylShownTextColor(of: $0) })
         }
         let colors = NSCountedSet()
@@ -1490,7 +1490,7 @@ extension CYLPlusButton {
     private func cylIsInPlatterSelectedLayer() -> Bool {
         var view = superview
         while let candidate = view {
-            if candidate.cyl_isPlatterSelectedContentView() {
+            if candidate.cylIsPlatterSelectedContentView() {
                 return true
             }
             view = candidate.superview
@@ -1500,7 +1500,7 @@ extension CYLPlusButton {
 
     /** [EN] The tab button a tab item title belongs to. [CN] TabBarItem 标题所属的 Tab 按钮。 */
     private func cylTabButton(ofTabBarItemTitleLabel label: UIView) -> UIControl? {
-        label.superview?.cyl_nearestControl(below: nil)
+        label.superview?.cylNearestControl(below: nil)
     }
 
     /**
@@ -1514,7 +1514,7 @@ extension CYLPlusButton {
         if !(labelSuperview is UIControl), label === labelSuperview.cyl_badge {
             return false
         }
-        guard let tabButton = labelSuperview.cyl_nearestControl(below: tabBar) else { return false }
+        guard let tabButton = labelSuperview.cylNearestControl(below: tabBar) else { return false }
         return !tabButton.cyl_isPlaceholder && !CYLPlusButton.cylPlusButtonIsPlusButtonView(tabButton)
     }
 
@@ -1606,7 +1606,7 @@ extension CYLPlusButton {
                 CYLPlusButtonIndex = UInt(index)
             } else {
                 #if DEBUG
-                assertionFailure(CYLLocalizedString("[DEBUG INFO] 如果你想使用 PlusChildViewController 样式，你必须同时在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。"))
+                assertionFailure(cylLocalizedString("[DEBUG INFO] 如果你想使用 PlusChildViewController 样式，你必须同时在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。"))
                 #endif
             }
         } else {
@@ -1675,13 +1675,13 @@ extension CYLPlusButton {
             return
         }
         let context = CYLPlusButton.cylPlusButtonTabBarContext(forOwner: sender)
-        var tabBarController = sender.cyl_owningTabBarController()
+        var tabBarController = sender.cylOwningTabBarController()
         if tabBarController?.cyl_context != context {
-            tabBarController = CYLTabBarController.cyl_tabBarController(forContext: context)
+            tabBarController = CYLTabBarController.cylTabBarController(forContext: context)
         }
         // [EN] That controller's own plus child view controller. [CN] 该控制器自己的 PlusButton 子控制器。
         guard let tabBarController,
-              let plusChildViewController = CYLPlusButton.cylPlusChildViewController(forOwner: tabBarController),
+              let plusChildViewController = CYLPlusButton.cylPlusChildViewControllerValue(forOwner: tabBarController),
               let index = tabBarController.viewControllers?.firstIndex(of: plusChildViewController) else {
             return
         }
@@ -1725,8 +1725,8 @@ extension CYLPlusButton {
 
     @objc(isLayoutCentered)
     func cylIsLayoutCentered() -> Bool {
-        cylConstantOfPlusButtonCenterYOffset(forTabBarHeight: cyl_tabBarController?.tabBar.cylBoundsSize().height ?? 0) == 0 &&
-            cylMultiplierOfTabBarHeight(cyl_tabBarController?.tabBar.cylBoundsSize().height ?? 0, plusButtonHeight: frame.height) == 0.5
+        cylConstantOfPlusButtonCenterYOffset(forTabBarHeight: cylTabBarController?.tabBar.cylBoundsSize().height ?? 0) == 0 &&
+            cylMultiplierOfTabBarHeight(cylTabBarController?.tabBar.cylBoundsSize().height ?? 0, plusButtonHeight: frame.height) == 0.5
     }
 
     @objc(cyl_plusButtonMultiplierOfTabBarHeight:)
@@ -1955,18 +1955,18 @@ extension CYLPlusButton {
 
     @objc(cyl_tabButtonHighlightTouchDown)
     func cylTabButtonHighlightTouchDown() {
-        cyl_owningTabBarController()?.cylTabButtonTouchDown(self)
+        cylOwningTabBarController()?.cylTabButtonTouchDown(self)
     }
 
     @objc(cyl_tabButtonHighlightTouchUp)
     func cylTabButtonHighlightTouchUp() {
-        cyl_owningTabBarController()?.cylTabButtonTouchUp(self)
+        cylOwningTabBarController()?.cylTabButtonTouchUp(self)
     }
 
     @objc(cyl_tabBarItemGestureTouchDown)
     func cylTabBarItemGestureTouchDown() {
         let storage = cylPlusButtonStorage
-        storage.selectedViewControllerAtTouchDown = cyl_owningTabBarController()?.selectedViewController
+        storage.selectedViewControllerAtTouchDown = cylOwningTabBarController()?.selectedViewController
         storage.hasTouchDownForTabBarItemGesture = true
     }
 
@@ -1976,7 +1976,7 @@ extension CYLPlusButton {
         let selectedViewController = storage.hasTouchDownForTabBarItemGesture ? storage.selectedViewControllerAtTouchDown : nil
         storage.hasTouchDownForTabBarItemGesture = false
         storage.selectedViewControllerAtTouchDown = nil
-        cyl_owningTabBarController()?.cylRecognizePlusButtonTap(self, selectedViewControllerAtTouchDown: selectedViewController)
+        cylOwningTabBarController()?.cylRecognizePlusButtonTap(self, selectedViewControllerAtTouchDown: selectedViewController)
     }
 
     // MARK: The stand-in in the selected layer
@@ -1987,7 +1987,7 @@ extension CYLPlusButton {
         if let snapshot = storage.snapshot, let cgImage = snapshot.cgImage {
             return UIImage(cgImage: cgImage, scale: snapshot.scale, orientation: snapshot.imageOrientation)
         }
-        storage.snapshot = cyl_takeSnapshot()
+        storage.snapshot = cylTakeSnapshot()
         return storage.snapshot
     }
 
@@ -2138,13 +2138,13 @@ extension CYLPlusButton {
     func cylPlusButtonSetTabLabelHidden(_ hidden: Bool) {
         guard CYLConstants.isLiquidGlassActive(),
               let plusButton = CYLPlusButton.cylPlusButton(forOwner: self),   // the plus button of this button's own context
-              CYLPlusButton.cylPlusChildViewController(forOwner: self) != nil,
+              CYLPlusButton.cylPlusChildViewControllerValue(forOwner: self) != nil,
               !plusButton.cyl_keepShowingPlusButtonLabel,
-              let tabLabel = plusButton.cyl_tabLabel(), !(tabLabel.text ?? "").isEmpty else {
+              let tabLabel = plusButton.cylTabLabel(), !(tabLabel.text ?? "").isEmpty else {
             return
         }
-        tabLabel.cyl_setHidden(hidden)
-        plusButton.cylPlusButtonSelectedContentView()?.cyl_tabLabel()?.cyl_setHidden(!hidden)
+        tabLabel.cylSetHidden(hidden)
+        plusButton.cylPlusButtonSelectedContentView()?.cylTabLabel()?.cylSetHidden(!hidden)
     }
 
     @objc(cyl_plusButtonSelectedContentImage)
@@ -2183,7 +2183,7 @@ extension CYLPlusButton {
     }
 
     @objc(cyl_plusChildViewControllerForTabBarContext:)
-    class func cylPlusChildViewController(forTabBarContext tabBarContext: String?) -> UIViewController? {
+    class func cylPlusChildViewControllerValue(forTabBarContext tabBarContext: String?) -> UIViewController? {
         CYLPlusButtonRegistry.shared.registration(for: tabBarContext)?.plusChildViewController
     }
 
@@ -2227,7 +2227,7 @@ extension CYLPlusButton {
 
     private class func cylRegistration(ofPlusChildViewController viewController: UIViewController?) -> CYLPlusButtonRegistration? {
         guard let viewController else { return nil }
-        let inner = viewController.cyl_getViewControllerInsteadOfNavigation()
+        let inner = viewController.cylGetViewControllerInsteadOfNavigation()
         return CYLPlusButtonRegistry.shared.withLock { registrations in
             registrations.values.first { registration in
                 guard let child = registration.plusChildViewController else { return false }
@@ -2257,9 +2257,9 @@ extension CYLPlusButton {
             return context
         }
         guard let owner = owner as? NSObject else {
-            return CYLTabBarController.cyl_active()?.cyl_context ?? CYLPlusButtonRegistry.shared.latestContext
+            return CYLTabBarController.cylActive()?.cyl_context ?? CYLPlusButtonRegistry.shared.latestContext
         }
-        if let tabBarController = owner.cyl_owningTabBarController() {
+        if let tabBarController = owner.cylOwningTabBarController() {
             return tabBarController.cyl_context
         }
         // [EN] A tab bar that is not attached to its controller yet carries the context the controller copied to it.
@@ -2270,23 +2270,23 @@ extension CYLPlusButton {
         }
         // [EN] Nothing to go by: the most recently active controller, else the context registered last.
         // [CN] 无从判断：取最近活跃的控制器，否则取最后注册的 context。
-        return CYLTabBarController.cyl_active()?.cyl_context ?? CYLPlusButtonRegistry.shared.latestContext
+        return CYLTabBarController.cylActive()?.cyl_context ?? CYLPlusButtonRegistry.shared.latestContext
     }
 
     @objc(cyl_plusButtonForOwner:)
     class func cylPlusButton(forOwner owner: Any?) -> CYLPlusButton? {
-        if let tabBarController = (owner as? NSObject)?.cyl_owningTabBarController() {
+        if let tabBarController = (owner as? NSObject)?.cylOwningTabBarController() {
             return cylBinding(for: tabBarController)?.plusButton
         }
         return cylPlusButton(forTabBarContext: cylPlusButtonTabBarContext(forOwner: owner))
     }
 
     @objc(cyl_plusChildViewControllerForOwner:)
-    class func cylPlusChildViewController(forOwner owner: Any?) -> UIViewController? {
-        if let tabBarController = (owner as? NSObject)?.cyl_owningTabBarController() {
+    class func cylPlusChildViewControllerValue(forOwner owner: Any?) -> UIViewController? {
+        if let tabBarController = (owner as? NSObject)?.cylOwningTabBarController() {
             return cylBinding(for: tabBarController)?.plusChildViewController
         }
-        return cylPlusChildViewController(forTabBarContext: cylPlusButtonTabBarContext(forOwner: owner))
+        return cylPlusChildViewControllerValue(forTabBarContext: cylPlusButtonTabBarContext(forOwner: owner))
     }
 
     /**
@@ -2372,7 +2372,7 @@ extension CYLPlusButton {
         }
         if tabbarItemsCount % 2 != 0 {
             #if DEBUG
-            assertionFailure(CYLLocalizedString("[DEBUG INFO] 如果 CYLTabBarController 的子控制器个数是奇数，你必须在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。"))
+            assertionFailure(cylLocalizedString("[DEBUG INFO] 如果 CYLTabBarController 的子控制器个数是奇数，你必须在你自定义的 plusButton 中实现 `+indexOfPlusButtonInTabBar`，来指定 plusButton 的位置。"))
             #endif
             return UInt(NSNotFound)
         }
@@ -2423,13 +2423,13 @@ extension CYLPlusButton {
     @objc(cyl_configurationPlusButtonSetUpWithAttributes:)
     func cylConfigurationPlusButtonSetUp(attributes configurationAttributes: [String: Any]?) {
         var attributes = configurationAttributes ?? [:]
-        for key in [CYLTabBarItemImage, CYLTabBarItemSelectedImage] {
+        for key in [cylTabBarItemImage, cylTabBarItemSelectedImage] {
             if let image = attributes[key] {
-                attributes[key] = cylPlusButtonImageFittingSize(image, attributes[CYLPlusButtonImageSize])
+                attributes[key] = cylPlusButtonImageFittingSize(image, attributes[cylPlusButtonImageSize])
             }
         }
-        let title = attributes[CYLTabBarItemTitle] as? String ?? ""
-        if let backgroundImage = attributes[CYLPlusButtonBackgroundImage] as? UIImage {
+        let title = attributes[cylTabBarItemTitle] as? String ?? ""
+        if let backgroundImage = attributes[cylPlusButtonBackgroundImage] as? UIImage {
             // [EN] A title drawn on a background image, the button the size of the image (Example-PAG's "Menu"); the same image when
             //      highlighted, so the button does not darken on touch.
             // [CN] 画在背景图上的标题，按钮与图片同样大小（Example-PAG 的「菜单」）；高亮时使用同一图片，按下时按钮不会变暗。
@@ -2437,22 +2437,22 @@ extension CYLPlusButton {
             setBackgroundImage(backgroundImage, for: .highlighted)
             titleLabel?.textAlignment = .center
             setTitle(title, for: .normal)
-            setTitle(attributes[CYLTabBarItemSelectedTitle] as? String ?? title, for: .selected)
+            setTitle(attributes[cylTabBarItemSelectedTitle] as? String ?? title, for: .selected)
             sizeToFit()
         } else {
             cylConfigure(attributes: attributes, title: title)
         }
-        if let titleColor = attributes[CYLTabBarItemTitleColor] as? UIColor {
+        if let titleColor = attributes[cylTabBarItemTitleColor] as? UIColor {
             setTitleColor(titleColor, for: .normal)
-            setTitleColor(attributes[CYLTabBarItemSelectedTitleColor] as? UIColor ?? titleColor, for: .selected)
+            setTitleColor(attributes[cylTabBarItemSelectedTitleColor] as? UIColor ?? titleColor, for: .selected)
         }
-        if let font = attributes[CYLTabBarItemTitleFont] as? UIFont, configuration == nil {
+        if let font = attributes[cylTabBarItemTitleFont] as? UIFont, configuration == nil {
             titleLabel?.font = font
         }
-        if let size = attributes[CYLPlusButtonSize] as? NSValue {
+        if let size = attributes[cylPlusButtonSize] as? NSValue {
             bounds = CGRect(origin: .zero, size: size.cgSizeValue)
         }
-        if (attributes[CYLPlusButtonKeepsTitleVisible] as? NSNumber)?.boolValue == true {
+        if (attributes[cylPlusButtonKeepsTitleVisible] as? NSNumber)?.boolValue == true {
             cyl_keepShowingPlusButtonLabel = true
         }
         // [EN] Taps reach `configurationPlusButtonTapped` through the tab bar controller's tap report, once per tap in every style.
@@ -2466,20 +2466,20 @@ extension CYLPlusButton {
     @objc(cyl_configurationPlusButtonAlignsTitleWithAttributes:)
     class func cylConfigurationPlusButtonAlignsTitle(attributes: [String: Any]?) -> Bool {
         let attributes = attributes ?? [:]
-        if let aligns = attributes[CYLPlusButtonAlignsTitle] as? NSNumber {
+        if let aligns = attributes[cylPlusButtonAlignsTitle] as? NSNumber {
             return aligns.boolValue
         }
-        return !((attributes[CYLTabBarItemTitle] as? String) ?? "").isEmpty && attributes[CYLPlusButtonBackgroundImage] == nil
+        return !((attributes[cylTabBarItemTitle] as? String) ?? "").isEmpty && attributes[cylPlusButtonBackgroundImage] == nil
     }
 
     private func cylConfigure(attributes: [String: Any], title: String) {
         let button = self
-        let image = attributes[CYLTabBarItemImage] as? UIImage
+        let image = attributes[cylTabBarItemImage] as? UIImage
         if let image {
             button.setImage(image, for: .normal)
             button.setImage(image, for: .highlighted)
         }
-        if let selectedImage = attributes[CYLTabBarItemSelectedImage] as? UIImage {
+        if let selectedImage = attributes[cylTabBarItemSelectedImage] as? UIImage {
             button.setImage(selectedImage, for: .selected)
             button.setImage(selectedImage, for: [.selected, .highlighted])
         } else if let image, CYLConstants.isLiquidGlassActive(), !title.isEmpty {
@@ -2487,9 +2487,9 @@ extension CYLPlusButton {
             button.setImage(image, for: .selected)
             button.setImage(image, for: [.selected, .highlighted])
         }
-        let font = attributes[CYLTabBarItemTitleFont] as? UIFont ?? UIFont.systemFont(ofSize: 10)
-        let normalColor = attributes[CYLTabBarItemTitleColor] as? UIColor ?? .gray
-        let selectedColor = attributes[CYLTabBarItemSelectedTitleColor] as? UIColor ?? .blue
+        let font = attributes[cylTabBarItemTitleFont] as? UIFont ?? UIFont.systemFont(ofSize: 10)
+        let normalColor = attributes[cylTabBarItemTitleColor] as? UIColor ?? .gray
+        let selectedColor = attributes[cylTabBarItemSelectedTitleColor] as? UIColor ?? .blue
         var configuration = UIButton.Configuration.plain()
         configuration.baseBackgroundColor = .clear
         configuration.imagePlacement = .top
@@ -2499,8 +2499,8 @@ extension CYLPlusButton {
         configuration.titleLineBreakMode = .byClipping
         button.configuration = configuration
         button.titleLabel?.textAlignment = .center
-        button.setTitle(CYLLocalizedString(title), for: .normal)
-        button.setTitle(CYLLocalizedString(attributes[CYLTabBarItemSelectedTitle] as? String ?? title), for: .selected)
+        button.setTitle(cylLocalizedString(title), for: .normal)
+        button.setTitle(cylLocalizedString(attributes[cylTabBarItemSelectedTitle] as? String ?? title), for: .selected)
         // [EN] The font and the state's color on every state change, as `-setTitleColor:forState:` would without a configuration.
         // [CN] 每次状态变化时设置字体与该状态的颜色，与没有 configuration 时 `-setTitleColor:forState:` 的效果相同。
         button.configurationUpdateHandler = { plusButton in

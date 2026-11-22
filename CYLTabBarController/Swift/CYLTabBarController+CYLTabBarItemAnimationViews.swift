@@ -54,8 +54,8 @@ extension CYLTabBarController {
     }
 
     private func cylAddAnimation(to control: UIControl, url: URL, size: CGSize) {
-        control.cyl_addTabBarItemAnimation(with: url, size: size, contentMode: tabBarItemAnimationViewContentMode(), animationSpeed: tabBarItemAnimationSpeed)
-        control.cyl_setTabBarItemAnimationLoops(tabBarItemAnimationLoops)
+        control.cylAddTabBarItemAnimation(with: url, size: size, contentMode: tabBarItemAnimationViewContentMode(), animationSpeed: tabBarItemAnimationSpeed)
+        control.cylSetTabBarItemAnimationLoops(tabBarItemAnimationLoops)
     }
 
     /**
@@ -73,7 +73,7 @@ extension CYLTabBarController {
             return
         }
         let tabBar = cyl_tabBar as? CYLTabBar
-        guard let index = tabBar?.cylSubTabBarButtonsWithoutPlusButton().firstIndex(where: { $0 === control }), !control.cyl_isPlusButton() else { return }
+        guard let index = tabBar?.cylSubTabBarButtonsWithoutPlusButton().firstIndex(where: { $0 === control }), !control.cylIsPlusButton() else { return }
         let tabBarItem = cylTabBarItem(forTabButton: control)
         var url = tabBarItem?.cyl_tabBarItemAnimationURL
         var sizeValue = tabBarItem?.cyl_tabBarItemAnimationSizeValue
@@ -104,7 +104,7 @@ extension CYLTabBarController {
      */
     @objc(addLottieImageWithControl:lottieURL:lottieSizeValue:animation:defaultSelected:)
     func cylAddLottieImage(withControl control: UIControl, lottieURL: URL?, lottieSizeValue: NSValue?, animation: Bool, defaultSelected: Bool) {
-        guard cylTabBarItemAnimationGetServiceEntryPoint() != nil, tabBarStyleType != .flatDesign, !control.cyl_isPlusControl() else { return }
+        guard cylTabBarItemAnimationGetServiceEntryPoint() != nil, tabBarStyleType != .flatDesign, !control.cylIsPlusControl() else { return }
         var url = lottieURL
         var sizeValue = lottieSizeValue
         if url == nil || sizeValue == nil {

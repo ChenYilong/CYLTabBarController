@@ -37,25 +37,25 @@ extension CYLSettingsDemo {
         let cell = subtitleCell(tableView, "CYLBundleImageCell")
         cell.selectionStyle = .none
         let fileName = "cyl_badge_sample_icon@3x.png"
-        cell.imageView?.image = CYLImageInBundle(CYLResourceBundle(), nil, fileName)
-        let mainBundleResult = CYLBundleImage(nil, "CYLTabBarController", nil, fileName) != nil
-            ? CYLLocalizedString("已找到") : CYLLocalizedString("未找到（use_frameworks 时资源包位于 framework 中）")
+        cell.imageView?.image = cylImageInBundle(cylResourceBundle(), nil, fileName)
+        let mainBundleResult = cylBundleImage(nil, "CYLTabBarController", nil, fileName) != nil
+            ? cylLocalizedString("已找到") : cylLocalizedString("未找到（use_frameworks 时资源包位于 framework 中）")
         func found(_ value: Any?) -> String { value != nil ? "✓" : "✗" }
         let fileManager = FileManager.default
-        let pathInBundle = CYLImagePathInBundle(CYLResourceBundle(), nil, "cyl_badge_sample_icon@3x")
-        let mainBundlePath = CYLBundleImagePath(nil, "CYLTabBarController", nil, fileName)
-        let mainBundleData = CYLBundleImageData(nil, "CYLTabBarController", nil, fileName)
-        let imageFromData = CYLBundleImageFromData(nil, "CYLTabBarController", nil, fileName)
+        let pathInBundle = cylImagePathInBundle(cylResourceBundle(), nil, "cyl_badge_sample_icon@3x")
+        let mainBundlePath = cylBundleImagePath(nil, "CYLTabBarController", nil, fileName)
+        let mainBundleData = cylBundleImageData(nil, "CYLTabBarController", nil, fileName)
+        let imageFromData = cylBundleImageFromData(nil, "CYLTabBarController", nil, fileName)
         // [EN] `imageNamed:` also takes a path inside a bundle of the main bundle. [CN] `imageNamed:` 也接受主 bundle 中某个 bundle 内的路径。
-        let namedImage = CYLImageNamed("CYLTabBarController.bundle/cyl_badge_sample_icon")
+        let namedImage = cylImageNamed("CYLTabBarController.bundle/cyl_badge_sample_icon")
         let dataText = mainBundleData.map { ByteCountFormatter.string(fromByteCount: Int64($0.count), countStyle: .file) } ?? found(nil)
         let loaders = "CYLImagePathInBundle \(found(pathInBundle.flatMap { fileManager.fileExists(atPath: $0) ? $0 : nil })) "
             + "(\(pathInBundle.map { ($0 as NSString).lastPathComponent } ?? "-")) · "
             + "CYLBundleImagePath \(found(mainBundlePath.flatMap { fileManager.fileExists(atPath: $0) ? $0 : nil })) · "
             + "CYLBundleImageData \(dataText) · CYLBundleImageFromData \(found(imageFromData)) (@\(imageFromData.map { "\($0.scale)" } ?? "-")x) · "
             + "CYLImageNamed \(found(namedImage))"
-        cell.textLabel?.text = CYLLocalizedString("从 bundle 加载图片（issue #535）")
-        cell.detailTextLabel?.text = String(format: CYLLocalizedString("左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@"),
+        cell.textLabel?.text = cylLocalizedString("从 bundle 加载图片（issue #535）")
+        cell.detailTextLabel?.text = String(format: cylLocalizedString("左侧图片由 CYLImageInBundle 从资源包读取（不缓存）。主 bundle 中的 CYLBundleImage：%@"),
                                             mainBundleResult) + "\n" + loaders
         return cell
     }
@@ -67,8 +67,8 @@ extension CYLSettingsDemo {
         let settingSwitch = cell.accessoryView as? CYLNavigationSettingSwitch ?? CYLNavigationSettingSwitch()
         cell.accessoryView = settingSwitch
         settingSwitch.isOn = UIViewController.cyl_automaticNavigationSettingEnabled
-        cell.textLabel?.text = CYLLocalizedString("不继承基类隐藏导航栏（issue #535）")
-        cell.detailTextLabel?.text = CYLLocalizedString("打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。")
+        cell.textLabel?.text = cylLocalizedString("不继承基类隐藏导航栏（issue #535）")
+        cell.detailTextLabel?.text = cylLocalizedString("打开开关即设置 cyl_automaticNavigationSettingEnabled；点击该行 push 一个普通 UIViewController，它设置了 cyl_navigationBarHidden 与 cyl_hidesAncestorNavigationBars。")
         return cell
     }
 
@@ -77,8 +77,8 @@ extension CYLSettingsDemo {
     static func slideTransitionCell(_ tableView: UITableView) -> UITableViewCell {
         let cell = subtitleCell(tableView, "CYLSlideTransitionCell", symbol: "rectangle.split.3x1")
         cell.accessoryType = .disclosureIndicator
-        cell.textLabel?.text = CYLLocalizedString("滑动转场（CYLTabBarSlideTransitionAnimator）")
-        cell.detailTextLabel?.text = CYLLocalizedString("点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。")
+        cell.textLabel?.text = cylLocalizedString("滑动转场（CYLTabBarSlideTransitionAnimator）")
+        cell.detailTextLabel?.text = cylLocalizedString("点击打开一个系统 UITabBarController：点击 Tab 或在页面上左右拖动，页面跟随手指滑动切换。")
         return cell
     }
 
@@ -99,13 +99,13 @@ extension CYLSettingsDemo {
 
         var title: String {
             switch self {
-            case .loaded: return CYLLocalizedString("加载图片")
-            case .replaced: return CYLLocalizedString("替换为更大的图片")
-            case .removed: return CYLLocalizedString("移除图片")
-            case .backgroundLoaded: return CYLLocalizedString("加载背景图片")
-            case .readyImage: return CYLLocalizedString("对照：启动时即有图片")
-            case .readyLargerImage: return CYLLocalizedString("对照：启动时即有更大的图片")
-            case .readyBackground: return CYLLocalizedString("对照：启动时即有背景图片")
+            case .loaded: return cylLocalizedString("加载图片")
+            case .replaced: return cylLocalizedString("替换为更大的图片")
+            case .removed: return cylLocalizedString("移除图片")
+            case .backgroundLoaded: return cylLocalizedString("加载背景图片")
+            case .readyImage: return cylLocalizedString("对照：启动时即有图片")
+            case .readyLargerImage: return cylLocalizedString("对照：启动时即有更大的图片")
+            case .readyBackground: return cylLocalizedString("对照：启动时即有背景图片")
             }
         }
 
@@ -138,8 +138,8 @@ extension CYLSettingsDemo {
     static func lateImageCell(_ tableView: UITableView) -> UITableViewCell {
         let cell = subtitleCell(tableView, "CYLLateImageCell", symbol: "photo.badge.arrow.down")
         cell.accessoryType = .disclosureIndicator
-        cell.textLabel?.text = CYLLocalizedString("PlusButton 图片之后才加载")
-        cell.detailTextLabel?.text = CYLLocalizedString("点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。")
+        cell.textLabel?.text = cylLocalizedString("PlusButton 图片之后才加载")
+        cell.detailTextLabel?.text = cylLocalizedString("点击选择场景，push 一个 TabBarController：PlusButton 创建时没有图片，2 秒后加载、替换、移除图片或加载背景图片；最终布局应与启动时就有图片一致。")
         return cell
     }
 
@@ -151,8 +151,8 @@ extension CYLSettingsDemo {
      *      让它变成弹出框（iOS 26），最后几个场景被截断。
      */
     static func showLateImageDemo(from viewController: UIViewController, _ tableView: UITableView?, _ indexPath: IndexPath) {
-        let alert = UIAlertController(title: CYLLocalizedString("PlusButton 图片之后才加载"), message: nil, preferredStyle: .actionSheet)
-        let styleType = (viewController.cyl_owningTabBarController() ?? viewController.cyl_tabBarController)?.tabBarStyleType ?? .liquidGlass
+        let alert = UIAlertController(title: cylLocalizedString("PlusButton 图片之后才加载"), message: nil, preferredStyle: .actionSheet)
+        let styleType = (viewController.cylOwningTabBarController() ?? viewController.cylTabBarController)?.tabBarStyleType ?? .liquidGlass
         for lateCase in LateImageCase.allCases {
             alert.addAction(UIAlertAction(title: lateCase.title, style: .default) { [weak viewController] _ in
                 guard let presenter = viewController else { return }
@@ -165,7 +165,7 @@ extension CYLSettingsDemo {
                 }
             })
         }
-        alert.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
+        alert.addAction(UIAlertAction(title: cylLocalizedString("取消"), style: .cancel))
         if UIDevice.current.userInterfaceIdiom == .pad {
             let sourceView: UIView = tableView?.cellForRow(at: indexPath) ?? tableView ?? viewController.view
             alert.popoverPresentationController?.sourceView = sourceView
@@ -203,7 +203,7 @@ final class CYLOutsideBoundsCell: UITableViewCell {
         outsideButton.backgroundColor = .systemBlue
         outsideButton.layer.cornerRadius = 6
         outsideButton.setTitleColor(.white, for: .normal)
-        outsideButton.setTitle(CYLLocalizedString("点我"), for: .normal)
+        outsideButton.setTitle(cylLocalizedString("点我"), for: .normal)
         // [EN] Inside the box (left half) and outside it (right half). [CN] 左半部分在方框内，右半部分在方框外。
         outsideButton.frame = CGRect(x: 40, y: 8, width: 80, height: 28)
         outsideButton.addTarget(self, action: #selector(outsideButtonTapped), for: .touchUpInside)
@@ -233,9 +233,9 @@ final class CYLOutsideBoundsCell: UITableViewCell {
     }
 
     private func reload() {
-        titleLabel.text = CYLLocalizedString("超出父视图响应点击（issue #535）")
+        titleLabel.text = cylLocalizedString("超出父视图响应点击（issue #535）")
         outsideSwitch.isOn = outsideButton.cyl_respondsOutsideSuperviewBounds
-        summaryLabel.text = String(format: CYLLocalizedString("打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次"),
+        summaryLabel.text = String(format: cylLocalizedString("打开开关后，点击灰色方框外的按钮部分也能响应；点击会播放放大再缩小动画。已点击：%@ 次"),
                                    NSNumber(value: tapCount))
     }
 
@@ -246,7 +246,7 @@ final class CYLOutsideBoundsCell: UITableViewCell {
 
     @objc private func outsideButtonTapped() {
         tapCount += 1
-        outsideButton.cyl_addScaleBounceAnimation(completion: nil)
+        outsideButton.cylAddScaleBounceAnimation(completion: nil)
         reload()
     }
 }
@@ -266,9 +266,9 @@ final class CYLNavigationSettingDemoViewController: UIViewController {
         let label = UILabel()
         label.numberOfLines = 0
         label.textAlignment = .center
-        label.text = CYLLocalizedString("这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。")
+        label.text = cylLocalizedString("这是一个普通的 UIViewController，没有继承 CYLBaseViewController。导航栏已隐藏。")
         let backButton = UIButton(type: .system)
-        backButton.setTitle(CYLLocalizedString("关闭"), for: .normal)
+        backButton.setTitle(cylLocalizedString("关闭"), for: .normal)
         backButton.addTarget(self, action: #selector(back), for: .touchUpInside)
         let stackView = UIStackView(arrangedSubviews: [label, backButton])
         stackView.axis = .vertical
@@ -320,9 +320,9 @@ final class CYLSlideTransitionDemoTabBarController: UITabBarController, UITabBar
         viewControllers = [UIColor.systemRed, .systemGreen, .systemBlue].enumerated().map { index, color in
             let page = UIViewController()
             page.view.backgroundColor = color
-            page.tabBarItem.title = String(format: CYLLocalizedString("页面 %@"), NSNumber(value: index + 1))
+            page.tabBarItem.title = String(format: cylLocalizedString("页面 %@"), NSNumber(value: index + 1))
             let closeButton = UIButton(type: .system)
-            closeButton.setTitle(CYLLocalizedString("关闭"), for: .normal)
+            closeButton.setTitle(cylLocalizedString("关闭"), for: .normal)
             closeButton.setTitleColor(.white, for: .normal)
             closeButton.addTarget(self, action: #selector(close), for: .touchUpInside)
             closeButton.translatesAutoresizingMaskIntoConstraints = false
@@ -382,7 +382,7 @@ final class CYLLateImageDemoPlusButton: CYLPlusButton, CYLPlusButtonSubclassing 
         case .readyLargerImage: image = CYLSettingsDemo.lateImageCircle(60)
         default: image = UIImage()
         }
-        let button = cyl_plusButton(with: image, title: CYLLocalizedString("发布"), selectedTitle: nil, selectedTitleColor: nil)
+        let button = cyl_plusButton(with: image, title: cylLocalizedString("发布"), selectedTitle: nil, selectedTitleColor: nil)
         if lateCase == .readyBackground {
             button.setBackgroundImage(CYLSettingsDemo.lateImageCircle(60), for: .normal)
             button.sizeToFit()
@@ -418,7 +418,7 @@ final class CYLLateImageDemoPlusButton: CYLPlusButton, CYLPlusButtonSubclassing 
     static func plusChildViewController() -> UIViewController {
         let page = UIViewController()
         page.view.backgroundColor = .systemPurple
-        page.title = CYLLocalizedString("发布")
+        page.title = cylLocalizedString("发布")
         return page
     }
 }
@@ -441,7 +441,7 @@ final class CYLLateImageDemoTabBarController: CYLTabBarController {
             let page = UIViewController()
             page.view.backgroundColor = color
             let label = UILabel()
-            label.text = lateCase.isReadyAtLaunch ? lateCase.title : String(format: CYLLocalizedString("2 秒后：%@"), lateCase.title)
+            label.text = lateCase.isReadyAtLaunch ? lateCase.title : String(format: cylLocalizedString("2 秒后：%@"), lateCase.title)
             label.textColor = .white
             label.font = .boldSystemFont(ofSize: 17)
             label.translatesAutoresizingMaskIntoConstraints = false
@@ -451,9 +451,9 @@ final class CYLLateImageDemoTabBarController: CYLTabBarController {
             viewControllers.append(page)
             let image = UIImage(systemName: symbols[index]) ?? UIImage()
             attributes.append([
-                CYLTabBarItemTitle: String(format: CYLLocalizedString("页面 %@"), NSNumber(value: index + 1)),
-                CYLTabBarItemImage: image,
-                CYLTabBarItemSelectedImage: image,
+                cylTabBarItemTitle: String(format: cylLocalizedString("页面 %@"), NSNumber(value: index + 1)),
+                cylTabBarItemImage: image,
+                cylTabBarItemSelectedImage: image,
             ])
         }
         let tabBarController = CYLLateImageDemoTabBarController(viewControllers: viewControllers, tabBarItemsAttributes: attributes,

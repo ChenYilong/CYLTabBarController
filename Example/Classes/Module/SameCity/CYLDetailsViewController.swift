@@ -33,16 +33,16 @@ class CYLDetailsViewController: CYLBaseViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        cyl_sharedAppDelegate()?.cyl_forceUpdateInterfaceOrientation(.landscapeLeft)
+        cylSharedAppDelegate()?.cylForceUpdateInterfaceOrientation(.landscapeLeft)
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        cyl_sharedAppDelegate()?.cyl_forceUpdateInterfaceOrientation(.portrait)
+        cylSharedAppDelegate()?.cylForceUpdateInterfaceOrientation(.portrait)
     }
 
     override func touchesBegan(_ _: Set<UITouch>, with _: UIEvent?) {
-        cyl_popSelectTabBarChildViewController(forClassType: CYLMineViewController.self) { selected in
+        cylPopSelectTabBarChildViewController(forClassType: CYLMineViewController.self) { selected in
             (selected as? CYLMineViewController)?.testPush()
         }
     }

@@ -60,7 +60,7 @@ class RootTabBarController: CYLTabBarController {
         self.delegate = self
 
         customizeInterface()
-        CYLPlusChildViewController.view.layoutIfNeeded()
+        cylPlusChildViewController.view.layoutIfNeeded()
 
     }
     

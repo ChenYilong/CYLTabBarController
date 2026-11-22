@@ -182,7 +182,7 @@ extension UIViewController {
      * [CN] 在左滑返回的过渡期间禁用 interactivePopGestureRecognizer，请在 viewWillDisappear / dealloc 中调用。
      */
     @objc(cyl_disableInteractivePopGestureRecognizer)
-    public func cyl_disableInteractivePopGestureRecognizer() {
+    public func cylDisableInteractivePopGestureRecognizer() {
         cylSetPopGestureDelegate(nil, enabled: nil)
     }
 
@@ -191,7 +191,7 @@ extension UIViewController {
      * [CN] 左滑返回结束后重新启用 interactivePopGestureRecognizer，请在 viewDidDisappear 中调用。
      */
     @objc(cyl_enableInteractivePopGestureRecognizer)
-    public func cyl_enableInteractivePopGestureRecognizer() {
+    public func cylEnableInteractivePopGestureRecognizer() {
         cylSetPopGestureDelegate(self, enabled: true)
     }
 
@@ -201,7 +201,7 @@ extension UIViewController {
      * [CN] 重新设置返回手势：cyl_disablePopGestureRecognizer 为 YES 或当前为栈底页面时禁用，否则启用。请在 viewDidAppear 中调用。
      */
     @objc(cyl_resetInteractivePopGestureRecognizer)
-    public func cyl_resetInteractivePopGestureRecognizer() {
+    public func cylResetInteractivePopGestureRecognizer() {
         guard let navigationController else { return }
         let enabled = !cyl_disablePopGestureRecognizer && navigationController.viewControllers.count != 1
         navigationController.interactivePopGestureRecognizer?.isEnabled = enabled
@@ -217,7 +217,7 @@ extension UIViewController {
      * [CN] 当 cyl_hideNavigationBarSeparator 为 YES 时隐藏导航栏底部分割线，请在 viewWillAppear 中调用。
      */
     @objc(cyl_hideNavigationBarSeparatorIfNeeded)
-    public func cyl_hideNavigationBarSeparatorIfNeeded() {
+    public func cylHideNavigationBarSeparatorIfNeeded() {
         guard cyl_hideNavigationBarSeparator, let navigationBar = navigationController?.navigationBar else { return }
         navigationBar.shadowImage = UIImage()
         navigationBar.isTranslucent = false
@@ -229,7 +229,7 @@ extension UIViewController {
      * [CN] 本页面消失时是否应恢复显示导航栏：push 时下一个页面已在栈中，pop 时本页面已被移除；接下来显示的页面同样隐藏导航栏时为 NO。
      */
     @objc(cyl_shouldNavigationBarVisible)
-    public func cyl_shouldNavigationBarVisible() -> Bool {
+    public func cylShouldNavigationBarVisible() -> Bool {
         guard let viewControllers = navigationController?.viewControllers, !viewControllers.isEmpty else { return true }
         let nextViewController: UIViewController
         if let index = viewControllers.firstIndex(of: self) {
@@ -247,8 +247,8 @@ extension UIViewController {
      * [CN] 若本页面隐藏了导航栏且需要恢复，则重新显示导航栏，请在 viewWillDisappear 中调用。
      */
     @objc(cyl_setNavigationBarVisibleIfNeeded:)
-    public func cyl_setNavigationBarVisibleIfNeeded(_ animated: Bool) {
-        if cyl_navigationBarHidden && cyl_shouldNavigationBarVisible() {
+    public func cylSetNavigationBarVisibleIfNeeded(_ animated: Bool) {
+        if cyl_navigationBarHidden && cylShouldNavigationBarVisible() {
             navigationController?.setNavigationBarHidden(false, animated: animated)
         }
     }
@@ -258,7 +258,7 @@ extension UIViewController {
      * [CN] 当 cyl_navigationBarHidden 为 YES 时隐藏导航栏，请在 viewWillAppear 中调用。
      */
     @objc(cyl_setNavigationBarHiddenIfNeeded:)
-    public func cyl_setNavigationBarHiddenIfNeeded(_ animated: Bool) {
+    public func cylSetNavigationBarHiddenIfNeeded(_ animated: Bool) {
         if cyl_navigationBarHidden {
             navigationController?.setNavigationBarHidden(true, animated: animated)
         }
@@ -271,9 +271,9 @@ extension UIViewController {
      * [CN] viewWillAppear 中的一站式设置：按需隐藏分割线、导航栏与外层导航栏。
      */
     @objc(cyl_viewWillAppearNavigationSetting:)
-    public func cyl_viewWillAppearNavigationSetting(_ animated: Bool) {
-        cyl_hideNavigationBarSeparatorIfNeeded()
-        cyl_setNavigationBarHiddenIfNeeded(animated)
+    public func cylViewWillAppearNavigationSetting(_ animated: Bool) {
+        cylHideNavigationBarSeparatorIfNeeded()
+        cylSetNavigationBarHiddenIfNeeded(animated)
         cylHideAncestorNavigationBarsIfNeeded(animated)
     }
 
@@ -282,9 +282,9 @@ extension UIViewController {
      * [CN] viewWillDisappear 中的一站式设置：禁用返回手势，并按需恢复导航栏。
      */
     @objc(cyl_viewWillDisappearNavigationSetting:)
-    public func cyl_viewWillDisappearNavigationSetting(_ animated: Bool) {
-        cyl_disableInteractivePopGestureRecognizer()
-        cyl_setNavigationBarVisibleIfNeeded(animated)
+    public func cylViewWillDisappearNavigationSetting(_ animated: Bool) {
+        cylDisableInteractivePopGestureRecognizer()
+        cylSetNavigationBarVisibleIfNeeded(animated)
     }
 
     /**
@@ -292,8 +292,8 @@ extension UIViewController {
      * [CN] viewDidDisappear 中的一站式设置：重新启用返回手势，并按需恢复外层导航栏。
      */
     @objc(cyl_viewDidDisappearNavigationSetting:)
-    public func cyl_viewDidDisappearNavigationSetting(_ animated: Bool) {
-        cyl_enableInteractivePopGestureRecognizer()
+    public func cylViewDidDisappearNavigationSetting(_ animated: Bool) {
+        cylEnableInteractivePopGestureRecognizer()
         cylShowAncestorNavigationBarsIfNeeded(animated)
     }
 
@@ -302,8 +302,8 @@ extension UIViewController {
      * [CN] viewDidAppear 中的一站式设置：重置返回手势状态。
      */
     @objc(cyl_viewDidAppearNavigationSetting:)
-    public func cyl_viewDidAppearNavigationSetting(_: Bool) {
-        cyl_resetInteractivePopGestureRecognizer()
+    public func cylViewDidAppearNavigationSetting(_: Bool) {
+        cylResetInteractivePopGestureRecognizer()
     }
 
     /**
@@ -311,8 +311,8 @@ extension UIViewController {
      * [CN] dealloc 中的一站式设置：禁用返回手势。
      */
     @objc(cyl_deallocNavigationSetting)
-    public func cyl_deallocNavigationSetting() {
-        cyl_disableInteractivePopGestureRecognizer()
+    public func cylDeallocNavigationSetting() {
+        cylDisableInteractivePopGestureRecognizer()
     }
 
     // MARK: Outer navigation bars (FIX: issue #535)
@@ -381,7 +381,7 @@ extension UIViewController {
     dynamic func cylAutomaticNavigationViewWillAppear(_ animated: Bool) {
         cylAutomaticNavigationViewWillAppear(animated)
         if cyl_needsAutomaticNavigationSetting {
-            cyl_viewWillAppearNavigationSetting(animated)
+            cylViewWillAppearNavigationSetting(animated)
         }
     }
 
@@ -389,7 +389,7 @@ extension UIViewController {
     dynamic func cylAutomaticNavigationViewDidAppear(_ animated: Bool) {
         cylAutomaticNavigationViewDidAppear(animated)
         if cyl_needsAutomaticNavigationSetting {
-            cyl_viewDidAppearNavigationSetting(animated)
+            cylViewDidAppearNavigationSetting(animated)
         }
     }
 
@@ -397,7 +397,7 @@ extension UIViewController {
     dynamic func cylAutomaticNavigationViewWillDisappear(_ animated: Bool) {
         cylAutomaticNavigationViewWillDisappear(animated)
         if cyl_needsAutomaticNavigationSetting {
-            cyl_viewWillDisappearNavigationSetting(animated)
+            cylViewWillDisappearNavigationSetting(animated)
         }
     }
 
@@ -405,7 +405,7 @@ extension UIViewController {
     dynamic func cylAutomaticNavigationViewDidDisappear(_ animated: Bool) {
         cylAutomaticNavigationViewDidDisappear(animated)
         if cyl_needsAutomaticNavigationSetting {
-            cyl_viewDidDisappearNavigationSetting(animated)
+            cylViewDidDisappearNavigationSetting(animated)
         }
     }
 }

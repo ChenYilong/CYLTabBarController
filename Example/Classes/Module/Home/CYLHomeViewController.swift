@@ -54,13 +54,13 @@ class CYLHomeViewController: CYLDemoBadgeTableViewController, UITabBarController
         navigationItem.rightBarButtonItems = [liquidGlassItem, themeItem]
         // [EN] #425: the badge style comes from CYLBadgeAppearance; animated navigation item badges in a random color.
         // [CN] #425：角标样式来自 CYLBadgeAppearance；导航栏按钮的动画角标，使用随机颜色。
-        liquidGlassItem.cyl_showBadgeValue("", animationType: .shake, backgroundColor: .cyl_randomColor)
-        navigationItem.leftBarButtonItem?.cyl_showBadgeValue("", animationType: .breathe, backgroundColor: .cyl_randomColor)
+        liquidGlassItem.cylShowBadgeValue("", animationType: .shake, backgroundColor: .cyl_randomColor)
+        navigationItem.leftBarButtonItem?.cylShowBadgeValue("", animationType: .breathe, backgroundColor: .cyl_randomColor)
         if #available(iOS 26.0, *) {
             let interaction = UIScrollEdgeElementContainerInteraction()
             interaction.scrollView = tableView
             interaction.edge = .bottom
-            cyl_tabBarController?.tabBar.addInteraction(interaction)
+            cylTabBarController?.tabBar.addInteraction(interaction)
             bottomEdgeInteraction = interaction
         }
     }
@@ -72,7 +72,7 @@ class CYLHomeViewController: CYLDemoBadgeTableViewController, UITabBarController
         //      blur the whole list, so it is used only while the tab bar is horizontal.
         // [CN] 竖向 TabBar（iPhone Duo 折叠，iOS 27.1）是整列高度：底部边缘效果会模糊整个列表，因此只在横向时启用。
         guard #available(iOS 26.0, *), let interaction = bottomEdgeInteraction as? UIScrollEdgeElementContainerInteraction else { return }
-        let tabBarSize = cyl_tabBarController?.tabBar.bounds.size ?? .zero
+        let tabBarSize = cylTabBarController?.tabBar.bounds.size ?? .zero
         let scrollView: UIScrollView? = tabBarSize.height > tabBarSize.width ? nil : tableView
         if interaction.scrollView !== scrollView {
             interaction.scrollView = scrollView
@@ -81,7 +81,7 @@ class CYLHomeViewController: CYLDemoBadgeTableViewController, UITabBarController
 
     /// [EN] Issue #216: the skin (theme) picker. [CN] Issue #216：换肤（主题）选择器。
     @objc private func showThemePicker(_ _: Any?) {
-        cyl_presentThemePicker(from: nil) { [weak self] in
+        cylPresentThemePicker(from: nil) { [weak self] in
             self?.tableView.reloadData()
         }
     }
@@ -101,7 +101,7 @@ class CYLHomeViewController: CYLDemoBadgeTableViewController, UITabBarController
         let cell = tableView.dequeueReusableCell(withIdentifier: "GalleryCell") ?? UITableViewCell(style: .subtitle, reuseIdentifier: "GalleryCell")
         cell.textLabel?.text = cylDemoLocalizedString("打开 TabBar 场景展示")
         cell.detailTextLabel?.text = cylDemoLocalizedString("每个场景都是用公开 API 构建的 TabBar：样式、动画、提醒、Lottie 以及较新的 Tab API")
-        cell.cyl_wrapsTextLabels()
+        cell.cylWrapsTextLabels()
         cell.accessoryType = .disclosureIndicator
         return cell
     }

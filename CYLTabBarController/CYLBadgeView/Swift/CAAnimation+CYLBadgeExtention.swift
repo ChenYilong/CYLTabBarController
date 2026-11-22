@@ -33,9 +33,9 @@ import UIKit
 /**
  * [EN] The badge animations. Translated from Objective-C (docs/Swift-Migration.md); Objective-C callers get the
  *      declarations from `CYLSwiftInterface.h`; the Swift names are the ones Clang imported (some read oddly, such as
- *      `cyl_badge_once_fade(in_AnimationRepeatTimes:durTimes:)`, and are kept for compatibility).
+ *      `cyl_badge_once_fade(in_AnimationRepeatTimes:durTimes:)`, now `cylBadgeOnceFade(inAnimationRepeatTimes:durTimes:)`; the old names are deprecated forwards).
  * [CN] 角标动画。已从 Objective-C 翻译（docs/Swift-Migration.md）；Objective-C 调用方从 `CYLSwiftInterface.h` 获得声明；Swift 名称与
- *      Clang 原先导入的名称相同（有些读起来不自然，例如 `cyl_badge_once_fade(in_AnimationRepeatTimes:durTimes:)`，为兼容而保留）。
+ *      Clang 原先导入的名称相同（有些读起来不自然，例如 `cyl_badge_once_fade(in_AnimationRepeatTimes:durTimes:)`，现为 `cylBadgeOnceFade(inAnimationRepeatTimes:durTimes:)`，旧名称是已废弃的转发）。
  */
 extension CAAnimation {
 
@@ -46,7 +46,7 @@ extension CAAnimation {
      * [CN] 在 1 与 0.1 之间无限循环淡入淡出。
      */
     @objc(cyl_opacityForeverAnimationWithDuration:)
-    public class func cyl_opacityForeverAnimation(withDuration duration: TimeInterval) -> CABasicAnimation {
+    public class func cylOpacityForeverAnimation(withDuration duration: TimeInterval) -> CABasicAnimation {
         let animation = CABasicAnimation(keyPath: "opacity")
         animation.fromValue = NSNumber(value: 1.0 as Float)
         animation.toValue = NSNumber(value: 0.1 as Float)
@@ -64,7 +64,7 @@ extension CAAnimation {
      * [CN] 在 1 与 0.4 之间淡入淡出若干次。
      */
     @objc(cyl_opacityTimesAnimationRepeatTimes:duration:)
-    public class func cyl_opacityTimesAnimationRepeatTimes(_ repeatTimes: Float, duration: TimeInterval) -> CABasicAnimation {
+    public class func cylOpacityTimesAnimationRepeatTimes(_ repeatTimes: Float, duration: TimeInterval) -> CABasicAnimation {
         let animation = CABasicAnimation(keyPath: "opacity")
         animation.fromValue = NSNumber(value: 1.0 as Float)
         animation.toValue = NSNumber(value: 0.4 as Float)
@@ -82,7 +82,7 @@ extension CAAnimation {
      * [CN] 绕某个轴累计旋转 `degree`（弧度）。
      */
     @objc(cyl_rotationAnimationWithDuration:degree:direction:repeatCount:)
-    public class func cyl_rotationAnimation(withDuration duration: TimeInterval, degree: CGFloat, direction axis: CYLAxis,
+    public class func cylRotationAnimation(withDuration duration: TimeInterval, degree: CGFloat, direction axis: CYLAxis,
                                             repeatCount: Float) -> CABasicAnimation {
         let keyPaths = ["transform.rotation.x", "transform.rotation.y", "transform.rotation.z"]
         let animation = CABasicAnimation(keyPath: keyPaths[Int(axis.rawValue)])
@@ -102,7 +102,7 @@ extension CAAnimation {
      * [CN] 在两个比例之间来回缩放。
      */
     @objc(cyl_scaleAnimationFromScale:toScale:duration:repeatTimes:)
-    public class func cyl_scale(fromScale: CGFloat, toScale: CGFloat, duration: TimeInterval,
+    public class func cylScale(fromScale: CGFloat, toScale: CGFloat, duration: TimeInterval,
                                 repeatTimes: Float) -> CABasicAnimation {
         let animation = CABasicAnimation(keyPath: "transform.scale")
         animation.fromValue = NSNumber(value: Double(fromScale))
@@ -122,7 +122,7 @@ extension CAAnimation {
      * [CN] 让图层（`obj`）左右摇晃其宽度的四分之一。
      */
     @objc(cyl_shakeAnimationRepeatTimes:duration:forObj:)
-    public class func cyl_shakeAnimationRepeatTimes(_ repeatTimes: Float, duration: TimeInterval,
+    public class func cylShakeAnimationRepeatTimes(_ repeatTimes: Float, duration: TimeInterval,
                                                     forObj obj: Any) -> CAKeyframeAnimation {
         positionAnimation(repeatTimes, duration, obj) { position, size in
             let offset = size.width / 4
@@ -136,7 +136,7 @@ extension CAAnimation {
      * [CN] 让图层（`obj`）上下弹跳其高度的四分之一。
      */
     @objc(cyl_bounceAnimationRepeatTimes:duration:forObj:)
-    public class func cyl_bounceRepeatTimes(_ repeatTimes: Float, duration: TimeInterval,
+    public class func cylBounceRepeatTimes(_ repeatTimes: Float, duration: TimeInterval,
                                             forObj obj: Any) -> CAKeyframeAnimation {
         positionAnimation(repeatTimes, duration, obj) { position, size in
             let offset = size.height / 4
@@ -152,7 +152,7 @@ extension CAAnimation {
      * [CN] 相对于图层当前位置左右摇晃 `offset` 点（`transform.translation.x`）。
      */
     @objc(cyl_shakeAnimationRepeatTimes:duration:offset:)
-    public class func cyl_shakeAnimationRepeatTimes(_ repeatTimes: Float, duration: TimeInterval,
+    public class func cylShakeAnimationRepeatTimes(_ repeatTimes: Float, duration: TimeInterval,
                                                     offset: CGFloat) -> CAKeyframeAnimation {
         translationAnimation("transform.translation.x", repeatTimes, duration, offset)
     }
@@ -162,7 +162,7 @@ extension CAAnimation {
      * [CN] 相对于图层当前位置上下弹跳 `offset` 点（`transform.translation.y`）。
      */
     @objc(cyl_bounceAnimationRepeatTimes:duration:offset:)
-    public class func cyl_bounceRepeatTimes(_ repeatTimes: Float, duration: TimeInterval,
+    public class func cylBounceRepeatTimes(_ repeatTimes: Float, duration: TimeInterval,
                                             offset: CGFloat) -> CAKeyframeAnimation {
         translationAnimation("transform.translation.y", repeatTimes, duration, offset)
     }
@@ -174,7 +174,7 @@ extension CAAnimation {
      * [CN] 从 2.7 倍缩放到 1 倍。
      */
     @objc(cyl_badge_once_scale_AnimationRepeatTimes:duration:)
-    public class func cyl_badge_once_scale_AnimationRepeatTimes(_ repeatTimes: Float,
+    public class func cylBadgeOnceScaleAnimationRepeatTimes(_ repeatTimes: Float,
                                                                 duration: TimeInterval) -> CABasicAnimation {
         onceAnimation("transform.scale", from: 2.7, to: 1, repeatTimes, duration, .easeInEaseOut)
     }
@@ -184,7 +184,7 @@ extension CAAnimation {
      * [CN] 从左侧滑入 `moveDistance`。
      */
     @objc(cyl_badge_once_leftRight_AnimationMoveDistance:repeatTimes:duration:)
-    public class func cyl_badge_once_leftRight_AnimationMoveDistance(_ moveDistance: CGFloat, repeatTimes: Float,
+    public class func cylBadgeOnceLeftRightAnimationMoveDistance(_ moveDistance: CGFloat, repeatTimes: Float,
                                                                      duration: TimeInterval) -> CABasicAnimation {
         onceAnimation("transform.translation.x", from: -Double(moveDistance), to: 0, repeatTimes, duration, .easeOut)
     }
@@ -194,7 +194,7 @@ extension CAAnimation {
      * [CN] 从右侧滑入 `moveDistance`。
      */
     @objc(cyl_badge_once_rightLeft_AnimationMoveDistance:repeatTimes:duration:)
-    public class func cyl_badge_once_rightLeft_AnimationMoveDistance(_ moveDistance: CGFloat, repeatTimes: Float,
+    public class func cylBadgeOnceRightLeftAnimationMoveDistance(_ moveDistance: CGFloat, repeatTimes: Float,
                                                                      duration: TimeInterval) -> CABasicAnimation {
         onceAnimation("transform.translation.x", from: Double(moveDistance), to: 0, repeatTimes, duration, .easeOut)
     }
@@ -204,8 +204,8 @@ extension CAAnimation {
      * [CN] 从 0 淡入到 1。
      */
     @objc(cyl_badge_once_fadeIn_AnimationRepeatTimes:duration:)
-    public class func cyl_badge_once_fade(in_AnimationRepeatTimes repeatTimes: Float,
-                                          duration: TimeInterval) -> CABasicAnimation {
+    public class func cylBadgeOnceFade(inAnimationRepeatTimes repeatTimes: Float,
+                                       duration: TimeInterval) -> CABasicAnimation {
         onceAnimation("opacity", from: 0, to: 1, repeatTimes, duration, .easeIn)
     }
 
@@ -214,7 +214,7 @@ extension CAAnimation {
      * [CN] 旋转半圈进入。
      */
     @objc(cyl_badge_once_rolling_AnimationRepeatTimes:duration:)
-    public class func cyl_badge_once_rolling_AnimationRepeatTimes(_ repeatTimes: Float,
+    public class func cylBadgeOnceRollingAnimationRepeatTimes(_ repeatTimes: Float,
                                                                   duration: TimeInterval) -> CABasicAnimation {
         onceAnimation("transform.rotation.z", from: Double.pi, to: 0, repeatTimes, duration, .easeInEaseOut)
     }
@@ -224,7 +224,7 @@ extension CAAnimation {
      * [CN] 在 `duration` 内的缩放弹簧效果（0.85、1.15、0.9、1）。
      */
     @objc(cyl_springAnimationForDuration:)
-    public class func cyl_springAnimation(forDuration duration: TimeInterval) -> CAKeyframeAnimation {
+    public class func cylSpringAnimation(forDuration duration: TimeInterval) -> CAKeyframeAnimation {
         let animation = CAKeyframeAnimation(keyPath: "transform.scale")
         animation.values = [0.85, 1.15, 0.9, 1.0]
         animation.keyTimes = [0.0, 0.15, 0.3, 0.45].map { NSNumber(value: $0 / duration) }
@@ -239,8 +239,8 @@ extension CAAnimation {
      * [CN] 为兼容保留：`cyl_opacityForeverAnimation(withDuration:)`。
      */
     @objc(cyl_opacityForever_Animation:)
-    public class func cyl_opacityForever_Animation(_ time: Float) -> CABasicAnimation {
-        cyl_opacityForeverAnimation(withDuration: TimeInterval(time))
+    public class func cylOpacityForeverAnimation(_ time: Float) -> CABasicAnimation {
+        cylOpacityForeverAnimation(withDuration: TimeInterval(time))
     }
 
     /**
@@ -248,8 +248,8 @@ extension CAAnimation {
      * [CN] 为兼容保留：`cyl_opacityTimesAnimationRepeatTimes(_:duration:)`。
      */
     @objc(cyl_opacityTimes_Animation:durTimes:)
-    public class func cyl_opacityTimes_Animation(_ repeatTimes: Float, durTimes time: Float) -> CABasicAnimation {
-        cyl_opacityTimesAnimationRepeatTimes(repeatTimes, duration: TimeInterval(time))
+    public class func cylOpacityTimesAnimation(_ repeatTimes: Float, durTimes time: Float) -> CABasicAnimation {
+        cylOpacityTimesAnimationRepeatTimes(repeatTimes, duration: TimeInterval(time))
     }
 
     /**
@@ -257,9 +257,9 @@ extension CAAnimation {
      * [CN] 为兼容保留：`cyl_rotationAnimation(withDuration:degree:direction:repeatCount:)`。
      */
     @objc(cyl_rotation:degree:direction:repeatCount:)
-    public class func cyl_rotation(_ dur: Float, degree: Float, direction axis: CYLAxis,
+    public class func cylRotation(_ dur: Float, degree: Float, direction axis: CYLAxis,
                                    repeatCount: Int32) -> CABasicAnimation {
-        cyl_rotationAnimation(withDuration: TimeInterval(dur), degree: CGFloat(degree), direction: axis,
+        cylRotationAnimation(withDuration: TimeInterval(dur), degree: CGFloat(degree), direction: axis,
                               repeatCount: Float(repeatCount))
     }
 
@@ -268,9 +268,9 @@ extension CAAnimation {
      * [CN] 为兼容保留：`cyl_scale(fromScale:toScale:duration:repeatTimes:)`。
      */
     @objc(cyl_scaleFrom:toScale:durTimes:rep:)
-    public class func cyl_scale(from fromScale: CGFloat, toScale: CGFloat, durTimes time: Float,
+    public class func cylScale(from fromScale: CGFloat, toScale: CGFloat, durTimes time: Float,
                                 rep repeatTimes: Float) -> CABasicAnimation {
-        cyl_scale(fromScale: fromScale, toScale: toScale, duration: TimeInterval(time), repeatTimes: repeatTimes)
+        cylScale(fromScale: fromScale, toScale: toScale, duration: TimeInterval(time), repeatTimes: repeatTimes)
     }
 
     /**
@@ -278,9 +278,9 @@ extension CAAnimation {
      * [CN] 为兼容保留：`cyl_shakeAnimationRepeatTimes(_:duration:forObj:)`。
      */
     @objc(cyl_shake_AnimationRepeatTimes:durTimes:forObj:)
-    public class func cyl_shake_AnimationRepeatTimes(_ repeatTimes: Float, durTimes time: Float,
+    public class func cylShakeAnimationRepeatTimes(_ repeatTimes: Float, durTimes time: Float,
                                                      forObj obj: Any) -> CAKeyframeAnimation {
-        cyl_shakeAnimationRepeatTimes(repeatTimes, duration: TimeInterval(time), forObj: obj)
+        cylShakeAnimationRepeatTimes(repeatTimes, duration: TimeInterval(time), forObj: obj)
     }
 
     /**
@@ -288,9 +288,9 @@ extension CAAnimation {
      * [CN] 为兼容保留：`cyl_bounceRepeatTimes(_:duration:forObj:)`。
      */
     @objc(cyl_bounce_AnimationRepeatTimes:durTimes:forObj:)
-    public class func cyl_bounce_AnimationRepeatTimes(_ repeatTimes: Float, durTimes time: Float,
+    public class func cylBounceAnimationRepeatTimes(_ repeatTimes: Float, durTimes time: Float,
                                                       forObj obj: Any) -> CAKeyframeAnimation {
-        cyl_bounceRepeatTimes(repeatTimes, duration: TimeInterval(time), forObj: obj)
+        cylBounceRepeatTimes(repeatTimes, duration: TimeInterval(time), forObj: obj)
     }
 
     /**
@@ -298,9 +298,9 @@ extension CAAnimation {
      * [CN] 为兼容保留：`cyl_badge_once_scale_AnimationRepeatTimes(_:duration:)`。
      */
     @objc(cyl_badge_once_scale_AnimationRepeatTimes:durTimes:)
-    public class func cyl_badge_once_scale_AnimationRepeatTimes(_ repeatTimes: Float,
+    public class func cylBadgeOnceScaleAnimationRepeatTimes(_ repeatTimes: Float,
                                                                 durTimes time: Float) -> CABasicAnimation {
-        cyl_badge_once_scale_AnimationRepeatTimes(repeatTimes, duration: TimeInterval(time))
+        cylBadgeOnceScaleAnimationRepeatTimes(repeatTimes, duration: TimeInterval(time))
     }
 
     /**
@@ -308,9 +308,9 @@ extension CAAnimation {
      * [CN] 为兼容保留：`cyl_badge_once_leftRight_AnimationMoveDistance(_:repeatTimes:duration:)`。
      */
     @objc(cyl_badge_once_leftRight_AnimationMoveDistance:repeatTimes:durTimes:)
-    public class func cyl_badge_once_leftRight_AnimationMoveDistance(_ moveDistance: CGFloat, repeatTimes: Float,
+    public class func cylBadgeOnceLeftRightAnimationMoveDistance(_ moveDistance: CGFloat, repeatTimes: Float,
                                                                      durTimes time: Float) -> CABasicAnimation {
-        cyl_badge_once_leftRight_AnimationMoveDistance(moveDistance, repeatTimes: repeatTimes, duration: TimeInterval(time))
+        cylBadgeOnceLeftRightAnimationMoveDistance(moveDistance, repeatTimes: repeatTimes, duration: TimeInterval(time))
     }
 
     /**
@@ -318,19 +318,19 @@ extension CAAnimation {
      * [CN] 为兼容保留：`cyl_badge_once_rightLeft_AnimationMoveDistance(_:repeatTimes:duration:)`。
      */
     @objc(cyl_badge_once_rightLeft_AnimationMoveDistance:repeatTimes:durTimes:)
-    public class func cyl_badge_once_rightLeft_AnimationMoveDistance(_ moveDistance: CGFloat, repeatTimes: Float,
+    public class func cylBadgeOnceRightLeftAnimationMoveDistance(_ moveDistance: CGFloat, repeatTimes: Float,
                                                                      durTimes time: Float) -> CABasicAnimation {
-        cyl_badge_once_rightLeft_AnimationMoveDistance(moveDistance, repeatTimes: repeatTimes, duration: TimeInterval(time))
+        cylBadgeOnceRightLeftAnimationMoveDistance(moveDistance, repeatTimes: repeatTimes, duration: TimeInterval(time))
     }
 
     /**
-     * [EN] Kept for compatibility: `cyl_badge_once_fade(in_AnimationRepeatTimes:duration:)`.
-     * [CN] 为兼容保留：`cyl_badge_once_fade(in_AnimationRepeatTimes:duration:)`。
+     * [EN] Kept for compatibility: the Objective-C selector `cyl_badge_once_fadeIn_AnimationRepeatTimes:durTimes:`.
+     * [CN] 为兼容保留：Objective-C selector `cyl_badge_once_fadeIn_AnimationRepeatTimes:durTimes:`。
      */
     @objc(cyl_badge_once_fadeIn_AnimationRepeatTimes:durTimes:)
-    public class func cyl_badge_once_fade(in_AnimationRepeatTimes repeatTimes: Float,
-                                          durTimes time: Float) -> CABasicAnimation {
-        cyl_badge_once_fade(in_AnimationRepeatTimes: repeatTimes, duration: TimeInterval(time))
+    public class func cylBadgeOnceFade(inAnimationRepeatTimes repeatTimes: Float,
+                                       durTimes time: Float) -> CABasicAnimation {
+        cylBadgeOnceFade(inAnimationRepeatTimes: repeatTimes, duration: TimeInterval(time))
     }
 
     /**
@@ -338,9 +338,9 @@ extension CAAnimation {
      * [CN] 为兼容保留：`cyl_badge_once_rolling_AnimationRepeatTimes(_:duration:)`。
      */
     @objc(cyl_badge_once_rolling_AnimationRepeatTimes:durTimes:)
-    public class func cyl_badge_once_rolling_AnimationRepeatTimes(_ repeatTimes: Float,
+    public class func cylBadgeOnceRollingAnimationRepeatTimes(_ repeatTimes: Float,
                                                                   durTimes time: Float) -> CABasicAnimation {
-        cyl_badge_once_rolling_AnimationRepeatTimes(repeatTimes, duration: TimeInterval(time))
+        cylBadgeOnceRollingAnimationRepeatTimes(repeatTimes, duration: TimeInterval(time))
     }
 
     // MARK: - Private

@@ -41,7 +41,7 @@ extension CYLTabBarController {
         storage.cylSetViewControllersStorage(cylViewControllersAligningPlusSlot(with: tabs))
         // [EN] Legacy global (what was written last); this tab bar's own index is `-[UIView cyl_plusButtonIndex]`, read after
         //      the slot is inserted. [CN] 旧的全局变量（最后写入的值）；本 TabBar 自己的下标见 `-[UIView cyl_plusButtonIndex]`，在插入 slot 之后读取。
-        CYLPlusButtonIndex = flatTabBar.cyl_plusButtonIndex()
+        CYLPlusButtonIndex = flatTabBar.cylPlusButtonIndex()
         cylFlatDesignCaptureItems()
         flatTabBar.items = cylFlatDesignItemsOfController()
         storage.cylSetNeedsReloadItems(false)

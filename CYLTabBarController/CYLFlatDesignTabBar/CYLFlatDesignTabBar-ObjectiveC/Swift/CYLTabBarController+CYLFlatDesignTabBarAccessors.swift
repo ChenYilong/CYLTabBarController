@@ -29,7 +29,7 @@ extension CYLTabBarController {
             storage.cylSetStoredTabBar(nil)
         }
         guard cylPrivate.cylStoredTabBar() == nil else { return }
-        cyl_setValue(CYLFlatDesignTabBarHideTabBar(), forKey: "tabBar")
+        cylSetValue(CYLFlatDesignTabBarHideTabBar(), forKey: "tabBar")
         if !tabBar.isHidden {
             tabBar.isHidden = true
         }

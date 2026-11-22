@@ -65,9 +65,9 @@ enum Tab: String, CaseIterable {
     var attributes: [AnyHashable: Any] {
         let image = UIImage(systemName: symbolName) ?? UIImage()
         var attributes: [AnyHashable: Any] = [
-            CYLTabBarItemTitle: rawValue.capitalized,
-            CYLTabBarItemImage: image,
-            CYLTabBarItemSelectedImage: image,
+            cylTabBarItemTitle: rawValue.capitalized,
+            cylTabBarItemImage: image,
+            cylTabBarItemSelectedImage: image,
         ]
         attributes.merge(animationAttributes) { _, new in new }
         return attributes

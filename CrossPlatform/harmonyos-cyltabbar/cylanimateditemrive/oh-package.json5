@@ -1,0 +1,12 @@
+{
+  "name": "cylanimateditemrive",
+  "version": "1.0.0",
+  "description": "Rive for HarmonyOS NEXT (ArkTS / ArkUI), shared by every library that plays .riv files: CYLRiveIcon with the loop and replay fixes, and an animationBuilder for CYLAnimatedItemView.",
+  "main": "Index.ets",
+  "author": "ChenYilong",
+  "license": "MIT",
+  "dependencies": {
+    "@ohos/rive": "1.0.4",
+    "cylanimateditem": "file:../cylanimateditem"
+  }
+}

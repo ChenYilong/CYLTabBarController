@@ -67,31 +67,31 @@ enum CYLSettingsRow: Int {
 extension UIViewController {
 
     private var cyl_settingsTabBarController: CYLTabBarController? {
-        cyl_owningTabBarController() ?? cyl_tabBarController
+        cylOwningTabBarController() ?? cylTabBarController
     }
 
     /**
      * [EN] The first in-place update row, after the simulated failures. [CN] 第一个原地更新行，位于模拟意外情况之后。
      */
     private var cyl_settingsTabBarItemUpdateStart: Int {
-        CYLSettingsRow.configurationEdgeCase.rawValue + cyl_configurationEdgeCaseRowCount()
+        CYLSettingsRow.configurationEdgeCase.rawValue + cylConfigurationEdgeCaseRowCount()
     }
 
     /**
      * [EN] The number of rows of the settings section. [CN] 设置分组的行数。
      */
     @objc(cyl_settingsRowCount)
-    public func cyl_settingsRowCount() -> Int {
-        cyl_settingsTabBarItemUpdateStart + cyl_tabBarItemUpdateRowCount()
+    public func cylSettingsRowCount() -> Int {
+        cyl_settingsTabBarItemUpdateStart + cylTabBarItemUpdateRowCount()
     }
 
     /**
      * [EN] The cell of a row; every row shows its whole text, wrapped. [CN] 某行的 cell；每行完整显示文字（换行）。
      */
     @objc(cyl_settingsCellForTableView:atIndexPath:)
-    public func cyl_settingsCell(for tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell {
+    public func cylSettingsCell(for tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell {
         let cell = cylSettingsRowCell(for: tableView, row: indexPath.row)
-        cell.cyl_wrapsTextLabels()
+        cell.cylWrapsTextLabels()
         return cell
     }
 
@@ -100,14 +100,14 @@ extension UIViewController {
         let tabBarController = cyl_settingsTabBarController
         let updateStart = cyl_settingsTabBarItemUpdateStart
         if row >= updateStart {
-            return cyl_tabBarItemUpdateCell(for: tableView, row: row - updateStart)
+            return cylTabBarItemUpdateCell(for: tableView, row: row - updateStart)
         }
         if row >= CYLSettingsRow.configurationEdgeCase.rawValue {
-            return cyl_configurationEdgeCaseCell(for: tableView, row: row - CYLSettingsRow.configurationEdgeCase.rawValue)
+            return cylConfigurationEdgeCaseCell(for: tableView, row: row - CYLSettingsRow.configurationEdgeCase.rawValue)
         }
         typealias Demo = CYLSettingsDemo
         switch CYLSettingsRow(rawValue: row) ?? .language {
-        case .memoryWarning: return cyl_memoryWarningCell(for: tableView)
+        case .memoryWarning: return cylMemoryWarningCell(for: tableView)
         case .titlePositionAdjustment: return Demo.titlePositionAdjustmentCell(tableView, tabBarController)
         case .standardAppearance: return Demo.standardAppearanceCell(tableView, tabBarController)
         case .loginState: return Demo.loginStateCell(tableView, tabBarController)
@@ -126,10 +126,10 @@ extension UIViewController {
         case .utilsHelpers: return Demo.utilsHelpersCell(tableView, tabBarController)
         case .tabBarMinimizeBehavior: return Demo.tabBarMinimizeCell(tableView, tabBarController)
         case .plusButtonLateImage: return Demo.lateImageCell(tableView)
-        case .theme: return cyl_themeSettingsCell(for: tableView)
+        case .theme: return cylThemeSettingsCell(for: tableView)
         case .scrollHideSimulation: return Demo.scrollHideSimulationMenuCell(tableView)
-        case .configurationFile: return cyl_configurationDemoCell(for: tableView)
-        case .language, .configurationEdgeCase: return cyl_languageCell(for: tableView)
+        case .configurationFile: return cylConfigurationDemoCell(for: tableView)
+        case .language, .configurationEdgeCase: return cylLanguageCell(for: tableView)
         }
     }
 
@@ -168,24 +168,24 @@ extension UIViewController {
      * [EN] The groups that have rows, in display order (`CYLSettingsGroup` values). [CN] 有行的分组，按显示顺序（`CYLSettingsGroup` 值）。
      */
     @objc(cyl_settingsGroups)
-    public func cyl_settingsGroups() -> [NSNumber] {
-        CYLSettingsGroup.allCases.filter { !cyl_settingsRows(in: $0).isEmpty }.map { NSNumber(value: $0.rawValue) }
+    public func cylSettingsGroups() -> [NSNumber] {
+        CYLSettingsGroup.allCases.filter { !cylSettingsRows(in: $0).isEmpty }.map { NSNumber(value: $0.rawValue) }
     }
 
     /**
      * [EN] The title of `group`, in the app's language. [CN] `group` 的标题，使用 App 语言。
      */
     @objc(cyl_titleForSettingsGroup:)
-    public func cyl_title(for group: CYLSettingsGroup) -> String {
+    public func cylTitle(for group: CYLSettingsGroup) -> String {
         switch group {
-        case .general: return CYLLocalizedString("通用")
-        case .tabBarAppearance: return CYLLocalizedString("TabBar 外观")
-        case .tabBarItemUpdate: return CYLLocalizedString("原地更新 Tab")
-        case .pagesSelectionLogin: return CYLLocalizedString("Tab 页面、选中与登录")
+        case .general: return cylLocalizedString("通用")
+        case .tabBarAppearance: return cylLocalizedString("TabBar 外观")
+        case .tabBarItemUpdate: return cylLocalizedString("原地更新 Tab")
+        case .pagesSelectionLogin: return cylLocalizedString("Tab 页面、选中与登录")
         case .plusButton: return "PlusButton"
-        case .tabInteractions: return CYLLocalizedString("Tab 交互")
-        case .helpers: return CYLLocalizedString("无需继承基类与工具方法")
-        case .configuration: return CYLLocalizedString("配置文件")
+        case .tabInteractions: return cylLocalizedString("Tab 交互")
+        case .helpers: return cylLocalizedString("无需继承基类与工具方法")
+        case .configuration: return cylLocalizedString("配置文件")
         }
     }
 
@@ -195,8 +195,8 @@ extension UIViewController {
      * [CN] `group` 中的行（设置分组中的行号）；未被任何分组归类的行（新增的行）放在“通用”分组中，保证可见。
      */
     @objc(cyl_settingsRowsInGroup:)
-    public func cyl_settingsRows(in group: CYLSettingsGroup) -> [NSNumber] {
-        let rowCount = cyl_settingsRowCount()
+    public func cylSettingsRows(in group: CYLSettingsGroup) -> [NSNumber] {
+        let rowCount = cylSettingsRowCount()
         var rows = cylPlacedSettingsRows(in: group).filter { $0 < rowCount }
         if group == .general {
             let placed = Set(CYLSettingsGroup.allCases.flatMap(cylPlacedSettingsRows(in:)))
@@ -209,8 +209,8 @@ extension UIViewController {
      * [EN] The cell of settings row `row`, for a grouped list. [CN] 设置行 `row` 的 cell，用于分组列表。
      */
     @objc(cyl_settingsCellForTableView:row:)
-    public func cyl_settingsCell(for tableView: UITableView, row: Int) -> UITableViewCell {
-        cyl_settingsCell(for: tableView, at: IndexPath(row: row, section: Int(CYLSettingsSection)))
+    public func cylSettingsCell(for tableView: UITableView, row: Int) -> UITableViewCell {
+        cylSettingsCell(for: tableView, at: IndexPath(row: row, section: Int(CYLSettingsSection)))
     }
 
     /**
@@ -219,7 +219,7 @@ extension UIViewController {
      * [CN] 执行设置行 `row`，用于分组列表：各行会刷新其在设置分组中的 indexPath，而分组列表中没有该分组，因此不传列表执行，由调用方刷新。
      */
     @objc(cyl_didSelectSettingsRow:)
-    public func cyl_didSelectSettingsRow(_ row: Int) {
+    public func cylDidSelectSettingsRow(_ row: Int) {
         cylRunSettingsRow(at: IndexPath(row: row, section: Int(CYLSettingsSection)), in: nil)
     }
 
@@ -227,7 +227,7 @@ extension UIViewController {
      * [EN] Runs a row of the settings section, and deselects and reloads it. [CN] 执行设置分组中的某行，并取消选中、刷新该行。
      */
     @objc(cyl_didSelectSettingsRowAtIndexPath:inTableView:)
-    public func cyl_didSelectSettingsRow(at indexPath: IndexPath, in tableView: UITableView) {
+    public func cylDidSelectSettingsRow(at indexPath: IndexPath, in tableView: UITableView) {
         cylRunSettingsRow(at: indexPath, in: tableView)
     }
 
@@ -239,19 +239,19 @@ extension UIViewController {
         let reload = { tableView?.reloadRows(at: [indexPath], with: .none) }
         let updateStart = cyl_settingsTabBarItemUpdateStart
         if row >= updateStart {
-            cyl_didSelectTabBarItemUpdateRow(row - updateStart)
+            cylDidSelectTabBarItemUpdateRow(row - updateStart)
             // [EN] The rows show which changes are on (a checkmark). [CN] 各行用勾号显示已应用的更改。
-            tableView?.reloadRows(at: (updateStart..<cyl_settingsRowCount()).map { IndexPath(row: $0, section: indexPath.section) }, with: .none)
+            tableView?.reloadRows(at: (updateStart..<cylSettingsRowCount()).map { IndexPath(row: $0, section: indexPath.section) }, with: .none)
             return
         }
         if row >= CYLSettingsRow.configurationEdgeCase.rawValue {
-            cyl_runConfigurationEdgeCase(atRow: row - CYLSettingsRow.configurationEdgeCase.rawValue)
+            cylRunConfigurationEdgeCase(atRow: row - CYLSettingsRow.configurationEdgeCase.rawValue)
             return
         }
         typealias Demo = CYLSettingsDemo
         switch CYLSettingsRow(rawValue: row) ?? .language {
         case .memoryWarning:
-            cyl_simulateMemoryWarningAndShowResult()
+            cylSimulateMemoryWarningAndShowResult()
         case .titlePositionAdjustment:
             Demo.switchTitlePositionAdjustment(tabBarController)
             reload()
@@ -307,17 +307,17 @@ extension UIViewController {
             reload()
         case .theme:
             // [EN] The row shows the theme picked. [CN] 该行显示所选主题。
-            cyl_presentThemePicker(from: tableView?.cellForRow(at: indexPath)) { [weak tableView] in
+            cylPresentThemePicker(from: tableView?.cellForRow(at: indexPath)) { [weak tableView] in
                 if let tableView, tableView.window != nil, indexPath.row < tableView.numberOfRows(inSection: indexPath.section) {
                     tableView.reloadRows(at: [indexPath], with: .none)
                 }
             }
         case .scrollHideSimulation:
-            cyl_presentScrollHideSimulationMenu()
+            cylPresentScrollHideSimulationMenu()
         case .configurationFile:
-            cyl_presentConfigurationDemo()
+            cylPresentConfigurationDemo()
         case .language, .configurationEdgeCase:
-            cyl_presentLanguagePicker()
+            cylPresentLanguagePicker()
         }
     }
 }

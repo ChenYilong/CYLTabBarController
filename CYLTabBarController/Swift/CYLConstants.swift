@@ -16,34 +16,34 @@ import UIKit
  [CN] Tab 没有图片时（没有尺寸与图片的动画）图片的宽度。自第 114 步起为 Swift；Objective-C 通过 CYLConstants.h 的宏读取，通过
       `CYLConstants.tabBarItemImagePlaceholderSize` 设置。
  */
-public var CYLTabBarItemImagePlaceholderWidth: CGFloat = 22
+public var cylTabBarItemImagePlaceholderWidth: CGFloat = 22
 
 /**
  [EN] The height of a tab's image when it has none. [CN] Tab 没有图片时图片的高度。
  */
-public var CYLTabBarItemImagePlaceholderHeight: CGFloat = 22
+public var cylTabBarItemImagePlaceholderHeight: CGFloat = 22
 
 /**
  [EN] Objective-C's `CYLTabBarItemImagePlaceholderWidth` (a macro of CYLConstants.h). [CN] Objective-C 的 `CYLTabBarItemImagePlaceholderWidth`（宏）。
  */
 @_cdecl("CYLTabBarItemImagePlaceholderCurrentWidth")
-public func CYLTabBarItemImagePlaceholderCurrentWidth() -> CGFloat {
-    CYLTabBarItemImagePlaceholderWidth
+public func cylTabBarItemImagePlaceholderCurrentWidth() -> CGFloat {
+    cylTabBarItemImagePlaceholderWidth
 }
 
 /**
  [EN] Objective-C's `CYLTabBarItemImagePlaceholderHeight` (a macro of CYLConstants.h). [CN] Objective-C 的 `CYLTabBarItemImagePlaceholderHeight`（宏）。
  */
 @_cdecl("CYLTabBarItemImagePlaceholderCurrentHeight")
-public func CYLTabBarItemImagePlaceholderCurrentHeight() -> CGFloat {
-    CYLTabBarItemImagePlaceholderHeight
+public func cylTabBarItemImagePlaceholderCurrentHeight() -> CGFloat {
+    cylTabBarItemImagePlaceholderHeight
 }
 
 /**
  [EN] `CYLConstants.uiBasisWidthScale()` for the `CYLScale` macro of CYLConstants.h. [CN] 供 CYLConstants.h 的 `CYLScale` 宏使用。
  */
 @_cdecl("CYLConstantsUIBasisWidthScale")
-public func CYLConstantsUIBasisWidthScale() -> CGFloat {
+public func cylConstantsUIBasisWidthScale() -> CGFloat {
     CYLConstants.uiBasisWidthScale()
 }
 
@@ -51,7 +51,7 @@ public func CYLConstantsUIBasisWidthScale() -> CGFloat {
  [EN] `CYLConstants.uiBasisHeightScale()` for the `CYLHScale` macro of CYLConstants.h. [CN] 供 CYLConstants.h 的 `CYLHScale` 宏使用。
  */
 @_cdecl("CYLConstantsUIBasisHeightScale")
-public func CYLConstantsUIBasisHeightScale() -> CGFloat {
+public func cylConstantsUIBasisHeightScale() -> CGFloat {
     CYLConstants.uiBasisHeightScale()
 }
 
@@ -69,7 +69,7 @@ open class CYLConstants: NSObject {
     /// [EN] The screen against the 375 x 667 design size, read once (the Objective-C class did it in `+initialize`).
     /// [CN] 屏幕相对 375 x 667 设计尺寸的比例，只读取一次（原 Objective-C 类在 `+initialize` 中读取）。
     private static let cylBasisScales: (width: CGFloat, height: CGFloat) = {
-        let bounds = CYLGetRootWindow()?.windowScene?.screen.bounds ?? .zero
+        let bounds = cylGetRootWindow()?.windowScene?.screen.bounds ?? .zero
         return (bounds.width / 375, bounds.height / 667)
     }()
 
@@ -102,10 +102,10 @@ open class CYLConstants: NSObject {
           Objective-C 中是只读的宏）。
      */
     @objc open class var tabBarItemImagePlaceholderSize: CGSize {
-        get { CGSize(width: CYLTabBarItemImagePlaceholderWidth, height: CYLTabBarItemImagePlaceholderHeight) }
+        get { CGSize(width: cylTabBarItemImagePlaceholderWidth, height: cylTabBarItemImagePlaceholderHeight) }
         set {
-            CYLTabBarItemImagePlaceholderWidth = newValue.width
-            CYLTabBarItemImagePlaceholderHeight = newValue.height
+            cylTabBarItemImagePlaceholderWidth = newValue.width
+            cylTabBarItemImagePlaceholderHeight = newValue.height
         }
     }
 
@@ -210,15 +210,15 @@ open class CYLConstants: NSObject {
      [CN] Tab 动画是否开启：构建中包含动画库，并且给出了 URL，或某个 Tab 的属性指定了动画文件。
      */
     @objc(isTabBarItemAnimationEnabledWithURLs:tabBarItemsAttributes:)
-    open class func isTabBarItemAnimationEnabled(with URLs: [URL]!, tabBarItemsAttributes: [[AnyHashable: Any]]!) -> Bool {
+    open class func isTabBarItemAnimationEnabled(with urls: [URL]!, tabBarItemsAttributes: [[AnyHashable: Any]]!) -> Bool {
         guard CYLTabBarItemAnimationCore.service != nil else { return false }
-        if !(URLs ?? []).isEmpty {
+        if !(urls ?? []).isEmpty {
             return true
         }
         let attributesList: [[AnyHashable: Any]] = tabBarItemsAttributes ?? []
         return attributesList.contains { attributes in
-            CYLTabBarItemAnimationCore.attributesAnimationValue(attributes, CYLTabBarAnimationURL) != nil
-                || CYLTabBarItemAnimationCore.attributesAnimationValue(attributes, CYLTabBarAnimationFilePath) != nil
+            CYLTabBarItemAnimationCore.attributesAnimationValue(attributes, cylTabBarAnimationURL) != nil
+                || CYLTabBarItemAnimationCore.attributesAnimationValue(attributes, cylTabBarAnimationFilePath) != nil
         }
     }
 }

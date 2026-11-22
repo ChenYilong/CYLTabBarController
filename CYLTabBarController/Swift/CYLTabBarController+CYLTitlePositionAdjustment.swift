@@ -79,12 +79,12 @@ extension CYLTabBarController {
             return nil
         }
         var colors: [String: Any] = [:]
-        for key in [CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor, CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor] {
+        for key in [cylTabBarItemTitleColor, cylTabBarItemSelectedTitleColor, cylTabBarItemIconColor, cylTabBarItemSelectedIconColor] {
             if let color = attributes[key] as? UIColor {
                 colors[key] = color
             }
         }
-        for key in [CYLTabBarItemTitleFont, CYLTabBarItemSelectedTitleFont] {
+        for key in [cylTabBarItemTitleFont, cylTabBarItemSelectedTitleFont] {
             if let font = attributes[key] as? UIFont {
                 colors[key] = font
             }
@@ -108,16 +108,16 @@ extension CYLTabBarController {
 
     @available(iOS 13.0, *)
     private static func cylSetColors(of itemAppearance: UITabBarItemAppearance, _ colors: NSDictionary) {
-        cylSetTitleAttribute(of: itemAppearance.normal, .foregroundColor, colors[CYLTabBarItemTitleColor])
-        cylSetTitleAttribute(of: itemAppearance.selected, .foregroundColor, colors[CYLTabBarItemSelectedTitleColor])
+        cylSetTitleAttribute(of: itemAppearance.normal, .foregroundColor, colors[cylTabBarItemTitleColor])
+        cylSetTitleAttribute(of: itemAppearance.selected, .foregroundColor, colors[cylTabBarItemSelectedTitleColor])
         // [EN] Fonts: the selected state uses the unselected font unless it has its own. [CN] 字体：选中状态没有单独设置时使用未选中的字体。
-        let titleFont = colors[CYLTabBarItemTitleFont]
+        let titleFont = colors[cylTabBarItemTitleFont]
         cylSetTitleAttribute(of: itemAppearance.normal, .font, titleFont)
-        cylSetTitleAttribute(of: itemAppearance.selected, .font, colors[CYLTabBarItemSelectedTitleFont] ?? titleFont)
-        if let iconColor = colors[CYLTabBarItemIconColor] as? UIColor {
+        cylSetTitleAttribute(of: itemAppearance.selected, .font, colors[cylTabBarItemSelectedTitleFont] ?? titleFont)
+        if let iconColor = colors[cylTabBarItemIconColor] as? UIColor {
             itemAppearance.normal.iconColor = iconColor
         }
-        if let selectedIconColor = colors[CYLTabBarItemSelectedIconColor] as? UIColor {
+        if let selectedIconColor = colors[cylTabBarItemSelectedIconColor] as? UIColor {
             itemAppearance.selected.iconColor = selectedIconColor
         }
     }

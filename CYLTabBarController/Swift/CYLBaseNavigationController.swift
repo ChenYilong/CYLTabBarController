@@ -19,30 +19,30 @@ import UIKit
 open class CYLBaseNavigationController: UINavigationController {
 
     open override func pushViewController(_ viewController: UIViewController, animated: Bool) {
-        cyl_baseNavigationWillPush(viewController)
+        cylBaseNavigationWillPush(viewController)
         super.pushViewController(viewController, animated: animated)
     }
 
     open override func setViewControllers(_ viewControllers: [UIViewController], animated: Bool) {
         super.setViewControllers(viewControllers, animated: animated)
-        cyl_baseNavigationToggleTabBarHidden()
+        cylBaseNavigationToggleTabBarHidden()
     }
 
     open override func popToRootViewController(animated: Bool) -> [UIViewController]? {
         let viewControllers = super.popToRootViewController(animated: animated)
-        cyl_baseNavigationToggleTabBarHidden()
+        cylBaseNavigationToggleTabBarHidden()
         return viewControllers
     }
 
     open override func popViewController(animated: Bool) -> UIViewController? {
         let viewController = super.popViewController(animated: animated)
-        cyl_baseNavigationToggleTabBarHidden()
+        cylBaseNavigationToggleTabBarHidden()
         return viewController
     }
 
     open override func popToViewController(_ viewController: UIViewController, animated: Bool) -> [UIViewController]? {
         let viewControllers = super.popToViewController(viewController, animated: animated)
-        cyl_baseNavigationToggleTabBarHidden()
+        cylBaseNavigationToggleTabBarHidden()
         return viewControllers
     }
 }

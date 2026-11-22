@@ -272,18 +272,18 @@ extension UIControl {
         cyl_actualBadgeView?.cyl_resumeBadge()
     }
 
-    public override func cyl_refreshBadge() {
+    @objc(cyl_refreshBadge) public override func cylRefreshBadge() {
         if CYLControlBadgeKeys.layerPerformDepth == 0 {
-            cyl_asView.cyl_perform(#selector(UIView.cyl_refreshBadge))
+            cyl_asView.cyl_perform(#selector(UIView.cylRefreshBadge))
             return
         }
-        cyl_actualBadgeView?.cyl_refreshBadge()
+        cyl_actualBadgeView?.cylRefreshBadge()
     }
 
     // MARK: Private methods
 
     @objc(cyl_getActualBadgeSuperViewFromControl:)
-    dynamic func cyl_getActualBadgeSuperView(fromControl tabButton: UIControl) -> UIView? {
+    dynamic func cylGetActualBadgeSuperView(fromControl tabButton: UIControl) -> UIView? {
         (tabButton as UIView).cyl_getActualBadgeSuperView() as? UIView
     }
 
@@ -296,18 +296,18 @@ extension UIControl {
      *      为其内容之上、与图标对齐的透明锚点视图（`-cyl_badgeAnchorViewAlignedToView:`），控件自身的内容不会遮挡或裁剪角标。
      */
     public override func cyl_getActualBadgeSuperView() -> Any? {
-        let tabImageView = cyl_tabImageView()
-        let animationView = cyl_tabBarItemAnimationView()
+        let tabImageView = cylTabImageView()
+        let animationView = cylTabBarItemAnimationView()
         var actualBadgeSuperView: UIView?
         // [EN] An animated item (`CYLAnimatedItemView`, a FlatDesign tab button included): its animation view of any format
         //      while it shows, else its image; the Lottie / image lookup below is for UIKit's tab buttons.
         // [CN] 动效 item（`CYLAnimatedItemView`，包括扁平样式 Tab 按钮）：其任意格式的动画视图（显示时），否则为其图片；下面的 Lottie / 图片查找用于
         //      UIKit 的 Tab 按钮。
-        if let iconHost = cyl_animatedItemBadgeHost() {
+        if let iconHost = cylAnimatedItemBadgeHost() {
             actualBadgeSuperView = iconHost
-        } else if let animationView, !animationView.cyl_isInvisiable() || animationView.cyl_badgeHostReplacedByIconView {
+        } else if let animationView, !animationView.cylIsInvisiable() || animationView.cyl_badgeHostReplacedByIconView {
             actualBadgeSuperView = animationView
-        } else if let tabImageView, !tabImageView.cyl_isInvisiable() || tabImageView.cyl_badgeHostReplacedByIconView {
+        } else if let tabImageView, !tabImageView.cylIsInvisiable() || tabImageView.cyl_badgeHostReplacedByIconView {
             actualBadgeSuperView = tabImageView
         }
         // [EN] By class name: `-cyl_isTabButton` is YES for every UIControl before iOS 26.
@@ -316,7 +316,7 @@ extension UIControl {
         let isTabBarButton = className.contains("TabButton") || className.contains("TabBarButton")
         // [EN] An animated item, a tab or not: the badge goes on its icon subview itself (animation or image view), never on
         //      the item or on an anchor. [CN] 动效 item（无论是否为 Tab）：角标直接放在其图标子视图（动画或图片视图）上，而不是 item 或锚点上。
-        if !isTabBarButton && cyl_animatedItemBadgeHost() == nil {
+        if !isTabBarButton && cylAnimatedItemBadgeHost() == nil {
             return cylBadgeAnchorViewAligned(to: actualBadgeSuperView)
         }
         if let actualBadgeSuperView {
@@ -445,7 +445,7 @@ extension UIControl {
         if !CYLUtils.isLiquidGlassActive() {
             return [self]
         }
-        let counterpart = cyl_isPlatterSelectedControl() ? cyl_platterNormal() : cyl_platterSelected()
+        let counterpart = cylIsPlatterSelectedControl() ? cylPlatterNormal() : cylPlatterSelected()
         if let counterpart, counterpart !== self {
             return [self, counterpart]
         }
@@ -479,13 +479,13 @@ extension UIControl {
         if !CYLUtils.isLiquidGlassActive() {
             return true
         }
-        if cyl_platterSelected()?.cyl_tabImageView() == nil {
+        if cylPlatterSelected()?.cylTabImageView() == nil {
             return false
         }
-        let isTabImageViewReady = (cyl_tabImageView()?.frame.size.width ?? 0) > 10 || (cyl_tabLabel()?.frame.size.width ?? 0) > 10
+        let isTabImageViewReady = (cylTabImageView()?.frame.size.width ?? 0) > 10 || (cylTabLabel()?.frame.size.width ?? 0) > 10
         var isAnimationReady = true
-        if let tabBarController = cyl_tabBarController, tabBarController.tabBarItemAnimationURLs.count > 0 {
-            isAnimationReady = cyl_isTabBarItemAnimationReady()
+        if let tabBarController = cylTabBarController, tabBarController.tabBarItemAnimationURLs.count > 0 {
+            isAnimationReady = cylIsTabBarItemAnimationReady()
         }
         return isTabImageViewReady && isAnimationReady
     }

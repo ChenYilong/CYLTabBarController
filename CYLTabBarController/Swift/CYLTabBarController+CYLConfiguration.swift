@@ -222,7 +222,7 @@ enum CYLConfigurationValues {
      * [CN] "default"、"system"、"flatDesign"、"liquidGlass"（不区分大小写，可带 `CYLTabBarStyleType` 前缀）或数字。
      */
     static func styleTypeValue(_ value: Any) -> NSNumber? {
-        let key = CYLTabBarControllerStyleType
+        let key = cylTabBarControllerStyleType
         if let number = value as? NSNumber, !(value is String) {
             let style = number.intValue
             let flatDesign = CYLTabBarStyleType.flatDesign.rawValue
@@ -269,7 +269,7 @@ enum CYLConfigurationValues {
             if let image = UIImage(systemName: String(string.dropFirst(7))) {
                 return image
             }
-            logInvalid(CYLTabBarItemImage, value)
+            logInvalid(cylTabBarItemImage, value)
         }
         return value
     }
@@ -435,7 +435,7 @@ enum CYLConfigurationValues {
      */
     static func animationOptionsValue(_ value: Any) -> [String: String]? {
         guard let dictionary = dictionaryFromMapEntries(value) as? NSDictionary else {
-            logInvalid(CYLTabBarAnimationOptions, value)
+            logInvalid(cylTabBarAnimationOptions, value)
             return nil
         }
         var options: [String: String] = [:]
@@ -444,7 +444,7 @@ enum CYLConfigurationValues {
             if let name = name as? String, !name.isEmpty, let text, !text.isEmpty {
                 options[name] = text
             } else {
-                logInvalid(CYLTabBarAnimationOptions, option)
+                logInvalid(cylTabBarAnimationOptions, option)
             }
         }
         return options
@@ -458,7 +458,7 @@ enum CYLConfigurationValues {
     static func applyAnimationOptions(_ item: inout [String: Any], _ options: [String: String]?) {
         guard let options, !options.isEmpty else { return }
         let pairs = [
-            (CYLTabBarAnimationURL, CYLTabBarAnimationFilePath), (CYLTabBarAnimationDarkURL, CYLTabBarAnimationDarkFilePath),
+            (cylTabBarAnimationURL, cylTabBarAnimationFilePath), (cylTabBarAnimationDarkURL, cylTabBarAnimationDarkFilePath),
             (lottieURL, lottieFilePath), (lottieDarkURL, lottieDarkFilePath), (pagURL, pagFilePath), (pagDarkURL, pagDarkFilePath),
             (riveURL, riveFilePath), (riveDarkURL, riveDarkFilePath), (gifURL, gifFilePath), (gifDarkURL, gifDarkFilePath),
             (svgaURL, svgaFilePath), (svgaDarkURL, svgaDarkFilePath),
@@ -502,40 +502,40 @@ enum CYLConfigurationValues {
      */
     static func plusButtonAttributesValue(_ value: Any) -> [String: Any]? {
         guard let value = value as? NSDictionary else {
-            logInvalid(CYLTabBarControllerPlusButton, value)
+            logInvalid(cylTabBarControllerPlusButton, value)
             return nil
         }
         var attributes: [String: Any] = [:]
-        for key in [CYLTabBarItemTitle, CYLTabBarItemSelectedTitle] {
+        for key in [cylTabBarItemTitle, cylTabBarItemSelectedTitle] {
             if let title = value[key], title is String || title is NSNumber {
                 attributes[key] = (title as AnyObject).description
             }
         }
         // [EN] The image, and the selected one (`CYLPlusButtonSubclass`'s highlighted image). [CN] 图片与选中图片（`CYLPlusButtonSubclass` 的高亮图片）。
-        for key in [CYLTabBarItemImage, CYLTabBarItemSelectedImage] {
+        for key in [cylTabBarItemImage, cylTabBarItemSelectedImage] {
             attributes[key] = plusButtonImage(value[key])
         }
-        attributes[CYLTabBarItemSelectedTitleColor] = colorValue(value[CYLTabBarItemSelectedTitleColor])
-        attributes[CYLTabBarItemTitleColor] = colorValue(value[CYLTabBarItemTitleColor])
-        attributes[CYLTabBarItemTitleFont] = fontValue(value[CYLTabBarItemTitleFont])
-        attributes[CYLPlusButtonBackgroundImage] = plusButtonImage(value[CYLPlusButtonBackgroundImage])
+        attributes[cylTabBarItemSelectedTitleColor] = colorValue(value[cylTabBarItemSelectedTitleColor])
+        attributes[cylTabBarItemTitleColor] = colorValue(value[cylTabBarItemTitleColor])
+        attributes[cylTabBarItemTitleFont] = fontValue(value[cylTabBarItemTitleFont])
+        attributes[cylPlusButtonBackgroundImage] = plusButtonImage(value[cylPlusButtonBackgroundImage])
         // [EN] Numbers: a position and a vertical center. [CN] 数字：位置与垂直中心。
-        for key in [CYLPlusButtonIndexInTabBar, CYLPlusButtonCenterYMultiplier, CYLPlusButtonCenterYOffset] {
+        for key in [cylPlusButtonIndexInTabBar, cylPlusButtonCenterYMultiplier, cylPlusButtonCenterYOffset] {
             guard let raw = value[key] else { continue }
             let number = (raw as? NSString).map { NSNumber(value: $0.doubleValue) } ?? (raw as? NSNumber)
-            if let number, number.doubleValue.isFinite, !(key == CYLPlusButtonIndexInTabBar && number.doubleValue < 0) {
+            if let number, number.doubleValue.isFinite, !(key == cylPlusButtonIndexInTabBar && number.doubleValue < 0) {
                 attributes[key] = number
             } else {
                 logInvalid(key, raw)
             }
         }
-        for key in [CYLPlusButtonSize, CYLPlusButtonImageSize] {
+        for key in [cylPlusButtonSize, cylPlusButtonImageSize] {
             attributes[key] = value[key].flatMap { sizeValue($0, key: key) }
         }
-        for key in [CYLPlusButtonAlignsTitle, CYLPlusButtonKeepsTitleVisible, CYLPlusButtonShowsSelection] {
+        for key in [cylPlusButtonAlignsTitle, cylPlusButtonKeepsTitleVisible, cylPlusButtonShowsSelection] {
             attributes[key] = value[key].flatMap { boolValue($0) }
         }
-        for key in [CYLTabBarItemIdentifier, CYLTabBarItemPageIdentifier] {
+        for key in [cylTabBarItemIdentifier, cylTabBarItemPageIdentifier] {
             if let string = value[key] as? String, !string.isEmpty {
                 attributes[key] = string
             }
@@ -569,32 +569,32 @@ enum CYLConfigurationValues {
 
     /** [EN] Every key the library reads. [CN] 本库读取的所有键。 */
     static let knownConfigurationKeys: [String] = [
-        CYLTabBarControllerViewControllers, CYLTabBarControllerTabBarItemsAttributes, CYLTabBarControllerImageInsets,
-        CYLTabBarControllerTitlePositionAdjustment, CYLTabBarControllerStyleType, CYLTabBarControllerContext,
-        CYLTabBarControllerPageRegistry, CYLTabBarControllerPageResolver, CYLTabBarControllerPageLookupOrder,
-        CYLTabBarControllerAutomaticPageRegistration, CYLTabBarControllerTabBarItemAnimationSpeed,
-        CYLTabBarControllerThemes, CYLTabBarControllerThemeIdentifier, CYLTabBarControllerDarkThemeIdentifier,
-        CYLTabBarControllerThemeManagerName, CYLTabBarControllerPlusButton, CYLTabBarControllerPlusButtonAction,
-        CYLTabBarControllerUserInterfaceStyle, CYLTabBarControllerTabButtonTapAnimation, CYLTabBarControllerSwipeToSwitchTab,
-        CYLTabBarControllerLoginRequiredTabBarItemIdentifiers, CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning,
-        CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers, CYLTabBarControllerLocalization,
-        CYLTabBarControllerConfigurationRoute, CYLTabBarControllerManifestRoute, CYLTabBarControllerIconRenderingMode,
-        CYLTabBarControllerIconColor, CYLTabBarControllerSelectedIconColor,
+        cylTabBarControllerViewControllers, cylTabBarControllerTabBarItemsAttributes, cylTabBarControllerImageInsets,
+        cylTabBarControllerTitlePositionAdjustment, cylTabBarControllerStyleType, cylTabBarControllerContext,
+        cylTabBarControllerPageRegistry, cylTabBarControllerPageResolver, cylTabBarControllerPageLookupOrder,
+        cylTabBarControllerAutomaticPageRegistration, cylTabBarControllerTabBarItemAnimationSpeed,
+        cylTabBarControllerThemes, cylTabBarControllerThemeIdentifier, cylTabBarControllerDarkThemeIdentifier,
+        cylTabBarControllerThemeManagerName, cylTabBarControllerPlusButton, cylTabBarControllerPlusButtonAction,
+        cylTabBarControllerUserInterfaceStyle, cylTabBarControllerTabButtonTapAnimation, cylTabBarControllerSwipeToSwitchTab,
+        cylTabBarControllerLoginRequiredTabBarItemIdentifiers, cylTabBarControllerUnloadsUnselectedViewsOnMemoryWarning,
+        cylTabBarControllerKeepsLoadedTabBarItemIdentifiers, cylTabBarControllerLocalization,
+        cylTabBarControllerConfigurationRoute, cylTabBarControllerManifestRoute, cylTabBarControllerIconRenderingMode,
+        cylTabBarControllerIconColor, cylTabBarControllerSelectedIconColor,
     ]
 
     static let knownItemKeys: [String] = [
-        CYLTabBarItemTitle, CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage,
-        CYLTabBarItemSelectedDarkImage, CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, CYLTabBarItemImageURLSize,
-        CYLTabBarItemImageInsets, CYLTabBarItemTitlePositionAdjustment, CYLTabBarItemImagePositionAdjustment,
-        lottieFilePath, lottieURL, lottieSize, CYLTabBarItemIdentifier, lottieDarkURL, lottieDarkFilePath, lottieDarkColors,
-        CYLTabBarItemPageIdentifier, CYLTabBarItemPageParameters, CYLTabBarItemPlatforms, CYLTabBarItemMinimumAppVersion,
-        CYLTabBarItemSelectedTitle, CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor, CYLTabBarItemIconColor,
-        CYLTabBarItemSelectedIconColor, CYLTabBarItemIconRenderingMode, CYLTabBarItemSelectedBackgroundColor,
-        CYLTabBarItemBackgroundColor, CYLTabBarItemTitleFont, CYLTabBarItemSelectedTitleFont,
-        CYLTabBarItemAccessibilityIdentifier, CYLTabBarItemAccessibilityLabel, CYLTabBarItemAccessibilityHint,
+        cylTabBarItemTitle, cylTabBarItemImage, cylTabBarItemSelectedImage, cylTabBarItemDarkImage,
+        cylTabBarItemSelectedDarkImage, cylTabBarItemImageURL, cylTabBarItemSelectedImageURL, cylTabBarItemImageURLSize,
+        cylTabBarItemImageInsets, cylTabBarItemTitlePositionAdjustment, cylTabBarItemImagePositionAdjustment,
+        lottieFilePath, lottieURL, lottieSize, cylTabBarItemIdentifier, lottieDarkURL, lottieDarkFilePath, lottieDarkColors,
+        cylTabBarItemPageIdentifier, cylTabBarItemPageParameters, cylTabBarItemPlatforms, cylTabBarItemMinimumAppVersion,
+        cylTabBarItemSelectedTitle, cylTabBarItemTitleColor, cylTabBarItemSelectedTitleColor, cylTabBarItemIconColor,
+        cylTabBarItemSelectedIconColor, cylTabBarItemIconRenderingMode, cylTabBarItemSelectedBackgroundColor,
+        cylTabBarItemBackgroundColor, cylTabBarItemTitleFont, cylTabBarItemSelectedTitleFont,
+        cylTabBarItemAccessibilityIdentifier, cylTabBarItemAccessibilityLabel, cylTabBarItemAccessibilityHint,
         // [EN] Tab animations (#604, #752, #605). [CN] Tab 动画（#604、#752、#605）。
-        CYLTabBarAnimationURL, CYLTabBarAnimationFilePath, CYLTabBarAnimationSize, CYLTabBarAnimationDarkURL,
-        CYLTabBarAnimationDarkFilePath, CYLTabBarAnimationDarkColors, CYLTabBarAnimationColors, CYLTabBarAnimationOptions,
+        cylTabBarAnimationURL, cylTabBarAnimationFilePath, cylTabBarAnimationSize, cylTabBarAnimationDarkURL,
+        cylTabBarAnimationDarkFilePath, cylTabBarAnimationDarkColors, cylTabBarAnimationColors, cylTabBarAnimationOptions,
         lottieLoopsWhenUnselected, pagURL, pagFilePath, pagSize, pagDarkURL, pagDarkFilePath, riveURL, riveFilePath, riveSize,
         riveDarkURL, riveDarkFilePath, riveDarkColors, gifURL, gifFilePath, gifSize, gifDarkURL, gifDarkFilePath,
         svgaURL, svgaFilePath, svgaSize, svgaDarkURL, svgaDarkFilePath,
@@ -638,7 +638,7 @@ enum CYLConfigurationValues {
     static func makeIdentifiersUnique(_ items: inout [[String: Any]]) {
         var used = Set<String>()
         for index in items.indices {
-            guard let identifier = items[index][CYLTabBarItemIdentifier] as? String else { continue }
+            guard let identifier = items[index][cylTabBarItemIdentifier] as? String else { continue }
             var unique = identifier
             var suffix = 2
             while used.contains(unique) {
@@ -647,10 +647,10 @@ enum CYLConfigurationValues {
             }
             if unique != identifier {
                 debugLog("🟡 CYLTabBarController configuration: duplicate identifier \(identifier) renamed \(unique).")
-                items[index][CYLTabBarItemIdentifier] = unique
+                items[index][cylTabBarItemIdentifier] = unique
                 // [EN] The page ID falls back to the tab ID: keep the original one (B12). [CN] 页面 ID 默认取 Tab 标识：保留原来的标识（B12）。
-                if ((items[index][CYLTabBarItemPageIdentifier] as? String) ?? "").isEmpty {
-                    items[index][CYLTabBarItemPageIdentifier] = identifier
+                if ((items[index][cylTabBarItemPageIdentifier] as? String) ?? "").isEmpty {
+                    items[index][cylTabBarItemPageIdentifier] = identifier
                 }
             }
             used.insert(unique)
@@ -708,13 +708,13 @@ enum CYLConfigurationValues {
     /** [EN] `CYLTabBarItemPlatforms` as lowercase names (B23). [CN] 将 `CYLTabBarItemPlatforms` 转为小写名称列表（B23）。 */
     static func platformsValue(_ value: Any) -> [String]? {
         guard let names = (value as? String).map({ $0.components(separatedBy: ",") as [Any] }) ?? (value as? [Any]) else {
-            logInvalid(CYLTabBarItemPlatforms, value)
+            logInvalid(cylTabBarItemPlatforms, value)
             return nil
         }
         var platforms: [String] = []
         for name in names {
             guard let platform = (name as? String).map({ trimmed($0).lowercased() }), !platform.isEmpty else {
-                logInvalid(CYLTabBarItemPlatforms, value)
+                logInvalid(cylTabBarItemPlatforms, value)
                 return nil
             }
             platforms.append(platform)
@@ -769,11 +769,11 @@ enum CYLConfigurationValues {
             if !name.isEmpty, CYLTabBarPageRegistry.defaultPageLookupOrder.contains(name), !order.contains(name) {
                 order.append(name)
             } else if !name.isEmpty || !(entry is String) {
-                logInvalid(CYLTabBarControllerPageLookupOrder, entry)
+                logInvalid(cylTabBarControllerPageLookupOrder, entry)
             }
         }
         if order.isEmpty {
-            logInvalid(CYLTabBarControllerPageLookupOrder, value)
+            logInvalid(cylTabBarControllerPageLookupOrder, value)
             return nil
         }
         return order
@@ -784,13 +784,13 @@ enum CYLConfigurationValues {
      * [CN] 该 Tab 在本设备上被排除的原因，没有则为 nil：不适用于 iOS，或需要更新的 App 版本（B24）。
      */
     static func exclusionReason(_ item: [String: Any]) -> String? {
-        if let platforms = item[CYLTabBarItemPlatforms] as? [String], !platforms.contains("ios") {
+        if let platforms = item[cylTabBarItemPlatforms] as? [String], !platforms.contains("ios") {
             return "its platforms are \(platforms.joined(separator: ", "))"
         }
-        if let minimum = item[CYLTabBarItemMinimumAppVersion] as? String {
+        if let minimum = item[cylTabBarItemMinimumAppVersion] as? String {
             let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
             guard let minimumNumbers = versionNumbers(minimum) else {
-                logInvalid(CYLTabBarItemMinimumAppVersion, minimum)
+                logInvalid(cylTabBarItemMinimumAppVersion, minimum)
                 return nil
             }
             if let appVersion, let appNumbers = versionNumbers(appVersion), version(appNumbers, isLowerThan: minimumNumbers) {
@@ -813,15 +813,15 @@ enum CYLConfigurationValues {
                 item[key] = value
             }
         }
-        for key in [CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemIdentifier, CYLTabBarItemPageIdentifier,
-                    CYLTabBarItemMinimumAppVersion, CYLTabBarItemAccessibilityIdentifier, CYLTabBarItemAccessibilityLabel,
-                    CYLTabBarItemAccessibilityHint] {
+        for key in [cylTabBarItemTitle, cylTabBarItemSelectedTitle, cylTabBarItemIdentifier, cylTabBarItemPageIdentifier,
+                    cylTabBarItemMinimumAppVersion, cylTabBarItemAccessibilityIdentifier, cylTabBarItemAccessibilityLabel,
+                    cylTabBarItemAccessibilityHint] {
             if let value = item[key], stringValue(value) == nil {
                 logInvalid(key, value)
             }
             item[key] = stringValue(item[key])
         }
-        for key in [CYLTabBarItemImage, CYLTabBarItemSelectedImage, CYLTabBarItemDarkImage, CYLTabBarItemSelectedDarkImage] {
+        for key in [cylTabBarItemImage, cylTabBarItemSelectedImage, cylTabBarItemDarkImage, cylTabBarItemSelectedDarkImage] {
             var value = item[key]
             if let unwrapped = value, !(unwrapped is String), !(unwrapped is UIImage) {
                 logInvalid(key, unwrapped)
@@ -829,24 +829,24 @@ enum CYLConfigurationValues {
             }
             item[key] = value.map { imageValue($0) }
         }
-        if let value = item[CYLTabBarItemImageInsets] {
-            item[CYLTabBarItemImageInsets] = edgeInsetsValue(value, key: CYLTabBarItemImageInsets)
+        if let value = item[cylTabBarItemImageInsets] {
+            item[cylTabBarItemImageInsets] = edgeInsetsValue(value, key: cylTabBarItemImageInsets)
         }
-        for key in [CYLTabBarItemTitlePositionAdjustment, CYLTabBarItemImagePositionAdjustment] {
+        for key in [cylTabBarItemTitlePositionAdjustment, cylTabBarItemImagePositionAdjustment] {
             if let value = item[key] {
                 item[key] = offsetValue(value, key: key)
             }
         }
-        for key in [CYLTabBarItemImageURLSize, lottieSize, CYLTabBarAnimationSize, pagSize, riveSize, gifSize, svgaSize] {
+        for key in [cylTabBarItemImageURLSize, lottieSize, cylTabBarAnimationSize, pagSize, riveSize, gifSize, svgaSize] {
             if let value = item[key] {
                 item[key] = sizeValue(value, key: key)
             }
         }
         // [EN] Animation URLs: a local file must exist and be readable (B17). [CN] 动画 URL：本地文件必须存在且可读（B17）。
-        for key in [CYLTabBarItemImageURL, CYLTabBarItemSelectedImageURL, lottieURL, lottieDarkURL, CYLTabBarAnimationURL,
-                    CYLTabBarAnimationDarkURL, pagURL, pagDarkURL, riveURL, riveDarkURL, gifURL, gifDarkURL, svgaURL, svgaDarkURL] {
+        for key in [cylTabBarItemImageURL, cylTabBarItemSelectedImageURL, lottieURL, lottieDarkURL, cylTabBarAnimationURL,
+                    cylTabBarAnimationDarkURL, pagURL, pagDarkURL, riveURL, riveDarkURL, gifURL, gifDarkURL, svgaURL, svgaDarkURL] {
             guard let value = item[key] else { continue }
-            let isImage = key == CYLTabBarItemImageURL || key == CYLTabBarItemSelectedImageURL
+            let isImage = key == cylTabBarItemImageURL || key == cylTabBarItemSelectedImageURL
             var checked: Any? = isImage ? imageURLValue(value) : urlValue(value)
             if !isImage, let url = checked as? URL, url.isFileURL, !isReadableAnimationFile(url.path) {
                 checked = nil
@@ -856,7 +856,7 @@ enum CYLConfigurationValues {
             }
             item[key] = checked
         }
-        for key in [lottieFilePath, lottieDarkFilePath, CYLTabBarAnimationFilePath, CYLTabBarAnimationDarkFilePath, pagFilePath,
+        for key in [lottieFilePath, lottieDarkFilePath, cylTabBarAnimationFilePath, cylTabBarAnimationDarkFilePath, pagFilePath,
                     pagDarkFilePath, riveFilePath, riveDarkFilePath, gifFilePath, gifDarkFilePath, svgaFilePath, svgaDarkFilePath] {
             guard let value = item[key] else { continue }
             var path = (value as? String).map { mainBundlePath($0) }
@@ -866,46 +866,46 @@ enum CYLConfigurationValues {
             }
             item[key] = path
         }
-        for key in [CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor, CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor,
-                    CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemBackgroundColor] {
+        for key in [cylTabBarItemTitleColor, cylTabBarItemSelectedTitleColor, cylTabBarItemIconColor, cylTabBarItemSelectedIconColor,
+                    cylTabBarItemSelectedBackgroundColor, cylTabBarItemBackgroundColor] {
             guard let value = item[key] else { continue }
             item[key] = colorValue(value)
             if item[key] == nil {
                 logInvalid(key, attributes[key])
             }
         }
-        if let value = item[CYLTabBarItemIconRenderingMode] {
+        if let value = item[cylTabBarItemIconRenderingMode] {
             // FIX: issue #787 — "template", "original" or "automatic". [CN] "template"、"original" 或 "automatic"。
             var mode = (value as? String)?.lowercased()
             if !["template", "original", "automatic"].contains(mode ?? "") {
-                logInvalid(CYLTabBarItemIconRenderingMode, attributes[CYLTabBarItemIconRenderingMode])
+                logInvalid(cylTabBarItemIconRenderingMode, attributes[cylTabBarItemIconRenderingMode])
                 mode = nil
             }
-            item[CYLTabBarItemIconRenderingMode] = mode
+            item[cylTabBarItemIconRenderingMode] = mode
         }
-        for key in [CYLTabBarItemTitleFont, CYLTabBarItemSelectedTitleFont] {
+        for key in [cylTabBarItemTitleFont, cylTabBarItemSelectedTitleFont] {
             guard let value = item[key] else { continue }
             item[key] = fontValue(value)
             if item[key] == nil {
                 logInvalid(key, attributes[key])
             }
         }
-        if let value = item[CYLTabBarItemPageParameters] {
+        if let value = item[cylTabBarItemPageParameters] {
             // [EN] Protobuf maps arrive as key / value entries; parameters must be a dictionary (B25).
             // [CN] Protobuf 的 map 以 key / value 条目出现；参数必须是字典（B25）。
             let parameters = dictionaryFromMapEntries(value)
             if parameters is NSDictionary {
-                item[CYLTabBarItemPageParameters] = parameters
+                item[cylTabBarItemPageParameters] = parameters
             } else {
-                logInvalid(CYLTabBarItemPageParameters, parameters)
-                item[CYLTabBarItemPageParameters] = nil
+                logInvalid(cylTabBarItemPageParameters, parameters)
+                item[cylTabBarItemPageParameters] = nil
             }
         }
-        if let value = item[CYLTabBarItemPlatforms] {
-            item[CYLTabBarItemPlatforms] = platformsValue(value)
+        if let value = item[cylTabBarItemPlatforms] {
+            item[cylTabBarItemPlatforms] = platformsValue(value)
         }
         warnUnknownKeys(item.keys, known: knownItemKeys)
-        for key in [lottieDarkColors, CYLTabBarAnimationDarkColors, CYLTabBarAnimationColors, riveDarkColors] {
+        for key in [lottieDarkColors, cylTabBarAnimationDarkColors, cylTabBarAnimationColors, riveDarkColors] {
             guard let value = item[key] else { continue }
             let colors = darkColorsValue(value, key: key)
             if colors is NSDictionary {
@@ -922,9 +922,9 @@ enum CYLConfigurationValues {
             }
             item[lottieLoopsWhenUnselected] = loops
         }
-        if let value = item[CYLTabBarAnimationOptions] {
+        if let value = item[cylTabBarAnimationOptions] {
             let options = animationOptionsValue(value)
-            item[CYLTabBarAnimationOptions] = options
+            item[cylTabBarAnimationOptions] = options
             applyAnimationOptions(&item, options)
         }
         return item
@@ -933,13 +933,13 @@ enum CYLConfigurationValues {
     /** [EN] View controllers from code: only UIViewController instances, each once (C6, C7). [CN] 代码传入的子控制器：只保留 UIViewController 实例，且每个只保留一次（C6、C7）。 */
     static func validViewControllers(_ value: Any) -> [UIViewController]? {
         guard let array = value as? [Any] else {
-            logInvalid(CYLTabBarControllerViewControllers, value)
+            logInvalid(cylTabBarControllerViewControllers, value)
             return nil
         }
         var viewControllers: [UIViewController] = []
         for element in array {
             guard let viewController = element as? UIViewController, !viewControllers.contains(where: { $0 === viewController }) else {
-                logInvalid(CYLTabBarControllerViewControllers, element)
+                logInvalid(cylTabBarControllerViewControllers, element)
                 continue
             }
             viewControllers.append(viewController)
@@ -950,12 +950,12 @@ enum CYLConfigurationValues {
     static func error(_ code: CYLTabBarConfigurationErrorCode, _ description: String, underlying: Error? = nil) -> NSError {
         var userInfo: [String: Any] = [NSLocalizedDescriptionKey: description]
         userInfo[NSUnderlyingErrorKey] = underlying
-        return NSError(domain: CYLTabBarConfigurationErrorDomain, code: code.rawValue, userInfo: userInfo)
+        return NSError(domain: cylTabBarConfigurationErrorDomain, code: code.rawValue, userInfo: userInfo)
     }
 
     /** [EN] A configuration read from a file or a URL must describe at least one tab (B1, B2, D7). [CN] 从文件或 URL 读取的配置必须至少描述一个 Tab（B1、B2、D7）。 */
     static func tabsError(_ configuration: [String: Any]) -> NSError? {
-        let items = configuration[CYLTabBarControllerTabBarItemsAttributes]
+        let items = configuration[cylTabBarControllerTabBarItemsAttributes]
         if items is NSDictionary || (items as? [Any])?.contains(where: { $0 is NSDictionary }) == true {
             return nil
         }
@@ -997,29 +997,29 @@ enum CYLConfigurationSkins {
         var list = value as? [Any]
         var themes: [String: [String: Any]] = [:]
         if let dictionary = value as? NSDictionary {
-            if dictionary[CYLTabBarThemeIdentifier] != nil {
+            if dictionary[cylTabBarThemeIdentifier] != nil {
                 list = [dictionary]
             } else {
                 for (key, entry) in dictionary {
                     if let identifier = Values.stringValue(key), !identifier.isEmpty, let values = themeValues(entry) {
                         themes[identifier] = values
                     } else {
-                        Values.logInvalid(CYLTabBarControllerThemes, key)
+                        Values.logInvalid(cylTabBarControllerThemes, key)
                     }
                 }
             }
         }
         for entry in list ?? [] {
             let dictionary = entry as? NSDictionary
-            if let identifier = Values.stringValue(dictionary?[CYLTabBarThemeIdentifier]), !identifier.isEmpty,
-               let values = themeValues(dictionary?[CYLTabBarThemeValues]) {
+            if let identifier = Values.stringValue(dictionary?[cylTabBarThemeIdentifier]), !identifier.isEmpty,
+               let values = themeValues(dictionary?[cylTabBarThemeValues]) {
                 themes[identifier] = values
             } else {
-                Values.logInvalid(CYLTabBarControllerThemes, entry)
+                Values.logInvalid(cylTabBarControllerThemes, entry)
             }
         }
         if themes.isEmpty {
-            Values.logInvalid(CYLTabBarControllerThemes, value)
+            Values.logInvalid(cylTabBarControllerThemes, value)
             return nil
         }
         return themes
@@ -1051,24 +1051,24 @@ enum CYLConfigurationSkins {
     }
 
     static func info(of configuration: [String: Any]) -> [String: Any]? {
-        guard let themes = configuration[CYLTabBarControllerThemes].flatMap({ self.themes($0) }) else { return nil }
+        guard let themes = configuration[cylTabBarControllerThemes].flatMap({ self.themes($0) }) else { return nil }
         let identifiers = themes.keys.sorted { ($0 as NSString).compare($1) == .orderedAscending }
-        var base = Values.stringValue(configuration[CYLTabBarControllerThemeIdentifier])
+        var base = Values.stringValue(configuration[cylTabBarControllerThemeIdentifier])
         if let name = base, themes[name] == nil {
-            Values.logInvalid(CYLTabBarControllerThemeIdentifier, name)
+            Values.logInvalid(cylTabBarControllerThemeIdentifier, name)
             base = nil
         }
         let baseIdentifier = base ?? identifiers.first ?? ""
-        var dark = Values.stringValue(configuration[CYLTabBarControllerDarkThemeIdentifier])
+        var dark = Values.stringValue(configuration[cylTabBarControllerDarkThemeIdentifier])
         if let name = dark, themes[name] == nil {
-            Values.logInvalid(CYLTabBarControllerDarkThemeIdentifier, name)
+            Values.logInvalid(cylTabBarControllerDarkThemeIdentifier, name)
             dark = nil
         }
         var managerName: String?
-        if let raw = configuration[CYLTabBarControllerThemeManagerName] {
+        if let raw = configuration[cylTabBarControllerThemeManagerName] {
             managerName = Values.stringValue(raw)
             if (managerName ?? "").isEmpty {
-                Values.logInvalid(CYLTabBarControllerThemeManagerName, raw)
+                Values.logInvalid(cylTabBarControllerThemeManagerName, raw)
                 managerName = nil
             }
         }
@@ -1103,7 +1103,7 @@ enum CYLConfigurationSkins {
                 continue
             }
             if !itemReference.isEmpty {
-                let identifier = Values.stringValue(item[CYLTabBarItemIdentifier]) ?? ""
+                let identifier = Values.stringValue(item[cylTabBarItemIdentifier]) ?? ""
                 references[identifier.isEmpty ? NSNumber(value: position) : identifier as NSString] = itemReference
             }
             position += 1
@@ -1122,7 +1122,7 @@ enum CYLConfigurationLocalization {
     private typealias Values = CYLConfigurationValues
 
     /** [EN] The text keys whose values are localization keys. [CN] 值为本地化键的文本键。 */
-    static let textKeys = [CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemAccessibilityLabel, CYLTabBarItemAccessibilityHint]
+    static let textKeys = [cylTabBarItemTitle, cylTabBarItemSelectedTitle, cylTabBarItemAccessibilityLabel, cylTabBarItemAccessibilityHint]
 
     /** [EN] The folder of the `.lproj` folders and the table name; nil when off or invalid. [CN] `.lproj` 文件夹所在目录与表名；关闭或无效时为 nil。 */
     static func directory(_ value: Any, fileDirectory: String?) -> (directory: String, table: String)? {
@@ -1139,21 +1139,21 @@ enum CYLConfigurationLocalization {
             }
         }
         guard let info = value as? NSDictionary else {
-            Values.logInvalid(CYLTabBarControllerLocalization, value)
+            Values.logInvalid(cylTabBarControllerLocalization, value)
             return nil
         }
         var table = "Localizable"
-        if let name = Values.stringValue(info[CYLTabBarLocalizationTableName]), !name.isEmpty {
+        if let name = Values.stringValue(info[cylTabBarLocalizationTableName]), !name.isEmpty {
             table = name.hasSuffix(".strings") ? (name as NSString).deletingPathExtension : name
         }
-        if let path = Values.stringValue(info[CYLTabBarLocalizationPath]), !path.isEmpty {
+        if let path = Values.stringValue(info[cylTabBarLocalizationPath]), !path.isEmpty {
             // [EN] A location route (CYLResourceRoute, docs/Resource-Routes.md). [CN] 位置路由（CYLResourceRoute，docs/Resource-Routes.md）。
             return CYLResourceRoute.path(forRoute: path, baseDirectory: fileDirectory ?? resources).map { ($0, table) }
         }
-        if let bundleName = Values.stringValue(info[CYLTabBarLocalizationBundleName]), !bundleName.isEmpty, bundleName != "main" {
+        if let bundleName = Values.stringValue(info[cylTabBarLocalizationBundleName]), !bundleName.isEmpty, bundleName != "main" {
             let name = bundleName.hasSuffix(".bundle") ? bundleName : bundleName + ".bundle"
             guard let bundlePath = Bundle.main.path(forResource: name, ofType: nil) else {
-                Values.logInvalid(CYLTabBarLocalizationBundleName, bundleName)
+                Values.logInvalid(cylTabBarLocalizationBundleName, bundleName)
                 return nil
             }
             return (bundlePath, table)
@@ -1204,9 +1204,9 @@ enum CYLConfigurationLocalization {
     /** [EN] Translates the texts when `CYLTabBarControllerLocalization` is set; removes the private file folder. [CN] 设置了 `CYLTabBarControllerLocalization` 时翻译文本；移除私有的文件目录键。 */
     static func apply(_ configuration: inout [String: Any]) {
         let fileDirectory = Values.stringValue(configuration.removeValue(forKey: Values.fileDirectoryKey))
-        guard let value = configuration[CYLTabBarControllerLocalization],
+        guard let value = configuration[cylTabBarControllerLocalization],
               let (directory, table) = directory(value, fileDirectory: fileDirectory) else { return }
-        let language = CYLLocalizationLanguage()
+        let language = cylLocalizationLanguage()
         guard let strings = strings(directory: directory, table: table, language: language) else {
             Values.debugLog("🟡 CYLTabBarController configuration: no \(table).strings for \(language) in \(directory); the texts stay as they are.")
             return
@@ -1216,18 +1216,18 @@ enum CYLConfigurationLocalization {
 
     /** [EN] `CYLTabBarControllerManifestRoute` and `CYLTabBarControllerConfigurationRoute`: the routed keys, then this configuration's keys over them. [CN] 先取路由指向的键，再用本配置中的键覆盖。 */
     static func applyRoutes(_ configuration: inout [String: Any]) {
-        if let manifestRoute = configuration.removeValue(forKey: CYLTabBarControllerManifestRoute) {
+        if let manifestRoute = configuration.removeValue(forKey: cylTabBarControllerManifestRoute) {
             // [EN] A manifest the app may use, as a configuration, under the other keys. [CN] 本 App 可以使用的清单，转换为配置，再由其他键覆盖。
             if let route = manifestRoute as? String, let manifest = try? CYLTabBarManifest.manifest(withRoute: route),
                (try? manifest.isEligible(at: Date())) != nil {
                 configuration = manifest.configuration().merging(configuration) { $1 }
             } else {
-                Values.logInvalid(CYLTabBarControllerManifestRoute, manifestRoute)
+                Values.logInvalid(cylTabBarControllerManifestRoute, manifestRoute)
             }
         }
-        guard let route = configuration.removeValue(forKey: CYLTabBarControllerConfigurationRoute) else { return }
+        guard let route = configuration.removeValue(forKey: cylTabBarControllerConfigurationRoute) else { return }
         guard let routeString = route as? String, let file = try? CYLTabBarController.cylConfiguration(route: routeString) else {
-            Values.logInvalid(CYLTabBarControllerConfigurationRoute, route)
+            Values.logInvalid(cylTabBarControllerConfigurationRoute, route)
             return
         }
         configuration = file.merging(configuration) { $1 }
@@ -1260,31 +1260,31 @@ extension CYLTabBarController {
         // [EN] The routed file first, then its localized texts. [CN] 先读取路由指向的文件，再本地化文本。
         CYLConfigurationLocalization.applyRoutes(&normalized)
         CYLConfigurationLocalization.apply(&normalized)
-        if let value = normalized[CYLTabBarControllerViewControllers] {
-            normalized[CYLTabBarControllerViewControllers] = Values.validViewControllers(value)
+        if let value = normalized[cylTabBarControllerViewControllers] {
+            normalized[cylTabBarControllerViewControllers] = Values.validViewControllers(value)
         }
-        if let registry = normalized[CYLTabBarControllerPageRegistry], !(registry is CYLTabBarPageProviding) {
+        if let registry = normalized[cylTabBarControllerPageRegistry], !(registry is CYLTabBarPageProviding) {
             // [EN] Any `CYLTabBarPageProviding`; a string from a file cannot provide pages (C14). [CN] 任何 `CYLTabBarPageProviding`；文件中的字符串不能提供页面（C14）。
-            Values.logInvalid(CYLTabBarControllerPageRegistry, registry)
-            normalized[CYLTabBarControllerPageRegistry] = nil
+            Values.logInvalid(cylTabBarControllerPageRegistry, registry)
+            normalized[cylTabBarControllerPageRegistry] = nil
         }
-        for key in [CYLTabBarControllerPageResolver, CYLTabBarControllerPlusButtonAction] {
+        for key in [cylTabBarControllerPageResolver, cylTabBarControllerPlusButtonAction] {
             if let value = normalized[key], !cylIsBlock(value) {
                 // [EN] Only a block can be called (C15). [CN] 只有 block 可以调用（C15）。
                 Values.logInvalid(key, value)
                 normalized[key] = nil
             }
         }
-        if let value = normalized[CYLTabBarControllerPageLookupOrder] {
-            normalized[CYLTabBarControllerPageLookupOrder] = Values.pageLookupOrderValue(value)
+        if let value = normalized[cylTabBarControllerPageLookupOrder] {
+            normalized[cylTabBarControllerPageLookupOrder] = Values.pageLookupOrderValue(value)
         }
         let checked: [(String, (Any) -> NSNumber?)] = [
-            (CYLTabBarControllerTabBarItemAnimationSpeed, Values.animationSpeedValue),
-            (CYLTabBarControllerUserInterfaceStyle, Values.userInterfaceStyleValue),
-            (CYLTabBarControllerTabButtonTapAnimation, Values.tapAnimationValue),
-            (CYLTabBarControllerSwipeToSwitchTab, Values.boolValue),
-            (CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning, Values.boolValue),
-            (CYLTabBarControllerAutomaticPageRegistration, Values.boolValue),
+            (cylTabBarControllerTabBarItemAnimationSpeed, Values.animationSpeedValue),
+            (cylTabBarControllerUserInterfaceStyle, Values.userInterfaceStyleValue),
+            (cylTabBarControllerTabButtonTapAnimation, Values.tapAnimationValue),
+            (cylTabBarControllerSwipeToSwitchTab, Values.boolValue),
+            (cylTabBarControllerUnloadsUnselectedViewsOnMemoryWarning, Values.boolValue),
+            (cylTabBarControllerAutomaticPageRegistration, Values.boolValue),
         ]
         for (key, convert) in checked {
             guard let value = normalized[key] else { continue }
@@ -1294,11 +1294,11 @@ extension CYLTabBarController {
             }
             normalized[key] = converted
         }
-        if let value = normalized[CYLTabBarControllerPlusButton] {
-            normalized[CYLTabBarControllerPlusButton] = Values.plusButtonAttributesValue(value)
+        if let value = normalized[cylTabBarControllerPlusButton] {
+            normalized[cylTabBarControllerPlusButton] = Values.plusButtonAttributesValue(value)
         }
         // [EN] Lists of tab identifiers: an array of strings, or a comma-separated string. [CN] Tab 标识列表：字符串数组或逗号分隔的字符串。
-        for key in [CYLTabBarControllerLoginRequiredTabBarItemIdentifiers, CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers] {
+        for key in [cylTabBarControllerLoginRequiredTabBarItemIdentifiers, cylTabBarControllerKeepsLoadedTabBarItemIdentifiers] {
             guard let list = normalized[key] else { continue }
             let entries = (list as? String).map { $0.components(separatedBy: ",") as [Any] } ?? (list as? [Any])
             if entries == nil {
@@ -1309,26 +1309,26 @@ extension CYLTabBarController {
         cylNormalizeTabs(&normalized)
         Values.warnUnknownKeys(normalized.keys, known: Values.knownConfigurationKeys)
         #if DEBUG
-        if ((normalized[CYLTabBarControllerTabBarItemsAttributes] as? [Any])?.isEmpty ?? true),
-           ((normalized[CYLTabBarControllerViewControllers] as? [Any])?.isEmpty ?? true) {
+        if ((normalized[cylTabBarControllerTabBarItemsAttributes] as? [Any])?.isEmpty ?? true),
+           ((normalized[cylTabBarControllerViewControllers] as? [Any])?.isEmpty ?? true) {
             NSLog("🔴 CYLTabBarController configuration: no tab; the tab bar controller will be empty.")
         }
         #endif
-        if let value = normalized[CYLTabBarControllerImageInsets] {
-            normalized[CYLTabBarControllerImageInsets] = Values.edgeInsetsValue(value, key: CYLTabBarControllerImageInsets)
+        if let value = normalized[cylTabBarControllerImageInsets] {
+            normalized[cylTabBarControllerImageInsets] = Values.edgeInsetsValue(value, key: cylTabBarControllerImageInsets)
         }
-        if let value = normalized[CYLTabBarControllerTitlePositionAdjustment] {
-            normalized[CYLTabBarControllerTitlePositionAdjustment] = Values.offsetValue(value, key: CYLTabBarControllerTitlePositionAdjustment)
+        if let value = normalized[cylTabBarControllerTitlePositionAdjustment] {
+            normalized[cylTabBarControllerTitlePositionAdjustment] = Values.offsetValue(value, key: cylTabBarControllerTitlePositionAdjustment)
         }
-        if let value = normalized[CYLTabBarControllerStyleType] {
-            normalized[CYLTabBarControllerStyleType] = Values.styleTypeValue(value)
+        if let value = normalized[cylTabBarControllerStyleType] {
+            normalized[cylTabBarControllerStyleType] = Values.styleTypeValue(value)
         }
-        if let context = normalized[CYLTabBarControllerContext] {
+        if let context = normalized[cylTabBarControllerContext] {
             if let number = context as? NSNumber, !(context is String) {
-                normalized[CYLTabBarControllerContext] = number.stringValue
+                normalized[cylTabBarControllerContext] = number.stringValue
             } else if !(context is String) {
-                Values.logInvalid(CYLTabBarControllerContext, context)
-                normalized[CYLTabBarControllerContext] = nil
+                Values.logInvalid(cylTabBarControllerContext, context)
+                normalized[cylTabBarControllerContext] = nil
             }
         }
         return normalized
@@ -1340,27 +1340,27 @@ extension CYLTabBarController {
      * [CN] Tab：皮肤的 "@name" 值、TabBar 的图标默认值（#787）、被排除的 Tab（B22）、占位（B4）与唯一标识（B12）。
      */
     private class func cylNormalizeTabs(_ normalized: inout [String: Any]) {
-        var themesInfo = normalized[CYLTabBarControllerThemes] != nil ? CYLConfigurationSkins.info(of: normalized) : nil
+        var themesInfo = normalized[cylTabBarControllerThemes] != nil ? CYLConfigurationSkins.info(of: normalized) : nil
         let initialValues = themesInfo.flatMap { info in
             (info[Values.themesListKey] as? [String: [String: Any]])?[info[Values.themesInitialKey] as? String ?? ""]
         }
         var itemReferences: [[String: String]] = []
-        var items = normalized[CYLTabBarControllerTabBarItemsAttributes]
+        var items = normalized[cylTabBarControllerTabBarItemsAttributes]
         if items is NSDictionary {
             // [EN] One tab: Protobuf text and XML give a dictionary. [CN] 只有一个 Tab：Protobuf 文本与 XML 解析为字典。
             items = [items as Any]
         }
         var barIconDefaults: [String: Any] = [:]
-        barIconDefaults[CYLTabBarItemIconRenderingMode] = normalized[CYLTabBarControllerIconRenderingMode]
-        barIconDefaults[CYLTabBarItemIconColor] = normalized[CYLTabBarControllerIconColor]
-        barIconDefaults[CYLTabBarItemSelectedIconColor] = normalized[CYLTabBarControllerSelectedIconColor]
+        barIconDefaults[cylTabBarItemIconRenderingMode] = normalized[cylTabBarControllerIconRenderingMode]
+        barIconDefaults[cylTabBarItemIconColor] = normalized[cylTabBarControllerIconColor]
+        barIconDefaults[cylTabBarItemSelectedIconColor] = normalized[cylTabBarControllerSelectedIconColor]
         if let items {
             var normalizedItems: [[String: Any]] = []
             if let list = items as? [Any] {
                 for element in list {
                     guard let item = element as? NSDictionary else {
                         // [EN] A placeholder keeps the indexes of view controllers passed in code (B4). [CN] 用占位保持与代码传入的子控制器的下标对应（B4）。
-                        Values.logInvalid(CYLTabBarControllerTabBarItemsAttributes, element)
+                        Values.logInvalid(cylTabBarControllerTabBarItemsAttributes, element)
                         normalizedItems.append([:])
                         itemReferences.append([:])
                         continue
@@ -1381,9 +1381,9 @@ extension CYLTabBarController {
                     var normalizedItem = Values.normalizedItemAttributes(source)
                     if let reason = Values.exclusionReason(normalizedItem) {
                         // [EN] A marked placeholder: the tab is left out (B22), kept for `cyl_skippedTabs`. [CN] 带标记的占位：该 Tab 被移除（B22），保留给 `cyl_skippedTabs`。
-                        Values.debugLog("🟡 CYLTabBarController configuration: the tab \(normalizedItem[CYLTabBarItemTitle] as? String ?? "") is left out on this device: \(reason).")
+                        Values.debugLog("🟡 CYLTabBarController configuration: the tab \(normalizedItem[cylTabBarItemTitle] as? String ?? "") is left out on this device: \(reason).")
                         var excluded: [String: Any] = [Values.excludedKey: true, Values.exclusionReasonKey: reason]
-                        for key in [CYLTabBarItemTitle, CYLTabBarItemIdentifier, CYLTabBarItemPageIdentifier] {
+                        for key in [cylTabBarItemTitle, cylTabBarItemIdentifier, cylTabBarItemPageIdentifier] {
                             excluded[key] = normalizedItem[key]
                         }
                         normalizedItem = excluded
@@ -1391,13 +1391,13 @@ extension CYLTabBarController {
                     normalizedItems.append(normalizedItem)
                 }
             } else {
-                Values.logInvalid(CYLTabBarControllerTabBarItemsAttributes, items)
+                Values.logInvalid(cylTabBarControllerTabBarItemsAttributes, items)
             }
             Values.makeIdentifiersUnique(&normalizedItems)
-            normalized[CYLTabBarControllerTabBarItemsAttributes] = normalizedItems
+            normalized[cylTabBarControllerTabBarItemsAttributes] = normalizedItems
         }
         if var info = themesInfo {
-            CYLConfigurationSkins.finish(&info, items: normalized[CYLTabBarControllerTabBarItemsAttributes] as? [[String: Any]] ?? [],
+            CYLConfigurationSkins.finish(&info, items: normalized[cylTabBarControllerTabBarItemsAttributes] as? [[String: Any]] ?? [],
                                          itemReferences: itemReferences)
             themesInfo = info
             normalized[Values.themesKey] = info
@@ -1418,7 +1418,7 @@ extension CYLTabBarController {
         if let error = Values.tabsError(configuration) {
             throw error
         }
-        if configuration[CYLTabBarControllerLocalization] != nil {
+        if configuration[cylTabBarControllerLocalization] != nil {
             // [EN] A relative `CYLTabBarLocalizationPath` is resolved against this file's folder. [CN] 相对的 `CYLTabBarLocalizationPath` 相对于本文件所在目录。
             configuration[Values.fileDirectoryKey] = (path as NSString).deletingLastPathComponent
         }

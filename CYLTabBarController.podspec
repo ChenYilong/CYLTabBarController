@@ -132,7 +132,7 @@ Pod::Spec.new do |s|
     #      with an animation subspec (`CYL_ANIMATION_ENGINE_AVAILABLE`).
     # [CN] 组件核心（CYLAnimatedItemView，静态图片），从不依赖动效引擎：只有引入动画子库时 TabBar 才会播放动画（`CYL_ANIMATION_ENGINE_AVAILABLE`）。
     core.dependency 'CYLTabBarController/CYLAnimatedItem'
-    core.source_files = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}', 'CYLTabBarController/Swift/*.swift'
+    core.source_files = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}', 'CYLTabBarController/Swift/*.swift', 'CYLTabBarController/Swift/Deprecated/*.swift'
     core.exclude_files = [
     'CYLTabBarController/Package/**/*', # SPM-only: the umbrella headers, module maps and header links of the C targets
     'CYLTabBarController/CYLUtils/**/*', # the CYLUtils subspec above

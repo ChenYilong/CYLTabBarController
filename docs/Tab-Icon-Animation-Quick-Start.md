@@ -127,8 +127,8 @@ pod 'CYLTabBarController/PAG'
 let animationFiles = ["tab_home.pag", "tab_health.pag", "tab_moments.pag", "tab_me.pag"]
 let attributes = zip(tabBarItemsAttributes, animationFiles).map { attributes, fileName in
     var item = CYLTabBarItemAttributesAddingAnimationFile(attributes, fileName, nil)
-    if item[CYLTabBarAnimationFilePath] != nil {
-        item[CYLTabBarAnimationSize] = NSValue(cgSize: CGSize(width: 33, height: 33))
+    if item[cylTabBarAnimationFilePath] != nil {
+        item[cylTabBarAnimationSize] = NSValue(cgSize: CGSize(width: 33, height: 33))
     }
     return item
 }
