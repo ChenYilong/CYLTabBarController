@@ -43,3 +43,8 @@ Organized by tag (tag: `instructions`): each heading has its tag and a summary; 
   GitHub inside `cylanimateditem`, guarded by the device architecture, compile and no crash first, behind a debug build
   option until verified (removing it needs the owner's approval); Plan 2, if it fails, the macOS (arm64) session tests.
 - Full text: [docs/instructions/windows-harmonyos.md](docs/instructions/windows-harmonyos.md), "From instructions.md".
+
+## Git (tag: `git`)
+
+- Before any git operation (commit, push, pull, rebase, merge, branch, pull request), read
+  [docs/instructions/git.md](docs/instructions/git.md) in full, then run the git command (added 2026-11-22, owner).

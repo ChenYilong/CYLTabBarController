@@ -27,6 +27,7 @@
 | [第三方 Skill](#cn第三方-skill) | [Third-party skills](#enthird-party-skills) |
 | [指令文件按标签整理](#cn指令文件按标签整理) | [Instruction files by tag](#eninstruction-files-by-tag) |
 | [必须全文阅读的行为准则](#cn必须全文阅读的行为准则) | [Behavioral guidelines read in full](#enbehavioral-guidelines-read-in-full) |
+| [git 操作前全文阅读 git 标签文件](#cngit-操作前全文阅读-git-标签文件) | [Read the git tag file before any git operation](#enread-the-git-tag-file-before-any-git-operation) |
 
 <!-- navigation:end -->
 
@@ -104,3 +105,10 @@
 | 中文 | English |
 |:---|:---|
 | DONE（2026-11-22，分支 `feat/cross-platform-components`，chen-yilong-b6）。用户原话："找到本项目instructions 相关文件（可能包含根目录的agent Claude文件instructions 文件， 首先确认下面内容的归类。如果agent Claude文件文件超出每个文件200行限制，则优先放入docs 里的instructions文件夹合适文件，）以及skills相关文件，如果没有就新增文件保证写入成功，全英文写入，并且在本次任务中就执行一次下面的指令： 找到本项目docs文件夹或者子文件夹里的如下文件， Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes 使用相对路径的方式放入根目录instructions 相关文件 ，相关文件顶部，并标注必须全文阅读该文件。新建分类，新建tag标题。" | DONE (2026-11-22, branch `feat/cross-platform-components`, chen-yilong-b6). The user's prompt is quoted verbatim in the left column (Chinese); in English: in the instruction files (root agent / Claude / instructions files; overflow beyond 200 lines goes to `docs/instructions/` first) and the skill files, in English, and once in this task: put `docs/instructions/Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes.md` at the top of the root instruction files by relative path, marked as a file that must be read in full, under a new category and tag heading. **Done**: a new tag `behavioral` (first named `behavior`; "Behavioral guidelines: read in full first") as the first section of `AGENTS.md` and `instructions.md` and the first row of the tag table, linking the file (committed with this change; renamed on 2026-11-22 to `docs/instructions/behavioral.md` to follow the tag file names, prompt verbatim: "go ahead, install MSYS2 。then 按照我们之前约定的tag分类方式处理  Behavioral_guidelines_to_reduce_common_LLM_coding_mistakes  文件， 这个文件可以叫 Behavioral，大小写以及文件命名， 参考  docs/instructions文件夹下面其他文件命名，并调整引用了该文件的相对路径。"); the rule (rule 5) in `docs/instructions/instructions.md` and in the skills `cyl-task-workflow` and `cyl-docs`; `AGENTS.md` 134 lines, `instructions.md` 46 lines. Score: 100 / 100. |
+
+## [CN]git 操作前全文阅读 git 标签文件
+## [EN]Read the git tag file before any git operation
+
+| 中文 | English |
+|:---|:---|
+| DONE（2026-11-22，分支 `feat/cross-platform-components`，chen-yilong-b6）。用户原话："找到本项目instructions 相关文件（可能包含根目录的agent Claude文件instructions 文件， 首先确认下面内容的归类。如果agent Claude文件文件超出每个文件200行限制，则优先放入docs 里的instructions文件夹合适文件，）以及skills相关文件，如果没有就新增文件保证写入成功，全英文写入，并且在本次任务中就执行一次下面的指令： 执行git 操作前，必须全文阅读git 对应的tag文件。再进行git操作。" | DONE (2026-11-22, branch `feat/cross-platform-components`, chen-yilong-b6). The user's prompt is quoted verbatim in the left column (Chinese); in English: in the instruction files (root agent / Claude / instructions files; overflow into `docs/instructions/` first) and the skill files, in English, and once in this task: before any git operation, read the git tag file in full, then run git. **Done**: classified under the `git` tag: the first line of the `git` heading in `AGENTS.md`, a new `git` heading in `instructions.md`, a bold note at the top of `docs/instructions/git.md`, rule 6 of `docs/instructions/instructions.md`, and the skill `cyl-task-workflow`; executed once: `docs/instructions/git.md` read in full before the commit of this change. Score: 100 / 100. |

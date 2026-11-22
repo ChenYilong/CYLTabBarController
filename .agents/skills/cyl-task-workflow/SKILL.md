@@ -94,3 +94,7 @@ The instruction files (`AGENTS.md`, `instructions.md`, `docs/instructions.md`, `
 ## Read in full before any task (added 2026-11-22, owner)
 
 Before any task in this repository, read `docs/instructions/behavioral.md` in full (tag `behavioral`, linked at the top of `AGENTS.md` and `instructions.md`). Files marked "read in full" are linked at the top of the root instruction files under their own tag heading: `docs/instructions/instructions.md`, rule 5.
+
+## Read the git tag file before any git operation (added 2026-11-22, owner)
+
+Before any git operation (commit, push, pull, rebase, merge, branch, tag, reset, pull request), read `docs/instructions/git.md` in full, every line, then run the git command (`docs/instructions/instructions.md`, rule 6).

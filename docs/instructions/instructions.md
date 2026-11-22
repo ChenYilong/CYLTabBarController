@@ -20,6 +20,9 @@ with content of its own).
    loads `AGENTS.md`) under its own tag heading, with the words "read in full"; it is read completely before any task,
    not only when its tag is triggered. When a root instruction file would pass 200 lines, the overflow goes to the
    matching file in `docs/instructions/` first.
-6. **Check.** `wc -l AGENTS.md instructions.md docs/instructions.md` prints no file above 200 lines.
+6. **Read a tag file in full before its operations (added 2026-11-22, owner).** Before any git operation (commit,
+   push, pull, rebase, merge, branch, tag, reset, pull request), read [git.md](git.md) (tag `git`) in full, every line,
+   then run the git command. The `git` headings of `AGENTS.md` and `instructions.md` repeat this.
+7. **Check.** `wc -l AGENTS.md instructions.md docs/instructions.md` prints no file above 200 lines.
 
 Current tags and files: the table at the top of [AGENTS.md](../../AGENTS.md).

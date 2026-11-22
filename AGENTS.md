@@ -128,6 +128,7 @@ appears in the task). Instruction files (this file, `instructions.md`, `docs/ins
 
 ## Git, commits and pull requests (tag: `git`)
 
+- **Before any git operation, read [docs/instructions/git.md](docs/instructions/git.md) in full**, then run the git command.
 - `touch .git/hooks/NO_AUTO_SYNC` before every commit; Commitizen style (`feat: ✨`, `fix: 🐛`, `docs: 📝` …), English only, the author line `By  @ChenYilong <luohanchenyilong@163.com>` in the body.
 - On a branch other than `master` / `main`: commit and push at the end of every turn without asking; every branch with commits has an open pull request (ask when more than two are open); push over SSH first.
 - Never commit `._*` or `*.lock` files; check `docs/` for stale `TODO` / `Linux` notes before every commit.

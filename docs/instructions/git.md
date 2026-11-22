@@ -1,5 +1,8 @@
 # Git, commits and pull requests (tag: `git`)
 
+**Read this file in full, every line, before any git operation** (commit, push, pull, rebase, merge, branch, tag, reset,
+pull request): rule added by the owner on 2026-11-22 ([instructions.md](instructions.md), rule 6).
+
 Full text of the `git` rules. [AGENTS.md](../../AGENTS.md#git-commits-and-pull-requests-tag-git) keeps the summary of this tag;
 read this file when a task touches the tag. Moved verbatim from AGENTS.md on 2026-11-22 (instruction files are organized
 by tag and kept under 200 lines: see [instructions.md](instructions.md)).
