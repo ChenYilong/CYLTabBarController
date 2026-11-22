@@ -14,79 +14,33 @@ String animationURLWithOptions(String file, [Map<String, Object> options = const
   return '$base#${names.map((name) => '${Uri.encodeComponent(name)}=${Uri.encodeComponent('${options[name]}')}').join('&')}';
 }
 
-/// The commands of a [CYLAnimationView]: pass one as `controller:`; the commands do nothing before the view exists.
+/// Plays an animation by hand, for a [CYLAnimationView] whose `drivesAnimationPlayback` is false (the cross-platform engine
+/// contract, docs/Animated-Item.md): the commands `play`, `stopAtProgress` and `restart` of the native view. Give it to the
+/// view's `controller`; a command before the view exists does nothing.
 class CYLAnimationController {
   MethodChannel? _channel;
+
+  void _attach(MethodChannel? channel) => _channel = channel;
 
   /// Plays from the current progress.
   Future<void> play() async => _channel?.invokeMethod<void>('play');
 
-  /// Stops and shows [progress] (0 to 1) as a still frame.
+  /// Stops and shows the frame at [progress], 0 (the first frame) to 1 (the last).
   Future<void> stopAtProgress(double progress) async => _channel?.invokeMethod<void>('stopAtProgress', progress);
 
   /// Plays again from the start.
   Future<void> restart() async => _channel?.invokeMethod<void>('restart');
-
-  /// Whether a view is attached.
-  bool get isAttached => _channel != null;
-}
-
-/// The channel of one native animation view: sends the parameters that changed and turns the native callbacks into the
-/// widget's. Frozen names: `setSource`, `setSelected`, `setAnimationSpeed`, `setAnimationLoops`,
-/// `setAnimationRestartToken`, `setDrivesAnimationPlayback`, `setPlaying`, `setIconSize`, `setTintColor`; the callbacks
-/// `onAnimationLoaded`, `onAnimationFailed`, `onAnimationEnd`.
-@visibleForTesting
-class CYLAnimationBridge {
-  CYLAnimationBridge(this.channel, this.widget, [this.controller]) {
-    controller?._channel = channel;
-    channel.setMethodCallHandler(_handle);
-  }
-
-  final MethodChannel channel;
-  CYLAnimationView widget;
-  CYLAnimationController? controller;
-
-  Future<dynamic> _handle(MethodCall call) async {
-    switch (call.method) {
-      case 'onAnimationLoaded':
-        widget.onAnimationLoaded?.call();
-      case 'onAnimationFailed':
-        widget.onAnimationFailed?.call();
-      case 'onAnimationEnd':
-        widget.onAnimationEnd?.call();
-    }
-    return null;
-  }
-
-  /// Sends what differs between [old] and the current widget.
-  void update(CYLAnimationView old, CYLAnimationView current) {
-    widget = current;
-    void send(String method, Object? argument) => channel.invokeMethod<void>(method, argument);
-    if (current.source != old.source) send('setSource', current.source);
-    if (current.selected != old.selected) send('setSelected', current.selected);
-    if (current.animationSpeed != old.animationSpeed) send('setAnimationSpeed', current.animationSpeed);
-    if (current.animationLoops != old.animationLoops) send('setAnimationLoops', current.animationLoops);
-    if (current.animationRestartToken != old.animationRestartToken) send('setAnimationRestartToken', current.animationRestartToken);
-    if (current.drivesAnimationPlayback != old.drivesAnimationPlayback) send('setDrivesAnimationPlayback', current.drivesAnimationPlayback);
-    if (current.playing != old.playing) send('setPlaying', current.playing);
-    if (current.iconSize != old.iconSize) send('setIconSize', current.iconSize);
-    if (current.tintColor != old.tintColor) send('setTintColor', current.tintColor?.toARGB32());
-    if (current.controller != old.controller) {
-      old.controller?._channel = null;
-      current.controller?._channel = channel;
-    }
-  }
-
-  void dispose() {
-    channel.setMethodCallHandler(null);
-    controller?._channel = null;
-  }
 }
 
 /// An animation played by CYLTabBarController's own engine (the one of the tab icons), whatever its library: Rive,
 /// Lottie, PAG, GIF or SVGA, when the app has that library (iOS subspec or Swift package, Android dependency).
 ///
 /// [file] is a file name in the app (the iOS main bundle, the Android assets), a path or a URL.
+///
+/// The names follow the cross-platform engine contract (docs/Animated-Item.md, "Engine API across platforms"): [selected],
+/// [animationSpeed], [animationLoops], [animationRestartToken], [drivesAnimationPlayback], [iconSize], [tintColor], the
+/// callbacks [onAnimationLoaded], [onAnimationFailed], [onAnimationEnd] and the [controller]'s commands. Both native halves
+/// wrap `CYLAnimatedItemView`; there is no engine logic in Dart.
 class CYLAnimationView extends StatefulWidget {
   const CYLAnimationView({
     super.key,
@@ -100,10 +54,10 @@ class CYLAnimationView extends StatefulWidget {
     this.drivesAnimationPlayback = true,
     this.iconSize,
     this.tintColor,
+    this.controller,
     this.onAnimationLoaded,
     this.onAnimationFailed,
     this.onAnimationEnd,
-    this.controller,
   });
 
   final String file;
@@ -111,78 +65,124 @@ class CYLAnimationView extends StatefulWidget {
   /// Options of the file, e.g. Rive's `artboard`, `stateMachine`, `input`, `duration`.
   final Map<String, Object> options;
 
-  /// Plays when true, stops when false.
   final bool playing;
 
-  /// Whether the item is selected: with [drivesAnimationPlayback], selected plays once from the start, unselected rests.
+  /// Whether the item is selected: a selected item rests on its last frame, an unselected one on its first.
   final bool selected;
 
-  /// The speed, 1 by default; 0 or less keeps the file's own speed.
+  /// The playback rate, 1 is the file's own speed.
   final double animationSpeed;
 
-  /// Whether the animation loops.
+  /// Whether the animation plays again after each pass.
   final bool animationLoops;
 
-  /// Restarts the animation from the start whenever it changes (the value at creation is not a restart).
+  /// Plays again from the start when it changes (the value at creation is not a restart).
   final int animationRestartToken;
 
-  /// True by default. False: the view applies none of the default rules and the host plays through [controller].
+  /// true (default): the view applies the default playback rules; false: the host plays through the [controller].
   final bool drivesAnimationPlayback;
 
-  /// The icon size in logical pixels; null fills the view.
+  /// The icon's side in logical pixels; null fills the view.
   final double? iconSize;
 
-  /// The tint of the icon (where the engine takes one).
+  /// Tints the icon and an animation that takes a tint.
   final Color? tintColor;
 
-  /// The engine loaded the file.
-  final VoidCallback? onAnimationLoaded;
-
-  /// The engine could not load the file: the still image or the placeholder stays.
-  final VoidCallback? onAnimationFailed;
-
-  /// A pass that does not loop reached its end.
-  final VoidCallback? onAnimationEnd;
-
-  /// `play()`, `stopAtProgress(progress)` and `restart()`.
   final CYLAnimationController? controller;
 
-  /// [file] with [options] in its fragment: what the native view receives.
-  String get source => animationURLWithOptions(file, options);
+  /// The animation is in place (a local file once parsed, a download once it arrived).
+  final VoidCallback? onAnimationLoaded;
+
+  /// The animation cannot play: a missing or corrupted file, a parse error, a failed download.
+  final VoidCallback? onAnimationFailed;
+
+  /// A play-once pass ended (not on a stop, not while looping).
+  final VoidCallback? onAnimationEnd;
 
   @override
   State<CYLAnimationView> createState() => _CYLAnimationViewState();
 }
 
 class _CYLAnimationViewState extends State<CYLAnimationView> {
-  CYLAnimationBridge? _bridge;
+  MethodChannel? _channel;
+
+  String get _source => animationURLWithOptions(widget.file, widget.options);
 
   @override
   void didUpdateWidget(CYLAnimationView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _bridge?.update(oldWidget, widget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller?._attach(null);
+      widget.controller?._attach(_channel);
+    }
+    final channel = _channel;
+    if (channel == null) return;
+    // The contract's order: the rules first, then the file, then what plays.
+    if (widget.drivesAnimationPlayback != oldWidget.drivesAnimationPlayback) {
+      channel.invokeMethod<void>('setDrivesAnimationPlayback', widget.drivesAnimationPlayback);
+    }
+    if (widget.animationSpeed != oldWidget.animationSpeed) {
+      channel.invokeMethod<void>('setAnimationSpeed', widget.animationSpeed);
+    }
+    if (widget.animationLoops != oldWidget.animationLoops) {
+      channel.invokeMethod<void>('setAnimationLoops', widget.animationLoops);
+    }
+    if (widget.iconSize != oldWidget.iconSize) {
+      channel.invokeMethod<void>('setIconSize', widget.iconSize);
+    }
+    if (widget.tintColor != oldWidget.tintColor) {
+      channel.invokeMethod<void>('setTintColor', widget.tintColor?.toARGB32());
+    }
+    if (widget.selected != oldWidget.selected) {
+      channel.invokeMethod<void>('setSelected', widget.selected);
+    }
+    if (_source != animationURLWithOptions(oldWidget.file, oldWidget.options)) {
+      channel.invokeMethod<void>('setSource', _source);
+    }
+    if (widget.animationRestartToken != oldWidget.animationRestartToken) {
+      channel.invokeMethod<void>('setAnimationRestartToken', widget.animationRestartToken);
+    }
+    if (widget.playing != oldWidget.playing) {
+      channel.invokeMethod<void>('setPlaying', widget.playing);
+    }
   }
 
   @override
   void dispose() {
-    _bridge?.dispose();
+    widget.controller?._attach(null);
+    _channel?.setMethodCallHandler(null);
     super.dispose();
   }
 
-  void _created(int id) => _bridge = CYLAnimationBridge(MethodChannel('$_viewType/$id'), widget, widget.controller);
+  void _created(int id) {
+    final channel = MethodChannel('$_viewType/$id');
+    channel.setMethodCallHandler((call) async {
+      switch (call.method) {
+        case 'onAnimationLoaded':
+          widget.onAnimationLoaded?.call();
+        case 'onAnimationFailed':
+          widget.onAnimationFailed?.call();
+        case 'onAnimationEnd':
+          widget.onAnimationEnd?.call();
+      }
+      return null;
+    });
+    _channel = channel;
+    widget.controller?._attach(channel);
+  }
 
   @override
   Widget build(BuildContext context) {
     final params = <String, Object?>{
-      'source': widget.source,
+      'source': _source,
       'playing': widget.playing,
       'selected': widget.selected,
       'animationSpeed': widget.animationSpeed,
       'animationLoops': widget.animationLoops,
       'animationRestartToken': widget.animationRestartToken,
       'drivesAnimationPlayback': widget.drivesAnimationPlayback,
-      'iconSize': widget.iconSize,
-      'tintColor': widget.tintColor?.toARGB32(),
+      if (widget.iconSize != null) 'iconSize': widget.iconSize,
+      if (widget.tintColor != null) 'tintColor': widget.tintColor!.toARGB32(),
     };
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:

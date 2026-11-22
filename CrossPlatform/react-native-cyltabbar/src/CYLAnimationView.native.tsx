@@ -1,6 +1,6 @@
-import { forwardRef, useImperativeHandle, useRef, type ElementRef } from 'react';
+import { useImperativeHandle, useRef, type ComponentRef, type Ref } from 'react';
 import type { ColorValue, ViewProps } from 'react-native';
-import NativeAnimationView, { Commands, type NativeProps } from './CyltabbarAnimationViewNativeComponent';
+import NativeAnimationView, { Commands } from './CyltabbarAnimationViewNativeComponent';
 
 /**
  * Options of an animation file, e.g. Rive's `artboard`, `stateMachine`, `input`, `duration`.
@@ -30,6 +30,21 @@ export function animationURLWithOptions(file: string, options: CYLAnimationOptio
   return pairs.length > 0 ? `${base}#${pairs.join('&')}` : base;
 }
 
+/**
+ * [EN] The commands of the native view, for a `CYLAnimationView` whose `drivesAnimationPlayback` is false (the cross-platform
+ *      engine contract, docs/Animated-Item.md): `play()`, `stopAtProgress(progress)` and `restart()`.
+ * [CN] 原生视图的命令，用于 `drivesAnimationPlayback` 为 false 的 `CYLAnimationView`（跨端引擎契约，见 docs/Animated-Item.md）：
+ *      `play()`、`stopAtProgress(progress)`、`restart()`。
+ */
+export type CYLAnimationViewHandle = {
+  /** Plays from the current progress. */
+  play: () => void;
+  /** Stops and shows the frame at `progress`, 0 (the first frame) to 1 (the last). */
+  stopAtProgress: (progress: number) => void;
+  /** Plays again from the start. */
+  restart: () => void;
+};
+
 export type CYLAnimationViewProps = ViewProps & {
   /**
    * A file name in the app (iOS main bundle, Android assets), a path or a URL: `.riv`, `.json` (Lottie), `.pag`, `.gif`, `.svga`.
@@ -37,105 +52,67 @@ export type CYLAnimationViewProps = ViewProps & {
   file: string;
   options?: CYLAnimationOptions;
   playing?: boolean;
-  /**
-   * Whether the item is selected: with `drivesAnimationPlayback`, selected plays once from the start, unselected rests.
-   */
+  /** Whether the item is selected: a selected item rests on its last frame, an unselected one on its first. */
   selected?: boolean;
-  /**
-   * The speed, 1 by default; 0 or less keeps the file's own speed.
-   */
+  /** The playback rate, 1 is the file's own speed. */
   animationSpeed?: number;
-  /**
-   * Whether the animation loops.
-   */
+  /** Whether the animation plays again after each pass. */
   animationLoops?: boolean;
-  /**
-   * Restarts the animation from the start whenever it changes.
-   */
+  /** Plays again from the start when it changes (the value at creation is not a restart). */
   animationRestartToken?: number;
-  /**
-   * Default true. False: the view applies none of the default rules and the host plays through the ref commands.
-   */
+  /** true (default): the view applies the default playback rules; false: the host plays through `ref`. */
   drivesAnimationPlayback?: boolean;
-  /**
-   * The icon size in points; omitted fills the view.
-   */
+  /** The icon's side in points; unset fills the view. */
   iconSize?: number;
+  /** Tints the icon and an animation that takes a tint. */
   tintColor?: ColorValue;
+  /** The animation is in place (a local file once parsed, a download once it arrived). */
   onAnimationLoaded?: () => void;
+  /** The animation cannot play: a missing or corrupted file, a parse error, a failed download. */
   onAnimationFailed?: () => void;
+  /** A play-once pass ended (not on a stop, not while looping). */
   onAnimationEnd?: () => void;
+  /** The commands `play`, `stopAtProgress` and `restart`. */
+  ref?: Ref<CYLAnimationViewHandle>;
 };
 
 /**
- * The commands of a `CYLAnimationView`, through its ref.
+ * An animation played by CYLTabBarController's own engine (the one of the tab icons), whatever its library: Rive, Lottie,
+ * PAG, GIF or SVGA, when the app has that library (iOS subspec, Android dependency). 由 CYLTabBarController 自己的引擎（Tab 图标所用）播放的动画。
+ *
+ * The names follow the cross-platform engine contract (docs/Animated-Item.md, "Engine API across platforms"); both native
+ * halves wrap `CYLAnimatedItemView`, there is no engine logic in JavaScript.
+ * 名称遵循跨端引擎契约（docs/Animated-Item.md「跨端引擎 API」）；两个原生半边都封装 `CYLAnimatedItemView`，JavaScript 中没有引擎逻辑。
  */
-export type CYLAnimationViewHandle = {
-  /**
-   * Plays from the current progress.
-   */
-  play(): void;
-  /**
-   * Stops and shows `progress` (0 to 1) as a still frame.
-   */
-  stopAtProgress(progress: number): void;
-  /**
-   * Plays again from the start.
-   */
-  restart(): void;
-};
-
-/**
- * The props of the native view for the props of a `CYLAnimationView`: `source` is the file with its options, the end,
- * load and failure callbacks lose their (empty) event, `drivesAnimationPlayback` defaults to true.
- */
-export function nativeAnimationProps({
+export function CYLAnimationView({
   file,
   options,
   playing,
   onAnimationLoaded,
   onAnimationFailed,
   onAnimationEnd,
-  drivesAnimationPlayback,
+  ref,
   ...rest
-}: CYLAnimationViewProps): NativeProps {
-  return {
-    ...rest,
-    source: animationURLWithOptions(file, options),
-    playing: playing ?? false,
-    drivesAnimationPlayback: drivesAnimationPlayback ?? true,
-    onAnimationLoaded: onAnimationLoaded && (() => onAnimationLoaded()),
-    onAnimationFailed: onAnimationFailed && (() => onAnimationFailed()),
-    onAnimationEnd: onAnimationEnd && (() => onAnimationEnd()),
-  };
+}: CYLAnimationViewProps) {
+  const native = useRef<ComponentRef<typeof NativeAnimationView>>(null);
+  useImperativeHandle(
+    ref,
+    () => ({
+      play: () => native.current && Commands.play(native.current),
+      stopAtProgress: (progress: number) => native.current && Commands.stopAtProgress(native.current, progress),
+      restart: () => native.current && Commands.restart(native.current),
+    }),
+    []
+  );
+  return (
+    <NativeAnimationView
+      {...rest}
+      ref={native}
+      source={animationURLWithOptions(file, options)}
+      playing={playing ?? false}
+      onAnimationLoaded={onAnimationLoaded ? () => onAnimationLoaded() : undefined}
+      onAnimationFailed={onAnimationFailed ? () => onAnimationFailed() : undefined}
+      onAnimationEnd={onAnimationEnd ? () => onAnimationEnd() : undefined}
+    />
+  );
 }
-
-/**
- * The ref commands over the native view `getNative()` returns (nothing happens while it is null).
- */
-export function animationViewHandle(getNative: () => ElementRef<typeof NativeAnimationView> | null): CYLAnimationViewHandle {
-  return {
-    play: () => {
-      const native = getNative();
-      if (native) Commands.play(native);
-    },
-    stopAtProgress: (progress: number) => {
-      const native = getNative();
-      if (native) Commands.stopAtProgress(native, progress);
-    },
-    restart: () => {
-      const native = getNative();
-      if (native) Commands.restart(native);
-    },
-  };
-}
-
-/**
- * An animation played by CYLTabBarController's own engine (the one of the tab icons), whatever its library: Rive, Lottie,
- * PAG, GIF or SVGA, when the app has that library (iOS subspec, Android dependency). 由 CYLTabBarController 自己的引擎（Tab 图标所用）播放的动画。
- */
-export const CYLAnimationView = forwardRef<CYLAnimationViewHandle, CYLAnimationViewProps>(function CYLAnimationView(props, ref) {
-  const native = useRef<ElementRef<typeof NativeAnimationView>>(null);
-  useImperativeHandle(ref, () => animationViewHandle(() => native.current), []);
-  return <NativeAnimationView ref={native} {...nativeAnimationProps(props)} />;
-});

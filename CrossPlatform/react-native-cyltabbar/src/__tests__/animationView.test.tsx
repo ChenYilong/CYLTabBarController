@@ -8,8 +8,7 @@ jest.mock('../CyltabbarAnimationViewNativeComponent', () => ({
   Commands: { play: jest.fn(), stopAtProgress: jest.fn(), restart: jest.fn() },
 }));
 
-import { Commands } from '../CyltabbarAnimationViewNativeComponent';
-import { animationURLWithOptions, animationViewHandle, nativeAnimationProps } from '../CYLAnimationView.native';
+import { animationURLWithOptions } from '../CYLAnimationView.native';
 
 type Case = { input: string; file?: string; options: Record<string, string> };
 
@@ -37,69 +36,5 @@ describe('animationURLWithOptions against the shared source-options.json', () =>
   it('sorts by name and drops empty values', () => {
     expect(animationURLWithOptions('a.riv', { b: 2, a: 'x y', c: '' })).toBe('a.riv#a=x%20y&b=2');
     expect(animationURLWithOptions('a.riv#old=1', {})).toBe('a.riv');
-  });
-});
-
-describe('nativeAnimationProps', () => {
-  it('maps the contract props, with drivesAnimationPlayback true and playing false by default', () => {
-    const props = nativeAnimationProps({
-      file: 'house.riv',
-      options: { input: 'active' },
-      selected: true,
-      animationSpeed: 2,
-      animationLoops: true,
-      animationRestartToken: 3,
-      iconSize: 32,
-      tintColor: '#FF0000',
-    });
-    expect(props).toMatchObject({
-      source: 'house.riv#input=active',
-      playing: false,
-      selected: true,
-      animationSpeed: 2,
-      animationLoops: true,
-      animationRestartToken: 3,
-      drivesAnimationPlayback: true,
-      iconSize: 32,
-      tintColor: '#FF0000',
-    });
-    expect(nativeAnimationProps({ file: 'a.gif', drivesAnimationPlayback: false, playing: true })).toMatchObject({
-      drivesAnimationPlayback: false,
-      playing: true,
-    });
-  });
-
-  it('turns the events into plain callbacks and leaves them out when not given', () => {
-    const onAnimationEnd = jest.fn();
-    const props = nativeAnimationProps({ file: 'a.gif', onAnimationEnd });
-    props.onAnimationEnd?.({ nativeEvent: {} } as never);
-    expect(onAnimationEnd).toHaveBeenCalledTimes(1);
-    expect(onAnimationEnd).toHaveBeenCalledWith();
-    expect(props.onAnimationLoaded).toBeUndefined();
-    expect(props.onAnimationFailed).toBeUndefined();
-  });
-});
-
-describe('animationViewHandle', () => {
-  it('sends play, stopAtProgress and restart to the native view', () => {
-    const native = { name: 'native' } as never;
-    const handle = animationViewHandle(() => native);
-    handle.play();
-    handle.stopAtProgress(0.5);
-    handle.restart();
-    expect(Commands.play).toHaveBeenCalledWith(native);
-    expect(Commands.stopAtProgress).toHaveBeenCalledWith(native, 0.5);
-    expect(Commands.restart).toHaveBeenCalledWith(native);
-  });
-
-  it('does nothing before the native view exists', () => {
-    jest.clearAllMocks();
-    const handle = animationViewHandle(() => null);
-    handle.play();
-    handle.stopAtProgress(1);
-    handle.restart();
-    expect(Commands.play).not.toHaveBeenCalled();
-    expect(Commands.stopAtProgress).not.toHaveBeenCalled();
-    expect(Commands.restart).not.toHaveBeenCalled();
   });
 });
