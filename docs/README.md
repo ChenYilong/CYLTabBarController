@@ -400,6 +400,7 @@ docs/
 │   ├── ios-layout-block-dealloc-executor.png
 │   ├── ios-lottie-pag-tint-option.png
 │   ├── ios-lottie4-tint-option.png
+│   ├── ios-pause-while-scrolling-counter.png
 │   ├── ios-pause-while-scrolling-switch.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
 │   ├── ios-rive-dark-tint-appearance-switch.png
