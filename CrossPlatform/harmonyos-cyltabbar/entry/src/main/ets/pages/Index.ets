@@ -3,7 +3,7 @@ import {
   CYLTabBarController, CYLTabBarItemAttributes, CYLPlusButton, CYLPlusButtonPageIndex, CYLBadge, CYLBadgeView,
   CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset, CYLEdgeInsets, cyl_simulateMemoryWarning, cyl_badgeTitleForRow,
   cyl_badgeStyleCount, cyl_applyBadgeSample, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle,
-  CYLTabBarMinimizeBehavior, cyl_reportScroll, cyl_pushViewController, CYLThemeManager, CYLThemeManagerCenter,
+  CYLTabBarMinimizeBehavior, cyl_reportScroll, cyl_reportScrollStarted, cyl_pausesAnimationsWhileUserScrolls, cyl_reportScrollStopped, cyl_pushViewController, CYLThemeManager, CYLThemeManagerCenter,
   cyl_tabBarItemIdentifiers, cyl_indexOfTabBarItemWithIdentifier, cyl_selectTabBarItemWithIdentifier
 } from 'cyltabbar';
 import { CYLLocalizedString, cyl_localizationKey, cyl_badgeAccessibilityText, CYLTabBarDefaultHeight } from 'cyltabbar';
@@ -219,6 +219,7 @@ struct Index {
   }
 
   aboutToAppear(): void {
+    cyl_pausesAnimationsWhileUserScrolls(true);
     demoRegisterThemes();
     CYLThemeManagerCenter.defaultThemeManager.addListener(this.themeListener);
     // [EN] SceneDelegate.m -setUpBadgeAppearance (#425). [CN] 全局角标偏移。
@@ -1162,6 +1163,9 @@ struct Index {
         .contentEndOffset(CYL_LIST_END_INSET)
         .backgroundColor($r('app.color.cyl_grouped_background'))
         .onDidScroll((offset: number) => cyl_reportScroll(offset))
+        // [EN] The tab icon animations pause while the user scrolls (cyl_pausesAnimationsWhileUserScrolls). [CN] 用户滚动时 Tab 图标动画暂停。
+        .onScrollStart(() => cyl_reportScrollStarted())
+        .onScrollStop(() => cyl_reportScrollStopped())
         .id(`cyl-page-${identifier}`)
       } else {
         Column()
