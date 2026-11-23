@@ -317,27 +317,30 @@
     return path;
 }
 
-- (void)testShowsImageWhenAnimationEndsNeedsAnImage {
+- (void)testTheImageArgumentIsResolvedLikeSourceAndClearedWithTheMethod {
     [self makeBridgeWithArguments:@{ @"showsImageWhenAnimationEnds" : @YES }];
-    XCTAssertFalse([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue], @"no image: the animation is not hidden, the last frame stays");
+    XCTAssertTrue([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue], @"forwarded as it is, with or without an image");
+    XCTAssertNil([_item valueForKey:@"image"]);
     [self callMethod:@"setImage" argument:[self writeStillImage]];
     XCTAssertNotNil([_item valueForKey:@"image"], @"the image resolved like source: an absolute path");
     XCTAssertTrue([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue]);
     [self callMethod:@"setImage" argument:nil];
     XCTAssertNil([_item valueForKey:@"image"]);
-    XCTAssertFalse([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue], @"the image went away, so did the replacement");
+    XCTAssertTrue([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue]);
 }
 
-- (void)testTheEndShowsTheImageOnlyWhenOneExists {
+- (void)testTheEndReplacesTheAnimationWithTheImageOrThePlaceholder {
     [self makeBridgeWithArguments:@{ @"showsImageWhenAnimationEnds" : @YES, @"playing" : @YES }];
     [self loadSource];
     _factory.player.onEnded();
-    XCTAssertFalse([[_item valueForKey:@"isShowingImageAfterAnimationEnd"] boolValue], @"no image: nothing replaces the last frame");
+    XCTAssertTrue([[_item valueForKey:@"isShowingImageAfterAnimationEnd"] boolValue], @"no image: the library's placeholder replaces the ended animation (HarmonyOS rule)");
     [self callMethod:@"setImage" argument:[self writeStillImage]];
     [self callMethod:@"setPlaying" argument:@NO];
+    XCTAssertFalse([[_item valueForKey:@"isShowingImageAfterAnimationEnd"] boolValue], @"stopping shows the animation again");
     [self callMethod:@"setPlaying" argument:@YES];
     _factory.player.onEnded();
-    XCTAssertTrue([[_item valueForKey:@"isShowingImageAfterAnimationEnd"] boolValue], @"an image exists: it replaces the ended animation");
+    XCTAssertTrue([[_item valueForKey:@"isShowingImageAfterAnimationEnd"] boolValue], @"the image replaces the ended animation");
+    XCTAssertNotNil([_item valueForKey:@"image"]);
 }
 
 @end

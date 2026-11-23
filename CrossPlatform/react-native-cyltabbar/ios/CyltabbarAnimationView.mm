@@ -60,7 +60,6 @@ using namespace facebook::react;
   NSInteger _restartToken;
   CGFloat _iconSide;
   NSString *_image;
-  BOOL _showsImageProp;
 #endif
 }
 
@@ -104,9 +103,9 @@ static NSURL *CYLRNAnimationURL(NSString *source)
 
 /// [EN] Loads the still image of the `image` prop, resolved like `source` (`CYLRNAnimationURL`): a file name of the main bundle,
 ///      a path or a URL (a download, applied when it arrived, if the prop did not change meanwhile). With no image the item
-///      has none, and `applyShowsImage` then keeps the last frame. [CN] 加载 `image` 属性的静态图片，解析方式与 `source` 相同
-///      （`CYLRNAnimationURL`）：主 bundle 的文件名、路径或 URL（下载完成时应用，期间属性未变化才应用）。没有图片时条目没有静态图，
-///      `applyShowsImage` 保留最后一帧。
+///      has none and the end shows the library's placeholder (the HarmonyOS rule). [CN] 加载 `image` 属性的静态图片，解析方式与
+///      `source` 相同（`CYLRNAnimationURL`）：主 bundle 的文件名、路径或 URL（下载完成时应用，期间属性未变化才应用）。没有图片时条目没有静态图，
+///      结束时显示库的占位图（鸿蒙规则）。
 - (void)loadImage:(NSString *)image
 {
   NSURL *URL = image.length > 0 ? CYLRNAnimationURL(image) : nil;
@@ -123,20 +122,10 @@ static NSURL *CYLRNAnimationURL(NSString *source)
         __strong __typeof(weakSelf) strongSelf = weakSelf;
         if (strongSelf && [strongSelf->_image isEqualToString:image]) {
           strongSelf->_item.image = loaded;
-          [strongSelf applyShowsImage];
         }
       });
     });
   }
-  [self applyShowsImage];
-}
-
-/// [EN] `showsImageWhenAnimationEnds` takes effect only when an image exists: without one the animation is not hidden, so the
-///      last frame stays (nothing, not the library's placeholder, replaces it), the same rule as Android.
-/// [CN] 仅当存在图片时 `showsImageWhenAnimationEnds` 才生效：没有图片时不隐藏动画，保留最后一帧（不会换成库的占位图），与 Android 相同。
-- (void)applyShowsImage
-{
-  _item.showsImageWhenAnimationEnds = _showsImageProp && _item.image != nil;
 }
 
 - (void)setUpItem
@@ -207,13 +196,11 @@ static NSURL *CYLRNAnimationURL(NSString *source)
 #if CYL_RN_ANIMATION_AVAILABLE
   const auto &newProps = *std::static_pointer_cast<CyltabbarAnimationViewProps const>(props);
   _item.drivesAnimationPlayback = newProps.drivesAnimationPlayback;
-  _showsImageProp = newProps.showsImageWhenAnimationEnds;
+  _item.showsImageWhenAnimationEnds = newProps.showsImageWhenAnimationEnds;
   NSString *image = [NSString stringWithUTF8String:newProps.image.c_str()];
   if (![image isEqualToString:_image ?: @""]) {
     _image = image;
     [self loadImage:image];
-  } else {
-    [self applyShowsImage];
   }
   _item.animationSpeed = newProps.animationSpeed;
   _item.animationLoops = newProps.animationLoops;

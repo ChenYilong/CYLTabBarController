@@ -59,8 +59,8 @@ export interface NativeProps extends ViewProps {
   showsImageWhenAnimationEnds?: CodegenTypes.WithDefault<boolean, false>;
   /**
    * The still image shown by `showsImageWhenAnimationEnds` after a play-once pass, resolved exactly like `source`: a URL, a
-   * path or a file name in the app (iOS main bundle, Android assets). Without it, nothing replaces the animation: the last
-   * frame stays.
+   * path or a file name in the app (iOS main bundle, Android assets). Without it the end shows the library's placeholder
+   * (the HarmonyOS rule); with `showsImageWhenAnimationEnds` off the last frame stays.
    */
   image?: string;
   /**

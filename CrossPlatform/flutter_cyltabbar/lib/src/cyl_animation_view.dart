@@ -84,11 +84,11 @@ class CYLAnimationView extends StatefulWidget {
   /// true (default): the view applies the default playback rules; false: the host plays through the [controller].
   final bool drivesAnimationPlayback;
 
-  /// Shows [image] instead of the last frame when a play-once pass ends (default false; needs [image]); the next play shows the animation again.
+  /// Shows [image] instead of the last frame when a play-once pass ends (default false); the next play shows the animation again.
   final bool showsImageWhenAnimationEnds;
 
   /// The still image [showsImageWhenAnimationEnds] shows, resolved exactly like [file]: a file name in the app (the iOS main
-  /// bundle, the Android assets), a path or a URL. Without it the last frame stays when a play-once pass ends.
+  /// bundle, the Android assets), a path or a URL. Without it the end shows the library's placeholder (the HarmonyOS rule).
   final String? image;
 
   /// The icon's side in logical pixels; null fills the view.

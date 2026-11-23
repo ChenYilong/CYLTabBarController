@@ -62,11 +62,11 @@ export type CYLAnimationViewProps = ViewProps & {
   animationRestartToken?: number;
   /** true (default): the view applies the default playback rules; false: the host plays through `ref`. */
   drivesAnimationPlayback?: boolean;
-  /** Shows `image` instead of the last frame when a play-once pass ends (default false; needs `image`); the next play shows the animation again. */
+  /** Shows `image` instead of the last frame when a play-once pass ends (default false); the next play shows the animation again. */
   showsImageWhenAnimationEnds?: boolean;
   /**
    * The still image `showsImageWhenAnimationEnds` shows: a file name in the app (iOS main bundle, Android assets), a path or a
-   * URL, resolved like `file`. Without it the last frame stays when a play-once pass ends.
+   * URL, resolved like `file`. Without it the end shows the library's placeholder (the HarmonyOS rule).
    */
   image?: string;
   /** The icon's side in points; unset fills the view. */

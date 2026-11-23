@@ -308,7 +308,6 @@ static UIColor *CYLFlutterColor(id value) {
     BOOL _selected;
     BOOL _playing;
     NSString *_image;
-    BOOL _showsImage;
 #endif
 }
 
@@ -355,7 +354,7 @@ static UIColor *CYLFlutterColor(id value) {
         _item.drivesAnimationPlayback = [arguments[@"drivesAnimationPlayback"] boolValue];
     }
     if ([arguments[@"showsImageWhenAnimationEnds"] isKindOfClass:[NSNumber class]]) {
-        _showsImage = [arguments[@"showsImageWhenAnimationEnds"] boolValue];
+        _item.showsImageWhenAnimationEnds = [arguments[@"showsImageWhenAnimationEnds"] boolValue];
     }
     [self applyImage:[arguments[@"image"] isKindOfClass:[NSString class]] ? arguments[@"image"] : nil];
     if ([arguments[@"animationSpeed"] isKindOfClass:[NSNumber class]]) {
@@ -400,7 +399,7 @@ static UIColor *CYLFlutterColor(id value) {
 }
 
 /// [EN] Loads the still image of the `image` argument, resolved like `source` (`CYLFlutterAnimationURL`): a file name of the main
-///      bundle, a path or a URL (a download, applied when it arrived if the image did not change meanwhile).
+///      bundle, a path or a URL (a download, applied when it arrived if the image did not change meanwhile). With no image the end shows the library's placeholder (the HarmonyOS rule).
 /// [CN] 加载 `image` 参数的静态图片，解析方式与 `source` 相同（`CYLFlutterAnimationURL`）：主 bundle 的文件名、路径或 URL
 ///      （下载完成时应用，期间图片未变化才应用）。
 - (void)applyImage:(NSString *)image {
@@ -419,19 +418,10 @@ static UIColor *CYLFlutterColor(id value) {
                 __strong __typeof(weakSelf) strongSelf = weakSelf;
                 if (strongSelf && [strongSelf->_image isEqualToString:image]) {
                     strongSelf->_item.image = loaded;
-                    [strongSelf applyShowsImage];
                 }
             });
         });
     }
-    [self applyShowsImage];
-}
-
-/// [EN] `showsImageWhenAnimationEnds` takes effect only when an image exists: without one the animation is not hidden, so the
-///      last frame stays (not the library's placeholder), the same rule as Android and React Native.
-/// [CN] 仅当存在图片时 `showsImageWhenAnimationEnds` 才生效：没有图片时不隐藏动画，保留最后一帧（不会换成库的占位图），与 Android、React Native 相同。
-- (void)applyShowsImage {
-    _item.showsImageWhenAnimationEnds = _showsImage && _item.image != nil;
 }
 
 - (void)applySource:(NSString *)source {
@@ -475,8 +465,7 @@ static UIColor *CYLFlutterColor(id value) {
     } else if ([method isEqualToString:@"setDrivesAnimationPlayback"]) {
         _item.drivesAnimationPlayback = [argument isKindOfClass:[NSNumber class]] ? [argument boolValue] : YES;
     } else if ([method isEqualToString:@"setShowsImageWhenAnimationEnds"]) {
-        _showsImage = [argument isKindOfClass:[NSNumber class]] ? [argument boolValue] : NO;
-        [self applyShowsImage];
+        _item.showsImageWhenAnimationEnds = [argument isKindOfClass:[NSNumber class]] ? [argument boolValue] : NO;
     } else if ([method isEqualToString:@"setImage"]) {
         [self applyImage:[argument isKindOfClass:[NSString class]] ? argument : nil];
     } else if ([method isEqualToString:@"setPlaying"]) {

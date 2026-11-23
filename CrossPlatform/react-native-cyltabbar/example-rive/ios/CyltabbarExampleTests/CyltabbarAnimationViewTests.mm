@@ -285,30 +285,33 @@ using namespace facebook::react;
   return path;
 }
 
-- (void)testShowsImageWhenAnimationEndsNeedsAnImage {
+- (void)testTheImagePropIsResolvedLikeSourceAndClearedWithTheProp {
   CyltabbarAnimationViewProps defaults;
   XCTAssertTrue(defaults.image.empty(), @"the codegen default of image is empty");
   [self update:^(CyltabbarAnimationViewProps &props) { props.showsImageWhenAnimationEnds = true; }];
-  XCTAssertFalse([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue], @"no image: the animation is not hidden, the last frame stays");
+  XCTAssertTrue([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue], @"forwarded as it is, with or without an image");
+  XCTAssertNil([_item valueForKey:@"image"]);
   NSString *path = [self writeStillImage];
   [self update:^(CyltabbarAnimationViewProps &props) { props.image = path.UTF8String; }];
   XCTAssertNotNil([_item valueForKey:@"image"], @"the image prop resolved like source: an absolute path");
   XCTAssertTrue([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue]);
   [self update:^(CyltabbarAnimationViewProps &props) { props.image = ""; }];
   XCTAssertNil([_item valueForKey:@"image"]);
-  XCTAssertFalse([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue], @"the image went away, so did the replacement");
+  XCTAssertTrue([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue]);
 }
 
-- (void)testTheEndShowsTheImageOnlyWhenOneExists {
+- (void)testTheEndReplacesTheAnimationWithTheImageOrThePlaceholder {
   [self update:^(CyltabbarAnimationViewProps &props) { props.showsImageWhenAnimationEnds = true; props.playing = true; }];
   [self loadSource];
   _factory.player.onEnded();
-  XCTAssertFalse([[_item valueForKey:@"isShowingImageAfterAnimationEnd"] boolValue], @"no image: nothing replaces the last frame");
+  XCTAssertTrue([[_item valueForKey:@"isShowingImageAfterAnimationEnd"] boolValue], @"no image: the library's placeholder replaces the ended animation (HarmonyOS rule)");
   NSString *path = [self writeStillImage];
   [self update:^(CyltabbarAnimationViewProps &props) { props.image = path.UTF8String; props.playing = false; }];
+  XCTAssertFalse([[_item valueForKey:@"isShowingImageAfterAnimationEnd"] boolValue], @"stopping shows the animation again");
   [self update:^(CyltabbarAnimationViewProps &props) { props.playing = true; }];
   _factory.player.onEnded();
-  XCTAssertTrue([[_item valueForKey:@"isShowingImageAfterAnimationEnd"] boolValue], @"an image exists: it replaces the ended animation");
+  XCTAssertTrue([[_item valueForKey:@"isShowingImageAfterAnimationEnd"] boolValue], @"the image replaces the ended animation");
+  XCTAssertNotNil([_item valueForKey:@"image"]);
 }
 
 #pragma mark - Objective-C++ calls 从 Objective-C++ 调用
