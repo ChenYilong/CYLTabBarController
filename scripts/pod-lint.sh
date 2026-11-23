@@ -184,7 +184,7 @@ bump_version() {
 # [CN] 待办：CYLDeallocBlockExecutor 1.4.0 发布后删除（docs/Lifecycle-Library.md）。核心子库依赖 CYLDeallocBlockExecutor ~> 1.4，
 #      trunk 上还没有，因此 `lib` 使用一个从 Podfile 所固定分支获取源码的本地 podspec。设置 CYL_DEALLOC_EXECUTOR_BRANCH=（空）
 #      则使用 trunk。
-CYL_DEALLOC_EXECUTOR_BRANCH="${CYL_DEALLOC_EXECUTOR_BRANCH-f1397ed0e8b7fe34d0756986fdba59ad02d9eb6f}"  # a commit (or a branch), as the Podfiles pin
+CYL_DEALLOC_EXECUTOR_BRANCH="${CYL_DEALLOC_EXECUTOR_BRANCH-6aef46d97fb79a4530931d84a17e828c67f35444}"  # a commit (or a branch), as the Podfiles pin
 lint_external_podspecs() {
   [ -n "$CYL_DEALLOC_EXECUTOR_BRANCH" ] || return 0
   dir="$PWD/build/pod-lint-podspecs"
