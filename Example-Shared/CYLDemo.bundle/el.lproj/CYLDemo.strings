@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "n/a στο Android: μια εφαρμογή δεν μπορεί να στείλει αυτό το συμβάν συστήματος.";
 "Runs every automatic row, one after the other." = "Εκτελεί όλες τις αυτόματες γραμμές, τη μία μετά την άλλη.";
 "Tab bar %@ · page ID \"%@\"" = "Γραμμή καρτελών %@ · ID σελίδας «%@»";
+"Animated item engine API" = "API μηχανών του κινούμενου στοιχείου";
+"Stop at 50%" = "Διακοπή στο 50%";
+"Restart token: %@" = "Διακριτικό επανεκκίνησης: %@";
+"End callback: %@" = "Callback λήξης: %@";
+"none yet" = "κανένα ακόμη";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Η αναπαραγωγή ελέγχεται από τον host (drivesAnimationPlayback = false)";
+"Engine API" = "API μηχανής";

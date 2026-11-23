@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "n/a na Androidu: aplikace nemůže vyvolat tuto systémovou událost.";
 "Runs every automatic row, one after the other." = "Spustí všechny automatické řádky jeden po druhém.";
 "Tab bar %@ · page ID \"%@\"" = "Panel karet %@ · ID stránky „%@“";
+"Animated item engine API" = "API enginů animované položky";
+"Stop at 50%" = "Zastavit na 50 %";
+"Restart token: %@" = "Token restartu: %@";
+"End callback: %@" = "Callback konce: %@";
+"none yet" = "zatím žádný";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Přehrávání řídí hostitel (drivesAnimationPlayback = false)";
+"Engine API" = "API enginu";

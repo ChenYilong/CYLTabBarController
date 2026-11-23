@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "n/a pada Android: apl tidak boleh menghantar peristiwa sistem ini.";
 "Runs every automatic row, one after the other." = "Menjalankan setiap baris automatik, satu demi satu.";
 "Tab bar %@ · page ID \"%@\"" = "Bar tab %@ · ID halaman “%@”";
+"Animated item engine API" = "API enjin item animasi";
+"Stop at 50%" = "Berhenti pada 50%";
+"Restart token: %@" = "Token mula semula: %@";
+"End callback: %@" = "Panggil balik tamat: %@";
+"none yet" = "belum ada";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Main balik dikawal hos (drivesAnimationPlayback = false)";
+"Engine API" = "API enjin";

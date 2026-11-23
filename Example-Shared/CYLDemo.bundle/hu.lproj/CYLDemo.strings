@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "n/a Androidon: egy app nem küldheti el ezt a rendszereseményt.";
 "Runs every automatic row, one after the other." = "Az összes automatikus sort lefuttatja, egymás után.";
 "Tab bar %@ · page ID \"%@\"" = "%@. lapsáv · oldalazonosító: \"%@\"";
+"Animated item engine API" = "Animált elem motor-API-ja";
+"Stop at 50%" = "Megállítás 50%-nál";
+"Restart token: %@" = "Újraindítási token: %@";
+"End callback: %@" = "Befejezési visszahívás: %@";
+"none yet" = "még nincs";
+"Host-driven playback (drivesAnimationPlayback = false)" = "A lejátszást a gazda vezérli (drivesAnimationPlayback = false)";
+"Engine API" = "Motor-API";

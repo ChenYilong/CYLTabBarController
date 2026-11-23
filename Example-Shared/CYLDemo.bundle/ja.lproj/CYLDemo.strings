@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "Android では n/a：アプリはこのシステムイベントを送信できません。";
 "Runs every automatic row, one after the other." = "すべての自動行を順番に実行します。";
 "Tab bar %@ · page ID \"%@\"" = "タブバー %@ · ページ ID「%@」";
+"Animated item engine API" = "アニメーション項目のエンジン API";
+"Stop at 50%" = "50% で停止";
+"Restart token: %@" = "再生トークン：%@";
+"End callback: %@" = "終了コールバック：%@";
+"none yet" = "まだなし";
+"Host-driven playback (drivesAnimationPlayback = false)" = "ホストが再生を制御（drivesAnimationPlayback = false）";
+"Engine API" = "エンジン API";

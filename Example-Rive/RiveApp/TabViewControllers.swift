@@ -32,6 +32,14 @@ extension Tab {
             return settingsViewController(headerView: demos)
         case .user:
             rootViewController = UIHostingController(rootView: SignInView(show: .constant(true)))
+            // [EN] The next tab in turn after the Bell tab's demos (AGENTS.md, "Demo table rows"): the engine API of
+            //      `CYLAnimatedItemView`, a page pushed from the navigation bar. [CN] 轮到 Bell Tab 的演示之后的下一个 Tab
+            //      （AGENTS.md「Demo table rows」）：`CYLAnimatedItemView` 的引擎 API，从导航栏推入的页面。
+            let engineAPIItem = UIBarButtonItem(title: cylDemoLocalizedString("Engine API"), primaryAction: UIAction { [weak rootViewController] _ in
+                rootViewController?.navigationController?.pushViewController(AnimatedItemEngineAPIViewController(), animated: true)
+            })
+            engineAPIItem.accessibilityIdentifier = "AnimatedItemEngineAPIButton"
+            rootViewController.navigationItem.rightBarButtonItem = engineAPIItem
         }
         rootViewController.title = rawValue.capitalized
         return UINavigationController(rootViewController: rootViewController)

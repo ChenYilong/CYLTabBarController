@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "n/a op Android: een app kan deze systeemgebeurtenis niet versturen.";
 "Runs every automatic row, one after the other." = "Voert alle automatische rijen uit, de een na de ander.";
 "Tab bar %@ · page ID \"%@\"" = "Tabbalk %@ · pagina-ID ‘%@’";
+"Animated item engine API" = "Engine-API van het geanimeerde item";
+"Stop at 50%" = "Stop op 50%";
+"Restart token: %@" = "Herstarttoken: %@";
+"End callback: %@" = "Eindcallback: %@";
+"none yet" = "nog geen";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Afspelen door de host (drivesAnimationPlayback = false)";
+"Engine API" = "Engine-API";

@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "n/a på Android: en app kan inte skicka den här systemhändelsen.";
 "Runs every automatic row, one after the other." = "Kör alla automatiska rader, en efter en.";
 "Tab bar %@ · page ID \"%@\"" = "Flikfält %@ · sid-ID ”%@”";
+"Animated item engine API" = "Motor-API för animerat objekt";
+"Stop at 50%" = "Stoppa vid 50 %";
+"Restart token: %@" = "Omstartstoken: %@";
+"End callback: %@" = "Slutcallback: %@";
+"none yet" = "ingen än";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Värden styr uppspelningen (drivesAnimationPlayback = false)";
+"Engine API" = "Motor-API";

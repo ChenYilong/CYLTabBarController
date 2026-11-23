@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "n/a บน Android: แอปไม่สามารถส่งเหตุการณ์ระบบนี้ได้";
 "Runs every automatic row, one after the other." = "เรียกใช้ทุกแถวอัตโนมัติทีละแถว";
 "Tab bar %@ · page ID \"%@\"" = "แท็บบาร์ %@ · ID หน้า \"%@\"";
+"Animated item engine API" = "API เอนจินของรายการแอนิเมชัน";
+"Stop at 50%" = "หยุดที่ 50%";
+"Restart token: %@" = "โทเคนเริ่มใหม่: %@";
+"End callback: %@" = "คอลแบ็กเมื่อจบ: %@";
+"none yet" = "ยังไม่มี";
+"Host-driven playback (drivesAnimationPlayback = false)" = "โฮสต์ควบคุมการเล่น (drivesAnimationPlayback = false)";
+"Engine API" = "API เอนจิน";

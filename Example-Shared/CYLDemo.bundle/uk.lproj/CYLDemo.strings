@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "n/a на Android: застосунок не може надіслати цю системну подію.";
 "Runs every automatic row, one after the other." = "Запускає всі автоматичні рядки один за одним.";
 "Tab bar %@ · page ID \"%@\"" = "Панель вкладок %@ · ID сторінки «%@»";
+"Animated item engine API" = "API рушіїв анімованого елемента";
+"Stop at 50%" = "Зупинити на 50%";
+"Restart token: %@" = "Токен перезапуску: %@";
+"End callback: %@" = "Зворотний виклик завершення: %@";
+"none yet" = "ще немає";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Відтворенням керує хост (drivesAnimationPlayback = false)";
+"Engine API" = "API рушія";

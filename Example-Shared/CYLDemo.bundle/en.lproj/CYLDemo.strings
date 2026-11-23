@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "n/a on Android: an app cannot post this system event.";
 "Runs every automatic row, one after the other." = "Runs every automatic row, one after the other.";
 "Tab bar %@ · page ID \"%@\"" = "Tab bar %@ · page ID \"%@\"";
+"Animated item engine API" = "Animated item engine API";
+"Stop at 50%" = "Stop at 50%";
+"Restart token: %@" = "Restart token: %@";
+"End callback: %@" = "End callback: %@";
+"none yet" = "none yet";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Host-driven playback (drivesAnimationPlayback = false)";
+"Engine API" = "Engine API";

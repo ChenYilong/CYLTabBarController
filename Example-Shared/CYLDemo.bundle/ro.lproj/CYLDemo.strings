@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "n/a pe Android: o aplicație nu poate trimite acest eveniment de sistem.";
 "Runs every automatic row, one after the other." = "Rulează toate rândurile automate, unul după altul.";
 "Tab bar %@ · page ID \"%@\"" = "Bara de file %@ · ID pagină „%@”";
+"Animated item engine API" = "API-ul motoarelor elementului animat";
+"Stop at 50%" = "Oprește la 50%";
+"Restart token: %@" = "Token de repornire: %@";
+"End callback: %@" = "Callback de final: %@";
+"none yet" = "încă niciunul";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Redarea este condusă de gazdă (drivesAnimationPlayback = false)";
+"Engine API" = "API motor";
