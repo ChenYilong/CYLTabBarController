@@ -17,7 +17,7 @@ type AnimationEvent = Readonly<{}>;
 /**
  * [EN] The cross-platform engine contract, with the names frozen in docs/Animated-Item.md ("Engine API across platforms"):
  *      props `source` and `playing` as before, plus `selected`, `animationSpeed`, `animationLoops`, `animationRestartToken`,
- *      `drivesAnimationPlayback`, `iconSize` and `tintColor`; the events `onAnimationLoaded`, `onAnimationFailed` and
+ *      `drivesAnimationPlayback`, `showsImageWhenAnimationEnds`, `image`, `iconSize` and `tintColor`; the events `onAnimationLoaded`, `onAnimationFailed` and
  *      `onAnimationEnd`; the commands `play`, `stopAtProgress` and `restart`. Both native halves wrap `CYLAnimatedItemView`.
  * [CN] 跨端引擎契约，名称已在 docs/Animated-Item.md（「跨端引擎 API」）中冻结：属性 `source`、`playing` 不变，新增 `selected`、
  *      `animationSpeed`、`animationLoops`、`animationRestartToken`、`drivesAnimationPlayback`、`iconSize`、`tintColor`；事件
@@ -57,6 +57,12 @@ export interface NativeProps extends ViewProps {
    * Shows the still image instead of the last frame when a play-once pass ends.
    */
   showsImageWhenAnimationEnds?: CodegenTypes.WithDefault<boolean, false>;
+  /**
+   * The still image shown by `showsImageWhenAnimationEnds` after a play-once pass, resolved exactly like `source`: a URL, a
+   * path or a file name in the app (iOS main bundle, Android assets). Without it, nothing replaces the animation: the last
+   * frame stays.
+   */
+  image?: string;
   /**
    * The icon's side in points; 0 fills the view.
    */
