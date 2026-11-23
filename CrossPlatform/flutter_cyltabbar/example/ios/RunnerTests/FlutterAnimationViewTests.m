@@ -304,4 +304,40 @@
     XCTAssertTrue([_registrar.fakeMessenger.sentMethods containsObject:@"onAnimationEnd"]);
 }
 
+/// [EN] Writes a small PNG and returns its path, for the `image` argument (a path resolves like `source`). [CN] 写出一个小 PNG 并返回路径，用于 `image` 参数（路径的解析方式与 `source` 相同）。
+- (NSString *)writeStillImage {
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(8, 8)];
+    UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [[UIColor redColor] setFill];
+        [context fillRect:CGRectMake(0, 0, 8, 8)];
+    }];
+    NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"cyl-still-%@.png", NSUUID.UUID.UUIDString]];
+    [UIImagePNGRepresentation(image) writeToFile:path atomically:YES];
+    [self addTeardownBlock:^{ [NSFileManager.defaultManager removeItemAtPath:path error:nil]; }];
+    return path;
+}
+
+- (void)testShowsImageWhenAnimationEndsNeedsAnImage {
+    [self makeBridgeWithArguments:@{ @"showsImageWhenAnimationEnds" : @YES }];
+    XCTAssertFalse([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue], @"no image: the animation is not hidden, the last frame stays");
+    [self callMethod:@"setImage" argument:[self writeStillImage]];
+    XCTAssertNotNil([_item valueForKey:@"image"], @"the image resolved like source: an absolute path");
+    XCTAssertTrue([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue]);
+    [self callMethod:@"setImage" argument:nil];
+    XCTAssertNil([_item valueForKey:@"image"]);
+    XCTAssertFalse([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue], @"the image went away, so did the replacement");
+}
+
+- (void)testTheEndShowsTheImageOnlyWhenOneExists {
+    [self makeBridgeWithArguments:@{ @"showsImageWhenAnimationEnds" : @YES, @"playing" : @YES }];
+    [self loadSource];
+    _factory.player.onEnded();
+    XCTAssertFalse([[_item valueForKey:@"isShowingImageAfterAnimationEnd"] boolValue], @"no image: nothing replaces the last frame");
+    [self callMethod:@"setImage" argument:[self writeStillImage]];
+    [self callMethod:@"setPlaying" argument:@NO];
+    [self callMethod:@"setPlaying" argument:@YES];
+    _factory.player.onEnded();
+    XCTAssertTrue([[_item valueForKey:@"isShowingImageAfterAnimationEnd"] boolValue], @"an image exists: it replaces the ended animation");
+}
+
 @end

@@ -43,6 +43,7 @@ void main() {
     expect(view.animationLoops, isFalse);
     expect(view.animationRestartToken, 0);
     expect(view.showsImageWhenAnimationEnds, isFalse);
+    expect(view.image, isNull);
     expect(view.playing, isFalse);
   });
 

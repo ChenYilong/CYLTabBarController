@@ -514,6 +514,8 @@ class _ExamplePageState extends State<CYLExamplePage> {
   bool _animationLoops = false;
   // Host-driven mode of the engine row: with drivesAnimationPlayback false the item plays only on play() / restart().
   bool _drivesPlayback = true;
+  // The still image after a play-once pass (showsImageWhenAnimationEnds with image); off keeps the last frame.
+  bool _showsImageWhenEnded = false;
   int _engineEnded = 0;
   final CYLAnimationController _engineController = CYLAnimationController();
   // CYLSwitchTitlePositionAdjustment(): the title row cycles the vertical offset of every title through 0, -4 and 4 at
@@ -859,6 +861,8 @@ class _ExamplePageState extends State<CYLExamplePage> {
                     animationLoops: _animationLoops,
                     animationRestartToken: _playAllRequest,
                     drivesAnimationPlayback: _drivesPlayback,
+                    showsImageWhenAnimationEnds: _showsImageWhenEnded,
+                    image: 'cyl_still_check.png',
                     controller: _engineController,
                     onAnimationEnd: () => setState(() => _engineEnded++),
                     iconSize: 40,
@@ -874,6 +878,13 @@ class _ExamplePageState extends State<CYLExamplePage> {
                     child: Switch(
                       value: _drivesPlayback,
                       onChanged: (value) => setState(() => _drivesPlayback = value),
+                    ),
+                  ),
+                  Semantics(
+                    label: 'Show image when ended',
+                    child: Switch(
+                      value: _showsImageWhenEnded,
+                      onChanged: (value) => setState(() => _showsImageWhenEnded = value),
                     ),
                   ),
                   TextButton(

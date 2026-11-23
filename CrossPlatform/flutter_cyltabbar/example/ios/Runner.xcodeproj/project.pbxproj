@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		14454ABF5DCE4BF7BD195CCA /* icons.riv in Resources */ = {isa = PBXBuildFile; fileRef = 3FF52A4B814A4B70AB8E9F30 /* icons.riv */; };
+		5E1C0DE5B1D2E3F4A5B6C7D8 /* cyl_still_check.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E1C0DE6B1D2E3F4A5B6C7D8 /* cyl_still_check.png */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		16A760621D7D4D83BB61EB10 /* green_lottie_tab_discover_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 1CC8FDAA520C49DDB15A48D5 /* green_lottie_tab_discover_dark.json */; };
 		25E94CA8D5BAB78E7604C490 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F8DC86CCEACAD9907839847 /* Pods_RunnerTests.framework */; };
@@ -64,6 +65,7 @@
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		3F8DC86CCEACAD9907839847 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FF52A4B814A4B70AB8E9F30 /* icons.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = icons.riv; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets/icons.riv"; sourceTree = SOURCE_ROOT; };
+		5E1C0DE6B1D2E3F4A5B6C7D8 /* cyl_still_check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cyl_still_check.png; path = Runner/cyl_still_check.png; sourceTree = SOURCE_ROOT; };
 		5B78B22C584167E0744FF87E /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 				17BE476FA978496A8324E63D /* green_lottie_tab_mine_dark.json */,
 				DE7A286DC067478B849B91FF /* green_lottie_tab_mine.json */,
 				3FF52A4B814A4B70AB8E9F30 /* icons.riv */,
+				5E1C0DE6B1D2E3F4A5B6C7D8 /* cyl_still_check.png */,
 				1338B07BC7454727B0E7E40B /* green_lottie_tab_news_dark.json */,
 				7930957FF92847C480DA6B48 /* green_lottie_tab_news.json */,
 				1CC8FDAA520C49DDB15A48D5 /* green_lottie_tab_discover_dark.json */,
@@ -303,6 +306,7 @@
 				EB6DE3E5F466459DA5D4772C /* green_lottie_tab_mine_dark.json in Resources */,
 				945C22889D1A4725BC79DA54 /* green_lottie_tab_mine.json in Resources */,
 				14454ABF5DCE4BF7BD195CCA /* icons.riv in Resources */,
+				5E1C0DE5B1D2E3F4A5B6C7D8 /* cyl_still_check.png in Resources */,
 				D98767A89ADE486B98B04E8D /* green_lottie_tab_news_dark.json in Resources */,
 				3025FD4F02F54357AC181B17 /* green_lottie_tab_news.json in Resources */,
 				16A760621D7D4D83BB61EB10 /* green_lottie_tab_discover_dark.json in Resources */,
