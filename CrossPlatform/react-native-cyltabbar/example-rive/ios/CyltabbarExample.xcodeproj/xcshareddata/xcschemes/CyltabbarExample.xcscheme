@@ -32,7 +32,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "00E356ED1AD99517003FC87E"
+               BlueprintIdentifier = "4230FA9DBF32B7A07619331A"
                BuildableName = "CyltabbarExampleTests.xctest"
                BlueprintName = "CyltabbarExampleTests"
                ReferencedContainer = "container:CyltabbarExample.xcodeproj">
