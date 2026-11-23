@@ -1,10 +1,10 @@
 # x86_64 debug engine kit: Rive (@ohos/rive 1.0.4)
 
 **Debug test kit for the x86_64 HarmonyOS emulator only.** Never part of a HAR, a release build or a published package:
-`tools/cyl_hap_x86_64.py install` adds these files to a debug HAP when the device is x86_64, and `CYLAnimatedItemEngines`
-turns Rive on for x86_64 only in debug builds and only when that tool installed the kit (README "x86_64 emulator", Plan 1;
-owner's rules in CYLTabBarController `instructions.md`, tag `windows-harmonyos`). Removing the debug guard needs the
-owner's approval.
+`tools/cyl_hap_x86_64.py install` adds these files to a HAP when the device is x86_64, and `CYLAnimatedItemEngines`
+turns Rive on for x86_64 only when that tool installed the kit (README "x86_64 emulator", Plan 1;
+owner's rules in CYLTabBarController `instructions.md`, tag `windows-harmonyos`). The debug-build guard was removed
+with the owner's approval (2026-11-23).
 
 | File | What | SHA-256 |
 |:---|:---|:---|

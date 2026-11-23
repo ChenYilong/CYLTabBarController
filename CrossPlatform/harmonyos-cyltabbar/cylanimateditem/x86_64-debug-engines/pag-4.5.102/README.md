@@ -2,8 +2,8 @@
 
 **Debug test kit for the x86_64 HarmonyOS emulator only**, like [../pag](../pag/README.md) (4.4.31): never part of a HAR, a
 release build or a published package. `tools/cyl_hap_x86_64.py install` adds it only to a HAP whose ArkTS was built with
-@tencent/libpag 4.5.102 (`kit.json`; a native library of another version crashes the app's ArkTS layer). Removing the
-debug guard needs the owner's approval.
+@tencent/libpag 4.5.102 (`kit.json`; a native library of another version crashes the app's ArkTS layer). The debug-build
+guard was removed with the owner's approval (2026-11-23).
 
 | File | What | SHA-256 |
 |:---|:---|:---|

@@ -207,22 +207,22 @@ export class CYLAnimatedItemEngines {
   private static cylX86DebugEngines: string[] | undefined = undefined;
 
   /**
-   * [EN] Debug builds only: turns on the engines of the x86_64 debug engine kit (`x86_64-debug-engines`, e.g. Rive built
+   * [EN] Turns on the engines of the x86_64 debug engine kit (`x86_64-debug-engines`, e.g. Rive built
    *      for x86_64) when `tools/cyl_hap_x86_64.py install` added it to this HAP, which it marks with the rawfile
-   *      `cyl_x86_64_debug_engines.json`; those engines then also accept `x86_64`. Release builds, and debug builds installed
-   *      without the kit, change nothing (PAG and Rive keep their still images on x86_64). Kept once found; returns the engines.
-   *      CYLAnimatedItemView and CYLTabBarController call it. Owner's Plan 1: this debug guard stays until the owner
-   *      approves removing it.
-   * [CN] 仅 debug 构建：当 `tools/cyl_hap_x86_64.py install` 把 x86_64 调试引擎包（`x86_64-debug-engines`，例如为 x86_64 构建的 Rive）
-   *      加入本 HAP（以 rawfile `cyl_x86_64_debug_engines.json` 标记）时，开启该包中的引擎，这些引擎随即也接受 `x86_64`。release 构建以及
-   *      未安装该包的 debug 构建不做任何改变（x86_64 上 PAG 与 Rive 保持静态图片）。找到后保留；返回这些引擎。
+   *      `cyl_x86_64_debug_engines.json`; those engines then also accept `x86_64`, in debug and release builds. A HAP
+   *      installed without the kit changes nothing (PAG and Rive keep their still images on x86_64). Kept once found; returns the engines.
+   *      CYLAnimatedItemView and CYLTabBarController call it. Owner's Plan 1: the debug-build guard was removed with
+   *      the owner's approval (2026-11-23); the marker and the device's x86_64 ABI remain the guards.
+   * [CN] 当 `tools/cyl_hap_x86_64.py install` 把 x86_64 调试引擎包（`x86_64-debug-engines`，例如为 x86_64 构建的 Rive）
+   *      加入本 HAP（以 rawfile `cyl_x86_64_debug_engines.json` 标记）时，开启该包中的引擎，这些引擎随即也接受 `x86_64`。debug 与 release
+   *      构建均适用；未安装该包的 HAP 不做任何改变（x86_64 上 PAG 与 Rive 保持静态图片）。找到后保留；返回这些引擎。
    */
   static loadX86_64DebugEngines(context: common.Context | undefined): string[] {
     if (CYLAnimatedItemEngines.cylX86DebugEngines !== undefined && CYLAnimatedItemEngines.cylX86DebugEngines.length > 0) {
       return CYLAnimatedItemEngines.cylX86DebugEngines.slice();
     }
     let engines: string[] = [];
-    if (BuildProfile.DEBUG && context !== undefined) {
+    if (context !== undefined) {
       try {
         const bytes: Uint8Array = context.resourceManager.getRawFileContentSync('cyl_x86_64_debug_engines.json');
         let text: string = '';
@@ -240,7 +240,7 @@ export class CYLAnimatedItemEngines {
       }
     });
     if (engines.length > 0) {
-      console.warn(`[CYLAnimatedItem] x86_64 debug engine kit active: ${engines.join(', ')} (debug builds only).`);
+      console.warn(`[CYLAnimatedItem] x86_64 debug engine kit active: ${engines.join(', ')}.`);
     }
     CYLAnimatedItemEngines.cylX86DebugEngines = engines;
     return engines.slice();

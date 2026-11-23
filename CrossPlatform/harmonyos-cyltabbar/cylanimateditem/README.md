@@ -108,7 +108,7 @@ it); `strip <in.hap> [<out.hap>]` only copies the HAP without native libraries. 
 
 | Testable on the x86_64 emulator | Needs an arm64 device |
 |:---|:---|
-| Lottie, SVGA and GIF playback; still images and placeholders; PAG and Rive items on their still images (no crash, no blank item); Rive playback in debug builds with the debug engine kit (section 5); `showsImageWhenAnimationEnds` with Lottie or SVGA; layout, dark mode, accessibility, localization, gestures, countdown, stack view | PAG playback; Rive in release builds; Rive's dispose crash workarounds on a real device |
+| Lottie, SVGA and GIF playback; still images and placeholders; PAG and Rive items on their still images (no crash, no blank item); Rive and PAG playback with the debug engine kit (section 5); `showsImageWhenAnimationEnds` with Lottie or SVGA; layout, dark mode, accessibility, localization, gestures, countdown, stack view | Rive and PAG without the kit; Rive's dispose crash workarounds on a real device |
 
 Device tests (hypium): the cyltabbar example's `entry/src/ohosTest` (`CYLAnimatedItemFallback.test.ets`) checks the
 ABI rules on the device (expectations follow `deviceInfo.abiList`, so it also passes on arm64), a simulated x86_64 and
@@ -140,9 +140,10 @@ licenses in each README; each folder's `kit.json` names its package and version)
   from `ets/modules.abc`; a native library of another version crashed the app, so a mismatch is skipped with a message) (`--x86-engines auto`, the default; `no` / `yes` or
   `CYL_X86_ENGINES=0|1` force it).
 - `CYLAnimatedItemEngines.loadX86_64DebugEngines(context)` (called by `CYLAnimatedItemView` and `CYLTabBarController`)
-  reads the marker **in debug builds only** and lets the engines it names (Rive, PAG) accept `x86_64`; `x86_64DebugEngines()` lists what it turned on.
-  Release builds and debug builds installed without the kit keep the still images.
-- The debug guard stays until the owner approves removing it.
+  reads the marker (debug and release builds) and lets the engines it names (Rive, PAG) accept `x86_64`; `x86_64DebugEngines()` lists what it turned on.
+  A HAP installed without the kit keeps the still images.
+- The debug-build guard was removed with the owner's approval (2026-11-23), after Rive and PAG (4.5.102) played on the
+  x86_64 emulator without crashes; the marker and the device's x86_64 ABI remain the guards.
 
 Checked on the x86_64 emulator (2026-11-22): with the kit the Rive tab icons draw and animate, without it they keep their
 still images, and the hypium suite passes 9 / 9 in both installs; in CollectionViewClassifyMenu the PAG icons play and end

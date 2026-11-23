@@ -17,7 +17,7 @@ off. With --x86-engines auto (default) on an x86_64 device, it also adds the x86
 (../x86_64-debug-engines/rive: libohos_rive.so of @ohos/rive 1.0.4, libc++_shared.so; ../x86_64-debug-engines/pag: libpag.so
 of @tencent/libpag 4.4.31, ../x86_64-debug-engines/pag-4.5.102), only for the engines the HAP uses and only in the exact
 package version its ArkTS was built with (kit.json; another version is skipped with a message), and the marker rawfile
-cyl_x86_64_debug_engines.json, so Rive and PAG play in DEBUG builds (CYLAnimatedItemEngines reads the marker); CYL_X86_ENGINES=1 / 0
+cyl_x86_64_debug_engines.json, so Rive and PAG play (CYLAnimatedItemEngines reads the marker in debug and release builds); CYL_X86_ENGINES=1 / 0
 forces it. Standard library only. The Rive and PAG items of the stripped app show their still images
 (CYLAnimatedItemEngines.isSupportedOnDevice); their playback still needs an arm64 device.
 """

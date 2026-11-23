@@ -56,9 +56,9 @@ export function cylRiveRendererType(): RendererType {
 }
 
 /**
- * [EN] Whether @ohos/rive can run here: the engine registry decides (arm64-v8a; x86_64 too in debug builds with the x86_64
+ * [EN] Whether @ohos/rive can run here: the engine registry decides (arm64-v8a; x86_64 too with the x86_64
  *      debug engine kit). Elsewhere a Rive view crashed the app later (CYLTableViewPlaceHolder E15).
- * [CN] @ohos/rive 能否在此运行：由引擎注册表决定（arm64-v8a；debug 构建安装了 x86_64 调试引擎包时也包括 x86_64）。
+ * [CN] @ohos/rive 能否在此运行：由引擎注册表决定（arm64-v8a；安装了 x86_64 调试引擎包时也包括 x86_64）。
  */
 export function cylRiveIsSupported(): boolean {
   return CYLAnimatedItemEngines.isSupportedOnDevice('Rive');
