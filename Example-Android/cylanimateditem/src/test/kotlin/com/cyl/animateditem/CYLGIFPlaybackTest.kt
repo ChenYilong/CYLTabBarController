@@ -51,6 +51,34 @@ class CYLGIFPlaybackTest {
     }
 
     @Test
+    fun pauseFreezesTheFrameAndResumeContinuesFromIt() {
+        val view = view()
+        val player = player(view)
+        player.play()
+        advance(150)
+        assertEquals(1, view.shownFrame)
+        player.pause()
+        assertFalse("a paused pass does not play", view.isPlaying)
+        advance(1000)
+        assertEquals("the frame stays while paused", 1, view.shownFrame)
+        player.resume()
+        assertTrue(view.isPlaying)
+        advance(100)
+        assertEquals("continues from the second frame (time ~250 ms)", 1, view.shownFrame)
+        advance(700)
+        assertFalse(view.isPlaying)
+        assertEquals(2, view.shownFrame)
+    }
+
+    @Test
+    fun resumeWithoutPauseDoesNothing() {
+        val view = view()
+        val player = player(view)
+        player.resume()
+        assertFalse(view.isPlaying)
+    }
+
+    @Test
     fun withLoopsItPlaysAgainUntilTurnedOff() {
         val view = view()
         val player = player(view)

@@ -468,6 +468,13 @@ interface CYLTabBarItemAnimationPlayableView {
     fun cyl_showAnimationViewLastFrame()
     fun cyl_stopAnimationView()
     /**
+     * [EN] Pauses a playing animation where it is (`cyl.animation.didPause` follows from the item); optional, default: keeps playing.
+     * [CN] 在当前位置暂停正在播放的动画（item 随后发出 `cyl.animation.didPause`）；可选，默认继续播放。
+     */
+    fun cyl_pauseAnimationView() { /* [EN] Optional. [CN] 可选。 */ }
+    /** [EN] Continues what [cyl_pauseAnimationView] paused. [CN] 继续被 [cyl_pauseAnimationView] 暂停的动画。 */
+    fun cyl_resumeAnimationView() { /* [EN] Optional. [CN] 可选。 */ }
+    /**
      * [EN] Colors for Dark Mode, already resolved; null restores the light colors. [CN] 深色模式颜色（已解析）；null 恢复浅色。
      */
     fun cyl_applyAnimationViewColors(colors: Map<String, Int>?) { /* [EN] Optional. [CN] 可选。 */ }
@@ -558,6 +565,8 @@ open class CYLTabBarItemViewAnimator(
             override fun play() = playable.cyl_playAnimationView()
             override fun showLastFrame() = playable.cyl_showAnimationViewLastFrame()
             override fun stop() = playable.cyl_stopAnimationView()
+            override fun pause() = playable.cyl_pauseAnimationView()
+            override fun resume() = playable.cyl_resumeAnimationView()
             override val isPlaying: Boolean? get() = playable.cyl_isAnimationViewPlaying()
             override var loops: Boolean = false
                 set(value) { field = value; playable.cyl_setAnimationViewLoops(value) }
