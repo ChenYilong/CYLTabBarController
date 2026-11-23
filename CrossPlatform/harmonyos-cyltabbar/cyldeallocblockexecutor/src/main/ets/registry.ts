@@ -1,16 +1,21 @@
+import { LifecycleCenter } from './center';
 import { allTimings } from './types';
 import type { LifecycleCallback, LifecycleEvent, LifecycleInfo, LifecycleTiming } from './types';
 
 interface Entry {
   identifier: number;
   callback: LifecycleCallback<any>;
-  event: LifecycleEvent | null; // null: a teardown block
+  event: LifecycleEvent | null; // null: a teardown block or a custom event
+  custom: string | undefined; // set: a custom event block
   timing: LifecycleTiming;
   invokeOnce: boolean;
   key: string | undefined;
   fired: boolean;
   cancelled: boolean;
 }
+
+type Kind = 'lifecycle' | 'custom' | 'dealloc';
+const kindOf = (e: Entry): Kind => (e.event !== null ? 'lifecycle' : e.custom !== undefined ? 'custom' : 'dealloc');
 
 export interface AddOptions {
   timing?: LifecycleTiming;
@@ -46,6 +51,7 @@ export class LifecycleRegistry {
   private nextIdentifier = 1;
   private readonly manual = new Set<string>();
   private readonly performDepth = new Map<LifecycleEvent, number>();
+  private forwards: { target: WeakRef<LifecycleRegistry>; events: Set<LifecycleEvent> | undefined }[] = [];
 
   /** Called when a block is added for `event` (the controller attaches its sources lazily). */
   onRegister: ((event: LifecycleEvent) => void) | undefined;
@@ -71,9 +77,9 @@ export class LifecycleRegistry {
     this.entries = this.entries.filter((e) => !e.cancelled);
   }
 
-  private removeKey(key: string | undefined, dealloc: boolean): void {
+  private removeKey(key: string | undefined, kind: Kind): void {
     if (key === undefined) return;
-    this.drop((e) => e.key === key && (e.event === null) === dealloc);
+    this.drop((e) => e.key === key && kindOf(e) === kind);
   }
 
   // lifecycle blocks
@@ -84,12 +90,13 @@ export class LifecycleRegistry {
     callback: LifecycleCallback<T>,
     options: AddOptions = {},
   ): number {
-    this.removeKey(options.key, false);
+    this.removeKey(options.key, 'lifecycle');
     const identifier = this.nextIdentifier++;
     this.entries.push({
       identifier,
       callback,
       event,
+      custom: undefined,
       timing: options.timing ?? 'afterSuper',
       invokeOnce: options.invokeOnce ?? false,
       key: options.key,
@@ -103,6 +110,73 @@ export class LifecycleRegistry {
   /** Cancels one block by `identifier` or by `key`; true when one was removed. */
   cancelLifecycleCallback(target: { identifier: number } | { key: string }): boolean {
     return this.cancelOne(target, false);
+  }
+
+  // custom events
+
+  /** Adds a block for the custom event `name` (a name the app or the core posts); returns its identifier. */
+  addCustomCallback<T = any>(name: string, callback: LifecycleCallback<T>, options: { invokeOnce?: boolean; key?: string } = {}): number {
+    this.removeKey(options.key, 'custom');
+    const identifier = this.nextIdentifier++;
+    this.entries.push({
+      identifier,
+      callback,
+      event: null,
+      custom: name,
+      timing: 'afterSuper',
+      invokeOnce: options.invokeOnce ?? false,
+      key: options.key,
+      fired: false,
+      cancelled: false,
+    });
+    return identifier;
+  }
+
+  /** Runs the blocks of the custom event `name` (the owner's, then the global observers'), in identifier order. */
+  postLifecycleEvent(name: string, userInfo?: Record<string, unknown>): void {
+    const owner = this.owner.deref();
+    if (owner === undefined) return;
+    const info: LifecycleInfo = { event: null, timing: 'afterSuper', customEvent: name, userInfo };
+    const snapshot = this.entries
+      .filter((e) => e.custom === name && !(e.invokeOnce && e.fired))
+      .sort((a, b) => a.identifier - b.identifier);
+    for (const e of snapshot) {
+      if (e.cancelled || (e.invokeOnce && e.fired)) continue;
+      if (e.invokeOnce) e.fired = true;
+      e.callback(owner, e.identifier, { ...info });
+    }
+    for (const f of this.liveForwards(undefined)) f.firePosted(name, userInfo);
+    LifecycleCenter.dispatch(owner, null, name, 'afterSuper', info);
+  }
+
+  /** Runs a posted event that came through a forward (the target's own blocks and the global observers). */
+  private firePosted(name: string, userInfo?: Record<string, unknown>): void {
+    this.postLifecycleEvent(name, userInfo);
+  }
+
+  // forwarding
+
+  /**
+   * Forwards the events fired on this owner to `target`'s registry (all events, or the given set), as an object that is
+   * not a view gets the events of the view that shows it. The target is held weakly; forwarding to the same target again
+   * replaces the earlier forward. Posted custom events are forwarded too.
+   */
+  forwardLifecycleEvents(target: LifecycleRegistry, events?: readonly LifecycleEvent[]): void {
+    this.forwards = this.forwards.filter((f) => {
+      const t = f.target.deref();
+      return t !== undefined && t !== target;
+    });
+    this.forwards.push({ target: new WeakRef(target), events: events ? new Set(events) : undefined });
+  }
+
+  private liveForwards(event: LifecycleEvent | undefined): LifecycleRegistry[] {
+    const live: LifecycleRegistry[] = [];
+    this.forwards = this.forwards.filter((f) => f.target.deref() !== undefined);
+    for (const f of this.forwards) {
+      const t = f.target.deref();
+      if (t !== undefined && (event === undefined || f.events === undefined || f.events.has(event))) live.push(t);
+    }
+    return live;
   }
 
   /** Cancels the blocks of `event` (and `timing` when given) that have no key. */
@@ -122,7 +196,7 @@ export class LifecycleRegistry {
   /** Re-arms the one block added under `key`. */
   rearmLifecycleCallback(key: string): void {
     for (const e of this.entries) {
-      if (e.event !== null && e.key === key) e.fired = false;
+      if (kindOf(e) !== 'dealloc' && e.key === key) e.fired = false;
     }
   }
 
@@ -130,12 +204,13 @@ export class LifecycleRegistry {
 
   /** Adds a teardown block: it runs once, when the owner is torn down. */
   addDeallocCallback<T = any>(callback: LifecycleCallback<T>, options: { key?: string } = {}): number {
-    this.removeKey(options.key, true);
+    this.removeKey(options.key, 'dealloc');
     const identifier = this.nextIdentifier++;
     this.entries.push({
       identifier,
       callback,
       event: null,
+      custom: undefined,
       timing: 'end',
       invokeOnce: false,
       key: options.key,
@@ -151,13 +226,13 @@ export class LifecycleRegistry {
 
   /** Cancels the teardown blocks that have no key. */
   cancelAllDeallocCallbacks(): void {
-    this.drop((e) => e.event === null && e.key === undefined);
+    this.drop((e) => kindOf(e) === 'dealloc' && e.key === undefined);
   }
 
   private cancelOne(target: { identifier: number } | { key: string }, dealloc: boolean): boolean {
     const hit = this.entries.find(
       (e) =>
-        (e.event === null) === dealloc &&
+        (kindOf(e) === 'dealloc') === dealloc &&
         ('identifier' in target ? e.identifier === target.identifier : e.key === target.key),
     );
     if (!hit) return false;
@@ -170,8 +245,8 @@ export class LifecycleRegistry {
   runDealloc(): void {
     const owner = this.owner.deref();
     if (owner === undefined) return;
-    const snapshot = this.entries.filter((e) => e.event === null).sort((a, b) => a.identifier - b.identifier);
-    this.entries = this.entries.filter((e) => e.event !== null);
+    const snapshot = this.entries.filter((e) => kindOf(e) === 'dealloc').sort((a, b) => a.identifier - b.identifier);
+    this.entries = this.entries.filter((e) => kindOf(e) !== 'dealloc');
     for (const e of snapshot) {
       if (e.cancelled) continue;
       e.callback(owner, e.identifier, { event: null, timing: 'end', isDealloc: true });
@@ -253,5 +328,8 @@ export class LifecycleRegistry {
       if (e.invokeOnce) e.fired = true;
       e.callback(owner, e.identifier, { ...info, event, timing });
     }
+    const full: LifecycleInfo = { ...info, event, timing };
+    for (const t of this.liveForwards(event)) t.fire(event, timing, info);
+    LifecycleCenter.dispatch(owner, event, undefined, timing, full);
   }
 }

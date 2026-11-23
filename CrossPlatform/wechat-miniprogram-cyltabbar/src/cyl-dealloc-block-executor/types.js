@@ -18,6 +18,14 @@ const LifecycleEvent = {
   willMoveToParent: 'willMoveToParent',
   didMoveToParent: 'didMoveToParent',
   didReceiveMemoryWarning: 'didReceiveMemoryWarning',
+  // Design v5 (observable moments), appended so the existing names stay stable.
+  willMoveToWindow: 'willMoveToWindow',
+  didMoveToWindow: 'didMoveToWindow',
+  didEnterScreen: 'didEnterScreen',
+  didLeaveScreen: 'didLeaveScreen',
+  scrollWillBeginDragging: 'scrollWillBeginDragging',
+  scrollDidEndDragging: 'scrollDidEndDragging',
+  scrollDidEndScrolling: 'scrollDidEndScrolling',
 }         ;
 
 /**
@@ -37,6 +45,5 @@ const allTimings                             = ['beforeSuper', 'afterSuper', 'en
 /** What a block can read about the event (iOS `CYLLifecycleInfo`). */
 
 /** A block: the owner, its own identifier and the info. */
-
 
 module.exports = { LifecycleEvent, LifecycleTiming, allTimings };

@@ -18,6 +18,14 @@ export const LifecycleEvent = {
   willMoveToParent: 'willMoveToParent',
   didMoveToParent: 'didMoveToParent',
   didReceiveMemoryWarning: 'didReceiveMemoryWarning',
+  // Design v5 (observable moments), appended so the existing names stay stable.
+  willMoveToWindow: 'willMoveToWindow',
+  didMoveToWindow: 'didMoveToWindow',
+  didEnterScreen: 'didEnterScreen',
+  didLeaveScreen: 'didLeaveScreen',
+  scrollWillBeginDragging: 'scrollWillBeginDragging',
+  scrollDidEndDragging: 'scrollDidEndDragging',
+  scrollDidEndScrolling: 'scrollDidEndScrolling',
 } as const;
 export type LifecycleEvent = (typeof LifecycleEvent)[keyof typeof LifecycleEvent];
 
@@ -60,6 +68,16 @@ export interface LifecycleInfo {
   parentAttached?: boolean;
   /** True for the block of a teardown. */
   isDealloc?: boolean;
+  /** Scroll events: the scrolling source (a scroll view, a list, a page), as the platform names it. */
+  scrollView?: unknown;
+  /** `scrollDidEndDragging`: the scroll view keeps moving after the finger lifts. */
+  willDecelerate?: boolean;
+  /** `willMoveToWindow` / `didMoveToWindow`: the window, or null when the view leaves it. */
+  window?: unknown;
+  /** Custom events: the name the event was posted under. */
+  customEvent?: string;
+  /** Custom events: what the poster passed along. */
+  userInfo?: Record<string, unknown>;
 }
 
 /** A block: the owner, its own identifier and the info. */

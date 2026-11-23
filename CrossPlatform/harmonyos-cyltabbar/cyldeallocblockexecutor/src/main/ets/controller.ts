@@ -26,6 +26,11 @@ export interface Rect {
  * - `didReceiveMemoryWarning`: `memoryLevel(level)` from `UIAbility.onMemoryLevel`;
  * - teardown blocks: `aboutToDisappear()`.
  * - `viewWillLayoutSubviews`, `viewLayoutMarginsDidChange`: no source.
+ * - design v5: `windowAttached()` / `windowDetached()` (`onAttach` / `onDetach`) fire the window moves;
+ *   `visibleAreaChanged(visible)` (`onVisibleAreaChange`) and `onPageShow` / `onPageHide` fire
+ *   `didEnterScreen` / `didLeaveScreen` on transitions; `scrollStarted()` / `scrollStopped()`
+ *   (`onScrollStart` / `onScrollStop`) fire the scroll events (ArkUI has no drag-end event, so a stop
+ *   is a drag end without deceleration and the end of scrolling).
  */
 export class LifecycleController<T extends object> {
   readonly registry: LifecycleRegistry;
@@ -36,6 +41,7 @@ export class LifecycleController<T extends object> {
   private lastSize: Rect | undefined;
   private lastInsets: Insets | undefined;
   private lastColorMode: string | undefined;
+  private onScreen = false;
 
   constructor(owner: T) {
     this.owner = owner;
@@ -51,6 +57,42 @@ export class LifecycleController<T extends object> {
   private around(event: LifecycleEvent, info: Partial<LifecycleInfo> = {}): void {
     this.registry.fireAutomatic(event, 'beforeSuper', info);
     this.registry.fireAutomatic(event, 'afterSuper', info);
+  }
+
+  /** `onAttach()` of the component: it joined the window. */
+  windowAttached(window?: unknown): void {
+    this.around('willMoveToWindow', { window: window ?? null });
+    this.around('didMoveToWindow', { window: window ?? null });
+  }
+
+  /** `onDetach()` of the component: it left the window. */
+  windowDetached(): void {
+    this.around('willMoveToWindow', { window: null });
+    this.around('didMoveToWindow', { window: null });
+    this.setScreenVisible(false);
+  }
+
+  /** `onVisibleAreaChange`: the component is (not) visible enough on screen. */
+  visibleAreaChanged(visible: boolean): void {
+    this.setScreenVisible(visible);
+  }
+
+  /** Fires `didEnterScreen` / `didLeaveScreen` on transitions only. */
+  setScreenVisible(visible: boolean): void {
+    if (this.onScreen === visible || this.detached) return;
+    this.onScreen = visible;
+    this.around(visible ? 'didEnterScreen' : 'didLeaveScreen');
+  }
+
+  /** `onScrollStart` of the scrollable component. */
+  scrollStarted(scrollView?: unknown): void {
+    this.around('scrollWillBeginDragging', { scrollView });
+  }
+
+  /** `onScrollStop` of the scrollable component. */
+  scrollStopped(scrollView?: unknown): void {
+    this.around('scrollDidEndDragging', { scrollView, willDecelerate: false });
+    this.around('scrollDidEndScrolling', { scrollView });
   }
 
   /** `aboutToAppear()` of the page or component. */
@@ -69,6 +111,7 @@ export class LifecycleController<T extends object> {
     this.around('viewWillAppear', { animated: false });
     this.around('viewIsAppearing');
     this.around('viewDidAppear', { animated: false });
+    this.setScreenVisible(true);
   }
 
   /** `onPageHide()`. */
@@ -77,6 +120,7 @@ export class LifecycleController<T extends object> {
     this.shown = false;
     this.around('viewWillDisappear', { animated: false });
     this.around('viewDidDisappear', { animated: false });
+    this.setScreenVisible(false);
   }
 
   /** `aboutToDisappear()`: move events, then the teardown blocks. */
