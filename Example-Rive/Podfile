@@ -15,9 +15,22 @@ target 'RiveApp' do
   pod 'CYLAnimatedItem', :path => '../'
   # FIX: issue #415 — SVGA animations (SVGAPlayer), shown after the Rive demo. SVGA 动画（SVGAPlayer），显示在 Rive 演示之后。
   pod 'CYLTabBarController/SVGA', :path => '../'
+  # [EN] Lottie (lottie-ios 4.x) and PAG items of the Engine API page, next to Rive and SVGA, to show `onAnimationEnd` of every engine.
+  # [CN] Engine API 页面中的 Lottie（lottie-ios 4.x）与 PAG 条目，与 Rive、SVGA 并列，用于展示每种引擎的 `onAnimationEnd`。
+  pod 'CYLTabBarController/LottieSwift', :path => '../'
+  pod 'CYLTabBarController/PAG', :path => '../'
+  # libpag 4.5.101, pinned as in Example-PAG/Podfile. 与 Example-PAG/Podfile 相同，固定 libpag 4.5.101。
+  pod 'libpag', :git => 'https://github.com/libpag/pag-ios.git', :commit => '12613de91b049b3d8afc0c09ae1bb48df6a6acec', :inhibit_warnings => true
   # The FlatDesign style, chosen with the navigation bar button of the settings list. It also brings Lottie.
   # 扁平样式，通过设置列表的导航栏按钮选择。它同时会引入 Lottie。
   pod 'CYLTabBarController/CYLFlatDesignTabBar', :path => '../'
+end
+
+# [EN] The .pag files are not in the repository: fetched (pinned, SHA-256 checked) as in Example-PAG.
+# [CN] .pag 文件不在仓库中：与 Example-PAG 相同，安装时下载（固定版本，校验 SHA-256）。
+pre_install do |installer|
+  script = File.expand_path('../../scripts/fetch-animation-resources.py', installer.sandbox.root.to_s)
+  system('python3', script, 'PAGResources') || abort('[!] Could not download the PAG files: python3 ' + script)
 end
 
 post_install do |installer|

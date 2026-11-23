@@ -15,12 +15,13 @@ import CYLTabBarController
  *      "Play all" (`restartAnimation()`: `animationRestartToken` grows by one and each item restarts from progress 0), a tap on
  *      an item (`animationPlayer.play()`), "Stop at 50%" (a stop, then `progress = 0.5`), the speed slider (`speed` of each
  *      player, `animationSpeed` of each item) and the loop switch (`loops` of each player, `animationLoops` of each item). The
- *      label under the controls shows `onAnimationEnd` firing per engine. Engines of this example: Rive (icons.riv) and SVGA.
+ *      label under the controls shows `onAnimationEnd` firing per engine. Engines of this example: Rive (icons.riv), SVGA, Lottie (lottie-ios 4.x, the
+ *      repository's LottieResources) and PAG (libpag, pinned as in Example-PAG/Podfile).
  * [CN] `CYLAnimatedItemView` 的跨平台引擎 API（docs/Animated-Item.md「Engine API across platforms」；以鸿蒙为准），由宿主驱动：每个条目的
  *      `drivesAnimationPlayback = false`，视图不再应用自己的速度、循环与静止进度规则，只提供 `animationPlayer`。本页做鸿蒙宿主所做的事：
  *      「全部播放」（`restartAnimation()`：`animationRestartToken` 加一，每个条目从进度 0 重新播放）、点击条目（`animationPlayer.play()`）、
  *      「停在 50%」（先停止，再 `progress = 0.5`）、倍速滑块（各播放器的 `speed`、各条目的 `animationSpeed`）与循环开关（各播放器的 `loops`、
- *      各条目的 `animationLoops`）。控件下方的标签显示各引擎的 `onAnimationEnd` 触发情况。本示例的引擎：Rive（icons.riv）与 SVGA。
+ *      各条目的 `animationLoops`）。控件下方的标签显示各引擎的 `onAnimationEnd` 触发情况。本示例的引擎：Rive（icons.riv）、SVGA、Lottie（lottie-ios 4.x，仓库的 LottieResources）与 PAG（libpag，固定版本同 Example-PAG/Podfile）。
  */
 final class AnimatedItemEngineAPIViewController: UIViewController {
 
@@ -54,9 +55,9 @@ final class AnimatedItemEngineAPIViewController: UIViewController {
 
     // MARK: - Items
 
-    /// [EN] One Rive item (the BELL artboard of icons.riv, its state machine input "active") and two SVGA items, through the
-    ///      same `CYLAnimatedItemView`: only the file differs. [CN] 一个 Rive 条目（icons.riv 的 BELL 画板，状态机输入 "active"）与两个
-    ///      SVGA 条目，都使用同一个 `CYLAnimatedItemView`：只有文件不同。
+    /// [EN] One Rive item (the BELL artboard of icons.riv, its state machine input "active"), two SVGA items, one Lottie and
+    ///      one PAG item, through the same `CYLAnimatedItemView`: only the file differs. [CN] 一个 Rive 条目（icons.riv 的 BELL
+    ///      画板，状态机输入 "active"）、两个 SVGA 条目、一个 Lottie 与一个 PAG 条目，都使用同一个 `CYLAnimatedItemView`：只有文件不同。
     private func makeEngineItems() -> [EngineItem] {
         var items: [EngineItem] = []
         if let url = CYLTabBarAnimationURLWithOptions(Bundle.main.url(forResource: "icons", withExtension: "riv"), [
@@ -70,6 +71,12 @@ final class AnimatedItemEngineAPIViewController: UIViewController {
             if let url = Bundle.main.url(forResource: file, withExtension: "svga") {
                 items.append(makeItem(name: "SVGA \(file.replacingOccurrences(of: "tab_", with: ""))", url: url))
             }
+        }
+        if let url = Bundle.main.url(forResource: "green_lottie_tab_home", withExtension: "json") {
+            items.append(makeItem(name: "Lottie", url: url))
+        }
+        if let url = Bundle.main.url(forResource: "tab_home", withExtension: "pag") {
+            items.append(makeItem(name: "PAG", url: url))
         }
         return items
     }
