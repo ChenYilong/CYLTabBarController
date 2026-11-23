@@ -10,7 +10,7 @@ import CYLAnimatedItem
 #if SWIFT_PACKAGE
 import CYLAnimatedItemViews
 #endif
-import CYLDeallocBlockExecutor
+internal import CYLDeallocBlockExecutor
 
 /**
  [EN] The animation pod (CYLAnimatedItem) posts `cyl.animation.didStart` / `didStop` as notifications because it does not
