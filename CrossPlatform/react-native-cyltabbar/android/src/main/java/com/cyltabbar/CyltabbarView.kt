@@ -34,6 +34,7 @@ class CyltabbarView(private val reactContext: ThemedReactContext) : CYLTabBarHos
     didLongPressTab = { index, identifier, title -> dispatch(TabLongPressEvent(surfaceId(), id, index, identifier, title)) }
     didRequestLogin = { index, identifier, title -> dispatch(TabLongPressEvent(surfaceId(), id, index, identifier, title, "topLoginRequest")) }
     loginStateDidChange = { loggedIn -> dispatch(LoginStateEvent(surfaceId(), id, loggedIn)) }
+    didPostLifecycleEvent = { name, userInfo -> dispatch(LifecycleMomentEvent(surfaceId(), id, name, userInfo)) }
     didApplyManifest = { source -> dispatch(ManifestApplyEvent(surfaceId(), id, source)) }
     didFailManifest = { message -> dispatch(ManifestFailEvent(surfaceId(), id, message)) }
   }
@@ -135,6 +136,15 @@ class TabBarLayoutEvent(surfaceId: Int, viewId: Int, private val height: Double)
 }
 
 /** [EN] The manifest was applied; the source is "remote", "cache" or "embedded". [CN] 清单已应用；来源是 "remote"、"cache" 或 "embedded"。 */
+class LifecycleMomentEvent(surfaceId: Int, viewId: Int, private val name: String, private val userInfo: String) :
+  Event<LifecycleMomentEvent>(surfaceId, viewId) {
+  override fun getEventName() = "topLifecycleEvent"
+  override fun getEventData(): WritableMap = Arguments.createMap().apply {
+    putString("name", name)
+    putString("userInfo", userInfo)
+  }
+}
+
 class ManifestApplyEvent(surfaceId: Int, viewId: Int, private val source: String) : Event<ManifestApplyEvent>(surfaceId, viewId) {
   override fun getEventName() = "topManifestApply"
   override fun getEventData(): WritableMap = Arguments.createMap().apply { putString("source", source) }

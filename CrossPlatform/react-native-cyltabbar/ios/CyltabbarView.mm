@@ -67,6 +67,9 @@ static id CYLRNJSONObject(NSString *JSON);
     _hostView.loginStateDidChange = ^(BOOL loggedIn) {
       [weakSelf emitLoginStateChange:loggedIn];
     };
+    _hostView.didPostLifecycleEvent = ^(NSString *name, NSString *userInfo) {
+      [weakSelf emitLifecycleEventNamed:name userInfo:userInfo];
+    };
     _hostView.didApplyManifest = ^(NSString *source) {
       [weakSelf emitManifestApplyWithSource:source];
     };
@@ -274,6 +277,16 @@ static id CYLRNJSONObject(NSString *JSON)
   }
   std::static_pointer_cast<CyltabbarViewEventEmitter const>(_eventEmitter)
       ->onTabBarLayout(CyltabbarViewEventEmitter::OnTabBarLayout{.height = height});
+}
+
+- (void)emitLifecycleEventNamed:(NSString *)name userInfo:(NSString *)userInfo
+{
+  if (!_eventEmitter) {
+    return;
+  }
+  std::static_pointer_cast<CyltabbarViewEventEmitter const>(_eventEmitter)
+      ->onLifecycleEvent(CyltabbarViewEventEmitter::OnLifecycleEvent{
+          .name = std::string(name.UTF8String), .userInfo = std::string(userInfo.UTF8String)});
 }
 
 - (void)emitManifestApplyWithSource:(NSString *)source
