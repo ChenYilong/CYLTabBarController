@@ -7,6 +7,7 @@
  */
 const cylTabPage = require('../../utils/cyl_tab_page');
 const { cylFeedRows } = require('../../utils/cyl_feed_rows');
+const { cylPlayAll, cylRestartSelected, cylSetSpeed, cylSetLoops } = require('../../utils/cyl_item_players');
 const { cylDemoConfiguration, cylInstalledAnimation, cylAvailableAnimationFiles } = require('../../utils/cyl_demo_configuration');
 
 // [EN] Row titles of the animation packages. [CN] 动画包的行标题。
@@ -108,19 +109,26 @@ Component({
     cyl_skin(event) {
       this.cyl_update({ themeIdentifier: event.currentTarget.dataset.value });
     },
+    // [EN] The tab bar of this page, whose icons the playback controls play through cyl_player() (utils/cyl_item_players.js).
+    // [CN] 本页面的 TabBar，播放控件通过 cyl_player() 播放其图标（utils/cyl_item_players.js）。
+    cyl_tabBar() {
+      return this.getTabBar?.()?.selectComponent('#cyl-tab-bar');
+    },
     cyl_playAll() {
-      const tabBar = this.getTabBar?.();
-      const bar = tabBar?.selectComponent('#cyl-tab-bar');
-      if (bar) {
-        bar.cyl_playAll();
-      }
+      cylPlayAll(this.cyl_tabBar());
+    },
+    cyl_restart() {
+      cylRestartSelected(this.cyl_tabBar());
     },
     cyl_speed(event) {
-      if (Number(event.detail.value) !== getApp().globalData.cylTabBarState.animationSpeed) {
-        this.cyl_update({ animationSpeed: Number(event.detail.value) });
+      const speed = Number(event.detail.value);
+      if (speed !== getApp().globalData.cylTabBarState.animationSpeed) {
+        cylSetSpeed(this.cyl_tabBar(), speed);
+        this.cyl_update({ animationSpeed: speed });
       }
     },
     cyl_loop(event) {
+      cylSetLoops(this.cyl_tabBar(), event.detail.value);
       this.cyl_update({ animationLoop: event.detail.value });
     },
     cyl_itemStyle(event) {

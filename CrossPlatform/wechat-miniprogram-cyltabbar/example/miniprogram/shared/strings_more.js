@@ -156,7 +156,13 @@ module.exports = {
     "Updates the titles of all tabs at once; tap again to restore": "सभी टैब के शीर्षक एक साथ अपडेट करता है; वापस लाने के लिए फिर टैप करें",
     "Valentine's Day": "वैलेंटाइन डे",
     "With the switch on, the part of the button outside the gray box responds too; each tap plays the scale animation. Taps: {outsideTaps}": "स्विच चालू होने पर स्लेटी बॉक्स के बाहर का बटन वाला हिस्सा भी प्रतिक्रिया देता है; हर टैप पर स्केल एनिमेशन चलता है। टैप: {outsideTaps}",
-    "Zoom in": "ज़ूम इन"
+    "Zoom in": "ज़ूम इन",
+    "Playback": "प्लेबैक",
+    "Play all": "सभी चलाएँ",
+    "Restart": "फिर से शुरू करें",
+    "Speed": "गति",
+    "times": "गुना",
+    "Loop": "लूप"
   },
   "es": {
     "Badges": "Insignias",
@@ -314,7 +320,13 @@ module.exports = {
     "Updates the titles of all tabs at once; tap again to restore": "Actualiza los títulos de todas las pestañas a la vez; toca de nuevo para restaurar",
     "Valentine's Day": "San Valentín",
     "With the switch on, the part of the button outside the gray box responds too; each tap plays the scale animation. Taps: {outsideTaps}": "Con el interruptor activado, la parte del botón fuera del cuadro gris también responde; cada toque reproduce la animación de escala. Toques: {outsideTaps}",
-    "Zoom in": "Acercar"
+    "Zoom in": "Acercar",
+    "Playback": "Reproducción",
+    "Play all": "Reproducir todo",
+    "Restart": "Reiniciar",
+    "Speed": "Velocidad",
+    "times": "veces",
+    "Loop": "Bucle"
   },
   "ar": {
     "Badges": "الشارات",
@@ -472,6 +484,12 @@ module.exports = {
     "Updates the titles of all tabs at once; tap again to restore": "يحدّث عناوين كل علامات التبويب دفعة واحدة؛ اضغط مرة أخرى للاستعادة",
     "Valentine's Day": "عيد الحب",
     "With the switch on, the part of the button outside the gray box responds too; each tap plays the scale animation. Taps: {outsideTaps}": "عند تشغيل المفتاح، يستجيب جزء الزر الموجود خارج المربع الرمادي أيضًا؛ كل نقرة تشغّل حركة التكبير والتصغير. النقرات: {outsideTaps}",
-    "Zoom in": "تكبير تدريجي"
+    "Zoom in": "تكبير تدريجي",
+    "Playback": "التشغيل",
+    "Play all": "تشغيل الكل",
+    "Restart": "إعادة التشغيل",
+    "Speed": "السرعة",
+    "times": "مرات",
+    "Loop": "تكرار"
   }
 };

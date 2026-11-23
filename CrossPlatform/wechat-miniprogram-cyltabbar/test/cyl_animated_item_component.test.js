@@ -220,3 +220,44 @@ test('a GIF image rests on its first frame (a canvas), plays one pass when playe
   detach()
   delete global.wx
 })
+
+test('a GIF image reports the end of its pass (animationcomplete, the player onEnded, showsImageWhenAnimationEnds), not when another tab rests it', async () => {
+  const gif = Buffer.from('R0lGODlhBAAEAIEAAP8AAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQECgAAACwAAAAABAAEAAAICQABCBxIsCCAgAAh+QQFFAABACwAAAAABAAEAIEA/wAAAAAAAAAAAAAICQABCBxIsCCAgAAh+QQFHgABACwAAAAABAAEAIEAAP8AAAAAAAAAAAAICQABCBxIsCCAgAA7', 'base64')
+  global.wx = {
+    getAppBaseInfo: () => ({ theme: 'light' }),
+    getFileSystemManager: () => ({ readFile: ({ success }) => success({ data: gif.buffer.slice(gif.byteOffset, gif.byteOffset + gif.byteLength) }) }),
+  }
+  const canvas = { width: 0, height: 0, getContext: () => ({
+    createImageData: (w, h) => ({ data: new Uint8ClampedArray(w * h * 4) }), clearRect() {}, fillRect() {}, putImageData() {},
+  }) }
+  const query = { select: () => query, fields: () => query, exec: (callback) => callback([{ node: canvas }]) }
+  const { item, detach } = cylMount({ image: '/shared/tab_fire.gif', drivesAnimationPlayback: false }, null, { createSelectorQuery: () => query })
+  const player = item.cyl_player()
+  let ended = 0
+  player.onEnded(() => { ended += 1 })
+  assert.equal(player.supportsLoops, true)
+  player.play()
+  assert.equal(player.isPlaying, true)
+  assert.equal(item.data.m.gifImageStill, false, 'plays the GIF')
+  await new Promise((resolve) => setTimeout(resolve, 700))
+  assert.equal(item.data.m.gifImageStill, true, 'one pass (600 ms), then the still')
+  assert.equal(ended, 1, 'onEnded ran once')
+  assert.equal(player.isPlaying, false)
+  assert.deepEqual(item.events.filter(([name]) => name === 'animationcomplete'), [['animationcomplete', { type: 'gif' }]])
+  // Resting it by hand (stopAtProgress) or by another tab is not an end.
+  player.play()
+  player.stopAtProgress(0)
+  await new Promise((resolve) => setTimeout(resolve, 700))
+  assert.equal(ended, 1, 'stopAtProgress is not an end')
+  // Looping never ends a pass.
+  player.loops = true
+  player.play()
+  await new Promise((resolve) => setTimeout(resolve, 700))
+  assert.equal(ended, 1, 'a looping GIF image reports no end')
+  assert.equal(item.data.m.gifImageStill, false)
+  item.set({ loop: false }) // the fake setData runs no observers: the property change does
+  await new Promise((resolve) => setTimeout(resolve, 700))
+  assert.equal(ended, 2, 'loop turned off: the pass in progress ends and reports')
+  detach()
+  delete global.wx
+})

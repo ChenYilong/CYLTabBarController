@@ -225,6 +225,7 @@ docs/
 │   ├── android-manifest-plus-button-middle.png
 │   ├── android-more-than-five-tabs-report.png
 │   ├── android-playback-controls-pag-example-api35-b57c844.png
+│   ├── android-react-native-engine-api-play-all.png
 │   ├── android-rive-menu-loop-pause-fix.png
 │   ├── android-rive-menu-settles-then-rests.png
 │   ├── android-rive-rest-same-frame-every-launch.png

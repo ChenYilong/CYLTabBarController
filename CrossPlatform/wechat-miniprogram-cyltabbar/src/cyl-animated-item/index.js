@@ -482,7 +482,13 @@ Component({
     cyl_scheduleGIFImageEnd() {
       const duration = this.cylGIFImageInfo?.duration || 1000
       const elapsed = Date.now() - (this.cylGIFImageStartedAt || Date.now())
-      this.cylGIFImageTimer = setTimeout(() => this.cyl_restGIFImage(), duration - (elapsed % duration))
+      this.cylGIFImageTimer = setTimeout(() => {
+        this.cyl_restGIFImage()
+        // [EN] A timed pass of a GIF image ended: the same as an engine's `complete`. [CN] GIF 图片的一遍计时结束：与引擎的 `complete` 相同。
+        this.cyl_animationDidEnd()
+        this.cyl_playDidEnd()
+        this.triggerEvent('animationcomplete', { type: 'gif' })
+      }, duration - (elapsed % duration))
     },
 
     /** [EN] Back to the first-frame still. [CN] 回到第一帧静帧。 */
