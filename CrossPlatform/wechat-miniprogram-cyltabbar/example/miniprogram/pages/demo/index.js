@@ -4,6 +4,7 @@
  * [CN] 首页某一行的演示页（utils/cyl_demo_cases.js）：说明、输入、结果、按钮，以及该用例的实时 cyl-tab-bar。
  */
 const cylTabPage = require('../../utils/cyl_tab_page');
+const { cylPageScrolled } = require('../../utils/cyl_scroll_pause');
 const { cylDemoCase } = require('../../utils/cyl_demo_cases');
 
 Component({
@@ -47,6 +48,7 @@ Component({
 
     // [EN] Scroll rows: down hides the bar, up shows it, as CYLTabBarController's scroll hiding. [CN] 滚动行：向下隐藏，向上显示。
     onPageScroll(event) {
+      cylPageScrolled(this, event);
       if (!this.data.demo.scroll) {
         return;
       }
