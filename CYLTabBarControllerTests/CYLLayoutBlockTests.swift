@@ -69,7 +69,7 @@ final class CYLLayoutBlockTests: XCTestCase {
 
     func testTabBarDidLayoutBlockRunsAfterEachLayoutAndNilRemovesIt() {
         let controller = makeTabBarController()
-        guard let tabBar = controller.cyl_tabBar else { return XCTFail("no tab bar") }
+        guard let tabBar = controller.cyl_tabBar as? CYLTabBar else { return XCTFail("no tab bar") }
         var runs = 0
         tabBar.didLayoutSubViewsBlock = { _ in runs += 1 }
         layOut(controller)
@@ -85,7 +85,7 @@ final class CYLLayoutBlockTests: XCTestCase {
 
     func testSettingTheTabBarBlockAgainReplacesTheFirst() {
         let controller = makeTabBarController()
-        guard let tabBar = controller.cyl_tabBar else { return XCTFail("no tab bar") }
+        guard let tabBar = controller.cyl_tabBar as? CYLTabBar else { return XCTFail("no tab bar") }
         var first = 0
         var second = 0
         tabBar.didLayoutSubViewsBlock = { _ in first += 1 }
@@ -100,7 +100,7 @@ final class CYLLayoutBlockTests: XCTestCase {
     func testItemLayoutBlockReceivesItsItemAndButton() {
         let controller = makeTabBarController()
         layOut(controller)
-        guard let item = controller.cyl_tabBar?.items?.first else { return XCTFail("no item") }
+        guard let item = (controller.cyl_tabBar as? UITabBar)?.items?.first else { return XCTFail("no item") }
         var received: (UITabBarItem, UIView)?
         item.cyl_viewDidLayoutSubviewsBlock = { item, view in received = (item, view) }
         controller.cyl_tabBar?.setNeedsLayout()
