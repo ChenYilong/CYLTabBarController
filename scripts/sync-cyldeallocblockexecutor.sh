@@ -38,7 +38,7 @@ if [[ -z "$library" ]]; then
   git clone --quiet --no-checkout "$repository_url" "$work/library"
   library="$work/library"
 fi
-git -C "$library" cat-file -e "$commit^{commit}" 2>/dev/null || git -C "$library" fetch --quiet origin "$branch"
+git -C "$library" cat-file -e "$commit^{commit}" 2>/dev/null || git -C "$library" fetch --quiet origin "$branch" || git -C "$library" fetch --quiet origin "$commit"
 full="$(git -C "$library" rev-parse "$commit^{commit}")"
 
 vendored_md() {

@@ -10,7 +10,7 @@ target 'GIFApp' do
   # GIF tab icons that play once when selected. A GIF given as an image needs no subspec, and loops.
   # 选中时播放一次的 GIF Tab 图标。作为图片传入的 GIF 不需要子库，并且循环播放。
   pod 'CYLTabBarController/GIF', :path => '../'
-  pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => 'dc96e06673a7bf2419a8b04fe6ca23f9ca6d4e4c' # TODO: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md)
+  pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => '08baf66ef7f40d3bbacafe049edb8ac5b1dbf15e' # TODO: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md)
   # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
   # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
   pod 'CYLAnimatedItem', :path => '../'
