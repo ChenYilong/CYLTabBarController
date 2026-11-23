@@ -79,4 +79,15 @@ class CYLLayoutBlockTest : CYLRobolectricTestCase() {
         controller.resetTabs()
         assertEquals(listOf("once"), log)
     }
+
+    @Test
+    fun destroyingTheActivityRunsTheControllersTeardownBlocksOnce() {
+        val ran = mutableListOf<String>()
+        withActivity { activity ->
+            val controller = controllerWith(activity, "One", "Two")
+            com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry.of(controller)
+                .addDeallocCallback<CYLTabBarController>("test") { _, _, _ -> ran.add("teardown") }
+        }
+        assertEquals(listOf("teardown"), ran)
+    }
 }

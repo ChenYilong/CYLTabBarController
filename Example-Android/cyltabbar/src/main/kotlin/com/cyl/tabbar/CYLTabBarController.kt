@@ -187,8 +187,14 @@ open class CYLTabBarController(val activity: FragmentActivity) {
             }
         })
         // [EN] The activity pausing (a call, another app, the recents screen) shows a bar hidden by scrolling (#13). [CN] Activity 暂停（来电、其他 App、最近任务）时恢复滚动隐藏的 TabBar（#13）。
+        // [EN] The activity being destroyed runs the controller's teardown blocks (CYLDeallocBlockExecutor), like `dealloc` on iOS: the memory callbacks below unregister there.
+        // [CN] Activity 销毁时运行控制器的销毁块（CYLDeallocBlockExecutor），与 iOS 的 `dealloc` 相同：下面的内存回调在此注销。
         activity.lifecycle.addObserver(androidx.lifecycle.LifecycleEventObserver { _, event ->
-            if (event == androidx.lifecycle.Lifecycle.Event.ON_PAUSE) cyl_restoreTabBarHiddenByScroll()
+            when (event) {
+                androidx.lifecycle.Lifecycle.Event.ON_PAUSE -> cyl_restoreTabBarHiddenByScroll()
+                androidx.lifecycle.Lifecycle.Event.ON_DESTROY -> cylLifecycleCallbacks.runDealloc()
+                else -> Unit
+            }
         })
         registerActive(this)
     }
@@ -1282,7 +1288,14 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         override fun onConfigurationChanged(newConfig: android.content.res.Configuration) { /* [EN] Not a memory warning. [CN] 不是内存警告。 */ }
         @Deprecated("Deprecated in Java")
         override fun onLowMemory() = cyl_didReceiveMemoryWarning()
-    }.also { activity.registerComponentCallbacks(it) }
+    }.also { callbacks ->
+        activity.registerComponentCallbacks(callbacks)
+        // [EN] Paired with the registration: the keyed teardown block unregisters it when the activity is destroyed (it was never unregistered before).
+        // [CN] 与注册配对：带 key 的销毁块在 Activity 销毁时注销（之前从未注销）。
+        cylLifecycleCallbacks.addDeallocCallback<CYLTabBarController>("cyl.core.memoryCallbacks") { owner, _, _ ->
+            owner.activity.unregisterComponentCallbacks(callbacks)
+        }
+    }
 
     // MARK: - CYLTabBarItemIdentifier 标识
 
