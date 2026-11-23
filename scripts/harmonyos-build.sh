@@ -12,7 +12,10 @@ else
   DEVECO="${DEVECO_HOME:-/c/Program Files/Huawei/DevEco Studio}"
 fi
 mkdir -p "$DST"
-for d in AppScope cyltabbar cylanimateditem entry hvigor; do
+# [EN] Every module build-profile.json5 registers (the cyl* folders, e.g. cylanimateditem_lottie and cyldeallocblockexecutor), not a fixed list.
+# [CN] build-profile.json5 注册的每个模块（cyl* 目录，例如 cylanimateditem_lottie、cyldeallocblockexecutor），而不是固定列表。
+MODULES=$(cd "$SRC" && ls -d cyl*/ | tr -d '/')
+for d in AppScope entry hvigor $MODULES; do
   rm -rf "$DST/$d/src"
   # [EN] `._*` are macOS AppleDouble files on an external drive; ArkTS compiles `._X.ets` and fails ("Invalid character").
   # [CN] `._*` 是外置磁盘上的 macOS AppleDouble 文件；ArkTS 会编译 `._X.ets` 并报错（"Invalid character"）。
@@ -29,6 +32,8 @@ LOG="$DST/build.log"
 node "$DEVECO/tools/hvigor/bin/hvigorw.js" --mode module -p product=default assembleHap --no-daemon >"$LOG" 2>&1
 # [EN] cylanimateditem is a HAR no module depends on yet (docs/Animated-Item.md): build it too, so its errors show.
 # [CN] cylanimateditem 是尚无模块依赖的 HAR（docs/Animated-Item.md）：一并编译，以便暴露其错误。
-node "$DEVECO/tools/hvigor/bin/hvigorw.js" --mode module -p module=cylanimateditem@default -p product=default assembleHar --no-daemon >>"$LOG" 2>&1
+for HAR in cylanimateditem cyldeallocblockexecutor; do
+  node "$DEVECO/tools/hvigor/bin/hvigorw.js" --mode module -p module=$HAR@default -p product=default assembleHar --no-daemon >>"$LOG" 2>&1
+done
 grep -E "ERROR|Error Message|At File|BUILD|COMPILE RESULT" "$LOG" | sed 's/\x1b\[[0-9;]*m//g' | head -40
 ! grep -q "BUILD FAILED" "$LOG" && grep -q "BUILD SUCCESSFUL" "$LOG" && find "$DST/entry/build" -name "*.hap"
