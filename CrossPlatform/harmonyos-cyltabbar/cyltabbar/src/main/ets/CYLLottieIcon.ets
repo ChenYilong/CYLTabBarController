@@ -1,4 +1,5 @@
 import lottie, { AnimationItem } from '@ohos/lottie';
+import { LifecycleController } from 'cyldeallocblockexecutor';
 
 let cylLottieCount: number = 0;
 
@@ -41,14 +42,23 @@ export struct CYLLottieIcon {
   private context: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
   private lottieItem?: AnimationItem;
   private name: string = '';
+  private cylLifecycle: LifecycleController<CYLLottieIcon> | undefined = undefined;
 
   aboutToAppear(): void {
+    this.cylLifecycle = new LifecycleController<CYLLottieIcon>(this);
+    this.cylLifecycle.registry.addDeallocCallback<CYLLottieIcon>((owner: CYLLottieIcon) => owner.cylTeardown(), { key: 'cyl.lottie.teardown' });
+    this.cylLifecycle.aboutToAppear();
     cylLottieCount += 1;
     this.name = `cyl-lottie-${cylLottieCount}`;
     this.registerReplay(() => this.cylReplay());
   }
 
   aboutToDisappear(): void {
+    this.cylLifecycle?.aboutToDisappear();
+  }
+
+  // [EN] The teardown block (CYLDeallocBlockExecutor), run by `aboutToDisappear`. [CN] 销毁块（CYLDeallocBlockExecutor），由 `aboutToDisappear` 运行。
+  private cylTeardown(): void {
     this.lottieItem?.destroy(this.name);
     this.lottieItem = undefined;
   }

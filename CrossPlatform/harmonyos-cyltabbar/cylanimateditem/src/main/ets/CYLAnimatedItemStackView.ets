@@ -1,6 +1,7 @@
 import { CYLAnimatedItemView, CYLAnimatedItemAxis, CYLAnimatedItemAnimationContext } from './CYLAnimatedItemView';
 import { CYLAnimatedItemStackModel, CYLAnimatedItemStackItem } from './CYLAnimatedItemStackModel';
 import { deviceInfo } from '@kit.BasicServicesKit';
+import { LifecycleController } from 'cyldeallocblockexecutor';
 
 /**
  * [EN] The screen reader role of a stack item: a button when it acts, text otherwise. `accessibilityRole` exists from API 18
@@ -56,13 +57,21 @@ export struct CYLAnimatedItemStackView {
   cylNoAnimation(context: CYLAnimatedItemAnimationContext) {
   }
 
+  private cylLifecycle: LifecycleController<CYLAnimatedItemStackView> | undefined = undefined;
+
   aboutToAppear(): void {
+    this.cylLifecycle = new LifecycleController<CYLAnimatedItemStackView>(this);
     this.model.addListener(this.cylListener);
+    // [EN] Paired with the listener above: the keyed teardown block removes it (CYLDeallocBlockExecutor). [CN] 与上面的监听配对：带 key 的销毁块移除它（CYLDeallocBlockExecutor）。
+    const model = this.model;
+    const listener = this.cylListener;
+    this.cylLifecycle.registry.addDeallocCallback<CYLAnimatedItemStackView>(() => model.removeListener(listener), { key: 'cyl.stack.listener' });
+    this.cylLifecycle.aboutToAppear();
     this.revision = this.model.revision;
   }
 
   aboutToDisappear(): void {
-    this.model.removeListener(this.cylListener);
+    this.cylLifecycle?.aboutToDisappear();
   }
 
   /** [EN] The key of an item for ForEach: its id and the revision, so a changed field redraws it. [CN] ForEach 的键：id 加修订号，字段变化后重绘。 */

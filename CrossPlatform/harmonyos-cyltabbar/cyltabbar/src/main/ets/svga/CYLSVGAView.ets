@@ -1,4 +1,5 @@
 import { image } from '@kit.ImageKit';
+import { LifecycleController } from 'cyldeallocblockexecutor';
 import { http } from '@kit.NetworkKit';
 import { CYLSVGAMovie, cylLoadSVGAMovie } from './CYLSVGAMovie';
 import { cylDrawSVGAFrame } from './CYLSVGARenderer';
@@ -104,11 +105,21 @@ export struct CYLSVGAView {
    */
   registerReplay: (replay: () => void) => void = (_replay: () => void) => {};
 
+  private cylLifecycle: LifecycleController<CYLSVGAView> | undefined = undefined;
+
   aboutToAppear(): void {
     this.registerReplay(() => this.cylReplay());
+    this.cylLifecycle = new LifecycleController<CYLSVGAView>(this);
+    this.cylLifecycle.registry.addDeallocCallback<CYLSVGAView>((owner: CYLSVGAView) => owner.cylTeardown(), { key: 'cyl.svga.teardown' });
+    this.cylLifecycle.aboutToAppear();
   }
 
   aboutToDisappear(): void {
+    this.cylLifecycle?.aboutToDisappear();
+  }
+
+  // [EN] The teardown block (CYLDeallocBlockExecutor), run by `aboutToDisappear`. [CN] 销毁块（CYLDeallocBlockExecutor），由 `aboutToDisappear` 运行。
+  private cylTeardown(): void {
     this.cylStop();
     this.bitmaps.forEach((bitmap: image.PixelMap) => {
       bitmap.release();
