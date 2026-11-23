@@ -69,6 +69,7 @@ Component({
         if (!tabBar) {
           return;
         }
+        this.cyl_applyPendingPage();
         // [EN] A skin with colors and a standardAppearance theme are skins the configuration selects (utils/cyl_demo_skins.js,
         //      utils/cyl_demo_updates.js). [CN] 带颜色的皮肤与 standardAppearance 主题都是配置所选的皮肤。
         const configured = String(this.data.configuration.CYLTabBarControllerThemeIdentifier || '').includes(':');
@@ -120,20 +121,29 @@ Component({
      * [CN] 选中页面为当前页面的 Tab。
      */
     cyl_syncWithRoute(route) {
-      const configuration = this.data.configuration;
-      const items = (configuration.CYLTabBarControllerTabBarItemsAttributes || [])
-        .concat(configuration.CYLTabBarControllerPlusButton ? [configuration.CYLTabBarControllerPlusButton] : []);
-      const item = items.find((attributes) => cylPagePath(attributes.CYLTabBarItemPageIdentifier
-        || attributes.CYLTabBarItemIdentifier) === route);
-      if (item) {
-        this.setData({ selectedIdentifier: item.CYLTabBarItemIdentifier }, () => {
-          // [EN] Each tab page has its own tab bar, so the page that appears plays the selected Lottie icon.
-          // [CN] 每个 Tab 页面都有自己的 TabBar，因此由出现的页面播放选中 Tab 的 Lottie 图标。
-          const tabBar = this.selectComponent('#cyl-tab-bar');
-          if (tabBar) {
-            tabBar.cyl_playLottie(item.CYLTabBarItemIdentifier);
-          }
-        });
+      // [EN] The route is converted to the tab's position inside the bar (as iOS selects by index), not matched by
+      //      identifier or title. Each tab page has its own tab bar, so the page that appears also plays the selected
+      //      Lottie icon (cyl_selectPage does both). A page shown before this bar's cyl-tab-bar has its configuration
+      //      (the first visit) finds no tab yet: the route waits in cylPendingPage until cyl_apply has set it.
+      // [CN] 路由被转换为 Tab 在 TabBar 中的位置（与 iOS 按 index 选中一致），而不是按标识或标题匹配。每个 Tab 页面都有自己的
+      //      TabBar，因此出现的页面同时播放选中 Tab 的 Lottie 图标（cyl_selectPage 两件事都做）。页面在本 TabBar 的 cyl-tab-bar
+      //      拿到配置之前显示（首次访问）时还找不到 Tab：路由保存在 cylPendingPage，等 cyl_apply 设置配置后再应用。
+      const prefix = 'pages/';
+      const suffix = '/index';
+      this.cylPendingPage = typeof route === 'string' && route.startsWith(prefix) && route.endsWith(suffix)
+        ? route.slice(prefix.length, route.length - suffix.length) : '';
+      this.cyl_applyPendingPage();
+    },
+
+    /**
+     * [EN] Selects the waiting page's tab once the bar has one for it; a bar that is not mounted or has no configuration yet
+     *      keeps the page waiting.
+     * [CN] 一旦 TabBar 有该页面对应的 Tab 就选中它；尚未挂载或还没有配置的 TabBar 让页面继续等待。
+     */
+    cyl_applyPendingPage() {
+      const tabBar = this.cylPendingPage ? this.selectComponent('#cyl-tab-bar') : null;
+      if (tabBar && tabBar.cyl_selectPage(this.cylPendingPage)) {
+        this.cylPendingPage = '';
       }
     },
 
