@@ -14,7 +14,7 @@ target 'CYLTabBarController' do
 #pod 'CYLTabBarController/LottieObjectiveC', :path => './'
 #pod 'CYLTabBarController/LottieSwift', :path => './'
 pod 'CYLTabBarController/CYLFlatDesignTabBar', :path => './'
-pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => '08baf66ef7f40d3bbacafe049edb8ac5b1dbf15e' # TODO: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md)
+pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => 'c85c10c0dac23308a5373e4ab4f4e1da7bc41ed9' # TODO: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md)
 # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
 # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
 pod 'CYLAnimatedItem', :path => './'
