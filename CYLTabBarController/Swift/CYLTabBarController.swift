@@ -403,10 +403,12 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     }
 
     open override func didReceiveMemoryWarning() {
+        // [EN] The unloading is the keyed `.afterSuper` block `cyl.core.memoryWarning` of CYLDeallocBlockExecutor, fired by the
+        //      library's hook inside `super`: a real warning and `cylSimulateMemoryWarning` (which calls this method) both run it.
+        // [CN] 卸载逻辑是 CYLDeallocBlockExecutor 中带 key 的 `.afterSuper` block `cyl.core.memoryWarning`，由库的 hook 在 `super` 内触发：
+        //      真实的内存警告与 `cylSimulateMemoryWarning`（调用本方法）都会执行它。
+        cylRegisterMemoryWarningCallback()
         super.didReceiveMemoryWarning()
-        if unloadsUnselectedViewsOnMemoryWarning {
-            unloadViewsOfUnselectedViewControllers()
-        }
     }
 
     open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?,

@@ -370,6 +370,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         // [EN] The core dispatches `.end` of the layout event itself, where the block runs today. [CN] 核心自己在原来执行 block 的位置派发布局事件的 `.end`。
         it.setManualLifecycleDispatch(true, setOf(LifecycleEvent.viewDidLayoutSubviews), setOf(LifecycleTiming.end))
         registerLayoutBlockCallback(it, false)
+        registerMemoryWarningCallback(it)
     }
     /**
      * [EN] The animation file of each animated tab, in tab order (`CYLTabBarAnimation…` and the library keys). [CN] 每个有动画的 Tab 的动画文件，按 Tab 顺序。
@@ -1276,8 +1277,17 @@ open class CYLTabBarController(val activity: FragmentActivity) {
      * [EN] A memory warning (`onTrimMemory` / `onLowMemory`): unloads when `unloadsUnselectedViewsOnMemoryWarning`. [CN] 内存警告：`unloadsUnselectedViewsOnMemoryWarning` 时卸载。
      */
     internal fun cyl_didReceiveMemoryWarning() {
-        cyl_restoreTabBarHiddenByScroll()
-        if (unloadsUnselectedViewsOnMemoryWarning) unloadViewsOfUnselectedViewControllers()
+        // [EN] Through CYLDeallocBlockExecutor, like iOS: the keyed `afterSuper` block `cyl.core.memoryWarning` does the work; a real warning
+        //      (`onTrimMemory`, `onLowMemory`) and `cyl_simulateMemoryWarning…` both come here. [CN] 与 iOS 相同，经由 CYLDeallocBlockExecutor：
+        //      带 key 的 `afterSuper` block `cyl.core.memoryWarning` 完成工作；真实内存警告与 `cyl_simulateMemoryWarning…` 都经过这里。
+        cylLifecycleCallbacks.performLifecycle(LifecycleEvent.didReceiveMemoryWarning, callSuper = {}, body = {})
+    }
+
+    private fun registerMemoryWarningCallback(callbacks: LifecycleRegistry) {
+        callbacks.addLifecycleCallback<CYLTabBarController>(LifecycleEvent.didReceiveMemoryWarning, key = MEMORY_WARNING_KEY) { owner, _, _ ->
+            owner.cyl_restoreTabBarHiddenByScroll()
+            if (owner.unloadsUnselectedViewsOnMemoryWarning) owner.unloadViewsOfUnselectedViewControllers()
+        }
     }
 
     private val memoryCallbacks: android.content.ComponentCallbacks2 = object : android.content.ComponentCallbacks2 {
@@ -1830,6 +1840,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
          * [EN] The key of the layout block in CYLDeallocBlockExecutor; `cyl.core.` keys belong to the core. [CN] 布局 block 在 CYLDeallocBlockExecutor 中的 key；`cyl.core.` 开头的 key 属于核心。
          */
         private const val LAYOUT_BLOCK_KEY = "cyl.core.layoutBlock"
+        private const val MEMORY_WARNING_KEY = "cyl.core.memoryWarning"
         /**
          * [EN] Decoded tab icons by URL, shared by every tab bar controller. [CN] 按 URL 缓存的已解码 Tab 图标，所有 TabBarController 共用。
          */

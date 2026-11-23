@@ -513,6 +513,7 @@ export struct CYLTabBarController {
     // [EN] cyltabbar plays Lottie (@ohos/lottie), Rive (@ohos/rive) and SVGA (its own player): CYLAnimatedItemView draws them.
     // [CN] cyltabbar 播放 Lottie、Rive 与 SVGA（自带播放器）：由 CYLAnimatedItemView 绘制。
     this.cylLifecycle = new LifecycleController<CYLTabBarController>(this);
+    this.cylLifecycle.registry.addLifecycleCallback<CYLTabBarController>('didReceiveMemoryWarning', (owner: CYLTabBarController) => owner.cylUnloadOnMemoryWarning(), { key: 'cyl.core.memoryWarning' });
     ['Lottie', 'Rive', 'SVGA'].forEach((type: string) => CYLAnimatedItemEngines.register(type));
     // [EN] Debug builds installed with the x86_64 debug engine kit: Rive also plays on the x86_64 emulator.
     // [CN] 安装了 x86_64 调试引擎包的 debug 构建：Rive 也能在 x86_64 模拟器上播放。
@@ -852,6 +853,19 @@ export struct CYLTabBarController {
   }
 
   cylOnMemoryWarning(): void {
+    // [EN] Through CYLDeallocBlockExecutor, as on iOS: the keyed `afterSuper` block `cyl.core.memoryWarning` does the work.
+    //      `cyl_simulateMemoryWarning` and a real warning (`UIAbility.onMemoryLevel` calling it) both come here; level 2 is
+    //      MEMORY_LEVEL_CRITICAL, the level the controller treats as a warning.
+    // [CN] 与 iOS 相同，经由 CYLDeallocBlockExecutor：带 key 的 `afterSuper` block `cyl.core.memoryWarning` 完成工作。
+    //      `cyl_simulateMemoryWarning` 与真实警告（`UIAbility.onMemoryLevel` 调用它）都经过这里；级别 2 是 MEMORY_LEVEL_CRITICAL。
+    if (this.cylLifecycle === undefined) {
+      this.cylUnloadOnMemoryWarning();
+      return;
+    }
+    this.cylLifecycle.memoryLevel(2);
+  }
+
+  private cylUnloadOnMemoryWarning(): void {
     this.cylRestoreFromScroll();
     let unloaded: number[] = [];
     if (this.unloadsUnselectedViewsOnMemoryWarning) {

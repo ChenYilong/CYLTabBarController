@@ -90,4 +90,15 @@ class CYLLayoutBlockTest : CYLRobolectricTestCase() {
         }
         assertEquals(listOf("teardown"), ran)
     }
+
+    @Test
+    fun aSimulatedMemoryWarningRunsTheKeyedBlockAndTheAppsOwnBlockAfterIt() = withActivity { activity ->
+        val controller = controllerWith(activity, "One", "Two")
+        val order = mutableListOf<String>()
+        com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry.of(controller)
+            .addLifecycleCallback<CYLTabBarController>(com.chenyilong.cyldeallocblockexecutor.LifecycleEvent.didReceiveMemoryWarning) { _, _, _ -> order.add("app") }
+        controller.unloadsUnselectedViewsOnMemoryWarning = false
+        CYLTabBarController.cyl_simulateMemoryWarningForTabBarController(controller)
+        assertEquals(listOf("app"), order)
+    }
 }
