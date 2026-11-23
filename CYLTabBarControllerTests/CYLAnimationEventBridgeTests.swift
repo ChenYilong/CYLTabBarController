@@ -144,4 +144,38 @@ final class CYLAnimationEventBridgeTests: XCTestCase {
         XCTAssertTrue(item.imageView.isAnimating)
         window.isHidden = true
     }
+
+    /// [EN] Cost of the library's UIView window hooks (docs/Lifecycle-Library.md, step 21): the clock time of making and showing
+    ///      200 windows, each with a scroll view, before the bridge is installed (`testWindowHookCost1Baseline`), after `install()`
+    ///      (`…2AfterInstall`), and after `pausesAnimationsWhileUserScrolls(true)` (`…3AfterScrollObserver`: the first global
+    ///      observer, which installs the hooks). XCTest allows one measurement per method and runs methods in name order; the
+    ///      hooks cannot be removed again, so run only these three for clean numbers (`-only-testing`, in a fresh process). There is no baseline and no assertion on purpose: the numbers are read from the log, so a slow CI
+    ///      machine cannot make it flaky.
+    /// [CN] 库的 UIView 窗口钩子的开销（docs/Lifecycle-Library.md，第 21 步）：创建并显示 200 个窗口（各含一个 scroll view）的时钟时间，
+    ///      分三个阶段：安装桥接之前（基线）、`install()` 之后、`pausesAnimationsWhileUserScrolls(true)`（第一个全局观察者，
+    ///      它才安装钩子）之后。钩子无法再移除，所以三个阶段必须在同一进程中按此顺序运行：单独运行此测试才能得到干净的数字
+    ///      （`-only-testing`，新进程）。XCTest 每个方法只允许一次测量，并按名称顺序运行；三个方法分别是基线、`install()` 之后、第一个全局观察者之后。故意没有基线断言：数字从日志中读取，因此慢速 CI 机器不会让它不稳定。
+    func testWindowHookCost1Baseline() { measureWindows() }
+    func testWindowHookCost2AfterInstall() { CYLAnimationEventBridge.install(); measureWindows() }
+    func testWindowHookCost3AfterScrollObserver() {
+        CYLAnimationEventBridge.pausesAnimationsWhileUserScrolls(true)
+        addTeardownBlock { CYLAnimationEventBridge.pausesAnimationsWhileUserScrolls(false) }
+        measureWindows()
+    }
+
+    private func measureWindows() {
+        let options = XCTMeasureOptions()
+        options.iterationCount = 10
+        func windows() {
+            for _ in 0..<200 {
+                let controller = UIViewController()
+                controller.view.addSubview(UIScrollView(frame: CGRect(x: 0, y: 0, width: 320, height: 480)))
+                let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+                window.rootViewController = controller
+                window.makeKeyAndVisible()
+                window.isHidden = true
+            }
+        }
+        measure(metrics: [XCTClockMetric()], options: options, block: windows)
+    }
 }
