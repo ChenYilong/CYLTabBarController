@@ -184,14 +184,14 @@ bump_version() {
 # [CN] 待办：CYLDeallocBlockExecutor 1.4.0 发布后删除（docs/Lifecycle-Library.md）。核心子库依赖 CYLDeallocBlockExecutor ~> 1.4，
 #      trunk 上还没有，因此 `lib` 使用一个从 Podfile 所固定分支获取源码的本地 podspec。设置 CYL_DEALLOC_EXECUTOR_BRANCH=（空）
 #      则使用 trunk。
-CYL_DEALLOC_EXECUTOR_BRANCH="${CYL_DEALLOC_EXECUTOR_BRANCH-feat/lifecycle-callbacks}"
+CYL_DEALLOC_EXECUTOR_BRANCH="${CYL_DEALLOC_EXECUTOR_BRANCH-b768b47798c0a182675b23e00f2ded7ddc543f1d}"  # a commit (or a branch), as the Podfiles pin
 lint_external_podspecs() {
   [ -n "$CYL_DEALLOC_EXECUTOR_BRANCH" ] || return 0
   dir="$PWD/build/pod-lint-podspecs"
   mkdir -p "$dir"
   curl -fsSL --proto '=https' --tlsv1.2 "https://raw.githubusercontent.com/ChenYilong/CYLDeallocBlockExecutor/$CYL_DEALLOC_EXECUTOR_BRANCH/CYLDeallocBlockExecutor.podspec" |
-    sed "s|:tag => s.version.to_s|:branch => \"$CYL_DEALLOC_EXECUTOR_BRANCH\"|" > "$dir/CYLDeallocBlockExecutor.podspec"
-  grep -q ":branch =>" "$dir/CYLDeallocBlockExecutor.podspec" || { echo "error: could not pin CYLDeallocBlockExecutor to $CYL_DEALLOC_EXECUTOR_BRANCH" >&2; exit 1; }
+    sed "s|:tag => s.version.to_s|:commit => \"$CYL_DEALLOC_EXECUTOR_BRANCH\"|" > "$dir/CYLDeallocBlockExecutor.podspec"
+  grep -q ":commit =>" "$dir/CYLDeallocBlockExecutor.podspec" || { echo "error: could not pin CYLDeallocBlockExecutor to $CYL_DEALLOC_EXECUTOR_BRANCH" >&2; exit 1; }
   echo "--external-podspecs=$dir/CYLDeallocBlockExecutor.podspec"
 }
 

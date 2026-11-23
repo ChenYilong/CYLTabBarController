@@ -5,8 +5,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ChenYilong/CYLDeallocBlockExecutor.git",
       "state" : {
-        "branch" : "feat/lifecycle-callbacks",
-        "revision" : "c1b01a3cfcf728339c99069fe2de6dcaa7671723"
+        "revision" : "b768b47798c0a182675b23e00f2ded7ddc543f1d"
       }
     },
     {
