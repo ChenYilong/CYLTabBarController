@@ -1,3 +1,4 @@
+import { LifecycleLog } from './log';
 import type { LifecycleCallback, LifecycleEvent, LifecycleInfo, LifecycleTiming } from './types';
 
 interface GlobalEntry {
@@ -69,9 +70,38 @@ export class LifecycleCenter {
     return LifecycleCenter.entries.length < before;
   }
 
+  private static deallocObservers: { identifier: number; key: string | undefined; callback: (description: string, info: LifecycleInfo) => void }[] = [];
+
+  /**
+   * Observes the teardown of every owner that has a registry, to know when any object goes away. The callback gets a description
+   * (class name and `name` / `id`), never the owner: it is being destroyed. For logging and bookkeeping, not for cleanup.
+   */
+  static addDeallocObserver(callback: (description: string, info: LifecycleInfo) => void, options: { key?: string } = {}): number {
+    if (options.key !== undefined) LifecycleCenter.deallocObservers = LifecycleCenter.deallocObservers.filter((o) => o.key !== options.key);
+    const identifier = LifecycleCenter.nextIdentifier++;
+    LifecycleCenter.deallocObservers.push({ identifier, key: options.key, callback });
+    return identifier;
+  }
+
+  static cancelDeallocObserver(target: { identifier: number } | { key: string }): boolean {
+    const before = LifecycleCenter.deallocObservers.length;
+    LifecycleCenter.deallocObservers = LifecycleCenter.deallocObservers.filter((o) =>
+      'identifier' in target ? o.identifier !== target.identifier : o.key !== target.key,
+    );
+    return LifecycleCenter.deallocObservers.length < before;
+  }
+
+  /** Called by a registry when its owner's teardown blocks ran. */
+  static dispatchDealloc(description: string): void {
+    const info: LifecycleInfo = { event: null, timing: 'end', isDealloc: true };
+    LifecycleLog.log(() => `dealloc ${description}`);
+    for (const o of [...LifecycleCenter.deallocObservers]) o.callback(description, info);
+  }
+
   /** For tests: removes every observer and forgets the scroll state. */
   static reset(): void {
     LifecycleCenter.entries = [];
+    LifecycleCenter.deallocObservers = [];
     LifecycleCenter.scrolling.clear();
   }
 

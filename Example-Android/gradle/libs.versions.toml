@@ -16,7 +16,7 @@ svgaplayer = "2.6.1"
 androidx-test-core = "1.6.1"
 viewpager2 = "1.0.0"
 # [EN] A commit of CYLDeallocBlockExecutor (JitPack). TODO: replace with a release once the library is published to Maven Central (see cyltabbar/build.gradle.kts). [CN] CYLDeallocBlockExecutor 的某次提交（JitPack）。TODO：库发布到 Maven Central 后改为正式版本（见 cyltabbar/build.gradle.kts）。
-cyldeallocblockexecutor = "9e141eafbff18a3644c7ea202bc4379c48dee499"
+cyldeallocblockexecutor = "f1397ed0e8b7fe34d0756986fdba59ad02d9eb6f"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }

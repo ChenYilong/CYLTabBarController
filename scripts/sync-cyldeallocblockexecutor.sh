@@ -67,7 +67,7 @@ generate() {
   git -C "$library" archive "$full" HarmonyOS MiniProgram LICENSE | tar -x -C "$work/x"
   # [EN] HarmonyOS: the registry and controller as plain TypeScript, imported without the `.ts` extension (ArkTS resolves by name).
   # [CN] 鸿蒙：注册表与控制器为纯 TypeScript，导入时不带 `.ts` 扩展名（ArkTS 按名称解析）。
-  for file in types center registry controller; do
+  for file in types log center registry controller; do
     sed "s#from '\./\([a-z]*\)\.ts'#from './\1'#" "$work/x/HarmonyOS/src/$file.ts" > "$out/$harmony_dest/src/main/ets/$file.ts"
   done
   cp "$work/x/HarmonyOS/cyldeallocblockexecutor/oh-package.json5" "$work/x/HarmonyOS/cyldeallocblockexecutor/build-profile.json5" \
@@ -77,10 +77,11 @@ generate() {
 export { LifecycleController } from './src/main/ets/controller';
 export { LifecycleRegistry } from './src/main/ets/registry';
 export { LifecycleCenter } from './src/main/ets/center';
+export { LifecycleLog, AnimationEvents, BadgeEvents } from './src/main/ets/log';
 export { LifecycleEvent, LifecycleTiming } from './src/main/ets/types';
 EOT
   # [EN] Mini Program: CommonJS files of the library, no build step. [CN] 小程序：库中的 CommonJS 文件，无需构建。
-  cp "$work/x/MiniProgram/index.js" "$work/x/MiniProgram/registry.js" "$work/x/MiniProgram/center.js" "$work/x/MiniProgram/types.js" "$work/x/MiniProgram/controller.js" \
+  cp "$work/x/MiniProgram/index.js" "$work/x/MiniProgram/registry.js" "$work/x/MiniProgram/center.js" "$work/x/MiniProgram/log.js" "$work/x/MiniProgram/types.js" "$work/x/MiniProgram/controller.js" \
      "$work/x/MiniProgram/package.json" "$work/x/LICENSE" "$out/$mini_dest/"
   vendored_md "HarmonyOS" "HarmonyOS, ArkTS" > "$out/$harmony_dest/VENDORED.md"
   vendored_md "MiniProgram" "WeChat Mini Program, JavaScript" > "$out/$mini_dest/VENDORED.md"
