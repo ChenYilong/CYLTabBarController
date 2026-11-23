@@ -400,6 +400,7 @@ docs/
 │   ├── ios-flatdesign-hide-show.png
 │   ├── ios-flatdesign-svga-selected-icon-fixed.png
 │   ├── ios-flutter-engine-api-play-all.png
+│   ├── ios-flutter-host-driven.png
 │   ├── ios-gif-image-rest-then-play.png
 │   ├── ios-gif-svga-tint-option.png
 │   ├── ios-lottie-pag-tint-option.png

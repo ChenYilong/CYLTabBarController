@@ -510,6 +510,10 @@ class _ExamplePageState extends State<CYLExamplePage> {
   int _playAllRequest = 0;
   double _animationSpeed = 1;
   bool _animationLoops = false;
+  // Host-driven mode of the engine row: with drivesAnimationPlayback false the item plays only on play() / restart().
+  bool _drivesPlayback = true;
+  int _engineEnded = 0;
+  final CYLAnimationController _engineController = CYLAnimationController();
   // CYLSwitchTitlePositionAdjustment(): the title row cycles the vertical offset of every title through 0, -4 and 4 at
   // runtime (`setTitlePositionAdjustment:`); null is the configuration's -3.5. 标题行在运行时依次切换所有标题的垂直偏移：
   // 0、-4、4；null 为配置中的 -3.5。
@@ -852,9 +856,30 @@ class _ExamplePageState extends State<CYLExamplePage> {
                     animationSpeed: _animationSpeed,
                     animationLoops: _animationLoops,
                     animationRestartToken: _playAllRequest,
+                    drivesAnimationPlayback: _drivesPlayback,
+                    controller: _engineController,
+                    onAnimationEnd: () => setState(() => _engineEnded++),
                     iconSize: 40,
                   ),
                 ),
+              ),
+            if (!_plusPageSelected && _selectedIndex != 0)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Semantics(
+                    label: 'Drives playback',
+                    child: Switch(
+                      value: _drivesPlayback,
+                      onChanged: (value) => setState(() => _drivesPlayback = value),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => _engineController.play(),
+                    child: const Text('Play'),
+                  ),
+                  Text('end ×$_engineEnded', semanticsLabel: 'End callback $_engineEnded times'),
+                ],
               ),
             Expanded(
               child: _plusPageSelected
