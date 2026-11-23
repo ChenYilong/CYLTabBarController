@@ -2744,8 +2744,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ChenYilong/CYLDeallocBlockExecutor.git";
 			requirement = {
-				branch = "feat/lifecycle-callbacks";
-				kind = branch;
+				kind = revision;
+				revision = b768b47798c0a182675b23e00f2ded7ddc543f1d;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
