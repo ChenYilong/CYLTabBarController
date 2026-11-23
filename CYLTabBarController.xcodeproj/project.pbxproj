@@ -2749,7 +2749,7 @@
 			repositoryURL = "https://github.com/ChenYilong/CYLDeallocBlockExecutor.git";
 			requirement = {
 				kind = revision;
-				revision = d03850fb5b843194c7189fbed391cadea8394c7a;
+				revision = 92a357286a8ef62fd5bcf2da38275f1c6392a73e;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

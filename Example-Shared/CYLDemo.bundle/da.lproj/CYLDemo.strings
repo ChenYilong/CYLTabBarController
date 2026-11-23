@@ -461,4 +461,4 @@
 "n/a on Android: an app cannot post this system event." = "n/a på Android: en app kan ikke sende denne systemhændelse.";
 "Runs every automatic row, one after the other." = "Kører alle automatiske rækker, den ene efter den anden.";
 "Tab bar %@ · page ID \"%@\"" = "Fanelinje %@ · side-ID »%@«";
-"Pause while scrolling" = "Pause while scrolling";
+"Pause while scrolling" = "Pause under rulning";

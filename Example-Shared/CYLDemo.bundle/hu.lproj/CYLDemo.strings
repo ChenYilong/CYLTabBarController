@@ -461,4 +461,4 @@
 "n/a on Android: an app cannot post this system event." = "n/a Androidon: egy app nem küldheti el ezt a rendszereseményt.";
 "Runs every automatic row, one after the other." = "Az összes automatikus sort lefuttatja, egymás után.";
 "Tab bar %@ · page ID \"%@\"" = "%@. lapsáv · oldalazonosító: \"%@\"";
-"Pause while scrolling" = "Pause while scrolling";
+"Pause while scrolling" = "Szüneteltetés görgetés közben";

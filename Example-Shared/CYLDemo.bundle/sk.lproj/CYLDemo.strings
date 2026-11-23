@@ -461,4 +461,4 @@
 "n/a on Android: an app cannot post this system event." = "n/a v systéme Android: aplikácia nemôže odoslať túto systémovú udalosť.";
 "Runs every automatic row, one after the other." = "Spustí všetky automatické riadky jeden po druhom.";
 "Tab bar %@ · page ID \"%@\"" = "Panel kariet %@ · ID stránky „%@“";
-"Pause while scrolling" = "Pause while scrolling";
+"Pause while scrolling" = "Pozastaviť pri posúvaní";
