@@ -133,6 +133,39 @@ extension CYLTabBarController {
         cylTabBarMinimizeLifecycleEvent()
     }
 
+    // MARK: - [EN] The appearance events through CYLDeallocBlockExecutor [CN] 通过 CYLDeallocBlockExecutor 派发的出现与消失事件
+
+    /**
+     [EN] The four appearance overrides of `CYLTabBarController` register (replace, by key) a `.afterSuper` block and then call
+          `super`, where the library's hook fires it: the order is the same as `super` followed by the body, and blocks an app
+          adds for the same events run after the core's, as before. The functions above keep their selectors and bodies.
+     [CN] `CYLTabBarController` 的四个出现与消失重写先登记（按 key 替换）一个 `.afterSuper` block，再调用 `super`，由库的 hook 在其中触发：
+          顺序与“`super` 之后执行主体”相同，App 为同一事件添加的 block 仍在核心之后执行。上面的函数保持原来的 selector 与实现。
+     */
+    func cylRegisterViewWillAppearCallback() {
+        cylAddLifecycleCallback(for: .viewWillAppear, key: "cyl.core.viewWillAppear") { controller, _, info in
+            controller.cylViewWillAppear(info.animated ?? false)
+        }
+    }
+
+    func cylRegisterViewDidAppearCallback() {
+        cylAddLifecycleCallback(for: .viewDidAppear, key: "cyl.core.viewDidAppear") { controller, _, info in
+            controller.cylViewDidAppear(info.animated ?? false)
+        }
+    }
+
+    func cylRegisterViewWillDisappearCallback() {
+        cylAddLifecycleCallback(for: .viewWillDisappear, key: "cyl.core.viewWillDisappear") { controller, _, info in
+            controller.cylViewWillDisappear(info.animated ?? false)
+        }
+    }
+
+    func cylRegisterViewDidDisappearCallback() {
+        cylAddLifecycleCallback(for: .viewDidDisappear, key: "cyl.core.viewDidDisappear") { controller, _, info in
+            controller.cylViewDidDisappear(info.animated ?? false)
+        }
+    }
+
     // MARK: - Tab change (not FlatDesign)
 
     /**

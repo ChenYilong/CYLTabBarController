@@ -23,6 +23,7 @@
  */
 import { Fit, Loop, RendererType, RiveAnimationView, SMINumber, ViewModelInstance, initializeRive } from '@ohos/rive';
 import { deviceInfo } from '@kit.BasicServicesKit';
+import { LifecycleController } from 'cyldeallocblockexecutor';
 import {
   CYLAnimatedItemEngineBinding, CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemEngines,
   CYLAnimatedItemPlayer, CYLAnimatedItemSource, cylAnimatedItemARGBInteger, cylAnimatedItemParseHexColor
@@ -557,6 +558,7 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
 export struct CYLAnimatedItemRiveView {
   state: CYLAnimatedItemEngineState = new CYLAnimatedItemEngineState();
   private unlisten?: () => void;
+  private cylLifecycle: LifecycleController<CYLAnimatedItemRiveView> | undefined = undefined;
   private binding: CYLAnimatedItemEngineBinding = new CYLAnimatedItemEngineBinding();
   private riveView: RiveAnimationView | null = null;
   private bytes: ArrayBuffer | null = null;
@@ -565,6 +567,9 @@ export struct CYLAnimatedItemRiveView {
   private unusable: boolean = false;
 
   aboutToAppear(): void {
+    this.cylLifecycle = new LifecycleController<CYLAnimatedItemRiveView>(this);
+    this.cylLifecycle.registry.addDeallocCallback<CYLAnimatedItemRiveView>((owner: CYLAnimatedItemRiveView) => owner.cylTeardown(), { key: 'cyl.rive.teardown' });
+    this.cylLifecycle.aboutToAppear();
     this.unlisten = this.state.listen(() => this.cylStateChanged());
     try {
       cylEnsureRiveInitialized();
@@ -577,6 +582,11 @@ export struct CYLAnimatedItemRiveView {
   }
 
   aboutToDisappear(): void {
+    this.cylLifecycle?.aboutToDisappear();
+  }
+
+  // [EN] The teardown block (CYLDeallocBlockExecutor), run by `aboutToDisappear`. [CN] 销毁块（CYLDeallocBlockExecutor），由 `aboutToDisappear` 运行。
+  private cylTeardown(): void {
     this.unlisten?.();
     this.binding.release();
     this.riveView = null;

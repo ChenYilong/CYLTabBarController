@@ -19,6 +19,22 @@ const { cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemRestingProg
 const { cylGIFImageInfo } = require('./cyl_gif_image')
 const { CYLAnimatedItemPlayer } = require('./cyl_animated_item_player')
 const { CYLAnimatedItemCountdown, CYL_COUNTDOWN_TICK_INTERVAL } = require('./cyl_animated_item_countdown')
+const { LifecycleController } = require('../cyl-dealloc-block-executor/index')
+
+/**
+ * [EN] What `detached` releases: the countdown timer, the app-show and theme listeners and the GIF timers. It runs as the keyed
+ *      teardown block `cyl.animatedItem.teardown` of CYLDeallocBlockExecutor (see `lifetimes`).
+ * [CN] `detached` 释放的内容：倒计时定时器、App 显示与主题监听、GIF 定时器。它作为 CYLDeallocBlockExecutor 中带 key 的销毁块
+ *      `cyl.animatedItem.teardown` 运行（见 `lifetimes`）。
+ */
+function cylTeardown(item) {
+  if (item.cylPlayer) item.cylPlayer.destroy()
+  item.cyl_stopCountdownTimer()
+  if (typeof wx !== 'undefined' && typeof wx.offAppShow === 'function' && item.cylAppShowListener) wx.offAppShow(item.cylAppShowListener)
+  clearTimeout(item.cylGifTimer)
+  clearTimeout(item.cylGIFImageTimer)
+  if (typeof wx !== 'undefined' && typeof wx.offThemeChange === 'function' && item.cylThemeListener) wx.offThemeChange(item.cylThemeListener)
+}
 
 /**
  * [EN] The id of the engine node (only one is rendered), reached by `selectComponent` for the playback methods.
@@ -303,6 +319,9 @@ Component({
 
   lifetimes: {
     attached() {
+      this.cylLifecycle = new LifecycleController(this)
+      this.cylLifecycle.registry.addDeallocCallback(cylTeardown, { key: 'cyl.animatedItem.teardown' })
+      this.cylLifecycle.onLoad()
       // [EN] The system theme, kept current while attached. [CN] 系统主题，挂载期间保持最新。
       let theme = 'light'
       try {
@@ -323,12 +342,9 @@ Component({
       this.cyl_update()
     },
     detached() {
-      if (this.cylPlayer) this.cylPlayer.destroy()
-      this.cyl_stopCountdownTimer()
-      if (typeof wx !== 'undefined' && typeof wx.offAppShow === 'function' && this.cylAppShowListener) wx.offAppShow(this.cylAppShowListener)
-      clearTimeout(this.cylGifTimer)
-      clearTimeout(this.cylGIFImageTimer)
-      if (typeof wx !== 'undefined' && typeof wx.offThemeChange === 'function' && this.cylThemeListener) wx.offThemeChange(this.cylThemeListener)
+      // [EN] Runs the teardown block; a component that never attached has no controller and is released directly. [CN] 运行销毁块；从未 attached 的组件没有控制器，直接释放。
+      if (this.cylLifecycle) this.cylLifecycle.onUnload()
+      else cylTeardown(this)
     },
   },
 

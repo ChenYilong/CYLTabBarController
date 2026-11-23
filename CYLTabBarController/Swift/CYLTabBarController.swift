@@ -373,23 +373,27 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     }
 
     open override func viewWillAppear(_ animated: Bool) {
+        // [EN] The core's work is the keyed `.afterSuper` block `cyl.core.viewWillAppear` (CYLDeallocBlockExecutor), fired inside `super`. [CN] 核心的工作是带 key 的 `.afterSuper` block `cyl.core.viewWillAppear`（CYLDeallocBlockExecutor），在 `super` 内触发。
+        cylRegisterViewWillAppearCallback()
         super.viewWillAppear(animated)
-        cylViewWillAppear(animated)
     }
 
     open override func viewDidAppear(_ animated: Bool) {
+        // [EN] The core's work is the keyed `.afterSuper` block `cyl.core.viewDidAppear` (CYLDeallocBlockExecutor), fired inside `super`. [CN] 核心的工作是带 key 的 `.afterSuper` block `cyl.core.viewDidAppear`（CYLDeallocBlockExecutor），在 `super` 内触发。
+        cylRegisterViewDidAppearCallback()
         super.viewDidAppear(animated)
-        cylViewDidAppear(animated)
     }
 
     open override func viewWillDisappear(_ animated: Bool) {
+        // [EN] The core's work is the keyed `.afterSuper` block `cyl.core.viewWillDisappear` (CYLDeallocBlockExecutor), fired inside `super`. [CN] 核心的工作是带 key 的 `.afterSuper` block `cyl.core.viewWillDisappear`（CYLDeallocBlockExecutor），在 `super` 内触发。
+        cylRegisterViewWillDisappearCallback()
         super.viewWillDisappear(animated)
-        cylViewWillDisappear(animated)
     }
 
     open override func viewDidDisappear(_ animated: Bool) {
+        // [EN] The core's work is the keyed `.afterSuper` block `cyl.core.viewDidDisappear` (CYLDeallocBlockExecutor), fired inside `super`. [CN] 核心的工作是带 key 的 `.afterSuper` block `cyl.core.viewDidDisappear`（CYLDeallocBlockExecutor），在 `super` 内触发。
+        cylRegisterViewDidDisappearCallback()
         super.viewDidDisappear(animated)
-        cylViewDidDisappear(animated)
     }
 
     open override func viewDidLayoutSubviews() {

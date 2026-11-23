@@ -14,6 +14,7 @@ import lottie, { AnimationItem } from '@ohos/lottie';
 import { image } from '@kit.ImageKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
+import { LifecycleController } from 'cyldeallocblockexecutor';
 import {
   CYLAnimatedItemEngineBinding, CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemPlayer,
   CYLAnimatedItemSource, cylAnimatedItemParseHexColor
@@ -150,6 +151,7 @@ function cylLottieData(context: Context, source: CYLAnimatedItemSource): Object 
 export struct CYLAnimatedItemLottieView {
   state: CYLAnimatedItemEngineState = new CYLAnimatedItemEngineState();
   private unlisten?: () => void;
+  private cylLifecycle: LifecycleController<CYLAnimatedItemLottieView> | undefined = undefined;
   private settings: RenderingContextSettings = new RenderingContextSettings(true);
   private context2D: CanvasRenderingContext2D = new CanvasRenderingContext2D(this.settings);
   private binding: CYLAnimatedItemEngineBinding = new CYLAnimatedItemEngineBinding();
@@ -157,10 +159,18 @@ export struct CYLAnimatedItemLottieView {
   private canvasReady: boolean = false;
 
   aboutToAppear(): void {
+    this.cylLifecycle = new LifecycleController<CYLAnimatedItemLottieView>(this);
+    this.cylLifecycle.registry.addDeallocCallback<CYLAnimatedItemLottieView>((owner: CYLAnimatedItemLottieView) => owner.cylTeardown(), { key: 'cyl.lottie.teardown' });
+    this.cylLifecycle.aboutToAppear();
     this.unlisten = this.state.listen(() => this.cylStateChanged());
   }
 
   aboutToDisappear(): void {
+    this.cylLifecycle?.aboutToDisappear();
+  }
+
+  // [EN] The teardown block (CYLDeallocBlockExecutor), run by `aboutToDisappear`. [CN] 销毁块（CYLDeallocBlockExecutor），由 `aboutToDisappear` 运行。
+  private cylTeardown(): void {
     this.unlisten?.();
     this.binding.release();
   }

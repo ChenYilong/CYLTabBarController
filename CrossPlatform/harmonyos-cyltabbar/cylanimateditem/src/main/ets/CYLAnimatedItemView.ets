@@ -1,4 +1,5 @@
 import { CYLAnimatedItemTypeRegistry } from './CYLAnimatedItemTypes';
+import { LifecycleController } from 'cyldeallocblockexecutor';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
 import {
   CYLAnimatedItemCountdown, CYLAnimatedItemCountdownListener, CYLAnimatedItemCountdownStorage, CYLCountdownRunning, CYLCountdownFinished,
@@ -591,7 +592,12 @@ export struct CYLAnimatedItemView {
   onItemDragEnd?: (dx: number, dy: number) => void;
   @State private animationContext: CYLAnimatedItemAnimationContext = new CYLAnimatedItemAnimationContext();
 
+  private cylLifecycle: LifecycleController<CYLAnimatedItemView> | undefined = undefined;
+
   aboutToAppear(): void {
+    this.cylLifecycle = new LifecycleController<CYLAnimatedItemView>(this);
+    this.cylLifecycle.registry.addDeallocCallback<CYLAnimatedItemView>((owner: CYLAnimatedItemView) => owner.cylTeardown(), { key: 'cyl.animatedItem.teardown' });
+    this.cylLifecycle.aboutToAppear();
     CYLAnimatedItemEngines.loadX86_64DebugEngines(this.getUIContext().getHostContext());
     this.cylLastRestartToken = this.animationRestartToken + this.cylControllerRestarts;
     this.cylLastSelected = this.isItemSelected;
@@ -606,6 +612,11 @@ export struct CYLAnimatedItemView {
   }
 
   aboutToDisappear(): void {
+    this.cylLifecycle?.aboutToDisappear();
+  }
+
+  // [EN] The teardown block (CYLDeallocBlockExecutor), run by `aboutToDisappear`. [CN] 销毁块（CYLDeallocBlockExecutor），由 `aboutToDisappear` 运行。
+  private cylTeardown(): void {
     this.cylStopCountdownTimer();
     try {
       this.getUIContext().getHostContext()?.getApplicationContext().off('applicationStateChange', this.cylForegroundCallback);
