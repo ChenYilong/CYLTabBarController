@@ -1,5 +1,5 @@
 import { CYLAnimatedItemTypeRegistry } from './CYLAnimatedItemTypes';
-import { LifecycleController } from 'cyldeallocblockexecutor';
+import { LifecycleCenter, LifecycleController } from 'cyldeallocblockexecutor';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
 import {
   CYLAnimatedItemCountdown, CYLAnimatedItemCountdownListener, CYLAnimatedItemCountdownStorage, CYLCountdownRunning, CYLCountdownFinished,
@@ -593,11 +593,26 @@ export struct CYLAnimatedItemView {
   @State private animationContext: CYLAnimatedItemAnimationContext = new CYLAnimatedItemAnimationContext();
 
   private cylLifecycle: LifecycleController<CYLAnimatedItemView> | undefined = undefined;
+  private cylScrollPaused: boolean = false;
+  private cylStopScrollObserver: (() => void) | undefined = undefined;
+  private static cylScrollCounter: number = 0;
+
+  /**
+   * [EN] True: every animated item pauses while the user scrolls (the app calls `scrollStarted()` / `scrollStopped()` of a
+   *      LifecycleController from its List / Scroll `onScrollStart` / `onScrollStop`) and resumes afterwards. Read when an
+   *      item appears. [CN] 为 true 时，用户滚动期间所有动画条目暂停，滚动结束后恢复。条目出现时读取。
+   */
+  static pausesWhileUserScrolls: boolean = false;
 
   aboutToAppear(): void {
     this.cylLifecycle = new LifecycleController<CYLAnimatedItemView>(this);
     this.cylLifecycle.registry.addDeallocCallback<CYLAnimatedItemView>((owner: CYLAnimatedItemView) => owner.cylTeardown(), { key: 'cyl.animatedItem.teardown' });
     this.cylLifecycle.aboutToAppear();
+    if (CYLAnimatedItemView.pausesWhileUserScrolls) {
+      CYLAnimatedItemView.cylScrollCounter += 1;
+      this.cylStopScrollObserver = LifecycleCenter.whileUserScrolls(() => this.cylPauseAnimation(), () => this.cylResumeAnimation(),
+        { key: `cyl.animatedItem.scroll.${CYLAnimatedItemView.cylScrollCounter}` });
+    }
     CYLAnimatedItemEngines.loadX86_64DebugEngines(this.getUIContext().getHostContext());
     this.cylLastRestartToken = this.animationRestartToken + this.cylControllerRestarts;
     this.cylLastSelected = this.isItemSelected;
@@ -618,6 +633,7 @@ export struct CYLAnimatedItemView {
   // [EN] The teardown block (CYLDeallocBlockExecutor), run by `aboutToDisappear`. [CN] 销毁块（CYLDeallocBlockExecutor），由 `aboutToDisappear` 运行。
   private cylTeardown(): void {
     this.cylPostAnimationEvent('cyl.animation.didStop');
+    this.cylStopScrollObserver?.();
     this.cylStopCountdownTimer();
     try {
       this.getUIContext().getHostContext()?.getApplicationContext().off('applicationStateChange', this.cylForegroundCallback);
@@ -804,11 +820,21 @@ export struct CYLAnimatedItemView {
 
   /** [EN] Scrolling pauses the engine: posts didPause. [CN] 滚动暂停动画：发出 didPause。 */
   cylPauseAnimation(): void {
+    if (this.cylScrollPaused) {
+      return;
+    }
+    this.cylScrollPaused = true;
+    this.cylUpdateContext();
     this.cylPostAnimationEvent('cyl.animation.didPause');
   }
 
   /** [EN] Scrolling ended: posts didResume. [CN] 滚动结束：发出 didResume。 */
   cylResumeAnimation(): void {
+    if (!this.cylScrollPaused) {
+      return;
+    }
+    this.cylScrollPaused = false;
+    this.cylUpdateContext();
     this.cylPostAnimationEvent('cyl.animation.didResume');
   }
 
@@ -817,7 +843,8 @@ export struct CYLAnimatedItemView {
     context.url = this.animationUrl;
     context.size = this.iconSize;
     context.selected = this.isItemSelected;
-    context.speed = this.animationSpeed;
+    // [EN] Speed 0 while paused by scrolling: every engine already applies the context's speed. [CN] 滚动暂停时速度为 0：各引擎本来就应用 context 的速度。
+    context.speed = this.cylScrollPaused ? 0 : this.animationSpeed;
     context.loops = this.animationLoops;
     context.restartToken = this.animationRestartToken + this.cylControllerRestarts;
     context.setRestartHandler = this.cylSetRestartHandler;
@@ -1102,6 +1129,15 @@ export struct CYLAnimatedItemView {
     .accessibilityDescription(this.isItemSelected && this.selectedDescription.length > 0 ?
       [this.itemDescription, this.selectedDescription].filter((part: string) => part.length > 0).join(', ') : this.itemDescription)
     .id(this.itemId)
+    .onVisibleAreaChange([0.0, 0.01], (isVisible: boolean) => {
+      this.cylLifecycle?.visibleAreaChanged(isVisible);
+    })
+    .onAttach(() => {
+      this.cylLifecycle?.windowAttached();
+    })
+    .onDetach(() => {
+      this.cylLifecycle?.windowDetached();
+    })
     .onClick(() => {
       this.cylHandleTap();
     })

@@ -10,4 +10,4 @@
 - Library: https://github.com/ChenYilong/CYLDeallocBlockExecutor
 - Branch: `feat/lifecycle-callbacks` (pull request #12)
 - Folder in the library: `MiniProgram`
-- Commit: `5f666d9ba60d12fed1b528408f28d300b709713b`
+- Commit: `3da6f7536fa0a334bb22ef20d873a77e64327a8f`
