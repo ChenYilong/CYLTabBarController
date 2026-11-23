@@ -15,6 +15,14 @@ import CYLAnimatedItem
  [CN] 动图（GIF）图标的动画时机（`cyl.animation.didStart` / `didPause` / `didResume` / `didStop`）
       以及 `CYLAnimationEventBridge.setAnimationsPaused(_:)`（docs/Lifecycle-Library.md，第 11 与 21 步）。
  */
+private final class CYLScriptedPanRecognizer: UIPanGestureRecognizer {
+    var scripted: UIGestureRecognizer.State = .possible
+    override var state: UIGestureRecognizer.State {
+        get { scripted }
+        set {}
+    }
+}
+
 @MainActor
 final class CYLAnimationEventBridgeTests: XCTestCase {
 
@@ -73,5 +81,67 @@ final class CYLAnimationEventBridgeTests: XCTestCase {
         CYLAnimationEventBridge.setAnimationsPaused(true)
         CYLAnimationEventBridge.setAnimationsPaused(false)
         XCTAssertFalse(playing.imageView.isAnimating, "a stopped item is not resumed")
+    }
+
+    /// [EN] An item made on its own (no tab bar controller) is found by the bridge by name, and plays and pauses without
+    ///      anyone calling `install()` first. (The bridge is process-wide, so earlier tests may have installed it already: the
+    ///      lookup by name is what this pins down.)
+    /// [CN] 单独创建的控件（没有 TabBarController）能被桥接按名称找到，并且不必先调用 `install()` 就能播放与暂停。
+    ///      （桥接是进程级的，之前的测试可能已安装：这里固定的是按名称查找。）
+    func testAnItemOutsideATabBarControllerFindsTheBridgeByName() throws {
+        let installer = try XCTUnwrap(NSClassFromString("CYLAnimationEventBridgeInstaller") as? NSObject.Type)
+        XCTAssertTrue(installer.responds(to: NSSelectorFromString("install")))
+        let item = CYLAnimatedItemView(frame: .zero)
+        let seen = record(item)
+        item.playAnimatedImage(makeAnimatedImage())
+        XCTAssertEqual(seen(), ["cyl.animation.didStart"])
+        CYLAnimationEventBridge.setAnimationsPaused(true)
+        XCTAssertFalse(item.imageView.isAnimating)
+        CYLAnimationEventBridge.setAnimationsPaused(false)
+        item.stopAnimatedImage()
+    }
+
+    /// [EN] The scroll path: a view controller on screen reports its scroll view to the library once a global observer waits;
+    ///      a drag that begins pauses every playing item, the end of scrolling resumes them. The drag is driven through the pan
+    ///      gesture recognizer's target, as the library listens to it (the test target does not link the library).
+    /// [CN] 滚动路径：全局观察者存在后，屏幕上的视图控制器把它的滚动视图报告给库；开始拖动时暂停所有播放中的控件，滚动结束时恢复。
+    ///      拖动通过 pan 手势识别器的 target 驱动，与库监听它的方式一致（测试目标未链接该库）。
+    func testScrollingPausesPlayingItemsAndResumesThem() throws {
+        let item = CYLAnimatedItemView(frame: .zero)
+        item.animationLoops = true // [EN] a finite pass would end during the run loop waits below. [CN] 有限次播放会在下面等待 run loop 时结束。
+        item.playAnimatedImage(makeAnimatedImage())
+        CYLAnimationEventBridge.pausesAnimationsWhileUserScrolls(true)
+        addTeardownBlock { CYLAnimationEventBridge.pausesAnimationsWhileUserScrolls(false); item.stopAnimatedImage() }
+
+        let scrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+        scrollView.contentSize = CGSize(width: 320, height: 2000)
+        let controller = UIViewController()
+        controller.view.addSubview(scrollView)
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 320, height: 480))
+        window.rootViewController = controller
+        window.makeKeyAndVisible()
+        RunLoop.main.run(until: Date().addingTimeInterval(0.3))
+
+        let pauses = CYLAnimationEventBridge.pauseCount
+        let resumes = CYLAnimationEventBridge.resumeCount
+        let targets = try XCTUnwrap(scrollView.panGestureRecognizer.value(forKey: "targets") as? [NSObject])
+        // [EN] The library's observer reads only `recognizer.state`; a real recognizer's state cannot be set from outside UIKit,
+        //      so the observer gets a recognizer that reports the state we want.
+        // [CN] 库的观察者只读取 `recognizer.state`；真实识别器的状态无法在 UIKit 之外设置，所以交给观察者一个报告我们想要的状态的识别器。
+        let fake = CYLScriptedPanRecognizer()
+        func drive(_ state: UIGestureRecognizer.State) {
+            fake.scripted = state
+            for case let target as NSObject in targets.compactMap({ $0.value(forKey: "target") as AnyObject? }) where target.responds(to: NSSelectorFromString("pan:")) {
+                target.perform(NSSelectorFromString("pan:"), with: fake)
+            }
+        }
+        drive(.began)
+        XCTAssertEqual(CYLAnimationEventBridge.pauseCount, pauses + 1, "a drag that begins pauses the playing items")
+        XCTAssertFalse(item.imageView.isAnimating)
+        drive(.ended)
+        RunLoop.main.run(until: Date().addingTimeInterval(0.3))
+        XCTAssertEqual(CYLAnimationEventBridge.resumeCount, resumes + 1, "the end of scrolling resumes them")
+        XCTAssertTrue(item.imageView.isAnimating)
+        window.isHidden = true
     }
 }

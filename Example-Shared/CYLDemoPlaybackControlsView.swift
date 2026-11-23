@@ -28,6 +28,7 @@ final class CYLDemoPlaybackControlsView: UIView {
     private let speedValueLabel = UILabel()
     private let loopSwitch = UISwitch()
     private let pauseSwitch = UISwitch()
+    private let pauseCountLabel = UILabel()
 
     /**
      * [EN] Puts the controls above the rows of `tableView`, for the tab bar controller of `viewController`.
@@ -114,7 +115,17 @@ final class CYLDemoPlaybackControlsView: UIView {
         pauseLabel.isAccessibilityElement = false
         pauseSwitch.accessibilityLabel = cylDemoLocalizedString("Pause while scrolling")
         pauseSwitch.addTarget(self, action: #selector(pauseChanged), for: .valueChanged)
-        let pauseRow = UIStackView(arrangedSubviews: [pauseLabel, pauseSwitch])
+        // [EN] The counter (pauses / resumes since launch) shows the scroll pause working: digits only, so nothing to localize.
+        // [CN] 计数（自启动以来的暂停 / 恢复次数）显示滚动暂停在起作用：只有数字，无需本地化。
+        pauseCountLabel.font = .monospacedDigitSystemFont(ofSize: 15, weight: .regular)
+        pauseCountLabel.textColor = .secondaryLabel
+        pauseCountLabel.accessibilityLabel = cylDemoLocalizedString("Pause while scrolling")
+        pauseCountLabel.accessibilityIdentifier = "CYLDemoPauseCounter"
+        pauseCountLabel.setContentHuggingPriority(.required, for: .horizontal)
+        updatePauseCount()
+        NotificationCenter.default.addObserver(self, selector: #selector(updatePauseCount), name: CYLAnimationEventBridge.countsDidChangeNotification, object: nil)
+        let pauseRow = UIStackView(arrangedSubviews: [pauseLabel, pauseCountLabel, pauseSwitch])
+        pauseRow.spacing = 8
         pauseRow.alignment = .center
 
         let card = UIStackView(arrangedSubviews: [playAllButton, speedRow, loopRow, pauseRow])
@@ -153,6 +164,12 @@ final class CYLDemoPlaybackControlsView: UIView {
         speedSlider.value = (speedSlider.value / 0.05).rounded() * 0.05
         tabBarController?.tabBarItemAnimationSpeed = CGFloat(speedSlider.value)
         updateSpeedValue()
+    }
+
+    /// [EN] Shows "paused / resumed" counts. [CN] 显示「暂停 / 恢复」次数。
+    @objc private func updatePauseCount() {
+        pauseCountLabel.text = "⏸ \(CYLAnimationEventBridge.pauseCount)  ▶ \(CYLAnimationEventBridge.resumeCount)"
+        pauseCountLabel.accessibilityValue = "\(CYLAnimationEventBridge.pauseCount) / \(CYLAnimationEventBridge.resumeCount)"
     }
 
     @objc private func pauseChanged() {

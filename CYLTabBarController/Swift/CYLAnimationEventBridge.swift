@@ -44,7 +44,36 @@ public enum CYLAnimationEventBridge {
      */
     public static func setAnimationsPaused(_ paused: Bool) {
         track()
-        playing.allObjects.forEach { paused ? $0.pauseAnimation() : $0.resumeAnimation() }
+        paused ? pauseAllPlaying() : resumeAllPlaying()
+    }
+
+    // MARK: - Observing the pause path
+
+    /**
+     [EN] How many times every playing item was paused and resumed since launch (by `setAnimationsPaused(_:)` or by the scroll
+          pause). For debugging and demos: the example shows them next to the "Pause while scrolling" switch, and the tests read
+          them to see the scroll path without the library's log.
+     [CN] 自启动以来所有播放中控件被暂停与恢复的次数（来自 `setAnimationsPaused(_:)` 或滚动暂停）。用于调试与示例：示例在「滚动时暂停」
+          开关旁显示它们，测试也用它们在不依赖库日志的情况下观察滚动路径。
+     */
+    public private(set) static var pauseCount = 0
+    public private(set) static var resumeCount = 0
+
+    /**
+     [EN] Posted on the main queue after `pauseCount` or `resumeCount` changed. [CN] `pauseCount` 或 `resumeCount` 变化后在主队列发出。
+     */
+    public static let countsDidChangeNotification = Notification.Name("CYLAnimationEventBridgeCountsDidChange")
+
+    private static func pauseAllPlaying() {
+        pauseCount += 1
+        playing.allObjects.forEach { $0.pauseAnimation() }
+        NotificationCenter.default.post(name: countsDidChangeNotification, object: nil)
+    }
+
+    private static func resumeAllPlaying() {
+        resumeCount += 1
+        playing.allObjects.forEach { $0.resumeAnimation() }
+        NotificationCenter.default.post(name: countsDidChangeNotification, object: nil)
     }
 
     // MARK: - Pause while the user scrolls
@@ -94,9 +123,9 @@ public enum CYLAnimationEventBridge {
         removeScrollObservers = nil
         guard enabled else { return }
         removeScrollObservers = CYLLifecycleCenter.whileUserScrolls(key: "cyl.animation.scroll", pause: {
-            playing.allObjects.forEach { $0.pauseAnimation() }
+            pauseAllPlaying()
         }, resume: {
-            playing.allObjects.forEach { $0.resumeAnimation() }
+            resumeAllPlaying()
         })
     }
 }
