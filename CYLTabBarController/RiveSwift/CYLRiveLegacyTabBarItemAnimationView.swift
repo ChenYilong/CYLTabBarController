@@ -29,6 +29,9 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
     /// [EN] Plays again after each pass (`cyl_setAnimationViewLoops:`). [CN] 每次播放后再次播放（`cyl_setAnimationViewLoops:`）。
     private var loops = false
     private var loopTask: Task<Void, Never>?
+    private var endHandler: (() -> Void)?
+    /// [EN] Whether the state machine input is held YES now. [CN] 状态机输入当前是否保持为 YES。
+    private var isActive = false
 
     // MARK: - [EN] CYLRiveFileInspecting [CN] 文件检查接口
 
@@ -233,6 +236,7 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
                 }
                 self.viewModel.setInput(input, value: true)
                 self.viewModel.play()
+                self.isActive = true
                 guard duration > 0 else {
                     return
                 }
@@ -241,12 +245,29 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
                     return
                 }
                 self.viewModel.setInput(input, value: false)
+                self.isActive = false
+                if !self.loops {
+                    self.endHandler?()
+                }
             }
         } else {
             viewModel.reset()
             viewModel.play()
         }
         scheduleLoop()
+    }
+
+    /// [EN] Called when a pass of a state machine input with an `activeDuration` ends and looping is off, as the current
+    ///      renderer does; a trigger, a number input, a linear animation or an input held YES (`activeDuration` 0) has no end
+    ///      to tell. [CN] 带 `activeDuration` 的状态机输入的一遍播放结束且循环关闭时调用，与当前渲染器相同；trigger、数字输入、
+    ///      线性动画或保持为 YES 的输入（`activeDuration` 为 0）没有可判断的结束。
+    public func setAnimationEndHandler(_ handler: (() -> Void)?) {
+        endHandler = handler
+    }
+
+    /// [EN] Whether the input is held YES now (the other kinds have no state to read). [CN] 输入当前是否保持为 YES（其他类型没有可读取的状态）。
+    public func isAnimationPlaying() -> Bool {
+        isActive
     }
 
     /// [EN] `cyl_setAnimationViewLoops:`. [CN] `cyl_setAnimationViewLoops:`。
@@ -304,6 +325,7 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
         deactivateTask = nil
         loopTask?.cancel()
         loopTask = nil
+        isActive = false
         if configuration.animationName != nil {
             viewModel.stop()
         } else if let input = configuration.stateMachineInput {
