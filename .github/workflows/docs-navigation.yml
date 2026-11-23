@@ -8,6 +8,8 @@ on:
       - "README.md"
       - "docs/**"
       - "CYLTabBarController/**/*.h"
+      - "CYLTabBarController/**/*.swift"
+      - "scripts/check-swift-protocol-bodies.py"
       - "scripts/update-docs-navigation.py"
       - "scripts/sync-agent-skills.py"
       - "scripts/sync-example-shared.py"
@@ -24,6 +26,8 @@ on:
       - "README.md"
       - "docs/**"
       - "CYLTabBarController/**/*.h"
+      - "CYLTabBarController/**/*.swift"
+      - "scripts/check-swift-protocol-bodies.py"
       - "scripts/update-docs-navigation.py"
       - "scripts/sync-agent-skills.py"
       - "scripts/sync-example-shared.py"
@@ -54,3 +58,6 @@ jobs:
         run: python3 scripts/android-library-strings.py --check
       - name: Check the Android example strings
         run: python3 scripts/android-demo-strings.py --check
+      # [EN] A Swift protocol holds requirements only, no bodies (docs/instructions/code.md): catches Swift written without a compiler. [CN] Swift 协议只含要求、不含函数体：发现未经编译器编写的 Swift 错误。
+      - name: Check the Swift protocol bodies
+        run: python3 scripts/check-swift-protocol-bodies.py CYLTabBarController
