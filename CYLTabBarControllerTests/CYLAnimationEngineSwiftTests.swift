@@ -242,3 +242,121 @@ final class CYLAnimatedItemSourceOptionsTests: XCTestCase {
         XCTAssertEqual(CYLAnimationSource(parsing: "[1]").type, "Lottie")
     }
 }
+
+/// [EN] A playable view that ends its pass when the test says so: stands for the view of an engine whose own library tells the
+///      end (SVGA, Rive), reached through the same optional members of `CYLTabBarItemAnimationPlayableView`.
+/// [CN] 由测试决定何时结束一遍播放的可播放视图：代表由其动画库报告结束的引擎视图（SVGA、Rive），经由
+///      `CYLTabBarItemAnimationPlayableView` 的同一组可选成员。
+private final class CYLEndingPlayableView: UIView, CYLTabBarItemAnimationPlayableView {
+    private(set) var isPlayingNow = false
+    private var endHandler: (() -> Void)?
+
+    func playAnimation() { isPlayingNow = true }
+    func showAnimationLastFrame() {}
+    func stopAnimation() { isPlayingNow = false }
+    func setAnimationLoops(_: Bool) {}
+    func isAnimationPlaying() -> Bool { isPlayingNow }
+    func setAnimationEndHandler(_ handler: (() -> Void)?) { endHandler = handler }
+
+    /// [EN] The library reports that a pass ran to its end, always: the guards against reporting while looping belong to the
+    ///      player and the item, and are what the tests check. [CN] 动画库一律报告一遍播放到了结尾：循环时不报告的保护属于播放器与条目，
+    ///      正是测试要检查的。
+    func finishPass() {
+        isPlayingNow = false
+        endHandler?()
+    }
+}
+
+@MainActor
+private final class CYLEndingViewProvider: NSObject, CYLTabBarItemAnimationViewProviding {
+    static func makeAnimationView(fileURL _: URL, options _: [String: String],
+                                  contentMode _: UIView.ContentMode) -> (UIView & CYLTabBarItemAnimationPlayableView)? {
+        CYLEndingPlayableView()
+    }
+}
+
+/**
+ [EN] The end callbacks (`CYLTabBarItemAnimationPlayer.onEnded`, `CYLAnimatedItemView.onAnimationEnd`) of the engines whose view
+      is a `CYLTabBarItemAnimationPlayableView` (Rive, SVGA, GIF), through the shared `CYLTabBarItemViewAnimator` with a fake view
+      in place of the library's. What no test here can reach without the library: the moment the library reports the end (see
+      docs/Animated-Item.md, "Engine API across platforms").
+ [CN] 视图为 `CYLTabBarItemAnimationPlayableView` 的引擎（Rive、SVGA、GIF）的结束回调（`CYLTabBarItemAnimationPlayer.onEnded`、
+      `CYLAnimatedItemView.onAnimationEnd`）：经由共用的 `CYLTabBarItemViewAnimator`，用假视图代替动画库的视图。没有动画库时这里的测试够不到的是：
+      动画库报告结束的那一刻（见 docs/Animated-Item.md「Engine API across platforms」）。
+ */
+@MainActor
+final class CYLAnimationEndCallbackTests: XCTestCase {
+
+    private func makeFactory() -> CYLTabBarItemAnimationFactory {
+        let registry = CYLTabBarItemAnimatorRegistry()
+        registry.register(CYLTabBarItemViewAnimator(identifier: "Ending", fileExtensions: ["ending"], attributeKeys: nil,
+                                                            viewProvider: CYLEndingViewProvider.self))
+        return CYLTabBarItemAnimationFactory(registry: registry)
+    }
+
+    /// [EN] A remote URL, so the item has no file to look for (as the Objective-C test of the fake engine does). [CN] 远程 URL，因此条目没有要查找的文件
+    ///      （与 Objective-C 假引擎测试相同）。
+    private let fileURL = URL(string: "https://example.com/ending.ending")!
+
+    func testThePlayerReportsTheEndOfAPlayOncePass() throws {
+        let factory = makeFactory()
+        let view = try XCTUnwrap(factory.animationView(url: fileURL, size: CGSize(width: 24, height: 24), contentMode: .scaleAspectFit) as? CYLEndingPlayableView)
+        let player = try XCTUnwrap(factory.player(for: view))
+        XCTAssertTrue(player.supportsLoops == true)
+        var ends = 0
+        let base = try XCTUnwrap(player as? CYLTabBarItemAnimationBasePlayer)
+        base.onEnded = { ends += 1 }
+        player.play()
+        XCTAssertTrue(player.isPlaying == true)
+        view.finishPass()
+        XCTAssertEqual(ends, 1)
+        XCTAssertTrue(player.isPlaying == false)
+    }
+
+    func testAStopAndALoopReportNoEnd() throws {
+        let factory = makeFactory()
+        let view = try XCTUnwrap(factory.animationView(url: fileURL, size: CGSize(width: 24, height: 24), contentMode: .scaleAspectFit) as? CYLEndingPlayableView)
+        let player = try XCTUnwrap(factory.player(for: view))
+        var ends = 0
+        let base = try XCTUnwrap(player as? CYLTabBarItemAnimationBasePlayer)
+        base.onEnded = { ends += 1 }
+        player.play()
+        player.stop()
+        XCTAssertEqual(ends, 0, "a stop is not an end")
+        XCTAssertFalse(view.isPlayingNow)
+        // [EN] `loops` YES: the view loops and reports nothing. [CN] `loops` 为 YES：视图自己循环，不报告。
+        let looping = try XCTUnwrap(player as? NSObject)
+        looping.setValue(true, forKey: "loops")
+        player.play()
+        view.finishPass()
+        XCTAssertEqual(ends, 0, "the player drops an end that arrives while it loops")
+        looping.setValue(false, forKey: "loops")
+        player.play()
+        view.finishPass()
+        XCTAssertEqual(ends, 1, "the same player reports it again once it plays once")
+    }
+
+    func testTheItemReportsOnAnimationEndOnlyForAPlayOncePass() throws {
+        let item = CYLAnimatedItemView(frame: CGRect(x: 0, y: 0, width: 200, height: 44))
+        item.animationSource = makeFactory()
+        var ends = 0
+        item.onAnimationEnd = { ends += 1 }
+        item.animationURL = fileURL
+        let view = try XCTUnwrap(item.animationView as? CYLEndingPlayableView)
+        item.playAnimation()
+        view.finishPass()
+        XCTAssertEqual(ends, 1, "a play-once pass that runs to its end")
+        item.animationLoops = true
+        item.playAnimation()
+        view.finishPass()
+        XCTAssertEqual(ends, 1, "a looping animation has no end to report")
+        item.animationLoops = false
+        item.playAnimation()
+        item.stopAnimation()
+        XCTAssertEqual(ends, 1, "a stop is not an end")
+        item.drivesAnimationPlayback = false
+        item.animationPlayer?.play()
+        view.finishPass()
+        XCTAssertEqual(ends, 2, "a host that drives playback still gets the end")
+    }
+}

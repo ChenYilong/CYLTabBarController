@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "Android'de n/a: bir uygulama bu sistem olayını gönderemez.";
 "Runs every automatic row, one after the other." = "Tüm otomatik satırları art arda çalıştırır.";
 "Tab bar %@ · page ID \"%@\"" = "Sekme çubuğu %@ · sayfa kimliği \"%@\"";
+"Animated item engine API" = "Animasyonlu öğe motoru API'si";
+"Stop at 50%" = "%50'de durdur";
+"Restart token: %@" = "Yeniden başlatma belirteci: %@";
+"End callback: %@" = "Bitiş geri çağrısı: %@";
+"none yet" = "henüz yok";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Oynatmayı ana uygulama yönetir (drivesAnimationPlayback = false)";
+"Engine API" = "Motor API'si";

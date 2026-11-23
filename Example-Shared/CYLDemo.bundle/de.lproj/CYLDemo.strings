@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "n/a unter Android: Eine App kann dieses Systemereignis nicht auslösen.";
 "Runs every automatic row, one after the other." = "Führt alle automatischen Zeilen nacheinander aus.";
 "Tab bar %@ · page ID \"%@\"" = "Tab-Leiste %@ · Seiten-ID „%@“";
+"Animated item engine API" = "Engine-API der Animations-Elemente";
+"Stop at 50%" = "Bei 50 % anhalten";
+"Restart token: %@" = "Neustart-Token: %@";
+"End callback: %@" = "Ende-Callback: %@";
+"none yet" = "noch keiner";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Wiedergabe durch den Host (drivesAnimationPlayback = false)";
+"Engine API" = "Engine-API";

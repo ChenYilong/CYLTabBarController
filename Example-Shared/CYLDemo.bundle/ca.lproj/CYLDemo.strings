@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "n/a a Android: una app no pot enviar aquest esdeveniment del sistema.";
 "Runs every automatic row, one after the other." = "Executa totes les files automàtiques, una darrere l'altra.";
 "Tab bar %@ · page ID \"%@\"" = "Barra de pestanyes %@ · ID de pàgina «%@»";
+"Animated item engine API" = "API dels motors de l'element animat";
+"Stop at 50%" = "Atura al 50 %";
+"Restart token: %@" = "Testimoni de reinici: %@";
+"End callback: %@" = "Callback de final: %@";
+"none yet" = "encara cap";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Reproducció controlada pel host (drivesAnimationPlayback = false)";
+"Engine API" = "API del motor";

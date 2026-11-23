@@ -389,6 +389,7 @@ docs/
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png
+│   ├── ios-animated-item-engine-api.png
 │   ├── ios-badge-breathe-not-under-icon.png
 │   ├── ios-badges-follow-swapped-animation-skin.png
 │   ├── ios-badges-on-animated-item-component.png

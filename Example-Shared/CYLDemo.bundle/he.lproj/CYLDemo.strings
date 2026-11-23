@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "n/a ב-Android: אפליקציה אינה יכולה לשלוח אירוע מערכת זה.";
 "Runs every automatic row, one after the other." = "מריץ את כל השורות האוטומטיות, אחת אחרי השנייה.";
 "Tab bar %@ · page ID \"%@\"" = "סרגל לשוניות %@ · מזהה עמוד \"%@\"";
+"Animated item engine API" = "API של מנועי הפריט המונפש";
+"Stop at 50%" = "עצור ב-50%";
+"Restart token: %@" = "אסימון הפעלה מחדש: %@";
+"End callback: %@" = "קריאה חוזרת בסיום: %@";
+"none yet" = "עדיין אין";
+"Host-driven playback (drivesAnimationPlayback = false)" = "המארח שולט בהפעלה (drivesAnimationPlayback = false)";
+"Engine API" = "API של מנוע";

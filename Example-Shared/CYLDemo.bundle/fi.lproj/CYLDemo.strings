@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "n/a Androidissa: sovellus ei voi lähettää tätä järjestelmätapahtumaa.";
 "Runs every automatic row, one after the other." = "Suorittaa kaikki automaattiset rivit peräkkäin.";
 "Tab bar %@ · page ID \"%@\"" = "Välilehtipalkki %@ · sivun tunnus \"%@\"";
+"Animated item engine API" = "Animoidun kohteen moottorin API";
+"Stop at 50%" = "Pysäytä 50 %:iin";
+"Restart token: %@" = "Uudelleenkäynnistyksen tunniste: %@";
+"End callback: %@" = "Päättymisen takaisinkutsu: %@";
+"none yet" = "ei vielä";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Isäntä ohjaa toistoa (drivesAnimationPlayback = false)";
+"Engine API" = "Moottorin API";

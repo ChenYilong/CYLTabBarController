@@ -461,3 +461,10 @@
 "n/a on Android: an app cannot post this system event." = "Android 上 n/a：App 无法发出此系统事件。";
 "Runs every automatic row, one after the other." = "依次运行所有自动行。";
 "Tab bar %@ · page ID \"%@\"" = "TabBar %@ · 页面 ID“%@”";
+"Animated item engine API" = "动画条目引擎 API";
+"Stop at 50%" = "停在 50%";
+"Restart token: %@" = "重播令牌：%@";
+"End callback: %@" = "结束回调：%@";
+"none yet" = "尚无";
+"Host-driven playback (drivesAnimationPlayback = false)" = "由宿主驱动播放（drivesAnimationPlayback = false）";
+"Engine API" = "引擎 API";
