@@ -109,7 +109,7 @@ function cylMountBar(identifiers, loopers) {
   const bar = {
     cylModel: {
       context: 'test',
-      items: identifiers.map((identifier) => ({ identifier, lottie: { loopsWhenUnselected: (loopers || []).includes(identifier) } })),
+      items: identifiers.map((identifier) => ({ identifier, key: identifier, lottie: { loopsWhenUnselected: (loopers || []).includes(identifier) } })),
     },
     selectComponent: (id) => items[id] || null,
   }
@@ -142,7 +142,7 @@ test('a tab that loops while unselected is not stopped by a switch', () => {
 test('exactly one slot is selected after a switch (selection comes from one identifier)', () => {
   const definition = cylDefinition('../src/cyl-tab-bar/index.js')
   assert.equal(typeof definition.methods.cyl_slot, 'function')
-  const model = { isDark: false, items: ['a', 'b', 'c'].map((identifier) => ({ identifier, title: identifier, image: 'x.png', selectedImage: 'y.png' })) }
+  const model = { isDark: false, items: ['a', 'b', 'c'].map((identifier) => ({ identifier, key: identifier, title: identifier, image: 'x.png', selectedImage: 'y.png' })) }
   const context = { cylModel: model, cylBadges: {}, cylCovers: {}, cylBadgeAttributes: {}, data: {}, ...definition.methods }
   const selectedCount = (selected) => model.items.filter((item) => context.cyl_slot(item, selected).selected === true).length
   assert.equal(selectedCount('b'), 1)
@@ -153,8 +153,8 @@ test('a bar shown after a tap draws the tapped tab at once, not its own stale se
   const definition = cylDefinition('../src/cyl-tab-bar/index.js')
   assert.equal(typeof definition.pageLifetimes.show, 'function')
   const sent = []
-  const model = { context: 'flicker', items: [{ identifier: 'a' }, { identifier: 'b' }] }
-  const tapped = { cylModel: model, data: { selectedIdentifier: 'a' }, setData(patch) { sent.push(patch) }, ...definition.methods }
+  const model = { context: 'flicker', items: [{ identifier: 'a', key: 'a' }, { identifier: 'b', key: 'b' }] }
+  const tapped = { cylModel: model, cylSelectedKey: 'a', data: { selectedIdentifier: 'a', selectedIndex: 0 }, setData(patch) { sent.push(patch) }, ...definition.methods }
   tapped.cylLongPressed = false
   tapped.cyl_recordTap = () => {}
   tapped.cyl_playTapAnimation = () => {}
@@ -164,9 +164,9 @@ test('a bar shown after a tap draws the tapped tab at once, not its own stale se
   tapped.data.loggedIn = true
   model.loginRequiredIdentifiers = []
   tapped.cyl_onTap({ type: 'tap', currentTarget: { dataset: { key: 'b' } } })
-  const cached = { cylModel: model, data: { selectedIdentifier: 'a' }, setData(patch) { sent.push(patch) } }
+  const cached = { cylModel: model, cylSelectedKey: 'a', data: { selectedIdentifier: 'a', selectedIndex: 0 }, setData(patch) { sent.push(patch) }, ...definition.methods }
   definition.pageLifetimes.show.call(cached)
-  assert.deepEqual(sent[sent.length - 1], { selectedIdentifier: 'b' })
+  assert.deepEqual(sent[sent.length - 1], { selectedIdentifier: 'b', selectedIndex: 1 })
 })
 
 test('every live bar follows a tap before its page is shown, so the page never shows the previous tab first', () => {
@@ -176,10 +176,10 @@ test('every live bar follows a tap before its page is shown, so the page never s
   //      因此点击本身在同一上下文的所有存活 TabBar 中选中该 Tab，早于 wx.switchTab。
   global.wx = { getSystemInfoSync: () => ({ theme: 'light' }), getAppBaseInfo: () => ({ theme: 'light' }) }
   const definition = cylDefinition('../src/cyl-tab-bar/index.js')
-  const model = { context: 'live', items: [{ identifier: 'home' }, { identifier: 'message' }], loginRequiredIdentifiers: [] }
-  const other = { context: 'other', items: [{ identifier: 'home' }, { identifier: 'message' }], loginRequiredIdentifiers: [] }
+  const model = { context: 'live', items: [{ identifier: 'home', key: 'home' }, { identifier: 'message', key: 'message' }], loginRequiredIdentifiers: [] }
+  const other = { context: 'other', items: [{ identifier: 'home', key: 'home' }, { identifier: 'message', key: 'message' }], loginRequiredIdentifiers: [] }
   const mount = (barModel) => {
-    const bar = { cylModel: barModel, sent: [], data: { selectedIdentifier: 'home', loggedIn: true, cylSlots: [{ key: 'home' }, { key: 'message' }] } }
+    const bar = { cylModel: barModel, cylSelectedKey: 'home', sent: [], data: { selectedIdentifier: 'home', selectedIndex: 0, loggedIn: true, cylSlots: [{ key: 'home' }, { key: 'message' }] } }
     Object.assign(bar, definition.methods)
     bar.setData = (patch) => { bar.sent.push(patch); Object.assign(bar.data, patch) }
     bar.cyl_render = () => {}

@@ -83,7 +83,7 @@ const CYL_PLAYBACK_WINDOW = 3000;
  * [CN] 最后被点击的 Tab，App 中所有 TabBar 共享（每个 Tab 页面都有自己的 TabBar）。被点击而显示的页面立即绘制这个选中项，
  *      而不是自己过期的选中项（之前透镜先停在上一个 Tab，随后才跳过去）。
  */
-const cylLastSelection = { context: '', identifier: '', time: 0 };
+const cylLastSelection = { context: '', key: '', time: 0 };
 
 /**
  * [EN] Every attached bar of the app. A tap selects the tab in each bar of the same configuration context at once, so
@@ -97,9 +97,9 @@ const cylLastSelection = { context: '', identifier: '', time: 0 };
 const cylLiveBars = new Set();
 
 function cylRecentSelection(context) {
-  const recent = cylLastSelection.identifier && cylLastSelection.context === context
+  const recent = cylLastSelection.key && cylLastSelection.context === context
     && Date.now() - cylLastSelection.time < CYL_PLAYBACK_WINDOW;
-  return recent ? cylLastSelection.identifier : '';
+  return recent ? cylLastSelection.key : '';
 }
 
 function cylBadgeText(value) {
@@ -166,9 +166,63 @@ function cylHideItems(model, hidden) {
   model.items = model.items.filter((item) => !hidden.includes(item.identifier));
 }
 
-/** [EN] The first tab's identifier, '' without tabs. [CN] 第一个 Tab 的标识，没有 Tab 时为 ''。 */
+/** [EN] The first tab's key, '' without tabs. [CN] 第一个 Tab 的 key，没有 Tab 时为 ''。 */
 function cylFirstIdentifier(model) {
-  return model.items[0] ? model.items[0].identifier : '';
+  return model.items[0] ? model.items[0].key : '';
+}
+
+/**
+ * [EN] Gives every tab and the plus button a `key` that is unique in the bar: its identifier when no other one has it,
+ *      else `cyl-tab-<position>` (the plus button counts at its place). Tabs without identifier or title, repeated
+ *      identifiers, and an identifier that differs from the page identifier are all told apart by position, as iOS
+ *      selects by index.
+ * [CN] 为每个 Tab 与 PlusButton 生成在 TabBar 中唯一的 `key`：没有其他项使用其标识时用标识，否则用 `cyl-tab-<位置>`（PlusButton
+ *      按其位置计数）。没有标识或标题、标识重复、标识与页面标识不同的 Tab 都按位置区分，与 iOS 按 index 选中一致。
+ */
+function cylAssignKeys(model) {
+  const used = new Set();
+  const unique = (wanted, position) => {
+    let key = wanted && !used.has(wanted) ? wanted : `cyl-tab-${position}`;
+    while (used.has(key)) {
+      key = `${key}-${position}`;
+    }
+    used.add(key);
+    return key;
+  };
+  const plus = model.plusButton;
+  let position = 0;
+  model.items.forEach((item, index) => {
+    if (plus && plus.index === index) {
+      plus.key = unique(plus.identifier || 'cyl-plus-button', position);
+      position += 1;
+    }
+    item.key = unique(item.identifier, position);
+    position += 1;
+  });
+  if (plus && !plus.key) {
+    plus.key = unique(plus.identifier || 'cyl-plus-button', position);
+  }
+}
+
+/** [EN] The keys in bar order, the plus button's at its place. [CN] 按 TabBar 顺序排列的 key，PlusButton 在其位置。 */
+function cylSlotKeys(model) {
+  const keys = model.items.map((item) => item.key);
+  if (model.plusButton) {
+    keys.splice(Math.min(model.plusButton.index, keys.length), 0, model.plusButton.key);
+  }
+  return keys;
+}
+
+/** [EN] The key of the tab (or plus button) with this identifier, '' without one. [CN] 该标识的 Tab（或 PlusButton）的 key，没有时为 ''。 */
+function cylKeyOfIdentifier(model, identifier) {
+  if (!identifier) {
+    return '';
+  }
+  const item = model.items.find((candidate) => candidate.identifier === identifier);
+  if (item) {
+    return item.key;
+  }
+  return model.plusButton && model.plusButton.identifier === identifier ? model.plusButton.key : '';
 }
 
 /**
@@ -310,6 +364,12 @@ Component({
      */
     selectedIdentifier: { type: String, value: '' },
     /**
+     * [EN] The position of the selected tab, the plus button counted (iOS selectedIndex); -1 leaves the selection to
+     *      `selectedIdentifier`. Wins when it changes.
+     * [CN] 选中 Tab 的位置，PlusButton 也计入（iOS selectedIndex）；-1 表示由 `selectedIdentifier` 决定。变化时优先。
+     */
+    selectedIndex: { type: Number, value: -1 },
+    /**
      * [EN] Whether the user is logged in; tabs in CYLTabBarControllerLoginRequiredTabBarItemIdentifiers need it.
      * [CN] 用户是否已登录；CYLTabBarControllerLoginRequiredTabBarItemIdentifiers 中的 Tab 需要登录。
      */
@@ -352,7 +412,7 @@ Component({
   },
 
   observers: {
-    'configuration, strings, symbolsByTheme, imageBasePath, animationBasePath, selectedIdentifier, appVersion, itemStyle, glassLensStyle, hiddenIdentifiers, tabBarHeight': function () {
+    'configuration, strings, symbolsByTheme, imageBasePath, animationBasePath, selectedIdentifier, appVersion, itemStyle, glassLensStyle, hiddenIdentifiers, tabBarHeight, selectedIndex': function () {
       this.cyl_render();
     },
   },
@@ -365,8 +425,8 @@ Component({
      */
     show() {
       const recent = this.cylModel ? cylRecentSelection(this.cylModel.context || '') : '';
-      if (recent && recent !== this.data.selectedIdentifier) {
-        this.setData({ selectedIdentifier: recent });
+      if (recent && recent !== this.cylSelectedKey) {
+        this.cyl_select(recent);
       }
     },
   },
@@ -425,15 +485,32 @@ Component({
       if (hidden.length > 0) {
         cylHideItems(model, hidden);
       }
+      cylAssignKeys(model);
       this.cylModel = model;
       const recent = this.cylRendered ? '' : cylRecentSelection(model.context || '');
       this.cylRendered = true;
-      // [EN] The first render of a bar follows the tab just tapped, and keeps it as its selection.
-      // [CN] TabBar 的首次渲染跟随刚被点击的 Tab，并把它保存为自己的选中项。
-      const requested = recent || this.data.selectedIdentifier;
-      const shown = model.items.some((item) => item.identifier === requested)
-        || (model.plusButton && model.plusButton.identifier === requested);
-      const selected = shown ? requested : cylFirstIdentifier(model);
+      // [EN] The first render of a bar follows the tab just tapped, and keeps it as its selection. Selection is held as a
+      //      key (a position in effect); `selectedIndex` and `selectedIdentifier` are converted at this edge when they
+      //      changed since the last render.
+      // [CN] TabBar 的首次渲染跟随刚被点击的 Tab，并把它保存为自己的选中项。选中项以 key（实质是位置）保存；`selectedIndex` 与
+      //      `selectedIdentifier` 自上次渲染以来变化时，在这里转换。
+      const slotKeys = cylSlotKeys(model);
+      const indexSet = this.data.selectedIndex;
+      let requested = recent;
+      if (!requested && indexSet >= 0 && indexSet !== this.cylIndexMirror && slotKeys[indexSet]) {
+        requested = slotKeys[indexSet];
+      }
+      if (!requested && this.data.selectedIdentifier !== this.cylIdentifierMirror) {
+        requested = cylKeyOfIdentifier(model, this.data.selectedIdentifier);
+      }
+      requested = requested || this.cylSelectedKey;
+      // [EN] A bar rendered before its configuration arrives (the example's custom-tab-bar passes {} first) has no tabs to
+      //      choose from: it keeps the requested key, so the render with the real configuration still draws the tapped
+      //      tab, not the first one for a frame.
+      // [CN] 配置到达之前就渲染的 TabBar（示例的 custom-tab-bar 先传入 {}）没有可选的 Tab：保留所请求的 key，这样带真实配置的
+      //      渲染仍然绘制被点击的 Tab，而不是先闪现第一个 Tab。
+      const selected = slotKeys.includes(requested) || slotKeys.length === 0 ? requested : cylFirstIdentifier(model);
+      this.cylSelectedKey = selected;
       const slots = model.items.map((item) => this.cyl_slot(item, selected));
       if (model.plusButton) {
         slots.splice(model.plusButton.index, 0, this.cyl_plusSlot(model.plusButton, selected,
@@ -450,7 +527,7 @@ Component({
       const itemStyle = this.cyl_itemStyle(model);
       const styleType = cylBarStyleType(itemStyle, model.styleType);
       this.setData({
-        ...(recent && recent !== this.data.selectedIdentifier ? { selectedIdentifier: recent } : {}),
+        ...this.cyl_selectionMirror(model, selected),
         cylSlots: slots,
         cylItemStyle: itemStyle,
         cylGlassLensStyle: cylGlassLensStyle(this.cylRequestedGlassLensStyle !== undefined
@@ -497,7 +574,7 @@ Component({
       if (!model) {
         return;
       }
-      const keys = model.items.filter((item) => !item.lottie?.loopsWhenUnselected).map((item) => item.identifier);
+      const keys = model.items.filter((item) => !item.lottie?.loopsWhenUnselected).map((item) => item.key);
       keys.filter((key) => key !== selected).forEach((key) => {
         const item = this.selectComponent(`#cyl-item-${key}`);
         if (item && typeof item.cyl_stopAnimation === 'function') {
@@ -513,7 +590,7 @@ Component({
      *      Tab 页面都有自己的 TabBar 实例。
      */
     cyl_playLottie(identifier) {
-      const key = identifier || this.cylLottieSelected;
+      const key = (this.cylModel && cylKeyOfIdentifier(this.cylModel, identifier)) || identifier || this.cylLottieSelected;
       const item = this.selectComponent(`#cyl-item-${key}`);
       if (!item) {
         return;
@@ -535,8 +612,8 @@ Component({
      * [CN] 一个 Tab 的渲染数据：当前状态的图片、标题与颜色、角标，以及无障碍标签（角标作为 Tab 的一部分朗读，
      *      例如 "Message, 3"）。
      */
-    cyl_slot(item, selectedIdentifier) {
-      const selected = item.identifier === selectedIdentifier;
+    cyl_slot(item, selectedKey) {
+      const selected = item.key === selectedKey;
       const badge = cylBadgeText(this.cylBadges[item.identifier]);
       const isDot = badge === '•';
       const color = selected ? item.selectedTitleColor : item.titleColor;
@@ -564,7 +641,7 @@ Component({
         },
       };
       return {
-        key: item.identifier,
+        key: item.key,
         isPlusButton: false,
         selected,
         item: itemProperties,
@@ -643,9 +720,9 @@ Component({
      * [CN] PlusButton 的渲染数据：按 CYLPlusButtonCenterYMultiplier（50 pt 高的 TabBar）与 CYLPlusButtonCenterYOffset
      *      凸起，尺寸由 CYLPlusButtonSize / CYLPlusButtonImageSize 决定。
      */
-    cyl_plusSlot(plus, selectedIdentifier, barHeight = CYL_BAR_HEIGHT, tabTitleLine = null) {
+    cyl_plusSlot(plus, selectedKey, barHeight = CYL_BAR_HEIGHT, tabTitleLine = null) {
       const titleLine = tabTitleLine || { iconHeight: CYL_ITEM_ICON_HEIGHT, titleOffset: 0 };
-      const selected = plus.hasPage && plus.identifier === selectedIdentifier;
+      const selected = plus.hasPage && plus.key === selectedKey;
       const imageWidth = plus.imageWidth || plus.width || 56;
       const imageHeight = plus.imageHeight || plus.height || 56;
       const titleHeight = plus.title && plus.keepsTitleVisible ? 16 : 0;
@@ -663,7 +740,7 @@ Component({
       const color = selected ? plus.selectedTitleColor : plus.titleColor;
       const widthStyle = plus.width ? ` width: ${plus.width}px;` : '';
       return {
-        key: plus.identifier || 'cyl-plus-button',
+        key: plus.key,
         isPlusButton: true,
         selected,
         showsSelection: selected && plus.showsSelection,
@@ -715,8 +792,8 @@ Component({
     cyl_detail(key) {
       const model = this.cylModel;
       const plus = model.plusButton;
-      const isPlusButton = Boolean(plus) && key === (plus.identifier || 'cyl-plus-button');
-      const item = isPlusButton ? plus : model.items.find((candidate) => candidate.identifier === key);
+      const isPlusButton = Boolean(plus) && key === plus.key;
+      const item = isPlusButton ? plus : model.items.find((candidate) => candidate.key === key);
       return item ? {
         index: this.data.cylSlots.findIndex((slot) => slot.key === key),
         identifier: item.identifier,
@@ -756,8 +833,8 @@ Component({
       }
       const model = this.cylModel;
       const plus = model.plusButton;
-      const isPlusButton = Boolean(plus) && key === (plus.identifier || 'cyl-plus-button');
-      const item = isPlusButton ? plus : model.items.find((candidate) => candidate.identifier === key);
+      const isPlusButton = Boolean(plus) && key === plus.key;
+      const item = isPlusButton ? plus : model.items.find((candidate) => candidate.key === key);
       if (!item) {
         return;
       }
@@ -782,20 +859,20 @@ Component({
         this.triggerEvent('plustap', detail);
         return;
       }
-      const currentIdentifier = this.data.selectedIdentifier || cylFirstIdentifier(model);
-      if (item.identifier === currentIdentifier) {
+      const currentKey = this.cylSelectedKey || cylFirstIdentifier(model);
+      if (key === currentKey) {
         this.triggerEvent('reselect', detail);
         return;
       }
       // [EN] Select and play at once on the tapped bar; the page's own bar continues the playback (cylPlayback).
       // [CN] 在被点击的 TabBar 上立即选中并播放；页面自己的 TabBar 继续该播放（cylPlayback）。
       cylLastSelection.context = model.context || '';
-      cylLastSelection.identifier = item.identifier;
+      cylLastSelection.key = key;
       cylLastSelection.time = Date.now();
-      this.setData({ selectedIdentifier: item.identifier });
+      this.cyl_select(key);
       cylLiveBars.forEach((bar) => {
         if (bar !== this) {
-          bar.cyl_followSelection(model.context || '', item.identifier);
+          bar.cyl_followSelection(model.context || '', key);
         }
       });
       this.triggerEvent('select', detail);
@@ -805,15 +882,13 @@ Component({
      * [EN] Selects a tab tapped on another bar of the same context (see cylLiveBars), when this bar shows it.
      * [CN] 选中同一上下文中另一个 TabBar 上被点击的 Tab（见 cylLiveBars），前提是本 TabBar 显示该 Tab。
      */
-    cyl_followSelection(context, identifier) {
+    cyl_followSelection(context, key) {
       const model = this.cylModel;
-      if (!model || (model.context || '') !== context || identifier === this.data.selectedIdentifier) {
+      if (!model || (model.context || '') !== context || key === this.cylSelectedKey) {
         return;
       }
-      const shown = model.items.some((candidate) => candidate.identifier === identifier)
-        || (model.plusButton && model.plusButton.identifier === identifier);
-      if (shown) {
-        this.setData({ selectedIdentifier: identifier });
+      if (cylSlotKeys(model).includes(key)) {
+        this.cyl_select(key);
       }
     },
 
@@ -826,7 +901,7 @@ Component({
       if (!model) {
         return;
       }
-      const item = model.items.find((candidate) => candidate.identifier === key);
+      const item = model.items.find((candidate) => candidate.key === key);
       // [EN] A tab's own animation wins (viewController.cyl_tabButtonAnimation). [CN] Tab 自己的动画优先。
       const name = item?.tapAnimation || model.tapAnimation;
       if (!name || name === 'none') {
@@ -852,7 +927,7 @@ Component({
      */
     cyl_playSelectedTapAnimation() {
       const model = this.cylModel;
-      const key = this.data.selectedIdentifier || (model?.items[0] ? model.items[0].identifier : '');
+      const key = this.cylSelectedKey || (model?.items[0] ? model.items[0].key : '');
       this.cyl_playTapAnimation(key);
     },
 
@@ -864,7 +939,7 @@ Component({
     cyl_fireworks(key) {
       const model = this.cylModel;
       const plus = model.plusButton;
-      const item = plus && key === (plus.identifier || 'cyl-plus-button') ? plus : model.items.find((candidate) => candidate.identifier === key);
+      const item = plus && key === plus.key ? plus : model.items.find((candidate) => candidate.key === key);
       const color = (item && (item.selectedIconTint || item.selectedTitleColor)) || '#FF9500';
       const delay = model.animationDuration;
       const background = model.fireworksImage ? '' : ` background-color: ${color};`;
@@ -929,13 +1004,13 @@ Component({
       }
       const plus = model.plusButton;
       const slots = this.data.cylSlots.filter((slot) => !slot.isPlusButton || plus?.hasPage);
-      const current = this.data.selectedIdentifier || (model.items[0] ? model.items[0].identifier : '');
+      const current = this.cylSelectedKey || (model.items[0] ? model.items[0].key : '');
       const index = slots.findIndex((slot) => slot.key === current);
       const next = slots[index + (step > 0 ? 1 : -1)];
       if (index < 0 || !next) {
         return false;
       }
-      const item = next.isPlusButton ? plus : model.items.find((candidate) => candidate.identifier === next.key);
+      const item = next.isPlusButton ? plus : model.items.find((candidate) => candidate.key === next.key);
       const needsLogin = item && model.loginRequiredIdentifiers.includes(item.identifier) && !this.data.loggedIn;
       this.cyl_onTap({ currentTarget: { dataset: { key: next.key } } });
       return !needsLogin;
@@ -946,13 +1021,13 @@ Component({
       if (!model?.swipeToSwitchTab) {
         return false;
       }
-      const current = this.data.selectedIdentifier || (model.items[0] ? model.items[0].identifier : '');
-      const index = model.items.findIndex((item) => item.identifier === current);
+      const current = this.cylSelectedKey || (model.items[0] ? model.items[0].key : '');
+      const index = model.items.findIndex((item) => item.key === current);
       const next = model.items[index + (step > 0 ? 1 : -1)];
       if (index < 0 || !next) {
         return false;
       }
-      this.cyl_onTap({ currentTarget: { dataset: { key: next.identifier } } });
+      this.cyl_onTap({ currentTarget: { dataset: { key: next.key } } });
       return true;
     },
 
@@ -962,6 +1037,70 @@ Component({
      */
     cyl_selectIdentifier(identifier) {
       this.setData({ selectedIdentifier: identifier || '' });
+    },
+
+    /**
+     * [EN] Selects a tab by its position, the plus button counted, as `selectedIndex` does (iOS selectedIndex).
+     * [CN] 按位置选中 Tab（PlusButton 也计入），与 `selectedIndex` 相同（iOS selectedIndex）。
+     */
+    cyl_selectIndex(index) {
+      this.setData({ selectedIndex: Number.isInteger(index) ? index : -1 });
+    },
+
+    /**
+     * [EN] Selects the tab (or plus button) whose page is `pageIdentifier` by its position in this bar and plays its
+     *      Lottie icon: the route to index conversion for tab pages (iOS selects by index too). Returns whether the bar
+     *      has such a tab; a bar without configuration yet leaves the selection to the tap that is in flight.
+     * [CN] 按位置选中页面为 `pageIdentifier` 的 Tab（或 PlusButton）并播放其 Lottie 图标：Tab 页面的路由到 index 转换
+     *      （iOS 同样按 index 选中）。返回本 TabBar 是否有这样的 Tab；尚无配置的 TabBar 把选中交给正在进行的点击。
+     */
+    cyl_selectPage(pageIdentifier) {
+      const model = this.cylModel;
+      const keys = model ? cylSlotKeys(model) : [];
+      const index = keys.findIndex((key) => {
+        const item = model.items.find((candidate) => candidate.key === key)
+          || (model.plusButton && model.plusButton.key === key ? model.plusButton : null);
+        return item && item.pageIdentifier === pageIdentifier;
+      });
+      if (index < 0) {
+        return false;
+      }
+      this.cyl_select(keys[index]);
+      this.cyl_playLottie(keys[index]);
+      return true;
+    },
+
+    /**
+     * [EN] Selects the tab with this key on this bar at once, and mirrors it to the public properties.
+     * [CN] 在本 TabBar 上立即选中该 key 的 Tab，并同步到公开属性。
+     */
+    cyl_select(key) {
+      const model = this.cylModel;
+      this.cylSelectedKey = key;
+      if (model) {
+        this.setData(this.cyl_selectionMirror(model, key));
+      }
+    },
+
+    /**
+     * [EN] The public properties (`selectedIdentifier`, `selectedIndex`) that differ from the selected key, as a setData
+     *      patch: only what differs, because setting a property runs the observer again.
+     * [CN] 与选中 key 不一致的公开属性（`selectedIdentifier`、`selectedIndex`），作为 setData 补丁：只含不同的部分，
+     *      因为设置属性会再次触发 observer。
+     */
+    cyl_selectionMirror(model, key) {
+      const item = model.items.find((candidate) => candidate.key === key)
+        || (model.plusButton && model.plusButton.key === key ? model.plusButton : null);
+      this.cylIdentifierMirror = item ? item.identifier : '';
+      this.cylIndexMirror = cylSlotKeys(model).indexOf(key);
+      const mirror = {};
+      if (this.data.selectedIdentifier !== this.cylIdentifierMirror) {
+        mirror.selectedIdentifier = this.cylIdentifierMirror;
+      }
+      if (this.data.selectedIndex !== this.cylIndexMirror) {
+        mirror.selectedIndex = this.cylIndexMirror;
+      }
+      return mirror;
     },
 
     /**

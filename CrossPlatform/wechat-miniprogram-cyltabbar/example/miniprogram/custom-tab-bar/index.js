@@ -120,20 +120,16 @@ Component({
      * [CN] 选中页面为当前页面的 Tab。
      */
     cyl_syncWithRoute(route) {
-      const configuration = this.data.configuration;
-      const items = (configuration.CYLTabBarControllerTabBarItemsAttributes || [])
-        .concat(configuration.CYLTabBarControllerPlusButton ? [configuration.CYLTabBarControllerPlusButton] : []);
-      const item = items.find((attributes) => cylPagePath(attributes.CYLTabBarItemPageIdentifier
-        || attributes.CYLTabBarItemIdentifier) === route);
-      if (item) {
-        this.setData({ selectedIdentifier: item.CYLTabBarItemIdentifier }, () => {
-          // [EN] Each tab page has its own tab bar, so the page that appears plays the selected Lottie icon.
-          // [CN] 每个 Tab 页面都有自己的 TabBar，因此由出现的页面播放选中 Tab 的 Lottie 图标。
-          const tabBar = this.selectComponent('#cyl-tab-bar');
-          if (tabBar) {
-            tabBar.cyl_playLottie(item.CYLTabBarItemIdentifier);
-          }
-        });
+      // [EN] The route is converted to the tab's position inside the bar (as iOS selects by index), not matched by
+      //      identifier or title. Each tab page has its own tab bar, so the page that appears also plays the selected
+      //      Lottie icon (cyl_selectPage does both).
+      // [CN] 路由被转换为 Tab 在 TabBar 中的位置（与 iOS 按 index 选中一致），而不是按标识或标题匹配。每个 Tab 页面都有自己的
+      //      TabBar，因此出现的页面同时播放选中 Tab 的 Lottie 图标（cyl_selectPage 两件事都做）。
+      const tabBar = this.selectComponent('#cyl-tab-bar');
+      const prefix = 'pages/';
+      const suffix = '/index';
+      if (tabBar && route.startsWith(prefix) && route.endsWith(suffix)) {
+        tabBar.cyl_selectPage(route.slice(prefix.length, route.length - suffix.length));
       }
     },
 
