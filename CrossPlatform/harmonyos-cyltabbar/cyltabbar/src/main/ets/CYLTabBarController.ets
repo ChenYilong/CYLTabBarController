@@ -509,8 +509,8 @@ export struct CYLTabBarController {
     CYLAnimatedItemLottie.register();
     CYLAnimatedItemSVGA.register();
     ['Rive'].forEach((type: string) => CYLAnimatedItemEngines.register(type));
-    // [EN] Debug builds installed with the x86_64 debug engine kit: Rive also plays on the x86_64 emulator.
-    // [CN] 安装了 x86_64 调试引擎包的 debug 构建：Rive 也能在 x86_64 模拟器上播放。
+    // [EN] A HAP installed with the x86_64 debug engine kit: Rive also plays on the x86_64 emulator.
+    // [CN] 安装了 x86_64 调试引擎包的 HAP：Rive 也能在 x86_64 模拟器上播放。
     CYLAnimatedItemEngines.loadX86_64DebugEngines(this.getUIContext().getHostContext());
     this.loaded = [this.selectedIndex];
     this.cylGIFPlayback.loops = this.tabBarItemAnimationLoops;
