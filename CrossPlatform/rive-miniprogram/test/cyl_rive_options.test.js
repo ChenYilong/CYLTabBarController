@@ -59,3 +59,31 @@ test('the shared rules: "?" before "#", undecodable text kept, an http query sta
   assert.deepEqual(cylRiveRoute('https://x.cn/a.riv?token=1#artboard=A'), { path: 'https://x.cn/a.riv?token=1', options: { artboard: 'A' } })
   assert.deepEqual(cylRiveRoute('a.riv#input=&artboard=B&=x'), { path: 'a.riv', options: { artboard: 'B' } })
 })
+
+/*
+ * [EN] Every `#` option of the shared vectors is accounted for: the ones cyl-rive reads arrive in `cylRiveOptions` (also with
+ *      the component's other properties empty) with the vector's decoded value, and the rest belong to the item, not to cyl-rive
+ *      (`tint` is applied by cyl-animated-item / the `tint` property), so no vector option is lost or invented.
+ * [CN] 共享向量中的每个 `#` 选项都有归属：cyl-rive 读取的选项会以向量解码后的值出现在 `cylRiveOptions` 中（组件其他属性为空时也一样），
+ *      其余属于条目而不属于 cyl-rive（`tint` 由 cyl-animated-item / `tint` 属性处理），因此没有选项丢失或凭空出现。
+ */
+const CYL_ITEM_OPTION_NAMES = ['tint']
+
+fixture.cases.filter((vector) => 'file' in vector).forEach((vector) => {
+  test(`full option set of shared vector: ${vector.input.trim().slice(0, 60)}`, () => {
+    const names = Object.keys(vector.options)
+    names.forEach((name) => assert.ok(CYL_RIVE_OPTION_NAMES.includes(name) || CYL_ITEM_OPTION_NAMES.includes(name), `unowned option ${name}`))
+    const { path: file, options } = cylRiveOptions(vector.input, { artboard: '', stateMachine: '', input: '' })
+    assert.equal(file, vector.file)
+    names.filter((name) => CYL_RIVE_OPTION_NAMES.includes(name)).forEach((name) => assert.equal(options[name], vector.options[name]))
+    assert.deepEqual(Object.keys(options).filter((name) => name !== 'duration').sort(), names.filter((name) => CYL_RIVE_OPTION_NAMES.includes(name)).sort())
+    assert.equal(options.duration, 1, 'the default duration')
+  })
+})
+
+test('the shared vectors exercise artboard, stateMachine, input and tint at least once, with percent decoding and a "#" inside a value', () => {
+  const seen = new Set(fixture.cases.flatMap((vector) => Object.keys(vector.options)))
+  ;['artboard', 'stateMachine', 'input', 'tint'].forEach((name) => assert.ok(seen.has(name), name))
+  assert.ok(fixture.cases.some((vector) => Object.values(vector.options).includes('State Machine 1')), 'percent-decoded value')
+  assert.ok(fixture.cases.some((vector) => vector.options.tint === '#FF0000'), 'a "#" after "="')
+})
