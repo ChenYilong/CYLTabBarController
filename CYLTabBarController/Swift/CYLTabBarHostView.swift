@@ -6,7 +6,7 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
-import CYLDeallocBlockExecutor
+internal import CYLDeallocBlockExecutor
 import ObjectiveC
 import UIKit
 
