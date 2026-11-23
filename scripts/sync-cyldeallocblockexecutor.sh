@@ -63,24 +63,13 @@ EOF
 generate() {
   # $1: output root
   local out="$1"
-  mkdir -p "$out/$harmony_dest/src/main/ets" "$out/$mini_dest"
+  mkdir -p "$out/$harmony_dest" "$out/$mini_dest"
   git -C "$library" archive "$full" HarmonyOS MiniProgram LICENSE | tar -x -C "$work/x"
-  # [EN] HarmonyOS: the registry and controller as plain TypeScript, imported without the `.ts` extension (ArkTS resolves by name).
-  # [CN] 鸿蒙：注册表与控制器为纯 TypeScript，导入时不带 `.ts` 扩展名（ArkTS 按名称解析）。
-  for file in types log center registry controller; do
-    sed "s#from '\./\([a-z]*\)\.ts'#from './\1'#" "$work/x/HarmonyOS/src/$file.ts" > "$out/$harmony_dest/src/main/ets/$file.ts"
-  done
-  cp "$work/x/HarmonyOS/cyldeallocblockexecutor/oh-package.json5" "$work/x/HarmonyOS/cyldeallocblockexecutor/build-profile.json5" \
-     "$work/x/HarmonyOS/cyldeallocblockexecutor/hvigorfile.ts" "$work/x/LICENSE" "$out/$harmony_dest/"
-  cp "$work/x/HarmonyOS/cyldeallocblockexecutor/src/main/module.json5" "$out/$harmony_dest/src/main/"
-  cat > "$out/$harmony_dest/Index.ets" <<'EOT'
-export { LifecycleController } from './src/main/ets/controller';
-export { LifecycleRegistry } from './src/main/ets/registry';
-export type { AddOptions, CustomOptions, DeallocOptions } from './src/main/ets/registry';
-export { LifecycleCenter } from './src/main/ets/center';
-export { LifecycleLog, AnimationEvents, BadgeEvents } from './src/main/ets/log';
-export { LifecycleEvent, LifecycleTiming } from './src/main/ets/types';
-EOT
+  # [EN] HarmonyOS: the library's HAR module as it is (sources without `.ts` extensions, `Index.ets`, the ArkUI window bridge, hvigor files);
+  #      only the LICENSE of the library's root is added. [CN] 鸿蒙：直接使用库的 HAR 模块（导入不带 `.ts` 扩展名、`Index.ets`、ArkUI 窗口桥接、
+  #      hvigor 文件）；只补充库根目录的 LICENSE。
+  cp -R "$work/x/HarmonyOS/cyldeallocblockexecutor/." "$out/$harmony_dest/"
+  cp "$work/x/LICENSE" "$out/$harmony_dest/"
   # [EN] Mini Program: CommonJS files of the library, no build step. [CN] 小程序：库中的 CommonJS 文件，无需构建。
   cp "$work/x/MiniProgram/index.js" "$work/x/MiniProgram/registry.js" "$work/x/MiniProgram/center.js" "$work/x/MiniProgram/log.js" "$work/x/MiniProgram/types.js" "$work/x/MiniProgram/controller.js" \
      "$work/x/MiniProgram/package.json" "$work/x/LICENSE" "$out/$mini_dest/"
