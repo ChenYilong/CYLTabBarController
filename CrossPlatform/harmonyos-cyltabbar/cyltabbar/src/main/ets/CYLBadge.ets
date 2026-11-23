@@ -177,7 +177,11 @@ export class CYLBadge {
     this.value = value;
     this.animationType = animationType ?? this.animationType;
     this.generation += 1;
-    this.eventPoster?.('cyl.badge.didShow', { value: value, animationType: this.animationType });
+    // [EN] ArkTS: a typed record, not an object literal. [CN] ArkTS：使用带类型的 Record，而不是对象字面量。
+    const info: Record<string, Object> = {};
+    info['value'] = value;
+    info['animationType'] = this.animationType;
+    this.eventPoster?.('cyl.badge.didShow', info);
   }
 
   /** [EN] -cyl_showNewBadge: "new" (uppercase: "NEW"). [CN] 显示 "new"。 */
