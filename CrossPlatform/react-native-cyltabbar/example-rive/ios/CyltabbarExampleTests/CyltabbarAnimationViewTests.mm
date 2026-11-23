@@ -272,6 +272,45 @@ using namespace facebook::react;
   XCTAssertNotNil(player.onEnded, @"the item owns the player's end callback");
 }
 
+/// [EN] Writes a small PNG and returns its path, for the `image` prop (a path resolves like `source`). [CN] 写出一个小 PNG 并返回路径，用于 `image` 属性（路径的解析方式与 `source` 相同）。
+- (NSString *)writeStillImage {
+  UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(8, 8)];
+  UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+    [[UIColor redColor] setFill];
+    [context fillRect:CGRectMake(0, 0, 8, 8)];
+  }];
+  NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"cyl-still-%@.png", NSUUID.UUID.UUIDString]];
+  [UIImagePNGRepresentation(image) writeToFile:path atomically:YES];
+  [self addTeardownBlock:^{ [NSFileManager.defaultManager removeItemAtPath:path error:nil]; }];
+  return path;
+}
+
+- (void)testShowsImageWhenAnimationEndsNeedsAnImage {
+  CyltabbarAnimationViewProps defaults;
+  XCTAssertTrue(defaults.image.empty(), @"the codegen default of image is empty");
+  [self update:^(CyltabbarAnimationViewProps &props) { props.showsImageWhenAnimationEnds = true; }];
+  XCTAssertFalse([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue], @"no image: the animation is not hidden, the last frame stays");
+  NSString *path = [self writeStillImage];
+  [self update:^(CyltabbarAnimationViewProps &props) { props.image = path.UTF8String; }];
+  XCTAssertNotNil([_item valueForKey:@"image"], @"the image prop resolved like source: an absolute path");
+  XCTAssertTrue([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue]);
+  [self update:^(CyltabbarAnimationViewProps &props) { props.image = ""; }];
+  XCTAssertNil([_item valueForKey:@"image"]);
+  XCTAssertFalse([[_item valueForKey:@"showsImageWhenAnimationEnds"] boolValue], @"the image went away, so did the replacement");
+}
+
+- (void)testTheEndShowsTheImageOnlyWhenOneExists {
+  [self update:^(CyltabbarAnimationViewProps &props) { props.showsImageWhenAnimationEnds = true; props.playing = true; }];
+  [self loadSource];
+  _factory.player.onEnded();
+  XCTAssertFalse([[_item valueForKey:@"isShowingImageAfterAnimationEnd"] boolValue], @"no image: nothing replaces the last frame");
+  NSString *path = [self writeStillImage];
+  [self update:^(CyltabbarAnimationViewProps &props) { props.image = path.UTF8String; props.playing = false; }];
+  [self update:^(CyltabbarAnimationViewProps &props) { props.playing = true; }];
+  _factory.player.onEnded();
+  XCTAssertTrue([[_item valueForKey:@"isShowingImageAfterAnimationEnd"] boolValue], @"an image exists: it replaces the ended animation");
+}
+
 #pragma mark - Objective-C++ calls 从 Objective-C++ 调用
 
 // [EN] `CYLAnimatedItemResourceBundle()` is defined in Swift (`@_cdecl`) and declared `noexcept` for C++ in

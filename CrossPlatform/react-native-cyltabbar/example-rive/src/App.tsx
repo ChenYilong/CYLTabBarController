@@ -312,6 +312,8 @@ function EngineApiRow() {
   // Host-driven mode: with drivesAnimationPlayback false the item plays only on play() / restart(), not on selection.
   const [drives, setDrives] = useState(true);
   const [ended, setEnded] = useState(0);
+  // The still image after a play-once pass (showsImageWhenAnimationEnds with `image`); off keeps the last frame.
+  const [showsImage, setShowsImage] = useState(false);
   const speedText = String(speed);
   return (
     <View style={styles.engineRow}>
@@ -323,6 +325,8 @@ function EngineApiRow() {
         animationSpeed={speed}
         animationLoops={loops}
         drivesAnimationPlayback={drives}
+        showsImageWhenAnimationEnds={showsImage}
+        image="cyl_still_check.png"
         onAnimationEnd={() => setEnded((value) => value + 1)}
         iconSize={48}
         style={styles.svgaIcon}
@@ -349,6 +353,7 @@ function EngineApiRow() {
       </View>
       <Switch value={loops} onValueChange={setLoops} accessibilityLabel={chinese ? '循环播放' : 'Loop'} />
       <Switch value={drives} onValueChange={setDrives} accessibilityLabel={chinese ? '视图自动播放' : 'Drives playback'} />
+      <Switch value={showsImage} onValueChange={setShowsImage} accessibilityLabel={chinese ? '结束后显示图片' : 'Show image when ended'} />
       <Text style={styles.rowTitle} accessibilityLabel={chinese ? `结束回调 ${ended} 次` : `End callback ${ended} times`}>{`end ×${ended}`}</Text>
     </View>
   );

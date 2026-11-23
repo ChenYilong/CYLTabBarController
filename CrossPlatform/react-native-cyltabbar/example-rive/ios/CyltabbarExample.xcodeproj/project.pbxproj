@@ -25,6 +25,7 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8A09BEC5C2CB4489A12FE5E5 /* shapes.riv in Resources */ = {isa = PBXBuildFile; fileRef = 824A37227822460EBBB05705 /* shapes.riv */; };
 		8C9A21760F884E3993212C98 /* icons.riv in Resources */ = {isa = PBXBuildFile; fileRef = 633C5047B761428292C0A127 /* icons.riv */; };
+		5E1C0DE5B1D2E3F4A5B6C7D8 /* cyl_still_check.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E1C0DE6B1D2E3F4A5B6C7D8 /* cyl_still_check.png */; };
 		8E7F05B39AB54ED7B9D4076A /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6E9CF0354B5840858A0AE92F /* Inter-Regular.ttf */; };
 		92AE3D56AA595020E5110757 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		9A58ADCBE9DBA7A89A198B1F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CE2E1C64ED8C06A5D4454B /* Foundation.framework */; };
@@ -67,6 +68,7 @@
 		5DCACB8F33CDC322A6C60F78 /* libPods-CyltabbarExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CyltabbarExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		60CE2E1C64ED8C06A5D4454B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		633C5047B761428292C0A127 /* icons.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = icons.riv; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets/icons.riv"; sourceTree = SOURCE_ROOT; };
+		5E1C0DE6B1D2E3F4A5B6C7D8 /* cyl_still_check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cyl_still_check.png; path = cyl_still_check.png; sourceTree = SOURCE_ROOT; };
 		6E9CF0354B5840858A0AE92F /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Regular.ttf"; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/Fonts/Inter-Regular.ttf"; sourceTree = SOURCE_ROOT; };
 		735D4DAE0416298B1623E20E /* tab_home.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_home.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_home.svga"; sourceTree = SOURCE_ROOT; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = CyltabbarExample/AppDelegate.swift; sourceTree = "<group>"; };
@@ -156,6 +158,7 @@
 				824A37227822460EBBB05705 /* shapes.riv */,
 				870A1328DB234BEDA6A64FB0 /* menu_button.riv */,
 				633C5047B761428292C0A127 /* icons.riv */,
+				5E1C0DE6B1D2E3F4A5B6C7D8 /* cyl_still_check.png */,
 				5C9E3E71719C2AD9B9B4652F /* tab_chat.svga */,
 				391D90876FBD0B06DC34F764 /* tab_search.svga */,
 				19E028627758C15D4D6F3E1C /* tab_activity.svga */,
@@ -300,6 +303,7 @@
 				8A09BEC5C2CB4489A12FE5E5 /* shapes.riv in Resources */,
 				0AC45C5AA8BB4D54BB7CD92E /* menu_button.riv in Resources */,
 				8C9A21760F884E3993212C98 /* icons.riv in Resources */,
+				5E1C0DE5B1D2E3F4A5B6C7D8 /* cyl_still_check.png in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				92AE3D56AA595020E5110757 /* PrivacyInfo.xcprivacy in Resources */,
