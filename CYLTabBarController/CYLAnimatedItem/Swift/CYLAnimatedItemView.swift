@@ -620,6 +620,23 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      */
     public var onAnimationEnd: (() -> Void)?
     /**
+     [EN] Whether a play-once animation (`animationLoops` off) is replaced by the still image when it ends, the name and meaning of
+          HarmonyOS's and Android's `showsImageWhenAnimationEnds`: the animation view is hidden and `imageView` shows
+          `selectedImage` / `image` (else the placeholder). false by default, so the last frame stays. The next
+          `playAnimation()`, `restartAnimation()`, `stopAnimation()` or `showAnimationLastFrame()` shows the animation again.
+          For an animation whose last frame is empty (a success check that fades out). Needs an engine that can tell the end
+          (`CYLTabBarItemAnimationPlayer.onEnded`); `onAnimationEnd` is called after the image is shown.
+     [CN] 只播放一次（`animationLoops` 关闭）的动画结束时是否换成静态图片，名称与含义同鸿蒙与 Android 的 `showsImageWhenAnimationEnds`：
+          隐藏动画视图，`imageView` 显示 `selectedImage` / `image`（没有时显示占位图）。默认为 false，保留最后一帧。下一次 `playAnimation()`、
+          `restartAnimation()`、`stopAnimation()` 或 `showAnimationLastFrame()` 会重新显示动画。用于最后一帧为空的动画（逐渐消失的成功对勾）。
+          需要能判断结束的引擎（`CYLTabBarItemAnimationPlayer.onEnded`）；显示图片之后才调用 `onAnimationEnd`。
+     */
+    public var showsImageWhenAnimationEnds = false {
+        didSet { if !showsImageWhenAnimationEnds { showAnimationAgain() } }
+    }
+    /** [EN] Whether the still image replaces the ended animation now (`showsImageWhenAnimationEnds`). [CN] 静态图片当前是否替换了已结束的动画。 */
+    public private(set) var isShowingImageAfterAnimationEnd = false
+    /**
      [EN] Called on the main queue when the animation of `animationURL` is in place (a local file once parsed, a download once
           it arrived), the name and meaning of HarmonyOS's `onAnimationLoaded`. React Native and Flutter forward it as `onAnimationLoaded`.
      [CN] `animationURL` 的动画就绪时在主队列调用（本地文件解析完成，或下载完成），名称与含义同鸿蒙的 `onAnimationLoaded`。
@@ -789,7 +806,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     /// [CN] 动画是否已显示：已创建且不在等待其文件（下载）。在此之前显示传入的静态图片，没有时显示占位图。
     private func animationShows() -> Bool {
         #if CYL_ANIMATION_ENGINE_AVAILABLE
-        guard let view = animationView else { return false }
+        guard let view = animationView, !isShowingImageAfterAnimationEnd else { return false }
         return !CYLTabBarItemAnimationIsLoading(view)
         #else
         return false
@@ -829,7 +846,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         }
         // [EN] `isIconHidden`: another view is shown in the icon's place. [CN] `isIconHidden`：另一个视图显示在图标的位置。
         imageView.isHidden = isIconHidden || animationShows()
-        if isIconHidden { animationView?.isHidden = true }
+        animationView?.isHidden = isIconHidden || isShowingImageAfterAnimationEnd
         // [EN] A new animation view or icon takes the current icon tint. [CN] 新的动画视图或图标使用当前的图标着色。
         if let color = currentItemStateAppearance?.iconColor ?? lastIconTintColor {
             applyIconTintColor(color)
@@ -1080,6 +1097,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         storedAnimationView?.removeFromSuperview()
         storedAnimationView = nil
         playing = false
+        isShowingImageAfterAnimationEnd = false
         if let url = animationURL, !cylAnimatedItemLocalFileIsMissing(url) {
             let size = (iconSize.width > 0 && iconSize.height > 0)
                 ? iconSize : CGSize(width: cylAnimatedItemDefaultAnimationSide, height: cylAnimatedItemDefaultAnimationSide)
@@ -1129,6 +1147,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     open func playAnimation() {
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         guard let player = animationPlayer else { playAnimatedImage(); return }
+        showAnimationAgain()
         playing = true
         applyPlayerSettings()
         player.play()
@@ -1202,6 +1221,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         let player = animationPlayer
         let wasPlaying = playing
         playing = false
+        showAnimationAgain()
         stopLoopTimer()
         player?.stop()
         if drivesAnimationPlayback { setPlayerValue(animationRestingProgress, for: "progress") }
@@ -1224,9 +1244,18 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     open func showAnimationLastFrame() {
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         playing = false
+        showAnimationAgain()
         stopLoopTimer()
         animationPlayer?.showLastFrame()
         #endif
+    }
+
+    /// [EN] Shows the animation again in place of the still image shown after its end. [CN] 重新显示动画，替换结束后显示的静态图片。
+    private func showAnimationAgain() {
+        guard isShowingImageAfterAnimationEnd else { return }
+        isShowingImageAfterAnimationEnd = false
+        updateIcon()
+        setNeedsLayout()
     }
 
     private func stopLoopTimer() {
@@ -1264,6 +1293,11 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         if drivesAnimationPlayback, animationLoops { return }
         playing = false
         stopLoopTimer()
+        if showsImageWhenAnimationEnds, animationView != nil {
+            isShowingImageAfterAnimationEnd = true
+            updateIcon()
+            setNeedsLayout()
+        }
         onAnimationEnd?()
     }
 

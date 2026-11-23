@@ -359,4 +359,40 @@ final class CYLAnimationEndCallbackTests: XCTestCase {
         view.finishPass()
         XCTAssertEqual(ends, 2, "a host that drives playback still gets the end")
     }
+
+    func testTheStillImageReplacesAnEndedAnimationOnlyWhenAsked() throws {
+        let item = CYLAnimatedItemView(frame: CGRect(x: 0, y: 0, width: 200, height: 44))
+        item.animationSource = makeFactory()
+        item.image = UIImage(systemName: "star")
+        item.animationURL = fileURL
+        let view = try XCTUnwrap(item.animationView as? CYLEndingPlayableView)
+        XCTAssertFalse(item.showsImageWhenAnimationEnds, "off by default, like HarmonyOS and Android")
+        item.playAnimation()
+        view.finishPass()
+        XCTAssertFalse(item.isShowingImageAfterAnimationEnd, "off: the last frame stays")
+        XCTAssertFalse(view.isHidden)
+        item.showsImageWhenAnimationEnds = true
+        item.playAnimation()
+        var shownOnEnd: Bool?
+        item.onAnimationEnd = { shownOnEnd = item.isShowingImageAfterAnimationEnd }
+        view.finishPass()
+        XCTAssertTrue(item.isShowingImageAfterAnimationEnd, "the end swaps the animation for the still image")
+        XCTAssertEqual(shownOnEnd, true, "onAnimationEnd comes after the image is shown")
+        XCTAssertTrue(view.isHidden)
+        XCTAssertFalse(item.imageView.isHidden)
+        XCTAssertNotNil(item.imageView.image)
+        item.restartAnimation()
+        XCTAssertFalse(item.isShowingImageAfterAnimationEnd, "the next play shows the animation again")
+        XCTAssertFalse(view.isHidden)
+        item.animationLoops = true
+        item.playAnimation()
+        view.finishPass()
+        XCTAssertFalse(item.isShowingImageAfterAnimationEnd, "a looping animation has no end")
+        item.animationLoops = false
+        item.playAnimation()
+        view.finishPass()
+        item.showsImageWhenAnimationEnds = false
+        XCTAssertFalse(item.isShowingImageAfterAnimationEnd, "turning it off shows the animation again")
+        XCTAssertFalse(view.isHidden)
+    }
 }
