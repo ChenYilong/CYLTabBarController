@@ -731,7 +731,20 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         NotificationCenter.default.removeObserver(self)
     }
 
+    /**
+     [EN] Asks CYLTabBarController's event bridge (when that module is linked) to install itself, once, so an item used on its
+          own (a stack view, a table placeholder, React Native, Flutter) also posts `cyl.animation.*` as lifecycle events and can
+          be paused. Found by name: this pod never depends on CYLTabBarController; without it nothing happens.
+     [CN] 请求 CYLTabBarController 的事件桥接（已链接该模块时）安装自己，只执行一次，使单独使用的控件（stack view、表格占位、
+          React Native、Flutter）同样把 `cyl.animation.*` 作为生命周期事件发出并可被暂停。按名称查找：本 pod 从不依赖
+          CYLTabBarController；没有它时什么都不发生。
+     */
+    private static let installEventBridge: Void = {
+        _ = (NSClassFromString("CYLAnimationEventBridgeInstaller") as AnyObject?)?.perform(NSSelectorFromString("install"))
+    }()
+
     private func animatedItemSetUp() {
+        _ = Self.installEventBridge
         imageView.contentMode = .scaleAspectFit
         imageView.isAccessibilityElement = false
         imageView.accessibilityElementsHidden = true
