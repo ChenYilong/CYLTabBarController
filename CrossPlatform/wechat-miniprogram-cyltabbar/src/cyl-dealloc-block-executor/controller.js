@@ -13,6 +13,9 @@ const { LifecycleRegistry } = require('./registry.js');
  *   themeChanged(theme) from wx.onThemeChange;
  * - didReceiveMemoryWarning: memoryWarning() from wx.onMemoryWarning;
  * - teardown blocks: onUnload.
+ * - design v5: onLoad / onUnload fire the window moves; onShow / onHide and screenVisible(visible) (from an
+ *   IntersectionObserver) fire didEnterScreen / didLeaveScreen on transitions; onPageScroll(event) fires the scroll events
+ *   (no drag-end event exists: the first scroll event begins, a quiet period of scrollEndDelay ms ends);
  * - viewWillLayoutSubviews, viewDidLayoutSubviews, viewSafeAreaInsetsDidChange,
  *   viewLayoutMarginsDidChange: no source (the framework has no layout event
  *   and no insets event; safe area is read once with wx.getWindowInfo).
@@ -26,6 +29,11 @@ class LifecycleController {
     this.ready = false;
     this.detached = false;
     this.lastTheme = undefined;
+    this.onScreen = false;
+    this.scrolling = false;
+    this.scrollTimer = undefined;
+    /** Milliseconds without a scroll event that end scrolling. */
+    this.scrollEndDelay = 150;
   }
 
   /** True once `onUnload()` ran: the teardown blocks are done and new ones never run. */
@@ -41,6 +49,8 @@ class LifecycleController {
   onLoad() {
     if (this.loaded) return;
     this.loaded = true;
+    this.around('willMoveToWindow', { window: this.owner });
+    this.around('didMoveToWindow', { window: this.owner });
     this.around('willMoveToParent', { parentAttached: true });
     this.around('viewDidLoad');
     this.around('didMoveToParent', { parentAttached: true });
@@ -51,13 +61,19 @@ class LifecycleController {
     this.shown = true;
     this.around('viewWillAppear', { animated: false });
     this.around('viewIsAppearing');
-    if (this.ready) this.around('viewDidAppear', { animated: false });
+    if (this.ready) {
+      this.around('viewDidAppear', { animated: false });
+      this.screenVisible(true);
+    }
   }
 
   onReady() {
     if (this.ready || this.detached) return;
     this.ready = true;
-    if (this.shown) this.around('viewDidAppear', { animated: false });
+    if (this.shown) {
+      this.around('viewDidAppear', { animated: false });
+      this.screenVisible(true);
+    }
   }
 
   onHide() {
@@ -65,15 +81,44 @@ class LifecycleController {
     this.shown = false;
     this.around('viewWillDisappear', { animated: false });
     this.around('viewDidDisappear', { animated: false });
+    this.screenVisible(false);
   }
 
   onUnload() {
     if (this.detached) return;
     this.onHide();
     this.detached = true;
+    if (this.scrollTimer !== undefined) clearTimeout(this.scrollTimer);
+    this.around('willMoveToWindow', { window: null });
+    this.around('didMoveToWindow', { window: null });
     this.around('willMoveToParent', { parentAttached: false });
     this.around('didMoveToParent', { parentAttached: false });
     this.registry.runDealloc();
+  }
+
+  /** Fires didEnterScreen / didLeaveScreen on transitions only (also from a wx.createIntersectionObserver callback). */
+  screenVisible(visible) {
+    if (this.onScreen === visible || this.detached) return;
+    this.onScreen = visible;
+    this.around(visible ? 'didEnterScreen' : 'didLeaveScreen');
+  }
+
+  /** The page or component `onPageScroll(event)`; there is no drag-end event, so a quiet period of `scrollEndDelay` ms ends scrolling. */
+  onPageScroll(event) {
+    if (this.detached) return;
+    if (!this.scrolling) {
+      this.scrolling = true;
+      this.around('scrollWillBeginDragging', { scrollView: event });
+    }
+    if (this.scrollTimer !== undefined) clearTimeout(this.scrollTimer);
+    this.scrollTimer = setTimeout(() => this.endScrolling(event), this.scrollEndDelay);
+  }
+
+  endScrolling(event) {
+    if (!this.scrolling) return;
+    this.scrolling = false;
+    this.around('scrollDidEndDragging', { scrollView: event, willDecelerate: false });
+    this.around('scrollDidEndScrolling', { scrollView: event });
   }
 
   onResize(size) {
@@ -116,6 +161,7 @@ function withLifecycle(options) {
   wrap('onHide', (c) => c.onHide());
   wrap('onUnload', (c) => c.onUnload());
   wrap('onResize', (c, a) => c.onResize(a[0] ?? {}));
+  wrap('onPageScroll', (c, a) => c.onPageScroll(a[0] ?? {}));
   return out;
 }
 

@@ -43,6 +43,9 @@ Pod::Spec.new do |s|
   # 不包含 TabBar 代码。Core 依赖它，因此其他所有 subspec 都已包含，现有 Podfile 无需修改。
   s.subspec 'CYLBadgeView' do |badge|
     badge.dependency 'CYLTabBarController/CYLUtils'
+    # [EN] The badge posts its moments (shown, cleared, ready, animation start and stop) through CYLDeallocBlockExecutor (docs/Lifecycle-Library.md).
+    # [CN] 角标通过 CYLDeallocBlockExecutor 发出时机事件（显示、清除、就绪、动画开始与结束）。
+    badge.dependency 'CYLDeallocBlockExecutor', '~> 1.4'
     badge.source_files = 'CYLTabBarController/CYLBadgeView/**/*.{h,m,swift}'
     badge.public_header_files = 'CYLTabBarController/CYLBadgeView/**/*.h'
     # Shared by the badge sources only; tells a standalone build from one with Core (tab bar). 仅供角标源文件使用，用于区分是否包含 Core。

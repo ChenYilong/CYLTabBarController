@@ -23,7 +23,7 @@ Read the document for the feature before using its API. The public API is in the
 | Highlights of earlier versions (1.99.x: iOS 27, iPhone Duo, runtime plus button) | [Version highlights](../../../docs/Version-Highlights.md) |
 | Plus button rules | [PlusButton](../../../docs/PlusButton.md) |
 | Plus button: slot, counts; on Liquid Glass it follows its slot's center; titles are cut (longest first) only when they overflow the platter | [PlusButton-Slot](../../../docs/PlusButton-Slot.md) |
-| Lifecycle and dealloc blocks from CYLDeallocBlockExecutor (core dependency, `cyl.core.` keys) | [Lifecycle-Library](../../../docs/Lifecycle-Library.md) |
+| Lifecycle, dealloc and observable-moment blocks from CYLDeallocBlockExecutor (core dependency, `cyl.core.` keys; badge moments `cyl.badge.*`, `cyl.core.tabBarItemsReady`, window / screen / scroll events, `CYLLifecycleCenter`) | [Lifecycle-Library](../../../docs/Lifecycle-Library.md) |
 | Swift migration of the iOS core layer: plan, order, score (`scripts/swift-migration-score.py`), progress | [Swift-Migration](../../../docs/Swift-Migration.md) |
 | Swift migration phase ③: which protocols, enums and headers change together, what stays Objective-C (`objc-required`), `Package.swift` as one target | [Swift-Migration-Phase3](../../../docs/Swift-Migration-Phase3.md) |
 | Every open TODO of `docs/`, grouped by what it needs (code, simulator, device, maintainer), and the sweep's progress | [TODO-Sweep](../../../docs/TODO-Sweep.md) |
