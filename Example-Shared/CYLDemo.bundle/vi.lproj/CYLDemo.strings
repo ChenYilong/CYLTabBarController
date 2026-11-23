@@ -461,3 +461,4 @@
 "n/a on Android: an app cannot post this system event." = "n/a trên Android: ứng dụng không thể gửi sự kiện hệ thống này.";
 "Runs every automatic row, one after the other." = "Chạy lần lượt mọi hàng tự động.";
 "Tab bar %@ · page ID \"%@\"" = "Thanh tab %@ · ID trang \"%@\"";
+"Pause while scrolling" = "Pause while scrolling";

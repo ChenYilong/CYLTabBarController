@@ -461,3 +461,4 @@
 "n/a on Android: an app cannot post this system event." = "n/a na Androidu: aplikacija ne može poslati ovaj sistemski događaj.";
 "Runs every automatic row, one after the other." = "Pokreće sve automatske retke, jedan za drugim.";
 "Tab bar %@ · page ID \"%@\"" = "Traka s karticama %@ · ID stranice \"%@\"";
+"Pause while scrolling" = "Pause while scrolling";

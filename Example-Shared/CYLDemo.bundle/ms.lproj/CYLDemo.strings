@@ -461,3 +461,4 @@
 "n/a on Android: an app cannot post this system event." = "n/a pada Android: apl tidak boleh menghantar peristiwa sistem ini.";
 "Runs every automatic row, one after the other." = "Menjalankan setiap baris automatik, satu demi satu.";
 "Tab bar %@ · page ID \"%@\"" = "Bar tab %@ · ID halaman “%@”";
+"Pause while scrolling" = "Pause while scrolling";

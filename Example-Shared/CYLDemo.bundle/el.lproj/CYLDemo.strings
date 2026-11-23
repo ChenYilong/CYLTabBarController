@@ -461,3 +461,4 @@
 "n/a on Android: an app cannot post this system event." = "n/a στο Android: μια εφαρμογή δεν μπορεί να στείλει αυτό το συμβάν συστήματος.";
 "Runs every automatic row, one after the other." = "Εκτελεί όλες τις αυτόματες γραμμές, τη μία μετά την άλλη.";
 "Tab bar %@ · page ID \"%@\"" = "Γραμμή καρτελών %@ · ID σελίδας «%@»";
+"Pause while scrolling" = "Pause while scrolling";

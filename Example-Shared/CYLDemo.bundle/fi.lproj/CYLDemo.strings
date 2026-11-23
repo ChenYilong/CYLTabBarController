@@ -461,3 +461,4 @@
 "n/a on Android: an app cannot post this system event." = "n/a Androidissa: sovellus ei voi lähettää tätä järjestelmätapahtumaa.";
 "Runs every automatic row, one after the other." = "Suorittaa kaikki automaattiset rivit peräkkäin.";
 "Tab bar %@ · page ID \"%@\"" = "Välilehtipalkki %@ · sivun tunnus \"%@\"";
+"Pause while scrolling" = "Pause while scrolling";

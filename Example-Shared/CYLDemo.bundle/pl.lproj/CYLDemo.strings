@@ -461,3 +461,4 @@
 "n/a on Android: an app cannot post this system event." = "n/a na Androidzie: aplikacja nie może wysłać tego zdarzenia systemowego.";
 "Runs every automatic row, one after the other." = "Uruchamia wszystkie automatyczne wiersze, jeden po drugim.";
 "Tab bar %@ · page ID \"%@\"" = "Pasek kart %@ · ID strony „%@”";
+"Pause while scrolling" = "Pause while scrolling";
