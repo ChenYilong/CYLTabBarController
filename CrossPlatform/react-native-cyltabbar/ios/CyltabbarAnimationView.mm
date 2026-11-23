@@ -49,6 +49,7 @@ using namespace facebook::react;
 #if CYL_RN_ANIMATION_AVAILABLE
   CYLAnimatedItemView *_item;
   BOOL _hasRestartToken;
+  BOOL _selected;
   NSInteger _restartToken;
   CGFloat _iconSide;
 #endif
@@ -98,7 +99,11 @@ static NSURL *CYLRNAnimationURL(NSString *source)
   _item = [[CYLAnimatedItemView alloc] initWithFrame:self.bounds];
   // [EN] Icon only; the view the host gives is the icon's frame. [CN] 只有图标；宿主给的视图就是图标的范围。
   _item.onAnimationEnd = ^{ [weakSelf emit:@"end"]; };
-  _item.onAnimationLoaded = ^{ [weakSelf emit:@"loaded"]; };
+  _item.onAnimationLoaded = ^{
+    // [EN] A selected item that becomes ready plays, as on Android. [CN] 就绪的选中条目开始播放，与 Android 一致。
+    [weakSelf followSelection];
+    [weakSelf emit:@"loaded"];
+  };
   _item.onAnimationFailed = ^{ [weakSelf emit:@"failed"]; };
   [self addSubview:_item];
 }
@@ -128,6 +133,22 @@ static NSURL *CYLRNAnimationURL(NSString *source)
   }
 }
 
+/// [EN] The default rule of the bridge (`drivesAnimationPlayback` true): selected plays from the resting frame, unselected
+///      stops at the resting progress. `CYLAnimatedItemView` itself never plays on selection on iOS (the tab engine does).
+/// [CN] 桥接的默认规则（`drivesAnimationPlayback` 为 true）：选中从静止帧开始播放，未选中停在静止进度。iOS 上 `CYLAnimatedItemView` 自身
+///      不会因选中而播放（由 Tab 引擎播放）。
+- (void)followSelection
+{
+  if (!_item.drivesAnimationPlayback || _playing) {
+    return;
+  }
+  if (_selected) {
+    [_item playAnimation];
+  } else {
+    [_item stopAnimation];
+  }
+}
+
 /// [EN] The player of the current animation, nil until it is in place. [CN] 当前动画的播放器，就绪前为 nil。
 - (id<CYLTabBarItemAnimationPlayer>)player
 {
@@ -146,6 +167,8 @@ static NSURL *CYLRNAnimationURL(NSString *source)
   [self fitIcon];
   [_item applyIconTintColor:RCTUIColorFromSharedColor(newProps.tintColor)];
   _item.selected = newProps.selected;
+  const BOOL selectionChanged = newProps.selected != _selected;
+  _selected = newProps.selected;
   if (_hasRestartToken && newProps.animationRestartToken != _restartToken) {
     [_item restartAnimation];
   }
@@ -155,6 +178,9 @@ static NSURL *CYLRNAnimationURL(NSString *source)
   if (![source isEqualToString:_source ?: @""]) {
     _source = source;
     _item.animationURL = source.length > 0 ? CYLRNAnimationURL(source) : nil;
+  }
+  if (selectionChanged) {
+    [self followSelection];
   }
   if (newProps.playing != _playing) {
     _playing = newProps.playing;
@@ -215,6 +241,7 @@ static NSURL *CYLRNAnimationURL(NSString *source)
 #if CYL_RN_ANIMATION_AVAILABLE
   _item.animationURL = nil;
   _hasRestartToken = NO;
+  _selected = NO;
 #endif
   _source = nil;
   _playing = NO;
