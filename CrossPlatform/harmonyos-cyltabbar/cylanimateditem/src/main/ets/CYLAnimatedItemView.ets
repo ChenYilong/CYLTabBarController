@@ -829,7 +829,11 @@ export struct CYLAnimatedItemView {
    * [CN] 向本控件的观察者发出动画事件（核心库的 AnimationEvents）。
    */
   cylPostAnimationEvent(name: string): void {
-    this.cylLifecycle?.registry.postLifecycleEvent(name, { url: this.animationUrl, selected: this.isItemSelected });
+    // [EN] ArkTS: a typed record, not an object literal. [CN] ArkTS：使用带类型的 Record，而不是对象字面量。
+    const info: Record<string, Object> = {};
+    info['url'] = this.animationUrl;
+    info['selected'] = this.isItemSelected;
+    this.cylLifecycle?.registry.postLifecycleEvent(name, info);
   }
 
   /** [EN] Scrolling pauses the engine: posts didPause. [CN] 滚动暂停动画：发出 didPause。 */
