@@ -127,6 +127,15 @@ import UIKit
           用户滚动期间使用（docs/Lifecycle-Library.md）。
      */
     open func pauseAnimation() {
+        // [EN] A GIF icon (animated image): the frames stop and the icon shows its still frame; resume plays them again.
+        // [CN] GIF 图标（动图）：帧动画停止并显示静止帧；恢复时重新播放。
+        if imageView.isAnimating, !pausedByScroll {
+            pausedByScroll = true
+            pausedAnimatedImage = true
+            imageView.stopAnimating()
+            postAnimationEvent("cyl.animation.didPause")
+            return
+        }
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         guard playing, !pausedByScroll, let player = animationPlayer else { return }
         pausedByScroll = true
@@ -139,6 +148,13 @@ import UIKit
 
     /** [EN] Continues after `pauseAnimation()` and posts `cyl.animation.didResume`. [CN] 在 `pauseAnimation()` 之后继续播放并发出 `cyl.animation.didResume`。 */
     open func resumeAnimation() {
+        if pausedAnimatedImage, pausedByScroll {
+            pausedByScroll = false
+            pausedAnimatedImage = false
+            imageView.startAnimating()
+            postAnimationEvent("cyl.animation.didResume")
+            return
+        }
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         guard pausedByScroll, let player = animationPlayer else { return }
         pausedByScroll = false
@@ -716,6 +732,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         imageView.animationDuration = animated.duration
         imageView.animationRepeatCount = animationLoops ? 0 : 1
         imageView.startAnimating()
+        postAnimationEvent("cyl.animation.didStart")
         return true
     }
 
@@ -725,12 +742,17 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     @objc(stopAnimatedImage)
     open func stopAnimatedImage() {
         guard imageView.isAnimating || imageView.animationImages != nil else { return }
+        let wasAnimating = imageView.isAnimating || pausedAnimatedImage
         imageView.stopAnimating()
         imageView.animationImages = nil
+        pausedAnimatedImage = false
+        pausedByScroll = false
         updateIcon()
+        if wasAnimating { postAnimationEvent("cyl.animation.didStop") }
     }
     private var playing = false
     private var pausedByScroll = false
+    private var pausedAnimatedImage = false
     private var speedBeforePause: CGFloat = 1
     /// [EN] The icon tint applied last (`applyIconTintColor(_:)`), given again to a new animation view. [CN] 最近应用的图标着色，再次交给新的动画视图。
     private var lastIconTintColor: UIColor?

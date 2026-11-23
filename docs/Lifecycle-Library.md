@@ -36,6 +36,7 @@
 | [Step 13: HarmonyOS wiring (static) / 第 13 步：HarmonyOS 接线（静态）](#step-13-harmonyos-wiring-static--第-13-步harmonyos-接线静态) | [Step 13: HarmonyOS wiring (static) / 第 13 步：HarmonyOS 接线（静态）](#step-13-harmonyos-wiring-static--第-13-步harmonyos-接线静态) |
 | [Step 14: one library commit everywhere / 第 14 步：所有位置固定同一个库 commit](#step-14-one-library-commit-everywhere--第-14-步所有位置固定同一个库-commit) | [Step 14: one library commit everywhere / 第 14 步：所有位置固定同一个库 commit](#step-14-one-library-commit-everywhere--第-14-步所有位置固定同一个库-commit) |
 | [Step 15: advisor re-score (2026-11-23) / 第 15 步：advisor 重新评分](#step-15-advisor-re-score-2026-11-23--第-15-步advisor-重新评分) | [Step 15: advisor re-score (2026-11-23) / 第 15 步：advisor 重新评分](#step-15-advisor-re-score-2026-11-23--第-15-步advisor-重新评分) |
+| [Step 16: closing the re-score gaps (2026-11-23) / 第 16 步：补齐重新评分的缺口](#step-16-closing-the-re-score-gaps-2026-11-23--第-16-步补齐重新评分的缺口) | [Step 16: closing the re-score gaps (2026-11-23) / 第 16 步：补齐重新评分的缺口](#step-16-closing-the-re-score-gaps-2026-11-23--第-16-步补齐重新评分的缺口) |
 
 <!-- navigation:end -->
 
@@ -170,3 +171,16 @@ TODO（缺失项 / missing points）:
 - [ ] Android: pause support for Rive / GIF / SVGA players; demo calling `observeScrolling`; run on a device. Android：Rive / GIF / SVGA 播放器的暂停；示例调用 `observeScrolling`；真机运行。
 - [ ] Mini Program: route `onPageScroll` of the example pages to the controller; run in WeChat DevTools. 小程序：示例页面把 `onPageScroll` 交给控制器；在微信开发者工具中运行。
 - [ ] Pins: move all pins and vendored copies to library `273a577` or later once the library CI is green; merge library PR #12 (merge commit). 固定：库 CI 通过后，把所有固定与内置副本更新到库 `273a577` 或更新的 commit；合并库 PR #12（merge commit）。
+
+## Step 16: closing the re-score gaps (2026-11-23) / 第 16 步：补齐重新评分的缺口
+
+- [EN] Done after the re-score, with Flutter 3.50.1 installed here (`flutter analyze` and `flutter test` run for the library package and for `flutter_cyltabbar`, 42 and 7 tests pass), `npm install` for React Native (`tsc` clean for `react-native-cyltabbar` and the library's `ReactNative/`, `jest` 1 / 1) and Gradle (`cylanimateditem` 102 / 102, `CYLScrollReportingTest`, `CYLBadgeEventsTest`, `:demokit:compileDebugKotlin`):
+  - **Native pause path for React Native and Flutter:** `CYLTabBarHostView.animationsPaused` (iOS, Android) pauses / resumes every playing tab icon; React Native prop `animationsPaused`, Flutter parameter `animationsPaused`; both examples set it from their demo list's scroll events. Android: `CYLAnimatedItemView.pauseAllAnimations()` / `resumeAllAnimations()`; iOS: `CYLAnimationEventBridge.setAnimationsPaused(_:)`.
+  - **Scroll sources wired in the demos:** Android `CYLScrollReporting.listViewScrollStateChanged` (the demo `ListView`; tested), HarmonyOS `cyl_reportScrollStarted()` / `cyl_reportScrollStopped()` / `cyl_pausesAnimationsWhileUserScrolls(true)` (static), Mini Program `cylPageScrolled` plus `cylPausesAnimationsWhileUserScrolls(true)` (checked in Node with the package paths; DevTools not run).
+  - **Players:** Android GIF pauses and resumes (`cyl_pauseAnimationView()` / `cyl_resumeAnimationView()`, optional on every playable view; tested); iOS GIF icons (animated images) post `didStart` / `didStop` and pause / resume (static).
+  - **Not done:** iOS compile and run, HarmonyOS hvigor build, WeChat DevTools, a device run on every platform, Rive and SVGA pause on Android, the tab-button KVO risk on iOS (kept; reviewed: `observe(\.isHidden)` runs only when a screen event is forwarded, fall back to forwarding without screen events if UIKit objects), the iOS demo row with its screenshot.
+- [CN] 重新评分之后完成；本机已装 Flutter 3.50.1（库包与 `flutter_cyltabbar` 的 `flutter analyze`、`flutter test` 均已运行，分别通过 42 与 7 项）、React Native 的 `npm install`（`react-native-cyltabbar` 与库的 `ReactNative/` 的 `tsc` 无错误，`jest` 1 / 1）以及 Gradle（`cylanimateditem` 102 / 102、`CYLScrollReportingTest`、`CYLBadgeEventsTest`、`:demokit:compileDebugKotlin`）：
+  - **React Native 与 Flutter 的原生暂停通路：** `CYLTabBarHostView.animationsPaused`（iOS、Android）暂停 / 恢复所有播放中的 Tab 图标；React Native 属性 `animationsPaused`、Flutter 参数 `animationsPaused`；两个示例都由示例列表的滚动事件设置。Android：`CYLAnimatedItemView.pauseAllAnimations()` / `resumeAllAnimations()`；iOS：`CYLAnimationEventBridge.setAnimationsPaused(_:)`。
+  - **示例中接入滚动来源：** Android `CYLScrollReporting.listViewScrollStateChanged`（示例 `ListView`；已测试），HarmonyOS `cyl_reportScrollStarted()` / `cyl_reportScrollStopped()` / `cyl_pausesAnimationsWhileUserScrolls(true)`（静态），小程序 `cylPageScrolled` 加 `cylPausesAnimationsWhileUserScrolls(true)`（已在 Node 中按包路径检查；未运行 DevTools）。
+  - **播放器：** Android GIF 可暂停与恢复（`cyl_pauseAnimationView()` / `cyl_resumeAnimationView()`，所有可播放视图上可选；已测试）；iOS 的 GIF 图标（动图）发出 `didStart` / `didStop` 并可暂停 / 恢复（静态）。
+  - **未完成：** iOS 编译与运行、HarmonyOS hvigor 构建、微信开发者工具、各平台真机运行、Android 上 Rive 与 SVGA 的暂停、iOS tab 按钮的 KVO 风险（保留；已评估：只有转发屏幕事件时才执行 `observe(\.isHidden)`，若 UIKit 报错则改为不转发屏幕事件）、带截图的 iOS 示例行。
