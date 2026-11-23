@@ -37,6 +37,7 @@
 | [Step 14: one library commit everywhere / 第 14 步：所有位置固定同一个库 commit](#step-14-one-library-commit-everywhere--第-14-步所有位置固定同一个库-commit) | [Step 14: one library commit everywhere / 第 14 步：所有位置固定同一个库 commit](#step-14-one-library-commit-everywhere--第-14-步所有位置固定同一个库-commit) |
 | [Step 15: advisor re-score (2026-11-23) / 第 15 步：advisor 重新评分](#step-15-advisor-re-score-2026-11-23--第-15-步advisor-重新评分) | [Step 15: advisor re-score (2026-11-23) / 第 15 步：advisor 重新评分](#step-15-advisor-re-score-2026-11-23--第-15-步advisor-重新评分) |
 | [Step 16: closing the re-score gaps (2026-11-23) / 第 16 步：补齐重新评分的缺口](#step-16-closing-the-re-score-gaps-2026-11-23--第-16-步补齐重新评分的缺口) | [Step 16: closing the re-score gaps (2026-11-23) / 第 16 步：补齐重新评分的缺口](#step-16-closing-the-re-score-gaps-2026-11-23--第-16-步补齐重新评分的缺口) |
+| [Step 17: pins and players (2026-11-23) / 第 17 步：固定与播放器](#step-17-pins-and-players-2026-11-23--第-17-步固定与播放器) | [Step 17: pins and players (2026-11-23) / 第 17 步：固定与播放器](#step-17-pins-and-players-2026-11-23--第-17-步固定与播放器) |
 
 <!-- navigation:end -->
 
@@ -156,8 +157,8 @@
 
 ## Step 14: one library commit everywhere / 第 14 步：所有位置固定同一个库 commit
 
-- [EN] Every pin (Podfiles, Package.swift, Package.resolved, pbxproj, Gradle files and lockfiles, `libs.versions.toml`, `pod-lint.sh`) and both vendored copies (HarmonyOS, Mini Program) now follow library commit `43f94adfc31f7f7620f5b07bf03dd15a57f44f45` (JitPack build confirmed). `scripts/sync-cyldeallocblockexecutor.sh --check` passes. The library's Android scroll source, Flutter CI job and RN `useLifecycle` additions are in it.
-- [CN] 所有固定（Podfile、Package.swift、Package.resolved、pbxproj、Gradle 文件与锁文件、`libs.versions.toml`、`pod-lint.sh`）和两份内置副本（HarmonyOS、小程序）现在都指向库 commit `43f94adfc31f7f7620f5b07bf03dd15a57f44f45`（已确认 JitPack 构建）。`scripts/sync-cyldeallocblockexecutor.sh --check` 通过。库里的 Android 滚动来源、Flutter CI 任务与 RN `useLifecycle` 新增内容都包含在内。
+- [EN] Every pin (Podfiles, Package.swift, Package.resolved, pbxproj, Gradle files and lockfiles, `libs.versions.toml`, `pod-lint.sh`) and both vendored copies (HarmonyOS, Mini Program) now follow library commit `402d00a069f9ba5570343e1aad88157fa213dc1a` (JitPack build confirmed). `scripts/sync-cyldeallocblockexecutor.sh --check` passes. The library's Android scroll source, Flutter CI job and RN `useLifecycle` additions are in it.
+- [CN] 所有固定（Podfile、Package.swift、Package.resolved、pbxproj、Gradle 文件与锁文件、`libs.versions.toml`、`pod-lint.sh`）和两份内置副本（HarmonyOS、小程序）现在都指向库 commit `402d00a069f9ba5570343e1aad88157fa213dc1a`（已确认 JitPack 构建）。`scripts/sync-cyldeallocblockexecutor.sh --check` 通过。库里的 Android 滚动来源、Flutter CI 任务与 RN `useLifecycle` 新增内容都包含在内。
 
 ## Step 15: advisor re-score (2026-11-23) / 第 15 步：advisor 重新评分
 
@@ -184,3 +185,8 @@ TODO（缺失项 / missing points）:
   - **示例中接入滚动来源：** Android `CYLScrollReporting.listViewScrollStateChanged`（示例 `ListView`；已测试），HarmonyOS `cyl_reportScrollStarted()` / `cyl_reportScrollStopped()` / `cyl_pausesAnimationsWhileUserScrolls(true)`（静态），小程序 `cylPageScrolled` 加 `cylPausesAnimationsWhileUserScrolls(true)`（已在 Node 中按包路径检查；未运行 DevTools）。
   - **播放器：** Android GIF 可暂停与恢复（`cyl_pauseAnimationView()` / `cyl_resumeAnimationView()`，所有可播放视图上可选；已测试）；iOS 的 GIF 图标（动图）发出 `didStart` / `didStop` 并可暂停 / 恢复（静态）。
   - **未完成：** iOS 编译与运行、HarmonyOS hvigor 构建、微信开发者工具、各平台真机运行、Android 上 Rive 与 SVGA 的暂停、iOS tab 按钮的 KVO 风险（保留；已评估：只有转发屏幕事件时才执行 `observe(\.isHidden)`，若 UIKit 报错则改为不转发屏幕事件）、带截图的 iOS 示例行。
+
+## Step 17: pins and players (2026-11-23) / 第 17 步：固定与播放器
+
+- [EN] Every pin and both vendored copies follow library `402d00a069f9ba5570343e1aad88157fa213dc1a` (JitPack build confirmed; the library code is that of `273a577`, later commits are documents). Android Rive (`pause()`, then the state machine's `play`) and SVGA (`pauseAnimation`, then `stepToFrame` of the current frame) players pause and resume through reflection (compiles; not run against the vendors' libraries). Per the owner's instruction the remaining work is written statically and the owner tests it afterwards.
+- [CN] 所有固定与两份内置副本都指向库 `402d00a069f9ba5570343e1aad88157fa213dc1a`（已确认 JitPack 构建；库代码即 `273a577`，之后的提交只是文档）。Android 的 Rive（`pause()`，恢复时播放状态机）与 SVGA（`pauseAnimation`，恢复时 `stepToFrame` 到当前帧）播放器通过反射暂停与恢复（可编译；未针对厂商库运行）。按所有者的指示，其余工作静态编写，由所有者之后测试。

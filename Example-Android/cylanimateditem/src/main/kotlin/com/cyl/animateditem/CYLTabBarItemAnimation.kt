@@ -1498,6 +1498,24 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
      */
     override fun cyl_isAnimationViewPlaying(): Boolean? = CYLReflection.call(rive, "isPlaying") as? Boolean
 
+    /**
+     * [EN] rive-android's `pause()` keeps the pose; resuming plays the state machine again (not an unnamed `play()`, which would also
+     *      start the linear animations), or the linear animation. [CN] rive-android 的 `pause()` 保留当前姿态；恢复时重新播放状态机
+     *      （不用不带名字的 `play()`，它还会启动线性动画），或播放线性动画。
+     */
+    override fun cyl_pauseAnimationView() {
+        CYLReflection.call(rive, "pause")
+    }
+
+    override fun cyl_resumeAnimationView() {
+        val machineName = stateMachine
+        if (machineName != null) {
+            CYLReflection.callKotlin(rive, "play", machineName, CYLReflection.DEFAULT, CYLReflection.DEFAULT, true, false)
+        } else {
+            CYLReflection.call(rive, "play")
+        }
+    }
+
     override fun cyl_stopAnimationView() {
         handler.removeCallbacksAndMessages(null)
         if (stateMachine != null) setActive(false) else { isActive = false; CYLReflection.call(rive, "stop"); CYLReflection.call(rive, "reset") }
