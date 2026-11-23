@@ -617,6 +617,7 @@ export struct CYLAnimatedItemView {
 
   // [EN] The teardown block (CYLDeallocBlockExecutor), run by `aboutToDisappear`. [CN] 销毁块（CYLDeallocBlockExecutor），由 `aboutToDisappear` 运行。
   private cylTeardown(): void {
+    this.cylPostAnimationEvent('cyl.animation.didStop');
     this.cylStopCountdownTimer();
     try {
       this.getUIContext().getHostContext()?.getApplicationContext().off('applicationStateChange', this.cylForegroundCallback);
@@ -788,8 +789,27 @@ export struct CYLAnimatedItemView {
     this.cylLastSelected = this.isItemSelected;
     if (token !== this.cylLastRestartToken) {
       this.cylLastRestartToken = token;
+      this.cylPostAnimationEvent('cyl.animation.didStart');
       this.cylRestartHandler?.();
     }
+  }
+
+  /**
+   * [EN] Posts an animation event (AnimationEvents of the core library) to the observers of this item.
+   * [CN] 向本控件的观察者发出动画事件（核心库的 AnimationEvents）。
+   */
+  cylPostAnimationEvent(name: string): void {
+    this.cylLifecycle?.registry.postLifecycleEvent(name, { url: this.animationUrl, selected: this.isItemSelected });
+  }
+
+  /** [EN] Scrolling pauses the engine: posts didPause. [CN] 滚动暂停动画：发出 didPause。 */
+  cylPauseAnimation(): void {
+    this.cylPostAnimationEvent('cyl.animation.didPause');
+  }
+
+  /** [EN] Scrolling ended: posts didResume. [CN] 滚动结束：发出 didResume。 */
+  cylResumeAnimation(): void {
+    this.cylPostAnimationEvent('cyl.animation.didResume');
   }
 
   private cylUpdateContext(): void {

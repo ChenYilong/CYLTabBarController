@@ -13,7 +13,7 @@ const { LifecycleRegistry } = require('./registry.js');
  *   themeChanged(theme) from wx.onThemeChange;
  * - didReceiveMemoryWarning: memoryWarning() from wx.onMemoryWarning;
  * - teardown blocks: onUnload.
- * - design v5: onLoad / onUnload fire the window moves; onShow / onHide and screenVisible(visible) (from an
+ * - design v5: onLoad / onUnload fire the window moves; onShow / onHide and screenVisible(visible) (observeScreen(selector) wires an
  *   IntersectionObserver) fire didEnterScreen / didLeaveScreen on transitions; onPageScroll(event) fires the scroll events
  *   (no drag-end event exists: the first scroll event begins, a quiet period of scrollEndDelay ms ends);
  * - viewWillLayoutSubviews, viewDidLayoutSubviews, viewSafeAreaInsetsDidChange,
@@ -101,6 +101,18 @@ class LifecycleController {
     if (this.onScreen === visible || this.detached) return;
     this.onScreen = visible;
     this.around(visible ? 'didEnterScreen' : 'didLeaveScreen');
+  }
+
+  /**
+   * Reports the screen events of the node `selector` (inside the owner, like `createSelectorQuery`) from a `wx.createIntersectionObserver`:
+   * `didEnterScreen` when any part of it is inside the viewport, `didLeaveScreen` when none is. `options.thresholds` (default `[0, 0.01]`)
+   * and `options.margins` go to the observer. Returns a function that stops observing. `api` is `wx` (injected for tests).
+   */
+  observeScreen(selector, options = {}, api = typeof wx !== 'undefined' ? wx : undefined) {
+    if (!api || typeof api.createIntersectionObserver !== 'function') return () => {}
+    const observer = api.createIntersectionObserver(this.owner, { thresholds: options.thresholds || [0, 0.01] });
+    observer.relativeToViewport(options.margins || {}).observe(selector, (result) => this.screenVisible(result.intersectionRatio > 0));
+    return () => observer.disconnect();
   }
 
   /** The page or component `onPageScroll(event)`; there is no drag-end event, so a quiet period of `scrollEndDelay` ms ends scrolling. */
