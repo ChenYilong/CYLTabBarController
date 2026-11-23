@@ -7,23 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		EB6DE3E5F466459DA5D4772C /* green_lottie_tab_mine_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 17BE476FA978496A8324E63D /* green_lottie_tab_mine_dark.json */; };
-		945C22889D1A4725BC79DA54 /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = DE7A286DC067478B849B91FF /* green_lottie_tab_mine.json */; };
 		14454ABF5DCE4BF7BD195CCA /* icons.riv in Resources */ = {isa = PBXBuildFile; fileRef = 3FF52A4B814A4B70AB8E9F30 /* icons.riv */; };
-		D98767A89ADE486B98B04E8D /* green_lottie_tab_news_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 1338B07BC7454727B0E7E40B /* green_lottie_tab_news_dark.json */; };
-		3025FD4F02F54357AC181B17 /* green_lottie_tab_news.json in Resources */ = {isa = PBXBuildFile; fileRef = 7930957FF92847C480DA6B48 /* green_lottie_tab_news.json */; };
-		16A760621D7D4D83BB61EB10 /* green_lottie_tab_discover_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 1CC8FDAA520C49DDB15A48D5 /* green_lottie_tab_discover_dark.json */; };
-		CB6644346438405B963B4FE2 /* green_lottie_tab_discover.json in Resources */ = {isa = PBXBuildFile; fileRef = C3FE7CC1535D4C6E8CA4202A /* green_lottie_tab_discover.json */; };
-		F734C4985DC844FCA4F3B9E7 /* green_lottie_tab_home_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 927FF9554EC74ADCB5E8D552 /* green_lottie_tab_home_dark.json */; };
-		6A73C70D40C3467590FA1FA1 /* green_lottie_tab_home.json in Resources */ = {isa = PBXBuildFile; fileRef = 8AB95AB814AB47B5840AB215 /* green_lottie_tab_home.json */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
-		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
+		16A760621D7D4D83BB61EB10 /* green_lottie_tab_discover_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 1CC8FDAA520C49DDB15A48D5 /* green_lottie_tab_discover_dark.json */; };
+		25E94CA8D5BAB78E7604C490 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F8DC86CCEACAD9907839847 /* Pods_RunnerTests.framework */; };
+		2C6C6C9CE848E5E2C9CA5726 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 943BA8930DA81242FD15344E /* Pods_Runner.framework */; };
+		3025FD4F02F54357AC181B17 /* green_lottie_tab_news.json in Resources */ = {isa = PBXBuildFile; fileRef = 7930957FF92847C480DA6B48 /* green_lottie_tab_news.json */; };
+		331C808B294A63AB00263BE5 /* FlutterAnimationViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* FlutterAnimationViewTests.m */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		6A73C70D40C3467590FA1FA1 /* green_lottie_tab_home.json in Resources */ = {isa = PBXBuildFile; fileRef = 8AB95AB814AB47B5840AB215 /* green_lottie_tab_home.json */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
+		945C22889D1A4725BC79DA54 /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = DE7A286DC067478B849B91FF /* green_lottie_tab_mine.json */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		CB6644346438405B963B4FE2 /* green_lottie_tab_discover.json in Resources */ = {isa = PBXBuildFile; fileRef = C3FE7CC1535D4C6E8CA4202A /* green_lottie_tab_discover.json */; };
+		D98767A89ADE486B98B04E8D /* green_lottie_tab_news_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 1338B07BC7454727B0E7E40B /* green_lottie_tab_news_dark.json */; };
+		EB6DE3E5F466459DA5D4772C /* green_lottie_tab_mine_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 17BE476FA978496A8324E63D /* green_lottie_tab_mine_dark.json */; };
+		F734C4985DC844FCA4F3B9E7 /* green_lottie_tab_home_dark.json in Resources */ = {isa = PBXBuildFile; fileRef = 927FF9554EC74ADCB5E8D552 /* green_lottie_tab_home_dark.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,25 +52,29 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		17BE476FA978496A8324E63D /* green_lottie_tab_mine_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_mine_dark.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_mine_dark.json"; sourceTree = SOURCE_ROOT; };
-		DE7A286DC067478B849B91FF /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_mine.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_mine.json"; sourceTree = SOURCE_ROOT; };
-		3FF52A4B814A4B70AB8E9F30 /* icons.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = icons.riv; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets/icons.riv"; sourceTree = SOURCE_ROOT; };
-		1338B07BC7454727B0E7E40B /* green_lottie_tab_news_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_news_dark.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_news_dark.json"; sourceTree = SOURCE_ROOT; };
-		7930957FF92847C480DA6B48 /* green_lottie_tab_news.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_news.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_news.json"; sourceTree = SOURCE_ROOT; };
-		1CC8FDAA520C49DDB15A48D5 /* green_lottie_tab_discover_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_discover_dark.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_discover_dark.json"; sourceTree = SOURCE_ROOT; };
-		C3FE7CC1535D4C6E8CA4202A /* green_lottie_tab_discover.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_discover.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_discover.json"; sourceTree = SOURCE_ROOT; };
-		927FF9554EC74ADCB5E8D552 /* green_lottie_tab_home_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_home_dark.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_home_dark.json"; sourceTree = SOURCE_ROOT; };
-		8AB95AB814AB47B5840AB215 /* green_lottie_tab_home.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "green_lottie_tab_home.json"; path = "../../../../Example/Classes/Other/LottieResources/green_lottie_tab_home.json"; sourceTree = SOURCE_ROOT; };
+		1338B07BC7454727B0E7E40B /* green_lottie_tab_news_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_news_dark.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_news_dark.json; sourceTree = SOURCE_ROOT; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
-		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
+		17BE476FA978496A8324E63D /* green_lottie_tab_mine_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_mine_dark.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_mine_dark.json; sourceTree = SOURCE_ROOT; };
+		1A459CC1C2653D9F658C50CA /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
+		1C3D47884AC2DA0E205F85BC /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
+		1CC8FDAA520C49DDB15A48D5 /* green_lottie_tab_discover_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_discover_dark.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_discover_dark.json; sourceTree = SOURCE_ROOT; };
+		331C807B294A618700263BE5 /* FlutterAnimationViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FlutterAnimationViewTests.m; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		3F8DC86CCEACAD9907839847 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3FF52A4B814A4B70AB8E9F30 /* icons.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = icons.riv; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets/icons.riv"; sourceTree = SOURCE_ROOT; };
+		5B78B22C584167E0744FF87E /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		784666492D4C4C64000A1A5F /* FlutterFramework */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterFramework; path = Flutter/ephemeral/Packages/.packages/FlutterFramework; sourceTree = "<group>"; };
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
+		7930957FF92847C480DA6B48 /* green_lottie_tab_news.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_news.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_news.json; sourceTree = SOURCE_ROOT; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		88C48EA0E4E4FB680C714ED6 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
+		8AB95AB814AB47B5840AB215 /* green_lottie_tab_home.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_home.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_home.json; sourceTree = SOURCE_ROOT; };
+		927FF9554EC74ADCB5E8D552 /* green_lottie_tab_home_dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_home_dark.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_home_dark.json; sourceTree = SOURCE_ROOT; };
+		943BA8930DA81242FD15344E /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -76,6 +82,10 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A8114841BFC720198F100CAB /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		C383C301CC34F3071F5F492F /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
+		C3FE7CC1535D4C6E8CA4202A /* green_lottie_tab_discover.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_discover.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_discover.json; sourceTree = SOURCE_ROOT; };
+		DE7A286DC067478B849B91FF /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_mine.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_mine.json; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +94,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */,
+				2C6C6C9CE848E5E2C9CA5726 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,6 +102,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25E94CA8D5BAB78E7604C490 /* Pods_RunnerTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -100,9 +112,18 @@
 		331C8082294A63A400263BE5 /* RunnerTests */ = {
 			isa = PBXGroup;
 			children = (
-				331C807B294A618700263BE5 /* RunnerTests.swift */,
+				331C807B294A618700263BE5 /* FlutterAnimationViewTests.m */,
 			);
 			path = RunnerTests;
+			sourceTree = "<group>";
+		};
+		64FF70C70757AF11E3F0410D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				943BA8930DA81242FD15344E /* Pods_Runner.framework */,
+				3F8DC86CCEACAD9907839847 /* Pods_RunnerTests.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		9740EEB11CF90186004384FC /* Flutter */ = {
@@ -134,6 +155,8 @@
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
+				C9C9AEDFDADB843DB664D271 /* Pods */,
+				64FF70C70757AF11E3F0410D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -161,6 +184,20 @@
 			path = Runner;
 			sourceTree = "<group>";
 		};
+		C9C9AEDFDADB843DB664D271 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				5B78B22C584167E0744FF87E /* Pods-Runner.debug.xcconfig */,
+				A8114841BFC720198F100CAB /* Pods-Runner.release.xcconfig */,
+				88C48EA0E4E4FB680C714ED6 /* Pods-Runner.profile.xcconfig */,
+				1C3D47884AC2DA0E205F85BC /* Pods-RunnerTests.debug.xcconfig */,
+				C383C301CC34F3071F5F492F /* Pods-RunnerTests.release.xcconfig */,
+				1A459CC1C2653D9F658C50CA /* Pods-RunnerTests.profile.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -168,6 +205,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */;
 			buildPhases = (
+				182BBE2DD9C63E65F95F6DAA /* [CP] Check Pods Manifest.lock */,
 				331C807D294A63A400263BE5 /* Sources */,
 				331C807F294A63A400263BE5 /* Resources */,
 				E6CB2256A917AD743AE22AC4 /* Frameworks */,
@@ -186,12 +224,15 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
 			buildPhases = (
+				AE7AC4FED622895E672659A3 /* [CP] Check Pods Manifest.lock */,
 				9740EEB61CF901F6004384FC /* Run Script */,
 				97C146EA1CF9000F007C117D /* Sources */,
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
+				1432091D3C19F347673F50BB /* [CP] Embed Pods Frameworks */,
+				222A4D2EEFCF796A24376A8E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -278,6 +319,68 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		1432091D3C19F347673F50BB /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/RiveRuntime/RiveRuntime.framework/RiveRuntime",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RiveRuntime.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		182BBE2DD9C63E65F95F6DAA /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RunnerTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		222A4D2EEFCF796A24376A8E /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources.sh",
+				"${PODS_ROOT}/../../../../../CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle",
+				"${PODS_ROOT}/../../../../../CYLTabBarController/Resources/CYLTabBarController.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RiveRuntime/runtime_ios_privacy.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLAnimatedItem.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/runtime_ios_privacy.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		3B06AD1E1E4923F5004D2608 /* Thin Binary */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -309,6 +412,28 @@
 			shellPath = /bin/sh;
 			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
 		};
+		AE7AC4FED622895E672659A3 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Runner-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -316,7 +441,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */,
+				331C808B294A63AB00263BE5 /* FlutterAnimationViewTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -435,6 +560,7 @@
 		};
 		331C8088294A63A400263BE5 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1C3D47884AC2DA0E205F85BC /* Pods-RunnerTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -452,6 +578,7 @@
 		};
 		331C8089294A63A400263BE5 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C383C301CC34F3071F5F492F /* Pods-RunnerTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -467,6 +594,7 @@
 		};
 		331C808A294A63A400263BE5 /* Profile */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1A459CC1C2653D9F658C50CA /* Pods-RunnerTests.profile.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
