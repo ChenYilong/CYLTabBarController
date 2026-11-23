@@ -7,7 +7,7 @@
  */
 export {
   CYLAnimatedItemView, CYLAnimatedItemStyle, CYLAnimatedItemAxis, CYLAnimatedItemAccessoryPlacement, CYLAnimatedItemAnimationContext, CYLAnimatedItemController,
-  CYLAnimatedItemEngines, cylAnimatedItemTypeOf, cylIconColorFilter
+  CYLAnimatedItemEngines, cylAnimatedItemTypeOf, cylIconColorFilter, cylSetPausesWhileUserScrolls, cylPausesWhileUserScrolls
 } from './src/main/ets/CYLAnimatedItemView';
 export { CYLAnimatedItemStackView } from './src/main/ets/CYLAnimatedItemStackView';
 export {

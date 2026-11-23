@@ -468,4 +468,4 @@
 "none yet" = "henüz yok";
 "Host-driven playback (drivesAnimationPlayback = false)" = "Oynatmayı ana uygulama yönetir (drivesAnimationPlayback = false)";
 "Engine API" = "Motor API'si";
-"Pause while scrolling" = "Pause while scrolling";
+"Pause while scrolling" = "Kaydırırken duraklat";

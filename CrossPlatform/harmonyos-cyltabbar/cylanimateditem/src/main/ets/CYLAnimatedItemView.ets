@@ -407,6 +407,28 @@ export function cylIconColorFilter(color: ResourceColor): number[] {
  *      显示规则与 iOS、Android 相同：已注册的引擎能播放时显示动画；否则在加载期间与失败之后显示静态图片（`image` / `selectedImage`）；只有没有静态图片时
  *      才显示占位图。它是一个无障碍元素：文本为 `itemTitle`（或 `itemAccessibilityText`），描述为 `itemDescription` 加上选中状态。
  */
+let cylPausesWhileScrolling: boolean = false;
+let cylScrollObserverNumber: number = 0;
+
+/**
+ * [EN] true: every animated item pauses while the user scrolls (the app reports the scrolling with `scrollStarted()` /
+ *      `scrollStopped()` of a LifecycleController, or `cyl_reportScrollStarted()` of cyltabbar) and resumes afterwards. Read when
+ *      an item appears. Module-level, because ArkTS keeps statics off structs. [CN] 为 true 时，用户滚动期间所有动画条目暂停，
+ *      滚动结束后恢复。条目出现时读取。放在模块级，因为 ArkTS 不在 struct 上放静态成员。
+ */
+export function cylSetPausesWhileUserScrolls(enabled: boolean): void {
+  cylPausesWhileScrolling = enabled;
+}
+
+export function cylPausesWhileUserScrolls(): boolean {
+  return cylPausesWhileScrolling;
+}
+
+function cylNextScrollObserverNumber(): number {
+  cylScrollObserverNumber += 1;
+  return cylScrollObserverNumber;
+}
+
 @Component
 export struct CYLAnimatedItemView {
   @Prop itemTitle: string = '';
@@ -595,23 +617,15 @@ export struct CYLAnimatedItemView {
   private cylLifecycle: LifecycleController<CYLAnimatedItemView> | undefined = undefined;
   private cylScrollPaused: boolean = false;
   private cylStopScrollObserver: (() => void) | undefined = undefined;
-  private static cylScrollCounter: number = 0;
 
-  /**
-   * [EN] True: every animated item pauses while the user scrolls (the app calls `scrollStarted()` / `scrollStopped()` of a
-   *      LifecycleController from its List / Scroll `onScrollStart` / `onScrollStop`) and resumes afterwards. Read when an
-   *      item appears. [CN] 为 true 时，用户滚动期间所有动画条目暂停，滚动结束后恢复。条目出现时读取。
-   */
-  static pausesWhileUserScrolls: boolean = false;
 
   aboutToAppear(): void {
     this.cylLifecycle = new LifecycleController<CYLAnimatedItemView>(this);
     this.cylLifecycle.registry.addDeallocCallback<CYLAnimatedItemView>((owner: CYLAnimatedItemView) => owner.cylTeardown(), { key: 'cyl.animatedItem.teardown' });
     this.cylLifecycle.aboutToAppear();
-    if (CYLAnimatedItemView.pausesWhileUserScrolls) {
-      CYLAnimatedItemView.cylScrollCounter += 1;
+    if (cylPausesWhileUserScrolls()) {
       this.cylStopScrollObserver = LifecycleCenter.whileUserScrolls(() => this.cylPauseAnimation(), () => this.cylResumeAnimation(),
-        { key: `cyl.animatedItem.scroll.${CYLAnimatedItemView.cylScrollCounter}` });
+        { key: `cyl.animatedItem.scroll.${cylNextScrollObserverNumber()}` });
     }
     CYLAnimatedItemEngines.loadX86_64DebugEngines(this.getUIContext().getHostContext());
     this.cylLastRestartToken = this.animationRestartToken + this.cylControllerRestarts;

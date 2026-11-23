@@ -9,7 +9,7 @@ import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLSVGAView } from './svga/CYLSVGAView';
 import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint,
   CYLTabBarAnimationTintTitle } from './CYLRiveTabBarItemAnimator';
-import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines, CYLAnimatedItemSVGA } from 'cylanimateditem';
+import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines, CYLAnimatedItemSVGA, cylSetPausesWhileUserScrolls } from 'cylanimateditem';
 import { CYLAnimatedItemLottie } from 'cylanimateditem_lottie';
 // TODO: replace the file: dependency (cyltabbar/oh-package.json5, a vendored copy) with the ohpm package after the library is published (owner's OK).
 import { LifecycleController } from 'cyldeallocblockexecutor';
@@ -84,9 +84,9 @@ function cylScrollController(): LifecycleController<CYLScrollSource> {
 
 /**
  * [EN] The user starts to scroll a List / Scroll (call it from `onScrollStart`): the global observers hear
- *      `scrollWillBeginDragging`, and with `CYLAnimatedItemView.pausesWhileUserScrolls` every animated tab icon pauses.
+ *      `scrollWillBeginDragging`, and with `cyl_pausesAnimationsWhileUserScrolls(true)` every animated tab icon pauses.
  * [CN] 用户开始滚动 List / Scroll（在 `onScrollStart` 中调用）：全局观察者收到 `scrollWillBeginDragging`，
- *      设置 `CYLAnimatedItemView.pausesWhileUserScrolls` 后所有动画 Tab 图标暂停。
+ *      设置 `cyl_pausesAnimationsWhileUserScrolls(true)` 后所有动画 Tab 图标暂停。
  */
 export function cyl_reportScrollStarted(): void {
   cylScrollController().scrollStarted();
@@ -98,7 +98,7 @@ export function cyl_reportScrollStarted(): void {
  *      `cyl_reportScrollStopped()` 之间）所有动画 Tab 图标暂停，之后恢复。请在 TabBar 出现之前设置。
  */
 export function cyl_pausesAnimationsWhileUserScrolls(enabled: boolean): void {
-  CYLAnimatedItemView.pausesWhileUserScrolls = enabled;
+  cylSetPausesWhileUserScrolls(enabled);
 }
 
 /** [EN] The scroll stopped (call it from `onScrollStop`): `scrollDidEndScrolling`, the icons resume. [CN] 滚动停止（在 `onScrollStop` 中调用）：恢复图标动画。 */

@@ -7,6 +7,9 @@
 
 import UIKit
 import CYLAnimatedItem
+#if SWIFT_PACKAGE
+import CYLAnimatedItemViews
+#endif
 import CYLDeallocBlockExecutor
 
 /**
