@@ -1036,6 +1036,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         applyPlayerSettings()
         player.play()
         startLoopTimerIfNeeded()
+        postAnimationEvent("cyl.animation.didStart")
         #else
         playAnimatedImage()
         #endif
@@ -1055,11 +1056,24 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         stopAnimatedImage()
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         let player = animationPlayer
+        let wasPlaying = playing
         playing = false
         stopLoopTimer()
         player?.stop()
         setPlayerValue(animationRestingProgress, for: "progress")
+        if wasPlaying { postAnimationEvent("cyl.animation.didStop") }
         #endif
+    }
+
+    /**
+     [EN] Posts an animation moment (`cyl.animation.didStart` / `didStop`) as a `NotificationCenter` notification whose object is
+          this view: the animation pod does not depend on CYLDeallocBlockExecutor, CYLTabBarController bridges the
+          notification into the library (CYLAnimationEventBridge), so observers hear it as a lifecycle event.
+     [CN] 以 `NotificationCenter` 通知发出动画时机（`cyl.animation.didStart` / `didStop`），object 为本视图：动画 pod 不依赖
+          CYLDeallocBlockExecutor，由 CYLTabBarController 桥接进库（CYLAnimationEventBridge），观察者即可作为生命周期事件收到。
+     */
+    private func postAnimationEvent(_ name: String) {
+        NotificationCenter.default.post(name: Notification.Name(name), object: self, userInfo: ["url": animationURL as Any])
     }
 
     /** [EN] Shows the last frame without playing. [CN] 不播放，直接显示最后一帧。 */
