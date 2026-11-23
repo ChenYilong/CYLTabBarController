@@ -14,7 +14,7 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 harmony_dest="CrossPlatform/harmonyos-cyltabbar/cyldeallocblockexecutor"
 mini_dest="CrossPlatform/wechat-miniprogram-cyltabbar/src/cyl-dealloc-block-executor"
 repository_url="https://github.com/ChenYilong/CYLDeallocBlockExecutor.git"
-branch="master"
+branch="feat/lifecycle-callbacks"
 
 check=0
 commit=""
@@ -54,7 +54,7 @@ vendored_md() {
 | TODO：库发布后改用 ohpm / npm 包（需要所有者同意）。 | TODO: replace this copy with the ohpm / npm package after the library is published (the owner's OK is needed). |
 
 - Library: https://github.com/ChenYilong/CYLDeallocBlockExecutor
-- Branch: \`$branch\` (pull request #14, merged)
+- Branch: \`$branch\` (pull request #12)
 - Folder in the library: \`$1\`
 - Commit: \`$full\`
 EOF
@@ -63,17 +63,13 @@ EOF
 generate() {
   # $1: output root
   local out="$1"
-  mkdir -p "$out/$harmony_dest/src/main/ets" "$out/$mini_dest"
+  mkdir -p "$out/$harmony_dest" "$out/$mini_dest"
   git -C "$library" archive "$full" HarmonyOS MiniProgram LICENSE | tar -x -C "$work/x"
-  # [EN] HarmonyOS: the library holds the whole HAR module (`HarmonyOS/cyldeallocblockexecutor`: Index.ets, src/main/ets with the
-  #      TypeScript sources and CYLLifecycleBridge.ets, module.json5, oh-package.json5, build-profile.json5, hvigorfile.ts, LICENSE),
-  #      copied as it is. Its imports have no `.ts` extension. The sed strips one only if an older library commit still has it.
-  # [CN] 鸿蒙：库里已有完整的 HAR 模块（`HarmonyOS/cyldeallocblockexecutor`：Index.ets、src/main/ets 下的 TypeScript 源码与
-  #      CYLLifecycleBridge.ets、module.json5、oh-package.json5、build-profile.json5、hvigorfile.ts、LICENSE），原样复制。导入不带 `.ts`
-  #      扩展名；仅当较旧的库提交仍带扩展名时，sed 才会去掉。
+  # [EN] HarmonyOS: the library's HAR module as it is (sources without `.ts` extensions, `Index.ets`, the ArkUI window bridge, hvigor files);
+  #      only the LICENSE of the library's root is added. [CN] 鸿蒙：直接使用库的 HAR 模块（导入不带 `.ts` 扩展名、`Index.ets`、ArkUI 窗口桥接、
+  #      hvigor 文件）；只补充库根目录的 LICENSE。
   cp -R "$work/x/HarmonyOS/cyldeallocblockexecutor/." "$out/$harmony_dest/"
-  find "$out/$harmony_dest" \( -name '*.ts' -o -name '*.ets' \) -exec sed -i.bak "s#from '\./\([A-Za-z]*\)\.ts'#from './\1'#" {} +
-  find "$out/$harmony_dest" -name '*.bak' -delete
+  cp "$work/x/LICENSE" "$out/$harmony_dest/"
   # [EN] Mini Program: CommonJS files of the library, no build step. [CN] 小程序：库中的 CommonJS 文件，无需构建。
   cp "$work/x/MiniProgram/index.js" "$work/x/MiniProgram/registry.js" "$work/x/MiniProgram/center.js" "$work/x/MiniProgram/log.js" "$work/x/MiniProgram/types.js" "$work/x/MiniProgram/controller.js" \
      "$work/x/MiniProgram/package.json" "$work/x/LICENSE" "$out/$mini_dest/"
