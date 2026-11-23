@@ -406,6 +406,7 @@ docs/
 │   ├── ios-lottie4-tint-option.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
 │   ├── ios-react-native-engine-api-play-all.png
+│   ├── ios-react-native-host-driven.png
 │   ├── ios-rive-dark-tint-appearance-switch.png
 │   ├── ios-rive-fixed-tint-unselected-only.png
 │   ├── ios-rive-flatdesign-item-appearance.png

@@ -309,6 +309,9 @@ function EngineApiRow() {
   const animation = useRef<CYLAnimationViewHandle>(null);
   const [speed, setSpeed] = useState(1);
   const [loops, setLoops] = useState(false);
+  // Host-driven mode: with drivesAnimationPlayback false the item plays only on play() / restart(), not on selection.
+  const [drives, setDrives] = useState(true);
+  const [ended, setEnded] = useState(0);
   const speedText = String(speed);
   return (
     <View style={styles.engineRow}>
@@ -319,12 +322,17 @@ function EngineApiRow() {
         selected
         animationSpeed={speed}
         animationLoops={loops}
+        drivesAnimationPlayback={drives}
+        onAnimationEnd={() => setEnded((value) => value + 1)}
         iconSize={48}
         style={styles.svgaIcon}
         accessible
         accessibilityRole="image"
         accessibilityLabel="CYLAnimationView, icons.riv"
       />
+      <Pressable onPress={() => animation.current?.play()} accessibilityRole="button" accessibilityLabel={chinese ? '播放' : 'Play'}>
+        <Text style={styles.playStop}>{chinese ? '播放' : 'Play'}</Text>
+      </Pressable>
       <Pressable onPress={() => animation.current?.restart()} accessibilityRole="button" accessibilityLabel={chinese ? '全部播放' : 'Play all'}>
         <Text style={styles.playStop}>{chinese ? '全部播放' : 'Play all'}</Text>
       </Pressable>
@@ -340,6 +348,8 @@ function EngineApiRow() {
         </Pressable>
       </View>
       <Switch value={loops} onValueChange={setLoops} accessibilityLabel={chinese ? '循环播放' : 'Loop'} />
+      <Switch value={drives} onValueChange={setDrives} accessibilityLabel={chinese ? '视图自动播放' : 'Drives playback'} />
+      <Text style={styles.rowTitle} accessibilityLabel={chinese ? `结束回调 ${ended} 次` : `End callback ${ended} times`}>{`end ×${ended}`}</Text>
     </View>
   );
 }
@@ -575,7 +585,7 @@ const styles = StyleSheet.create({
   card: { borderRadius: 14, backgroundColor: '#1C1C1E', marginHorizontal: 16, overflow: 'hidden' },
   row: { minHeight: 52, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   svgaIcons: { flexDirection: 'row', gap: 24 },
-  engineRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 16, marginTop: 12 },
+  engineRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', rowGap: 8, marginHorizontal: 16, marginTop: 12 },
   speedStepper: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   svgaIcon: { width: 64, height: 64 },
   rowTitle: { fontSize: 16, color: '#FFFFFF' },
