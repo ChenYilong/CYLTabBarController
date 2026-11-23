@@ -68,6 +68,43 @@ export function cyl_reportScroll(delta: number): void {
 
 let cylScrollCounter: number = 0;
 
+/** [EN] The owner the scroll moments are reported on. [CN] 滚动时机所属的对象。 */
+class CYLScrollSource {
+}
+
+let cylScrollLifecycle: LifecycleController<CYLScrollSource> | undefined = undefined;
+
+function cylScrollController(): LifecycleController<CYLScrollSource> {
+  if (cylScrollLifecycle === undefined) {
+    cylScrollLifecycle = new LifecycleController<CYLScrollSource>(new CYLScrollSource());
+  }
+  return cylScrollLifecycle;
+}
+
+/**
+ * [EN] The user starts to scroll a List / Scroll (call it from `onScrollStart`): the global observers hear
+ *      `scrollWillBeginDragging`, and with `CYLAnimatedItemView.pausesWhileUserScrolls` every animated tab icon pauses.
+ * [CN] 用户开始滚动 List / Scroll（在 `onScrollStart` 中调用）：全局观察者收到 `scrollWillBeginDragging`，
+ *      设置 `CYLAnimatedItemView.pausesWhileUserScrolls` 后所有动画 Tab 图标暂停。
+ */
+export function cyl_reportScrollStarted(): void {
+  cylScrollController().scrollStarted();
+}
+
+/**
+ * [EN] true: every animated tab icon pauses while the user scrolls (between `cyl_reportScrollStarted()` and `cyl_reportScrollStopped()`)
+ *      and resumes afterwards. Set it before the tab bar appears. [CN] 为 true 时，用户滚动期间（`cyl_reportScrollStarted()` 与
+ *      `cyl_reportScrollStopped()` 之间）所有动画 Tab 图标暂停，之后恢复。请在 TabBar 出现之前设置。
+ */
+export function cyl_pausesAnimationsWhileUserScrolls(enabled: boolean): void {
+  CYLAnimatedItemView.pausesWhileUserScrolls = enabled;
+}
+
+/** [EN] The scroll stopped (call it from `onScrollStop`): `scrollDidEndScrolling`, the icons resume. [CN] 滚动停止（在 `onScrollStop` 中调用）：恢复图标动画。 */
+export function cyl_reportScrollStopped(): void {
+  cylScrollController().scrollStopped();
+}
+
 /** [EN] AppStorage key bumped by cyl_restoreTabBar. [CN] cyl_restoreTabBar 递增的 AppStorage 键。 */
 export const CYLRestoreTabBarStorageKey: string = 'cyl_restoreTabBar';
 

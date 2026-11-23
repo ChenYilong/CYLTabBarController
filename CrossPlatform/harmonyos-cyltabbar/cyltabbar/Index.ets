@@ -10,7 +10,7 @@ export {
 export { CYLPlusButton, CYLPlusButtonInsets, cyl_plusButtonOverhang, cyl_liquidGlassContentDy } from './src/main/ets/CYLPlusButton';
 export {
   CYLTabBarController, CYLPlusButtonPageIndex, CYLEdgeInsets, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle, CYLColorModeStorageKey, cyl_updateColorMode,
-  CYLTabBarMinimizeBehavior, CYLScrollStorageKey, cyl_reportScroll, cyl_restoreTabBar, CYLRestoreTabBarStorageKey, CYLSelectRequestStorageKey,
+  CYLTabBarMinimizeBehavior, CYLScrollStorageKey, cyl_reportScroll, cyl_reportScrollStarted, cyl_pausesAnimationsWhileUserScrolls, cyl_reportScrollStopped, cyl_restoreTabBar, CYLRestoreTabBarStorageKey, CYLSelectRequestStorageKey,
   cyl_popSelectTabBarChildViewControllerAtIndex, cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier,
   cyl_pushViewController, cyl_pushOrPopToViewController, cyl_selectTabBarItemWithIdentifier, cyl_tabBarItemIdentifiers,
   cyl_indexOfTabBarItemWithIdentifier, cyl_simulateMemoryWarning, CYLMemoryWarningStorageKey
