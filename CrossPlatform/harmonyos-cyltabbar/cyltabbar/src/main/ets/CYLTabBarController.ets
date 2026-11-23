@@ -524,6 +524,15 @@ export struct CYLTabBarController {
     while (this.badges.length < this.tabBarItemsAttributes.length) {
       this.badges.push(new CYLBadge());
     }
+    // [EN] The badges post cyl.badge.didShow / didClear to the observers of this controller and of LifecycleCenter.
+    // [CN] 角标把 cyl.badge.didShow / didClear 发给本控制器与 LifecycleCenter 的观察者。
+    const poster: (name: string, info: Record<string, unknown>) => void = (name: string, info: Record<string, unknown>): void => {
+      this.cylLifecycle?.registry.postLifecycleEvent(name, info);
+    };
+    this.badges.forEach((badge: CYLBadge) => {
+      badge.eventPoster = poster;
+    });
+    this.plusButtonBadge.eventPoster = poster;
     this.cylObserveKeyboard();
     // [EN] The Liquid Glass lens starts on the selected slot. [CN] 液态玻璃镜片从选中槽位开始。
     this.glassLensPosition = this.cylGlassSelectedSlot();
