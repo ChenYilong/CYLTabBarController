@@ -396,6 +396,7 @@ docs/
 │   ├── ios-flatdesign-gif-no-image-under-animation-ios26-4-5ba3a089.png
 │   ├── ios-flatdesign-hide-show.png
 │   ├── ios-flatdesign-svga-selected-icon-fixed.png
+│   ├── ios-flutter-engine-api-play-all.png
 │   ├── ios-gif-image-rest-then-play.png
 │   ├── ios-gif-svga-tint-option.png
 │   ├── ios-lottie-pag-tint-option.png
