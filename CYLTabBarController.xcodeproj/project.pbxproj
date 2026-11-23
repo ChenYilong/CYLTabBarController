@@ -72,6 +72,7 @@
 		2E1507D0271474797BBCF4E8 /* CYLBaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D98A52A87EF90E4B817B1B /* CYLBaseViewController.swift */; };
 		62D5B3664543CAD93E2B6B63 /* CYLTabBarController+CYLDarkModeLottie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24046800227F9936BA468645 /* CYLTabBarController+CYLDarkModeLottie.swift */; };
 		92D74E6C63452CF936E72078 /* CYLTabBarController+CYLReloadBadges.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF6F723D03529D328D4FC9F /* CYLTabBarController+CYLReloadBadges.swift */; };
+		7A1C0DE5B1D2E3F4A5B6C7D8 /* CYLAnimationEventBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1C0DE6B1D2E3F4A5B6C7D8 /* CYLAnimationEventBridge.swift */; };
 		60AE777AF591ACF33A9FD668 /* CYLTabBarController+CYLCompatibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94CED75872B4FB080BA9CDCC /* CYLTabBarController+CYLCompatibility.swift */; };
 		01ABE1771BD08D6CF68B70A0 /* CYLTabBarController+CYLMemoryWarning.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */; };
 		82EFCBD382645D8075A68204 /* UINavigationController+CYLBaseNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6B4562B20681FC22822FF4 /* UINavigationController+CYLBaseNavigation.swift */; };
@@ -734,6 +735,7 @@
 		D9D98A52A87EF90E4B817B1B /* CYLBaseViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Swift/CYLBaseViewController.swift; sourceTree = "<group>"; };
 		24046800227F9936BA468645 /* CYLTabBarController+CYLDarkModeLottie.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Swift/CYLTabBarController+CYLDarkModeLottie.swift"; sourceTree = "<group>"; };
 		CBF6F723D03529D328D4FC9F /* CYLTabBarController+CYLReloadBadges.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Swift/CYLTabBarController+CYLReloadBadges.swift"; sourceTree = "<group>"; };
+		7A1C0DE6B1D2E3F4A5B6C7D8 /* CYLAnimationEventBridge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Swift/CYLAnimationEventBridge.swift"; sourceTree = "<group>"; };
 		94CED75872B4FB080BA9CDCC /* CYLTabBarController+CYLCompatibility.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Swift/CYLTabBarController+CYLCompatibility.swift"; sourceTree = "<group>"; };
 		AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Swift/CYLTabBarController+CYLMemoryWarning.swift"; sourceTree = "<group>"; };
 		7B6B4562B20681FC22822FF4 /* UINavigationController+CYLBaseNavigation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Swift/UINavigationController+CYLBaseNavigation.swift"; sourceTree = "<group>"; };
@@ -1379,6 +1381,7 @@
 				D9D98A52A87EF90E4B817B1B /* CYLBaseViewController.swift */,
 				24046800227F9936BA468645 /* CYLTabBarController+CYLDarkModeLottie.swift */,
 				CBF6F723D03529D328D4FC9F /* CYLTabBarController+CYLReloadBadges.swift */,
+				7A1C0DE6B1D2E3F4A5B6C7D8 /* CYLAnimationEventBridge.swift */,
 				94CED75872B4FB080BA9CDCC /* CYLTabBarController+CYLCompatibility.swift */,
 				AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */,
 				7B6B4562B20681FC22822FF4 /* UINavigationController+CYLBaseNavigation.swift */,
@@ -2082,6 +2085,7 @@
 				2E1507D0271474797BBCF4E8 /* CYLBaseViewController.swift in Sources */,
 				62D5B3664543CAD93E2B6B63 /* CYLTabBarController+CYLDarkModeLottie.swift in Sources */,
 				92D74E6C63452CF936E72078 /* CYLTabBarController+CYLReloadBadges.swift in Sources */,
+				7A1C0DE5B1D2E3F4A5B6C7D8 /* CYLAnimationEventBridge.swift in Sources */,
 				60AE777AF591ACF33A9FD668 /* CYLTabBarController+CYLCompatibility.swift in Sources */,
 				01ABE1771BD08D6CF68B70A0 /* CYLTabBarController+CYLMemoryWarning.swift in Sources */,
 				82EFCBD382645D8075A68204 /* UINavigationController+CYLBaseNavigation.swift in Sources */,

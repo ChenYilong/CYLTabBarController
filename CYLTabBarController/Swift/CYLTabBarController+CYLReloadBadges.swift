@@ -85,6 +85,7 @@ extension CYLTabBarController {
         }
         // [EN] The tab buttons are ready: `cyl.core.tabBarItemsReady` (CYLDeallocBlockExecutor), for blocks added with
         //      `cylAddLifecycleCallback(forCustomEvent:)` on this controller or `CYLLifecycleCenter`. [CN] Tab 按钮已就绪的事件。
+        CYLAnimationEventBridge.install()
         cylPostLifecycleEvent("cyl.core.tabBarItemsReady")
     }
 
