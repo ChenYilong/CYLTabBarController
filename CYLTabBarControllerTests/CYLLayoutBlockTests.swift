@@ -64,4 +64,52 @@ final class CYLLayoutBlockTests: XCTestCase {
         layOut(controller)
         XCTAssertTrue(received === controller)
     }
+
+    // MARK: - The tab bar's and the items' layout blocks (CYLDeallocBlockExecutor, keyed `.end` blocks)
+
+    func testTabBarDidLayoutBlockRunsAfterEachLayoutAndNilRemovesIt() {
+        let controller = makeTabBarController()
+        guard let tabBar = controller.cyl_tabBar else { return XCTFail("no tab bar") }
+        var runs = 0
+        tabBar.didLayoutSubViewsBlock = { _ in runs += 1 }
+        layOut(controller)
+        tabBar.setNeedsLayout()
+        tabBar.layoutIfNeeded()
+        XCTAssertGreaterThanOrEqual(runs, 1)
+        let before = runs
+        tabBar.didLayoutSubViewsBlock = nil
+        tabBar.setNeedsLayout()
+        tabBar.layoutIfNeeded()
+        XCTAssertEqual(runs, before, "setting nil removes the block")
+    }
+
+    func testSettingTheTabBarBlockAgainReplacesTheFirst() {
+        let controller = makeTabBarController()
+        guard let tabBar = controller.cyl_tabBar else { return XCTFail("no tab bar") }
+        var first = 0
+        var second = 0
+        tabBar.didLayoutSubViewsBlock = { _ in first += 1 }
+        tabBar.didLayoutSubViewsBlock = { _ in second += 1 }
+        layOut(controller)
+        tabBar.setNeedsLayout()
+        tabBar.layoutIfNeeded()
+        XCTAssertEqual(first, 0)
+        XCTAssertGreaterThanOrEqual(second, 1)
+    }
+
+    func testItemLayoutBlockReceivesItsItemAndButton() {
+        let controller = makeTabBarController()
+        layOut(controller)
+        guard let item = controller.cyl_tabBar?.items?.first else { return XCTFail("no item") }
+        var received: (UITabBarItem, UIView)?
+        item.cyl_viewDidLayoutSubviewsBlock = { item, view in received = (item, view) }
+        controller.cyl_tabBar?.setNeedsLayout()
+        controller.cyl_tabBar?.layoutIfNeeded()
+        XCTAssertTrue(received?.0 === item)
+        item.cyl_viewDidLayoutSubviewsBlock = nil
+        received = nil
+        controller.cyl_tabBar?.setNeedsLayout()
+        controller.cyl_tabBar?.layoutIfNeeded()
+        XCTAssertNil(received, "setting nil removes the block")
+    }
 }

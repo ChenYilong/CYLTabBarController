@@ -6,6 +6,7 @@
 //
 
 import UIKit
+internal import CYLDeallocBlockExecutor
 
 /**
  * [EN] The tab button of an item, its animation file and size, its image position and its double tap and layout blocks.
@@ -156,7 +157,28 @@ extension UITabBarItem {
         @objc(cyl_setViewDidLayoutSubviewsBlock:) set {
             objc_setAssociatedObject(self, UITabBarItem.layoutKey, newValue.map { unsafeBitCast($0, to: AnyObject.self) },
                                      .OBJC_ASSOCIATION_COPY_NONATOMIC)
+            cylRegisterLayoutBlock()
             cyl_tabButton?.superview?.setNeedsLayout()
+        }
+    }
+
+    private static let layoutCallbackKey = "cyl.core.itemLayoutBlock"
+
+    /// [EN] The block runs through CYLDeallocBlockExecutor: a keyed `.end` block of `viewDidLayoutSubviews`, dispatched by the
+    ///      tab bar after each layout (`cylRunItemLayoutBlocks`); it needs the item's tab button, as before. Replaced on a new
+    ///      block, removed on nil.
+    /// [CN] block 通过 CYLDeallocBlockExecutor 执行：`viewDidLayoutSubviews` 上带 key 的 `.end` block，由 TabBar 在每次布局后派发
+    ///      （`cylRunItemLayoutBlocks`）；与之前一样需要 item 的 Tab 按钮。设置新 block 时替换，设置为 nil 时移除。
+    private func cylRegisterLayoutBlock() {
+        cylSetManualLifecycleDispatch(true, for: [.viewDidLayoutSubviews], timings: [.end])
+        guard cyl_viewDidLayoutSubviewsBlock != nil else {
+            _ = cylCancelLifecycleCallback(key: Self.layoutCallbackKey)
+            return
+        }
+        cylAddLifecycleCallback(for: .viewDidLayoutSubviews, timing: .end, key: Self.layoutCallbackKey) { item, _, _ in
+            if let block = item.cyl_viewDidLayoutSubviewsBlock, let view = item.cyl_tabButton {
+                block(item, view)
+            }
         }
     }
 

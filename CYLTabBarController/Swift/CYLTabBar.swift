@@ -40,7 +40,10 @@ open class CYLTabBar: UITabBar, UIGestureRecognizerDelegate {
     // [EN] Spelled out, not `CYLTabBarDidLayoutSubViewsBlock`: the generated header may be read before that typedef; the
     //      types are the same for Objective-C callers. [CN] 写出完整类型而非 `CYLTabBarDidLayoutSubViewsBlock`：生成的头文件可能在该 typedef
     //      之前被读取；对 Objective-C 调用方而言类型相同。
-    @objc public var didLayoutSubViewsBlock: (@convention(block) (CYLTabBar) -> Void)?
+    @objc public var didLayoutSubViewsBlock: (@convention(block) (CYLTabBar) -> Void)? {
+        // [EN] Registered as a keyed `.end` block of CYLDeallocBlockExecutor (see `cylRegisterDidLayoutSubViewsBlock`). [CN] 登记为 CYLDeallocBlockExecutor 中带 key 的 `.end` block（见 `cylRegisterDidLayoutSubViewsBlock`）。
+        didSet { cylRegisterDidLayoutSubViewsBlock() }
+    }
 
     /**
      [EN] The plus button's state: registered and its context matches. [CN] PlusButton 的状态：已注册且 context 一致。
