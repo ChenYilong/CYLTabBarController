@@ -408,6 +408,7 @@ docs/
 │   ├── ios-layout-block-dealloc-executor.png
 │   ├── ios-lottie-pag-tint-option.png
 │   ├── ios-lottie4-tint-option.png
+│   ├── ios-pause-5-of-5-final-pin.png
 │   ├── ios-pause-after-flick-fixed-library.png
 │   ├── ios-pause-while-scrolling-counter.png
 │   ├── ios-pause-while-scrolling-switch.png
