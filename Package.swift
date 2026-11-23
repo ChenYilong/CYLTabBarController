@@ -26,7 +26,7 @@ let package = Package(
         .package(url: "https://github.com/airbnb/lottie-spm.git", from: "4.5.1"),
         // [EN] Lifecycle and dealloc blocks (docs/Lifecycle-Library.md). Pending: `from: "1.4.0"` once it is tagged.
         // [CN] 生命周期与 dealloc block（docs/Lifecycle-Library.md）。待办：打 tag 后改为 `from: "1.4.0"`。
-        .package(url: "https://github.com/ChenYilong/CYLDeallocBlockExecutor.git", revision: "9e141eafbff18a3644c7ea202bc4379c48dee499"),
+        .package(url: "https://github.com/ChenYilong/CYLDeallocBlockExecutor.git", revision: "f1397ed0e8b7fe34d0756986fdba59ad02d9eb6f"),
     ],
     targets: [
         // [EN] CYLAnimatedItem, Swift half: the animation URL options and the engine's Swift protocols, plus the component's

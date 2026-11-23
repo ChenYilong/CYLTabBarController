@@ -28,7 +28,7 @@ target 'CyltabbarExample' do
   # CYLTabBarController from this repository, for debugging the library together with the component.
   # The Objective-C example's subspec: FlatDesign and Lottie 4.x. ObjC 示例使用的子库：扁平样式与 Lottie 4.x。
   pod 'CYLTabBarController/CYLFlatDesignTabBar', :path => '../../../..'
-  pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => '9e141eafbff18a3644c7ea202bc4379c48dee499' # TODO: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md)
+  pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => 'f1397ed0e8b7fe34d0756986fdba59ad02d9eb6f' # TODO: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md)
   # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
   # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
   pod 'CYLAnimatedItem', :path => '../../../..'

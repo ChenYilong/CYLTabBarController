@@ -1,4 +1,5 @@
 import { LifecycleCenter } from './center';
+import { LifecycleLog } from './log';
 import { allTimings } from './types';
 import type { LifecycleCallback, LifecycleEvent, LifecycleInfo, LifecycleTiming } from './types';
 
@@ -140,6 +141,7 @@ export class LifecycleRegistry {
     const snapshot = this.entries
       .filter((e) => e.custom === name && !(e.invokeOnce && e.fired))
       .sort((a, b) => a.identifier - b.identifier);
+    LifecycleLog.log(() => `${LifecycleLog.describe(owner)} posts ${name}: ${snapshot.length} block(s)`);
     for (const e of snapshot) {
       if (e.cancelled || (e.invokeOnce && e.fired)) continue;
       if (e.invokeOnce) e.fired = true;
@@ -247,10 +249,12 @@ export class LifecycleRegistry {
     if (owner === undefined) return;
     const snapshot = this.entries.filter((e) => kindOf(e) === 'dealloc').sort((a, b) => a.identifier - b.identifier);
     this.entries = this.entries.filter((e) => kindOf(e) !== 'dealloc');
+    LifecycleLog.log(() => `teardown ${LifecycleLog.describe(owner)}: ${snapshot.length} block(s)`);
     for (const e of snapshot) {
       if (e.cancelled) continue;
       e.callback(owner, e.identifier, { event: null, timing: 'end', isDealloc: true });
     }
+    LifecycleCenter.dispatchDealloc(LifecycleLog.describe(owner));
   }
 
   // dispatch
@@ -323,6 +327,7 @@ export class LifecycleRegistry {
     const snapshot = this.entries
       .filter((e) => e.event === event && e.timing === timing && !(e.invokeOnce && e.fired))
       .sort((a, b) => a.identifier - b.identifier);
+    LifecycleLog.log(() => `${LifecycleLog.describe(owner)} ${event}/${timing}: ${snapshot.length} block(s)`);
     for (const e of snapshot) {
       if (e.cancelled || (e.invokeOnce && e.fired)) continue;
       if (e.invokeOnce) e.fired = true;
