@@ -7,6 +7,15 @@ by tag and kept under 200 lines: see [instructions.md](instructions.md)).
 - **Verify** before pushing: `pod lib lint CYLTabBarController.podspec --quick`, plus a build or static check of the
   changed code. Say plainly what could not be verified.
 
+- **Code written without a compiler (added 2026-11-23)**: when Swift or Objective-C is written where it cannot be built
+  (a Linux session, no Xcode), (1) say so in the commit message ("not compiled here"); (2) run
+  `python3 scripts/check-swift-protocol-bodies.py CYLTabBarController` and, for Objective-C, `clang -fsyntax-only` against stubs
+  where that is possible; (3) do not rely on the Linux checks: the iOS CI build (pod lib lint, the demos) is the real check,
+  so look at its result before telling anyone the code works. Downstream repositories pin this repository's *latest commit
+  on any branch* (`scripts/latest-cyl-commit.sh`), so a commit pushed without a compiler can break an integrator before CI
+  has run on it (CYLTableViewPlaceHolder, `e0d5e960`). Prefer pushing such code only after the review step above, and fix a
+  reported break first, then reply (`docs/instructions/code.md`, "Protocols hold requirements only").
+
 ## CI/CD and where tests run
 
 - **GitHub CI/CD for iOS runs on macOS 26 by default.** Before you rely on a CI environment, always read

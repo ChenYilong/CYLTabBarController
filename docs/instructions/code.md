@@ -25,6 +25,26 @@ by tag and kept under 200 lines: see [instructions.md](instructions.md)).
 - **No warnings**: fix every build and static-analyzer warning you meet, including old ones in code you did not change.
 - **Public API**: never remove or change an existing public API; add new API instead. Prefer implementing an existing
   protocol method over adding a new category method; file-private C functions and private headers are fine.
+- **Protocols hold requirements only; edits are anchored uniquely (added 2026-11-23, the `CYLAnimatedItemAnimating` break)**:
+  a Swift protocol lists requirements and nothing else: no function body, no stored property. Implementations go in the
+  class (or, for a Swift-only protocol, in a protocol extension; an `@objc` protocol cannot get Objective-C-visible
+  defaults from an extension). What happened: `pauseAnimation()` / `resumeAnimation()` were pasted with their bodies inside
+  `@objc public protocol CYLAnimatedItemAnimating` (commit `cc74a545`, still in `e0d5e960`), because the anchor text
+  `func playAnimation()` occurs in the protocol *and* in the class and the paste landed at the first match. Swift rejects
+  that, and every integrator that pinned the branch (CYLTableViewPlaceHolder) failed to compile before any CI had run on
+  the commit. Rules:
+  (1) **Released protocols**: `CYLAnimatedItemAnimating` and every other public protocol is released API; a new *required*
+  member breaks external conformers, so a new member of an `@objc` protocol is `@objc optional` (called as `x.method?()`),
+  or the method lives only on the class when every caller holds the class.
+  (2) **Anchors**: when a script or an edit inserts code, the anchor text includes the declaration keyword and the opening
+  brace (`open func playAnimation() {`, not `func playAnimation()`), is asserted to occur exactly once, and the insertion
+  point is the *end* of a declaration (never right after an opening brace). A search must also be scoped: the end marker of
+  a block is searched from the start marker, not from the top of the file.
+  (3) **Afterwards, check the enclosing declaration** of what was inserted (`sed -n '/protocol Name/,/^}/p'`), and compare
+  the protocol's member list with its version before the change.
+  (4) **Run `python3 scripts/check-swift-protocol-bodies.py CYLTabBarController`** before pushing Swift written without a
+  compiler: it fails on a protocol that contains a function body or a stored property (it found the two bodies above and
+  reports 0 after the fix). It is a heuristic, not a compile: say in the commit that the code was not compiled.
 - **Swift-friendly names for underscored protocol methods**: Swift method names must not contain underscores, but a
   Swift class that implements an Objective-C protocol method must use its imported name (e.g. `cyl_play…`); renaming it
   no longer satisfies the protocol. Adding `NS_SWIFT_NAME` to the existing method would change a Swift API already
