@@ -166,6 +166,11 @@
 | `cyl-lottie` `cyl_playSegments` | 方法 / method | ✅ 透传 / passes through to lottie-web `playSegments` |
 | `cyl-lottie` `cyl_setSpeed` | 方法 / method | ✅ 12 |
 | `cyl-lottie` `cyl_animation` | 方法 / method | ✅ evaluate（读取 / read `currentFrame`、`totalFrames`） |
+| `cyl-animated-item` `showsImageWhenAnimationEnds`（`shows-image-when-animation-ends`） | 属性 / property | ✅ 测试 / test `cyl_animated_item_component.test.js`（默认关；结束后显示静态图片，下一次播放重新显示动画；循环或没有图片时不换；GIF 一遍结束同样 / off by default; the still image after the end, the animation again on the next play; not with a loop or without an image; the same for a GIF pass） |
+| `cyl-animated-item` `animationcomplete` | 事件 / event | ✅ 测试 / test：只播放一次的一遍播放结束时发送（`player.onEnded` 同一时刻），循环与 `stopAnimation()` 不发送 / sent when a play-once pass ends (the same moment as `player.onEnded`), not for a loop or after `stopAnimation()` |
+| `cyl-animated-item` `drivesAnimationPlayback` | 属性 / property | ✅ 测试 / test `cyl_animated_item_player.test.js`（默认 true；false 时不应用任何默认规则，由宿主通过 `cyl_player()` 播放 / default true; false applies no default rule and the host plays through `cyl_player()`） |
+| `cyl-animated-item` `restartToken` | 属性 / property | ✅ 测试 / test `cyl_animated_item_player.test.js`（值变大时从头重播；创建时的值与更小的值不算 / a larger value plays again from the start; the value at creation and a lower one do not） |
+| `cyl-animated-item` `playAnimation`、`restartAnimation`、`stopAnimation`、`cyl_player()`（`play()`、`stopAtProgress(p)`） | 方法 / methods | ✅ 测试 / test `cyl_animated_item_player.test.js`（`play()` 从进度 0 播放；`stopAtProgress(p)` 暂停并定位到 0…1 / `play()` from progress 0; `stopAtProgress(p)` pauses and seeks to 0…1） |
 | 依赖 / dependency | 动画包可选 / animation packages optional | ✅ `cyl-tabbar-miniprogram` 不依赖动画库；示例只安装所选的一个 / depends on no animation library; the example installs the chosen one only（21–24） |
 
 ## [CN]cyl-tab-bar-item 与 CYLFlatDesignTabBarItem

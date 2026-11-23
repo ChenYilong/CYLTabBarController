@@ -1,0 +1,50 @@
+[
+ {
+  "ios": "CYLAnimatedItemView.showsImageWhenAnimationEnds",
+  "android": "CYLAnimatedItemView.showsImageWhenAnimationEnds",
+  "status": "done",
+  "note": "只播放一次的动画结束时显示静态图片代替最后一帧，默认 false / A play-once animation that ends shows the still image instead of the last frame, default false"
+ },
+ {
+  "ios": "CYLAnimatedItemView.isShowingImageAfterAnimationEnd",
+  "android": "CYLAnimatedItemView.isShowingImageAfterAnimationEnd",
+  "status": "done",
+  "note": "静态图片当前是否替换了已结束的动画（只读）/ Whether the still image replaces the ended animation now (read only)"
+ },
+ {
+  "ios": "CYLAnimatedItemView.onAnimationEnd",
+  "android": "CYLAnimatedItemView.animationEndListener",
+  "status": "done",
+  "note": "只播放一次的一遍播放结束时调用，停止与循环时不调用（鸿蒙 `onAnimationEnd`，小程序 `animationcomplete`）/ Called when a play-once pass ends, not on a stop or a loop (HarmonyOS `onAnimationEnd`, mini program `animationcomplete`)"
+ },
+ {
+  "ios": "CYLAnimatedItemView.drivesAnimationPlayback",
+  "android": "CYLAnimatedItemView.drivesAnimationPlayback",
+  "status": "partial",
+  "note": "默认值不同：iOS 与鸿蒙为 true，Android 为 false（待负责人决定，未改）；false 时不应用默认播放规则，宿主通过播放器播放 / The defaults differ: true on iOS and HarmonyOS, false on Android (owner question, not changed); false applies no default playback rule and the host plays through the player"
+ },
+ {
+  "ios": "CYLAnimatedItemView.animationRestartToken",
+  "android": "CYLAnimatedItemView.animationRestartToken",
+  "status": "done",
+  "note": "每次重播加一；iOS 只读，Android 可写，值变化即重播（鸿蒙 `animationRestartToken`，小程序 `restartToken`）/ Grows on every restart; read only on iOS, settable on Android where a changed value restarts (HarmonyOS `animationRestartToken`, mini program `restartToken`)"
+ },
+ {
+  "ios": "CYLAnimatedItemView.animationPlayer.play()",
+  "android": "CYLAnimatedItemView.animatedItemPlayer.play()",
+  "status": "done",
+  "note": "从当前进度播放 / Plays from the current progress"
+ },
+ {
+  "ios": "CYLAnimatedItemView.animationPlayer.progress (stop, then set)",
+  "android": "CYLAnimatedItemView.animatedItemPlayer.stopAtProgress(progress)",
+  "status": "partial",
+  "note": "iOS 没有单独的 `stopAtProgress`：先 `stop()`，播放器支持时再设置 `progress` / iOS has no single `stopAtProgress`: `stop()`, then set `progress` where the player supports it"
+ },
+ {
+  "ios": "CYLAnimatedItemView.restartAnimation()",
+  "android": "CYLAnimatedItemView.restartAnimation()",
+  "status": "done",
+  "note": "从进度 0 重新播放 / Plays again from progress 0"
+ }
+]

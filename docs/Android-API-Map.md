@@ -99,6 +99,7 @@
 | [`UIViewController+CYLTabBarItemUpdate.h`](#uiviewcontrollercyltabbaritemupdateh) | [`UIViewController+CYLTabBarItemUpdate.h`](#uiviewcontrollercyltabbaritemupdateh) |
 | [`UIViewController+CYLThemeSettings.h`](#uiviewcontrollercylthemesettingsh) | [`UIViewController+CYLThemeSettings.h`](#uiviewcontrollercylthemesettingsh) |
 | [仅 Android](#仅-android--android-only) | [Android only](#仅-android--android-only) |
+| [`CYLAnimatedItemView` 引擎契约](#cylanimateditemview-引擎契约--cylanimateditemview-engine-contract) | [`CYLAnimatedItemView` engine contract](#cylanimateditemview-引擎契约--cylanimateditemview-engine-contract) |
 
 <!-- navigation:end -->
 
@@ -1937,3 +1938,20 @@
 | `CYLTabBar.cyl_itemWidthWeights` | Tab widths by weight / 按权重分配宽度 |
 | `CYLTabBarController.cyl_swipesBetweenPages` | Swipe between pages / 滑动翻页 |
 | `CYLTabBarController.cyl_setupWithViewPager2` | Pages in a ViewPager2 / 页面放进 ViewPager2 |
+
+## `CYLAnimatedItemView` 引擎契约 / `CYLAnimatedItemView` engine contract
+
+| 中文 | English |
+|:---|:---|
+| 跨端动效引擎契约的成员（鸿蒙为准，见 [Animated-Item](Animated-Item.md)「Engine API across platforms」）。iOS 上 `CYLAnimatedItemView` 是 Swift 类，不在冻结的 Objective-C 头文件清单中，因此在这里单独列出，不计入完成率。 | Members of the cross-platform animation engine contract (HarmonyOS is the reference, see "Engine API across platforms" in [Animated-Item](Animated-Item.md)). On iOS `CYLAnimatedItemView` is a Swift class, not in the frozen Objective-C header list, so its members are listed here on their own, out of the score. |
+
+| iOS API | Android API | 状态 Status | 说明 / Note |
+|:---|:---|:---|:---|
+| `CYLAnimatedItemView.showsImageWhenAnimationEnds` | `CYLAnimatedItemView.showsImageWhenAnimationEnds` | done | 只播放一次的动画结束时显示静态图片代替最后一帧，默认 false / A play-once animation that ends shows the still image instead of the last frame, default false |
+| `CYLAnimatedItemView.isShowingImageAfterAnimationEnd` | `CYLAnimatedItemView.isShowingImageAfterAnimationEnd` | done | 静态图片当前是否替换了已结束的动画（只读）/ Whether the still image replaces the ended animation now (read only) |
+| `CYLAnimatedItemView.onAnimationEnd` | `CYLAnimatedItemView.animationEndListener` | done | 只播放一次的一遍播放结束时调用，停止与循环时不调用（鸿蒙 `onAnimationEnd`，小程序 `animationcomplete`）/ Called when a play-once pass ends, not on a stop or a loop (HarmonyOS `onAnimationEnd`, mini program `animationcomplete`) |
+| `CYLAnimatedItemView.drivesAnimationPlayback` | `CYLAnimatedItemView.drivesAnimationPlayback` | partial | 默认值不同：iOS 与鸿蒙为 true，Android 为 false（待负责人决定，未改）；false 时不应用默认播放规则，宿主通过播放器播放 / The defaults differ: true on iOS and HarmonyOS, false on Android (owner question, not changed); false applies no default playback rule and the host plays through the player |
+| `CYLAnimatedItemView.animationRestartToken` | `CYLAnimatedItemView.animationRestartToken` | done | 每次重播加一；iOS 只读，Android 可写，值变化即重播（鸿蒙 `animationRestartToken`，小程序 `restartToken`）/ Grows on every restart; read only on iOS, settable on Android where a changed value restarts (HarmonyOS `animationRestartToken`, mini program `restartToken`) |
+| `CYLAnimatedItemView.animationPlayer.play()` | `CYLAnimatedItemView.animatedItemPlayer.play()` | done | 从当前进度播放 / Plays from the current progress |
+| `CYLAnimatedItemView.animationPlayer.progress (stop, then set)` | `CYLAnimatedItemView.animatedItemPlayer.stopAtProgress(progress)` | partial | iOS 没有单独的 `stopAtProgress`：先 `stop()`，播放器支持时再设置 `progress` / iOS has no single `stopAtProgress`: `stop()`, then set `progress` where the player supports it |
+| `CYLAnimatedItemView.restartAnimation()` | `CYLAnimatedItemView.restartAnimation()` | done | 从进度 0 重新播放 / Plays again from progress 0 |

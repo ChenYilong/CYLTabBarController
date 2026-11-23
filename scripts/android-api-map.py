@@ -213,6 +213,7 @@ def inventory():
 
 
 ANDROID_ONLY_PATH = os.path.join(os.path.dirname(MAP_PATH), 'api-map-android-only.json')
+ANIMATED_ITEM_PATH = os.path.join(os.path.dirname(MAP_PATH), 'api-map-animated-item.json')
 
 
 def load_android_only():
@@ -223,6 +224,19 @@ def load_android_only():
     if not os.path.exists(ANDROID_ONLY_PATH):
         return []
     with open(ANDROID_ONLY_PATH, encoding='utf-8') as handle:
+        return json.load(handle)
+
+
+def load_animated_item():
+    """
+    [EN] The engine contract of `CYLAnimatedItemView` (Swift on iOS, so not in the frozen Objective-C header list): a list of
+         {"ios", "android", "status", "note"}, listed in their own section, out of the score.
+    [CN] `CYLAnimatedItemView` 的引擎契约（iOS 上是 Swift，不在冻结的 Objective-C 头文件清单中）：{"ios", "android", "status", "note"}
+         列表，单独成节，不计入完成率。
+    """
+    if not os.path.exists(ANIMATED_ITEM_PATH):
+        return []
+    with open(ANIMATED_ITEM_PATH, encoding='utf-8') as handle:
         return json.load(handle)
 
 
@@ -283,6 +297,14 @@ def document(rows, mapping):
                 '| 这些 API 只在 Android 上存在，iOS 库没有对应 API，不计入完成率。详见 [Android-Library](Android-Library.md) 的「仅 Android 的扩展」。 | These APIs exist on Android only; the iOS library has no counterpart, and they are left out of the score. Details: "Android-only extensions" in [Android-Library](Android-Library.md). |', '',
                 '| Android API | 说明 / Note |', TABLE_RULE]
         out += ['| `%s` | %s |' % (entry['android'], entry.get('note', '')) for entry in extensions]
+        out.append('')
+    contract = load_animated_item()
+    if contract:
+        out += ['## `CYLAnimatedItemView` 引擎契约 / `CYLAnimatedItemView` engine contract', '',
+                '| 中文 | English |', TABLE_RULE,
+                '| 跨端动效引擎契约的成员（鸿蒙为准，见 [Animated-Item](Animated-Item.md)「Engine API across platforms」）。iOS 上 `CYLAnimatedItemView` 是 Swift 类，不在冻结的 Objective-C 头文件清单中，因此在这里单独列出，不计入完成率。 | Members of the cross-platform animation engine contract (HarmonyOS is the reference, see "Engine API across platforms" in [Animated-Item](Animated-Item.md)). On iOS `CYLAnimatedItemView` is a Swift class, not in the frozen Objective-C header list, so its members are listed here on their own, out of the score. |', '',
+                '| iOS API | Android API | 状态 Status | 说明 / Note |', '|:---|:---|:---|:---|']
+        out += ['| `%s` | `%s` | %s | %s |' % (entry['ios'], entry['android'], entry['status'], entry.get('note', '')) for entry in contract]
         out.append('')
     return '\n'.join(out)
 
