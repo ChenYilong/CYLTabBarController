@@ -30,9 +30,8 @@ class MainTabBarController: CYLTabBarController {
         //      the default logic runs, which may cause your custom style to have no effect.
 
         self.tabBarStyleType = .liquidGlass
-        // [EN] Tab icon animations pause while the user scrolls a list and resume afterwards (cyl.animation.didPause / didResume).
-        // [CN] 用户滚动列表时 Tab 图标动画暂停，滚动结束后恢复（cyl.animation.didPause / didResume）。
-        CYLAnimationEventBridge.pausesAnimationsWhileUserScrolls(true)
+        // [EN] The Playback card's "Pause while scrolling" switch turns `CYLAnimationEventBridge.pausesAnimationsWhileUserScrolls` on.
+        // [CN] Playback 卡片中的「滚动时暂停」开关会开启 `CYLAnimationEventBridge.pausesAnimationsWhileUserScrolls`。
 
         UIApplication.shared.applicationSupportsShakeToEdit = true
         self.becomeFirstResponder()

@@ -468,3 +468,4 @@
 "none yet" = "aucun pour l'instant";
 "Host-driven playback (drivesAnimationPlayback = false)" = "Lecture pilotée par l'hôte (drivesAnimationPlayback = false)";
 "Engine API" = "API moteur";
+"Pause while scrolling" = "Pause pendant le défilement";

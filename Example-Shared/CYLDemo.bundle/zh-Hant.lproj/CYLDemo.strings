@@ -468,3 +468,4 @@
 "none yet" = "尚無";
 "Host-driven playback (drivesAnimationPlayback = false)" = "由宿主驅動播放（drivesAnimationPlayback = false）";
 "Engine API" = "引擎 API";
+"Pause while scrolling" = "滾動時暫停";

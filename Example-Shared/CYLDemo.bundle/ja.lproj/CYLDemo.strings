@@ -468,3 +468,4 @@
 "none yet" = "まだなし";
 "Host-driven playback (drivesAnimationPlayback = false)" = "ホストが再生を制御（drivesAnimationPlayback = false）";
 "Engine API" = "エンジン API";
+"Pause while scrolling" = "スクロール中は一時停止";

@@ -468,3 +468,4 @@
 "none yet" = "ingen än";
 "Host-driven playback (drivesAnimationPlayback = false)" = "Värden styr uppspelningen (drivesAnimationPlayback = false)";
 "Engine API" = "Motor-API";
+"Pause while scrolling" = "Pause while scrolling";

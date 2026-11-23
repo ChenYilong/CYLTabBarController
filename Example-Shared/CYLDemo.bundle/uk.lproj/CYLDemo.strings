@@ -468,3 +468,4 @@
 "none yet" = "ще немає";
 "Host-driven playback (drivesAnimationPlayback = false)" = "Відтворенням керує хост (drivesAnimationPlayback = false)";
 "Engine API" = "API рушія";
+"Pause while scrolling" = "Pause while scrolling";

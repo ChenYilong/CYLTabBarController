@@ -468,3 +468,4 @@
 "none yet" = "아직 없음";
 "Host-driven playback (drivesAnimationPlayback = false)" = "호스트가 재생 제어 (drivesAnimationPlayback = false)";
 "Engine API" = "엔진 API";
+"Pause while scrolling" = "스크롤 중 일시정지";

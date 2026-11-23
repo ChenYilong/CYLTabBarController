@@ -468,3 +468,4 @@
 "none yet" = "jeszcze brak";
 "Host-driven playback (drivesAnimationPlayback = false)" = "Odtwarzaniem steruje host (drivesAnimationPlayback = false)";
 "Engine API" = "API silnika";
+"Pause while scrolling" = "Pause while scrolling";

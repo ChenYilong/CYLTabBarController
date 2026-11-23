@@ -27,6 +27,7 @@ final class CYLDemoPlaybackControlsView: UIView {
     private let speedSlider = UISlider()
     private let speedValueLabel = UILabel()
     private let loopSwitch = UISwitch()
+    private let pauseSwitch = UISwitch()
 
     /**
      * [EN] Puts the controls above the rows of `tableView`, for the tab bar controller of `viewController`.
@@ -106,7 +107,17 @@ final class CYLDemoPlaybackControlsView: UIView {
         let loopRow = UIStackView(arrangedSubviews: [loopLabel, loopSwitch])
         loopRow.alignment = .center
 
-        let card = UIStackView(arrangedSubviews: [playAllButton, speedRow, loopRow])
+        // [EN] Pause while scrolling: every playing icon pauses while the user scrolls a list and resumes afterwards
+        //      (CYLAnimationEventBridge, the events cyl.animation.didPause / didResume). [CN] 滚动时暂停：用户滚动列表时所有播放中的图标暂停，滚动结束后恢复。
+        let pauseLabel = UILabel()
+        pauseLabel.text = cylDemoLocalizedString("Pause while scrolling")
+        pauseLabel.isAccessibilityElement = false
+        pauseSwitch.accessibilityLabel = cylDemoLocalizedString("Pause while scrolling")
+        pauseSwitch.addTarget(self, action: #selector(pauseChanged), for: .valueChanged)
+        let pauseRow = UIStackView(arrangedSubviews: [pauseLabel, pauseSwitch])
+        pauseRow.alignment = .center
+
+        let card = UIStackView(arrangedSubviews: [playAllButton, speedRow, loopRow, pauseRow])
         card.axis = .vertical
         card.spacing = 12
         card.isLayoutMarginsRelativeArrangement = true
@@ -142,6 +153,10 @@ final class CYLDemoPlaybackControlsView: UIView {
         speedSlider.value = (speedSlider.value / 0.05).rounded() * 0.05
         tabBarController?.tabBarItemAnimationSpeed = CGFloat(speedSlider.value)
         updateSpeedValue()
+    }
+
+    @objc private func pauseChanged() {
+        CYLAnimationEventBridge.pausesAnimationsWhileUserScrolls(pauseSwitch.isOn)
     }
 
     @objc private func loopChanged() {
