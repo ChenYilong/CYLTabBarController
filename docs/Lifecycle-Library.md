@@ -35,6 +35,7 @@
 | [Step 12: native host events for React Native and Flutter (static) / 第 12 步：React Native 与 Flutter 的原生宿主事件（静态）](#step-12-native-host-events-for-react-native-and-flutter-static--第-12-步react-native-与-flutter-的原生宿主事件静态) | [Step 12: native host events for React Native and Flutter (static) / 第 12 步：React Native 与 Flutter 的原生宿主事件（静态）](#step-12-native-host-events-for-react-native-and-flutter-static--第-12-步react-native-与-flutter-的原生宿主事件静态) |
 | [Step 13: HarmonyOS wiring (static) / 第 13 步：HarmonyOS 接线（静态）](#step-13-harmonyos-wiring-static--第-13-步harmonyos-接线静态) | [Step 13: HarmonyOS wiring (static) / 第 13 步：HarmonyOS 接线（静态）](#step-13-harmonyos-wiring-static--第-13-步harmonyos-接线静态) |
 | [Step 14: one library commit everywhere / 第 14 步：所有位置固定同一个库 commit](#step-14-one-library-commit-everywhere--第-14-步所有位置固定同一个库-commit) | [Step 14: one library commit everywhere / 第 14 步：所有位置固定同一个库 commit](#step-14-one-library-commit-everywhere--第-14-步所有位置固定同一个库-commit) |
+| [Step 15: advisor re-score (2026-11-23) / 第 15 步：advisor 重新评分](#step-15-advisor-re-score-2026-11-23--第-15-步advisor-重新评分) | [Step 15: advisor re-score (2026-11-23) / 第 15 步：advisor 重新评分](#step-15-advisor-re-score-2026-11-23--第-15-步advisor-重新评分) |
 
 <!-- navigation:end -->
 
@@ -156,3 +157,16 @@
 
 - [EN] Every pin (Podfiles, Package.swift, Package.resolved, pbxproj, Gradle files and lockfiles, `libs.versions.toml`, `pod-lint.sh`) and both vendored copies (HarmonyOS, Mini Program) now follow library commit `43f94adfc31f7f7620f5b07bf03dd15a57f44f45` (JitPack build confirmed). `scripts/sync-cyldeallocblockexecutor.sh --check` passes. The library's Android scroll source, Flutter CI job and RN `useLifecycle` additions are in it.
 - [CN] 所有固定（Podfile、Package.swift、Package.resolved、pbxproj、Gradle 文件与锁文件、`libs.versions.toml`、`pod-lint.sh`）和两份内置副本（HarmonyOS、小程序）现在都指向库 commit `43f94adfc31f7f7620f5b07bf03dd15a57f44f45`（已确认 JitPack 构建）。`scripts/sync-cyldeallocblockexecutor.sh --check` 通过。库里的 Android 滚动来源、Flutter CI 任务与 RN `useLifecycle` 新增内容都包含在内。
+
+## Step 15: advisor re-score (2026-11-23) / 第 15 步：advisor 重新评分
+
+- [EN] Task record. Prompt (verbatim): "advisor重新评分更新文档". Rubric: 100 = every platform posts `cyl.animation.*` / `cyl.badge.*`, pauses animations while the user scrolls, shows it in a demo, and the code is built and run on its platform; 60 = events work and the code compiles in CI. Current effect score about 63 / 100 (Android ~78, Mini Program ~76, iOS ~62, HarmonyOS ~58, React Native ~58, Flutter ~48; table and "verified how" column in the library's `docs/Cross-Platform-API.md`). The library CI showed the Swift suite compiling and 79 of 80 passing; the failure (global observers heard a drag once per subview) is fixed in library `273a577`, so the pins here are one library commit behind until the next pin step. HarmonyOS `.ets` uses `Object`, not `unknown` (ArkTS strict mode). Not `DONE`: below 100.
+- [CN] 任务记录。提示词（原文）：「advisor重新评分更新文档」。评分标准：100 = 每个平台都发出 `cyl.animation.*` / `cyl.badge.*`、在用户滚动时暂停动画、有示例演示，且代码已在其平台上构建并运行；60 = 事件可用且代码在 CI 中编译通过。当前效果分约 63 / 100（Android ~78、小程序 ~76、iOS ~62、HarmonyOS ~58、React Native ~58、Flutter ~48；表格与「验证方式」列见库的 `docs/Cross-Platform-API.md`）。库的 CI 显示 Swift 测试套件已能编译，80 项通过 79 项；失败项（global 观察者对一次拖动按子视图重复收到）已在库 `273a577` 修复，因此这里的固定比库落后一个 commit，下次固定时更新。HarmonyOS 的 `.ets` 使用 `Object`，不用 `unknown`（ArkTS 严格模式）。未达 100，不标 `DONE`。
+
+TODO（缺失项 / missing points）:
+- [ ] iOS: build and run the unit tests (`890b7146` fix pending CI); GIF path posts no animation events; verify speed-0 pause per engine; avoid KVO class swap on tab buttons; demo row and screenshot (needs Xcode). iOS：构建并运行单元测试；GIF 路径不发动画事件；逐个引擎验证速度为 0 的暂停；避免 tab 按钮上的 KVO 类替换；示例行与截图（需要 Xcode）。
+- [ ] HarmonyOS: build with hvigor; demo enabling `pausesWhileUserScrolls` and calling `scrollStarted()` / `scrollStopped()`. HarmonyOS：用 hvigor 构建；示例启用 `pausesWhileUserScrolls` 并调用 `scrollStarted()` / `scrollStopped()`。
+- [ ] React Native and Flutter: a host prop (for example `animationsPaused`, like `playAllRequest`) so a JS / Dart `whileUserScrolls` can pause the native tab icons; Codegen and type check; examples. React Native 与 Flutter：增加宿主属性（如 `animationsPaused`，仿 `playAllRequest`），让 JS / Dart 的 `whileUserScrolls` 能暂停原生 Tab 图标；Codegen 与类型检查；示例。
+- [ ] Android: pause support for Rive / GIF / SVGA players; demo calling `observeScrolling`; run on a device. Android：Rive / GIF / SVGA 播放器的暂停；示例调用 `observeScrolling`；真机运行。
+- [ ] Mini Program: route `onPageScroll` of the example pages to the controller; run in WeChat DevTools. 小程序：示例页面把 `onPageScroll` 交给控制器；在微信开发者工具中运行。
+- [ ] Pins: move all pins and vendored copies to library `273a577` or later once the library CI is green; merge library PR #12 (merge commit). 固定：库 CI 通过后，把所有固定与内置副本更新到库 `273a577` 或更新的 commit；合并库 PR #12（merge commit）。

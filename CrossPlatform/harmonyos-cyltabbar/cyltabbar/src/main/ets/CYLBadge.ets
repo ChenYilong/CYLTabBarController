@@ -160,7 +160,7 @@ export class CYLBadge {
    *      badge posts `cyl.badge.didShow` / `cyl.badge.didClear` (BadgeEvents of the core library).
    * [CN] 角标事件的去向：设置后角标会发出 `cyl.badge.didShow` / `cyl.badge.didClear`（核心库的 BadgeEvents）。
    */
-  eventPoster?: (name: string, info: Record<string, unknown>) => void;
+  eventPoster?: (name: string, info: Record<string, Object>) => void;
 
   /** [EN] -cyl_showBadge: a red dot. [CN] 显示红点。 */
   cyl_showBadge(): void {
