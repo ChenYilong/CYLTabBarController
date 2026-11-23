@@ -1,5 +1,12 @@
 #import "CyltabbarAnimationView.h"
 
+// [EN] Objective-C++ has no `@import`, so the generated Swift header of CYLAnimatedItem cannot import SVGAPlayerLite itself: its
+//      `SVGAPlayer` class must be declared first (the SVGA subspec only).
+// [CN] Objective-C++ 没有 `@import`，CYLAnimatedItem 生成的 Swift 头文件无法自行导入 SVGAPlayerLite：必须先声明 `SVGAPlayer` 类（仅 SVGA 子库）。
+#if __has_include(<SVGAPlayerLite/SVGAPlayer.h>)
+#import <SVGAPlayerLite/SVGAPlayer.h>
+#endif
+
 #import <CYLTabBarController/CYLTabBarController.h>
 // [EN] The animation view is a `CYLAnimatedItemView` (the cross-platform engine API, docs/Animated-Item.md, "Engine API across
 //      platforms"), in the CYLAnimatedItem pod that comes with CYLTabBarController; its generated Swift header declares it

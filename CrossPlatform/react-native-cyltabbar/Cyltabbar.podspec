@@ -22,8 +22,11 @@ Pod::Spec.new do |s|
   # [EN] With static libraries, the library's generated Swift header (CYLTabBarHostView and the other classes translated to
   #      Swift) is in its "Swift Compatibility Header" folder; with frameworks it is in the framework.
   # [CN] 使用静态库时，库生成的 Swift 头文件（CYLTabBarHostView 等已翻译为 Swift 的类）位于其 "Swift Compatibility Header" 目录；使用 framework 时位于 framework 中。
+  #      The same for the CYLAnimatedItem pod (`CYLAnimatedItemView`, behind `CyltabbarAnimationView`): without its folder the
+  #      animation view compiles empty (found on the simulator 2026-11-23). 动效组件 pod 同理（`CyltabbarAnimationView` 背后的
+  #      `CYLAnimatedItemView`）：缺少其目录时动画视图会编译为空（2026-11-23 在模拟器上发现）。
   s.pod_target_xcconfig = {
-    "HEADER_SEARCH_PATHS" => "\"$(PODS_CONFIGURATION_BUILD_DIR)/CYLTabBarController/Swift Compatibility Header\""
+    "HEADER_SEARCH_PATHS" => "\"$(PODS_CONFIGURATION_BUILD_DIR)/CYLTabBarController/Swift Compatibility Header\" \"$(PODS_CONFIGURATION_BUILD_DIR)/CYLAnimatedItem/Swift Compatibility Header\""
   }
 
   install_modules_dependencies(s)

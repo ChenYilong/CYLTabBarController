@@ -137,7 +137,14 @@ NS_ASSUME_NONNULL_BEGIN
  * [EN] The component's resource bundle, `CYLAnimatedItem.bundle` (the placeholder, its LICENSE and POLICY.md), or nil.
  * [CN] 组件的资源包 `CYLAnimatedItem.bundle`（占位图及其 LICENSE 与 POLICY.md），找不到时为 nil。
  */
+// [EN] In Objective-C++ the declaration must say `noexcept` as the generated Swift header does, or a file that includes both fails
+//      ("exception specification in declaration does not match previous declaration", React Native's `.mm` files).
+// [CN] 在 Objective-C++ 中，声明必须与生成的 Swift 头文件一致地写 `noexcept`，否则同时包含两者的文件会编译失败（React Native 的 `.mm` 文件）。
+#if defined(__cplusplus)
+FOUNDATION_EXPORT NSBundle *_Nullable CYLAnimatedItemResourceBundle(void) noexcept;
+#else
 FOUNDATION_EXPORT NSBundle *_Nullable CYLAnimatedItemResourceBundle(void);
+#endif
 
 NS_ASSUME_NONNULL_END
 
