@@ -1,4 +1,5 @@
 #import <UIKit/UIKit.h>
+#import <objc/runtime.h>
 #import <XCTest/XCTest.h>
 
 #import <CYLTabBarController/CYLTabBarController.h>
@@ -6,7 +7,14 @@
 #import <CYLAnimatedItem/CYLTabBarItemAnimationPlayer.h>
 #endif
 
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
+#else
+#import "CYLAnimatedItemMacros.h"
+#endif
+
 #import <React/RCTViewComponentView.h>
+#import <react/renderer/components/CyltabbarViewSpec/EventEmitters.h>
 #import <react/renderer/components/CyltabbarViewSpec/Props.h>
 
 using namespace facebook::react;
@@ -262,6 +270,66 @@ using namespace facebook::react;
   [self loadSource];
   CYLFakeBridgePlayer *player = _factory.player;
   XCTAssertNotNil(player.onEnded, @"the item owns the player's end callback");
+}
+
+#pragma mark - Objective-C++ calls 从 Objective-C++ 调用
+
+// [EN] `CYLAnimatedItemResourceBundle()` is defined in Swift (`@_cdecl`) and declared `noexcept` for C++ in
+//      CYLAnimatedItemMacros.h (`#if defined(__cplusplus)`): a `.mm` file that includes it and the Swift header must agree.
+// [CN] `CYLAnimatedItemResourceBundle()` 由 Swift 定义（`@_cdecl`），并在 CYLAnimatedItemMacros.h 中为 C++ 声明为 `noexcept`
+//      （`#if defined(__cplusplus)`）：同时包含它与 Swift 头文件的 `.mm` 文件必须一致。
+/// [EN] Sets the view's `_eventEmitter` ivar (what `updateEventEmitter:` stores). `updateEventEmitter:` itself cannot be used here:
+///      it asserts `dynamic_pointer_cast<ViewEventEmitter>`, which fails across the app and the test bundle (each has its own
+///      C++ type_info of `ViewEventEmitter`). The bridge's `emit:` only uses `static_pointer_cast`.
+/// [CN] 设置视图的 `_eventEmitter` 实例变量（`updateEventEmitter:` 保存的内容）。这里不能用 `updateEventEmitter:` 本身：它断言
+///      `dynamic_pointer_cast<ViewEventEmitter>`，在 App 与测试 bundle 之间会失败（各自有一份 `ViewEventEmitter` 的 C++ type_info）。
+///      桥接的 `emit:` 只用 `static_pointer_cast`。
+- (void)setEventEmitter:(EventEmitter::Shared)emitter {
+  Ivar ivar = class_getInstanceVariable([_bridge class], "_eventEmitter");
+  XCTAssertTrue(ivar != nullptr, @"RCTViewComponentView keeps its emitter in _eventEmitter");
+  *reinterpret_cast<EventEmitter::Shared *>(reinterpret_cast<char *>((__bridge void *)_bridge) + ivar_getOffset(ivar)) = emitter;
+}
+
+- (void)testResourceBundleIsCallableFromObjectiveCPlusPlusAsNoexcept {
+  static_assert(noexcept(CYLAnimatedItemResourceBundle()), "declared noexcept for C++ (CYLAnimatedItemMacros.h)");
+  NSBundle *first = CYLAnimatedItemResourceBundle();
+  NSBundle *second = CYLAnimatedItemResourceBundle();
+  XCTAssertEqual(first, second, @"one bundle object for every call");
+  if (first) {
+    XCTAssertTrue([first.bundlePath.lastPathComponent isEqualToString:@"CYLAnimatedItem.bundle"], @"%@", first.bundlePath);
+  }
+}
+
+// [EN] The event emitter path: a real generated `CyltabbarAnimationViewEventEmitter` (C++) is handed to the view, as Fabric does,
+//      and `onAnimationLoaded` and `onAnimationEnd` run through `emit:` (static_pointer_cast and the C++ call). Its dispatcher is
+//      an expired weak pointer, so nothing reaches JavaScript (a real `EventDispatcher` needs a JavaScript runtime): the test
+//      says the C++ calls run and do not crash, and that the end of the player reaches the view's `onAnimationEnd` once.
+// [CN] 事件发射路径：像 Fabric 一样把真实生成的 `CyltabbarAnimationViewEventEmitter`（C++）交给视图，`onAnimationLoaded` 与
+//      `onAnimationEnd` 经 `emit:` 执行（static_pointer_cast 与 C++ 调用）。其 dispatcher 是已过期的弱指针，因此不会到达 JavaScript
+//      （真实的 `EventDispatcher` 需要 JavaScript 运行时）：测试说明 C++ 调用会执行且不崩溃，并且播放器的结束只一次到达视图的 `onAnimationEnd`。
+- (void)testTheEventEmitterPathRunsForLoadedAndEnd {
+  auto emitter = std::make_shared<CyltabbarAnimationViewEventEmitter>(nullptr, std::weak_ptr<const EventDispatcher>());
+  [self setEventEmitter:emitter];
+
+  __block NSInteger loaded = 0;
+  __block NSInteger ended = 0;
+  void (^originalLoaded)(void) = [_item valueForKey:@"onAnimationLoaded"];
+  void (^originalEnded)(void) = [_item valueForKey:@"onAnimationEnd"];
+  XCTAssertNotNil(originalLoaded);
+  XCTAssertNotNil(originalEnded);
+  [_item setValue:^{ loaded += 1; originalLoaded(); } forKey:@"onAnimationLoaded"];
+  [_item setValue:^{ ended += 1; originalEnded(); } forKey:@"onAnimationEnd"];
+
+  [self loadSource];
+  XCTAssertEqual(loaded, 1, @"loaded went through the emitter path");
+  [self update:^(CyltabbarAnimationViewProps &props) { props.playing = true; }];
+  XCTAssertNotNil(_factory.player.onEnded);
+  _factory.player.onEnded();
+  XCTAssertEqual(ended, 1, @"the player's end reached onAnimationEnd and the C++ emitter call returned");
+  // [EN] Recycling drops the animation; an end after it must not reach a view without an emitter. [CN] 回收会丢弃动画；回收后的结束不得到达没有发射器的视图。
+  [self setEventEmitter:nullptr];
+  _factory.player.onEnded();
+  XCTAssertEqual(ended, 2, @"no emitter: the callback still runs and the C++ call is skipped");
 }
 
 @end
