@@ -67,6 +67,8 @@ class DemoListFragment : Fragment() {
         super.onAttach(context)
         // [EN] The texts follow this page's locale (DemoText). [CN] 文字跟随本页面的语言（DemoText）。
         DemoText.attach(context)
+        // [EN] The tab icon animations pause while the user scrolls a list. [CN] 用户滚动列表时 Tab 图标动画暂停。
+        com.cyl.animateditem.CYLAnimatedItemView.pausesAnimationsWhileUserScrolls = true
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -146,7 +148,11 @@ class DemoListFragment : Fragment() {
     private inner class ScrollBridge : AbsListView.OnScrollListener {
         private var lastPosition = -1
         private var lastTop = 0
-        override fun onScrollStateChanged(view: AbsListView, scrollState: Int) { /* [EN] Only the offset matters. [CN] 只关心偏移。 */ }
+        override fun onScrollStateChanged(view: AbsListView, scrollState: Int) {
+            // [EN] The tab icon animations pause while the user scrolls (CYLAnimatedItemView.pausesAnimationsWhileUserScrolls).
+            // [CN] 用户滚动时 Tab 图标动画暂停。
+            com.cyl.tabbar.CYLScrollReporting.listViewScrollStateChanged(view, scrollState)
+        }
         override fun onScroll(view: AbsListView, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
             val top = view.getChildAt(0)?.top ?: return
             val height = view.getChildAt(0)?.height ?: return
