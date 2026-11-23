@@ -4,6 +4,8 @@
 package com.cyl.tabbar
 
 import android.animation.ObjectAnimator
+import com.chenyilong.cyldeallocblockexecutor.BadgeEvents
+import com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry
 import android.animation.PropertyValuesHolder
 import android.content.Context
 import android.graphics.Canvas
@@ -171,8 +173,26 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
             CYLEnums.CYLBadgeAnimationType.RollingOnce -> ObjectAnimator.ofFloat(this, ROTATION_X, 90f, 0f).setDuration(400)
             CYLEnums.CYLBadgeAnimationType.ScaleOnce -> ObjectAnimator.ofPropertyValuesHolder(this, PropertyValuesHolder.ofFloat(SCALE_X, 0f, 1f), PropertyValuesHolder.ofFloat(SCALE_Y, 0f, 1f)).setDuration(300).apply { interpolator = OvershootInterpolator() }
         }
+        runAndReport(animator, type)
+    }
+
+    /**
+     * [EN] Starts [animator] and reports its moments on the badge's host view through CYLDeallocBlockExecutor: `cyl.badge.animationDidStart`
+     *      now, `cyl.badge.animationDidStop` when it ends (`finished` true) or is cancelled (`finished` false). [CN] 启动 [animator]，并通过
+     *      CYLDeallocBlockExecutor 在角标的宿主视图上报告时机：现在发出 `cyl.badge.animationDidStart`，结束（`finished` 为 true）或取消（为 false）时发出
+     *      `cyl.badge.animationDidStop`。
+     */
+    private fun runAndReport(animator: android.animation.Animator, type: CYLEnums.CYLBadgeAnimationType?) {
         running = animator
+        var cancelled = false
+        animator.addListener(object : android.animation.AnimatorListenerAdapter() {
+            override fun onAnimationCancel(a: android.animation.Animator) { cancelled = true }
+            override fun onAnimationEnd(a: android.animation.Animator) {
+                host?.cylPostBadgeEvent(BadgeEvents.animationDidStop, mapOf("finished" to !cancelled))
+            }
+        })
         animator.start()
+        host?.cylPostBadgeEvent(BadgeEvents.animationDidStart, mapOf("animationType" to type?.name))
     }
 
     /**
@@ -181,8 +201,7 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
     internal fun playAnimator(animator: android.animation.Animator) {
         stopAnimation()
         if (BuildConfig.CYL_BADGE_ANIMATION_DISABLED) return
-        running = animator
-        animator.start()
+        runAndReport(animator, null)
     }
 
     override fun onDetachedFromWindow() {
@@ -320,6 +339,23 @@ fun View.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnima
     cyl_refreshBadge()
     val reduceMotion = state.respectsReduceMotion && android.provider.Settings.Global.getFloat(context.contentResolver, android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
     if (!reduceMotion) badge.play(animationType)
+    cylPostBadgeEvent(BadgeEvents.didShow, mapOf("value" to value, "animationType" to animationType.name))
+    // [EN] The host is laid out: the badge is ready (at once when it is, on its first layout otherwise). [CN] 宿主已布局：角标就绪（已布局则立即发出，否则在首次布局时）。
+    if (isLaidOut) cylPostBadgeEvent(BadgeEvents.didBecomeReady) else addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
+        override fun onLayoutChange(v: View, l: Int, t: Int, r: Int, b: Int, ol: Int, ot: Int, oR: Int, ob: Int) {
+            v.removeOnLayoutChangeListener(this)
+            v.cylPostBadgeEvent(BadgeEvents.didBecomeReady)
+        }
+    })
+}
+
+/**
+ * [EN] Posts a badge moment through CYLDeallocBlockExecutor on this view (`LifecycleRegistry.of(view).addCustomCallback(BadgeEvents.didShow)`,
+ *      on the tab button's `CYLTabBarItem` through the forward, or `LifecycleCenter.addCustomCallback` for every badge). [CN] 通过
+ *      CYLDeallocBlockExecutor 在本视图上发出角标时机事件（可在本视图、经转发在 Tab 按钮的 `CYLTabBarItem` 上监听，或用 `LifecycleCenter` 监听所有角标）。
+ */
+internal fun View.cylPostBadgeEvent(name: String, userInfo: Map<String, Any?>? = null) {
+    LifecycleRegistry.of(this).postLifecycleEvent(name, userInfo)
 }
 
 /**
@@ -327,10 +363,12 @@ fun View.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnima
  */
 fun View.cyl_clearBadge() {
     val state = cyl_badgeState
+    val had = state.badge != null
     state.badge?.let { badge -> badge.stopAnimation(); cyl_detachBadge(badge) }
     state.badge = null
     state.value = null
     state.paused = false
+    if (had) cylPostBadgeEvent(BadgeEvents.didClear)
 }
 
 /**

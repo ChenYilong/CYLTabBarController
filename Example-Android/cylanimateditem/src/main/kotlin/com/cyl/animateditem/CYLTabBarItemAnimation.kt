@@ -104,6 +104,14 @@ interface CYLTabBarItemAnimationPlayer {
      */
     fun stop()
     /**
+     * [EN] Pauses on the current frame (the user is scrolling). Optional: an engine without a pause keeps playing. [CN] 暂停在当前帧（用户正在滚动）。可选：没有暂停能力的引擎会继续播放。
+     */
+    fun pause() { /* [EN] Optional. [CN] 可选。 */ }
+    /**
+     * [EN] Continues from the paused frame. Optional. [CN] 从暂停的帧继续。可选。
+     */
+    fun resume() { /* [EN] Optional. [CN] 可选。 */ }
+    /**
      * [EN] The playback position, 0…1. [CN] 播放位置，0…1。
      */
     var progress: Float
@@ -927,6 +935,8 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
         override fun play() { animationView?.let { CYLReflection.call(it, "setProgress", 0f); CYLReflection.call(it, "playAnimation") } }
         override fun showLastFrame() { animationView?.let { CYLReflection.call(it, "cancelAnimation"); CYLReflection.call(it, "setProgress", 1f) } }
         override fun stop() { animationView?.let { CYLReflection.call(it, "cancelAnimation"); CYLReflection.call(it, "setProgress", 0f) } }
+        override fun pause() { animationView?.let { CYLReflection.call(it, "pauseAnimation") } }
+        override fun resume() { animationView?.let { CYLReflection.call(it, "resumeAnimation") } }
         override val isPlaying: Boolean? get() = animationView?.let { CYLReflection.call(it, "isAnimating") as? Boolean }
         override var progress: Float
             get() = animationView?.let { CYLReflection.call(it, "getProgress") as? Float } ?: 0f
@@ -1057,6 +1067,8 @@ object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
         override fun play() { animationView?.let { CYLReflection.call(it, "setRepeatCount", if (loops) 0 else 1); CYLReflection.call(it, "setProgress", 0.0); CYLReflection.call(it, "play") } }
         override fun showLastFrame() { animationView?.let { CYLReflection.call(it, "stop"); CYLReflection.call(it, "setProgress", 1.0); CYLReflection.call(it, "flush") } }
         override fun stop() { animationView?.let { CYLReflection.call(it, "stop"); CYLReflection.call(it, "setProgress", 0.0); CYLReflection.call(it, "flush") } }
+        override fun pause() { animationView?.let { CYLReflection.call(it, "pause") } }
+        override fun resume() { animationView?.let { CYLReflection.call(it, "play") } }
         override val isPlaying: Boolean? get() = animationView?.let { CYLReflection.call(it, "isPlaying") as? Boolean }
         override var progress: Float
             get() = animationView?.let { (CYLReflection.call(it, "getProgress") as? Double)?.toFloat() } ?: 0f

@@ -10,4 +10,4 @@
 - Library: https://github.com/ChenYilong/CYLDeallocBlockExecutor
 - Branch: `feat/lifecycle-callbacks` (pull request #12)
 - Folder in the library: `HarmonyOS`
-- Commit: `f1397ed0e8b7fe34d0756986fdba59ad02d9eb6f`
+- Commit: `6aef46d97fb79a4530931d84a17e828c67f35444`
