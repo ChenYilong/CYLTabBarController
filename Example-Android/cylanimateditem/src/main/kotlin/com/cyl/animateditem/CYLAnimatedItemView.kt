@@ -1176,6 +1176,15 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             get() = PlayingViews.pausesWhileScrolling
             set(value) = PlayingViews.setPausesWhileScrolling(value)
 
+        /**
+         * [EN] Pauses every animated item that plays now (they post `cyl.animation.didPause`). For hosts that decide themselves,
+         *      such as the React Native and Flutter wrappers. [CN] 暂停当前所有正在播放的动效 item（发出 `cyl.animation.didPause`）。供自行决定的宿主使用，如 React Native 与 Flutter 包装层。
+         */
+        @JvmStatic fun pauseAllAnimations() = PlayingViews.pauseAll()
+
+        /** [EN] Resumes what [pauseAllAnimations] paused (`cyl.animation.didResume`). [CN] 恢复 [pauseAllAnimations] 暂停的动画。 */
+        @JvmStatic fun resumeAllAnimations() = PlayingViews.resumeAll()
+
         private const val ANDROID_ASSET_PREFIX = "file:///android_asset/"
         private const val END_WATCH_INTERVAL_MS = 16L
         private const val END_PROGRESS = 0.999f

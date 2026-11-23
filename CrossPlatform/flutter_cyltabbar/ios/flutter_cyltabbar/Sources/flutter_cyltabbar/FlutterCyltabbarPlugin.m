@@ -212,6 +212,8 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         _hostView.animationSpeed = [arguments isKindOfClass:[NSNumber class]] ? [arguments doubleValue] : 0;
     } else if ([call.method isEqualToString:@"setPlaybackLoops"]) {
         _hostView.animationLoops = [arguments isKindOfClass:[NSNumber class]] && [arguments boolValue];
+    } else if ([call.method isEqualToString:@"setAnimationsPaused"]) {
+        _hostView.animationsPaused = [arguments isKindOfClass:[NSNumber class]] && [arguments boolValue];
     } else if ([call.method isEqualToString:@"playAllAnimations"]) {
         [_hostView playAllAnimations];
     } else if ([call.method isEqualToString:@"setTabBarHidden"]) {

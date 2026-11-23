@@ -265,6 +265,11 @@ export type CYLTabBarProps = ViewProps & {
    */
   playAllRequest?: number;
   /**
+   * True pauses every playing tab icon animation, false resumes them (the events `cyl.animation.didPause` / `didResume` follow).
+   * Drive it from scroll events, for example with `LifecycleCenter.whileUserScrolls` and `useLifecycle().scrollHandlers`.
+   */
+  animationsPaused?: boolean;
+  /**
    * The title offset of every tab, [horizontal, vertical], set at runtime (`-[CYLTabBarController setTitlePositionAdjustment:]`)
    * without building the tab bar again; it wins over `CYLTabBarControllerTitlePositionAdjustment` of the configuration. A
    * plus button that aligns its title follows. Undefined keeps the configuration's.
@@ -429,6 +434,7 @@ export function CYLTabBar(props: CYLTabBarProps) {
     playbackSpeed,
     playbackLoops,
     playAllRequest,
+    animationsPaused,
     onMemoryWarning,
     titlePositionAdjustment,
     manifestURL,
@@ -470,6 +476,7 @@ export function CYLTabBar(props: CYLTabBarProps) {
       playbackSpeed={playbackSpeed ?? 0}
       playbackLoops={playbackLoops ?? false}
       playAllRequest={playAllRequest ?? 0}
+      animationsPaused={animationsPaused ?? false}
       titlePositionAdjustment={titlePositionAdjustment ?? []}
       manifestURL={manifestURL ?? ''}
       onManifestApply={(event) => onManifestApply?.(event.nativeEvent.source)}

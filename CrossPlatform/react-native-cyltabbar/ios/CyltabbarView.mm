@@ -123,6 +123,7 @@ static id CYLRNJSONObject(NSString *JSON);
     [_hostView playAllAnimations];
   }
   _playAllRequest = newViewProps.playAllRequest;
+  _hostView.animationsPaused = newViewProps.animationsPaused;
   // [EN] After the selection: logging out may move it away from a tab that needs login. [CN] 在选中之后：退出登录可能使选中离开需要登录的 Tab。
   // [EN] -1: not set, the host uses the cached state. [CN] -1：未设置，宿主使用缓存的状态。
   if (newViewProps.loginState >= 0) {

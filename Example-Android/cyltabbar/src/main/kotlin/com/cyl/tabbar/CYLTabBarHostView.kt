@@ -333,6 +333,19 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
     fun playAllAnimations() {
         tabBarController?.cyl_playAllTabBarItemAnimations()
     }
+
+    /**
+     * [EN] True pauses every playing tab icon animation, false resumes them (`cyl.animation.didPause` / `didResume`). A React
+     *      Native or Flutter list sets it from its own scroll events, as those do not reach the native registry.
+     * [CN] 为 true 时暂停所有正在播放的 Tab 图标动画，为 false 时恢复（`cyl.animation.didPause` / `didResume`）。React Native 或 Flutter 的列表据自己的滚动事件设置它，因为这些事件到不了原生注册表。
+     */
+    var animationsPaused: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            if (value) com.cyl.animateditem.CYLAnimatedItemView.pauseAllAnimations()
+            else com.cyl.animateditem.CYLAnimatedItemView.resumeAllAnimations()
+        }
     /**
      * [EN] The login state the tab bar uses, reported once it is built: until the app sets [loggedIn], the state the library
      *      cached (`cyl_loggedIn`, kept across launches), so the app can start from it.

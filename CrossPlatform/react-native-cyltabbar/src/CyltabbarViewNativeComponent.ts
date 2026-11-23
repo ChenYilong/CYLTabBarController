@@ -107,6 +107,11 @@ export interface NativeProps extends ViewProps {
    */
   playAllRequest?: CodegenTypes.WithDefault<CodegenTypes.Int32, 0>;
   /**
+   * True pauses every playing tab icon animation, false resumes them. Set it from the `onScrollBeginDrag` and
+   * `onMomentumScrollEnd` of your list (`useLifecycle` gives `scrollHandlers`).
+   */
+  animationsPaused?: CodegenTypes.WithDefault<boolean, false>;
+  /**
    * The title offset of every tab, [horizontal, vertical], set at runtime; empty keeps the configuration's.
    */
   titlePositionAdjustment?: ReadonlyArray<CodegenTypes.Double>;

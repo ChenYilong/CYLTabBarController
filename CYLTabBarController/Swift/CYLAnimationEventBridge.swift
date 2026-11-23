@@ -31,12 +31,36 @@ public enum CYLAnimationEventBridge {
                 view.cylPostLifecycleEvent(name, userInfo: info)
             }
         }
+        track()
+    }
+
+    /**
+     [EN] Pauses (`true`) or resumes (`false`) every playing animated item, for hosts that decide themselves (React Native, Flutter).
+     [CN] 暂停（`true`）或恢复（`false`）所有正在播放的动画控件，供自行决定的宿主使用（React Native、Flutter）。
+     */
+    public static func setAnimationsPaused(_ paused: Bool) {
+        track()
+        playing.allObjects.forEach { paused ? $0.pauseAnimation() : $0.resumeAnimation() }
     }
 
     // MARK: - Pause while the user scrolls
 
     private static let playing = NSHashTable<CYLAnimatedItemView>.weakObjects()
     private static var trackingInstalled = false
+    /// [EN] Starts remembering which views play, once. [CN] 开始记录哪些视图在播放（只执行一次）。
+    private static func track() {
+        install()
+        guard !trackingInstalled else { return }
+        trackingInstalled = true
+        let center = NotificationCenter.default
+        center.addObserver(forName: Notification.Name("cyl.animation.didStart"), object: nil, queue: nil) { note in
+            if let view = note.object as? CYLAnimatedItemView { playing.add(view) }
+        }
+        center.addObserver(forName: Notification.Name("cyl.animation.didStop"), object: nil, queue: nil) { note in
+            if let view = note.object as? CYLAnimatedItemView { playing.remove(view) }
+        }
+    }
+
     private static var removeScrollObservers: (() -> Void)?
 
     /**
@@ -48,16 +72,7 @@ public enum CYLAnimationEventBridge {
      */
     public static func pausesAnimationsWhileUserScrolls(_ enabled: Bool) {
         install()
-        if !trackingInstalled {
-            trackingInstalled = true
-            let center = NotificationCenter.default
-            center.addObserver(forName: Notification.Name("cyl.animation.didStart"), object: nil, queue: nil) { note in
-                if let view = note.object as? CYLAnimatedItemView { playing.add(view) }
-            }
-            center.addObserver(forName: Notification.Name("cyl.animation.didStop"), object: nil, queue: nil) { note in
-                if let view = note.object as? CYLAnimatedItemView { playing.remove(view) }
-            }
-        }
+        track()
         removeScrollObservers?()
         removeScrollObservers = nil
         guard enabled else { return }

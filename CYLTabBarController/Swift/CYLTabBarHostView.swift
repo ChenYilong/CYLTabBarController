@@ -433,6 +433,19 @@ open class CYLTabBarHostView: UIView {
     }
 
     /**
+     [EN] True pauses every playing tab icon animation, false resumes them (`cyl.animation.didPause` / `didResume`). A React Native
+          or Flutter list sets it from its own scroll events, as those do not reach the native registry.
+     [CN] 为 true 时暂停所有正在播放的 Tab 图标动画，为 false 时恢复。React Native 或 Flutter 的列表据自己的滚动事件设置它，
+          因为这些事件到不了原生注册表。
+     */
+    @objc open var animationsPaused = false {
+        didSet {
+            guard animationsPaused != oldValue else { return }
+            CYLAnimationEventBridge.setAnimationsPaused(animationsPaused)
+        }
+    }
+
+    /**
      * [EN] The library's language (`CYLSetLocalizationLanguage`); the controller is built again. [CN] 库的语言
      *      （`CYLSetLocalizationLanguage`）；重新创建 controller。
      */
