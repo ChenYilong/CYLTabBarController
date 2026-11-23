@@ -298,6 +298,8 @@ static UIColor *CYLFlutterColor(id value) {
     CYLAnimatedItemView *_item;
     NSInteger _restartToken;
     CGFloat _iconSide;
+    BOOL _selected;
+    BOOL _playing;
 #endif
 }
 
@@ -329,10 +331,15 @@ static UIColor *CYLFlutterColor(id value) {
     // [EN] The blocks hold the channel, not self: the channel does not own the item, so there is no cycle.
     // [CN] block 持有 channel 而不是 self：channel 不持有该条目，因此没有循环引用。
     FlutterMethodChannel *channel = _channel;
+    __weak __typeof(self) weakSelf = self;
     _item = [[CYLAnimatedItemView alloc] initWithFrame:_view.bounds];
     // [EN] Icon only; the view the host gives is the icon's frame. [CN] 只有图标；宿主给的视图就是图标的范围。
     _item.onAnimationEnd = ^{ [channel invokeMethod:@"onAnimationEnd" arguments:nil]; };
-    _item.onAnimationLoaded = ^{ [channel invokeMethod:@"onAnimationLoaded" arguments:nil]; };
+    _item.onAnimationLoaded = ^{
+        // [EN] A selected item that becomes ready plays, as on Android. [CN] 就绪的选中条目开始播放，与 Android 一致。
+        [weakSelf followSelection];
+        [channel invokeMethod:@"onAnimationLoaded" arguments:nil];
+    };
     _item.onAnimationFailed = ^{ [channel invokeMethod:@"onAnimationFailed" arguments:nil]; };
     [_view addSubview:_item];
     if ([arguments[@"drivesAnimationPlayback"] isKindOfClass:[NSNumber class]]) {
@@ -352,13 +359,30 @@ static UIColor *CYLFlutterColor(id value) {
         [_item applyIconTintColor:tint];
     }
     if ([arguments[@"selected"] isKindOfClass:[NSNumber class]]) {
-        _item.selected = [arguments[@"selected"] boolValue];
+        _selected = [arguments[@"selected"] boolValue];
+        _item.selected = _selected;
     }
     [self fitIcon];
     NSString *source = [arguments[@"source"] isKindOfClass:[NSString class]] ? arguments[@"source"] : nil;
     [self applySource:source];
     if ([arguments[@"playing"] boolValue]) {
+        _playing = YES;
         [_item playAnimation];
+    }
+}
+
+/// [EN] The default rule of the bridge (`drivesAnimationPlayback` true): selected plays from the resting frame, unselected
+///      stops at the resting progress. `CYLAnimatedItemView` itself never plays on selection on iOS (the tab engine does).
+/// [CN] 桥接的默认规则（`drivesAnimationPlayback` 为 true）：选中从静止帧开始播放，未选中停在静止进度。iOS 上 `CYLAnimatedItemView` 自身
+///      不会因选中而播放（由 Tab 引擎播放）。
+- (void)followSelection {
+    if (!_item.drivesAnimationPlayback || _playing) {
+        return;
+    }
+    if (_selected) {
+        [_item playAnimation];
+    } else {
+        [_item stopAnimation];
     }
 }
 
@@ -387,7 +411,9 @@ static UIColor *CYLFlutterColor(id value) {
     if ([method isEqualToString:@"setSource"]) {
         [self applySource:[argument isKindOfClass:[NSString class]] ? argument : nil];
     } else if ([method isEqualToString:@"setSelected"]) {
-        _item.selected = [argument boolValue];
+        _selected = [argument boolValue];
+        _item.selected = _selected;
+        [self followSelection];
     } else if ([method isEqualToString:@"setAnimationSpeed"]) {
         _item.animationSpeed = [argument isKindOfClass:[NSNumber class]] ? [argument doubleValue] : 1;
     } else if ([method isEqualToString:@"setAnimationLoops"]) {
@@ -401,7 +427,8 @@ static UIColor *CYLFlutterColor(id value) {
     } else if ([method isEqualToString:@"setDrivesAnimationPlayback"]) {
         _item.drivesAnimationPlayback = [argument isKindOfClass:[NSNumber class]] ? [argument boolValue] : YES;
     } else if ([method isEqualToString:@"setPlaying"]) {
-        if ([argument boolValue]) {
+        _playing = [argument boolValue];
+        if (_playing) {
             [_item playAnimation];
         } else {
             [_item stopAnimation];
