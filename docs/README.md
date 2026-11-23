@@ -401,6 +401,7 @@ docs/
 │   ├── ios-flatdesign-gif-no-image-under-animation-ios26-4-5ba3a089.png
 │   ├── ios-flatdesign-hide-show.png
 │   ├── ios-flatdesign-svga-selected-icon-fixed.png
+│   ├── ios-flutter-clean-build-run.png
 │   ├── ios-flutter-engine-api-play-all.png
 │   ├── ios-flutter-host-driven.png
 │   ├── ios-gif-image-rest-then-play.png
@@ -416,6 +417,7 @@ docs/
 │   ├── ios-react-native-engine-api-play-all.png
 │   ├── ios-react-native-host-driven.png
 │   ├── ios-rive-dark-tint-appearance-switch.png
+│   ├── ios-rive-end-callback.png
 │   ├── ios-rive-fixed-tint-unselected-only.png
 │   ├── ios-rive-flatdesign-item-appearance.png
 │   ├── ios-rive-item-appearance-icon-title-tint.png
