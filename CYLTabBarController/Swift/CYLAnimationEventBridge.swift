@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import os
 import CYLAnimatedItem
 #if SWIFT_PACKAGE
 import CYLAnimatedItemViews
@@ -64,6 +65,19 @@ public enum CYLAnimationEventBridge {
         }
     }
 
+    /**
+     [EN] Writes every lifecycle moment the library sees (window, screen, scroll, animation, badge) to the unified log, subsystem
+          `CYLTabBarController`, category `lifecycle` (`xcrun simctl spawn <udid> log stream --predicate 'subsystem == "CYLTabBarController"'`).
+          For debugging only; off by default.
+     [CN] 把库看到的每个生命周期时机（窗口、屏幕、滚动、动画、角标）写入统一日志，subsystem 为 `CYLTabBarController`，category 为 `lifecycle`。
+          仅用于调试；默认关闭。
+     */
+    public static func logsLifecycleMoments(_ enabled: Bool) {
+        CYLLifecycleLog.isEnabled = enabled
+        let logger = Logger(subsystem: "CYLTabBarController", category: "lifecycle")
+        CYLLifecycleLog.sink = { message in logger.notice("\(message, privacy: .public)") }
+    }
+
     private static var removeScrollObservers: (() -> Void)?
 
     /**
@@ -84,5 +98,16 @@ public enum CYLAnimationEventBridge {
         }, resume: {
             playing.allObjects.forEach { $0.resumeAnimation() }
         })
+    }
+}
+
+/**
+ [EN] The entry point the animation pod finds by name (`CYLAnimatedItemView` cannot import this module): installs the bridge.
+ [CN] 动画 pod 按名称查找的入口（`CYLAnimatedItemView` 不能导入本模块）：安装桥接。
+ */
+@objc(CYLAnimationEventBridgeInstaller)
+final class CYLAnimationEventBridgeInstaller: NSObject {
+    @objc static func install() {
+        CYLAnimationEventBridge.install()
     }
 }

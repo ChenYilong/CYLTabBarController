@@ -26,6 +26,11 @@ class CYLMessageViewController: CYLDemoBadgeTableViewController {
         // [EN] Play all, speed slider and loop switch (AGENTS.md, "Animated icon examples").
         // [CN] 「全部播放」、倍速滑块与循环开关（AGENTS.md「Animated icon examples」）。
         CYLDemoPlaybackControlsView.install(on: tableView, in: self)
+        // [EN] Launch argument `-CYLDemoLifecycleLog` writes the lifecycle moments to the unified log (docs/Lifecycle-Library.md, step 21).
+        // [CN] 启动参数 `-CYLDemoLifecycleLog` 把生命周期时机写入统一日志（docs/Lifecycle-Library.md，第 21 步）。
+        if ProcessInfo.processInfo.arguments.contains("-CYLDemoLifecycleLog") {
+            CYLAnimationEventBridge.logsLifecycleMoments(true)
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
