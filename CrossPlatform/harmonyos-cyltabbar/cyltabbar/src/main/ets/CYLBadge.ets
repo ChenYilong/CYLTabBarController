@@ -155,6 +155,13 @@ export class CYLBadge {
   newText: string = 'new';
   newUppercaseText: string = 'NEW';
 
+  /**
+   * [EN] Where badge events go: set it to `(name, info) => controller.registry.postLifecycleEvent(name, info)` and the
+   *      badge posts `cyl.badge.didShow` / `cyl.badge.didClear` (BadgeEvents of the core library).
+   * [CN] 角标事件的去向：设置后角标会发出 `cyl.badge.didShow` / `cyl.badge.didClear`（核心库的 BadgeEvents）。
+   */
+  eventPoster?: (name: string, info: Record<string, unknown>) => void;
+
   /** [EN] -cyl_showBadge: a red dot. [CN] 显示红点。 */
   cyl_showBadge(): void {
     this.cyl_showBadgeValue('', this.animationType);
@@ -170,6 +177,7 @@ export class CYLBadge {
     this.value = value;
     this.animationType = animationType ?? this.animationType;
     this.generation += 1;
+    this.eventPoster?.('cyl.badge.didShow', { value: value, animationType: this.animationType });
   }
 
   /** [EN] -cyl_showNewBadge: "new" (uppercase: "NEW"). [CN] 显示 "new"。 */
@@ -179,8 +187,12 @@ export class CYLBadge {
 
   /** [EN] -cyl_clearBadge. [CN] 移除角标。 */
   cyl_clearBadge(): void {
+    const hadBadge: boolean = this.value !== null;
     this.value = null;
     this.paused = false;
+    if (hadBadge) {
+      this.eventPoster?.('cyl.badge.didClear', {});
+    }
   }
 
   /** [EN] -cyl_pauseBadge: hidden, kept. [CN] 暂停：隐藏但保留。 */

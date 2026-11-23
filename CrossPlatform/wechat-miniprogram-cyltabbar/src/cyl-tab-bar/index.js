@@ -15,7 +15,7 @@ const { cylReadConfiguration } = require('./cyl_configuration');
 const { cylBadgeAnimationClass } = require('./cyl_debug');
 const { cylTabBarItemStyle, cylTabBarItemStyleForStyleType, cylGlassLensStyle } = require('./cyl_tab_bar_item_style');
 // Pending: replace the vendored copy with the npm package after the library is published (owner's OK): see ../cyl-dealloc-block-executor/VENDORED.md.
-const { LifecycleController } = require('../cyl-dealloc-block-executor/index');
+const { LifecycleController, BadgeEvents } = require('../cyl-dealloc-block-executor/index');
 
 /**
  * [EN] Heights in px from the stylesheets: the bar (index.wxss `.cyl-tab`, Liquid Glass `.cyl-style-liquidGlass .cyl-tab`),
@@ -976,6 +976,14 @@ Component({
         this.cylBadgeAttributes[identifier] = { ...attributes };
       }
       this.cyl_render();
+      // [EN] The badge moment through CYLDeallocBlockExecutor: `registry.addCustomCallback(BadgeEvents.didShow, …)` on the bar, or
+      //      `LifecycleCenter.addCustomCallback` for every bar. A mini program badge is drawn by `setData`, so there is no separate `didBecomeReady`.
+      // [CN] 通过 CYLDeallocBlockExecutor 发出角标时机：在 TabBar 的 `registry` 或用 `LifecycleCenter` 监听。小程序角标由 `setData` 绘制，因此没有单独的 `didBecomeReady`。
+      this.cylPostBadgeEvent(BadgeEvents.didShow, { identifier, value });
+    },
+
+    cylPostBadgeEvent(name, userInfo) {
+      if (this.cylLifecycle && !this.cylLifecycle.isDetached) this.cylLifecycle.registry.postLifecycleEvent(name, userInfo);
     },
 
     /**
@@ -1017,9 +1025,11 @@ Component({
      * [CN] 移除该标识的 Tab 的角标。
      */
     cyl_removeBadge(identifier) {
+      const had = this.cylBadges[identifier] !== undefined && this.cylBadges[identifier] !== null;
       delete this.cylBadges[identifier];
       delete this.cylBadgeAttributes[identifier];
       this.cyl_render();
+      if (had) this.cylPostBadgeEvent(BadgeEvents.didClear, { identifier });
     },
 
     /**

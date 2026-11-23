@@ -220,3 +220,49 @@ test('a GIF image rests on its first frame (a canvas), plays one pass when playe
   detach()
   delete global.wx
 })
+
+test('the item posts the animation moments, pauses and resumes through the engine, and stop reports once', () => {
+  const { AnimationEvents } = require('../src/cyl-dealloc-block-executor/index')
+  const engine = cylEngine((r) => ({ cyl_setProgress: r('setProgress'), cyl_pause: r('pause'), cyl_play: r('play') }))
+  const { item } = cylMount({ animationUrl: 'a.pag', autoplay: false }, engine)
+  const seen = []
+  const registry = item.cylLifecycle.registry
+  for (const name of Object.values(AnimationEvents)) {
+    registry.addCustomCallback(name, (o, id, info) => seen.push(`${name}${info.userInfo && 'finished' in info.userInfo ? ' finished=' + info.userInfo.finished : ''}`))
+  }
+  item.cyl_onAnimationReady()
+  item.playAnimation()
+  assert.equal(item.pauseAnimation(), true)
+  assert.equal(item.pauseAnimation(), false, 'a second pause does nothing')
+  assert.equal(item.resumeAnimation(), true)
+  assert.deepEqual(engine.calls.map((c) => c[0]).filter((n) => n === 'pause' || n === 'play'), ['pause', 'play'])
+  item.stopAnimation()
+  item.stopAnimation()
+  assert.deepEqual(seen, [
+    'cyl.animation.didStart', 'cyl.animation.didPause', 'cyl.animation.didResume', 'cyl.animation.didStop finished=false',
+  ])
+})
+
+test('pausesAnimationsWhileUserScrolls pauses a playing item while a scroll source is dragged and resumes it afterwards', () => {
+  const { LifecycleRegistry, LifecycleCenter } = require('../src/cyl-dealloc-block-executor/index')
+  const { cylPausesAnimationsWhileUserScrolls } = require('../src/cyl-animated-item/cyl_animation_events')
+  const engine = cylEngine((r) => ({ cyl_setProgress: r('setProgress'), cyl_pause: r('pause'), cyl_play: r('play') }))
+  const { item } = cylMount({ animationUrl: 'a.pag', autoplay: false }, engine)
+  item.cyl_onAnimationReady()
+  item.playAnimation()
+  const page = {}
+  const scroller = LifecycleRegistry.of(page)
+  scroller.hookInstalled = true
+  cylPausesAnimationsWhileUserScrolls(true)
+  try {
+    scroller.fireAutomatic('scrollWillBeginDragging', 'afterSuper')
+    assert.equal(item.cylPausedByUser, true)
+    scroller.fireAutomatic('scrollDidEndScrolling', 'afterSuper')
+    assert.equal(item.cylPausedByUser, false)
+    assert.deepEqual(engine.calls.map((c) => c[0]).filter((n) => n === 'pause' || n === 'play'), ['pause', 'play'])
+  } finally {
+    cylPausesAnimationsWhileUserScrolls(false)
+    LifecycleCenter.reset()
+    item.stopAnimation()
+  }
+})
