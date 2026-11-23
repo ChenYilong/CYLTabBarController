@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Välilehtipalkki %@ · sivun tunnus \"%@\"";
 "Animated item engine API" = "Animoidun kohteen moottorin API";
 "Stop at 50%" = "Pysäytä 50 %:iin";
+"Show image when ended" = "Näytä kuva lopussa";
 "Restart token: %@" = "Uudelleenkäynnistyksen tunniste: %@";
 "End callback: %@" = "Päättymisen takaisinkutsu: %@";
 "none yet" = "ei vielä";

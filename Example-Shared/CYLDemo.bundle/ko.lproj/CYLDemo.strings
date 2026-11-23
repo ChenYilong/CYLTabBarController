@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "탭 바 %@ · 페이지 ID “%@”";
 "Animated item engine API" = "애니메이션 항목 엔진 API";
 "Stop at 50%" = "50%에서 정지";
+"Show image when ended" = "종료 시 이미지 표시";
 "Restart token: %@" = "재시작 토큰: %@";
 "End callback: %@" = "종료 콜백: %@";
 "none yet" = "아직 없음";

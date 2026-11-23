@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Bar tab %@ · ID halaman “%@”";
 "Animated item engine API" = "API enjin item animasi";
 "Stop at 50%" = "Berhenti pada 50%";
+"Show image when ended" = "Papar imej apabila tamat";
 "Restart token: %@" = "Token mula semula: %@";
 "End callback: %@" = "Panggil balik tamat: %@";
 "none yet" = "belum ada";

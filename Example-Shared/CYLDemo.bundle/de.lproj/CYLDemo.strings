@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Tab-Leiste %@ · Seiten-ID „%@“";
 "Animated item engine API" = "Engine-API der Animations-Elemente";
 "Stop at 50%" = "Bei 50 % anhalten";
+"Show image when ended" = "Bild am Ende anzeigen";
 "Restart token: %@" = "Neustart-Token: %@";
 "End callback: %@" = "Ende-Callback: %@";
 "none yet" = "noch keiner";

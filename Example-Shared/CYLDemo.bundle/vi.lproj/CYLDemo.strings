@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Thanh tab %@ · ID trang \"%@\"";
 "Animated item engine API" = "API công cụ của mục hoạt ảnh";
 "Stop at 50%" = "Dừng ở 50%";
+"Show image when ended" = "Hiện ảnh khi kết thúc";
 "Restart token: %@" = "Mã thông báo phát lại: %@";
 "End callback: %@" = "Callback kết thúc: %@";
 "none yet" = "chưa có";

@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Panel karet %@ · ID stránky „%@“";
 "Animated item engine API" = "API enginů animované položky";
 "Stop at 50%" = "Zastavit na 50 %";
+"Show image when ended" = "Po skončení zobrazit obrázek";
 "Restart token: %@" = "Token restartu: %@";
 "End callback: %@" = "Callback konce: %@";
 "none yet" = "zatím žádný";

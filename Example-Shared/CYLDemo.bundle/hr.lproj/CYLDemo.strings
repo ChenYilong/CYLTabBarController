@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Traka s karticama %@ · ID stranice \"%@\"";
 "Animated item engine API" = "API pogona animirane stavke";
 "Stop at 50%" = "Zaustavi na 50 %";
+"Show image when ended" = "Prikaži sliku na kraju";
 "Restart token: %@" = "Token ponovnog pokretanja: %@";
 "End callback: %@" = "Povratni poziv završetka: %@";
 "none yet" = "još nema";

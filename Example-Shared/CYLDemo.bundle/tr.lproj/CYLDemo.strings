@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Sekme çubuğu %@ · sayfa kimliği \"%@\"";
 "Animated item engine API" = "Animasyonlu öğe motoru API'si";
 "Stop at 50%" = "%50'de durdur";
+"Show image when ended" = "Bitince resmi göster";
 "Restart token: %@" = "Yeniden başlatma belirteci: %@";
 "End callback: %@" = "Bitiş geri çağrısı: %@";
 "none yet" = "henüz yok";

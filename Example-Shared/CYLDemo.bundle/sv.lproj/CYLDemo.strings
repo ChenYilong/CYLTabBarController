@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Flikfält %@ · sid-ID ”%@”";
 "Animated item engine API" = "Motor-API för animerat objekt";
 "Stop at 50%" = "Stoppa vid 50 %";
+"Show image when ended" = "Visa bild när den är klar";
 "Restart token: %@" = "Omstartstoken: %@";
 "End callback: %@" = "Slutcallback: %@";
 "none yet" = "ingen än";

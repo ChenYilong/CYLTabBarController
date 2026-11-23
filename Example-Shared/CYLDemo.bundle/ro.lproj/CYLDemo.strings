@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Bara de file %@ · ID pagină „%@”";
 "Animated item engine API" = "API-ul motoarelor elementului animat";
 "Stop at 50%" = "Oprește la 50%";
+"Show image when ended" = "Afișează imaginea la final";
 "Restart token: %@" = "Token de repornire: %@";
 "End callback: %@" = "Callback de final: %@";
 "none yet" = "încă niciunul";

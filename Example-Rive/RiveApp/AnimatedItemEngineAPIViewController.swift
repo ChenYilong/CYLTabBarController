@@ -42,6 +42,7 @@ final class AnimatedItemEngineAPIViewController: UIViewController {
     private let speedSlider = UISlider()
     private let speedValueLabel = UILabel()
     private let loopSwitch = UISwitch()
+    private let endImageSwitch = UISwitch()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -87,6 +88,7 @@ final class AnimatedItemEngineAPIViewController: UIViewController {
         item.title = name
         item.iconSize = Self.iconSize
         item.drivesAnimationPlayback = false
+        item.image = UIImage(systemName: "checkmark.circle")
         item.animationURL = url
         item.accessibilityLabel = name
         item.accessibilityIdentifier = "AnimatedItem-\(name.replacingOccurrences(of: " ", with: "-"))"
@@ -162,6 +164,16 @@ final class AnimatedItemEngineAPIViewController: UIViewController {
         updateSpeedValue()
         for engineItem in engineItems {
             applyPolicy(to: engineItem.item)
+        }
+    }
+
+    /// [EN] `showsImageWhenAnimationEnds` of every item: a play-once pass that ends shows the still image (a check mark here) in
+    ///      place of the last frame; the next play shows the animation again. Turn the loop switch off to see it.
+    /// [CN] 每个条目的 `showsImageWhenAnimationEnds`：只播放一次的一遍播放结束时显示静态图片（这里是对勾）代替最后一帧；下一次播放重新显示动画。
+    ///      关闭循环开关即可看到。
+    @objc private func endImageChanged() {
+        for engineItem in engineItems {
+            engineItem.item.showsImageWhenAnimationEnds = endImageSwitch.isOn
         }
     }
 
@@ -244,6 +256,15 @@ final class AnimatedItemEngineAPIViewController: UIViewController {
         let loopRow = UIStackView(arrangedSubviews: [loopLabel, loopSwitch])
         loopRow.alignment = .center
 
+        let endImageLabel = UILabel()
+        endImageLabel.text = cylDemoLocalizedString("Show image when ended")
+        endImageLabel.isAccessibilityElement = false
+        endImageSwitch.accessibilityLabel = cylDemoLocalizedString("Show image when ended")
+        endImageSwitch.accessibilityIdentifier = "AnimatedItemEngineAPIShowsImageWhenEnds"
+        endImageSwitch.addTarget(self, action: #selector(endImageChanged), for: .valueChanged)
+        let endImageRow = UIStackView(arrangedSubviews: [endImageLabel, endImageSwitch])
+        endImageRow.alignment = .center
+
         for label in [tokenLabel, endLabel] {
             label.font = .preferredFont(forTextStyle: .body)
             label.adjustsFontForContentSizeCategory = true
@@ -252,7 +273,7 @@ final class AnimatedItemEngineAPIViewController: UIViewController {
         tokenLabel.accessibilityIdentifier = "AnimatedItemEngineAPIRestartToken"
         endLabel.accessibilityIdentifier = "AnimatedItemEngineAPIEndCallback"
 
-        let card = UIStackView(arrangedSubviews: [playAllButton, stopButton, speedRow, loopRow, tokenLabel, endLabel])
+        let card = UIStackView(arrangedSubviews: [playAllButton, stopButton, speedRow, loopRow, endImageRow, tokenLabel, endLabel])
         card.axis = .vertical
         card.spacing = 12
         card.isLayoutMarginsRelativeArrangement = true

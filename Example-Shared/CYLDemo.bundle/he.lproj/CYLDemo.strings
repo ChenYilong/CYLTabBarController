@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "סרגל לשוניות %@ · מזהה עמוד \"%@\"";
 "Animated item engine API" = "API של מנועי הפריט המונפש";
 "Stop at 50%" = "עצור ב-50%";
+"Show image when ended" = "הצג תמונה בסיום";
 "Restart token: %@" = "אסימון הפעלה מחדש: %@";
 "End callback: %@" = "קריאה חוזרת בסיום: %@";
 "none yet" = "עדיין אין";

@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Fanelinje %@ · side-ID «%@»";
 "Animated item engine API" = "Motor-API for animert element";
 "Stop at 50%" = "Stopp ved 50 %";
+"Show image when ended" = "Vis bilde ved slutt";
 "Restart token: %@" = "Omstartstoken: %@";
 "End callback: %@" = "Sluttcallback: %@";
 "none yet" = "ingen ennå";

@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Γραμμή καρτελών %@ · ID σελίδας «%@»";
 "Animated item engine API" = "API μηχανών του κινούμενου στοιχείου";
 "Stop at 50%" = "Διακοπή στο 50%";
+"Show image when ended" = "Εμφάνιση εικόνας στο τέλος";
 "Restart token: %@" = "Διακριτικό επανεκκίνησης: %@";
 "End callback: %@" = "Callback λήξης: %@";
 "none yet" = "κανένα ακόμη";

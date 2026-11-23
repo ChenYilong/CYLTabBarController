@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "%@. lapsáv · oldalazonosító: \"%@\"";
 "Animated item engine API" = "Animált elem motor-API-ja";
 "Stop at 50%" = "Megállítás 50%-nál";
+"Show image when ended" = "Kép megjelenítése a végén";
 "Restart token: %@" = "Újraindítási token: %@";
 "End callback: %@" = "Befejezési visszahívás: %@";
 "none yet" = "még nincs";

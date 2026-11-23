@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Barre d'onglets %@ · ID de page \"%@\"";
 "Animated item engine API" = "API des moteurs d'éléments animés";
 "Stop at 50%" = "Arrêter à 50 %";
+"Show image when ended" = "Afficher l’image à la fin";
 "Restart token: %@" = "Jeton de relance : %@";
 "End callback: %@" = "Rappel de fin : %@";
 "none yet" = "aucun pour l'instant";

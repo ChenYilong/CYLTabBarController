@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "टैब बार %@ · पेज ID \"%@\"";
 "Animated item engine API" = "एनिमेटेड आइटम इंजन API";
 "Stop at 50%" = "50% पर रोकें";
+"Show image when ended" = "समाप्त होने पर छवि दिखाएँ";
 "Restart token: %@" = "पुनः आरंभ टोकन: %@";
 "End callback: %@" = "समाप्ति कॉलबैक: %@";
 "none yet" = "अभी नहीं";

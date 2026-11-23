@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Pasek kart %@ · ID strony „%@”";
 "Animated item engine API" = "API silników elementu animowanego";
 "Stop at 50%" = "Zatrzymaj na 50%";
+"Show image when ended" = "Pokaż obraz po zakończeniu";
 "Restart token: %@" = "Token ponownego startu: %@";
 "End callback: %@" = "Wywołanie zwrotne końca: %@";
 "none yet" = "jeszcze brak";

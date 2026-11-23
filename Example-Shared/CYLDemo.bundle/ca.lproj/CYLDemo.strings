@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Barra de pestanyes %@ · ID de pàgina «%@»";
 "Animated item engine API" = "API dels motors de l'element animat";
 "Stop at 50%" = "Atura al 50 %";
+"Show image when ended" = "Mostra la imatge en acabar";
 "Restart token: %@" = "Testimoni de reinici: %@";
 "End callback: %@" = "Callback de final: %@";
 "none yet" = "encara cap";

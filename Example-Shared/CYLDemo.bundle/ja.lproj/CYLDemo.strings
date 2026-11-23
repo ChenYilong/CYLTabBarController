@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "タブバー %@ · ページ ID「%@」";
 "Animated item engine API" = "アニメーション項目のエンジン API";
 "Stop at 50%" = "50% で停止";
+"Show image when ended" = "終了時に画像を表示";
 "Restart token: %@" = "再生トークン：%@";
 "End callback: %@" = "終了コールバック：%@";
 "none yet" = "まだなし";

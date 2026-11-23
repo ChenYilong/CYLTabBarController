@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "TabBar %@ · 頁面 ID「%@」";
 "Animated item engine API" = "動畫項目引擎 API";
 "Stop at 50%" = "停在 50%";
+"Show image when ended" = "結束時顯示圖片";
 "Restart token: %@" = "重播權杖：%@";
 "End callback: %@" = "結束回呼：%@";
 "none yet" = "尚無";

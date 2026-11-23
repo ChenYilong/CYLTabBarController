@@ -463,6 +463,7 @@
 "Tab bar %@ · page ID \"%@\"" = "Tabbalk %@ · pagina-ID ‘%@’";
 "Animated item engine API" = "Engine-API van het geanimeerde item";
 "Stop at 50%" = "Stop op 50%";
+"Show image when ended" = "Afbeelding tonen na afloop";
 "Restart token: %@" = "Herstarttoken: %@";
 "End callback: %@" = "Eindcallback: %@";
 "none yet" = "nog geen";
