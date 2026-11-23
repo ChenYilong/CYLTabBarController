@@ -104,6 +104,7 @@ internal class CYLFlutterTabBarView(
       "setPlaybackSpeed" -> hostView.animationSpeed = (call.arguments as? Number)?.toFloat() ?: 0f
       "setPlaybackLoops" -> hostView.animationLoops = call.arguments == true
       "playAllAnimations" -> hostView.playAllAnimations()
+      "setAnimationsPaused" -> hostView.animationsPaused = call.arguments as? Boolean ?: false
       "setTitlePositionAdjustment" -> hostView.titlePositionAdjustment = titleOffset(call.arguments)
       "simulateMemoryWarning" -> return result.success(hostView.simulateMemoryWarning())
       "setLanguage" -> hostView.language = (call.arguments as? String)?.takeIf { it.isNotEmpty() }
