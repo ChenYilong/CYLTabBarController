@@ -70,3 +70,15 @@ test('speed reaches only the players that support it, loop only those that can l
   assert.equal(cylSetLoops(bar, true), 3, 'a GIF image can loop')
   assert.deepEqual(log.map(([name, , patch]) => [name, patch.loop]), [['home', true], ['gif', true], ['me', true]])
 })
+
+test('the Restart row has its own text in every language the example ships, none of them English', () => {
+  const own = require('../example/miniprogram/utils/cyl_demo_strings')
+  const more = require('../example/miniprogram/shared/strings_more')
+  const languages = [...Object.keys(own), ...Object.keys(more)]
+  assert.deepEqual(languages.sort(), ['ar', 'en', 'es', 'hi', 'zh-Hans', 'zh-Hant'])
+  languages.filter((language) => language !== 'en').forEach((language) => {
+    const text = (own[language] || more[language]).Restart
+    assert.ok(text && text !== 'Restart', language)
+  })
+  assert.equal(own.en.Restart, 'Restart')
+})
