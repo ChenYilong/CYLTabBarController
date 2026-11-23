@@ -8,7 +8,15 @@ integrator that pinned the branch). A heuristic for code written without a compi
     python3 scripts/check-swift-protocol-bodies.py [folder]     # default: the current folder; exit 1 on a hit
 """
 import re, sys, pathlib
-PROTO = re.compile(r'^\s*(?:@\w+(?:\([^)]*\))?\s+)*(?:public\s+|open\s+|internal\s+|private\s+|fileprivate\s+)?protocol\s+(\w+)')
+# The patterns are built from small parts, so each stays simple (SonarCloud python:S5843).
+ATTRS = r'(?:@\w+(?:\([^)]*\))?\s+)*'                                  # attributes such as @objc(name)
+ACCESS = r'(?:(?:public|open|internal|private|fileprivate)\s+)?'
+MEMBER_MODIFIERS = r'(?:(?:open|public|internal|private|final|override|static|class|mutating)\s+)*'
+PROPERTY_MODIFIERS = r'(?:(?:public|internal|private|static|class)\s+)*'
+PROTO = re.compile(r'^\s*' + ATTRS + ACCESS + r'protocol\s+(\w+)')
+BODY = re.compile(r'^' + ATTRS + MEMBER_MODIFIERS + r'(func|init|subscript)\b')
+LET = re.compile(r'^' + PROPERTY_MODIFIERS + r'let\b')
+STORED_VAR = re.compile(r'^' + PROPERTY_MODIFIERS + r'var\b[^{]*=\s*\S')
 def strip(line):
     line = re.sub(r'"(?:\\.|[^"\\])*"', '""', line)   # strings
     return re.sub(r'//.*$', '', line)                  # line comments
@@ -34,10 +42,10 @@ for path in sorted(pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else '.').rglob
             line = re.sub(r'/\*.*?\*/', '', line)
             if started and depth == 1:
                 member = line.strip()
-                body = re.match(r'^(?:@\w+(?:\([^)]*\))?\s+)*(?:(?:open|public|internal|private|final|override|static|class|mutating)\s+)*(func|init|subscript)\b', member)
+                body = BODY.match(member)
                 if body and '{' in member and not re.search(r'\{\s*get\b', member):
                     print(f'{path}:{j+1}: protocol {name}: body in a requirement: {member[:90]}'); hits += 1
-                if re.match(r'^(?:(?:public|internal|private|static|class)\s+)*(?:let)\b', member) or re.match(r'^(?:(?:public|internal|private|static|class)\s+)*var\b[^{]*=\s*\S', member):
+                if LET.match(member) or STORED_VAR.match(member):
                     print(f'{path}:{j+1}: protocol {name}: stored property: {member[:90]}'); hits += 1
             depth += line.count('{') - line.count('}')
             if '{' in line: started = True
