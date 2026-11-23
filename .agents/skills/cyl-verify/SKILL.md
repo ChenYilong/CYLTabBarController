@@ -50,6 +50,16 @@ ohpm, the WeChat Mini Program npm package) ships the root `LICENSE` inside the p
 Before pushing: `python3 scripts/check-license-notices.py` (exits 1 and names each missing file). A new published package
 gets its license file, a row in `docs/License-Notices.md` and an entry in the script, in the same change.
 
+## Swift written without a compiler (added 2026-11-23)
+
+A Swift protocol lists requirements only (no function body, no stored property); the implementation goes in the class. Run
+`python3 scripts/check-swift-protocol-bodies.py CYLTabBarController` before pushing Swift that was never compiled, anchor every
+scripted insertion on a unique string with the declaration keyword (`open func playAnimation() {`) and assert it occurs once,
+check which declaration encloses what you inserted, and write "not compiled here" in the commit. Downstream repositories pin the
+latest commit on any branch, so one bad commit breaks an integrator before CI has run on it (`cc74a545` / `e0d5e960`:
+`pauseAnimation()` / `resumeAnimation()` bodies inside `CYLAnimatedItemAnimating`, fixed in `c9ca8b05`). A new member of a
+released `@objc` protocol is `@objc optional`. Full rules: `docs/instructions/code.md`, "Protocols hold requirements only".
+
 ## Where a check runs: GitHub CI or locally
 
 GitHub CI/CD for iOS runs on **macOS 26** by default: always read `.github/workflows/ios.yml` on master first to confirm it
