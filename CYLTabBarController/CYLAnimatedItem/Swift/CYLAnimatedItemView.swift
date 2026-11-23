@@ -1067,10 +1067,12 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             return
         }
         #if CYL_ANIMATION_ENGINE_AVAILABLE
-        guard playing, !pausedByScroll, let player = animationPlayer else { return }
+        guard playing, !pausedByScroll, let player = animationPlayer as? NSObject else { return }
         pausedByScroll = true
-        speedBeforePause = player.animationSpeed
-        player.animationSpeed = 0
+        // [EN] `animationSpeed` is an optional protocol requirement: read and set it by key. [CN] `animationSpeed` 是可选协议要求：按 key 读取与设置。
+        speedBeforePause = player.responds(to: NSSelectorFromString("animationSpeed"))
+            ? ((player.value(forKey: "animationSpeed") as? CGFloat) ?? animationSpeed) : animationSpeed
+        setPlayerValue(CGFloat(0), for: "animationSpeed")
         stopLoopTimer()
         postAnimationEvent("cyl.animation.didPause")
         #endif
@@ -1086,9 +1088,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             return
         }
         #if CYL_ANIMATION_ENGINE_AVAILABLE
-        guard pausedByScroll, let player = animationPlayer else { return }
+        guard pausedByScroll, animationPlayer != nil else { return }
         pausedByScroll = false
-        player.animationSpeed = speedBeforePause
+        setPlayerValue(speedBeforePause, for: "animationSpeed")
         startLoopTimerIfNeeded()
         postAnimationEvent("cyl.animation.didResume")
         #endif
