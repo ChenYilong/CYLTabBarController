@@ -40,6 +40,11 @@ type ManifestFailEvent = Readonly<{
   message: string;
 }>;
 
+type LifecycleMomentEvent = Readonly<{
+  name: string;
+  userInfo: string;
+}>;
+
 export interface NativeProps extends ViewProps {
   /**
    * The configuration of CYLTabBarController, as JSON (docs/Configuration-File.md).
@@ -118,6 +123,10 @@ export interface NativeProps extends ViewProps {
    * The manifest could not be downloaded; the message says why, and another source was used if there was one.
    */
   onManifestFail?: CodegenTypes.DirectEventHandler<ManifestFailEvent>;
+  /**
+   * An animation (`cyl.animation.*`) or badge (`cyl.badge.*`) moment of any view; `userInfo` is a JSON object string.
+   */
+  onLifecycleEvent?: CodegenTypes.DirectEventHandler<LifecycleMomentEvent>;
   onTabLongPress?: CodegenTypes.DirectEventHandler<TabLongPressEvent>;
   /**
    * A tab that needs login was tapped while logged out; it is not selected.

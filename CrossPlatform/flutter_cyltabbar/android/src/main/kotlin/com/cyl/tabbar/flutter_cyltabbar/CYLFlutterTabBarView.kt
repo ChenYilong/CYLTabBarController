@@ -56,6 +56,11 @@ internal class CYLFlutterTabBarView(
     }
     hostView.loginStateDidChange = { loggedIn -> channel.invokeMethod("onLoginStateChange", loggedIn) }
     hostView.didApplyManifest = { source -> channel.invokeMethod("onManifestApply", source) }
+    hostView.didPostLifecycleEvent = { name, userInfo ->
+      android.os.Handler(android.os.Looper.getMainLooper()).post {
+        channel.invokeMethod("onLifecycleEvent", mapOf("name" to name, "userInfo" to userInfo))
+      }
+    }
     hostView.didFailManifest = { message -> channel.invokeMethod("onManifestFail", message) }
     applyLoggedIn(arguments["loggedIn"])
     // [EN] Before the configuration, so it is built once, in this language. [CN] 在配置之前，使 TabBar 以该语言只创建一次。

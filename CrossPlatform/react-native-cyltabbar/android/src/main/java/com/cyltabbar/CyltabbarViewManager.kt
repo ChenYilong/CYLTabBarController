@@ -135,6 +135,7 @@ class CyltabbarViewManager : SimpleViewManager<CyltabbarView>(),
     "topLoginRequest" to mapOf("registrationName" to "onLoginRequest"),
     "topLoginStateChange" to mapOf("registrationName" to "onLoginStateChange"),
     "topMemoryWarning" to mapOf("registrationName" to "onMemoryWarning"),
+    "topLifecycleEvent" to mapOf("registrationName" to "onLifecycleEvent"),
     "topManifestApply" to mapOf("registrationName" to "onManifestApply"),
     "topManifestFail" to mapOf("registrationName" to "onManifestFail"),
   )

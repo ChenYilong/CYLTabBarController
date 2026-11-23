@@ -176,6 +176,12 @@ export type CYLTabBarProps = ViewProps & {
    */
   onManifestApply?: (source: string) => void;
   /**
+   * An animation (`cyl.animation.didStart` / `didPause` / `didResume` / `didStop`) or badge (`cyl.badge.didShow` /
+   * `didClear` / `didBecomeReady` / `animationDidStart` / `animationDidStop`) moment of any tab view, with the info the
+   * poster passed. Names match `AnimationEvents` and `BadgeEvents` of the CYLDeallocBlockExecutor library.
+   */
+  onLifecycleEvent?: (name: string, userInfo: Record<string, string>) => void;
+  /**
    * The manifest could not be downloaded; the message says why, and another source was used if there was one.
    */
   onManifestFail?: (message: string) => void;
@@ -427,6 +433,7 @@ export function CYLTabBar(props: CYLTabBarProps) {
     titlePositionAdjustment,
     manifestURL,
     onManifestApply,
+    onLifecycleEvent,
     onManifestFail,
     selectedIndex,
     badgeValues,
@@ -466,6 +473,15 @@ export function CYLTabBar(props: CYLTabBarProps) {
       titlePositionAdjustment={titlePositionAdjustment ?? []}
       manifestURL={manifestURL ?? ''}
       onManifestApply={(event) => onManifestApply?.(event.nativeEvent.source)}
+      onLifecycleEvent={(event) => {
+        let info: Record<string, string> = {};
+        try {
+          info = JSON.parse(event.nativeEvent.userInfo) as Record<string, string>;
+        } catch {
+          // A malformed payload still reports the moment. 载荷无效时仍报告该时机。
+        }
+        onLifecycleEvent?.(event.nativeEvent.name, info);
+      }}
       onManifestFail={(event) => onManifestFail?.(event.nativeEvent.message)}
       onMemoryWarning={(event) => onMemoryWarning?.(event.nativeEvent.report)}
       onLoginStateChange={(event) => onLoginStateChange?.(event.nativeEvent.loggedIn)}

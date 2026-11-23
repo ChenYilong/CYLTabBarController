@@ -212,6 +212,7 @@ class CYLTabBar extends StatefulWidget {
     this.manifestURL,
     this.onManifestApply,
     this.onManifestFail,
+    this.onLifecycleEvent,
     this.configuration = const {},
     this.selectedIndex,
     this.badgeValues = const [],
@@ -358,6 +359,12 @@ class CYLTabBar extends StatefulWidget {
 
   /// The manifest could not be downloaded: the message says why, and another source was used if there was one.
   final ValueChanged<String>? onManifestFail;
+
+  /// An animation (`cyl.animation.didStart` / `didPause` / `didResume` / `didStop`) or badge (`cyl.badge.didShow` /
+  /// `didClear` / `didBecomeReady` / `animationDidStart` / `animationDidStop`) moment of any tab view, with the info the
+  /// poster passed. Names match `AnimationEvents` and `BadgeEvents` of the CYLDeallocBlockExecutor library.
+  /// 任意 Tab 视图的动画或角标时机，附带发出方传入的信息；名称与 CYLDeallocBlockExecutor 库的 AnimationEvents、BadgeEvents 一致。
+  final void Function(String name, Map<String, String> userInfo)? onLifecycleEvent;
 
   /// The configuration sent to the native library.
   Map<String, Object?> buildConfiguration() => {
@@ -510,6 +517,17 @@ class _CYLTabBarState extends State<CYLTabBar> {
           }
         case 'onManifestApply':
           widget.onManifestApply?.call((arguments as String?) ?? '');
+        case 'onLifecycleEvent':
+          final map = Map<Object?, Object?>.from((arguments as Map?) ?? const <Object?, Object?>{});
+          Map<String, String> info = <String, String>{};
+          try {
+            info = Map<String, String>.from(
+                jsonDecode((map['userInfo'] as String?) ?? '{}') as Map<dynamic, dynamic>);
+          } catch (_) {
+            // A malformed payload still reports the moment. 载荷无效时仍报告该时机。
+          }
+          widget.onLifecycleEvent?.call((map['name'] as String?) ?? '', info);
+          break;
         case 'onManifestFail':
           widget.onManifestFail?.call((arguments as String?) ?? '');
       }

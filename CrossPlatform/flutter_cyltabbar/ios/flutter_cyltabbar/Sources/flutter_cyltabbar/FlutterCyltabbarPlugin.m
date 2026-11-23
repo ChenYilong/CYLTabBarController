@@ -96,6 +96,11 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         _hostView.didApplyManifest = ^(NSString *source) {
             [weakChannel invokeMethod:@"onManifestApply" arguments:source];
         };
+        _hostView.didPostLifecycleEvent = ^(NSString *name, NSString *userInfo) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakChannel invokeMethod:@"onLifecycleEvent" arguments:@{@"name": name, @"userInfo": userInfo}];
+            });
+        };
         _hostView.didFailManifest = ^(NSString *message) {
             [weakChannel invokeMethod:@"onManifestFail" arguments:message];
         };

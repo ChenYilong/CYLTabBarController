@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import org.json.JSONArray
 import org.json.JSONObject
+import com.chenyilong.cyldeallocblockexecutor.LifecycleCenter
 import java.net.URI
 import java.util.concurrent.Executors
 
@@ -101,6 +102,39 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
      * [EN] The message of the failure that made the loader fall back to another source. [CN] 导致加载器回退到其他来源的失败原因。
      */
     var didFailManifest: ((String) -> Unit)? = null
+
+    /**
+     * [EN] Every animation (`cyl.animation.*`) and badge (`cyl.badge.*`) moment of any view, with the event name and the
+     *      posted info as a JSON object string. Set by the React Native and Flutter wrappers; observers on the core
+     *      library ([com.chenyilong.cyldeallocblockexecutor.LifecycleCenter]) are the way for native code.
+     * [CN] 任意视图的所有动画（`cyl.animation.*`）与角标（`cyl.badge.*`）时机，参数为事件名与以 JSON 对象字符串表示的附带信息。
+     *      由 React Native 与 Flutter 包装层设置；原生代码请直接使用核心库的 LifecycleCenter 观察者。
+     */
+    var didPostLifecycleEvent: ((name: String, userInfoJSON: String) -> Unit)? = null
+        set(value) {
+            field = value
+            relayLifecycleEvents()
+        }
+
+    /** [EN] (Re)subscribes the relay: only while a listener is set and the view is attached. [CN] （重新）订阅：仅在设置了监听且视图已附加时。 */
+    private fun relayLifecycleEvents() {
+        lifecycleRelayNames.forEach { LifecycleCenter.cancelCallback(key = lifecycleRelayKey + it) }
+        if (didPostLifecycleEvent == null || !isAttachedToWindow) return
+        lifecycleRelayNames.forEach { name ->
+            LifecycleCenter.addCustomCallback<Any>(name, key = lifecycleRelayKey + name) { _, _, info ->
+                val json = JSONObject()
+                info.userInfo?.forEach { (k, v) -> json.put(k, v?.toString()) }
+                didPostLifecycleEvent?.invoke(name, json.toString())
+            }
+        }
+    }
+
+    private val lifecycleRelayKey = "cyl.hostview.relay.${System.identityHashCode(this)}."
+    private val lifecycleRelayNames = listOf(
+        "cyl.animation.didStart", "cyl.animation.didPause", "cyl.animation.didResume", "cyl.animation.didStop",
+        "cyl.badge.didShow", "cyl.badge.didClear", "cyl.badge.didBecomeReady",
+        "cyl.badge.animationDidStart", "cyl.badge.animationDidStop",
+    )
 
     /**
      * [EN] Builds the controller again from `configuration` (images first). [CN] 由 `configuration` 重新创建控制器（先加载图片）。
@@ -505,6 +539,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        relayLifecycleEvents()
         buildIfReady()
     }
 
@@ -515,6 +550,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        lifecycleRelayNames.forEach { LifecycleCenter.cancelCallback(key = lifecycleRelayKey + it) }
         // [EN] Rebuilt when attached again: the fragments cannot outlive the view tree. [CN] 再次附加时重新创建：Fragment 不能比视图树存活更久。
         if (tabBarController != null && effectiveConfiguration() != null) {
             // [EN] Loading the same configuration again builds the controller on the next attach.
