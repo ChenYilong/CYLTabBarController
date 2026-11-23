@@ -63,6 +63,9 @@ App({
   },
 
   onLaunch() {
+    // [EN] The tab icon animations pause while the user scrolls a page (pages report it with cylPageScrolled).
+    // [CN] 用户滚动页面时 Tab 图标动画暂停（页面通过 cylPageScrolled 报告滚动）。
+    require('cyl-tabbar-miniprogram/cyl-animated-item/cyl_animation_events').cylPausesAnimationsWhileUserScrolls(true);
     this.cylListeners = [];
     // [EN] The Rive icons (the iOS examples' icons.riv) are white strokes: with the Rive package installed, the example
     //      starts on the dark skin, as Example-Rive and Example-SwiftUI-Rive run in dark mode.
