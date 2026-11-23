@@ -38,7 +38,7 @@ class CYLAnimationController {
 /// [file] is a file name in the app (the iOS main bundle, the Android assets), a path or a URL.
 ///
 /// The names follow the cross-platform engine contract (docs/Animated-Item.md, "Engine API across platforms"): [selected],
-/// [animationSpeed], [animationLoops], [animationRestartToken], [drivesAnimationPlayback], [iconSize], [tintColor], the
+/// [animationSpeed], [animationLoops], [animationRestartToken], [drivesAnimationPlayback], [showsImageWhenAnimationEnds], [iconSize], [tintColor], the
 /// callbacks [onAnimationLoaded], [onAnimationFailed], [onAnimationEnd] and the [controller]'s commands. Both native halves
 /// wrap `CYLAnimatedItemView`; there is no engine logic in Dart.
 class CYLAnimationView extends StatefulWidget {
@@ -52,6 +52,7 @@ class CYLAnimationView extends StatefulWidget {
     this.animationLoops = false,
     this.animationRestartToken = 0,
     this.drivesAnimationPlayback = true,
+    this.showsImageWhenAnimationEnds = false,
     this.iconSize,
     this.tintColor,
     this.controller,
@@ -81,6 +82,9 @@ class CYLAnimationView extends StatefulWidget {
 
   /// true (default): the view applies the default playback rules; false: the host plays through the [controller].
   final bool drivesAnimationPlayback;
+
+  /// Shows the still image instead of the last frame when a play-once pass ends (default false); the next play shows the animation again.
+  final bool showsImageWhenAnimationEnds;
 
   /// The icon's side in logical pixels; null fills the view.
   final double? iconSize;
@@ -120,6 +124,9 @@ class _CYLAnimationViewState extends State<CYLAnimationView> {
     // The contract's order: the rules first, then the file, then what plays.
     if (widget.drivesAnimationPlayback != oldWidget.drivesAnimationPlayback) {
       channel.invokeMethod<void>('setDrivesAnimationPlayback', widget.drivesAnimationPlayback);
+    }
+    if (widget.showsImageWhenAnimationEnds != oldWidget.showsImageWhenAnimationEnds) {
+      channel.invokeMethod<void>('setShowsImageWhenAnimationEnds', widget.showsImageWhenAnimationEnds);
     }
     if (widget.animationSpeed != oldWidget.animationSpeed) {
       channel.invokeMethod<void>('setAnimationSpeed', widget.animationSpeed);
@@ -181,6 +188,7 @@ class _CYLAnimationViewState extends State<CYLAnimationView> {
       'animationLoops': widget.animationLoops,
       'animationRestartToken': widget.animationRestartToken,
       'drivesAnimationPlayback': widget.drivesAnimationPlayback,
+      'showsImageWhenAnimationEnds': widget.showsImageWhenAnimationEnds,
       if (widget.iconSize != null) 'iconSize': widget.iconSize,
       if (widget.tintColor != null) 'tintColor': widget.tintColor!.toARGB32(),
     };

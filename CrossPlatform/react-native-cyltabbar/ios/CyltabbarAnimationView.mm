@@ -168,6 +168,7 @@ static NSURL *CYLRNAnimationURL(NSString *source)
 #if CYL_RN_ANIMATION_AVAILABLE
   const auto &newProps = *std::static_pointer_cast<CyltabbarAnimationViewProps const>(props);
   _item.drivesAnimationPlayback = newProps.drivesAnimationPlayback;
+  _item.showsImageWhenAnimationEnds = newProps.showsImageWhenAnimationEnds;
   _item.animationSpeed = newProps.animationSpeed;
   _item.animationLoops = newProps.animationLoops;
   _iconSide = newProps.iconSize;

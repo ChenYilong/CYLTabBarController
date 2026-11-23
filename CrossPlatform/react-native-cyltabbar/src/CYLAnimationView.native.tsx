@@ -62,6 +62,8 @@ export type CYLAnimationViewProps = ViewProps & {
   animationRestartToken?: number;
   /** true (default): the view applies the default playback rules; false: the host plays through `ref`. */
   drivesAnimationPlayback?: boolean;
+  /** Shows the still image instead of the last frame when a play-once pass ends (default false); the next play shows the animation again. */
+  showsImageWhenAnimationEnds?: boolean;
   /** The icon's side in points; unset fills the view. */
   iconSize?: number;
   /** Tints the icon and an animation that takes a tint. */

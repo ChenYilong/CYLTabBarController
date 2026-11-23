@@ -352,6 +352,9 @@ static UIColor *CYLFlutterColor(id value) {
     if ([arguments[@"drivesAnimationPlayback"] isKindOfClass:[NSNumber class]]) {
         _item.drivesAnimationPlayback = [arguments[@"drivesAnimationPlayback"] boolValue];
     }
+    if ([arguments[@"showsImageWhenAnimationEnds"] isKindOfClass:[NSNumber class]]) {
+        _item.showsImageWhenAnimationEnds = [arguments[@"showsImageWhenAnimationEnds"] boolValue];
+    }
     if ([arguments[@"animationSpeed"] isKindOfClass:[NSNumber class]]) {
         _item.animationSpeed = [arguments[@"animationSpeed"] doubleValue];
     }
@@ -433,6 +436,8 @@ static UIColor *CYLFlutterColor(id value) {
         }
     } else if ([method isEqualToString:@"setDrivesAnimationPlayback"]) {
         _item.drivesAnimationPlayback = [argument isKindOfClass:[NSNumber class]] ? [argument boolValue] : YES;
+    } else if ([method isEqualToString:@"setShowsImageWhenAnimationEnds"]) {
+        _item.showsImageWhenAnimationEnds = [argument isKindOfClass:[NSNumber class]] ? [argument boolValue] : NO;
     } else if ([method isEqualToString:@"setPlaying"]) {
         _playing = [argument boolValue];
         if (_playing) {

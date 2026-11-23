@@ -62,6 +62,8 @@ class CyltabbarAnimationView(context: Context) : FrameLayout(context) {
 
   fun applyDrivesAnimationPlayback(value: Boolean) { item.drivesAnimationPlayback = value }
 
+  fun applyShowsImageWhenAnimationEnds(value: Boolean) { item.showsImageWhenAnimationEnds = value }
+
   /** `iconSize` in dp; 0 or less fills the view. */
   fun applyIconSize(value: Float) { iconSize = value.takeIf { it > 0f }; fitIcon() }
 

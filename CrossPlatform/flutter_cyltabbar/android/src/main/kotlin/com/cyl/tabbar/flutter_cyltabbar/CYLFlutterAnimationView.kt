@@ -45,6 +45,7 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
     container.addView(item, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
     channel.setMethodCallHandler(this)
     (arguments["drivesAnimationPlayback"] as? Boolean)?.let { item.drivesAnimationPlayback = it }
+    (arguments["showsImageWhenAnimationEnds"] as? Boolean)?.let { item.showsImageWhenAnimationEnds = it }
     (arguments["animationSpeed"] as? Number)?.let { item.animationSpeed = it.toFloat() }
     (arguments["animationLoops"] as? Boolean)?.let { item.animationLoops = it }
     (arguments["animationRestartToken"] as? Number)?.let { item.animationRestartToken = it.toInt() }
@@ -80,6 +81,7 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
       "setAnimationLoops" -> item.animationLoops = argument as? Boolean ?: false
       "setAnimationRestartToken" -> item.animationRestartToken = (argument as? Number)?.toInt() ?: 0
       "setDrivesAnimationPlayback" -> item.drivesAnimationPlayback = argument as? Boolean ?: true
+      "setShowsImageWhenAnimationEnds" -> item.showsImageWhenAnimationEnds = argument as? Boolean ?: false
       "setPlaying" -> if (argument as? Boolean == true) item.playAnimation() else item.stopAnimation()
       "setIconSize" -> { iconSize = (argument as? Number)?.toFloat(); fitIcon() }
       "setTintColor" -> item.iconColor = (argument as? Number)?.toInt()

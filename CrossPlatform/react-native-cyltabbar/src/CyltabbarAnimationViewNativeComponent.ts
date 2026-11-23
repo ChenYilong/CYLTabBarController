@@ -54,6 +54,10 @@ export interface NativeProps extends ViewProps {
    */
   drivesAnimationPlayback?: CodegenTypes.WithDefault<boolean, true>;
   /**
+   * Shows the still image instead of the last frame when a play-once pass ends.
+   */
+  showsImageWhenAnimationEnds?: CodegenTypes.WithDefault<boolean, false>;
+  /**
    * The icon's side in points; 0 fills the view.
    */
   iconSize?: CodegenTypes.WithDefault<CodegenTypes.Float, 0>;
