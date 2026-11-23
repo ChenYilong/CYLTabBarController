@@ -7,6 +7,7 @@
 
 | 中文 | English |
 |:---|:---|
+| 本条按用户要求使用英文（见右列）。 | TODO, 95 / 100 so far (2026-11-23, branch `feat/harmony-animated-item-engines`, PR #824, Mac session, worktree `/tmp/xpr/cyl-824`, own simulator `iPhone 18 Pro (Mac TabBar)` 5084F21B): **raise the iOS score to 100: close the four leftovers with evidence**. Task from the coordinator, no user prompt of its own. (1) Lottie and PAG `onAnimationEnd` firing on the Example-Rive Engine API page (log or on-screen label) with a labeled original-pixel screenshot in `docs/assets`. (2) Host-driven mode (`drivesAnimationPlayback` false) exercised by an example case for the React Native and Flutter iOS views, run on the simulator, screenshot. (3) Native unit tests for the React Native (`CyltabbarAnimationView.mm`) and Flutter (`FlutterCyltabbarPlugin.m`) iOS bridge views: selected, speed, loops, restartToken, drivesAnimationPlayback, end event; run them. (4) The iOS CI run of the newest push (`a1e4eafb`, run 45141989790 was queued): if it fails, download the logs and fix. Rubric: **100** = all four done with evidence; each missing item costs what the report's TODO table says. |
 | 绑定的代码类 `CYLAnimatedItemView`：[`CYLTabBarController/CYLAnimatedItem/CYLAnimatedItemView.h`](../CYLTabBarController/CYLAnimatedItem/CYLAnimatedItemView.h) | Bound to the class `CYLAnimatedItemView`: [`CYLTabBarController/CYLAnimatedItem/CYLAnimatedItemView.h`](../CYLTabBarController/CYLAnimatedItem/CYLAnimatedItemView.h) |
 
 <!-- binding:end -->
