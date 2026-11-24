@@ -5,8 +5,6 @@
  *      these, so no other test sees it. This guard fails on syntax the Mini Program compiler may not handle, in every source
  *      file of the library, its vendored copies and the example: `?.(`, `#private` fields, `??=`, `||=`, `&&=`.
  *      Comments and string literals are ignored. Run: `npm test` (no setup needed).
- *      KNOWN_EXCEPTIONS lists the violations that exist until a re-pin; the test fails both on a new violation and on an
- *      exception that no longer applies, so the list cannot go stale.
  * [CN] 微信开发者工具遇到无法编译的 JavaScript 文件时不会在该文件上报错：模块只是"未定义"，所有引用它的组件都加载失败（2026-11-24：
  *      内置的 cyl-dealloc-block-executor/registry.js 中的 `this.onRegister?.(event)`；可选调用 `?.(` 是代码库中唯一的一处）。Node
  *      全都接受这些写法，因此其他测试发现不了。本测试在库的所有源码、内置副本与示例中，遇到小程序编译器可能不支持的语法即失败：
@@ -20,14 +18,6 @@ const path = require('node:path')
 const ROOT = path.join(__dirname, '..')
 const SCAN = ['src', 'example/miniprogram']
 const SKIP = new Set(['node_modules', 'miniprogram_npm', 'cyl_components', 'engines', '.deps'])
-// [EN] file:line of a violation that exists until the library fix is re-pinned (docs/WeChat-Mini-Program.md). Remove it then.
-const KNOWN_EXCEPTIONS = [
-  'src/cyl-dealloc-block-executor/registry.js:?.(',
-  'src/cyl-dealloc-block-executor/controller.js:??=',
-  'src/cyl-dealloc-block-executor/registry.js:class field',
-  'src/cyl-dealloc-block-executor/center.js:class field',
-  'src/cyl-dealloc-block-executor/log.js:class field',
-]
 const NL = String.fromCharCode(10)
 
 const PATTERNS = [
@@ -125,10 +115,7 @@ test('no source file uses syntax that WeChat DevTools may fail to compile (a mod
       })
     }
   }
-  const unexpected = [...found].filter((key) => !KNOWN_EXCEPTIONS.includes(key))
-  const stale = KNOWN_EXCEPTIONS.filter((key) => !found.has(key))
-  assert.deepEqual(unexpected, [], 'new syntax the Mini Program compiler may not handle')
-  assert.deepEqual(stale, [], 'KNOWN_EXCEPTIONS entry no longer applies: remove it')
+  assert.deepEqual([...found], [], 'syntax the Mini Program compiler may not handle')
 })
 
 test('the guard detects each token (so it cannot pass vacuously)', () => {
@@ -148,16 +135,16 @@ test('the guard detects each token (so it cannot pass vacuously)', () => {
  *      a plain `require('./x')` chain from a used file reaches it; a require inside an object spread (`...require('./x')`) is not
  *      followed (2026-11-24: index.js `module.exports = { ...require('./registry.js'), ... }` left only index.js defined, every
  *      other module "not defined"; plain `const x = require('./x')` lines, with or without `.js`, fixed it). So every file of the
- *      folder must be reachable from index.js through plain requires. UNREACHABLE_UNTIL_REPIN lists the files that are not, until
- *      the library fix is re-pinned; the test fails when a listed file became reachable (remove it).
+ *      folder must be reachable from index.js through plain requires. The test lists the files that are not
+ *      (none since the re-pin to library commit 4276a6d).
  * [CN] 内置的 dealloc 执行器只能从其 index.js 到达。开发者工具的「未使用文件」过滤只保留能通过普通 `require('./x')` 链到达的文件；
  *      对象展开中的 require（`...require('./x')`）不会被跟踪（2026-11-24）。因此该目录的每个文件都必须能从 index.js 通过普通 require 到达。
  */
-const UNREACHABLE_UNTIL_REPIN = ['center.js', 'controller.js', 'log.js', 'registry.js', 'types.js']
+const UNREACHABLE = []
 
 function plainRequires(source) {
   const result = []
-  const pattern = /(^|[^.A-Za-z0-9_$])require(s*'(.[^']*)'s*)/g
+  const pattern = /(^|[^.A-Za-z0-9_$])require\(\s*'([^']*)'\s*\)/g
   let match = pattern.exec(source)
   while (match) { result.push(match[2]); match = pattern.exec(source) }
   return result
@@ -176,5 +163,5 @@ test('every file of the vendored dealloc executor is reachable from index.js by 
     }
   }
   const unreachable = all.filter((name) => !seen.has(name)).sort()
-  assert.deepEqual(unreachable, UNREACHABLE_UNTIL_REPIN, 'files DevTools would drop (or a stale UNREACHABLE_UNTIL_REPIN entry)')
+  assert.deepEqual(unreachable, UNREACHABLE, 'files DevTools would drop')
 })
