@@ -432,6 +432,7 @@ function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, bord
   const glass = style === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive()
   // The host's value (0 is square); not set (-1): a capsule for the drawn Liquid Glass (the rule `0: automatic, a capsule` that
   // CollectionViewClassifyMenu's tags had, moved here), square for flat.
+  // cylAnimatedItemCornerRadiusCapsule is the capsule: CSS limits it to half the height, so it follows the size.
   const radius = Number(cornerRadius) >= 0 ? Number(cornerRadius) : (glass ? cylAnimatedItemCornerRadiusCapsule : 0)
   let css = `border-radius:${radius}px;`
   if (border > 0) css += `border:${border}px solid ${borderColor || 'transparent'};box-sizing:border-box;`

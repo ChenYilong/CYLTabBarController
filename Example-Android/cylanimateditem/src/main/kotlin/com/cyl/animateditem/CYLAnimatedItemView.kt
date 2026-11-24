@@ -1260,11 +1260,11 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     private fun applyItemBackground() {
         if (!usesItemBackground) return
         val density = resources.displayMetrics.density
-        // The host's value limited to half the height, else a capsule for Liquid Glass (the rule `0: automatic, a capsule` that
-        // CollectionViewClassifyMenu's tags had, moved here) and square for flat.
+        // The corner radius, all of it decided here: CYLAnimatedItemCornerRadiusCapsule is the capsule (half the height, following the
+        // size); any other value is dp limited to half the height; unset is a capsule for Liquid Glass and square for flat.
         val requested = itemCornerRadius
         val radius = if (requested != null) {
-            min(max(requested, 0f) * density, height / 2f)
+            if (requested == CYLAnimatedItemCornerRadiusCapsule) height / 2f else min(max(requested, 0f) * density, height / 2f)
         } else if (resolvedItemBackgroundStyle == CYLAnimatedItemBackgroundStyle.LiquidGlass) {
             height / 2f
         } else {

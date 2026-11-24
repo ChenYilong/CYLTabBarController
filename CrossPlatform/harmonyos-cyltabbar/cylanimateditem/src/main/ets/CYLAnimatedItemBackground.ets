@@ -57,6 +57,7 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
    * [EN] The radius: the set value, else a capsule for the drawn glass and square for flat. [CN] 圆角：设置的值，否则绘制玻璃时为胶囊、扁平时为直角。
    */
   static resolvedCornerRadius(style: CYLAnimatedItemBackgroundStyle, cornerRadius: number): number {
+    // CYLAnimatedItemCornerRadiusCapsule is the capsule: the platform limits it to half the height, so it follows the size.
     if (cornerRadius >= 0) {
       return cornerRadius;
     }

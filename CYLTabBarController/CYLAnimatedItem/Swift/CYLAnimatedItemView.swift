@@ -494,11 +494,11 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     /// [EN] Applies the background, radius and border for the current bounds. [CN] 按当前 bounds 应用背景、圆角与边框。
     private func layoutItemBackground() {
         guard usesItemBackground else { return }
-        // The corner radius: the host's value limited to half the height, else a capsule for Liquid Glass (the rule `0: automatic, a
-        // capsule` that CollectionViewClassifyMenu's tags had, moved here) and square for flat.
+        // The corner radius, all of it decided here: `CYLAnimatedItemCornerRadiusCapsule` is the capsule (half the height, following the
+        // size); any other value is points limited to half the height; unset is a capsule for Liquid Glass and square for flat.
         let radius: CGFloat
         if let requested = itemCornerRadius {
-            radius = min(max(requested, 0), bounds.height / 2)
+            radius = requested == CYLAnimatedItemCornerRadiusCapsule ? bounds.height / 2 : min(max(requested, 0), bounds.height / 2)
         } else {
             radius = resolvedItemBackgroundStyle == .liquidGlass ? bounds.height / 2 : 0
         }
