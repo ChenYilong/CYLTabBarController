@@ -42,6 +42,7 @@
 		A1C0FFEE5A1D0F00D0000003 /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE5A1D0F00D0000004 /* CYLPlusButtonBadgeDemo.swift */; };
 		A1C0FFEE5A1D0F00D0000005 /* RiveTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE5A1D0F00D0000006 /* RiveTabBarController.swift */; };
 		A1C0FFEE5A1D0F00D0000A02 /* AnimatedItemEngineAPIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE5A1D0F00D0000A01 /* AnimatedItemEngineAPIViewController.swift */; };
+		A1C0FFEE7A110F00D0000002 /* CYLDemoPlaybackControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE7A110F00D0000001 /* CYLDemoPlaybackControlsView.swift */; };
 		A85B4D667BD72D9C31E30BBC /* CYLSettingsDemoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D0C069C05195A044437DCC9 /* CYLSettingsDemoTableViewController.swift */; };
 		A905CDB1E98C37058FE447D1 /* SideMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FF32281E56757A718BBBB4 /* SideMenu.swift */; };
 		AC7015914DF03E3B9C6AFEAF /* check.riv in Resources */ = {isa = PBXBuildFile; fileRef = E8DF93C34F3E7B872BF47F0F /* check.riv */; };
@@ -100,6 +101,7 @@
 		A1C0FFEE5A1D0F00D0000004 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
 		A1C0FFEE5A1D0F00D0000006 /* RiveTabBarController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RiveTabBarController.swift; sourceTree = "<group>"; };
 		A1C0FFEE5A1D0F00D0000A01 /* AnimatedItemEngineAPIViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnimatedItemEngineAPIViewController.swift; sourceTree = "<group>"; };
+		A1C0FFEE7A110F00D0000001 /* CYLDemoPlaybackControlsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLDemoPlaybackControlsView.swift; path = "../Example-Shared/CYLDemoPlaybackControlsView.swift"; sourceTree = SOURCE_ROOT; };
 		A5B68C427C284DD38029286A /* Configurations */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Configurations; path = "../Example-Shared/Configurations"; sourceTree = SOURCE_ROOT; };
 		AD544589DFE95E305AADD727 /* CustomTextField.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
 		ADB104DA902FE6C1FA00D432 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -183,6 +185,7 @@
 			isa = PBXGroup;
 			children = (
 				5D0C069C05195A044437DCC9 /* CYLSettingsDemoTableViewController.swift */,
+				A1C0FFEE7A110F00D0000001 /* CYLDemoPlaybackControlsView.swift */,
 				D36FD68AE28A1C6B53E77085 /* CYLDemoTabBarStyle.swift */,
 				A1C0FFEE5A1D0F00D0000004 /* CYLPlusButtonBadgeDemo.swift */,
 			);
@@ -463,11 +466,13 @@
 				"${PODS_ROOT}/Target Support Files/Pods-RiveApp/Pods-RiveApp-resources.sh",
 				"${PODS_ROOT}/../../CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle",
 				"${PODS_ROOT}/../../CYLTabBarController/Resources/CYLTabBarController.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RiveRuntime/runtime_ios_privacy.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLAnimatedItem.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/runtime_ios_privacy.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -526,6 +531,7 @@
 				A905CDB1E98C37058FE447D1 /* SideMenu.swift in Sources */,
 				24C9C0A04F6CFE6ADF0916D6 /* TabItems.swift in Sources */,
 				A85B4D667BD72D9C31E30BBC /* CYLSettingsDemoTableViewController.swift in Sources */,
+				A1C0FFEE7A110F00D0000002 /* CYLDemoPlaybackControlsView.swift in Sources */,
 				8270F4983C7222D1B11969F9 /* CYLDemoTabBarStyle.swift in Sources */,
 				A1C0FFEE5A1D0F00D0000003 /* CYLPlusButtonBadgeDemo.swift in Sources */,
 				6F041C42C20CAC318EA621F8 /* SVGATabIconDemoView.swift in Sources */,

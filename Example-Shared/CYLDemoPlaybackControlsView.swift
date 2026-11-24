@@ -30,20 +30,53 @@ final class CYLDemoPlaybackControlsView: UIView {
     private let pauseSwitch = UISwitch()
     private let pauseCountLabel = UILabel()
     private let lastEventLabel = UILabel()
+    /// [EN] The switch state outlives the card: the library observes only scroll views that move to a window after the observer
+    ///      exists, so a page opened after the switch was turned on is the one that pauses; its card shows the switch ON.
+    /// [CN] 开关状态比卡片存活更久：库只观察在观察者存在之后才移入窗口的 scroll view，因此开关打开之后再打开的页面才会暂停；其卡片显示开关为打开。
+    private static var pausesWhileScrolling = false
+    private let card = UIStackView()
+    private weak var hostTableView: UITableView?
 
     /**
      * [EN] Puts the controls above the rows of `tableView`, for the tab bar controller of `viewController`.
      * [CN] 把控件放在 `tableView` 的各行之上，控制 `viewController` 所在的 TabBarController。
      */
     @objc(installOnTableView:viewController:)
-    static func install(on tableView: UITableView, in viewController: UIViewController) {
-        let view = CYLDemoPlaybackControlsView(viewController: viewController)
-        let width = tableView.bounds.width > 0 ? tableView.bounds.width : UIScreen.main.bounds.width
-        let height = view.systemLayoutSizeFitting(CGSize(width: width, height: UIView.layoutFittingCompressedSize.height),
-                                                  withHorizontalFittingPriority: .required,
-                                                  verticalFittingPriority: .fittingSizeLevel).height
-        view.frame = CGRect(x: 0, y: 0, width: width, height: height)
+    @discardableResult
+    static func install(on tableView: UITableView, in viewController: UIViewController) -> CYLDemoPlaybackControlsView {
+        let view = make(in: viewController)
+        view.hostTableView = tableView
+        view.resizeForTableHeader()
         tableView.tableHeaderView = view
+        return view
+    }
+
+    /**
+     * [EN] Adds a row at the bottom of the card (the root app adds its "Release the tab bar controller" row) and sizes the
+     *      table header again.
+     * [CN] 在卡片底部添加一行（根 App 添加它的「释放 TabBarController」行），并重新计算表头高度。
+     */
+    func appendRow(_ row: UIView) {
+        card.addArrangedSubview(row)
+        resizeForTableHeader()
+        hostTableView?.tableHeaderView = self
+    }
+
+    private func resizeForTableHeader() {
+        let tableWidth = hostTableView?.bounds.width ?? 0
+        let width = tableWidth > 0 ? tableWidth : UIScreen.main.bounds.width
+        let height = systemLayoutSizeFitting(CGSize(width: width, height: UIView.layoutFittingCompressedSize.height),
+                                             withHorizontalFittingPriority: .required,
+                                             verticalFittingPriority: .fittingSizeLevel).height
+        frame = CGRect(x: 0, y: 0, width: width, height: height)
+    }
+
+    /**
+     * [EN] The controls as a view for Auto Layout (a page that is not a table, such as the Rive example's engine API page).
+     * [CN] 作为 Auto Layout 视图的控件（不是列表的页面，例如 Rive 示例的引擎 API 页）。
+     */
+    static func make(in viewController: UIViewController) -> CYLDemoPlaybackControlsView {
+        CYLDemoPlaybackControlsView(viewController: viewController)
     }
 
     private init(viewController: UIViewController) {
@@ -63,6 +96,7 @@ final class CYLDemoPlaybackControlsView: UIView {
 
     override func didMoveToWindow() {
         super.didMoveToWindow()
+        pauseSwitch.isOn = Self.pausesWhileScrolling
         // [EN] Show the current policy (the app or another page may have changed it). [CN] 显示当前策略（App 或其他页面可能已修改）。
         guard window != nil, let tabBarController else {
             return
@@ -142,7 +176,9 @@ final class CYLDemoPlaybackControlsView: UIView {
                                                    name: Notification.Name("cyl.animation.\(name)"), object: nil)
         }
 
-        let card = UIStackView(arrangedSubviews: [playAllButton, speedRow, loopRow, pauseRow, lastEventLabel])
+        for row in [playAllButton, speedRow, loopRow, pauseRow, lastEventLabel] {
+            card.addArrangedSubview(row)
+        }
         card.axis = .vertical
         card.spacing = 12
         card.isLayoutMarginsRelativeArrangement = true
@@ -191,6 +227,7 @@ final class CYLDemoPlaybackControlsView: UIView {
     }
 
     @objc private func pauseChanged() {
+        Self.pausesWhileScrolling = pauseSwitch.isOn
         CYLAnimationEventBridge.pausesAnimationsWhileUserScrolls(pauseSwitch.isOn)
     }
 

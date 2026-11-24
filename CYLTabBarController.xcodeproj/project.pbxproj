@@ -34,6 +34,7 @@
 		134D0E2857E843ACB7030ADB /* CYLTabBarItemAnimationPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FCF23973CE0CE1C725278EF /* CYLTabBarItemAnimationPlayer.m */; };
 		16900C27361235B33E284862 /* CYLTabBarController+CYLLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0886F277346F01017F21E10A /* CYLTabBarController+CYLLogin.swift */; };
 		17B7BF3FFC5C4CA250F394AC /* CYLAnimatedItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21BB208E919470BD7E295947 /* CYLAnimatedItemView.swift */; };
+		9AC0FFEE2C3064BD00000602 /* CYLRiveInputPass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC0FFEE2C3064BD00000601 /* CYLRiveInputPass.swift */; };
 		18C9CF92D56B49E483F059AD /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = FF9F2AB372724E429E82DE06 /* CYLDemo.bundle */; };
 		18E8308B66C435016E450941 /* CYLTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1F03FEFE78078784730F /* CYLTabBar.swift */; };
 		19325584B4E42489F1DFC758 /* UIBarButtonItem+CYLBadgeExtention.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBFC445362C954B6C6748A81 /* UIBarButtonItem+CYLBadgeExtention.swift */; };
@@ -217,6 +218,8 @@
 		9A9801802461249F00E65289 /* green_lottie_tab_home.json in Resources */ = {isa = PBXBuildFile; fileRef = 9A98017C2461249F00E65289 /* green_lottie_tab_home.json */; };
 		9AC0181B1FE90AA1001EC2D6 /* CYLPlusDemoChildViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC0181A1FE90AA1001EC2D6 /* CYLPlusDemoChildViewController.swift */; };
 		9AC0FFEE2C3064BD00000102 /* CYLLayoutBlockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC0FFEE2C3064BD00000101 /* CYLLayoutBlockTests.swift */; };
+		9AC0FFEE2C3064BD00000502 /* CYLTabBarControllerDeallocTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC0FFEE2C3064BD00000501 /* CYLTabBarControllerDeallocTests.swift */; };
+		9AC0FFEE2C3064BD00000402 /* CYLRiveInputPassTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC0FFEE2C3064BD00000401 /* CYLRiveInputPassTests.swift */; };
 		9AC0FFEE2C3064BD00000202 /* CYLAnimationEventBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC0FFEE2C3064BD00000201 /* CYLAnimationEventBridgeTests.swift */; };
 		9AC0FFEE2C3064BD00000302 /* CYLAnimationEventBridgeLazyInstallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC0FFEE2C3064BD00000301 /* CYLAnimationEventBridgeLazyInstallTests.swift */; };
 		9AD7F5B022B7D4B6004BF0A0 /* gray_tabbar_me_animation.json in Resources */ = {isa = PBXBuildFile; fileRef = 9AD7F5AD22B7D4B6004BF0A0 /* gray_tabbar_me_animation.json */; };
@@ -479,6 +482,7 @@
 		1FCF23973CE0CE1C725278EF /* CYLTabBarItemAnimationPlayer.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = CYLTabBarItemAnimationPlayer.m; sourceTree = "<group>"; };
 		207DBEB9C099ECECBE1EC9CF /* CYLPlusButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLPlusButton.swift; sourceTree = "<group>"; };
 		21BB208E919470BD7E295947 /* CYLAnimatedItemView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Swift/CYLAnimatedItemView.swift; sourceTree = "<group>"; };
+		9AC0FFEE2C3064BD00000601 /* CYLRiveInputPass.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Swift/CYLRiveInputPass.swift; sourceTree = "<group>"; };
 		2235759C0549079BA7160DF4 /* CYLGalleryProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CYLGalleryProvider.swift; sourceTree = "<group>"; };
 		22D8EE709139B6B411751735 /* CYLBaseNavigationController.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLBaseNavigationController.h; sourceTree = "<group>"; };
 		2357C953616F9EBF0007DCFC /* CYLTabBarBadgeView.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLTabBarBadgeView.h; sourceTree = "<group>"; };
@@ -652,6 +656,8 @@
 		9A98017C2461249F00E65289 /* green_lottie_tab_home.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_home.json; sourceTree = "<group>"; };
 		9AC0181A1FE90AA1001EC2D6 /* CYLPlusDemoChildViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLPlusDemoChildViewController.swift; sourceTree = "<group>"; };
 		9AC0FFEE2C3064BD00000101 /* CYLLayoutBlockTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLLayoutBlockTests.swift; sourceTree = "<group>"; };
+		9AC0FFEE2C3064BD00000501 /* CYLTabBarControllerDeallocTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLTabBarControllerDeallocTests.swift; sourceTree = "<group>"; };
+		9AC0FFEE2C3064BD00000401 /* CYLRiveInputPassTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLRiveInputPassTests.swift; sourceTree = "<group>"; };
 		9AC0FFEE2C3064BD00000201 /* CYLAnimationEventBridgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimationEventBridgeTests.swift; sourceTree = "<group>"; };
 		9AC0FFEE2C3064BD00000301 /* CYLAnimationEventBridgeLazyInstallTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimationEventBridgeLazyInstallTests.swift; sourceTree = "<group>"; };
 		9AD7F5AD22B7D4B6004BF0A0 /* gray_tabbar_me_animation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = gray_tabbar_me_animation.json; sourceTree = "<group>"; };
@@ -1330,6 +1336,8 @@
 				B7C0DE5A11A2233D4001FB01 /* CYLAnimatedItemCountdownTests.swift */,
 				B7C0DE5A11A2233D4001FC01 /* CYLFlatDesignDelegateTests.swift */,
 				9AC0FFEE2C3064BD00000101 /* CYLLayoutBlockTests.swift */,
+				9AC0FFEE2C3064BD00000501 /* CYLTabBarControllerDeallocTests.swift */,
+				9AC0FFEE2C3064BD00000401 /* CYLRiveInputPassTests.swift */,
 				9AC0FFEE2C3064BD00000201 /* CYLAnimationEventBridgeTests.swift */,
 				9AC0FFEE2C3064BD00000301 /* CYLAnimationEventBridgeLazyInstallTests.swift */,
 				C0DE0B5E11A2233D4001AB01 /* CYLAnimationEngineSwiftTests.swift */,
@@ -1529,6 +1537,7 @@
 			children = (
 				CA53C48D512AF06756020E69 /* CYLAnimatedItemView.h */,
 				21BB208E919470BD7E295947 /* CYLAnimatedItemView.swift */,
+				9AC0FFEE2C3064BD00000601 /* CYLRiveInputPass.swift */,
 				E7358A37970FCF7D3118C3E5 /* CYLAnimatedItemStackView.swift */,
 				0DD4A3A6BC38825D6C1C28C3 /* CYLAnimatedItemMacros.h */,
 				D2E81251A0704712D5DBBA00 /* CYLAnimatedItemResources.swift */,
@@ -2054,6 +2063,7 @@
 				134D0E2857E843ACB7030ADB /* CYLTabBarItemAnimationPlayer.m in Sources */,
 				7464D47374F532136A57798D /* CYLTabBarItemAnimationFactory.m in Sources */,
 				17B7BF3FFC5C4CA250F394AC /* CYLAnimatedItemView.swift in Sources */,
+				9AC0FFEE2C3064BD00000602 /* CYLRiveInputPass.swift in Sources */,
 				FAD4E45EE92A7B9BE5C34B6F /* CYLAnimatedItemStackView.swift in Sources */,
 				38674B25A9B0BE2EDF9AF186 /* CYLLottieTabBarItemAnimator.m in Sources */,
 				CF3C28298101C33B5E37078E /* CYLPAGTabBarItemAnimator.m in Sources */,
@@ -2267,6 +2277,8 @@
 				B7C0DE5A11A2233D4001FB02 /* CYLAnimatedItemCountdownTests.swift in Sources */,
 				B7C0DE5A11A2233D4001FC02 /* CYLFlatDesignDelegateTests.swift in Sources */,
 				9AC0FFEE2C3064BD00000102 /* CYLLayoutBlockTests.swift in Sources */,
+				9AC0FFEE2C3064BD00000502 /* CYLTabBarControllerDeallocTests.swift in Sources */,
+				9AC0FFEE2C3064BD00000402 /* CYLRiveInputPassTests.swift in Sources */,
 				9AC0FFEE2C3064BD00000202 /* CYLAnimationEventBridgeTests.swift in Sources */,
 				9AC0FFEE2C3064BD00000302 /* CYLAnimationEventBridgeLazyInstallTests.swift in Sources */,
 				C0DE0B5E11A2233D4001AB02 /* CYLAnimationEngineSwiftTests.swift in Sources */,
@@ -2409,6 +2421,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chenyilong.CYLTabBarControllerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SWIFT_INCLUDE_PATHS = "$(inherited) $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -2431,6 +2444,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chenyilong.CYLTabBarControllerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SWIFT_INCLUDE_PATHS = "$(inherited) $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;

@@ -407,6 +407,7 @@ docs/
 │   ├── ios-gif-image-rest-then-play.png
 │   ├── ios-gif-svga-tint-option.png
 │   ├── ios-layout-block-dealloc-executor.png
+│   ├── ios-lifecycle-teardown-release-tab-bar-controller.png
 │   ├── ios-lottie-pag-tint-option.png
 │   ├── ios-lottie4-tint-option.png
 │   ├── ios-pause-5-of-5-final-pin.png
@@ -419,6 +420,7 @@ docs/
 │   ├── ios-react-native-host-driven.png
 │   ├── ios-rive-dark-tint-appearance-switch.png
 │   ├── ios-rive-end-callback.png
+│   ├── ios-rive-engine-api-last-bridge-event.png
 │   ├── ios-rive-engine-api-shows-image-off-on.png
 │   ├── ios-rive-fixed-tint-unselected-only.png
 │   ├── ios-rive-flatdesign-item-appearance.png
