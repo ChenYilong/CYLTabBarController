@@ -413,11 +413,13 @@ docs/
 │   ├── ios-pause-after-flick-fixed-library.png
 │   ├── ios-pause-while-scrolling-counter.png
 │   ├── ios-pause-while-scrolling-switch.png
+│   ├── ios-pause-while-scrolling-visible-page-0-0.png
 │   ├── ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png
 │   ├── ios-react-native-engine-api-play-all.png
 │   ├── ios-react-native-host-driven.png
 │   ├── ios-rive-dark-tint-appearance-switch.png
 │   ├── ios-rive-end-callback.png
+│   ├── ios-rive-engine-api-shows-image-off-on.png
 │   ├── ios-rive-fixed-tint-unselected-only.png
 │   ├── ios-rive-flatdesign-item-appearance.png
 │   ├── ios-rive-item-appearance-icon-title-tint.png

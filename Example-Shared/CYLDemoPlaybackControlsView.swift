@@ -29,6 +29,7 @@ final class CYLDemoPlaybackControlsView: UIView {
     private let loopSwitch = UISwitch()
     private let pauseSwitch = UISwitch()
     private let pauseCountLabel = UILabel()
+    private let lastEventLabel = UILabel()
 
     /**
      * [EN] Puts the controls above the rows of `tableView`, for the tab bar controller of `viewController`.
@@ -128,7 +129,20 @@ final class CYLDemoPlaybackControlsView: UIView {
         pauseRow.spacing = 8
         pauseRow.alignment = .center
 
-        let card = UIStackView(arrangedSubviews: [playAllButton, speedRow, loopRow, pauseRow])
+        // [EN] The name of the last animation event the bridge delivered (didStart / didStop / didPause / didResume), next to the
+        //      counter, so a run shows the events without the lifecycle log. Event names are identifiers, so nothing to localize.
+        // [CN] 桥接最近一次送达的动画事件名称（didStart / didStop / didPause / didResume），显示在计数旁边，使运行时无需生命周期日志就能看到事件。
+        //      事件名称是标识符，无需本地化。
+        lastEventLabel.font = .monospacedSystemFont(ofSize: 13, weight: .regular)
+        lastEventLabel.textColor = .secondaryLabel
+        lastEventLabel.text = "last event: -"
+        lastEventLabel.accessibilityIdentifier = "CYLDemoLastBridgeEvent"
+        for name in ["didStart", "didStop", "didPause", "didResume"] {
+            NotificationCenter.default.addObserver(self, selector: #selector(animationEventArrived(_:)),
+                                                   name: Notification.Name("cyl.animation.\(name)"), object: nil)
+        }
+
+        let card = UIStackView(arrangedSubviews: [playAllButton, speedRow, loopRow, pauseRow, lastEventLabel])
         card.axis = .vertical
         card.spacing = 12
         card.isLayoutMarginsRelativeArrangement = true
@@ -170,6 +184,10 @@ final class CYLDemoPlaybackControlsView: UIView {
     @objc private func updatePauseCount() {
         pauseCountLabel.text = "⏸ \(CYLAnimationEventBridge.pauseCount)  ▶ \(CYLAnimationEventBridge.resumeCount)"
         pauseCountLabel.accessibilityValue = "\(CYLAnimationEventBridge.pauseCount) / \(CYLAnimationEventBridge.resumeCount)"
+    }
+
+    @objc private func animationEventArrived(_ note: Notification) {
+        lastEventLabel.text = "last event: \(note.name.rawValue)"
     }
 
     @objc private func pauseChanged() {
