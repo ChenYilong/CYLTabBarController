@@ -1,5 +1,5 @@
 /*
-   Liquid Glass for the Android tab bar. The AGSL shaders, the effect order (vibrancy, blur, lens), the highlight and the
+   Liquid Glass for Android views (the tab bar and the tags of CollectionViewClassifyMenu). The AGSL shaders, the effect order (vibrancy, blur, lens), the highlight and the
    values of the tab bar are ported from Kyant's Backdrop (https://github.com/Kyant0/AndroidLiquidGlass, `backdrop/` and
    `LiquidBottomTabs.kt`), from Compose to Android views, and renamed to this library's conventions.
 
@@ -20,7 +20,7 @@
    Changes: Compose modifiers replaced by RenderNode drawing in a View; only the rounded rectangle shapes the tab bar uses.
  */
 
-package com.cyl.tabbar
+package com.cyl.liquidglass
 
 import android.graphics.BlendMode
 import android.graphics.Canvas
@@ -44,7 +44,7 @@ import kotlin.math.sqrt
  *      color (older versions and software canvases).
  * [CN] 设备能绘制的效果：完整的玻璃（折射，Android 13+）、只有模糊（Android 12），或半透明颜色（更早的版本与软件绘制）。
  */
-internal object CYLLiquidGlassSupport {
+object CYLLiquidGlassSupport {
     @get:androidx.annotation.ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)
     val rendersBlur: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
     @get:androidx.annotation.ChecksSdkIntAtLeast(api = Build.VERSION_CODES.TIRAMISU)
@@ -54,7 +54,7 @@ internal object CYLLiquidGlassSupport {
 /**
  * [EN] The AGSL shaders, from Backdrop's `internal/Shaders.kt`. [CN] AGSL 着色器，来自 Backdrop 的 `internal/Shaders.kt`。
  */
-internal object CYLLiquidGlassShaders {
+object CYLLiquidGlassShaders {
     private const val ROUNDED_RECT_SDF = """
 float radiusAt(float2 coord, float4 radii) {
     if (coord.x >= 0.0) {
@@ -223,7 +223,7 @@ half4 main(float2 coord) {
  *      moves `value`, stepped from frame times.
  * [CN] 阻尼弹簧，对应 Backdrop 的 TabBar 所用的 Compose `spring(dampingRatio, stiffness)`：`target` 驱动 `value`，按帧时间步进。
  */
-internal class CYLSpring(var value: Float, private val dampingRatio: Float, private val stiffness: Float, private val threshold: Float) {
+class CYLSpring(var value: Float, private val dampingRatio: Float, private val stiffness: Float, private val threshold: Float) {
     var target: Float = value
     var velocity: Float = 0f
         private set
@@ -254,14 +254,14 @@ internal class CYLSpring(var value: Float, private val dampingRatio: Float, priv
 }
 
 /**
- * [EN] Draws what is behind the tab bar (the pages) inside a rounded rectangle, through Backdrop's effects: the pages are
+ * [EN] Draws what is behind a glass shape (the pages) inside a rounded rectangle, through Backdrop's effects: the pages are
  *      recorded into a `RenderNode`, the part under the shape is copied into a second node that carries the effect chain,
  *      and that node is drawn clipped to the shape. Android 12+ with a hardware canvas; `draw` returns false otherwise so
  *      the caller draws a translucent color instead.
  * [CN] 在圆角矩形中绘制 TabBar 后面的内容（页面），并应用 Backdrop 的效果：页面录制到一个 `RenderNode`，形状下方的部分复制到带效果链的
  *      第二个节点，再按形状裁剪后绘制。需要 Android 12+ 与硬件加速画布；否则 `draw` 返回 false，由调用方改为绘制半透明颜色。
  */
-internal class CYLTabBarBackdrop {
+class CYLGlassBackdrop {
     private var sourceNode: Any? = null
     private var shapeNode: Any? = null
     private val clipPath = Path()
@@ -280,7 +280,7 @@ internal class CYLTabBarBackdrop {
 
     @RequiresApi(Build.VERSION_CODES.S)
     private fun drawEffects(canvas: Canvas, source: View, sourceX: Float, sourceY: Float, rect: RectF, radius: Float, effects: CYLGlassEffects) {
-        val pages = (sourceNode as? RenderNode) ?: RenderNode("CYLTabBarBackdropPages").also { sourceNode = it }
+        val pages = (sourceNode as? RenderNode) ?: RenderNode("CYLGlassBackdropPages").also { sourceNode = it }
         pages.setPosition(0, 0, source.width, source.height)
         val recording = pages.beginRecording(source.width, source.height)
         // [EN] The window's background first: pages are usually transparent where they have no content (the white is the
@@ -292,7 +292,7 @@ internal class CYLTabBarBackdrop {
 
         val width = kotlin.math.ceil(rect.width()).toInt()
         val height = kotlin.math.ceil(rect.height()).toInt()
-        val shape = (shapeNode as? RenderNode) ?: RenderNode("CYLTabBarBackdropShape").also { shapeNode = it }
+        val shape = (shapeNode as? RenderNode) ?: RenderNode("CYLGlassBackdropShape").also { shapeNode = it }
         shape.setPosition(0, 0, width, height)
         val shapeCanvas = shape.beginRecording(width, height)
         shapeCanvas.translate(-sourceX, -sourceY)
@@ -359,7 +359,7 @@ internal class CYLTabBarBackdrop {
 /**
  * [EN] The effects of one glass shape, in px. [CN] 一个玻璃形状的效果（像素）。
  */
-internal data class CYLGlassEffects(
+data class CYLGlassEffects(
     val saturation: Float = 1.5f,
     val blurRadius: Float = 0f,
     val refractionHeight: Float = 0f,
@@ -372,7 +372,7 @@ internal data class CYLGlassEffects(
  *      before.
  * [CN] Backdrop 的 `Highlight.Default`：细边缘，45° 方向更亮，以 PLUS 叠加在玻璃上。需要 Android 13+，更早的版本不绘制。
  */
-internal class CYLGlassHighlight {
+class CYLGlassHighlight {
     private var shader: Any? = null
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     private val path = Path()

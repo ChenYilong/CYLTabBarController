@@ -23,6 +23,7 @@ REQUIRED = [
     ("CocoaPods / SwiftPM / Carthage", "CYLAnimatedItem", "CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle/LICENSE", "CYLAnimatedItem.podspec"),
     ("CocoaPods / SwiftPM / Carthage", "CYLLiquidGlass", "CYLTabBarController/CYLLiquidGlass/Resources/CYLLiquidGlass.bundle/LICENSE", "CYLLiquidGlass.podspec"),
     (MAVEN, "cyltabbarcontroller", "Example-Android/cyltabbar/src/main/resources/META-INF/cyltabbar/LICENSE", "Example-Android/cyltabbar/build.gradle.kts"),
+    (MAVEN, "cyltabbarcontroller-liquidglass", "Example-Android/cylliquidglass/src/main/resources/META-INF/cylliquidglass/LICENSE", "Example-Android/cylliquidglass/build.gradle.kts"),
     (MAVEN, "cyltabbarcontroller-animateditem", "Example-Android/cylanimateditem/src/main/resources/META-INF/cylanimateditem/LICENSE", "Example-Android/cylanimateditem/build.gradle.kts"),
     ("npm (React Native)", "react-native-cyltabbar", "CrossPlatform/react-native-cyltabbar/LICENSE", "CrossPlatform/react-native-cyltabbar/package.json"),
     ("pub.dev (Flutter)", "flutter_cyltabbar", "CrossPlatform/flutter_cyltabbar/LICENSE", "CrossPlatform/flutter_cyltabbar/pubspec.yaml"),

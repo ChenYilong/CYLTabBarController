@@ -1,5 +1,9 @@
 package com.cyl.tabbar
 
+import com.cyl.liquidglass.CYLGlassBackdrop
+import com.cyl.liquidglass.CYLGlassEffects
+import com.cyl.liquidglass.CYLGlassHighlight
+import com.cyl.liquidglass.CYLSpring
 import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Color
@@ -176,7 +180,7 @@ internal object CYLClassicTabBarStyle : CYLTabBarStyleRenderer {
  *      在其上方居中（`layoutCentered` 使只有图标或只有标题时居中）；选中为蓝色，否则为灰色。
  */
 internal class CYLFlatDesignTabBarStyle : CYLTabBarStyleRenderer {
-    private val backdrop = CYLTabBarBackdrop()
+    private val backdrop = CYLGlassBackdrop()
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val rect = RectF()
 
@@ -239,8 +243,8 @@ internal class CYLFlatDesignTabBarStyle : CYLTabBarStyleRenderer {
  *      Android 12 只有模糊，更早的版本为半透明胶囊。
  */
 internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
-    private val panelBackdrop = CYLTabBarBackdrop()
-    private val bubbleBackdrop = CYLTabBarBackdrop()
+    private val panelBackdrop = CYLGlassBackdrop()
+    private val bubbleBackdrop = CYLGlassBackdrop()
     private val highlight = CYLGlassHighlight()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG)
