@@ -27,7 +27,7 @@
 | [iOS: CYLLiquidGlass](#ios-cylliquidglass) | [iOS: CYLLiquidGlass](#ios-cylliquidglass) |
 | [Android: `:cylliquidglass`](#android-cylliquidglass) | [Android: `:cylliquidglass`](#android-cylliquidglass) |
 | [HarmonyOS: `cylliquidglass`](#harmonyos-cylliquidglass) | [HarmonyOS: `cylliquidglass`](#harmonyos-cylliquidglass) |
-| [Mini program](#mini-program) | [Mini program](#mini-program) |
+| [Mini program: `cyl-liquid-glass`](#mini-program-cyl-liquid-glass) | [Mini program: `cyl-liquid-glass`](#mini-program-cyl-liquid-glass) |
 
 <!-- navigation:end -->
 
@@ -70,8 +70,10 @@ if !glass.isGlassDrawn {
 | `CYLLiquidGlass.isActive()`（与 iOS、Android 同名）：鸿蒙上始终为真（TabBar 在每个受支持的 API 上都绘制模糊仿制，系统材质从 API 24 起替代它）；`CYLLiquidGlass.activeOverride` 供测试替换。 | `CYLLiquidGlass.isActive()` (the same name as iOS and Android): always true on HarmonyOS (the tab bar draws the blur imitation on every supported API, the system material replaces it from API 24); `CYLLiquidGlass.activeOverride` replaces it in tests. |
 | `CYLLiquidGlassView`（与 iOS、Android 同名的组件）：任意组件的玻璃背景，放在 `Stack` 中内容之后：`glassTintColor`（颜色字符串，'' 为不着色）、`cornerRadius`（vp）、`dark`；不接收触摸，对辅助功能隐藏。`isGlassDrawn` 在鸿蒙上就是 `CYLLiquidGlass.isActive()`：为 false 时调用方不创建该视图。 | `CYLLiquidGlassView` (a component named as on iOS and Android): a glass background for any component, placed behind the content in a `Stack`: `glassTintColor` (a color string, '' for none), `cornerRadius` (vp), `dark`; it takes no touches and is hidden from accessibility. `isGlassDrawn` is `CYLLiquidGlass.isActive()` on HarmonyOS: when false the caller does not create the view. |
 
-## Mini program
+## Mini program: `cyl-liquid-glass`
 
 | 中文 | English |
 |:--|:--|
-| 小程序 `cyl-liquid-glass`：TODO，最后一个平台：与 `cyl-glass-lens` 不重复（`cyl-glass-lens` 仍是玻璃组件，新包只放共用部分，或带文档说明的别名）。 | Mini program `cyl-liquid-glass`: TODO, the last platform: it does not duplicate `cyl-glass-lens` (which stays the glass component; the new package holds shared parts only, or a documented alias). |
+| 组件 `cyl-liquid-glass`（`CrossPlatform/wechat-miniprogram-cyltabbar/src/cyl-liquid-glass`，随 `cyl-tabbar-miniprogram` 的 `src` 发布）：任意组件的玻璃背景，放在有定位的父视图内的最前面：`glassTintColor`（CSS 颜色，'' 为不着色）、`cornerRadius`（px）、`isDark`；占满父视图，CSS `backdrop-filter`（模糊 16 px、饱和度 180 %）加半透明着色与顶部高光；不接收触摸，对辅助功能隐藏。数值与 TabBar 的 `cyl-glass-lens` 相同。 | Component `cyl-liquid-glass` (`CrossPlatform/wechat-miniprogram-cyltabbar/src/cyl-liquid-glass`, published in `cyl-tabbar-miniprogram`'s `src`): a glass background for any component, placed first inside a positioned parent: `glassTintColor` (a CSS color, '' for none), `cornerRadius` (px), `isDark`; it fills the parent, CSS `backdrop-filter` (blur 16 px, saturation 180 %) over a translucent tint with a faint top highlight; it takes no touches and is hidden from accessibility. The values are those of the tab bar's `cyl-glass-lens`. |
+| `cyl_liquid_glass.js`：`cylLiquidGlassIsActive()`（与 iOS、Android、鸿蒙的 `isActive()` 同名）：小程序中始终为真；WebView 不支持 `backdrop-filter` 时只剩着色，与 TabBar 相同。`cylLiquidGlassSetActiveOverride(value)` 供测试替换；`cylLiquidGlassStyle(tint, radius)` 生成行内样式。组件的 data `isGlassDrawn` 即 `cylLiquidGlassIsActive()`。 | `cyl_liquid_glass.js`: `cylLiquidGlassIsActive()` (the same name as `isActive()` on iOS, Android and HarmonyOS): always true in a mini program; where the WebView lacks `backdrop-filter` only the tint stays, as in the tab bar. `cylLiquidGlassSetActiveOverride(value)` replaces it in tests; `cylLiquidGlassStyle(tint, radius)` builds the inline style. The component's data `isGlassDrawn` is `cylLiquidGlassIsActive()`. |
+| 与 `cyl-glass-lens` 不重复：`cyl-glass-lens` 仍是 TabBar 的透镜（滑动、弹入动画），数值按拷贝共用；待 TabBar 会话释放该文件夹后，再让它从本组件取玻璃。 | No duplicate of `cyl-glass-lens`: it stays the tab bar's lens (slide and spring-in animation), the values shared by copy; once the tab bar session releases that folder, it should take its glass from this component. |

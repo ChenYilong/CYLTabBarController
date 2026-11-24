@@ -1,0 +1,2 @@
+<!-- [EN] The glass (decoration). [CN] 玻璃（装饰）。 -->
+<view wx:if="{{isGlassDrawn}}" class="cyl-liquid-glass {{isDark ? 'cyl-liquid-glass-dark' : ''}}" style="{{glassStyle}}" aria-hidden="true"></view>

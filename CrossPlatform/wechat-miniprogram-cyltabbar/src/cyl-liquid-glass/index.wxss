@@ -1,0 +1,32 @@
+/*
+ * [EN] The values of the tab bar's lens (cyl-glass-lens, regular style): blur 16 px with saturation 180 %, a faint top highlight.
+ *      The tint default is a translucent neutral; `glassTintColor` replaces it. These values are shared with cyl-glass-lens by copy
+ *      until that component takes its glass from here.
+ * [CN] TabBar 透镜（cyl-glass-lens，regular 样式）的数值：模糊 16 px、饱和度 180 %、顶部淡淡的高光。默认着色为半透明中性色，
+ *      `glassTintColor` 会替换它。在 cyl-glass-lens 改为使用本组件之前，这些数值与它按拷贝共用。
+ */
+:host {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.cyl-liquid-glass {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  background-color: rgba(225, 222, 220, 0.5);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.cyl-liquid-glass-dark {
+  background-color: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
