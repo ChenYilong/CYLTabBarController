@@ -289,6 +289,10 @@
       "value": "Straal rode stip"
     },
     {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "Tabbalkcontroller vrijgeven (over 3 s)"
+    },
+    {
       "name": "cyl_l10n_56e8fac7007d",
       "value": "Replay"
     },
@@ -371,6 +375,10 @@
     {
       "name": "cyl_l10n_f1f3db859899",
       "value": "Still image after the animation ends"
+    },
+    {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "Tabbalkcontroller vrijgegeven"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -469,6 +477,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; tik om te kiezen en scrol dan deze lijst"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "dealloc-callbacks uitgevoerd: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "dealloc-callbacks uitgevoerd: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: tabcapsule, zoekbal en muziekbalk boven kleurrijke inhoud; scroll om te verkleinen"
     },
@@ -495,6 +511,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; verborgen, komt na 2 s terug"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "afbouw: niet uitgevoerd"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "afbouw: vrijgave over %d s"
     },
     {
       "name": "cyl_l10n_2a0608059131",

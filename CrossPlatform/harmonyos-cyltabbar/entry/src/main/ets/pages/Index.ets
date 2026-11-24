@@ -11,6 +11,7 @@ import { DemoTheme, DEMO_THEMES, demoRegisterThemes } from '../demo/DemoThemes';
 import { DemoScrollKind, DemoScrollSimulation, DEMO_SCROLL_SIMULATIONS, demoScrollKindName, demoScrollTitle } from '../demo/DemoScrollHide';
 import { cyl_restoreTabBar, CYLSetLocalizationLanguage, CYLLocalizationLanguage } from 'cyltabbar';
 import { DemoFlatDesignButton } from '../demo/DemoFlatDesign';
+import { DemoTeardown } from '../demo/DemoTeardown';
 import { DemoLiquidGlassButton } from '../demo/DemoLiquidGlass';
 import { CYLTabBarStyleType, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor, CYLLiquidGlassTintColor, CYLLiquidGlassUnselectedColor } from 'cyltabbar';
 import {
@@ -216,6 +217,34 @@ struct Index {
         }
       }
     }
+  }
+
+  /** [EN] Seconds left of the teardown countdown, 0 when it does not run. [CN] 销毁倒计时剩余秒数，未运行时为 0。 */
+  @State teardownRemaining: number = 0;
+
+  /**
+   * [EN] The "Release the tab bar controller" row: arms the dealloc callback on this controller, counts 3 s down (the status line
+   *      follows), then replaces the page with `pages/Released`, so this page disappears and its teardown blocks run.
+   * [CN] 「Release the tab bar controller」行：在本控制器上登记 dealloc 回调，倒计时 3 秒（状态行随之更新），然后把页面替换为
+   *      `pages/Released`，本页面消失，其销毁块运行。
+   */
+  private startTeardown(): void {
+    if (this.teardownRemaining > 0) {
+      return;
+    }
+    DemoTeardown.reset();
+    if (!DemoTeardown.arm('CYLTabBarController')) {
+      return;
+    }
+    this.teardownRemaining = 3;
+    const timer = setInterval(() => {
+      this.teardownRemaining -= 1;
+      if (this.teardownRemaining > 0) {
+        return;
+      }
+      clearInterval(timer);
+      this.getUIContext().getRouter().replaceUrl({ url: 'pages/Released' });
+    }, 1000);
   }
 
   aboutToAppear(): void {
@@ -983,6 +1012,14 @@ struct Index {
         id: 'animated-item-end', title: CYLLocalizedString('Still image after the animation ends'),
         subtitle: CYLLocalizedString('showsImageWhenAnimationEnds: a play-once Lottie icon, then its still image'),
         action: () => this.push('pages/AnimatedItemEnd', {} as DemoPushParams),
+      } as DemoRow] } as DemoSection] : []),
+      // [EN] The teardown row (iOS CYLDemoReleaseRow, docs/Lifecycle-Library.md step 21), on the second tab: leaves this page after 3 s
+      //      and the released page shows how many dealloc callbacks ran. [CN] 销毁行（对应 iOS 的 CYLDemoReleaseRow），位于第二个 Tab：3 秒后离开本页，
+      //      释放后的页面显示执行了多少个 dealloc 回调。
+      ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('Release the tab bar controller (in 3 s)'), rows: [{
+        id: 'release-tab-bar-controller', title: CYLLocalizedString('Release the tab bar controller (in 3 s)'),
+        subtitle: DemoTeardown.status(this.teardownRemaining),
+        action: () => this.startTeardown(),
       } as DemoRow] } as DemoSection] : []),
       ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('LiquidGlass'), rows: [{
         id: 'liquid-glass-dock', title: CYLLocalizedString('Liquid Glass: the see-through effect of the reference'),

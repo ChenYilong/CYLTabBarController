@@ -10,6 +10,7 @@
     "pages/Gallery",
     "pages/GalleryScene",
     "pages/LiquidGlassDock",
-    "pages/AnimatedItemEnd"
+    "pages/AnimatedItemEnd",
+    "pages/Released"
   ]
 }

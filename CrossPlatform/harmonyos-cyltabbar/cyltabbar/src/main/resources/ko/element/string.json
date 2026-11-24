@@ -289,6 +289,10 @@
       "value": "빨간 점 반지름"
     },
     {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "탭 바 컨트롤러 해제 (3초 후)"
+    },
+    {
       "name": "cyl_l10n_56e8fac7007d",
       "value": "Replay"
     },
@@ -371,6 +375,10 @@
     {
       "name": "cyl_l10n_f1f3db859899",
       "value": "Still image after the animation ends"
+    },
+    {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "탭 바 컨트롤러가 해제되었습니다"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -469,6 +477,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; 탭하여 선택한 뒤 이 목록을 스크롤"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "dealloc 콜백 실행: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "dealloc 콜백 실행: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: 다채로운 콘텐츠 위의 탭 캡슐, 검색 볼, 음악 바. 스크롤하면 축소"
     },
@@ -495,6 +511,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; 숨기면 2초 뒤 돌아옴"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "해제: 실행 안 됨"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "해제: %d초 후"
     },
     {
       "name": "cyl_l10n_2a0608059131",

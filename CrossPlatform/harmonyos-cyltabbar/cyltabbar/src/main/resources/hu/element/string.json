@@ -289,6 +289,10 @@
       "value": "Piros pont sugara"
     },
     {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "A lapfülsáv-vezérlő felszabadítása (3 mp múlva)"
+    },
+    {
       "name": "cyl_l10n_56e8fac7007d",
       "value": "Replay"
     },
@@ -371,6 +375,10 @@
     {
       "name": "cyl_l10n_f1f3db859899",
       "value": "Still image after the animation ends"
+    },
+    {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "A lapfülsáv-vezérlő felszabadult"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -469,6 +477,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; koppintson a választáshoz, majd görgesse a listát"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "lefutott dealloc visszahívások: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "lefutott dealloc visszahívások: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: lapkapszula, keresőgömb és zenesáv színes tartalom felett; görgessen a kicsinyítéshez"
     },
@@ -495,6 +511,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; elrejtve, 2 s múlva visszatér"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "lebontás: nem futott"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "lebontás: felszabadítás %d mp múlva"
     },
     {
       "name": "cyl_l10n_2a0608059131",
