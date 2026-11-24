@@ -12,10 +12,15 @@ import android.view.View
  *      `backdropSource`) is blurred and refracted inside a rounded rectangle, tinted with `glassTintColor` and edged with the
  *      glass highlight. Where `CYLLiquidGlass.isActive()` is false, or the canvas is not hardware accelerated, it draws nothing
  *      (`isGlassDrawn` is false), so the caller keeps its flat background. It takes no touches and is hidden from accessibility.
- *      While a glass view draws the pages, other glass views in them draw nothing (no glass inside glass).
+ *      While a glass view draws the pages, other glass views in them draw nothing (no glass inside glass). A glass view that sits
+ *      inside its own `backdropSource` (e.g. a list cell, with the default source, the window's root) cannot sample it: drawing
+ *      the source would draw the cells that are recording right now (`IllegalStateException`: "Recording currently in progress"),
+ *      so it draws only the tint.
  * [CN] 任意视图的液态玻璃背景（与 iOS `CYLLiquidGlassView` 同名）：它后面的内容（页面，`backdropSource`）在圆角矩形内被模糊与折射，
  *      以 `glassTintColor` 着色并加上玻璃高光边缘。`CYLLiquidGlass.isActive()` 为 false 或画布未硬件加速时不绘制（`isGlassDrawn` 为
  *      false），调用方保持其扁平背景。不接收触摸，对辅助功能隐藏。某个玻璃视图绘制页面时，页面中的其他玻璃视图不绘制（玻璃里不嵌玻璃）。
+ *      位于自己的 `backdropSource` 之内的玻璃视图（例如列表单元格，默认源为窗口根视图）不能采样它：绘制源会绘制正在录制的单元格
+ *      （`IllegalStateException`："Recording currently in progress"），所以只绘制着色。
  */
 internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
 
@@ -84,6 +89,7 @@ internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, at
         rect.set(0f, 0f, width.toFloat(), height.toFloat())
         val radius = cornerRadius.coerceAtMost(minOf(rect.width(), rect.height()) / 2f)
         val density = resources.displayMetrics.density
+        val sampled = !isInside(source)
         getLocationInWindow(here)
         source.getLocationInWindow(there)
         val effects = CYLGlassEffects(
@@ -92,17 +98,36 @@ internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, at
             refractionHeight = minOf(10f * density, rect.height() / 2f),
             refractionAmount = 14f * density,
         )
-        drawingGlass = true
-        val drawn = try {
-            backdrop.draw(canvas, source, (here[0] - there[0]).toFloat(), (here[1] - there[1]).toFloat(), rect, radius, effects)
-        } finally {
-            drawingGlass = false
+        // [EN] Inside its own source: the source's draw would redraw this view's recording ancestors, so only the tint is drawn.
+        // [CN] 位于自己的源之内：绘制源会重绘本视图正在录制的祖先，所以只绘制着色。
+        var drawn = false
+        if (sampled) {
+            drawingGlass = true
+            try {
+                drawn = backdrop.draw(canvas, source, (here[0] - there[0]).toFloat(), (here[1] - there[1]).toFloat(), rect, radius, effects)
+            } finally {
+                drawingGlass = false
+            }
         }
         glassTintColor?.let {
             tintPaint.color = it
             canvas.drawRoundRect(rect, radius, radius, tintPaint)
         }
         if (drawn) highlight.draw(canvas, rect, radius, density, 1f)
+    }
+
+    /**
+     * [EN] Whether this view is `source` or one of its descendants: then `source` is in a drawing pass while this view draws.
+     * [CN] 本视图是否为 `source` 或其后代：此时本视图绘制时 `source` 正处于绘制过程中。
+     */
+    internal fun isInside(source: View): Boolean {
+        if (source === this) return true
+        var ancestor = parent
+        while (ancestor != null) {
+            if (ancestor === source) return true
+            ancestor = ancestor.parent
+        }
+        return false
     }
 
     private companion object {

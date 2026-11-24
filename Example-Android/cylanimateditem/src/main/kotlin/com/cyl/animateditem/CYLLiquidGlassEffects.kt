@@ -33,6 +33,7 @@ import android.graphics.RenderEffect
 import android.graphics.RenderNode
 import android.graphics.RuntimeShader
 import android.graphics.Shader
+import android.util.Log
 import android.os.Build
 import android.view.View
 import androidx.annotation.RequiresApi
@@ -232,6 +233,7 @@ class CYLGlassBackdrop {
     private val clipPath = Path()
     private var refraction: Any? = null
     private var dispersion: Any? = null
+    private var loggedFailure = false
 
     /**
      * [EN] `source` is drawn so that its point (`sourceX`, `sourceY`) lands on `rect.left`, `rect.top`.
@@ -239,8 +241,31 @@ class CYLGlassBackdrop {
      */
     fun draw(canvas: Canvas, source: View, sourceX: Float, sourceY: Float, rect: RectF, radius: Float, effects: CYLGlassEffects): Boolean {
         if (!CYLLiquidGlassSupport.rendersBlur || !canvas.isHardwareAccelerated || source.width <= 0 || rect.width() <= 0f) return false
-        drawEffects(canvas, source, sourceX, sourceY, rect, radius, effects)
-        return true
+        return try {
+            drawEffects(canvas, source, sourceX, sourceY, rect, radius, effects)
+            true
+        } catch (e: IllegalStateException) {
+            // [EN] Last resort ("Recording currently in progress"): close our nodes so the next frame can record, draw nothing.
+            // [CN] 最后手段（"Recording currently in progress"）：关闭我们的节点以便下一帧录制，不绘制。
+            if (CYLLiquidGlassSupport.rendersBlur) {
+                endRecordingQuietly(sourceNode)
+                endRecordingQuietly(shapeNode)
+            }
+            if (!loggedFailure) {
+                loggedFailure = true
+                Log.w("CYLGlassBackdrop", "glass not sampled: " + e.message)
+            }
+            false
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun endRecordingQuietly(node: Any?) {
+        try {
+            (node as? RenderNode)?.endRecording()
+        } catch (ignored: IllegalStateException) {
+            // [EN] The node was not recording. [CN] 该节点没有在录制。
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
