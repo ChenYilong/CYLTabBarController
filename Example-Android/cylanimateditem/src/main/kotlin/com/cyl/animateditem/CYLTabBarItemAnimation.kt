@@ -1142,6 +1142,12 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
      */
     private var restingAfterLoad = false
     private var hasPlayed = false
+    /**
+     * [EN] The last play was a state machine boolean input with an `activeDuration`, and whether that pass is still running.
+     * [CN] 最近一次播放是带 `activeDuration` 的状态机布尔输入，以及这一遍是否仍在播放。
+     */
+    private var inputPassTimed = false
+    private var inputPassRunning = false
 
     /**
      * [EN] Rests on the first frame until the first play: a file whose state machine moves by itself (shapes.riv, truck.riv)
@@ -1396,6 +1402,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
      */
     override fun cyl_playAnimationView() {
         handler.removeCallbacksAndMessages(null)
+        inputPassRunning = false
         hasPlayed = true
         if (restingAfterLoad) {
             // [EN] Resumed where it rests (no settling), then played as usual. Only the state machine: an unnamed `play()` also
@@ -1435,9 +1442,13 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
             }
             machine != null && trigger == null && numberInput == null && hasInput(machine, booleanInput) -> {
                 setActive(false)
+                // [EN] A pass with an `activeDuration` runs from this play until the input goes back to false, as on iOS
+                //      (`CYLRiveInputPass`); rive-android's `isPlaying` stays true for these machines. [CN] 带 `activeDuration` 的一遍播放从这次播放持续到输入恢复为 false，与 iOS（`CYLRiveInputPass`）相同；这类状态机的 rive-android `isPlaying` 一直为 true。
+                inputPassTimed = CYLRiveInputPass.hasEnd(activeDuration)
+                inputPassRunning = inputPassTimed
                 handler.postDelayed({
                     setActive(true)
-                    if (activeDuration > 0) handler.postDelayed({ setActive(false) }, (activeDuration * 1000).toLong())
+                    if (inputPassTimed) handler.postDelayed({ setActive(false); inputPassRunning = false }, (activeDuration * 1000).toLong())
                 }, inputOffMilliseconds())
             }
             // [EN] rive-android `play(animationName, loop, direction, isStateMachine, settleInitialState)`, from the start.
@@ -1493,10 +1504,13 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
     }
 
     /**
-     * [EN] rive-android's `isPlaying`: false once the animation ends or the state machine settles (rive-android pauses it).
-     * [CN] rive-android 的 `isPlaying`：动画结束或状态机稳定（rive-android 会暂停它）后为 false。
+     * [EN] A state machine input pass with an `activeDuration` is playing until that duration has elapsed; otherwise
+     *      rive-android's `isPlaying`: false once the animation ends or the state machine settles (rive-android pauses it).
+     * [CN] 带 `activeDuration` 的状态机输入的一遍播放，在该时长经过之前一直在播放；其他情况为 rive-android 的 `isPlaying`：
+     *      动画结束或状态机稳定（rive-android 会暂停它）后为 false。
      */
-    override fun cyl_isAnimationViewPlaying(): Boolean? = CYLReflection.call(rive, "isPlaying") as? Boolean
+    override fun cyl_isAnimationViewPlaying(): Boolean? =
+        if (inputPassTimed) inputPassRunning else CYLReflection.call(rive, "isPlaying") as? Boolean
 
     /**
      * [EN] rive-android's `pause()` keeps the pose; resuming plays the state machine again (not an unnamed `play()`, which would also
@@ -1518,6 +1532,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
 
     override fun cyl_stopAnimationView() {
         handler.removeCallbacksAndMessages(null)
+        inputPassRunning = false
         if (stateMachine != null) setActive(false) else { isActive = false; CYLReflection.call(rive, "stop"); CYLReflection.call(rive, "reset") }
     }
 
