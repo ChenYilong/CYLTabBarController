@@ -131,6 +131,21 @@ final class CYLAnimatedItemBackgroundRenderer {
         style == .liquidGlass && CYLAnimatedItemView.isLiquidGlassActive() ? .liquidGlass : .flat
     }
 
+    /**
+     * [EN] The tint a glass draws with: the host's color made translucent (its alpha times `glassTintAlpha`), so an opaque color such as a
+     *      selected tag's green tints the glass instead of covering it (an opaque tint shows no glass at all). One rule for every host.
+     * [CN] 玻璃使用的着色：宿主颜色变为半透明（其透明度乘以 `glassTintAlpha`），因此选中标签的绿色这样的不透明色是给玻璃着色，而不是盖住它（不透明的着色
+     *      完全看不到玻璃）。所有宿主一个规则。
+     */
+    static let glassTintAlpha: CGFloat = 0.5
+
+    static func glassTint(_ color: UIColor?) -> UIColor? {
+        guard let color else { return nil }
+        var alpha: CGFloat = 1
+        color.getRed(nil, green: nil, blue: nil, alpha: &alpha)
+        return color.withAlphaComponent(alpha * glassTintAlpha)
+    }
+
     func apply(on host: UIView, style: CYLAnimatedItemBackgroundStyle, color: UIColor?, cornerRadius: CGFloat?,
                borderWidth: CGFloat, borderColor: UIColor?) {
         let resolved = Self.resolvedStyle(style)
@@ -147,7 +162,7 @@ final class CYLAnimatedItemBackgroundRenderer {
         var glassDrawn = false
         if resolved == .liquidGlass {
             let glass = glassView ?? CYLLiquidGlassView()
-            glass.glassTintColor = color
+            glass.glassTintColor = Self.glassTint(color)
             glass.cornerRadius = radius
             glass.frame = host.bounds
             if glass.superview == nil {

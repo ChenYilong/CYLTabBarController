@@ -21,7 +21,7 @@ test('cylanimateditemrive keeps its export list', () => {
     'CYLTabBarAnimationOptionRiveActiveProperty', 'CYLTabBarAnimationOptionRiveActiveDuration',
     'CYLTabBarAnimationOptionRiveTriggerProperty', 'CYLTabBarAnimationOptionRiveInput', 'CYLTabBarAnimationOptionRiveTriggerInput',
     'CYLTabBarAnimationOptionRiveAnimation', 'CYLTabBarAnimationOptionRiveLegacyRuntime', 'CYLTabBarAnimationOptionRiveNumberInput',
-    'CYLTabBarAnimationOptionRiveNumberValues', 'cylRiveNextNumber', 'cylRiveFileAndOptions', 'cylRiveRendererType',
+    'CYLTabBarAnimationOptionRiveNumberValues', 'CYLTabBarAnimationOptionRiveColor', 'cylRiveNextNumber', 'cylRiveFileAndOptions', 'cylRiveRendererType',
     'cylEnsureRiveInitialized', 'cylRiveIsSupported', 'CYLRiveLoopPolicy', 'CYLRiveAnimationBuilder', 'cylRegisterRiveEngine']
     .forEach((name) => assert.match(index, new RegExp(`\\b${name}\\b`), name));
 });
@@ -31,7 +31,7 @@ test('the option constants keep their strings', () => {
   const expected = {
     Artboard: 'artboard', StateMachine: 'stateMachine', ActiveProperty: 'active', ActiveDuration: 'duration',
     TriggerProperty: 'trigger', Input: 'input', TriggerInput: 'triggerInput', Animation: 'animation', LegacyRuntime: 'legacy',
-    NumberInput: 'numberInput', NumberValues: 'values',
+    NumberInput: 'numberInput', NumberValues: 'values', Color: 'color',
   };
   Object.entries(expected).forEach(([name, value]) => {
     assert.match(source, new RegExp(`CYLTabBarAnimationOptionRive${name}: string = '${value}'`), name);

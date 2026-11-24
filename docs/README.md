@@ -357,6 +357,7 @@ docs/
 │   ├── harmonyos-port-svga-demo-page.png
 │   ├── harmonyos-port-svga-demo-row.png
 │   ├── harmonyos-port-svga-demo-taps.png
+│   ├── harmonyos-rive-colors.png
 │   ├── harmonyos-rive-house-loop-arm64.png
 │   ├── harmonyos-rive-replay-arm64.png
 │   ├── harmonyos-rive-rest-then-play-arm64.png

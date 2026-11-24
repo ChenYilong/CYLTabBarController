@@ -32,7 +32,13 @@ export class CYLLifecycleBridge<T extends Object> {
     this.controller = new LifecycleController<T>(owner);
   }
 
-  aboutToAppear(): void {
+  /**
+   * `initialColorMode` (`ConfigurationConstant.ColorMode`, 0 dark, 1 light; for example `context.config.colorMode`) seeds the
+   * color mode the page starts in. Without it the first `onConfigurationUpdate` only records a baseline, so the first
+   * light-to-dark switch would fire no `traitCollectionDidChange`.
+   */
+  aboutToAppear(initialColorMode?: number): void {
+    if (initialColorMode !== undefined) this.onConfigurationUpdate(initialColorMode);
     this.controller.aboutToAppear();
   }
 

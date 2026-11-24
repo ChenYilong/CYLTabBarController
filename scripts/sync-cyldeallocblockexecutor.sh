@@ -14,7 +14,7 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 harmony_dest="CrossPlatform/harmonyos-cyltabbar/cyldeallocblockexecutor"
 mini_dest="CrossPlatform/wechat-miniprogram-cyltabbar/src/cyl-dealloc-block-executor"
 repository_url="https://github.com/ChenYilong/CYLDeallocBlockExecutor.git"
-branch="feat/lifecycle-callbacks"
+branch="master"
 
 check=0
 commit=""
@@ -54,7 +54,7 @@ vendored_md() {
 | TODO：库发布后改用 ohpm / npm 包（需要所有者同意）。 | TODO: replace this copy with the ohpm / npm package after the library is published (the owner's OK is needed). |
 
 - Library: https://github.com/ChenYilong/CYLDeallocBlockExecutor
-- Branch: \`$branch\` (pull request #12)
+- Branch: \`$branch\` (merge of pull request #26)
 - Folder in the library: \`$1\`
 - Commit: \`$full\`
 EOF

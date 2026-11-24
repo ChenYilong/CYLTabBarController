@@ -45,6 +45,10 @@
       "value": "閃爍 ×3"
     },
     {
+      "name": "cyl_l10n_9594eec95be7",
+      "value": "藍色"
+    },
+    {
       "name": "cyl_l10n_070554647306",
       "value": "邊框"
     },
@@ -95,6 +99,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem 置中顯示"
+    },
+    {
+      "name": "cyl_l10n_5adb0dc263ad",
+      "value": "顏色：%@"
     },
     {
       "name": "cyl_l10n_f6da70b584ae",
@@ -281,6 +289,10 @@
       "value": "Push 一個 TabBarController，其加號按鈕圖片 2 秒後改變；版面不應移動"
     },
     {
+      "name": "cyl_l10n_ee38e4d5dd68",
+      "value": "紅色"
+    },
+    {
       "name": "cyl_l10n_c27618b1aa9d",
       "value": "紅點"
     },
@@ -307,6 +319,10 @@
     {
       "name": "cyl_l10n_9d01c837b4bc",
       "value": "Rive Tab 圖示：house.riv（數字輸入 Rooms）"
+    },
+    {
+      "name": "cyl_l10n_bdd66081cc94",
+      "value": "Rive 顏色"
     },
     {
       "name": "cyl_l10n_f0c792c049bc",
@@ -421,6 +437,10 @@
       "value": "TabBar 外觀"
     },
     {
+      "name": "cyl_l10n_abf44ef609ef",
+      "value": "檔案自身的顏色"
+    },
+    {
       "name": "cyl_l10n_7c4aecba91c3",
       "value": "本頁面 Tab 的圖片來自 App 的 rawfile（即 iOS 的資源 bundle）；再次點擊復原"
     },
@@ -435,6 +455,10 @@
     {
       "name": "cyl_l10n_a4d0d101d6a3",
       "value": "左上角"
+    },
+    {
+      "name": "cyl_l10n_e38d6ac40a62",
+      "value": "applyColors：資料綁定 .riv 的視圖模型顏色屬性"
     },
     {
       "name": "cyl_l10n_2306a585ae00",

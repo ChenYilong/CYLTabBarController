@@ -5,5 +5,8 @@
   "description": "Lifecycle and teardown blocks for Mini Program pages, aligned with the iOS CYLDeallocBlockExecutor API.",
   "type": "commonjs",
   "main": "index.js",
-  "scripts": { "test": "node --test \"test/*.test.js\"" }
+  "scripts": {
+    "test": "node --test \"test/*.test.js\""
+  },
+  "types": "typings/index.d.ts"
 }
