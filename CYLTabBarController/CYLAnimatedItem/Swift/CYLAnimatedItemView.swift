@@ -863,6 +863,17 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         animatedItemSetUp()
     }
 
+    /**
+     [EN] Creates the view with its background style: `CYLAnimatedItemView(itemBackgroundStyle: .liquidGlass)` is all an example needs to
+          switch to Liquid Glass (a capsule by default; flat where the device draws none). Same as setting `itemBackgroundStyle`.
+     [CN] 以背景样式创建视图：`CYLAnimatedItemView(itemBackgroundStyle: .liquidGlass)` 即可让示例切换为液态玻璃（默认胶囊；设备不绘制时为扁平）。
+          等同于设置 `itemBackgroundStyle`。
+     */
+    public convenience init(itemBackgroundStyle: CYLAnimatedItemBackgroundStyle, frame: CGRect = .zero) {
+        self.init(frame: frame)
+        self.itemBackgroundStyle = itemBackgroundStyle
+    }
+
     deinit {
         loopTimer?.invalidate()
         countdownTimer?.invalidate()

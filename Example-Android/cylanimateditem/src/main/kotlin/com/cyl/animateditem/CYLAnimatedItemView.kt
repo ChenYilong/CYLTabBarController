@@ -65,6 +65,16 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs), CYLAnimatedItemContent, CYLAnimatedItemAnimating, CYLTabBarItemAnimationFailureHandling {
 
     /**
+     * [EN] Creates the view with its background style: `CYLAnimatedItemView(context, CYLAnimatedItemBackgroundStyle.LiquidGlass)` is all an
+     *      example needs to switch to Liquid Glass (a capsule by default; flat where the device draws none). Same as setting `itemBackgroundStyle`.
+     * [CN] 以背景样式创建视图：`CYLAnimatedItemView(context, CYLAnimatedItemBackgroundStyle.LiquidGlass)` 即可让示例切换为液态玻璃（默认胶囊；设备不绘制时为扁平）。
+     *      等同于设置 `itemBackgroundStyle`。
+     */
+    constructor(context: Context, itemBackgroundStyle: CYLAnimatedItemBackgroundStyle) : this(context, null) {
+        this.itemBackgroundStyle = itemBackgroundStyle
+    }
+
+    /**
      * [EN] The static icon. Hidden from accessibility (the item reads as one element). [CN] 静态图标。对无障碍隐藏（条目作为一个元素朗读）。
      */
     val iconView: ImageView = ImageView(context).apply {
