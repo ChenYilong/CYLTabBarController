@@ -503,10 +503,10 @@ export struct CYLAnimatedItemView {
   @Prop itemBackgroundColor: ResourceColor = '';
   /**
    * [EN] The corner radius in vp: a larger value than half the height is a capsule (the platform clamps), 0 is square. -1 (the
-   *      default) is not set: a capsule for every style (Liquid Glass and flat), so a host gets a capsule without setting anything and
-   *      customizes it by setting this property.
-   * [CN] 圆角半径（vp）：大于半高的值为胶囊（平台会截断），0 为直角。-1（默认）表示未设置：所有样式（液态玻璃与扁平）均为胶囊，宿主无需设置任何属性即可得到
-   *      胶囊，要自定义时设置此属性即可。
+   *      default) is not set: the Liquid Glass style is a capsule, so a host gets a capsule without setting anything and customizes
+   *      it by setting this property; the flat style is square.
+   * [CN] 圆角半径（vp）：大于半高的值为胶囊（平台会截断），0 为直角。-1（默认）表示未设置：液态玻璃样式为胶囊，宿主无需设置任何属性即可得到
+   *      胶囊，要自定义时设置此属性即可；扁平样式为直角。
    */
   @Prop itemCornerRadius: number = -1;
   /** [EN] The border width in vp. [CN] 边框宽度（vp）。 */
