@@ -27,6 +27,7 @@ internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, at
     private val backdrop = CYLGlassBackdrop()
     private val highlight = CYLGlassHighlight()
     private val tintPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val rimPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     private val rect = RectF()
     private val here = IntArray(2)
     private val there = IntArray(2)
@@ -113,7 +114,19 @@ internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, at
             tintPaint.color = it
             canvas.drawRoundRect(rect, radius, radius, tintPaint)
         }
-        if (drawn) highlight.draw(canvas, rect, radius, density, 1f)
+        if (drawn) {
+            highlight.draw(canvas, rect, radius, density, 1f)
+        } else {
+            // [EN] No sampled glass (a glass inside its own source, e.g. a tag in a list): the tint alone is almost invisible on a plain page,
+            //      so a hairline rim keeps the shape visible, as the glass edge does on iOS. [CN] 没有采样的玻璃（位于自己的源之内，例如列表中的标签）：
+            //      在纯色页面上只有着色几乎看不见，所以用一圈细边保持形状可见，与 iOS 的玻璃边缘相同。
+            val night = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
+                android.content.res.Configuration.UI_MODE_NIGHT_YES
+            rimPaint.strokeWidth = density
+            rimPaint.color = if (night) android.graphics.Color.argb(56, 255, 255, 255) else android.graphics.Color.argb(41, 0, 0, 0)
+            val inset = density / 2f
+            canvas.drawRoundRect(inset, inset, rect.width() - inset, rect.height() - inset, radius, radius, rimPaint)
+        }
     }
 
     /**
