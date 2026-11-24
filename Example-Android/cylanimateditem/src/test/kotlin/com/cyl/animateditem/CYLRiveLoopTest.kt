@@ -68,14 +68,16 @@ class CYLRiveLoopTest {
     }
 
     private val context: Context = ApplicationProvider.getApplicationContext()
+    /** [EN] The off window of a held input whose value is unknown or on (the fake has no boolean value): half a loop pass. [CN] 值未知或为开的保持输入的关闭窗口（伪造视图没有布尔值）：半个循环周期。 */
+    private val HELD_OFF_MS = (CYLRiveTabBarItemAnimationView.LOOP_SECONDS * 1000 / 2).toLong()
     private fun idle(ms: Long) = shadowOf(Looper.getMainLooper()).idleFor(ms, TimeUnit.MILLISECONDS)
 
     @Test
     fun aHeldInputPlaysAgain() {
         val rive = FakeRive(context, listOf(Machine("State Machine", listOf("isOpen"))))
         val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine", "input" to "isOpen", "duration" to "0"))
-        view.cyl_playAnimationView(); idle(CYLRiveTabBarItemAnimationView.INPUT_OFF_MS + 10)
-        view.cyl_playAnimationView(); idle(CYLRiveTabBarItemAnimationView.INPUT_OFF_MS + 10)
+        view.cyl_playAnimationView(); idle(HELD_OFF_MS + 10)
+        view.cyl_playAnimationView(); idle(HELD_OFF_MS + 10)
         assertEquals(listOf("isOpen=false", "isOpen=true", "isOpen=false", "isOpen=true"), rive.calls)
     }
 
@@ -178,7 +180,7 @@ class CYLRiveLoopTest {
         val rive = FakeRiveWithController(context, listOf(Machine("State Machine", listOf("isOpen"))), controller)
         val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine", "input" to "isOpen", "duration" to "0"))
         view.cyl_restUntilPlayed()
-        view.cyl_playAnimationView(); idle(CYLRiveTabBarItemAnimationView.INPUT_OFF_MS + 10)
+        view.cyl_playAnimationView(); idle(HELD_OFF_MS + 10)
         assertEquals("menu_button.riv on a slow emulator: the settled (paused) machine plays again before each input",
             listOf("play:State Machine", "play:State Machine", "isOpen=false", "play:State Machine", "isOpen=true"), rive.calls)
     }
@@ -197,8 +199,8 @@ class CYLRiveLoopTest {
         val rive = FakeRive(context, listOf(Machine("State Machine", listOf("isOpen"))))
         val view = CYLRiveTabBarItemAnimationView(context, rive, mapOf("stateMachine" to "State Machine", "input" to "isOpen", "duration" to "0"))
         view.cyl_restUntilPlayed()
-        view.cyl_playAnimationView(); idle(CYLRiveTabBarItemAnimationView.INPUT_OFF_MS + 10)
-        view.cyl_playAnimationView(); idle(CYLRiveTabBarItemAnimationView.INPUT_OFF_MS + 10)
+        view.cyl_playAnimationView(); idle(HELD_OFF_MS + 10)
+        view.cyl_playAnimationView(); idle(HELD_OFF_MS + 10)
         assertEquals("menu_button.riv: resumed once, then every play toggles isOpen",
             listOf("pause", "play:State Machine", "isOpen=false", "isOpen=true", "isOpen=false", "isOpen=true"), rive.calls)
     }

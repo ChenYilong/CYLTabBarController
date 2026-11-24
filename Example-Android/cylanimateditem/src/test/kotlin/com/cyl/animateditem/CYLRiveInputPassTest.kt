@@ -60,6 +60,19 @@ class CYLRiveInputPassTest {
     }
 
     @Test
+    fun aHeldInputAlreadyOnStaysOffHalfALoopPass() {
+        val half = (CYLRiveTabBarItemAnimationView.LOOP_SECONDS * 1000 / 2).toLong()
+        assertEquals(half, CYLRiveInputPass.offMilliseconds(0.0, loops = false, wasOn = true))
+        assertEquals(half, CYLRiveInputPass.offMilliseconds(0.0, loops = true, wasOn = false))
+        assertEquals(CYLRiveTabBarItemAnimationView.INPUT_OFF_MS, CYLRiveInputPass.offMilliseconds(0.0, loops = false, wasOn = false))
+    }
+
+    @Test
+    fun anInputWithADurationKeepsTheShortWindow() {
+        assertEquals(CYLRiveTabBarItemAnimationView.INPUT_OFF_MS, CYLRiveInputPass.offMilliseconds(1.0, loops = true, wasOn = true))
+    }
+
+    @Test
     fun playingAgainOrStoppingCancelsTheEnd() {
         val rive = riveView()
         val view = view(rive, "1")

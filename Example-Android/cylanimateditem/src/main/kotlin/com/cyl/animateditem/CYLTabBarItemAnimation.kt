@@ -1441,6 +1441,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
                 handler.postDelayed({ CYLReflection.call(rive, "fireState", machine, trigger) }, NEXT_FRAME_MS)
             }
             machine != null && trigger == null && numberInput == null && hasInput(machine, booleanInput) -> {
+                val wasOn = CYLRiveInputs.booleanValue(rive, machine, booleanInput) ?: true
                 setActive(false)
                 // [EN] A pass with an `activeDuration` runs from this play until the input goes back to false, as on iOS
                 //      (`CYLRiveInputPass`); rive-android's `isPlaying` stays true for these machines. [CN] 带 `activeDuration` 的一遍播放从这次播放持续到输入恢复为 false，与 iOS（`CYLRiveInputPass`）相同；这类状态机的 rive-android `isPlaying` 一直为 true。
@@ -1449,7 +1450,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
                 handler.postDelayed({
                     setActive(true)
                     if (inputPassTimed) handler.postDelayed({ setActive(false); inputPassRunning = false }, (activeDuration * 1000).toLong())
-                }, inputOffMilliseconds())
+                }, inputOffMilliseconds(wasOn))
             }
             // [EN] rive-android `play(animationName, loop, direction, isStateMachine, settleInitialState)`, from the start.
             // [CN] rive-android 的 `play(animationName, loop, direction, isStateMachine, settleInitialState)`，从头开始。
@@ -1465,15 +1466,18 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
      */
     /**
      * [EN] How long a held input stays off before it goes on again: half a loop pass while looping a held input (duration
-     *      0), so the state machine spends real time closed on a slow device and every pass toggles (menu_button.riv stuck
-     *      on an x86 emulator, the mini program's B20 fix 074285a6); otherwise INPUT_OFF_MS (150 ms): a slow device renders a
-     *      frame in more than 50 ms, and the machine must advance at least once with the input off.
-     * [CN] 保持的输入在重新打开前关闭多久：循环保持的输入（时长为 0）时为半个循环周期，使状态机在慢设备上也真正停留在关闭状态，每次循环都切换
-     *      （x86 模拟器上 menu_button.riv 卡住，同小程序的 B20 修复 074285a6）；否则为 INPUT_OFF_MS（150 ms）：慢设备渲染一帧超过 50 ms，
-     *      状态机必须在输入关闭时至少前进一次。
+     *      0) or when the input is already on (`wasOn`, every Play after the first: the 150 ms window reversed the false
+     *      pass of menu_button.riv at the hamburger, so it only twitched), so the state machine spends real time closed on a
+     *      slow device and every pass toggles (the mini program's B20 fix 074285a6); otherwise INPUT_OFF_MS (150 ms): a slow
+     *      device renders a frame in more than 50 ms, and the machine must advance at least once with the input off. The
+     *      rule is `CYLRiveInputPass.offMilliseconds`.
+     * [CN] 保持的输入在重新打开前关闭多久：循环保持的输入（时长 0）或输入本来就是开着时（`wasOn`，第一次之后的每次播放：150 ms 的窗口在汉堡处
+     *      就反转了 menu_button.riv 的 false 那一遍，只是抖了一下）为半个循环周期，使状态机在慢设备上也真正停留在关闭状态，每次都切换
+     *      （同小程序的 B20 修复 074285a6）；否则为 INPUT_OFF_MS（150 ms）：慢设备渲染一帧超过 50 ms，状态机必须在输入关闭时至少前进一次。
+     *      规则为 `CYLRiveInputPass.offMilliseconds`。
      */
-    private fun inputOffMilliseconds(): Long =
-        if (loops && activeDuration <= 0) (LOOP_SECONDS * 1000 / 2).toLong() else INPUT_OFF_MS
+    private fun inputOffMilliseconds(wasOn: Boolean): Long =
+        CYLRiveInputPass.offMilliseconds(activeDuration, loops, wasOn)
 
     private fun restartsOnPlay(): Boolean {
         val machine = stateMachine ?: return options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionRiveAnimation] == null
@@ -1676,6 +1680,19 @@ internal object CYLRiveInputs {
         return try {
             val smi = instance.javaClass.getMethod("input", String::class.java).invoke(instance, input) ?: return null
             (smi.javaClass.getMethod("getValue").invoke(smi) as? Number)?.toFloat()
+        } catch (error: Exception) { null }
+    }
+
+    /**
+     * [EN] A boolean input's value (`input(name).getValue()` of rive-android), null when unknown.
+     * [CN] 布尔输入的值（rive-android 的 `input(name).getValue()`），无法读取时为 null。
+     */
+    fun booleanValue(rive: Any, machine: String, input: String): Boolean? {
+        val machines = try { rive.javaClass.getMethod("getStateMachines").invoke(rive) as? List<*> } catch (error: Exception) { null } ?: return null
+        val instance = machines.firstOrNull { machineName(it) == machine } ?: return null
+        return try {
+            val smi = instance.javaClass.getMethod("input", String::class.java).invoke(instance, input) ?: return null
+            smi.javaClass.getMethod("getValue").invoke(smi) as? Boolean
         } catch (error: Exception) { null }
     }
 

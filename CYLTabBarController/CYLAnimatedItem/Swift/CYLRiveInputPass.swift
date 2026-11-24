@@ -31,6 +31,19 @@ enum CYLRiveInputPass {
         activeDuration > 0
     }
 
+    /// [EN] The input stays NO at least one frame, so the state machine advances with it. [CN] 输入至少保持 NO 一帧，使状态机带着它前进。
+    static let minimumOffSeconds: TimeInterval = 0.05
+    /// [EN] ... and at most this long, for a machine that never settles (shapes.riv, truck.riv). [CN] 至多保持这么久，用于永不稳定的状态机（shapes.riv、truck.riv）。
+    static let maximumOffSeconds: TimeInterval = 1.5
+
+    /// [EN] Does the NO window of a restart end now? It lasts until the state machine has settled, so its NO pass is seen
+    ///      (menu_button.riv shows its X for about 0.5 s), within `minimumOffSeconds` ... `maximumOffSeconds`.
+    ///      [CN] 重新播放的 NO 窗口现在是否结束？它持续到状态机稳定，使 NO 的那一遍被看到（menu_button.riv 约 0.5 秒显示 X），
+    ///      范围为 `minimumOffSeconds` ... `maximumOffSeconds`。
+    static func offWindowEnds(elapsed: TimeInterval, isSettled: Bool) -> Bool {
+        elapsed >= maximumOffSeconds || (elapsed >= minimumOffSeconds && isSettled)
+    }
+
     /// [EN] Does the input pass end now? Called after `activeDuration` seconds have elapsed. [CN] 输入的这一遍现在是否结束？在经过 `activeDuration` 秒之后调用。
     static func ending(activeDuration: TimeInterval, isCancelled: Bool, loops: Bool) -> Ending {
         guard hasEnd(activeDuration: activeDuration), !isCancelled else {
