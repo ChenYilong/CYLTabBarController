@@ -14,6 +14,14 @@ String animationURLWithOptions(String file, [Map<String, Object> options = const
   return '$base#${names.map((name) => '${Uri.encodeComponent(name)}=${Uri.encodeComponent('${options[name]}')}').join('&')}';
 }
 
+/// The named constant of the capsule (1000 logical pixels): pass it to [CYLAnimationView.itemCornerRadius] instead of a literal;
+/// the native view treats it as exactly half the height.
+const double cylAnimatedItemCornerRadiusCapsule = 1000;
+
+/// What the item's background is made of: the solid `itemBackgroundColor` ([flat], default), or Liquid Glass tinted with it
+/// ([liquidGlass]; drawn only where the platform draws Liquid Glass, elsewhere the view stays flat).
+enum CYLAnimatedItemBackgroundStyle { flat, liquidGlass }
+
 /// Plays an animation by hand, for a [CYLAnimationView] whose `drivesAnimationPlayback` is false (the cross-platform engine
 /// contract, docs/Animated-Item.md): the commands `play`, `stopAtProgress` and `restart` of the native view. Give it to the
 /// view's `controller`; a command before the view exists does nothing.
@@ -38,7 +46,8 @@ class CYLAnimationController {
 /// [file] is a file name in the app (the iOS main bundle, the Android assets), a path or a URL.
 ///
 /// The names follow the cross-platform engine contract (docs/Animated-Item.md, "Engine API across platforms"): [selected],
-/// [animationSpeed], [animationLoops], [animationRestartToken], [drivesAnimationPlayback], [showsImageWhenAnimationEnds], [image], [iconSize], [tintColor], the
+/// [animationSpeed], [animationLoops], [animationRestartToken], [drivesAnimationPlayback], [showsImageWhenAnimationEnds], [image], [iconSize], [tintColor], the item background ([itemBackgroundStyle],
+/// [itemBackgroundColor], [itemCornerRadius], [itemBorderWidth], [itemBorderColor]), the
 /// callbacks [onAnimationLoaded], [onAnimationFailed], [onAnimationEnd] and the [controller]'s commands. Both native halves
 /// wrap `CYLAnimatedItemView`; there is no engine logic in Dart.
 class CYLAnimationView extends StatefulWidget {
@@ -56,6 +65,11 @@ class CYLAnimationView extends StatefulWidget {
     this.image,
     this.iconSize,
     this.tintColor,
+    this.itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat,
+    this.itemBackgroundColor,
+    this.itemCornerRadius,
+    this.itemBorderWidth = 0,
+    this.itemBorderColor,
     this.controller,
     this.onAnimationLoaded,
     this.onAnimationFailed,
@@ -96,6 +110,23 @@ class CYLAnimationView extends StatefulWidget {
 
   /// Tints the icon and an animation that takes a tint.
   final Color? tintColor;
+
+  /// The background: [CYLAnimatedItemBackgroundStyle.flat] (default) fills with [itemBackgroundColor];
+  /// [CYLAnimatedItemBackgroundStyle.liquidGlass] draws Liquid Glass tinted with it, where the platform draws Liquid Glass.
+  final CYLAnimatedItemBackgroundStyle itemBackgroundStyle;
+
+  /// The solid fill when flat, the glass tint when Liquid Glass; null for none.
+  final Color? itemBackgroundColor;
+
+  /// The corner radius in logical pixels, limited to half the height; 0 is square, [cylAnimatedItemCornerRadiusCapsule] a
+  /// capsule. null (default): a capsule for Liquid Glass, square for flat.
+  final double? itemCornerRadius;
+
+  /// The border width in logical pixels.
+  final double itemBorderWidth;
+
+  /// The border color; null for none.
+  final Color? itemBorderColor;
 
   final CYLAnimationController? controller;
 
@@ -147,6 +178,21 @@ class _CYLAnimationViewState extends State<CYLAnimationView> {
     }
     if (widget.tintColor != oldWidget.tintColor) {
       channel.invokeMethod<void>('setTintColor', widget.tintColor?.toARGB32());
+    }
+    if (widget.itemBackgroundStyle != oldWidget.itemBackgroundStyle) {
+      channel.invokeMethod<void>('setItemBackgroundStyle', widget.itemBackgroundStyle.name);
+    }
+    if (widget.itemBackgroundColor != oldWidget.itemBackgroundColor) {
+      channel.invokeMethod<void>('setItemBackgroundColor', widget.itemBackgroundColor?.toARGB32());
+    }
+    if (widget.itemCornerRadius != oldWidget.itemCornerRadius) {
+      channel.invokeMethod<void>('setItemCornerRadius', widget.itemCornerRadius);
+    }
+    if (widget.itemBorderWidth != oldWidget.itemBorderWidth) {
+      channel.invokeMethod<void>('setItemBorderWidth', widget.itemBorderWidth);
+    }
+    if (widget.itemBorderColor != oldWidget.itemBorderColor) {
+      channel.invokeMethod<void>('setItemBorderColor', widget.itemBorderColor?.toARGB32());
     }
     if (widget.selected != oldWidget.selected) {
       channel.invokeMethod<void>('setSelected', widget.selected);
@@ -200,6 +246,11 @@ class _CYLAnimationViewState extends State<CYLAnimationView> {
       if (widget.image != null) 'image': widget.image,
       if (widget.iconSize != null) 'iconSize': widget.iconSize,
       if (widget.tintColor != null) 'tintColor': widget.tintColor!.toARGB32(),
+      'itemBackgroundStyle': widget.itemBackgroundStyle.name,
+      if (widget.itemBackgroundColor != null) 'itemBackgroundColor': widget.itemBackgroundColor!.toARGB32(),
+      if (widget.itemCornerRadius != null) 'itemCornerRadius': widget.itemCornerRadius,
+      'itemBorderWidth': widget.itemBorderWidth,
+      if (widget.itemBorderColor != null) 'itemBorderColor': widget.itemBorderColor!.toARGB32(),
     };
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:

@@ -8,7 +8,7 @@ jest.mock('../CyltabbarAnimationViewNativeComponent', () => ({
   Commands: { play: jest.fn(), stopAtProgress: jest.fn(), restart: jest.fn() },
 }));
 
-import { animationURLWithOptions } from '../CYLAnimationView.native';
+import { animationURLWithOptions, cylAnimatedItemCornerRadiusCapsule } from '../CYLAnimationView.native';
 
 type Case = { input: string; file?: string; options: Record<string, string> };
 
@@ -36,5 +36,20 @@ describe('animationURLWithOptions against the shared source-options.json', () =>
   it('sorts by name and drops empty values', () => {
     expect(animationURLWithOptions('a.riv', { b: 2, a: 'x y', c: '' })).toBe('a.riv#a=x%20y&b=2');
     expect(animationURLWithOptions('a.riv#old=1', {})).toBe('a.riv');
+  });
+});
+
+describe('the item background props', () => {
+  it('names the capsule constant 1000, as every platform does', () => {
+    expect(cylAnimatedItemCornerRadiusCapsule).toBe(1000);
+  });
+
+  it('declares the five frozen names in the native spec, flat by default and the radius unset', () => {
+    const spec = readFileSync(join(__dirname, '../CyltabbarAnimationViewNativeComponent.ts'), 'utf8');
+    expect(spec).toContain("itemBackgroundStyle?: CodegenTypes.WithDefault<'flat' | 'liquidGlass', 'flat'>");
+    expect(spec).toContain('itemBackgroundColor?: ColorValue');
+    expect(spec).toContain('itemCornerRadius?: CodegenTypes.WithDefault<CodegenTypes.Float, -1>');
+    expect(spec).toContain('itemBorderWidth?: CodegenTypes.WithDefault<CodegenTypes.Float, 0>');
+    expect(spec).toContain('itemBorderColor?: ColorValue');
   });
 });

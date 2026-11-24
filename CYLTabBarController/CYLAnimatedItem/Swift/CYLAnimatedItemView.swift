@@ -447,6 +447,16 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     public var itemCornerRadius: CGFloat? {
         didSet { if oldValue != itemCornerRadius { itemBackgroundDidChange() } }
     }
+    /**
+     [EN] `itemCornerRadius` for Objective-C, which cannot see an optional `CGFloat`: an `NSNumber` of points, nil for not set. The React
+          Native and Flutter iOS bridges set it (docs/Animated-Item.md, "Engine API across platforms").
+     [CN] 给 Objective-C 用的 `itemCornerRadius`（Objective-C 看不到可选的 `CGFloat`）：点数的 `NSNumber`，nil 表示未设置。React Native 与
+          Flutter 的 iOS 桥接使用它（见 docs/Animated-Item.md「跨端引擎 API」）。
+     */
+    public var itemCornerRadiusNumber: NSNumber? {
+        get { itemCornerRadius.map { NSNumber(value: Double($0)) } }
+        set { itemCornerRadius = newValue.map { CGFloat($0.doubleValue) } }
+    }
     /** [EN] The border width in points. [CN] 边框宽度（点）。 */
     public var itemBorderWidth: CGFloat = 0 {
         didSet { if oldValue != itemBorderWidth { itemBackgroundDidChange() } }

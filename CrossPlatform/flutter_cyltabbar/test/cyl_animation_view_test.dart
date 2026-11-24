@@ -47,6 +47,20 @@ void main() {
     expect(view.playing, isFalse);
   });
 
+  test('the item background defaults: flat, no color, radius unset, no border', () {
+    const view = CYLAnimationView(file: 'a.riv');
+    expect(view.itemBackgroundStyle, CYLAnimatedItemBackgroundStyle.flat);
+    expect(view.itemBackgroundColor, isNull);
+    expect(view.itemCornerRadius, isNull);
+    expect(view.itemBorderWidth, 0);
+    expect(view.itemBorderColor, isNull);
+  });
+
+  test('the capsule constant is 1000 and the style names are the frozen strings', () {
+    expect(cylAnimatedItemCornerRadiusCapsule, 1000);
+    expect(CYLAnimatedItemBackgroundStyle.values.map((style) => style.name), ['flat', 'liquidGlass']);
+  });
+
   test('commands before the view exists do nothing', () async {
     final controller = CYLAnimationController();
     await controller.play();

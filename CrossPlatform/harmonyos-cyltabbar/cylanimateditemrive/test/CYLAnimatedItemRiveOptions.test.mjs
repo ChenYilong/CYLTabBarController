@@ -48,3 +48,12 @@ test('the boolean stays true for the duration option, 1 s by default', () => {
   assert.equal(R.cylRiveActiveDuration('-1'), 1);
   assert.equal(R.cylRiveActiveDuration('x'), 1);
 });
+
+test('the NO window of a restart lasts a frame, waits for the machine to settle, ends at 1.5 s', () => {
+  assert.equal(R.cylRiveOffWindowEnds(16, true), false);
+  assert.equal(R.cylRiveOffWindowEnds(50, true), true);
+  assert.equal(R.cylRiveOffWindowEnds(500, false), false);
+  assert.equal(R.cylRiveOffWindowEnds(500, true), true);
+  assert.equal(R.cylRiveOffWindowEnds(1400, false), false);
+  assert.equal(R.cylRiveOffWindowEnds(1500, false), true);
+});

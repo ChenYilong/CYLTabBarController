@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.widget.FrameLayout
 import com.cyl.animateditem.CYLAnimatedItemAnimationEndListener
+import com.cyl.animateditem.CYLAnimatedItemBackgroundStyle
 import com.cyl.animateditem.CYLAnimatedItemView
 import com.cyl.animateditem.CYLSize
 import io.flutter.plugin.common.BinaryMessenger
@@ -15,7 +16,8 @@ import io.flutter.plugin.platform.PlatformView
  * An animation played by CYLTabBarController's engine through a `CYLAnimatedItemView` (the cross-platform engine API:
  * `docs/Animated-Item.md`, "Engine API across platforms"). Channel `flutter_cyltabbar/CYLAnimationView/<id>`: the methods
  * `setSource`, `setSelected`, `setAnimationSpeed`, `setAnimationLoops`, `setAnimationRestartToken`,
- * `setDrivesAnimationPlayback`, `setShowsImageWhenAnimationEnds`, `setImage`, `setPlaying`, `setIconSize`, `setTintColor` and the commands `play`, `stopAtProgress`,
+ * `setDrivesAnimationPlayback`, `setShowsImageWhenAnimationEnds`, `setImage`, `setPlaying`, `setIconSize`, `setTintColor`, `setItemBackgroundStyle`, `setItemBackgroundColor`, `setItemCornerRadius`, `setItemBorderWidth`,
+ * `setItemBorderColor` and the commands `play`, `stopAtProgress`,
  * `restart`; it calls back `onAnimationLoaded`, `onAnimationFailed` and `onAnimationEnd`. No engine logic here.
  * 由 CYLTabBarController 引擎通过 `CYLAnimatedItemView` 播放的动画（跨端引擎 API，见 `docs/Animated-Item.md`）。
  */
@@ -53,6 +55,11 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
     (arguments["animationRestartToken"] as? Number)?.let { item.animationRestartToken = it.toInt() }
     (arguments["iconSize"] as? Number)?.let { iconSize = it.toFloat() }
     (arguments["tintColor"] as? Number)?.let { item.iconColor = it.toInt() }
+    setItemBackgroundStyle(arguments["itemBackgroundStyle"])
+    (arguments["itemBackgroundColor"] as? Number)?.let { item.itemBackgroundColor = it.toInt() }
+    (arguments["itemCornerRadius"] as? Number)?.let { item.itemCornerRadius = it.toFloat() }
+    (arguments["itemBorderWidth"] as? Number)?.let { item.itemBorderWidth = it.toFloat() }
+    (arguments["itemBorderColor"] as? Number)?.let { item.itemBorderColor = it.toInt() }
     (arguments["selected"] as? Boolean)?.let { item.isSelected = it }
     fitIcon()
     (arguments["source"] as? String)?.let { item.animationURL = it }
@@ -71,6 +78,11 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
     val request = ++imageRequest
     val name = value?.takeIf { it.isNotBlank() } ?: run { item.image = null; return }
     CYLFlutterStillImage.loadAsync(item.context, name) { drawable -> if (request == imageRequest) item.image = drawable }
+  }
+
+  /** `itemBackgroundStyle`: "liquidGlass", or anything else (null, "flat") for flat. */
+  private fun setItemBackgroundStyle(value: Any?) {
+    item.itemBackgroundStyle = if (value == "liquidGlass") CYLAnimatedItemBackgroundStyle.LiquidGlass else CYLAnimatedItemBackgroundStyle.Flat
   }
 
   /** The icon fills the view, or is `iconSize` (dp) when given. 图标铺满视图，给了 `iconSize`（dp）时为该尺寸。 */
@@ -98,6 +110,11 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
       "setPlaying" -> if (argument as? Boolean == true) item.playAnimation() else item.stopAnimation()
       "setIconSize" -> { iconSize = (argument as? Number)?.toFloat(); fitIcon() }
       "setTintColor" -> item.iconColor = (argument as? Number)?.toInt()
+      "setItemBackgroundStyle" -> setItemBackgroundStyle(argument)
+      "setItemBackgroundColor" -> item.itemBackgroundColor = (argument as? Number)?.toInt()
+      "setItemCornerRadius" -> item.itemCornerRadius = (argument as? Number)?.toFloat()
+      "setItemBorderWidth" -> item.itemBorderWidth = (argument as? Number)?.toFloat() ?: 0f
+      "setItemBorderColor" -> item.itemBorderColor = (argument as? Number)?.toInt()
       "play" -> item.animatedItemPlayer.play()
       "stopAtProgress" -> item.animatedItemPlayer.stopAtProgress((argument as? Number)?.toFloat() ?: 0f)
       "restart" -> item.restartAnimation()

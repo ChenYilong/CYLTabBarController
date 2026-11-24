@@ -227,10 +227,26 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
             viewModel.play()
         } else if let input = configuration.stateMachineInput, usableInput {
             viewModel.setInput(input, value: false)
+            // [EN] Play with NO, so the state machine advances and runs its NO pass (menu_button.riv: hamburger -> X); a machine
+            //      that is not playing only sees NO and YES in one advance and stays where it was (docs/Animated-Item.md).
+            // [CN] 带着 NO 播放，使状态机前进并运行 NO 的那一遍（menu_button.riv：汉堡 -> X）；不在播放的状态机会在同一次前进中同时看到 NO 与 YES，
+            //      停在原处（docs/Animated-Item.md）。
+            viewModel.play()
             let duration = configuration.activeDuration
             deactivateTask = Task { @MainActor [weak self] in
-                // [EN] A frame later: the state machine sees NO, then YES. [CN] 一帧之后：状态机先看到 NO，再看到 YES。
-                try? await Task.sleep(nanoseconds: 50_000_000)
+                // [EN] Until the NO pass has settled (at least a frame, at most `CYLRiveInputPass.maximumOffSeconds`), then YES.
+                // [CN] 等到 NO 的那一遍稳定（至少一帧，至多 `CYLRiveInputPass.maximumOffSeconds`），再设为 YES。
+                var elapsed: TimeInterval = 0
+                repeat {
+                    try? await Task.sleep(nanoseconds: 16_000_000)
+                    elapsed += 0.016
+                    guard !Task.isCancelled, let self else {
+                        return
+                    }
+                    if CYLRiveInputPass.offWindowEnds(elapsed: elapsed, isSettled: !self.viewModel.isPlaying) {
+                        break
+                    }
+                } while true
                 guard !Task.isCancelled, let self else {
                     return
                 }
