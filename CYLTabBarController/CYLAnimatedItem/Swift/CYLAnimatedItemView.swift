@@ -60,6 +60,12 @@ import UIKit
 }
 
 /**
+ [EN] The corner radius of a capsule: pass this constant to `itemCornerRadius`, never the number 1000.
+ [CN] 胶囊的圆角半径：给 `itemCornerRadius` 传这个常量，不要传数字 1000。
+ */
+public let CYLAnimatedItemCornerRadiusCapsule: CGFloat = 1000
+
+/**
  [EN] What the view's background is made of: the solid `itemBackgroundColor` (`flat`, default), or Liquid Glass tinted with it
       (`liquidGlass`; drawn only where the system draws Liquid Glass, `CYLAnimatedItemView.isLiquidGlassActive()`: iOS 26 and
       later, as CYLTabBarController; elsewhere the style is ignored and the view stays flat).
@@ -430,10 +436,10 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         didSet { itemBackgroundDidChange() }
     }
     /**
-     [EN] The corner radius, applied as `min(radius, height / 2)`: 0 is square, a large value such as 1000 is a capsule. nil (the
+     [EN] The corner radius, applied as `min(radius, height / 2)`: 0 is square, `CYLAnimatedItemCornerRadiusCapsule` (1000) is a capsule; no other value has a special meaning. nil (the
           default) is not set: the Liquid Glass style is a capsule (half the height), so a host gets a capsule without setting
           anything and customizes it by setting this property; the flat style is square.
-     [CN] 圆角半径，实际取 `min(radius, height / 2)`：0 为直角，较大的值（如 1000）为胶囊。nil（默认）表示未设置：液态玻璃样式为胶囊（半高），
+     [CN] 圆角半径，实际取 `min(radius, height / 2)`：0 为直角，`CYLAnimatedItemCornerRadiusCapsule`（1000）为胶囊，其他值没有特殊含义。nil（默认）表示未设置：液态玻璃样式为胶囊（半高），
           宿主无需设置任何属性即可得到胶囊，要自定义时设置此属性即可；扁平样式为直角。
      */
     public var itemCornerRadius: CGFloat? {

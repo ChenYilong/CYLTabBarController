@@ -5,6 +5,7 @@ const test = require('node:test')
 const assert = require('node:assert/strict')
 const {
   cylAnimatedItemBackground,
+  cylAnimatedItemCornerRadiusCapsule,
   cylAnimatedItemLiquidGlassIsActive,
   cylAnimatedItemLiquidGlassSetActiveOverride,
 } = require('../src/cyl-animated-item/cyl_animated_item_model')
@@ -45,7 +46,7 @@ test('a radius below zero is square and the glass has a default tint', () => {
 
 test('an unset radius (-1) is a capsule for the drawn glass and square for flat; a set radius wins', () => {
   cylAnimatedItemLiquidGlassSetActiveOverride(true)
-  assert.match(cylAnimatedItemBackground('liquidGlass', '', -1, 0, '', false).css, /border-radius:999px;/)
+  assert.match(cylAnimatedItemBackground('liquidGlass', '', -1, 0, '', false).css, /border-radius:1000px;/)
   assert.match(cylAnimatedItemBackground('liquidGlass', '', 8, 0, '', false).css, /border-radius:8px;/)
   assert.match(cylAnimatedItemBackground('liquidGlass', '', 0, 0, '', false).css, /border-radius:0px;/)
   assert.match(cylAnimatedItemBackground('flat', '#fff', -1, 0, '', false).css, /border-radius:0px;/)

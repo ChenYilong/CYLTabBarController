@@ -83,7 +83,7 @@ class CYLLiquidGlassTest {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val view = CYLAnimatedItemView(context)
         view.itemBackgroundColor = 0xFF336699.toInt()
-        view.itemCornerRadius = 1000f
+        view.itemCornerRadius = CYLAnimatedItemCornerRadiusCapsule
         view.itemBorderWidth = 1f
         view.itemBorderColor = android.graphics.Color.RED
         view.layout(0, 0, 200, 80)

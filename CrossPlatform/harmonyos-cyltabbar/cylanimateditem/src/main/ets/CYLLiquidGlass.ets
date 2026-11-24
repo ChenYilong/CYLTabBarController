@@ -17,10 +17,6 @@ export class CYLLiquidGlass {
    */
   static readonly BLUR_SATURATION: number = 1.6;
   /**
-   * [EN] A corner radius larger than any item is high: a capsule (the Liquid Glass default). [CN] 比任何条目都高的圆角半径：胶囊（液态玻璃的默认）。
-   */
-  static readonly CAPSULE_RADIUS: number = 1000;
-  /**
    * [EN] The brightness of light glass. [CN] 浅色玻璃的亮度。
    */
   static readonly LIGHT_BRIGHTNESS: number = 1.05;

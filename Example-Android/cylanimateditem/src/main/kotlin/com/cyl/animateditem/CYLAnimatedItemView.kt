@@ -51,6 +51,12 @@ import kotlin.math.roundToInt
  *      长度单位为 px，名称以 `Dp` 结尾的除外。
  */
 /**
+ * [EN] The corner radius of a capsule, dp: pass this constant to `itemCornerRadius`, never the number 1000.
+ * [CN] 胶囊的圆角半径（dp）：给 `itemCornerRadius` 传这个常量，不要传数字 1000。
+ */
+const val CYLAnimatedItemCornerRadiusCapsule: Float = 1000f
+
+/**
  * [EN] What the view's background is made of: the solid `itemBackgroundColor` (`Flat`, default), or Liquid Glass tinted with it
  *      (`LiquidGlass`; drawn only where the device draws Liquid Glass, `CYLAnimatedItemView.isLiquidGlassActive()`: Android 12
  *      and later, as the tab bar; elsewhere the style is ignored and the view stays flat). Same names as iOS and HarmonyOS.
@@ -1206,10 +1212,10 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         set(value) { field = value; itemBackgroundDidChange() }
 
     /**
-     * [EN] The corner radius in dp, applied as `min(radius, height / 2)`: 0 is square, a large value such as 1000 is a capsule. null
+     * [EN] The corner radius in dp, applied as `min(radius, height / 2)`: 0 is square, [CYLAnimatedItemCornerRadiusCapsule] (1000) is a capsule; no other value has a special meaning. null
      *      (the default) is not set: the Liquid Glass style is a capsule (half the height), so a host gets a capsule without setting
      *      anything and customizes it by setting this property; the flat style is square.
-     * [CN] 圆角半径（dp），实际取 `min(radius, height / 2)`：0 为直角，较大的值（如 1000）为胶囊。null（默认）表示未设置：液态玻璃样式为胶囊
+     * [CN] 圆角半径（dp），实际取 `min(radius, height / 2)`：0 为直角，[CYLAnimatedItemCornerRadiusCapsule]（1000）为胶囊，其他值没有特殊含义。null（默认）表示未设置：液态玻璃样式为胶囊
      *      （半高），宿主无需设置任何属性即可得到胶囊，要自定义时设置此属性即可；扁平样式为直角。
      */
     var itemCornerRadius: Float? = null

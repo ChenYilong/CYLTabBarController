@@ -408,6 +408,9 @@ function cylAnimatedItemModel(input) {
  *      淡淡的高光与边框，按圆角裁剪。`cylAnimatedItemLiquidGlassIsActive()`（与其他平台的 `CYLAnimatedItemView.isLiquidGlassActive()` 同一规则）
  *      在小程序中始终为真：WebView 不支持 `backdrop-filter` 时只剩着色，与 TabBar 相同。
  */
+/** [EN] The corner radius of a capsule: pass this constant, never the number 1000. 0 is square. [CN] 胶囊的圆角半径：传这个常量，不要传数字 1000。0 为直角。 */
+const cylAnimatedItemCornerRadiusCapsule = 1000
+
 const cylLiquidGlassState = { activeOverride: undefined }
 
 function cylAnimatedItemLiquidGlassIsActive() {
@@ -429,7 +432,7 @@ function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, bord
   const glass = style === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive()
   // The host's value (0 is square); not set (-1): a capsule for the drawn Liquid Glass (the rule `0: automatic, a capsule` that
   // CollectionViewClassifyMenu's tags had, moved here), square for flat.
-  const radius = Number(cornerRadius) >= 0 ? Number(cornerRadius) : (glass ? 999 : 0)
+  const radius = Number(cornerRadius) >= 0 ? Number(cornerRadius) : (glass ? cylAnimatedItemCornerRadiusCapsule : 0)
   let css = `border-radius:${radius}px;`
   if (border > 0) css += `border:${border}px solid ${borderColor || 'transparent'};box-sizing:border-box;`
   if (glass) {
@@ -443,6 +446,7 @@ function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, bord
 }
 
 module.exports = {
+  cylAnimatedItemCornerRadiusCapsule,
   cylAnimatedItemBackground,
   cylAnimatedItemLiquidGlassIsActive,
   cylAnimatedItemLiquidGlassSetActiveOverride,

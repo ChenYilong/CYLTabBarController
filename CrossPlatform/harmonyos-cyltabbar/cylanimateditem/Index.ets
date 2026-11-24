@@ -11,7 +11,7 @@ export {
 } from './src/main/ets/CYLAnimatedItemView';
 export { CYLAnimatedItemStackView } from './src/main/ets/CYLAnimatedItemStackView';
 export { CYLLiquidGlass } from './src/main/ets/CYLLiquidGlass';
-export { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier } from './src/main/ets/CYLAnimatedItemBackground';
+export { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier, CYLAnimatedItemCornerRadiusCapsule } from './src/main/ets/CYLAnimatedItemBackground';
 export {
   CYLAnimatedItemStackModel, CYLAnimatedItemStackItem, CYLAnimatedItemStackActionHandler, CYLAnimatedItemStackDefaultSpacing
 } from './src/main/ets/CYLAnimatedItemStackModel';

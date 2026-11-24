@@ -5,6 +5,13 @@ import { CYLLiquidGlass } from './CYLLiquidGlass';
  *      the color, where `CYLLiquidGlass.isActive()`; flat elsewhere, the other parameters kept).
  * [CN] 条目背景的构成：纯色（`flat`，默认）或液态玻璃（带着色的模糊仿制，在 `CYLLiquidGlass.isActive()` 时；否则为扁平，其他参数保持）。
  */
+/**
+ * [EN] The corner radius of a capsule, vp: pass this constant as `cornerRadius`, never the number 1000. 0 is square; no other value has a
+ *      special meaning (-1 is not set: a capsule for the drawn glass).
+ * [CN] 胶囊的圆角半径（vp）：作为 `cornerRadius` 传这个常量，不要传数字 1000。0 为直角；其他值没有特殊含义（-1 表示未设置：绘制玻璃时为胶囊）。
+ */
+export const CYLAnimatedItemCornerRadiusCapsule: number = 1000;
+
 export enum CYLAnimatedItemBackgroundStyle {
   flat = 0,
   liquidGlass = 1
@@ -53,7 +60,7 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
     if (cornerRadius >= 0) {
       return cornerRadius;
     }
-    return CYLAnimatedItemBackgroundModifier.isGlassDrawn(style) ? CYLLiquidGlass.CAPSULE_RADIUS : 0;
+    return CYLAnimatedItemBackgroundModifier.isGlassDrawn(style) ? CYLAnimatedItemCornerRadiusCapsule : 0;
   }
 
   applyNormalAttribute(instance: CommonAttribute): void {
