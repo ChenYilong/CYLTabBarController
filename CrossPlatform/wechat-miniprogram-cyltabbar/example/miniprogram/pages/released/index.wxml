@@ -1,0 +1,4 @@
+<!-- [EN] The released page: the dealloc callbacks that ran. [CN] 释放后的页面：已执行的 dealloc 回调。 -->
+<view class="cyl-released">
+  <text id="cyl-released-status" class="cyl-released-text">{{text}}</text>
+</view>
