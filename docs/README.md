@@ -48,6 +48,7 @@
 | [液态玻璃的健壮性改进](Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](Login-Required-Tabs.md) | [Tabs That Need Login](Login-Required-Tabs.md) |
 | [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](Mac-CI-CD.md) |
+| [交给 macOS 会话的未满分项与待办（Windows 会话 chen-yilong-b6）](Mac-Handoff.md) | [Hand-off to macOS sessions: missing points and TODOs of Windows session chen-yilong-b6](Mac-Handoff.md) |
 | [PAG 动画 Tab 图标（与 Lottie 用法相同）](PAG-Animation.md) | [PAG animated tab icons (used like Lottie)](PAG-Animation.md) |
 | [只有部分 Tab 有动画（Lottie 或 PAG）](Per-Tab-Animation.md) | [Only some tabs animated (Lottie or PAG)](Per-Tab-Animation.md) |
 | [PlusButton 子控制器换肤测试](Plus-Child-Theme-Switching-Test.md) | [Plus child theme switching test](Plus-Child-Theme-Switching-Test.md) |
@@ -149,6 +150,7 @@ docs/
 ├── Liquid-Glass-Robustness.md
 ├── Login-Required-Tabs.md
 ├── Mac-CI-CD.md
+├── Mac-Handoff.md
 ├── ObjC-Example-Parity/
 │   └── README.md
 ├── PAG-Animation.md
