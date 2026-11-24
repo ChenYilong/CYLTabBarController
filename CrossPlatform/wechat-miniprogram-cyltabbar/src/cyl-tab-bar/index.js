@@ -413,6 +413,11 @@ Component({
 
   observers: {
     'configuration, strings, symbolsByTheme, imageBasePath, animationBasePath, selectedIdentifier, appVersion, itemStyle, glassLensStyle, hiddenIdentifiers, tabBarHeight, selectedIndex': function () {
+      // [EN] The bar's own write of the mirrored `selectedIdentifier` / `selectedIndex` is not a new input: no second render.
+      // [CN] TabBar 自己写入的 `selectedIdentifier` / `selectedIndex` 镜像值不是新的输入：不再渲染第二次。
+      if (this.cylWritingMirror) {
+        return;
+      }
       this.cyl_render();
     },
   },
@@ -526,7 +531,7 @@ Component({
       // [CN] TabBar 与 Item 共用一个枚举：Item 样式同时决定玻璃胶囊。
       const itemStyle = this.cyl_itemStyle(model);
       const styleType = cylBarStyleType(itemStyle, model.styleType);
-      this.setData({
+      this.cyl_writeData({
         ...this.cyl_selectionMirror(model, selected),
         cylSlots: slots,
         cylItemStyle: itemStyle,
@@ -1078,7 +1083,22 @@ Component({
       const model = this.cylModel;
       this.cylSelectedKey = key;
       if (model) {
-        this.setData(this.cyl_selectionMirror(model, key));
+        this.cyl_writeData(this.cyl_selectionMirror(model, key));
+      }
+    },
+
+    /**
+     * [EN] setData of the bar's own state: the observer of the public properties does not render again for the mirrored
+     *      `selectedIdentifier` / `selectedIndex` in it (the observer runs inside setData).
+     * [CN] 写入 TabBar 自己的状态：其中镜像的 `selectedIdentifier` / `selectedIndex` 不会让公开属性的 observer 再次渲染
+     *      （observer 在 setData 内运行）。
+     */
+    cyl_writeData(patch, callback) {
+      this.cylWritingMirror = true;
+      try {
+        this.setData(patch, callback);
+      } finally {
+        this.cylWritingMirror = false;
       }
     },
 
