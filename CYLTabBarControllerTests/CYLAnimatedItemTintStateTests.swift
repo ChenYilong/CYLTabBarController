@@ -136,6 +136,21 @@ final class CYLAnimatedItemBackgroundTests: XCTestCase {
         XCTAssertEqual(item.resolvedItemBackgroundStyle, .liquidGlass)
     }
 
+    func testAGlassWithoutAColorHasTheDefaultFrostedTint() throws {
+        guard #available(iOS 26.0, *) else {
+            throw XCTSkip("UIGlassEffect needs iOS 26")
+        }
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        let item = makeItem()
+        item.itemBackgroundStyle = .liquidGlass
+        item.layoutIfNeeded()
+        let glass = try XCTUnwrap(item.itemLiquidGlassView as? UIVisualEffectView)
+        var alpha: CGFloat = -1
+        (glass.effect as? UIGlassEffect)?.tintColor?.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light))
+            .getRed(nil, green: nil, blue: nil, alpha: &alpha)
+        XCTAssertEqual(alpha, 0.5, accuracy: 0.01, "no color set: the default frosted tint, so one style parameter is visible")
+    }
+
     func testSettingTheSameValueAgainDoesNotRequestALayout() {
         let item = makeItem()
         item.itemCornerRadius = 8

@@ -1172,6 +1172,10 @@ export struct CYLAnimatedItemView {
    * [EN] The background color: the tint over the glass blur, else the solid fill, '' meaning transparent. [CN] 背景色：玻璃模糊之上的着色，否则为纯色填充；'' 表示透明。
    */
   private cylItemBackgroundColor(): ResourceColor {
+    // [EN] The glass tint is translucent (and a default frosted tint when none is set): the shared rule of the modifier. [CN] 玻璃着色是半透明的（未设置时为默认磨砂着色）：与修饰器共用同一规则。
+    if (this.cylItemGlassDrawn()) {
+      return CYLAnimatedItemBackgroundModifier.glassTint(this.itemBackgroundColor !== '' ? this.itemBackgroundColor : Color.Transparent);
+    }
     return this.itemBackgroundColor !== '' ? this.itemBackgroundColor : Color.Transparent;
   }
 

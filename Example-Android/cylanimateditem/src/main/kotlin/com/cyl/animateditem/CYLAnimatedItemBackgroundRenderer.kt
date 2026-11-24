@@ -41,8 +41,20 @@ internal class CYLAnimatedItemBackgroundRenderer(private val host: ViewGroup) {
      *      selected tag's green tints the glass instead of covering it. One rule for every host, the same on every platform.
      * [CN] 玻璃使用的着色：宿主颜色变为半透明（其透明度乘以 [GLASS_TINT_ALPHA]），因此选中标签的绿色这样的不透明色是给玻璃着色而不是盖住它。所有宿主、所有平台同一规则。
      */
-    fun glassTint(color: Int?): Int? =
+    fun glassTint(color: Int?): Int =
         color?.let { Color.argb((Color.alpha(it) * GLASS_TINT_ALPHA).roundToInt(), Color.red(it), Color.green(it), Color.blue(it)) }
+            ?: defaultGlassTint()
+
+    /**
+     * [EN] The tint of a glass whose host set no color: a light frosted gray in light mode (225, 222, 220 at alpha 0.5), a faint white in dark mode
+     *      (alpha 0.14), so a Liquid Glass style alone is visible on a plain page (the same values on every platform).
+     * [CN] 宿主未设置颜色时玻璃的着色：浅色模式为淡灰（225, 222, 220，透明度 0.5），深色模式为淡白（透明度 0.14），因此只设置液态玻璃样式在纯色页面上也看得见（各平台数值相同）。
+     */
+    private fun defaultGlassTint(): Int {
+        val night = host.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
+            android.content.res.Configuration.UI_MODE_NIGHT_YES
+        return if (night) Color.argb(36, 255, 255, 255) else Color.argb(128, 225, 222, 220)
+    }
 
     fun apply(style: CYLAnimatedItemBackgroundStyle, color: Int?, cornerRadius: Float?, borderWidth: Float, borderColor: Int?) {
         val density = host.resources.displayMetrics.density

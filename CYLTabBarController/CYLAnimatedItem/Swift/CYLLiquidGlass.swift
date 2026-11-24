@@ -139,8 +139,20 @@ final class CYLAnimatedItemBackgroundRenderer {
      */
     static let glassTintAlpha: CGFloat = 0.75
 
+    /**
+     * [EN] The tint of a glass whose host set no color: a light frosted gray in light mode (225, 222, 220 at alpha 0.5) and a faint white in dark
+     *      mode (alpha 0.14), so `itemBackgroundStyle = .liquidGlass` alone is visible on a plain page (the same values on every platform).
+     * [CN] 宿主未设置颜色时玻璃的着色：浅色模式为淡灰（225, 222, 220，透明度 0.5），深色模式为淡白（透明度 0.14），因此只设置
+     *      `itemBackgroundStyle = .liquidGlass` 在纯色页面上也看得见（各平台数值相同）。
+     */
+    static let defaultGlassTint = UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(white: 1, alpha: 0.14)
+            : UIColor(red: 225 / 255, green: 222 / 255, blue: 220 / 255, alpha: 0.5)
+    }
+
     static func glassTint(_ color: UIColor?) -> UIColor? {
-        guard let color else { return nil }
+        guard let color else { return defaultGlassTint }
         var alpha: CGFloat = 1
         color.getRed(nil, green: nil, blue: nil, alpha: &alpha)
         return color.withAlphaComponent(alpha * glassTintAlpha)

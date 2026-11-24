@@ -73,6 +73,10 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
    *      不透明色是给玻璃着色而不是盖住它；与 iOS、Android 同一规则。其他类型的颜色（资源、`Color` 值）原样使用。
    */
   static glassTint(color: ResourceColor): ResourceColor {
+    // [EN] No color set: the default frosted tint (225, 222, 220 at alpha 0.5, as iOS in light mode). [CN] 未设置颜色：默认的磨砂着色（225, 222, 220，透明度 0.5，与 iOS 浅色模式相同）。
+    if (color === Color.Transparent || color === '') {
+      return '#80E1DEDC';
+    }
     let argb: number = -1;
     if (typeof color === 'number') {
       argb = color >>> 0;
