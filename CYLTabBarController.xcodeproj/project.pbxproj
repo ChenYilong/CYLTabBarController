@@ -706,7 +706,7 @@
 		AE81276B4DA3B12D26000902 /* CYLLocalizedString+CYLUtilsDeprecatedNames.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLLocalizedString+CYLUtilsDeprecatedNames.swift"; sourceTree = "<group>"; };
 		AEE9020C03E2D11459743C21 /* CYLTabBarTransition.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLTabBarTransition.h; sourceTree = "<group>"; };
 		B02D12D7950F4A0F8FF7CFE6 /* CYLAnimationURLOptions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLAnimationURLOptions.swift; sourceTree = "<group>"; };
-		4C7A1E0B9D3F5A6280B1D4E7 /* CYLLiquidGlass.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ../../CYLLiquidGlass/Swift/CYLLiquidGlass.swift; sourceTree = "<group>"; };
+		4C7A1E0B9D3F5A6280B1D4E7 /* CYLLiquidGlass.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Swift/CYLLiquidGlass.swift; sourceTree = "<group>"; };
 		B0730541CF894802806F1CAC /* UIViewController+CYLUtils.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIViewController+CYLUtils.h"; sourceTree = "<group>"; };
 		B073DA005E87E382E070E378 /* UIColor+CYLUtilsDeprecatedNames.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UIColor+CYLUtilsDeprecatedNames.swift"; sourceTree = "<group>"; };
 		B09E171BC787DC361EBF0D16 /* UIImage+CYLTabBarControllerExtention.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIImage+CYLTabBarControllerExtention.h"; sourceTree = "<group>"; };
@@ -1516,7 +1516,6 @@
 				7F7BF9225483BC626951173C /* CYLUtils.swift */,
 				ABD5E0C8522D79C46B45E57D /* CYLLocalizedString.swift */,
 				B02D12D7950F4A0F8FF7CFE6 /* CYLAnimationURLOptions.swift */,
-				4C7A1E0B9D3F5A6280B1D4E7 /* CYLLiquidGlass.swift */,
 				3E05977B57FDA7C51BEC8274 /* CYLAnimationKeyLookup.swift */,
 				C34D8CE8144E577E0C873B94 /* CYLResourceRoute.swift */,
 				E3BF1CFC1E8C4A9BEFBBD0CD /* UIImage+CYLUtils.swift */,
@@ -1540,6 +1539,7 @@
 			children = (
 				CA53C48D512AF06756020E69 /* CYLAnimatedItemView.h */,
 				21BB208E919470BD7E295947 /* CYLAnimatedItemView.swift */,
+				4C7A1E0B9D3F5A6280B1D4E7 /* CYLLiquidGlass.swift */,
 				9AC0FFEE2C3064BD00000601 /* CYLRiveInputPass.swift */,
 				E7358A37970FCF7D3118C3E5 /* CYLAnimatedItemStackView.swift */,
 				0DD4A3A6BC38825D6C1C28C3 /* CYLAnimatedItemMacros.h */,

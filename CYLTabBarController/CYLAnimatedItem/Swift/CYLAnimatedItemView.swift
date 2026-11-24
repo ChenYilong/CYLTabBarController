@@ -60,6 +60,20 @@ import UIKit
 }
 
 /**
+ [EN] What the view's background is made of: the solid `itemBackgroundColor` (`flat`, default), or Liquid Glass tinted with it
+      (`liquidGlass`; drawn only where the system draws Liquid Glass, `CYLAnimatedItemView.isLiquidGlassActive()`: iOS 26 and
+      later, as CYLTabBarController; elsewhere the style is ignored and the view stays flat).
+ [CN] 视图背景的构成：纯色 `itemBackgroundColor`（`flat`，默认），或以它着色的液态玻璃（`liquidGlass`；只在系统使用液态玻璃处绘制，
+      `CYLAnimatedItemView.isLiquidGlassActive()`：与 CYLTabBarController 一样为 iOS 26 及以上；其他系统忽略该样式，保持扁平）。
+ */
+@objc public enum CYLAnimatedItemBackgroundStyle: Int {
+    /** [EN] The solid color (default). [CN] 纯色（默认）。 */
+    case flat = 0
+    /** [EN] A Liquid Glass background tinted with `itemBackgroundColor`. [CN] 以 `itemBackgroundColor` 着色的液态玻璃背景。 */
+    case liquidGlass
+}
+
+/**
  [EN] The look of the control: the plain animated icon + title (default), or a countdown button, e.g. for "Get the SMS
       code" (see `CYLAnimatedItemView.startCountdown()`).
  [CN] 控件的样式：普通的动效 icon + title（默认），或倒计时按钮，例如「获取验证码」（见 `CYLAnimatedItemView.startCountdown()`）。
@@ -395,6 +409,103 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      */
     public var itemStyle: CYLAnimatedItemStyle = .plain {
         didSet { countdownStyleDidChange(from: oldValue) }
+    }
+
+    // MARK: - Background (flat or Liquid Glass), corner radius and border
+
+    /**
+     [EN] The background: `.flat` (default) fills the view with `itemBackgroundColor`; `.liquidGlass` draws Liquid Glass behind
+          the content, tinted with `itemBackgroundColor`, clipped to `itemCornerRadius`. Where the system draws no Liquid Glass
+          (`isLiquidGlassActive()`) the style is ignored and the view stays flat (`resolvedItemBackgroundStyle`). Setting any
+          `item…` background property makes the view draw its background, corner radius and border (the countdown style keeps its own).
+     [CN] 背景：`.flat`（默认）用 `itemBackgroundColor` 填充；`.liquidGlass` 在内容后面绘制液态玻璃，以 `itemBackgroundColor` 着色并按
+          `itemCornerRadius` 裁剪。系统不使用液态玻璃（`isLiquidGlassActive()`）时忽略该样式，保持扁平（`resolvedItemBackgroundStyle`）。
+          设置任一 `item…` 背景属性后，视图绘制其背景、圆角与边框（倒计时样式保持自己的外观）。
+     */
+    public var itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = .flat {
+        didSet { itemBackgroundDidChange() }
+    }
+    /** [EN] The solid fill when flat, the glass tint when Liquid Glass; nil for none. [CN] 扁平时的纯色填充，液态玻璃时的着色；nil 表示无。 */
+    public var itemBackgroundColor: UIColor? {
+        didSet { itemBackgroundDidChange() }
+    }
+    /**
+     [EN] The corner radius, applied as `min(radius, height / 2)`: 0 is square, a large value such as 1000 is a capsule.
+     [CN] 圆角半径，实际取 `min(radius, height / 2)`：0 为直角，较大的值（如 1000）为胶囊。
+     */
+    public var itemCornerRadius: CGFloat = 0 {
+        didSet { itemBackgroundDidChange() }
+    }
+    /** [EN] The border width in points. [CN] 边框宽度（点）。 */
+    public var itemBorderWidth: CGFloat = 0 {
+        didSet { itemBackgroundDidChange() }
+    }
+    /** [EN] The border color; nil for none. [CN] 边框颜色；nil 表示无。 */
+    public var itemBorderColor: UIColor? {
+        didSet { itemBackgroundDidChange() }
+    }
+    /**
+     [EN] The background really drawn: `itemBackgroundStyle`, or `.flat` where `isLiquidGlassActive()` is false.
+     [CN] 实际绘制的背景：`itemBackgroundStyle`，`isLiquidGlassActive()` 为 false 时为 `.flat`。
+     */
+    public var resolvedItemBackgroundStyle: CYLAnimatedItemBackgroundStyle {
+        itemBackgroundStyle == .liquidGlass && Self.isLiquidGlassActive() ? .liquidGlass : .flat
+    }
+    /**
+     [EN] The Liquid Glass layer behind the content while it is drawn; nil while the view is flat.
+     [CN] 绘制液态玻璃时位于内容后面的玻璃层；视图为扁平时为 nil。
+     */
+    public private(set) var itemLiquidGlassView: UIView?
+    /**
+     [EN] Whether the system draws Liquid Glass, the one rule CYLTabBarController uses too (`CYLUtils.isLiquidGlassActive()`
+          forwards here): iOS 27 and later always; iOS 26 unless the app sets `UIDesignRequiresCompatibility`. Read once.
+     [CN] 系统是否使用液态玻璃，CYLTabBarController 也使用这唯一的规则（`CYLUtils.isLiquidGlassActive()` 转发到这里）：iOS 27 及以上总是；
+          iOS 26 上 App 未设置 `UIDesignRequiresCompatibility` 时。只读取一次。
+     */
+    public static func isLiquidGlassActive() -> Bool {
+        CYLLiquidGlass.isActive()
+    }
+    /**
+     [EN] For tests: replaces the system check of `isLiquidGlassActive()` (nil, the default, asks the system).
+     [CN] 供测试使用：替代 `isLiquidGlassActive()` 对系统的检查（默认 nil，询问系统）。
+     */
+    public nonisolated(unsafe) static var liquidGlassActiveOverride: Bool? {
+        get { CYLLiquidGlass.activeOverride }
+        set { CYLLiquidGlass.activeOverride = newValue }
+    }
+
+    private var usesItemBackground = false
+
+    private func itemBackgroundDidChange() {
+        usesItemBackground = true
+        layoutItemBackground()
+        setNeedsLayout()
+    }
+
+    /// [EN] Applies the background, radius and border for the current bounds. [CN] 按当前 bounds 应用背景、圆角与边框。
+    private func layoutItemBackground() {
+        guard usesItemBackground else { return }
+        let radius = min(max(itemCornerRadius, 0), bounds.height / 2)
+        layer.cornerRadius = radius
+        layer.borderWidth = itemBorderWidth
+        layer.borderColor = itemBorderColor?.resolvedColor(with: traitCollection).cgColor
+        var glassDrawn = false
+        if resolvedItemBackgroundStyle == .liquidGlass {
+            let glass = (itemLiquidGlassView as? CYLLiquidGlassView) ?? CYLLiquidGlassView()
+            glass.glassTintColor = itemBackgroundColor
+            glass.cornerRadius = radius
+            glass.frame = bounds
+            if glass.superview == nil {
+                insertSubview(glass, at: 0)
+            }
+            itemLiquidGlassView = glass
+            glassDrawn = glass.isGlassDrawn
+        }
+        if !glassDrawn {
+            itemLiquidGlassView?.removeFromSuperview()
+            itemLiquidGlassView = nil
+        }
+        backgroundColor = glassDrawn ? nil : itemBackgroundColor
     }
     /** [EN] The length in seconds, 60 by default. Used by `startCountdown()`. [CN] 总时长（秒），默认 60。`startCountdown()` 使用。 */
     public var countdownDuration: TimeInterval = 60
@@ -912,6 +1023,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         super.layoutSubviews()
         layoutContent(in: bounds.inset(by: contentInsets))
         applyCountdownAppearance()
+        layoutItemBackground()
     }
 
     /**

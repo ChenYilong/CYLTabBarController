@@ -18,7 +18,6 @@ pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDealloc
 # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
 # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
 pod 'CYLAnimatedItem', :path => './'
-pod 'CYLLiquidGlass', :path => './'
 
 #only for test
 #pod 'CYLTabBarController/CYLFlatDesignTabBar', :git => 'https://github.com/ChenYilong/CYLTabBarController.git', :branch => 'fix/flatdesign-tabbar-position-during-transition'

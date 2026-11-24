@@ -32,7 +32,6 @@ target 'CyltabbarExample' do
   # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
   # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
   pod 'CYLAnimatedItem', :path => '../../../..'
-  pod 'CYLLiquidGlass', :path => '../../../..'
   # Rive tab icons (the CYLTabBarRive* keys, in code or a configuration file) animate here too, as example-rive.
   # Rive Tab 图标（CYLTabBarRive* 键，代码或配置文件）在本示例中也能播放，与 example-rive 相同。
   pod 'CYLTabBarController/Rive', :path => '../../../..'
