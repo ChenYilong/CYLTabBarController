@@ -1,5 +1,6 @@
 import { CYLAnimatedItemTypeRegistry } from './CYLAnimatedItemTypes';
 import { CYLLiquidGlass } from './CYLLiquidGlass';
+import { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier } from './CYLAnimatedItemBackground';
 import { LifecycleCenter, LifecycleController } from 'cyldeallocblockexecutor';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
 import {
@@ -35,17 +36,6 @@ export enum CYLAnimatedItemAccessoryPlacement {
   TopTrailing = 2
 }
 
-/**
- * [EN] What the view's background is made of: the solid `itemBackgroundColor` (`flat`, default), or Liquid Glass tinted with it
- *      (`liquidGlass`: the blur imitation the tab bar draws, `CYLLiquidGlass.isActive()`; the system material replaces it from
- *      API 24). Same names as iOS and Android.
- * [CN] 视图背景的构成：纯色 `itemBackgroundColor`（`flat`，默认），或以它着色的液态玻璃（`liquidGlass`：TabBar 绘制的模糊仿制，
- *      `CYLLiquidGlass.isActive()`；系统材质从 API 24 起替代它）。与 iOS、Android 同名。
- */
-export enum CYLAnimatedItemBackgroundStyle {
-  flat = 0,
-  liquidGlass = 1
-}
 
 /**
  * [EN] The look of `CYLAnimatedItemView`: the plain animated icon + title (default), or a countdown button, e.g. for "Get the
@@ -1166,7 +1156,7 @@ export struct CYLAnimatedItemView {
    * [EN] Whether the Liquid Glass is drawn: the style asks for it and `CYLLiquidGlass.isActive()`. [CN] 是否绘制液态玻璃：样式要求且 `CYLLiquidGlass.isActive()`。
    */
   private cylItemGlassDrawn(): boolean {
-    return this.itemBackgroundStyle === CYLAnimatedItemBackgroundStyle.liquidGlass && CYLLiquidGlass.isActive();
+    return CYLAnimatedItemBackgroundModifier.isGlassDrawn(this.itemBackgroundStyle);
   }
 
   /**
@@ -1175,10 +1165,7 @@ export struct CYLAnimatedItemView {
    *      （CollectionViewClassifyMenu 的标签曾有的「0 为自动，即胶囊」规则，移到这里），扁平时为直角。
    */
   private cylItemCornerRadius(): number {
-    if (this.itemCornerRadius >= 0) {
-      return this.itemCornerRadius;
-    }
-    return this.cylItemGlassDrawn() ? CYLLiquidGlass.CAPSULE_RADIUS : 0;
+    return CYLAnimatedItemBackgroundModifier.resolvedCornerRadius(this.itemBackgroundStyle, this.itemCornerRadius);
   }
 
   /**
