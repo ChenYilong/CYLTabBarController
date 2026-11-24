@@ -6,10 +6,13 @@
  *      `com.cyl.animateditem.CYLAnimatedItemView`。它不依赖任何其他包（不依赖 cyltabbar），也不依赖任何动画库。文档：docs/Animated-Item.md。
  */
 export {
-  CYLAnimatedItemView, CYLAnimatedItemStyle, CYLAnimatedItemAxis, CYLAnimatedItemAccessoryPlacement, CYLAnimatedItemAnimationContext, CYLAnimatedItemController,
+  CYLAnimatedItemView, CYLAnimatedItemStyle, CYLAnimatedItemBackgroundStyle, CYLAnimatedItemAxis, CYLAnimatedItemAccessoryPlacement, CYLAnimatedItemAnimationContext, CYLAnimatedItemController,
   CYLAnimatedItemEngines, cylAnimatedItemTypeOf, cylIconColorFilter, cylSetPausesWhileUserScrolls, cylPausesWhileUserScrolls
 } from './src/main/ets/CYLAnimatedItemView';
 export { CYLAnimatedItemStackView } from './src/main/ets/CYLAnimatedItemStackView';
+export {
+  CYLLiquidGlass, CYLLiquidGlassView, CYLLiquidGlassMaterial, CYLLiquidGlassCapsuleModifier
+} from './src/main/ets/CYLLiquidGlass';
 export {
   CYLAnimatedItemStackModel, CYLAnimatedItemStackItem, CYLAnimatedItemStackActionHandler, CYLAnimatedItemStackDefaultSpacing
 } from './src/main/ets/CYLAnimatedItemStackModel';

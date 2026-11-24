@@ -1,9 +1,0 @@
-{
-  "name": "cylliquidglass",
-  "version": "1.0.0",
-  "description": "CYLLiquidGlass for HarmonyOS NEXT (ArkTS / ArkUI): Liquid Glass as a base library, the availability rule CYLLiquidGlass.isActive() and CYLLiquidGlassView, a glass background for any component (a blur imitation until the system material is available). No dependency on the tab bar.",
-  "main": "Index.ets",
-  "author": "ChenYilong",
-  "license": "MIT",
-  "dependencies": {}
-}

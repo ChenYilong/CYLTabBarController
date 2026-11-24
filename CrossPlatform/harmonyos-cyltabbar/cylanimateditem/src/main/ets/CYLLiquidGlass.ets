@@ -1,11 +1,12 @@
 /**
- * [EN] Liquid Glass as a base library for HarmonyOS NEXT, the counterpart of iOS `CYLLiquidGlass` / `CYLLiquidGlassView` and
- *      Android `com.cyl.liquidglass`: the availability rule `CYLLiquidGlass.isActive()`, the glass material and capsule the tab
- *      bar draws, and `CYLLiquidGlassView`, a glass background for any component. API 12 to 21 have no system glass material,
- *      so the glass is a blur with a light or dark tint, as in the tab bar.
- * [CN] 作为基础库的鸿蒙液态玻璃，对应 iOS 的 `CYLLiquidGlass` / `CYLLiquidGlassView` 与 Android 的 `com.cyl.liquidglass`：可用性判断
- *      `CYLLiquidGlass.isActive()`、TabBar 绘制的玻璃材质与胶囊，以及 `CYLLiquidGlassView`（任意组件的玻璃背景）。API 12 到 21 没有系统玻璃
- *      材质，因此玻璃使用模糊加浅色或深色着色，与 TabBar 相同。
+ * [EN] The Liquid Glass of `CYLAnimatedItemView` on HarmonyOS NEXT (`itemBackgroundStyle = liquidGlass`): the availability rule
+ *      `CYLLiquidGlass.isActive()` (the same name as `CYLAnimatedItemView.isLiquidGlassActive()` on iOS and Android; an ArkUI
+ *      struct has no static members), the glass material and capsule the tab bar draws, and `CYLLiquidGlassView`, a glass
+ *      background for a host that draws its own container. API 12 to 21 have no system glass material, so the glass is a blur
+ *      with a light or dark tint, as in the tab bar.
+ * [CN] 鸿蒙 `CYLAnimatedItemView` 的液态玻璃（`itemBackgroundStyle = liquidGlass`）：可用性判断 `CYLLiquidGlass.isActive()`（对应 iOS 与
+ *      Android 的 `CYLAnimatedItemView.isLiquidGlassActive()`；ArkUI struct 没有静态成员）、TabBar 绘制的玻璃材质与胶囊，以及
+ *      `CYLLiquidGlassView`（供自行绘制容器的宿主使用的玻璃背景）。API 12 到 21 没有系统玻璃材质，因此玻璃使用模糊加浅色或深色着色，与 TabBar 相同。
  */
 
 /**

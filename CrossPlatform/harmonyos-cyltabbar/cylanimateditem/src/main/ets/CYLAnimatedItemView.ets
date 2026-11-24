@@ -1,4 +1,5 @@
 import { CYLAnimatedItemTypeRegistry } from './CYLAnimatedItemTypes';
+import { CYLLiquidGlass } from './CYLLiquidGlass';
 import { LifecycleCenter, LifecycleController } from 'cyldeallocblockexecutor';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
 import {
@@ -32,6 +33,18 @@ export enum CYLAnimatedItemAccessoryPlacement {
   Leading = 0,
   Trailing = 1,
   TopTrailing = 2
+}
+
+/**
+ * [EN] What the view's background is made of: the solid `itemBackgroundColor` (`flat`, default), or Liquid Glass tinted with it
+ *      (`liquidGlass`: the blur imitation the tab bar draws, `CYLLiquidGlass.isActive()`; the system material replaces it from
+ *      API 24). Same names as iOS and Android.
+ * [CN] 视图背景的构成：纯色 `itemBackgroundColor`（`flat`，默认），或以它着色的液态玻璃（`liquidGlass`：TabBar 绘制的模糊仿制，
+ *      `CYLLiquidGlass.isActive()`；系统材质从 API 24 起替代它）。与 iOS、Android 同名。
+ */
+export enum CYLAnimatedItemBackgroundStyle {
+  flat = 0,
+  liquidGlass = 1
 }
 
 /**
@@ -486,6 +499,24 @@ export struct CYLAnimatedItemView {
    *      only. [CN] 静态图标的颜色（如 iOS 的模板图着色）：SVG 与符号图作为填充色，位图通过保留透明度的颜色滤镜着色；''（默认）保留原色。
    */
   @Prop iconColor: ResourceColor = '';
+  /**
+   * [EN] The background: `flat` (default) fills the view with `itemBackgroundColor`; `liquidGlass` draws Liquid Glass (a blur
+   *      with the tint `itemBackgroundColor`) clipped to `itemCornerRadius`; where `CYLLiquidGlass.isActive()` is false the style
+   *      is ignored and the view stays flat. Setting any `item…` background property makes the view draw its background, corner
+   *      radius and border (the countdown style keeps its own). Same names as iOS and Android.
+   * [CN] 背景：`flat`（默认）用 `itemBackgroundColor` 填充；`liquidGlass` 绘制液态玻璃（带 `itemBackgroundColor` 着色的模糊），按
+   *      `itemCornerRadius` 裁剪；`CYLLiquidGlass.isActive()` 为 false 时忽略该样式，保持扁平。设置任一 `item…` 背景属性后，视图绘制其
+   *      背景、圆角与边框（倒计时样式保持自己的外观）。与 iOS、Android 同名。
+   */
+  @Prop itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat;
+  /** [EN] The solid fill when flat, the glass tint when liquid glass; '' for none. [CN] 扁平时的纯色填充，液态玻璃时的着色；'' 表示无。 */
+  @Prop itemBackgroundColor: ResourceColor = '';
+  /** [EN] The corner radius in vp, `min(radius, height / 2)` is not computed here: the platform clamps a radius larger than half the height to a capsule; -1 (default) means not set. [CN] 圆角半径（vp）；大于半高的值由平台按胶囊处理；-1（默认）表示未设置。 */
+  @Prop itemCornerRadius: number = -1;
+  /** [EN] The border width in vp. [CN] 边框宽度（vp）。 */
+  @Prop itemBorderWidth: number = 0;
+  /** [EN] The border color; '' for none. [CN] 边框颜色；'' 表示无。 */
+  @Prop itemBorderColor: ResourceColor = '';
   /**
    * [EN] The color the animation is drawn in, as one color, like a tinted template image (iOS / Android
    *      `CYLTabBarAnimationOptionTint`); '' keeps the file's own colors. Any engine: a layer of this color is
@@ -1117,6 +1148,28 @@ export struct CYLAnimatedItemView {
     return this.isBare && this.cylTitleText().length === 0 && this.cylIsEmpty(this.accessoryImage) && this.accessoryText.length === 0;
   }
 
+  /**
+   * [EN] Whether any `item…` background property is set. [CN] 是否设置了任一 `item…` 背景属性。
+   */
+  private cylUsesItemBackground(): boolean {
+    return this.itemBackgroundStyle !== CYLAnimatedItemBackgroundStyle.flat || this.itemBackgroundColor !== '' ||
+      this.itemCornerRadius >= 0 || this.itemBorderWidth > 0 || this.itemBorderColor !== '';
+  }
+
+  /**
+   * [EN] Whether the Liquid Glass is drawn: the style asks for it and `CYLLiquidGlass.isActive()`. [CN] 是否绘制液态玻璃：样式要求且 `CYLLiquidGlass.isActive()`。
+   */
+  private cylItemGlassDrawn(): boolean {
+    return this.itemBackgroundStyle === CYLAnimatedItemBackgroundStyle.liquidGlass && CYLLiquidGlass.isActive();
+  }
+
+  /**
+   * [EN] The background color: the tint over the glass blur, else the solid fill, '' meaning transparent. [CN] 背景色：玻璃模糊之上的着色，否则为纯色填充；'' 表示透明。
+   */
+  private cylItemBackgroundColor(): ResourceColor {
+    return this.itemBackgroundColor !== '' ? this.itemBackgroundColor : Color.Transparent;
+  }
+
   build() {
     Flex({
       direction: this.axis === CYLAnimatedItemAxis.Vertical ? FlexDirection.Column : FlexDirection.Row,
@@ -1126,10 +1179,13 @@ export struct CYLAnimatedItemView {
       this.cylContent()
     }
     .padding(this.cylPadding())
-    .backgroundColor(this.cylIsCountdown() ? '#F2F2F7' : Color.Transparent)
-    .borderRadius(this.cylIsCountdown() ? 6 : 0)
-    .borderWidth(this.cylIsCountdown() ? 0.5 : 0)
-    .borderColor(this.cylIsRunning() ? '#C7C7CC' : this.countdownBorderColor)
+    .backgroundEffect(this.cylItemGlassDrawn() ? { radius: 28, saturation: 1.6, brightness: 1.05 } : { radius: 0 })
+    .backgroundColor(this.cylIsCountdown() ? '#F2F2F7' : this.cylItemBackgroundColor())
+    .borderRadius(this.cylIsCountdown() ? 6 : (this.itemCornerRadius >= 0 ? this.itemCornerRadius : 0))
+    .borderWidth(this.cylIsCountdown() ? 0.5 : this.itemBorderWidth)
+    .borderColor(this.cylIsRunning() ? '#C7C7CC' : (this.cylUsesItemBackground() && this.itemBorderColor !== '' ?
+      this.itemBorderColor : this.countdownBorderColor))
+    .clip(this.cylItemGlassDrawn())
     // [EN] A Flex without a size fills its parent. A bare icon (a host's tab icon, no title, no accessory) is exactly the
     //      icon, so a host can place things against its edges: the tab bar puts the badge at the icon's top-right, and an
     //      item as wide as the tab slot moved it to the icon's top-left (HarmonyOS issue list #51). `undefined` keeps the

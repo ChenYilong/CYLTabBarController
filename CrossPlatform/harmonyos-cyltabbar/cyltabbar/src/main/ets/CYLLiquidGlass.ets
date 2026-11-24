@@ -51,11 +51,11 @@ export class CYLLiquidGlassTokens {
 }
 
 /**
- * [EN] The glass material and the glass capsule are part of the base library `cylliquidglass` now (the tab bar depends on it);
- *      re-exported here so that the tab bar's imports stay as they were.
- * [CN] 玻璃材质与玻璃胶囊现在属于基础库 `cylliquidglass`（TabBar 依赖它）；在此重新导出，TabBar 的导入保持不变。
+ * [EN] The glass material and the glass capsule are part of `cylanimateditem` now (CYLAnimatedItemView draws the glass; the tab
+ *      bar depends on it); re-exported here so that the tab bar's imports stay as they were.
+ * [CN] 玻璃材质与玻璃胶囊现在属于 `cylanimateditem`（CYLAnimatedItemView 绘制玻璃；TabBar 依赖它）；在此重新导出，TabBar 的导入保持不变。
  */
-export { CYLLiquidGlassMaterial, CYLLiquidGlassCapsuleModifier } from 'cylliquidglass';
+export { CYLLiquidGlassMaterial, CYLLiquidGlassCapsuleModifier } from 'cylanimateditem';
 
 /**
  * [EN] The bar container of Liquid Glass floats over the pages: out of the column's flow, pinned to the bottom, so the pages

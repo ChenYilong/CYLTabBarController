@@ -9,7 +9,6 @@
     "@ohos/lottie": "^2.0.38",
     "@ohos/rive": "1.0.4",
     "cylanimateditem": "file:../cylanimateditem",
-    "cylliquidglass": "file:../cylliquidglass",
     "cylanimateditem_lottie": "file:../cylanimateditem_lottie",
     "cylanimateditemrive": "file:../cylanimateditemrive",
     "cyldeallocblockexecutor": "file:../cyldeallocblockexecutor"
