@@ -407,6 +407,10 @@ Component({
     cylBarStyle: '',
     cylThemeIdentifier: '',
     cylAnimatingIdentifier: '',
+    // [EN] Whether the glass lens springs in: only for a tap on this very instance (see cyl_select). A bar shown by a page
+    //      switch draws its lens at once. [CN] 玻璃透镜是否弹入：只在本实例上的点击时（见 cyl_select）。页面切换后显示的 TabBar
+    //      立即绘制透镜。
+    cylLensAnimated: false,
     cylTapAnimation: 'none',
     cylAnimationStyle: '',
   },
@@ -515,6 +519,9 @@ Component({
       // [CN] 配置到达之前就渲染的 TabBar（示例的 custom-tab-bar 先传入 {}）没有可选的 Tab：保留所请求的 key，这样带真实配置的
       //      渲染仍然绘制被点击的 Tab，而不是先闪现第一个 Tab。
       const selected = slotKeys.includes(requested) || slotKeys.length === 0 ? requested : cylFirstIdentifier(model);
+      // [EN] A selection that changes here (first render, a parent property) is not a tap on this instance: no lens spring-in.
+      // [CN] 在这里发生变化的选中项（首次渲染、父组件属性）不是本实例上的点击：透镜不弹入。
+      const lensPatch = selected === this.cylSelectedKey ? {} : { cylLensAnimated: false };
       this.cylSelectedKey = selected;
       const slots = model.items.map((item) => this.cyl_slot(item, selected));
       if (model.plusButton) {
@@ -533,6 +540,7 @@ Component({
       const styleType = cylBarStyleType(itemStyle, model.styleType);
       this.cyl_writeData({
         ...this.cyl_selectionMirror(model, selected),
+        ...lensPatch,
         cylSlots: slots,
         cylItemStyle: itemStyle,
         cylGlassLensStyle: cylGlassLensStyle(this.cylRequestedGlassLensStyle !== undefined
@@ -874,7 +882,7 @@ Component({
       cylLastSelection.context = model.context || '';
       cylLastSelection.key = key;
       cylLastSelection.time = Date.now();
-      this.cyl_select(key);
+      this.cyl_select(key, true);
       cylLiveBars.forEach((bar) => {
         if (bar !== this) {
           bar.cyl_followSelection(model.context || '', key);
@@ -1070,6 +1078,12 @@ Component({
       if (index < 0) {
         return false;
       }
+      // [EN] A route sync is the truth now: a tap remembered for the other bars must not be applied over it by a later `show`.
+      // [CN] 路由同步此刻就是事实：为其他 TabBar 记住的点击不能再被之后的 `show` 覆盖在它上面。
+      if (cylLastSelection.key && cylLastSelection.context === (model.context || '') && cylLastSelection.key !== keys[index]) {
+        cylLastSelection.key = keys[index];
+        cylLastSelection.time = Date.now();
+      }
       this.cyl_select(keys[index]);
       this.cyl_playLottie(keys[index]);
       return true;
@@ -1079,11 +1093,14 @@ Component({
      * [EN] Selects the tab with this key on this bar at once, and mirrors it to the public properties.
      * [CN] 在本 TabBar 上立即选中该 key 的 Tab，并同步到公开属性。
      */
-    cyl_select(key) {
+    cyl_select(key, animateLens) {
       const model = this.cylModel;
       this.cylSelectedKey = key;
       if (model) {
-        this.cyl_writeData(this.cyl_selectionMirror(model, key));
+        // [EN] The lens springs in only for a tap on this instance (animateLens); every other selection (a followed tap, show,
+        //      route sync) draws it in its final state. [CN] 只有本实例上的点击（animateLens）让透镜弹入；其他选中（被跟随的点击、
+        //      show、路由同步）都以最终状态绘制。
+        this.cyl_writeData({ ...this.cyl_selectionMirror(model, key), cylLensAnimated: animateLens === true });
       }
     },
 

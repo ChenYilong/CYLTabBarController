@@ -17,10 +17,23 @@
     <text wx:else aria-hidden="true">{{accessoryText}}</text>
   </view>
   <view wx:if="{{m.showsIcon}}" class="cyl-animated-item-icon" style="{{m.iconStyle}}" aria-hidden="true">
+    <!-- [EN] Both static images stay mounted; a selection change toggles only their opacity (no node re-created, no src change). [CN] 两张静态图片都保持挂载；选中变化只切换不透明度（不重建节点，不改变 src）。 -->
+    <block wx:if="{{m.still.layered}}">
+      <view wx:if="{{m.still.normalTint}}" class="cyl-animated-item-image cyl-animated-item-tint {{m.still.normalHidden ? 'cyl-animated-item-hidden' : ''}}">
+        <image class="cyl-animated-item-tinted" src="{{m.still.normalImage}}" style="filter: drop-shadow({{m.still.normalTint}} 200px 0);" mode="aspectFit" />
+      </view>
+      <image wx:else class="cyl-animated-item-image {{m.still.normalHidden ? 'cyl-animated-item-hidden' : ''}}" src="{{m.still.normalImage}}" mode="aspectFit" />
+      <view wx:if="{{m.still.selectedTint}}" class="cyl-animated-item-image cyl-animated-item-tint {{m.still.selectedHidden ? 'cyl-animated-item-hidden' : ''}}">
+        <image class="cyl-animated-item-tinted" src="{{m.still.selectedImage}}" style="filter: drop-shadow({{m.still.selectedTint}} 200px 0);" mode="aspectFit" />
+      </view>
+      <image wx:else class="cyl-animated-item-image {{m.still.selectedHidden ? 'cyl-animated-item-hidden' : ''}}" src="{{m.still.selectedImage}}" mode="aspectFit" />
+    </block>
+    <block wx:else>
     <view wx:if="{{m.fallbackImage && m.iconTint}}" class="cyl-animated-item-image cyl-animated-item-tint {{m.fallbackHidden ? 'cyl-animated-item-hidden' : ''}}">
       <image class="cyl-animated-item-tinted" src="{{m.fallbackImage}}" style="filter: drop-shadow({{m.iconTint}} 200px 0);" mode="aspectFit" />
     </view>
     <image wx:elif="{{m.fallbackImage}}" class="cyl-animated-item-image {{m.fallbackHidden ? 'cyl-animated-item-hidden' : ''}}" src="{{m.fallbackImage}}" mode="aspectFit" />
+    </block>
     <image wx:if="{{m.gifPath}}" class="cyl-animated-item-image" src="{{m.gifPath}}" mode="aspectFit" />
     <!-- [EN] Only while resting: a canvas 2d ignores opacity, so it is removed while the GIF plays. [CN] 仅在静止时存在：canvas 2d 不受 opacity 影响，因此 GIF 播放时移除。 -->
     <canvas wx:if="{{m.gifImage && !gifImagePlaying}}" type="2d" id="cyl-gif-image-still" class="cyl-animated-item-image" />

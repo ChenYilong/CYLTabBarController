@@ -18,5 +18,13 @@ Component({
      * [CN] CYLGlassLensStyle（cyl-tab-bar/cyl_tab_bar_item_style.js）："regular"（默认）或 "skeuomorphic"。
      */
     lensStyle: { type: String, value: 'regular' },
+    /**
+     * [EN] Whether the lens springs in when it is created (default true, as a lens used alone). cyl-tab-bar sets it only for a tap
+     *      on the same bar instance: a bar shown by a page switch, a followed or a route-synced selection draws the lens at
+     *      once, in its final state, so no frame shows it growing from nothing next to the previous page's finished lens.
+     * [CN] 透镜创建时是否弹入（默认 true，单独使用时）。cyl-tab-bar 只在同一个 TabBar 实例上的点击时开启：页面切换后显示的
+     *      TabBar、被跟随或由路由同步的选中项会立即以最终状态绘制透镜，不会出现从无到有生长、而上一页的透镜已完整显示的帧。
+     */
+    animated: { type: Boolean, value: true },
   },
 });

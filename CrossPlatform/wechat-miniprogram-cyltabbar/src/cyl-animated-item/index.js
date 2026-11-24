@@ -156,6 +156,13 @@ Component({
     colors: { type: Object, value: null },
     iconTint: { type: String, value: '' },
     /**
+     * [EN] The tint of `selectedImage` while selected. Not set (the default): `iconTint` for both. With both images set, each
+     *      is its own layer and a selection change only toggles their opacity (no node re-created, no `src` change).
+     * [CN] 选中时 `selectedImage` 的着色。未设置（默认）：两者都用 `iconTint`。两张图片都设置时各自为一个图层，选中变化只切换
+     *      它们的不透明度（不重建节点，不改变 `src`）。
+     */
+    selectedIconTint: { type: String, value: null, optionalTypes: [Object] },
+    /**
      * [EN] One color for the animation (any CSS color), like a template image: Rive draws every pixel in it. '' keeps the
      *      file's colors. Rive only for now; other engines keep their colors.
      * [CN] 动画使用的一种颜色（任意 CSS 颜色），如同模板图片：Rive 把每个像素绘制为该颜色。'' 保持文件自身的颜色。
@@ -272,7 +279,7 @@ Component({
       this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, animationEnded: false, lottieData })
       this.cyl_update()
     },
-    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, animationTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
+    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, selectedIconTint, animationTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
       this.cyl_update()
     },
     'itemStyle, countdownIdleTitle, countdownRunningTitleFormat, countdownFinishedTitle, countdownImage, countdownRunningTitleColor, countdownDuration': function (itemStyle) {
