@@ -53,7 +53,10 @@ internal class CYLAnimatedItemBackgroundRenderer(private val host: ViewGroup) {
      * [CN] 玻璃使用的着色：宿主颜色变为半透明（其透明度乘以 [GLASS_TINT_ALPHA]），因此选中标签的绿色这样的不透明色是给玻璃着色而不是盖住它。所有宿主、所有平台同一规则。
      */
     fun glassTint(color: Int?): Int =
-        color?.let { Color.argb((Color.alpha(it) * GLASS_TINT_ALPHA).roundToInt(), Color.red(it), Color.green(it), Color.blue(it)) }
+        // [EN] null and a fully transparent color (Color.TRANSPARENT) both mean "no color": the default frosted tint. [CN] null 与完全透明的颜色
+        //      （Color.TRANSPARENT）都表示「没有颜色」：使用默认磨砂着色。
+        color?.takeIf { Color.alpha(it) != 0 }
+            ?.let { Color.argb((Color.alpha(it) * GLASS_TINT_ALPHA).roundToInt(), Color.red(it), Color.green(it), Color.blue(it)) }
             ?: defaultGlassTint(host.resources)
 
     fun apply(style: CYLAnimatedItemBackgroundStyle, color: Int?, cornerRadius: Float?, borderWidth: Float, borderColor: Int?) {

@@ -89,7 +89,12 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
     if (argb < 0) {
       return color;
     }
-    const alpha: number = Math.round(((argb >>> 24) & 0xFF) * CYLLiquidGlass.GLASS_TINT_ALPHA);
+    const sourceAlpha: number = (argb >>> 24) & 0xFF;
+    // [EN] A fully transparent color (alpha 0) means "no color" too: the default frosted tint. [CN] 完全透明的颜色（透明度 0）同样表示「没有颜色」：使用默认磨砂着色。
+    if (sourceAlpha === 0) {
+      return '#80E1DEDC';
+    }
+    const alpha: number = Math.round(sourceAlpha * CYLLiquidGlass.GLASS_TINT_ALPHA);
     return ((alpha << 24) | (argb & 0xFFFFFF)) >>> 0;
   }
 

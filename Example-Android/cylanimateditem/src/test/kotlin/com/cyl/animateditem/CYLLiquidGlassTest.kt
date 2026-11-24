@@ -23,6 +23,19 @@ class CYLLiquidGlassTest {
     }
 
     @Test
+    @Config(sdk = [34])
+    fun aTransparentColorMeansNoColorAndGetsTheDefaultFrostedTint() {
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        val renderer = CYLAnimatedItemBackgroundRenderer(android.widget.FrameLayout(context))
+        val frosted = renderer.glassTint(null)
+        assertEquals("null: the default frosted tint", android.graphics.Color.argb(128, 225, 222, 220), frosted)
+        assertEquals("Color.TRANSPARENT is no color: the same default tint", frosted, renderer.glassTint(android.graphics.Color.TRANSPARENT))
+        assertEquals("also an RGB with alpha 0", frosted, renderer.glassTint(0x00FF0000))
+        // A color with a real alpha tints at 75% of it.
+        assertEquals(android.graphics.Color.argb(Math.round(0x66 * 0.75f), 255, 136, 0), renderer.glassTint(0x66FF8800))
+    }
+
+    @Test
     fun aNestedCaptureIsRefusedAndTheFlagIsAlwaysReset() {
         // The glass of a tag inside the captured page: while a capture runs, a nested one gets null (the caller draws the tint).
         val outer = CYLGlassBackdrop.captureOnce { CYLGlassBackdrop.captureOnce { "nested" } }

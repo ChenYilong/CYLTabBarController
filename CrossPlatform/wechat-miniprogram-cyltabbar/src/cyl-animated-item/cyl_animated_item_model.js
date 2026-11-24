@@ -446,8 +446,10 @@ function cylAnimatedItemGlassTint(color) {
     r = Number(m[1]); g = Number(m[2]); b = Number(m[3])
     if (m[4] !== undefined) a = Number(m[4])
   } else {
-    return text
+    return text === 'transparent' ? '' : text
   }
+  // A fully transparent color means "no color" too: the caller then uses the default frosted tint.
+  if (a === 0) return ''
   return `rgba(${r},${g},${b},${Math.round(a * cylAnimatedItemGlassTintAlpha * 1000) / 1000})`
 }
 
@@ -466,7 +468,7 @@ function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, bord
   let css = `border-radius:${radius}px;`
   if (border > 0) css += `border:${border}px solid ${borderColor || 'transparent'};box-sizing:border-box;`
   if (glass) {
-    const tint = color ? cylAnimatedItemGlassTint(color) : (isDark ? 'rgba(255,255,255,0.14)' : 'rgba(225,222,220,0.5)')
+    const tint = (color ? cylAnimatedItemGlassTint(color) : '') || (isDark ? 'rgba(255,255,255,0.14)' : 'rgba(225,222,220,0.5)')
     css += `background-color:${tint};backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);`
     css += `box-shadow:inset 0 1px 0 rgba(255,255,255,${isDark ? 0.18 : 0.6});overflow:hidden;`
   } else if (color) {
