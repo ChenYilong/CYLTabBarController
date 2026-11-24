@@ -280,6 +280,7 @@ docs/
 │   ├── configuration-manifest-christmas.png
 │   ├── configuration-manifest-light.png
 │   ├── configuration-manifest-themes-bar.png
+│   ├── cross-platform-ios-tab-bar-height-flutter-rn.png
 │   ├── cyltableviewplaceholder-empty-placeholders-ios.png
 │   ├── cyltableviewplaceholder-refresh-icons-2e748b7-ios.png
 │   ├── cyltableviewplaceholder-refresh-icons-40ec453-ios.png
