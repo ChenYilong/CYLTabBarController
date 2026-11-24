@@ -396,7 +396,54 @@ function cylAnimatedItemModel(input) {
   }
 }
 
+/**
+ * [EN] The background of cyl-animated-item (`itemBackgroundStyle`, `itemBackgroundColor`, `itemCornerRadius`, `itemBorderWidth`,
+ *      `itemBorderColor`, the same names as iOS, Android and HarmonyOS): flat is the solid color; 'liquidGlass' is CSS
+ *      `backdrop-filter` (blur 16 px, saturation 180 %, the values of the tab bar's lens) over a translucent tint, a faint top
+ *      highlight and the border, clipped to the radius. `cylAnimatedItemLiquidGlassIsActive()` (the same rule name as
+ *      `CYLAnimatedItemView.isLiquidGlassActive()` elsewhere) is always true in a mini program: where the WebView lacks
+ *      `backdrop-filter` only the tint stays, as in the tab bar.
+ * [CN] cyl-animated-item 的背景（`itemBackgroundStyle`、`itemBackgroundColor`、`itemCornerRadius`、`itemBorderWidth`、`itemBorderColor`，与 iOS、
+ *      Android、鸿蒙同名）：扁平为纯色；'liquidGlass' 为 CSS `backdrop-filter`（模糊 16 px、饱和度 180 %，TabBar 透镜的数值）加半透明着色、顶部
+ *      淡淡的高光与边框，按圆角裁剪。`cylAnimatedItemLiquidGlassIsActive()`（与其他平台的 `CYLAnimatedItemView.isLiquidGlassActive()` 同一规则）
+ *      在小程序中始终为真：WebView 不支持 `backdrop-filter` 时只剩着色，与 TabBar 相同。
+ */
+const cylLiquidGlassState = { activeOverride: undefined }
+
+function cylAnimatedItemLiquidGlassIsActive() {
+  return cylLiquidGlassState.activeOverride !== undefined ? cylLiquidGlassState.activeOverride : true
+}
+
+/** [EN] For tests: replaces the rule (`undefined` uses it). [CN] 供测试使用：替代该规则（`undefined` 表示使用该规则）。 */
+function cylAnimatedItemLiquidGlassSetActiveOverride(value) {
+  cylLiquidGlassState.activeOverride = value
+}
+
+/**
+ * @returns {{css: string, glass: boolean}} the inline style of the root view, '' when no `item…` background property is set
+ */
+function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, borderColor, isDark) {
+  const border = Number(borderWidth) > 0 ? Number(borderWidth) : 0
+  const used = style === 'liquidGlass' || (color || '') !== '' || Number(cornerRadius) >= 0 || border > 0 || (borderColor || '') !== ''
+  if (!used) return { css: '', glass: false }
+  const glass = style === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive()
+  const radius = Number(cornerRadius) > 0 ? Number(cornerRadius) : 0
+  let css = `border-radius:${radius}px;`
+  if (border > 0) css += `border:${border}px solid ${borderColor || 'transparent'};box-sizing:border-box;`
+  if (glass) {
+    const tint = color || (isDark ? 'rgba(255,255,255,0.14)' : 'rgba(225,222,220,0.5)')
+    css += `background-color:${tint};backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);`
+    css += `box-shadow:inset 0 1px 0 rgba(255,255,255,${isDark ? 0.18 : 0.6});overflow:hidden;`
+  } else if (color) {
+    css += `background-color:${color};`
+  }
+  return { css, glass }
+}
+
 module.exports = {
+  cylAnimatedItemBackground,
+  cylAnimatedItemLiquidGlassIsActive,
+  cylAnimatedItemLiquidGlassSetActiveOverride,
   cylAnimatedItemCountdownTitleWidth,
   cylAnimatedItemIsDark,
   cylAnimatedItemModel,

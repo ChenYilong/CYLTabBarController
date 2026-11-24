@@ -15,7 +15,7 @@
  *      不依赖任何动画包。没有安装引擎的文件显示静态图片或占位图，并在开发者工具中输出一次需要安装的包。无障碍：一个元素，角色为按钮，
  *      `accessibility-label`（否则为标题），带选中与禁用状态。
  */
-const { cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemRestingProgress } = require('./cyl_animated_item_model')
+const { cylAnimatedItemBackground, cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemRestingProgress } = require('./cyl_animated_item_model')
 const { cylGIFImageInfo } = require('./cyl_gif_image')
 const { CYLAnimatedItemPlayer } = require('./cyl_animated_item_player')
 const { CYLAnimatedItemCountdown, CYL_COUNTDOWN_TICK_INTERVAL } = require('./cyl_animated_item_countdown')
@@ -50,6 +50,14 @@ const cylWarnedTypes = []
 
 Component({
   properties: {
+    // [EN] The background (flat, or Liquid Glass), corner radius and border, the same names as iOS, Android and HarmonyOS:
+    //      see cylAnimatedItemBackground() in cyl_animated_item_model.js. -1 (cornerRadius) and '' mean not set.
+    // [CN] 背景（扁平或液态玻璃）、圆角与边框，与 iOS、Android、鸿蒙同名：见 cyl_animated_item_model.js 的 cylAnimatedItemBackground()。圆角 -1 与 '' 表示未设置。
+    itemBackgroundStyle: { type: String, value: 'flat' },
+    itemBackgroundColor: { type: String, value: '' },
+    itemCornerRadius: { type: Number, value: -1 },
+    itemBorderWidth: { type: Number, value: 0 },
+    itemBorderColor: { type: String, value: '' },
     title: { type: String, value: '' },
     image: { type: String, value: '' },
     selectedImage: { type: String, value: '' },
@@ -242,6 +250,8 @@ Component({
   },
 
   data: {
+    itemBackgroundCss: '',
+    itemGlassDrawn: false,
     animationLoaded: false,
     animationFailed: false,
     gifPlaying: false,
@@ -257,6 +267,10 @@ Component({
   },
 
   observers: {
+    'itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor': function (style, color, radius, width, borderColor) {
+      const background = cylAnimatedItemBackground(style, color, radius, width, borderColor, false)
+      this.setData({ itemBackgroundCss: background.css, itemGlassDrawn: background.glass })
+    },
     'animationUrl, animationData, animationType': function (animationUrl, animationData, animationType) {
       // [EN] A host re-renders and sets the same file (or the same Lottie data object) again: keep the loaded / failed
       //      state, because the engine view (cyl-lottie reloads only when its inputs change) does not load again and sends
