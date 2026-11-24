@@ -88,3 +88,18 @@ export function cylRiveActiveDuration(value: string | undefined): number {
   const seconds = Number(value ?? '1');
   return Number.isFinite(seconds) && seconds >= 0 ? seconds : 1;
 }
+
+/** [EN] The NO window of a restart lasts at least this long (a frame), ... [CN] 重新播放的 NO 窗口至少持续这么久（一帧），…… */
+export const CYL_RIVE_MINIMUM_OFF_MS: number = 50;
+/** [EN] ... and at most this long, for a machine that never settles. [CN] ……至多这么久，用于永不稳定的状态机。 */
+export const CYL_RIVE_MAXIMUM_OFF_MS: number = 1500;
+
+/**
+ * [EN] Does the NO window of a restart end now? It lasts until the state machine has settled, so its NO pass is seen
+ *      (menu_button.riv shows its X for about 0.5 s), within the minimum and maximum. As iOS `CYLRiveInputPass.offWindowEnds`.
+ * [CN] 重新播放的 NO 窗口现在是否结束？它持续到状态机稳定，使 NO 的那一遍被看到（menu_button.riv 约 0.5 秒显示 X），范围在最小值与最大值之间。
+ *      与 iOS `CYLRiveInputPass.offWindowEnds` 相同。
+ */
+export function cylRiveOffWindowEnds(elapsedMs: number, isSettled: boolean): boolean {
+  return elapsedMs >= CYL_RIVE_MAXIMUM_OFF_MS || (elapsedMs >= CYL_RIVE_MINIMUM_OFF_MS && isSettled);
+}

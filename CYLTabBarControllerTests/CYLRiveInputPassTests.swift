@@ -39,4 +39,19 @@ final class CYLRiveInputPassTests: XCTestCase {
         XCTAssertTrue(CYLRiveInputPass.hasEnd(activeDuration: 60))
         XCTAssertFalse(CYLRiveInputPass.hasEnd(activeDuration: -1))
     }
+
+    func testTheOffWindowLastsAtLeastAFrameEvenWhenSettled() {
+        XCTAssertFalse(CYLRiveInputPass.offWindowEnds(elapsed: 0.016, isSettled: true))
+        XCTAssertTrue(CYLRiveInputPass.offWindowEnds(elapsed: 0.05, isSettled: true))
+    }
+
+    func testTheOffWindowWaitsForTheNoPassToSettle() {
+        XCTAssertFalse(CYLRiveInputPass.offWindowEnds(elapsed: 0.5, isSettled: false))
+        XCTAssertTrue(CYLRiveInputPass.offWindowEnds(elapsed: 0.5, isSettled: true))
+    }
+
+    func testTheOffWindowEndsAtTheMaximumForAMachineThatNeverSettles() {
+        XCTAssertFalse(CYLRiveInputPass.offWindowEnds(elapsed: 1.4, isSettled: false))
+        XCTAssertTrue(CYLRiveInputPass.offWindowEnds(elapsed: 1.5, isSettled: false))
+    }
 }
