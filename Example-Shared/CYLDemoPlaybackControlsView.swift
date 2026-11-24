@@ -164,12 +164,12 @@ final class CYLDemoPlaybackControlsView: UIView {
         pauseRow.alignment = .center
 
         // [EN] The name of the last animation event the bridge delivered (didStart / didStop / didPause / didResume), next to the
-        //      counter, so a run shows the events without the lifecycle log. Event names are identifiers, so nothing to localize.
+        //      counter, so a run shows the events without the lifecycle log. The label is localized; the event names inside it are identifiers.
         // [CN] 桥接最近一次送达的动画事件名称（didStart / didStop / didPause / didResume），显示在计数旁边，使运行时无需生命周期日志就能看到事件。
-        //      事件名称是标识符，无需本地化。
+        //      标签已本地化，其中的事件名称是标识符。
         lastEventLabel.font = .monospacedSystemFont(ofSize: 13, weight: .regular)
         lastEventLabel.textColor = .secondaryLabel
-        lastEventLabel.text = "last event: -"
+        lastEventLabel.text = cylDemoLocalizedString("last event: -")
         lastEventLabel.accessibilityIdentifier = "CYLDemoLastBridgeEvent"
         for name in ["didStart", "didStop", "didPause", "didResume"] {
             NotificationCenter.default.addObserver(self, selector: #selector(animationEventArrived(_:)),
@@ -223,7 +223,7 @@ final class CYLDemoPlaybackControlsView: UIView {
     }
 
     @objc private func animationEventArrived(_ note: Notification) {
-        lastEventLabel.text = "last event: \(note.name.rawValue)"
+        lastEventLabel.text = String(format: cylDemoLocalizedString("last event: %@"), note.name.rawValue)
     }
 
     @objc private func pauseChanged() {

@@ -470,3 +470,14 @@
 "Host-driven playback (drivesAnimationPlayback = false)" = "Oynatmayı ana uygulama yönetir (drivesAnimationPlayback = false)";
 "Engine API" = "Motor API'si";
 "Pause while scrolling" = "Kaydırırken duraklat";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Sekme çubuğu denetleyicisini serbest bırak (3 sn sonra)";
+"teardown: not run" = "serbest bırakma: çalıştırılmadı";
+"teardown: releasing in %d s" = "serbest bırakma: %d sn sonra";
+"dealloc callbacks ran: %d / %d" = "çalışan dealloc geri çağrıları: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "çalışan dealloc geri çağrıları: %d / %d (%@)";
+"Tab bar controller released" = "Sekme çubuğu denetleyicisi serbest bırakıldı";
+"bridge: pause %d, resume %d" = "köprü: duraklat %d, devam %d";
+"last event: -" = "son olay: -";
+"last event: %@" = "son olay: %@";

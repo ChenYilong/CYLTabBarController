@@ -396,6 +396,7 @@ docs/
 │   ├── ios-badge-breathe-not-under-icon.png
 │   ├── ios-badges-follow-swapped-animation-skin.png
 │   ├── ios-badges-on-animated-item-component.png
+│   ├── ios-demo-localized-playback-zh-hans.png
 │   ├── ios-engine-api-lottie-pag-end.png
 │   ├── ios-flatdesign-animateditem-tab-ios26-4-a6e88609.png
 │   ├── ios-flatdesign-gif-no-image-under-animation-ios26-4-5ba3a089.png

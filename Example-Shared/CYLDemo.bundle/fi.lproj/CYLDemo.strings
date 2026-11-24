@@ -470,3 +470,14 @@
 "Host-driven playback (drivesAnimationPlayback = false)" = "Isäntä ohjaa toistoa (drivesAnimationPlayback = false)";
 "Engine API" = "Moottorin API";
 "Pause while scrolling" = "Keskeytä vieritettäessä";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Vapauta välilehtipalkin ohjain (3 s kuluttua)";
+"teardown: not run" = "purku: ei suoritettu";
+"teardown: releasing in %d s" = "purku: vapautus %d s kuluttua";
+"dealloc callbacks ran: %d / %d" = "dealloc-takaisinkutsuja suoritettu: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "dealloc-takaisinkutsuja suoritettu: %d / %d (%@)";
+"Tab bar controller released" = "Välilehtipalkin ohjain vapautettu";
+"bridge: pause %d, resume %d" = "silta: tauko %d, jatko %d";
+"last event: -" = "viimeisin tapahtuma: -";
+"last event: %@" = "viimeisin tapahtuma: %@";

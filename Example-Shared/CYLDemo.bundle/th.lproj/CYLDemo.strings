@@ -470,3 +470,14 @@
 "Host-driven playback (drivesAnimationPlayback = false)" = "โฮสต์ควบคุมการเล่น (drivesAnimationPlayback = false)";
 "Engine API" = "API เอนจิน";
 "Pause while scrolling" = "หยุดชั่วคราวขณะเลื่อน";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "ปล่อย Tab Bar Controller (ใน 3 วินาที)";
+"teardown: not run" = "การปล่อย: ยังไม่ได้ทำงาน";
+"teardown: releasing in %d s" = "การปล่อย: ใน %d วินาที";
+"dealloc callbacks ran: %d / %d" = "คอลแบ็ก dealloc ที่ทำงานแล้ว: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "คอลแบ็ก dealloc ที่ทำงานแล้ว: %d / %d (%@)";
+"Tab bar controller released" = "ปล่อย Tab Bar Controller แล้ว";
+"bridge: pause %d, resume %d" = "บริดจ์: หยุดชั่วคราว %d, เล่นต่อ %d";
+"last event: -" = "เหตุการณ์ล่าสุด: -";
+"last event: %@" = "เหตุการณ์ล่าสุด: %@";

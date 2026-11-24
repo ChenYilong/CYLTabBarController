@@ -470,3 +470,14 @@
 "Host-driven playback (drivesAnimationPlayback = false)" = "Main balik dikawal hos (drivesAnimationPlayback = false)";
 "Engine API" = "API enjin";
 "Pause while scrolling" = "Jeda semasa menatal";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Lepaskan pengawal bar tab (dalam 3 s)";
+"teardown: not run" = "teardown: belum dijalankan";
+"teardown: releasing in %d s" = "teardown: dilepaskan dalam %d s";
+"dealloc callbacks ran: %d / %d" = "panggilan balik dealloc dijalankan: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "panggilan balik dealloc dijalankan: %d / %d (%@)";
+"Tab bar controller released" = "Pengawal bar tab telah dilepaskan";
+"bridge: pause %d, resume %d" = "jambatan: jeda %d, sambung semula %d";
+"last event: -" = "peristiwa terakhir: -";
+"last event: %@" = "peristiwa terakhir: %@";

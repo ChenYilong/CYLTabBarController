@@ -103,16 +103,17 @@ enum CYLDemoTeardown {
     }
 
     static var summary: String {
-        "dealloc callbacks ran: \(ran.count) / \(armed.count)" + (ran.isEmpty ? "" : " (\(ran.joined(separator: ", ")))")
+        ran.isEmpty ? String(format: cylDemoLocalizedString("dealloc callbacks ran: %d / %d"), ran.count, armed.count)
+            : String(format: cylDemoLocalizedString("dealloc callbacks ran: %d / %d (%@)"), ran.count, armed.count, ran.joined(separator: ", "))
     }
 }
 
 /**
  [EN] The row "Release the tab bar controller" of the playback card: after a 3 second countdown it replaces the window's root
       view controller with `CYLDemoReleasedViewController`, which drops the tab bar controller; the label shows how many dealloc
-      callbacks ran. Texts are diagnostics (identifiers and counters), so nothing is localized, as for "last event".
+      callbacks ran. The texts are localized (CYLDemo.bundle); only the identifiers and counters inside them are not.
  [CN] 播放卡片中的「释放 TabBarController」行：倒计时 3 秒后，把窗口的根视图控制器换成 `CYLDemoReleasedViewController`，
-      TabBarController 随之被释放；标签显示已执行的 dealloc 回调数。文字是诊断信息（标识符与计数），因此不本地化，与「last event」相同。
+      TabBarController 随之被释放；标签显示已执行的 dealloc 回调数。文字已本地化（CYLDemo.bundle），其中的标识符与计数不翻译。
  */
 final class CYLDemoReleaseRow: UIStackView {
     private weak var viewController: UIViewController?
@@ -125,14 +126,14 @@ final class CYLDemoReleaseRow: UIStackView {
         super.init(frame: .zero)
         axis = .vertical
         spacing = 6
-        button.setTitle("Release the tab bar controller (in 3 s)", for: .normal)
+        button.setTitle(cylDemoLocalizedString("Release the tab bar controller (in 3 s)"), for: .normal)
         button.contentHorizontalAlignment = .leading
         button.accessibilityIdentifier = "CYLDemoReleaseTabBarController"
         button.addTarget(self, action: #selector(start), for: .touchUpInside)
         statusLabel.font = .monospacedSystemFont(ofSize: 13, weight: .regular)
         statusLabel.textColor = .secondaryLabel
         statusLabel.numberOfLines = 0
-        statusLabel.text = "teardown: not run"
+        statusLabel.text = cylDemoLocalizedString("teardown: not run")
         statusLabel.accessibilityIdentifier = "CYLDemoTeardownStatus"
         addArrangedSubview(button)
         addArrangedSubview(statusLabel)
@@ -155,11 +156,11 @@ final class CYLDemoReleaseRow: UIStackView {
             CYLDemoTeardown.arm(root, name: String(describing: type(of: root)))
         }
         var remaining = 3
-        statusLabel.text = "teardown: releasing in \(remaining) s"
+        statusLabel.text = String(format: cylDemoLocalizedString("teardown: releasing in %d s"), remaining)
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self, weak window] timer in
             remaining -= 1
             if remaining > 0 {
-                self?.statusLabel.text = "teardown: releasing in \(remaining) s"
+                self?.statusLabel.text = String(format: cylDemoLocalizedString("teardown: releasing in %d s"), remaining)
                 return
             }
             timer.invalidate()
@@ -196,7 +197,7 @@ final class CYLDemoReleasedViewController: UIViewController {
     }
 
     @objc private func refresh() {
-        label.text = "Tab bar controller released\n\n\(CYLDemoTeardown.summary)\n\n"
-            + "bridge: pause \(CYLAnimationEventBridge.pauseCount), resume \(CYLAnimationEventBridge.resumeCount)"
+        label.text = cylDemoLocalizedString("Tab bar controller released") + "\n\n\(CYLDemoTeardown.summary)\n\n"
+            + String(format: cylDemoLocalizedString("bridge: pause %d, resume %d"), CYLAnimationEventBridge.pauseCount, CYLAnimationEventBridge.resumeCount)
     }
 }

@@ -470,3 +470,14 @@
 "Host-driven playback (drivesAnimationPlayback = false)" = "호스트가 재생 제어 (drivesAnimationPlayback = false)";
 "Engine API" = "엔진 API";
 "Pause while scrolling" = "스크롤 중 일시정지";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "탭 바 컨트롤러 해제 (3초 후)";
+"teardown: not run" = "해제: 실행 안 됨";
+"teardown: releasing in %d s" = "해제: %d초 후";
+"dealloc callbacks ran: %d / %d" = "dealloc 콜백 실행: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "dealloc 콜백 실행: %d / %d (%@)";
+"Tab bar controller released" = "탭 바 컨트롤러가 해제되었습니다";
+"bridge: pause %d, resume %d" = "브리지: 일시 정지 %d, 재개 %d";
+"last event: -" = "마지막 이벤트: -";
+"last event: %@" = "마지막 이벤트: %@";
