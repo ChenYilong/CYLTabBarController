@@ -177,6 +177,31 @@ final class CYLAnimatedItemBackgroundTests: XCTestCase {
         XCTAssertEqual(alpha, 0.3, accuracy: 0.01)
     }
 
+    func testGlassTintAlphaOneKeepsTheColorAsItIs() throws {
+        guard #available(iOS 26.0, *) else {
+            throw XCTSkip("UIGlassEffect needs iOS 26")
+        }
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        let item = makeItem()
+        item.itemBackgroundStyle = .liquidGlass
+        item.itemBackgroundColor = UIColor.systemTeal
+        item.layoutIfNeeded()
+        let glass = try XCTUnwrap(item.itemLiquidGlassView as? UIVisualEffectView)
+        func tintAlpha() -> CGFloat {
+            var alpha: CGFloat = -1
+            (glass.effect as? UIGlassEffect)?.tintColor?.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light))
+                .getRed(nil, green: nil, blue: nil, alpha: &alpha)
+            return alpha
+        }
+        XCTAssertEqual(tintAlpha(), 0.75, accuracy: 0.01, "the default share")
+        item.itemGlassTintAlpha = 1
+        item.layoutIfNeeded()
+        XCTAssertEqual(tintAlpha(), 1, accuracy: 0.01, "1: the color as it is, still glass")
+        item.itemGlassTintAlpha = nil
+        item.layoutIfNeeded()
+        XCTAssertEqual(tintAlpha(), 0.75, accuracy: 0.01)
+    }
+
     func testSettingTheSameValueAgainDoesNotRequestALayout() {
         let item = makeItem()
         item.itemCornerRadius = 8

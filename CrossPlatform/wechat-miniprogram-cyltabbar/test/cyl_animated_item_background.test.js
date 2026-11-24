@@ -76,3 +76,12 @@ test('a fully transparent color means no color: the glass gets the default frost
   }
   assert.match(cylAnimatedItemBackground('liquidGlass', 'transparent', -1, 0, '', true).css, /background-color:rgba\(255,255,255,0.14\);/)
 })
+
+test('a tint alpha of 1 keeps the color as it is (a selected tag), the default is 0.75', () => {
+  const { cylAnimatedItemGlassTint } = require('../src/cyl-animated-item/cyl_animated_item_model')
+  assert.equal(cylAnimatedItemGlassTint('#2AB9A0'), 'rgba(42,185,160,0.75)')
+  assert.equal(cylAnimatedItemGlassTint('#2AB9A0', 1), 'rgba(42,185,160,1)')
+  assert.equal(cylAnimatedItemGlassTint('#2AB9A0', -1), 'rgba(42,185,160,0.75)')
+  cylAnimatedItemLiquidGlassSetActiveOverride(true)
+  assert.match(cylAnimatedItemBackground('liquidGlass', '#2AB9A0', -1, 0, '', false, 1).css, /background-color:rgba\(42,185,160,1\);backdrop-filter/)
+})
