@@ -35,3 +35,34 @@ export function cylAnimatedItemARGBInteger(color: CYLAnimatedItemRGBA): number {
   const byte = (component: number): number => Math.max(0, Math.min(255, Math.round(component)));
   return (byte(color.alpha) * 0x1000000 + byte(color.red) * 0x10000 + byte(color.green) * 0x100 + byte(color.blue)) | 0;
 }
+
+/**
+ * [EN] The tint a glass draws with, for a '#RRGGBB', '#AARRGGBB' or ARGB number color: its alpha times `tintAlpha`, so an opaque color tints the glass
+ *      instead of covering it. A color whose alpha is 0 (`#00000000`, `0`, 'transparent') is `defaultTint`, as if no color was set: a clear color
+ *      would give no tint and the glass would be a faint halo on a white page. Undefined for any other text, which the caller uses as it is.
+ *      Pure, unit tested with Node (test/CYLAnimatedItemColors.test.mjs).
+ * [CN] 玻璃使用的着色，适用于 '#RRGGBB'、'#AARRGGBB' 或 ARGB 数值颜色：其透明度乘以 `tintAlpha`，因此不透明色是给玻璃着色而不是盖住它。透明度为 0 的颜色
+ *      （`#00000000`、`0`、'transparent'）使用 `defaultTint`，与未设置颜色相同：透明色没有着色，玻璃在白色页面上只是一圈淡淡的光晕。其他文本返回 undefined，
+ *      调用方原样使用。纯逻辑。
+ */
+export function cylAnimatedItemGlassTintColor(color: string | number, tintAlpha: number, defaultTint: string): string | number | undefined {
+  let argb: number = -1;
+  if (typeof color === 'number') {
+    argb = color >>> 0;
+  } else if (color.trim().toLowerCase() === 'transparent') {
+    return defaultTint;
+  } else {
+    const hex: RegExpMatchArray | null = color.match(/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/);
+    if (hex !== null) {
+      argb = hex[1].length === 6 ? (0xFF000000 + parseInt(hex[1], 16)) : parseInt(hex[1], 16);
+    }
+  }
+  if (argb < 0) {
+    return undefined;
+  }
+  if (((argb >>> 24) & 0xFF) === 0) {
+    return defaultTint;
+  }
+  const alpha: number = Math.round(((argb >>> 24) & 0xFF) * tintAlpha);
+  return ((alpha << 24) | (argb & 0xFFFFFF)) >>> 0;
+}

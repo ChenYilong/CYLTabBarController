@@ -151,10 +151,17 @@ final class CYLAnimatedItemBackgroundRenderer {
             : UIColor(red: 225 / 255, green: 222 / 255, blue: 220 / 255, alpha: 0.5)
     }
 
-    static func glassTint(_ color: UIColor?) -> UIColor? {
+    /**
+     * [EN] nil, and a color that is fully transparent (alpha 0 after resolving a dynamic color for `traits`, e.g. `UIColor.clear`), both mean "no
+     *      color": the default frosted tint. A host that clears its fill (a tag style's only "no color") gets the same visible glass.
+     * [CN] nil 与完全透明的颜色（按 `traits` 解析动态色后透明度为 0，例如 `UIColor.clear`）都表示「没有颜色」：使用默认磨砂着色。把填充清除的宿主
+     *      （标签样式唯一的「无颜色」）得到同样看得见的玻璃。
+     */
+    static func glassTint(_ color: UIColor?, traits: UITraitCollection = .current) -> UIColor? {
         guard let color else { return defaultGlassTint }
         var alpha: CGFloat = 1
-        color.getRed(nil, green: nil, blue: nil, alpha: &alpha)
+        color.resolvedColor(with: traits).getRed(nil, green: nil, blue: nil, alpha: &alpha)
+        if alpha == 0 { return defaultGlassTint }
         return color.withAlphaComponent(alpha * glassTintAlpha)
     }
 
@@ -174,7 +181,7 @@ final class CYLAnimatedItemBackgroundRenderer {
         var glassDrawn = false
         if resolved == .liquidGlass {
             let glass = glassView ?? CYLLiquidGlassView()
-            glass.glassTintColor = Self.glassTint(color)
+            glass.glassTintColor = Self.glassTint(color, traits: host.traitCollection)
             glass.cornerRadius = radius
             glass.frame = host.bounds
             if glass.superview == nil {

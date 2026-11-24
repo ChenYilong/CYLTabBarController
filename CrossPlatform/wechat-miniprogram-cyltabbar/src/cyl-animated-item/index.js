@@ -53,8 +53,9 @@ const cylWarnedTypes = []
 Component({
   properties: {
     // [EN] The background (flat, or Liquid Glass), corner radius and border, the same names as iOS, Android and HarmonyOS:
-    //      see cylAnimatedItemBackground() in cyl_animated_item_model.js. -1 (cornerRadius) and '' mean not set.
-    // [CN] 背景（扁平或液态玻璃）、圆角与边框，与 iOS、Android、鸿蒙同名：见 cyl_animated_item_model.js 的 cylAnimatedItemBackground()。圆角 -1 与 '' 表示未设置。
+    //      see cylAnimatedItemBackground() in cyl_animated_item_model.js. -1 (cornerRadius) and '' mean not set. A glass color with alpha 0
+//      ('transparent', '#00000000') draws the default frosted tint, as ''.
+    // [CN] 背景（扁平或液态玻璃）、圆角与边框，与 iOS、Android、鸿蒙同名：见 cyl_animated_item_model.js 的 cylAnimatedItemBackground()。圆角 -1 与 '' 表示未设置。玻璃颜色透明度为 0（'transparent'、'#00000000'）时使用默认的磨砂着色，与 '' 相同。
     itemBackgroundStyle: { type: String, value: 'flat' },
     itemBackgroundColor: { type: String, value: '' },
     itemCornerRadius: { type: Number, value: -1 },

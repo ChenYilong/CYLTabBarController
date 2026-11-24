@@ -60,7 +60,19 @@ test('a glass tint is translucent: alpha x 0.75 for hex and rgb colors, other te
   assert.equal(cylAnimatedItemGlassTint('#FFF'), 'rgba(255,255,255,0.75)')
   assert.equal(cylAnimatedItemGlassTint('rgba(0, 0, 0, 0.4)'), 'rgba(0,0,0,0.3)')
   assert.equal(cylAnimatedItemGlassTint('rgb(64, 64, 64)'), 'rgba(64,64,64,0.75)')
-  assert.equal(cylAnimatedItemGlassTint('transparent'), 'transparent')
+  assert.equal(cylAnimatedItemGlassTint('currentColor'), 'currentColor', 'other color text is used as it is')
   cylAnimatedItemLiquidGlassSetActiveOverride(true)
   assert.match(cylAnimatedItemBackground('liquidGlass', '#2AB9A0', 8, 0, '', false).css, /background-color:rgba\(42,185,160,0.75\);backdrop-filter/)
+})
+
+test('a fully transparent color means no color: the glass gets the default frosted tint', () => {
+  const { cylAnimatedItemGlassTint } = require('../src/cyl-animated-item/cyl_animated_item_model')
+  assert.equal(cylAnimatedItemGlassTint('rgba(0,0,0,0)'), '')
+  assert.equal(cylAnimatedItemGlassTint('transparent'), '')
+  assert.equal(cylAnimatedItemGlassTint('#00FF0000'), '')
+  cylAnimatedItemLiquidGlassSetActiveOverride(true)
+  for (const clear of ['transparent', 'rgba(0,0,0,0)', '']) {
+    assert.match(cylAnimatedItemBackground('liquidGlass', clear, -1, 0, '', false).css, /background-color:rgba\(225,222,220,0.5\);backdrop-filter/, `"${clear}": the default tint`)
+  }
+  assert.match(cylAnimatedItemBackground('liquidGlass', 'transparent', -1, 0, '', true).css, /background-color:rgba\(255,255,255,0.14\);/)
 })
