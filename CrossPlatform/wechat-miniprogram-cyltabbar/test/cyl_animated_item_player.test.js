@@ -234,7 +234,7 @@ test('onEnded runs when a play-once pass completes, with animationcomplete still
   item.cyl_onAnimationComplete({ detail: { type: 'svga' } })
   assert.equal(ended, 1)
   assert.equal(player.isPlaying, false)
-  assert.deepEqual(item.events.filter(([name]) => name === 'animationcomplete'), [['animationcomplete', { type: 'svga' }]])
+  assert.deepEqual(item.events.filter(([name]) => name === 'animationcomplete' || name === 'animationend'), [['animationcomplete', { type: 'svga' }], ['animationend', { type: 'svga' }]])
   player.play()
   item.cyl_onAnimationLoopComplete({ detail: {} })
   assert.equal(ended, 1)
