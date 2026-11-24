@@ -77,7 +77,7 @@ stills a GIF always plays), `riveWasmPath` / `pagWasmPath` (cyl-rive / cyl-pag `
 `accessoryAccessibilityLabel`, `accessoryPlacement`, `animationTint` (one color for a Rive animation, passed to cyl-rive `tint`; '' keeps the file's colors), `titleColor`, `titleDarkColor` (the title color while dark; '' keeps `titleColor`), `userInterfaceStyle` ('system', the default, follows the system theme and needs `"darkmode": true` in app.json; 'light' or 'dark' forces it), `titleFontSize` (px; 0 keeps 14), `titleFontWeight` ('normal', 'bold', 'bolder', 'lighter' or 100–900; '' keeps the default), `titleLines` (1: one line with an ellipsis, the default; 0: no limit; n > 1: up to n lines), `titleLineHeight` (px; 0 keeps the default), `titleSpacing` (px between the icon and the title; -1 keeps 2 px vertical / 4 px horizontal; a vertical item centres each wrapped line), `dragEnabled`, `accessibilityLabel`, `embedded` (inside a control that is the accessibility element: no padding, no 44 px
 minimum, hidden from accessibility, no gestures). Methods (through
 `selectComponent`): `playAnimation()` (from progress 0; a file still loading plays when ready), `restartAnimation()`,
-`stopAnimation()`, `cyl_player()` (the player, below). Events: `itemtap`, `itemlongpress`, `accessorytap`, `dragstart` / `dragmove` / `dragend`, and the engine's own, forwarded with its detail: `animationready` (e.g. `duration`), `animationcomplete` (a non-looping pass ended, e.g. to count repeats), `animationloopcomplete` (a looping pass ended), `animationerror` (`message`; the item still shows its image). GIF sends none of the four.
+`stopAnimation()`, `cyl_player()` (the player, below). Events: `itemtap`, `itemlongpress`, `accessorytap`, `dragstart` / `dragmove` / `dragend`, and the engine's own, forwarded with its detail: `animationready` (e.g. `duration`), `animationcomplete` (a non-looping pass ended, e.g. to count repeats; `animationend` is sent with it, the same detail, the HarmonyOS name), `animationloopcomplete` (a looping pass ended), `animationerror` (`message`; the item still shows its image). GIF sends none of the four.
 
 ### Engine contract: the player, host-driven mode, `restartToken`
 
@@ -99,8 +99,10 @@ The same contract HarmonyOS defines (`CrossPlatform/harmonyos-cyltabbar/cylanima
   still do what they are called for. Set it when the item is created. All engines stay behind the four generic nodes
   (`generic:cyl-lottie-view=…`), each package with its own default, so the 2 MB package limit is unchanged.
 - **`restartToken`** (Number, default 0): each time it grows the item plays again from the start, like `restartAnimation()`;
-  the value at creation and a lower value are not restarts.
-- **The end callback** is the existing `animationcomplete` event (no separate `animationend`), and `player.onEnded`. A GIF given
+  the value at creation and a lower value are not restarts. **`animationRestartToken`** is the same property under the HarmonyOS
+  name: growth of either one restarts (each has its own baseline).
+- **The end callback** is the `animationcomplete` event, sent together with its alias `animationend` (the HarmonyOS name, the same
+  detail), and `player.onEnded`. A GIF given
   as the `image` (canvas) sends neither.
 - Tests: `test/cyl_animated_item_player.test.js` (player, host-driven mode, restart token) and
   `test/cyl_animated_item_source.test.js` (`cylAnimatedItemSource`, the `#` options, against

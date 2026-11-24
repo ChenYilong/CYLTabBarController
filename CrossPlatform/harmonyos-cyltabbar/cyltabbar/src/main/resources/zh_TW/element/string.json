@@ -289,6 +289,10 @@
       "value": "紅點半徑"
     },
     {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "釋放 TabBarController（3 秒後）"
+    },
+    {
       "name": "cyl_l10n_56e8fac7007d",
       "value": "重新播放"
     },
@@ -371,6 +375,10 @@
     {
       "name": "cyl_l10n_f1f3db859899",
       "value": "動畫結束後顯示靜態圖片"
+    },
+    {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "TabBarController 已釋放"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -469,6 +477,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@；點擊選擇，然後捲動此列表"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "dealloc 回呼已執行：%d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "dealloc 回呼已執行：%d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar：頁籤膠囊、搜尋球與音樂列懸浮在彩色內容之上；捲動即可縮小"
     },
@@ -495,6 +511,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@；隱藏後 2 秒恢復顯示"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "銷毀：未執行"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "銷毀：%d 秒後釋放"
     },
     {
       "name": "cyl_l10n_2a0608059131",

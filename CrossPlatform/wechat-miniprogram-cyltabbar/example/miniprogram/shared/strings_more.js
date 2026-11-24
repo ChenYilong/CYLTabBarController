@@ -162,7 +162,13 @@ module.exports = {
     "Restart": "फिर से शुरू करें",
     "Speed": "गति",
     "times": "गुना",
-    "Loop": "लूप"
+    "Loop": "लूप",
+    "Release the tab bar controller (in 3 s)": "टैब बार कंट्रोलर को रिलीज़ करें (3 सेकंड में)",
+    "teardown: not run": "टियरडाउन: चलाया नहीं गया",
+    "teardown: releasing in %d s": "टियरडाउन: %d सेकंड में रिलीज़",
+    "dealloc callbacks ran: %d / %d": "dealloc कॉलबैक चले: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc कॉलबैक चले: %d / %d (%@)",
+    "Tab bar controller released": "टैब बार कंट्रोलर रिलीज़ हो गया"
   },
   "es": {
     "Badges": "Insignias",
@@ -326,7 +332,13 @@ module.exports = {
     "Restart": "Reiniciar",
     "Speed": "Velocidad",
     "times": "veces",
-    "Loop": "Bucle"
+    "Loop": "Bucle",
+    "Release the tab bar controller (in 3 s)": "Liberar el controlador de la barra de pestañas (en 3 s)",
+    "teardown: not run": "liberación: no ejecutada",
+    "teardown: releasing in %d s": "liberación: se libera en %d s",
+    "dealloc callbacks ran: %d / %d": "callbacks de dealloc ejecutados: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "callbacks de dealloc ejecutados: %d / %d (%@)",
+    "Tab bar controller released": "Controlador de la barra de pestañas liberado"
   },
   "ar": {
     "Badges": "الشارات",
@@ -490,6 +502,12 @@ module.exports = {
     "Restart": "إعادة التشغيل",
     "Speed": "السرعة",
     "times": "مرات",
-    "Loop": "تكرار"
+    "Loop": "تكرار",
+    "Release the tab bar controller (in 3 s)": "تحرير وحدة التحكم في شريط علامات التبويب (خلال 3 ث)",
+    "teardown: not run": "التفكيك: لم يتم التشغيل",
+    "teardown: releasing in %d s": "التفكيك: التحرير خلال %d ث",
+    "dealloc callbacks ran: %d / %d": "اكتملت استدعاءات dealloc: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "اكتملت استدعاءات dealloc: %d / %d (%@)",
+    "Tab bar controller released": "تم تحرير وحدة التحكم في شريط علامات التبويب"
   }
 };

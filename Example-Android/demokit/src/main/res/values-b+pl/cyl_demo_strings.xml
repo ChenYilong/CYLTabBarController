@@ -34,6 +34,7 @@
     <string name="cyl_demo_2db1db0706">Odtwarzanie</string>
     <string name="cyl_demo_34bffc9c7a">Animacje ikon kart: Odtwórz wszystkie, szybkość, pętla</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">Szybkość %@, pętla %@; dotknij, aby wyświetlić sterowanie</string>
+    <string name="cyl_demo_2f63c1fff7">Zwolnij kontroler paska kart (za 3 s)</string>
     <string name="cyl_demo_a4fe65264e">Język</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">Bieżący: %@</string>
     <string name="cyl_demo_bbc5e661e1">systemowy</string>
@@ -320,6 +321,7 @@
     <string name="cyl_demo_12e7b8220d">Odtwórz wszystko</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">Prędkość: %@</string>
     <string name="cyl_demo_f2f6a01889">Pętla</string>
+    <string name="cyl_demo_08078d674a">Kontroler paska kart został zwolniony</string>
     <string name="cyl_demo_44a57b22e0">Alert</string>
     <string name="cyl_demo_a127ceb079">Arkusz akcji</string>
     <string name="cyl_demo_9329618118">Arkusz strony</string>
@@ -338,6 +340,10 @@
     <string name="cyl_demo_1698b890f9">Uruchamia wszystkie automatyczne wiersze, jeden po drugim.</string>
     <string name="cyl_demo_afa158bdc8">Nad bieżącym kontekstem</string>
     <string name="cyl_demo_0add8377e7" formatted="false">Naciśnięto długo „%@”</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">wykonane wywołania zwrotne dealloc: %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">wykonane wywołania zwrotne dealloc: %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">zwolnienie: za %d s</string>
+    <string name="cyl_demo_c0fd658b68">zwolnienie: nie uruchomiono</string>
     <string name="cyl_demo_d4f455fa45">Otwórz: dwa paski kart, jeden identyfikator strony</string>
     <string name="cyl_demo_5b88804382" formatted="false">Pasek kart %@ · ID strony „%@”</string>
 </resources>

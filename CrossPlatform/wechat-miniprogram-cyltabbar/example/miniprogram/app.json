@@ -11,7 +11,8 @@
     "pages/demo/index",
     "pages/post/index",
     "pages/pushed/index",
-    "pages/pushed/locked"
+    "pages/pushed/locked",
+    "pages/released/index"
   ],
   "window": {
     "navigationBarTitleText": "CYLTabBarController",

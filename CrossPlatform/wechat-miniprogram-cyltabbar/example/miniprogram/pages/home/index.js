@@ -27,6 +27,7 @@ function cylFlaggedName(language) {
 const { cylDemoConfiguration } = require('../../utils/cyl_demo_configuration');
 const cylDemoList = require('../../shared/demo_list');
 const { cylHomeAction, CYL_TAP_STEPS, CYL_SOUND_STEPS } = require('../../utils/cyl_home_actions');
+const cylTeardown = require('../../utils/cyl_demo_teardown');
 const { CYL_DEMO_SKINS, cylEffectiveSkin, cylSkinSummary, cylSkinPreview } = require('../../utils/cyl_demo_skins');
 
 // [EN] UIColor.cyl_randomColor. [CN] 随机颜色。
@@ -143,6 +144,23 @@ Component({
       };
     },
 
+    /**
+     * [EN] The "Release the tab bar controller (in 3 s)" row: arms a dealloc callback on the cyl-tab-bar of every loaded tab page,
+     *      counts 3 s down (the row's status follows), then wx.reLaunch destroys the tab pages and their bars and shows the released
+     *      page (utils/cyl_demo_teardown.js).
+     * [CN] 「Release the tab bar controller (in 3 s)」行：在每个已加载 Tab 页面的 cyl-tab-bar 上登记 dealloc 回调，倒计时 3 秒（该行状态
+     *      随之更新），然后 wx.reLaunch 销毁 Tab 页面及其 TabBar，并显示释放后的页面（utils/cyl_demo_teardown.js）。
+     */
+    cyl_releaseTabBars() {
+      const pages = getApp().cylLoadedTabPages || {};
+      const bars = Object.keys(pages).map((route) => {
+        const page = pages[route];
+        const host = typeof page.getTabBar === 'function' ? page.getTabBar() : null;
+        return { bar: host ? host.selectComponent('#cyl-tab-bar') : null, name: route };
+      });
+      cylTeardown.cylStart(bars, () => this.cyl_render(), () => wx.reLaunch({ url: '/pages/released/index' }));
+    },
+
     cyl_tabBar() {
       const tabBar = typeof this.getTabBar === 'function' ? this.getTabBar() : null;
       return tabBar ? tabBar.selectComponent('#cyl-tab-bar') : null;
@@ -168,6 +186,14 @@ Component({
         const title = section.skins
           ? this.t('Skins: holidays and colors (%@)').replace('%@', String(CYL_DEMO_SKINS.length)) : cylListText(section.title);
         return { id: section.id, title, rows };
+      });
+      // [EN] The teardown row (iOS CYLDemoReleaseRow, docs/Lifecycle-Library.md step 21): releases the tab bars after 3 s and the
+      //      released page shows how many dealloc callbacks ran. [CN] 销毁行（对应 iOS 的 CYLDemoReleaseRow）：3 秒后释放 TabBar，
+      //      释放后的页面显示执行了多少个 dealloc 回调。
+      sections.push({
+        id: 'teardown',
+        title: this.t('Playback'),
+        rows: [{ id: 'releaseTabBar', title: this.t('Release the tab bar controller (in 3 s)'), subtitle: cylTeardown.cylStatus(), accessory: 'none' }],
       });
       // [EN] The badge rows of CYLHomeViewController, after the demo sections. [CN] CYLHomeViewController 的角标行，在演示 section 之后。
       sections.push({
@@ -400,6 +426,7 @@ Component({
           bar.cyl_onTap({ currentTarget: { dataset: { key: next.key } } });
         },
         gallery: () => wx.navigateTo({ url: '/pages/glass/index' }),
+        releaseTabBar: () => this.cyl_releaseTabBars(),
         login: () => this.cyl_update({ loggedIn: !state.loggedIn }),
         swipe: () => this.cyl_override({ CYLTabBarControllerSwipeToSwitchTab: !state.overrides?.CYLTabBarControllerSwipeToSwitchTab }),
       };

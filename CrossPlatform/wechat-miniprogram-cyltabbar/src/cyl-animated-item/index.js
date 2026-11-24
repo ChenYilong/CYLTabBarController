@@ -89,10 +89,10 @@ Component({
      *      `showsImageWhenAnimationEnds`): the engine is hidden and `selectedImage` / `image` (else the placeholder)
      *      shows. Off by default, so the last frame stays. `playAnimation()`, `stopAnimation()`, a new selection, a new
      *      file or turning `loop` on shows the animation again. The end is the engine's `complete` (Lottie, PAG, Rive,
-     *      SVGA) or the end of a timed GIF pass (with stills); `animationcomplete` is sent either way.
+     *      SVGA) or the end of a timed GIF pass (with stills); `animationcomplete` and its alias `animationend` are sent either way.
      * [CN] 只播放一次的动画（`loop` 关闭）结束时是否换成静态图片（iOS / Android 的 `showsImageWhenAnimationEnds`）：隐藏引擎，显示
      *      `selectedImage` / `image`（没有时为占位图）。默认关闭，保留最后一帧。`playAnimation()`、`stopAnimation()`、重新选中、新文件或开启
-     *      `loop` 时重新显示动画。结束来自引擎的 `complete`（Lottie、PAG、Rive、SVGA）或有静帧的 GIF 一遍计时结束；两种情况都发送 `animationcomplete`。
+     *      `loop` 时重新显示动画。结束来自引擎的 `complete`（Lottie、PAG、Rive、SVGA）或有静帧的 GIF 一遍计时结束；两种情况都发送 `animationcomplete` 与别名 `animationend`。
      */
     showsImageWhenAnimationEnds: { type: Boolean, value: false },
     /**
@@ -116,6 +116,11 @@ Component({
      *      变小也不算。`drivesAnimationPlayback` 为 false 时忽略。
      */
     restartToken: { type: Number, value: 0 },
+    /**
+     * [EN] Alias of `restartToken` under the HarmonyOS name: the same behavior; growth of either one restarts the animation.
+     * [CN] `restartToken` 的别名（鸿蒙的名称）：行为相同；任何一个增大都会重播。
+     */
+    animationRestartToken: { type: Number, value: 0 },
     /**
      * [EN] The frame (0...1) shown at rest while not selected (iOS `animationRestingProgress`); selected shows the last.
      * [CN] 未选中时静止显示的帧（0...1，iOS 的 `animationRestingProgress`）；选中时显示最后一帧。
@@ -150,6 +155,13 @@ Component({
     // [CN] `animationType` 与 `autoplay` 已在上方声明（"*.svga.bin" 读作 SVGA）。
     colors: { type: Object, value: null },
     iconTint: { type: String, value: '' },
+    /**
+     * [EN] The tint of `selectedImage` while selected. Not set (the default): `iconTint` for both. With both images set, each
+     *      is its own layer and a selection change only toggles their opacity (no node re-created, no `src` change).
+     * [CN] 选中时 `selectedImage` 的着色。未设置（默认）：两者都用 `iconTint`。两张图片都设置时各自为一个图层，选中变化只切换
+     *      它们的不透明度（不重建节点，不改变 `src`）。
+     */
+    selectedIconTint: { type: String, value: null, optionalTypes: [Object] },
     /**
      * [EN] One color for the animation (any CSS color), like a template image: Rive draws every pixel in it. '' keeps the
      *      file's colors. Rive only for now; other engines keep their colors.
@@ -267,7 +279,7 @@ Component({
       this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, animationEnded: false, lottieData })
       this.cyl_update()
     },
-    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, animationTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
+    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, selectedIconTint, animationTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
       this.cyl_update()
     },
     'itemStyle, countdownIdleTitle, countdownRunningTitleFormat, countdownFinishedTitle, countdownImage, countdownRunningTitleColor, countdownDuration': function (itemStyle) {
@@ -280,14 +292,17 @@ Component({
     'showsImageWhenAnimationEnds': function (shows) {
       if (!shows) this.cyl_showAnimationAgain()
     },
-    'restartToken': function (token) {
-      // [EN] The value at creation is the baseline (set in `attached`); only a larger one restarts, and a host that drives the
-      //      player itself is not restarted (HarmonyOS: the restart is one of the default rules). [CN] 创建时的值为基准（在
-      //      `attached` 中设置）；只有更大的值才重播，自行驱动播放器的宿主不会被重播（鸿蒙：重播属于默认规则）。
+    'restartToken, animationRestartToken': function (token, aliasToken) {
+      // [EN] The value at creation is the baseline of each (set in `attached`); only a larger one restarts (either of the two), and a
+      //      host that drives the player itself is not restarted (HarmonyOS: the restart is one of the default rules).
+      // [CN] 创建时的值是各自的基准（在 `attached` 中设置）；只有更大的值才重播（两者任一），自行驱动播放器的宿主不会被重播
+      //      （鸿蒙：重播属于默认规则）。
       const last = this.cylRestartToken
+      const lastAlias = this.cylAnimationRestartToken
       this.cylRestartToken = token
-      if (last === undefined || !(Number(token) > Number(last)) || !this.data.drivesAnimationPlayback) return
-      this.restartAnimation()
+      this.cylAnimationRestartToken = aliasToken
+      if (last === undefined || !this.data.drivesAnimationPlayback) return
+      if (Number(token) > Number(last) || Number(aliasToken) > Number(lastAlias)) this.restartAnimation()
     },
     'selected, restingProgress': function () {
       // [EN] Host-driven: the host rests and plays through the player; only the drawing follows `selected`. [CN] 宿主驱动：宿主通过播放器静止与播放；只有绘制随 `selected` 变化。
@@ -347,6 +362,7 @@ Component({
       // [EN] A countdown kept before a restart continues. [CN] 重启之前保存的倒计时继续。
       if (this.data.itemStyle === 'countdown') this.cyl_countdown().setCacheKey(this.data.countdownCacheKey)
       this.cylRestartToken = this.data.restartToken
+      this.cylAnimationRestartToken = this.data.animationRestartToken
       this.cyl_update()
     },
     detached() {
@@ -511,7 +527,7 @@ Component({
         // [EN] A timed pass of a GIF image ended: the same as an engine's `complete`. [CN] GIF 图片的一遍计时结束：与引擎的 `complete` 相同。
         this.cyl_animationDidEnd()
         this.cyl_playDidEnd()
-        this.triggerEvent('animationcomplete', { type: 'gif' })
+        this.cyl_emitComplete({ type: 'gif' })
       }, duration - (elapsed % duration))
     },
 
@@ -680,7 +696,7 @@ Component({
         // [EN] A timed pass of a GIF with stills ended: the same as an engine's `complete`. [CN] 有静帧的 GIF 一遍计时结束：与引擎的 `complete` 相同。
         this.cyl_animationDidEnd()
         this.cyl_playDidEnd()
-        this.triggerEvent('animationcomplete', { type: 'gif' })
+        this.cyl_emitComplete({ type: 'gif' })
       }, duration - (elapsed % duration))
     },
 
@@ -728,7 +744,16 @@ Component({
     cyl_onAnimationComplete(event) {
       this.cyl_animationDidEnd()
       this.cyl_playDidEnd()
-      this.triggerEvent('animationcomplete', event?.detail || {})
+      this.cyl_emitComplete(event?.detail || {})
+    },
+
+    /**
+     * [EN] A play-once pass ended: sends `animationcomplete` and its alias `animationend` (HarmonyOS name), both with the same detail.
+     * [CN] 只播放一次的一遍播放结束：发送 `animationcomplete` 及其别名 `animationend`（鸿蒙的名称），detail 相同。
+     */
+    cyl_emitComplete(detail) {
+      this.triggerEvent('animationcomplete', detail)
+      this.triggerEvent('animationend', detail)
     },
 
     /** [EN] A looping play finished one pass: forwarded as `animationloopcomplete`. [CN] 循环播放完成一遍：以 `animationloopcomplete` 转发。 */

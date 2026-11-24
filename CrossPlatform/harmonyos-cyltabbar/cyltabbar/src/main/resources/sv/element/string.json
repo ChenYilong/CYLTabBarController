@@ -289,6 +289,10 @@
       "value": "Radie för röd prick"
     },
     {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "Frigör flikradens controller (om 3 s)"
+    },
+    {
       "name": "cyl_l10n_56e8fac7007d",
       "value": "Replay"
     },
@@ -371,6 +375,10 @@
     {
       "name": "cyl_l10n_f1f3db859899",
       "value": "Still image after the animation ends"
+    },
+    {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "Flikradens controller har frigjorts"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -469,6 +477,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; tryck för att välja och rulla sedan listan"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "dealloc-återanrop körda: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "dealloc-återanrop körda: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: flikkapsel, sökboll och musikfält över färgglatt innehåll; rulla för att minimera"
     },
@@ -495,6 +511,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; dold, kommer tillbaka efter 2 s"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "nedmontering: inte körd"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "nedmontering: frigörs om %d s"
     },
     {
       "name": "cyl_l10n_2a0608059131",

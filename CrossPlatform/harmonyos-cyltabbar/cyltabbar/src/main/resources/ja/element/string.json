@@ -289,6 +289,10 @@
       "value": "赤い点の半径"
     },
     {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "タブバーコントローラを解放（3 秒後）"
+    },
+    {
       "name": "cyl_l10n_56e8fac7007d",
       "value": "Replay"
     },
@@ -371,6 +375,10 @@
     {
       "name": "cyl_l10n_f1f3db859899",
       "value": "Still image after the animation ends"
+    },
+    {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "タブバーコントローラを解放しました"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -469,6 +477,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@。タップして選び、このリストをスクロール"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "dealloc コールバック実行数: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "dealloc コールバック実行数: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar：カラフルなコンテンツ上のタブカプセル、検索ボール、音楽バー。スクロールで縮小"
     },
@@ -495,6 +511,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@。非表示にすると 2 秒後に戻る"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "解放: 未実行"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "解放: %d 秒後に実行"
     },
     {
       "name": "cyl_l10n_2a0608059131",

@@ -307,6 +307,33 @@ function cylAnimatedItemTitleLines(value) {
   return Number.isFinite(lines) && lines >= 0 ? Math.floor(lines) : 1
 }
 
+/**
+ * [EN] The two static layers of an item with both an `image` and a different `selectedImage` (no GIF): both stay mounted and a
+ *      selection change toggles only their opacity, so no node is created and no `src` changes on a tap (no frame can show a
+ *      blank or the previous image). Each layer has its own tint (`iconTint` for the normal one, `selectedIconTint` for the
+ *      selected one; a `selectedIconTint` that is not set means `iconTint`). `layered` is false for any other item.
+ * [CN] 同时有 `image` 与不同的 `selectedImage`（非 GIF）的条目的两个静态图层：两者都保持挂载，选中变化只切换它们的不透明度，
+ *      点击时既不创建节点也不改变 `src`（任何一帧都不会出现空白或上一张图片）。每个图层有自己的着色（普通图层用 `iconTint`，
+ *      选中图层用 `selectedIconTint`；未设置 `selectedIconTint` 时用 `iconTint`）。其他条目的 `layered` 为 false。
+ */
+function cylAnimatedItemStillLayers(p, fallbackImage, fallbackHidden) {
+  const normal = p.image || ''
+  const selected = p.selectedImage || ''
+  const tintNormal = p.iconTint || ''
+  const tintSelected = p.selectedIconTint === null || p.selectedIconTint === undefined ? tintNormal : p.selectedIconTint
+  const layered = !!normal && !!selected && normal !== selected && !!fallbackImage && !cylIsGIFImagePath(normal) && !cylIsGIFImagePath(selected)
+  return {
+    layered,
+    normalImage: normal,
+    selectedImage: selected,
+    normalTint: tintNormal,
+    selectedTint: tintSelected,
+    normalHidden: fallbackHidden || !!p.selected,
+    selectedHidden: fallbackHidden || !p.selected,
+    currentTint: p.selected ? tintSelected : tintNormal,
+  }
+}
+
 function cylAnimatedItemModel(input) {
   const p = cylAnimatedItemCountdownProperties(input)
   const animationPath = p.animationUrl || ''
@@ -315,6 +342,8 @@ function cylAnimatedItemModel(input) {
   const hasSource = !!animationPath || hasAnimationData
   const { usesEngine, gifShows, ended, animationShows } = cylAnimatedItemAnimationState(p, animationType, hasSource)
   const fallbackImage = cylAnimatedItemFallbackImage(p, hasSource, animationShows)
+  const fallbackHidden = (animationShows && !gifShows) || cylGIFImageStillShows(p, hasSource, fallbackImage)
+  const layers = cylAnimatedItemStillLayers(p, fallbackImage, fallbackHidden)
   const iconSize = cylAnimatedItemDimension(p.iconSize, 24)
   const iconWidth = cylAnimatedItemDimension(p.iconWidth, iconSize)
   const iconHeight = cylAnimatedItemDimension(p.iconHeight, iconSize)
@@ -344,7 +373,7 @@ function cylAnimatedItemModel(input) {
     animationHidden: usesEngine && ended,
     gifPath: gifShows ? cylAnimatedItemGifSource(p, animationPath) : '',
     fallbackImage,
-    fallbackHidden: (animationShows && !gifShows) || cylGIFImageStillShows(p, hasSource, fallbackImage),
+    fallbackHidden,
     // [EN] A GIF given as the image (no animation, or a failed one): it rests on its first frame, drawn on a canvas, until
     //      it is played (docs/GIF-Animation.md). [CN] 作为图片传入的 GIF（没有动画或动画失败）：在被播放之前停在第一帧（绘制在 canvas 上）。
     gifImage: cylGIFImageOf(p, hasSource, fallbackImage),
@@ -352,7 +381,8 @@ function cylAnimatedItemModel(input) {
     showsIcon: !!(fallbackImage || usesEngine || gifShows),
     iconStyle: `width: ${iconWidth}px; height: ${iconHeight}px;`,
     // [EN] A tint applies to the static image only; an animation keeps its own colors. [CN] 着色只作用于静态图片。
-    iconTint: p.iconTint || '',
+    iconTint: layers.currentTint,
+    still: layers,
     // [EN] The animation's one color (cyl-rive `tint`). [CN] 动画的单一颜色（cyl-rive 的 `tint`）。
     animationTint: String(p.animationTint || '').trim(),
     axisClass: (p.axis === 'vertical' ? 'cyl-animated-item-vertical' : 'cyl-animated-item-horizontal') + (p.embedded ? ' cyl-animated-item-embedded' : '') + (p.itemStyle === 'countdown' ? ' cyl-animated-item-countdown' : ''),

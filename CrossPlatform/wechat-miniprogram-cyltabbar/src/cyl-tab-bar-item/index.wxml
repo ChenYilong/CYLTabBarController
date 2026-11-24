@@ -8,7 +8,7 @@
   aria-hidden="true"
 >
   <!-- [EN] Liquid Glass: the lens behind the selected icon and title (decoration). [CN] 液态玻璃：选中图标与标题后的透镜（装饰）。 -->
-  <cyl-glass-lens wx:if="{{cylItemStyle === 'liquidGlass' && m.selected}}" class="cyl-item-glass-lens" is-dark="{{isDark}}" lens-style="{{glassLensStyle}}" aria-hidden="true" />
+  <cyl-glass-lens wx:if="{{cylItemStyle === 'liquidGlass' && m.selected}}" class="cyl-item-glass-lens" is-dark="{{isDark}}" lens-style="{{glassLensStyle}}" animated="{{lensAnimated}}" aria-hidden="true" />
   <view wx:if="{{m.image || m.animationPath}}" class="cyl-item-icon-box" style="{{m.iconBoxStyle}}">
     <!-- [EN] The icon is cyl-animated-item (docs/Animated-Item.md): every animation type it knows (Lottie, PAG, Rive,
          SVGA, GIF), and the static image or the placeholder when the engine is missing or fails.
@@ -18,12 +18,14 @@
       class="cyl-item-animation"
       bare="{{true}}"
       accessibility-hidden="{{true}}"
-      image="{{m.image}}"
+      image="{{m.normalImage}}"
+      selected-image="{{m.selectedStillImage}}"
+      selected-icon-tint="{{m.selectedStillTint}}"
       animation-url="{{m.animationPath}}"
       selected="{{m.selected}}"
       icon-width="{{m.iconWidth}}"
       icon-height="{{m.iconHeight}}"
-      icon-tint="{{m.iconTint}}"
+      icon-tint="{{m.normalStillTint}}"
       animation-tint="{{m.animationTint}}"
       colors="{{animationColors}}"
       loop="{{animationLoop || (!m.selected && loopsWhenUnselected)}}"

@@ -289,6 +289,10 @@
       "value": "Rayon du point rouge"
     },
     {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "Libérer le contrôleur de la barre d’onglets (dans 3 s)"
+    },
+    {
       "name": "cyl_l10n_56e8fac7007d",
       "value": "Replay"
     },
@@ -371,6 +375,10 @@
     {
       "name": "cyl_l10n_f1f3db859899",
       "value": "Still image after the animation ends"
+    },
+    {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "Contrôleur de la barre d’onglets libéré"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -469,6 +477,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@ ; touchez pour choisir, puis faites défiler cette liste"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "callbacks dealloc exécutés : %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "callbacks dealloc exécutés : %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar : capsule d’onglets, bulle de recherche et barre musicale sur un contenu coloré ; faire défiler pour réduire"
     },
@@ -495,6 +511,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@ ; masquée, elle revient après 2 s"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "libération : non exécutée"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "libération : dans %d s"
     },
     {
       "name": "cyl_l10n_2a0608059131",

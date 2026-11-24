@@ -166,7 +166,7 @@ test('a bar shown after a tap draws the tapped tab at once, not its own stale se
   tapped.cyl_onTap({ type: 'tap', currentTarget: { dataset: { key: 'b' } } })
   const cached = { cylModel: model, cylSelectedKey: 'a', data: { selectedIdentifier: 'a', selectedIndex: 0 }, setData(patch) { sent.push(patch) }, ...definition.methods }
   definition.pageLifetimes.show.call(cached)
-  assert.deepEqual(sent[sent.length - 1], { selectedIdentifier: 'b', selectedIndex: 1 })
+  assert.deepEqual(sent[sent.length - 1], { selectedIdentifier: 'b', selectedIndex: 1, cylLensAnimated: false }, 'the shown page draws its lens at once')
 })
 
 test('every live bar follows a tap before its page is shown, so the page never shows the previous tab first', () => {

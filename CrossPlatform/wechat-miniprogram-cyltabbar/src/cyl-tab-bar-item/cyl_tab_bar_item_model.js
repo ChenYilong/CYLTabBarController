@@ -130,6 +130,17 @@ function cylBadgeStyle(p, appearance, badge) {
 }
 
 /**
+ * [EN] The icon tint of one state (appearance color first, then the item's own), so cyl-animated-item can keep both static
+ *      images mounted, each with its own tint, and a selection change only toggles which one is visible.
+ * [CN] 某一状态下的图标着色（先取 appearance 颜色，再取 Item 自己的），使 cyl-animated-item 可以同时保持两张静态图片挂载、各用
+ *      自己的着色，选中变化只切换哪一张可见。
+ */
+function cylStateIconTint(p, selected) {
+  return reader.cylColor(cylAppearanceState(p.standardAppearance, selected).iconColor)
+    || reader.cylColor(selected ? p.selectedIconTint : p.iconTint);
+}
+
+/**
  * [EN] The render model from the component's properties.
  * [CN] 根据组件属性生成渲染模型。
  */
@@ -167,6 +178,13 @@ function cylItemModel(p) {
     enabled: p.enabled !== false,
     title,
     image,
+    // [EN] Both static images, whichever state: they go to cyl-animated-item as `image` and `selectedImage`, which keeps both
+    //      mounted (selectedStillImage is '' without an own selected image). [CN] 两张静态图片，与状态无关：作为 `image` 与
+    //      `selectedImage` 传给 cyl-animated-item，使两者都保持挂载（没有自己的选中图片时 selectedStillImage 为 ''）。
+    normalImage: p.image || '',
+    selectedStillImage: p.selectedImage || '',
+    normalStillTint: cylStateIconTint(p, false),
+    selectedStillTint: cylStateIconTint(p, true),
     animationPath,
     animationType: cylAnimationType(animationPath),
     iconTint,

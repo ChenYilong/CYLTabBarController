@@ -289,6 +289,10 @@
       "value": "Radi del punt vermell"
     },
     {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "Allibera el controlador de la barra de pestanyes (en 3 s)"
+    },
+    {
       "name": "cyl_l10n_56e8fac7007d",
       "value": "Replay"
     },
@@ -371,6 +375,10 @@
     {
       "name": "cyl_l10n_f1f3db859899",
       "value": "Still image after the animation ends"
+    },
+    {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "Controlador de la barra de pestanyes alliberat"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -469,6 +477,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; toca per triar i desplaça aquesta llista"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "callbacks de dealloc executats: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "callbacks de dealloc executats: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: càpsula de pestanyes, bola de cerca i barra de música sobre contingut de colors; desplaça per minimitzar"
     },
@@ -495,6 +511,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; amagada, torna al cap de 2 s"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "alliberament: no executat"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "alliberament: s’alliberarà en %d s"
     },
     {
       "name": "cyl_l10n_2a0608059131",

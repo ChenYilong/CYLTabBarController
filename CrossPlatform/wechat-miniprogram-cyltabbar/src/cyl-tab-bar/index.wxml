@@ -18,7 +18,7 @@
   >
     <block wx:if="{{item.isPlusButton}}">
       <!-- [EN] As iOS (CYLPlusButtonShowsSelection): the selection under the plus button exists on Liquid Glass only; it is the same cyl-glass-lens as a selected tab's. [CN] 与 iOS 一致（CYLPlusButtonShowsSelection）：PlusButton 下方的选中效果只在液态玻璃下出现。 -->
-      <cyl-glass-lens wx:if="{{item.showsSelection && cylStyleType === 'liquidGlass'}}" class="cyl-plus-selection" is-dark="{{cylIsDark}}" lens-style="{{cylGlassLensStyle}}" aria-hidden="true" />
+      <cyl-glass-lens wx:if="{{item.showsSelection && cylStyleType === 'liquidGlass'}}" class="cyl-plus-selection" is-dark="{{cylIsDark}}" lens-style="{{cylGlassLensStyle}}" animated="{{cylLensAnimated}}" aria-hidden="true" />
       <view class="cyl-plus-button {{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylAnimatingName + ' cyl-flip-' + cylFlipDirection : ''}}" style="{{item.buttonStyle}} {{cylAnimationStyle}}">
         <view wx:if="{{item.hitStyle}}" class="cyl-plus-hit" style="{{item.hitStyle}}" aria-hidden="true"></view>
         <image wx:if="{{item.backgroundImage}}" class="cyl-plus-background" src="{{item.backgroundImage}}" mode="aspectFit" aria-hidden="true" />
@@ -65,6 +65,7 @@
         animation-duration="{{cylAnimationDuration}}"
         item-style="{{cylItemStyle}}"
         glass-lens-style="{{cylGlassLensStyle}}"
+        lens-animated="{{cylLensAnimated}}"
         animation-speed="{{animationSpeed}}"
         animation-loop="{{animationLoop}}"
         is-dark="{{cylIsDark}}"
