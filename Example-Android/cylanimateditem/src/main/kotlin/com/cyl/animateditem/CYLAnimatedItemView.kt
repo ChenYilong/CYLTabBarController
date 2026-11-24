@@ -389,13 +389,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     /**
      * [EN] Whether the item applies the default rules itself: selected plays once from the start, unselected rests at
      *      `animationRestingProgress`, a grown `animationRestartToken` restarts, and a ready animation of a selected item
-     *      plays. False (the default here, so existing users keep their behavior; the React Native and Flutter views turn
-     *      it on) leaves all of that to the host, which plays through `animatedItemPlayer`. HarmonyOS: `drivesAnimationPlayback`.
+     *      plays. True is the default, as on iOS and HarmonyOS; false leaves all of that to the host, which plays through
+     *      `animatedItemPlayer` (the tab bar's `CYLTabBarItemButton` sets false: the tab bar plays its icons itself). HarmonyOS: `drivesAnimationPlayback`.
      * [CN] 条目是否自行应用默认规则：选中时从头播放一次，未选中时停在 `animationRestingProgress`，`animationRestartToken` 增大时重新播放，
-     *      选中条目的动画就绪后播放。false（此处默认，现有用法的行为不变；React Native 与 Flutter 的视图会开启）则全部交给宿主，宿主通过
-     *      `animatedItemPlayer` 播放。鸿蒙：`drivesAnimationPlayback`。
+     *      选中条目的动画就绪后播放。默认 true，与 iOS、鸿蒙一致；false 则全部交给宿主，宿主通过
+     *      `animatedItemPlayer` 播放（TabBar 的 `CYLTabBarItemButton` 设为 false：TabBar 自己播放图标）。鸿蒙：`drivesAnimationPlayback`。
      */
-    var drivesAnimationPlayback: Boolean = false
+    var drivesAnimationPlayback: Boolean = true
 
     /**
      * [EN] A token that restarts the animation from the start when it changes (only while `drivesAnimationPlayback`); the

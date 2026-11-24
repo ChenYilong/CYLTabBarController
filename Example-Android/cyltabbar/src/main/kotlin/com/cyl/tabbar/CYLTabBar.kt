@@ -113,6 +113,9 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
     }
 
     init {
+        // [EN] The tab bar plays the icons itself (apply, cyl_tabBarItemAnimationPlayer): the component must not also restart
+        //      the animation on every selection (double play). [CN] TabBar 自己播放图标：组件不能在每次选中时再重新播放（重复播放）。
+        drivesAnimationPlayback = false
         // [EN] The component adds the icon and the title; the tab keeps its own look (10 sp titles, icons not scaled up)
         //      and layout. [CN] 组件已添加图标与标题；Tab 保留自己的外观（10 sp 标题、图标不放大）与布局。
         iconView.scaleType = ImageView.ScaleType.CENTER_INSIDE
