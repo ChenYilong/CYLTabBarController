@@ -12,6 +12,7 @@
     "pages/LiquidGlassDock",
     "pages/AnimatedItemEnd",
     "pages/RiveColors",
-    "pages/Released"
+    "pages/Released",
+    "pages/ResourceMissing"
   ]
 }
