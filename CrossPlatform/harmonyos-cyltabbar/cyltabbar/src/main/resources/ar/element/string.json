@@ -289,6 +289,10 @@
       "value": "نصف قطر النقطة الحمراء"
     },
     {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "تحرير وحدة التحكم في شريط علامات التبويب (خلال 3 ث)"
+    },
+    {
       "name": "cyl_l10n_56e8fac7007d",
       "value": "Replay"
     },
@@ -371,6 +375,10 @@
     {
       "name": "cyl_l10n_f1f3db859899",
       "value": "Still image after the animation ends"
+    },
+    {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "تم تحرير وحدة التحكم في شريط علامات التبويب"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -469,6 +477,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@؛ انقر للاختيار ثم مرّر هذه القائمة"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "اكتملت استدعاءات dealloc: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "اكتملت استدعاءات dealloc: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: كبسولة علامات التبويب وكرة البحث وشريط الموسيقى فوق محتوى ملوّن؛ مرّر للتصغير"
     },
@@ -495,6 +511,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@؛ عند إخفائه يعود بعد ثانيتين"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "التفكيك: لم يتم التشغيل"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "التفكيك: التحرير خلال %d ث"
     },
     {
       "name": "cyl_l10n_2a0608059131",

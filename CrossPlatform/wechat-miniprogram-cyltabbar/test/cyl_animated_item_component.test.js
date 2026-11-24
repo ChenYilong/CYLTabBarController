@@ -100,7 +100,7 @@ test('showsImageWhenAnimationEnds: an ended play-once animation gives way to the
   assert.equal(item.data.m.fallbackHidden, false)
   assert.equal(item.data.m.fallbackImage, 'ok.png')
   assert.equal(item.data.m.usesEngine, true, 'the engine stays mounted, hidden, so the next play needs no reload')
-  assert.deepEqual(item.events.map((e) => e[0]), ['animationready', 'animationcomplete'])
+  assert.deepEqual(item.events.map((e) => e[0]), ['animationready', 'animationcomplete', 'animationend'])
   item.playAnimation()
   assert.equal(item.data.animationEnded, false)
   assert.equal(item.data.m.animationHidden, false)
@@ -141,7 +141,7 @@ test('showsImageWhenAnimationEnds: a timed GIF pass ends with the still image an
   assert.equal(item.data.m.gifPath, '')
   assert.equal(item.data.m.fallbackImage, 'ok.png')
   assert.equal(item.data.m.fallbackHidden, false)
-  assert.deepEqual(item.events.slice(-1), [['animationcomplete', { type: 'gif' }]])
+  assert.deepEqual(item.events.slice(-2), [['animationcomplete', { type: 'gif' }], ['animationend', { type: 'gif' }]])
   item.playAnimation()
   assert.equal(item.data.m.gifPath, 'star.gif')
   detach()
@@ -157,6 +157,7 @@ test('engine ready, complete, loop complete and error are forwarded as item even
   assert.deepEqual(item.events, [
     ['animationready', { duration: 1.5 }],
     ['animationcomplete', {}],
+    ['animationend', {}],
     ['animationloopcomplete', {}],
     ['animationerror', { message: 'bad file' }],
   ])
@@ -243,7 +244,7 @@ test('a GIF image reports the end of its pass (animationcomplete, the player onE
   assert.equal(item.data.m.gifImageStill, true, 'one pass (600 ms), then the still')
   assert.equal(ended, 1, 'onEnded ran once')
   assert.equal(player.isPlaying, false)
-  assert.deepEqual(item.events.filter(([name]) => name === 'animationcomplete'), [['animationcomplete', { type: 'gif' }]])
+  assert.deepEqual(item.events.filter(([name]) => name === 'animationcomplete' || name === 'animationend'), [['animationcomplete', { type: 'gif' }], ['animationend', { type: 'gif' }]])
   // Resting it by hand (stopAtProgress) or by another tab is not an end.
   player.play()
   player.stopAtProgress(0)

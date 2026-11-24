@@ -234,7 +234,7 @@ test('onEnded runs when a play-once pass completes, with animationcomplete still
   item.cyl_onAnimationComplete({ detail: { type: 'svga' } })
   assert.equal(ended, 1)
   assert.equal(player.isPlaying, false)
-  assert.deepEqual(item.events.filter(([name]) => name === 'animationcomplete'), [['animationcomplete', { type: 'svga' }]])
+  assert.deepEqual(item.events.filter(([name]) => name === 'animationcomplete' || name === 'animationend'), [['animationcomplete', { type: 'svga' }], ['animationend', { type: 'svga' }]])
   player.play()
   item.cyl_onAnimationLoopComplete({ detail: {} })
   assert.equal(ended, 1)
@@ -285,6 +285,20 @@ test('restartToken from the default 0 restarts at 1 (the first change after crea
   engine.calls.length = 0
   item.set({ restartToken: 1 })
   assert.deepEqual(engine.calls, [['playFromStart']])
+})
+
+test('animationRestartToken is the same as restartToken: growth of either one restarts', () => {
+  const engine = cylSeekEngine()
+  const { item } = cylMount({ animationUrl: 'a.svga', autoplay: false }, engine)
+  item.cyl_onAnimationReady()
+  engine.calls.length = 0
+  item.set({ animationRestartToken: 1 })
+  assert.deepEqual(engine.calls, [['playFromStart']])
+  item.set({ animationRestartToken: 1 })
+  item.set({ animationRestartToken: 0 })
+  assert.deepEqual(engine.calls, [['playFromStart']])
+  item.set({ restartToken: 1 })
+  assert.deepEqual(engine.calls, [['playFromStart'], ['playFromStart']])
 })
 
 test('host-driven: a selection change, the ready of the engine and restartToken apply none of the default rules', () => {

@@ -106,6 +106,31 @@ export function cyl_reportScrollStopped(): void {
   cylScrollController().scrollStopped();
 }
 
+/**
+ * [EN] The lifecycle of the tab bar controller that is on screen (the newest one that appeared and has not disappeared), so an app
+ *      can register a dealloc callback on it without a reference to the component (iOS `cylWillDealloc`; the example's
+ *      "Release the tab bar controller" row counts the callbacks that ran).
+ * [CN] 当前显示的 TabBarController 的生命周期（最新出现且尚未消失的那个），使 App 无需持有组件引用即可在其上登记 dealloc 回调
+ *      （对应 iOS 的 `cylWillDealloc`；示例的「Release the tab bar controller」行统计已执行的回调数）。
+ */
+let cylActiveLifecycle: LifecycleController<CYLTabBarController> | undefined = undefined;
+
+/**
+ * [EN] Registers a keyed dealloc callback on the tab bar controller on screen: it runs once, when the controller's page disappears
+ *      (`aboutToDisappear`), through CYLDeallocBlockExecutor. Returns false when no controller is on screen. A callback with the
+ *      same key replaces the earlier one.
+ * [CN] 在当前显示的 TabBarController 上登记带 key 的 dealloc 回调：控制器所在页面消失（`aboutToDisappear`）时通过
+ *      CYLDeallocBlockExecutor 只运行一次。没有显示中的控制器时返回 false。同 key 的回调会替换之前的回调。
+ */
+export function cyl_addTabBarControllerDeallocCallback(key: string, callback: () => void): boolean {
+  const lifecycle = cylActiveLifecycle;
+  if (lifecycle === undefined || lifecycle.isDetached) {
+    return false;
+  }
+  lifecycle.registry.addDeallocCallback<CYLTabBarController>((owner: CYLTabBarController) => callback(), { key: key });
+  return true;
+}
+
 /** [EN] AppStorage key bumped by cyl_restoreTabBar. [CN] cyl_restoreTabBar 递增的 AppStorage 键。 */
 export const CYLRestoreTabBarStorageKey: string = 'cyl_restoreTabBar';
 
@@ -579,10 +604,15 @@ export struct CYLTabBarController {
     // [EN] The Liquid Glass lens starts on the selected slot. [CN] 液态玻璃镜片从选中槽位开始。
     this.glassLensPosition = this.cylGlassSelectedSlot();
     this.cylLifecycle.aboutToAppear();
+    cylActiveLifecycle = this.cylLifecycle;
   }
 
   aboutToDisappear(): void {
+    // [EN] The callbacks registered through cyl_addTabBarControllerDeallocCallback run here. [CN] 通过 cyl_addTabBarControllerDeallocCallback 登记的回调在此运行。
     this.cylLifecycle?.aboutToDisappear();
+    if (cylActiveLifecycle === this.cylLifecycle) {
+      cylActiveLifecycle = undefined;
+    }
   }
 
   /**

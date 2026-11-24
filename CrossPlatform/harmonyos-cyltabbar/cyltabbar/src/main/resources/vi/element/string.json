@@ -289,6 +289,10 @@
       "value": "Bán kính chấm đỏ"
     },
     {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "Giải phóng bộ điều khiển thanh tab (sau 3 giây)"
+    },
+    {
       "name": "cyl_l10n_56e8fac7007d",
       "value": "Replay"
     },
@@ -371,6 +375,10 @@
     {
       "name": "cyl_l10n_f1f3db859899",
       "value": "Still image after the animation ends"
+    },
+    {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "Đã giải phóng bộ điều khiển thanh tab"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -469,6 +477,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; nhấn để chọn, rồi cuộn danh sách này"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "số callback dealloc đã chạy: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "số callback dealloc đã chạy: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: viên nang tab, quả cầu tìm kiếm và thanh nhạc trên nội dung nhiều màu; cuộn để thu nhỏ"
     },
@@ -495,6 +511,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; khi ẩn, quay lại sau 2 giây"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "giải phóng: chưa chạy"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "giải phóng: sau %d giây"
     },
     {
       "name": "cyl_l10n_2a0608059131",

@@ -34,6 +34,7 @@
     <string name="cyl_demo_2db1db0706">Toisto</string>
     <string name="cyl_demo_34bffc9c7a">Välilehtikuvakkeiden animaatiot: Toista kaikki, nopeus, silmukka</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">Nopeus %@, silmukka %@; napauta säätimiä varten</string>
+    <string name="cyl_demo_2f63c1fff7">Vapauta välilehtipalkin ohjain (3 s kuluttua)</string>
     <string name="cyl_demo_a4fe65264e">Kieli</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">Nykyinen: %@</string>
     <string name="cyl_demo_bbc5e661e1">järjestelmä</string>
@@ -320,6 +321,7 @@
     <string name="cyl_demo_12e7b8220d">Toista kaikki</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">Nopeus: %@</string>
     <string name="cyl_demo_f2f6a01889">Silmukka</string>
+    <string name="cyl_demo_08078d674a">Välilehtipalkin ohjain vapautettu</string>
     <string name="cyl_demo_44a57b22e0">Ilmoitus</string>
     <string name="cyl_demo_a127ceb079">Toimintovalikko</string>
     <string name="cyl_demo_9329618118">Sivuarkki</string>
@@ -338,6 +340,10 @@
     <string name="cyl_demo_1698b890f9">Suorittaa kaikki automaattiset rivit peräkkäin.</string>
     <string name="cyl_demo_afa158bdc8">Nykyisen kontekstin päällä</string>
     <string name="cyl_demo_0add8377e7" formatted="false">Painettu pitkään ”%@”</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">dealloc-takaisinkutsuja suoritettu: %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">dealloc-takaisinkutsuja suoritettu: %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">purku: vapautus %d s kuluttua</string>
+    <string name="cyl_demo_c0fd658b68">purku: ei suoritettu</string>
     <string name="cyl_demo_d4f455fa45">Avaa: kaksi välilehtipalkkia, yksi sivun tunnus</string>
     <string name="cyl_demo_5b88804382" formatted="false">Välilehtipalkki %@ · sivun tunnus \"%@\"</string>
 </resources>

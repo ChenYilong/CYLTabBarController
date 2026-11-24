@@ -289,6 +289,10 @@
       "value": "רדיוס הנקודה האדומה"
     },
     {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "שחרר את בקר סרגל הלשוניות (בעוד 3 שנ׳)"
+    },
+    {
       "name": "cyl_l10n_56e8fac7007d",
       "value": "Replay"
     },
@@ -371,6 +375,10 @@
     {
       "name": "cyl_l10n_f1f3db859899",
       "value": "Still image after the animation ends"
+    },
+    {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "בקר סרגל הלשוניות שוחרר"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -469,6 +477,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; הקש כדי לבחור ואז גלול את הרשימה"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "קריאות חוזרות של dealloc שהורצו: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "קריאות חוזרות של dealloc שהורצו: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: קפסולת כרטיסיות, כדור חיפוש וסרגל מוזיקה מעל תוכן צבעוני; גלול כדי לכווץ"
     },
@@ -495,6 +511,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; מוסתר, חוזר אחרי 2 שניות"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "פירוק: לא הורץ"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "פירוק: שחרור בעוד %d שנ׳"
     },
     {
       "name": "cyl_l10n_2a0608059131",

@@ -289,6 +289,10 @@
       "value": "Rază punct roșu"
     },
     {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "Eliberează controlerul barei de file (în 3 s)"
+    },
+    {
       "name": "cyl_l10n_56e8fac7007d",
       "value": "Replay"
     },
@@ -371,6 +375,10 @@
     {
       "name": "cyl_l10n_f1f3db859899",
       "value": "Still image after the animation ends"
+    },
+    {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "Controlerul barei de file a fost eliberat"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -469,6 +477,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; atingeți pentru a alege, apoi derulați lista"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "callback-uri dealloc executate: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "callback-uri dealloc executate: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: capsulă de file, bilă de căutare și bară muzicală peste conținut colorat; derulați pentru a minimiza"
     },
@@ -495,6 +511,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; ascunsă, revine după 2 s"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "eliberare: neexecutată"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "eliberare: în %d s"
     },
     {
       "name": "cyl_l10n_2a0608059131",

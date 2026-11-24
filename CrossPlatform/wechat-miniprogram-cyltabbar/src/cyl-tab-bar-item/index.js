@@ -112,6 +112,11 @@ Component({
      * [CN] liquidGlass 下透镜的 CYLGlassLensStyle："regular"（默认）或 "skeuomorphic"。cyl-tab-bar 为其设置。
      */
     glassLensStyle: { type: String, value: 'regular' },
+    /**
+     * [EN] Whether the lens springs in when this item becomes selected (cyl-tab-bar sets it for a tap on its own instance only).
+     * [CN] 本 Item 被选中时透镜是否弹入（cyl-tab-bar 只在自己实例上的点击时设置）。
+     */
+    lensAnimated: { type: Boolean, value: false },
     /** [EN] Playback speed of the icon animation, above 0, applied live. [CN] 图标动画的播放速度，大于 0，实时生效。 */
     animationSpeed: { type: Number, value: 1 },
     /** [EN] Repeats the icon animation until turned off, applied live. [CN] 重复播放图标动画直到关闭，实时生效。 */

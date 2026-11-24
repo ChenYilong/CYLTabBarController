@@ -114,7 +114,19 @@ object DemoCatalog {
     }) {
         val controller = tabBarController ?: return@DemoRow
         DemoPlaybackControls.show(requireContext(), controller) { reload() }
-    }))
+    }, releaseRow()))
+
+    /**
+     * [EN] "Release the tab bar controller (in 3 s)" (iOS `CYLDemoReleaseRow`): the host activity is replaced after 3 s and the
+     *      released screen shows how many of the library's dealloc callbacks ran (docs/Lifecycle-Library.md, step 21).
+     * [CN] 「Release the tab bar controller (in 3 s)」（对应 iOS 的 `CYLDemoReleaseRow`）：3 秒后替换宿主 Activity，释放后的界面显示库的
+     *      dealloc 回调执行了多少个（docs/Lifecycle-Library.md，第 21 步）。
+     */
+    private fun releaseRow() = DemoRow(cylDemoText("Release the tab bar controller (in 3 s)"), { DemoTeardown.status() }) {
+        val controller = tabBarController ?: return@DemoRow
+        val fragment = this
+        DemoTeardown.start(requireActivity(), controller) { if (fragment.isAdded) fragment.reload() }
+    }
 
     // MARK: - General 通用
 

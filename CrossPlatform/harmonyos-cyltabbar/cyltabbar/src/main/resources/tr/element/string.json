@@ -289,6 +289,10 @@
       "value": "Kırmızı nokta yarıçapı"
     },
     {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "Sekme çubuğu denetleyicisini serbest bırak (3 sn sonra)"
+    },
+    {
       "name": "cyl_l10n_56e8fac7007d",
       "value": "Replay"
     },
@@ -371,6 +375,10 @@
     {
       "name": "cyl_l10n_f1f3db859899",
       "value": "Still image after the animation ends"
+    },
+    {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "Sekme çubuğu denetleyicisi serbest bırakıldı"
     },
     {
       "name": "cyl_l10n_fee4a478923f",
@@ -469,6 +477,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; seçmek için dokunun, sonra bu listeyi kaydırın"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "çalışan dealloc geri çağrıları: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "çalışan dealloc geri çağrıları: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: renkli içeriğin üzerinde sekme kapsülü, arama topu ve müzik çubuğu; küçültmek için kaydırın"
     },
@@ -495,6 +511,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; gizlenince 2 sn sonra geri gelir"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "serbest bırakma: çalıştırılmadı"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "serbest bırakma: %d sn sonra"
     },
     {
       "name": "cyl_l10n_2a0608059131",

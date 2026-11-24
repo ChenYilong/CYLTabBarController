@@ -233,7 +233,13 @@ module.exports = {
     "Space": "Space",
     "Ocean": "Ocean",
     "Network icons": "Network icons",
-    "Log in to view “{title}”": "Log in to view “{title}”"
+    "Log in to view “{title}”": "Log in to view “{title}”",
+    "Release the tab bar controller (in 3 s)": "Release the tab bar controller (in 3 s)",
+    "teardown: not run": "teardown: not run",
+    "teardown: releasing in %d s": "teardown: releasing in %d s",
+    "dealloc callbacks ran: %d / %d": "dealloc callbacks ran: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc callbacks ran: %d / %d (%@)",
+    "Tab bar controller released": "Tab bar controller released"
   },
   "zh-Hans": {
     "Close button of the plus button": "PlusButton 的关闭按钮",
@@ -464,7 +470,13 @@ module.exports = {
     "Space": "太空",
     "Ocean": "海洋",
     "Network icons": "网络图标",
-    "Log in to view “{title}”": "「{title}」需要登录后才能查看"
+    "Log in to view “{title}”": "「{title}」需要登录后才能查看",
+    "Release the tab bar controller (in 3 s)": "释放 TabBarController（3 秒后）",
+    "teardown: not run": "销毁：未执行",
+    "teardown: releasing in %d s": "销毁：%d 秒后释放",
+    "dealloc callbacks ran: %d / %d": "dealloc 回调已执行：%d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc 回调已执行：%d / %d (%@)",
+    "Tab bar controller released": "TabBarController 已释放"
   },
   "zh-Hant": {
     "Close button of the plus button": "PlusButton 的關閉按鈕",
@@ -695,6 +707,12 @@ module.exports = {
     "Space": "太空",
     "Ocean": "海洋",
     "Network icons": "網路圖示",
-    "Log in to view “{title}”": "「{title}」需要登入後才能查看"
+    "Log in to view “{title}”": "「{title}」需要登入後才能查看",
+    "Release the tab bar controller (in 3 s)": "釋放 TabBarController（3 秒後）",
+    "teardown: not run": "銷毀：未執行",
+    "teardown: releasing in %d s": "銷毀：%d 秒後釋放",
+    "dealloc callbacks ran: %d / %d": "dealloc 回呼已執行：%d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc 回呼已執行：%d / %d (%@)",
+    "Tab bar controller released": "TabBarController 已釋放"
   }
 };
