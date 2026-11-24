@@ -470,3 +470,14 @@
 "Host-driven playback (drivesAnimationPlayback = false)" = "Afspelen door de host (drivesAnimationPlayback = false)";
 "Engine API" = "Engine-API";
 "Pause while scrolling" = "Pauzeren tijdens scrollen";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Tabbalkcontroller vrijgeven (over 3 s)";
+"teardown: not run" = "afbouw: niet uitgevoerd";
+"teardown: releasing in %d s" = "afbouw: vrijgave over %d s";
+"dealloc callbacks ran: %d / %d" = "dealloc-callbacks uitgevoerd: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "dealloc-callbacks uitgevoerd: %d / %d (%@)";
+"Tab bar controller released" = "Tabbalkcontroller vrijgegeven";
+"bridge: pause %d, resume %d" = "bridge: pauze %d, hervat %d";
+"last event: -" = "laatste gebeurtenis: -";
+"last event: %@" = "laatste gebeurtenis: %@";

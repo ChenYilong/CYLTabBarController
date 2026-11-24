@@ -470,3 +470,14 @@
 "Host-driven playback (drivesAnimationPlayback = false)" = "Відтворенням керує хост (drivesAnimationPlayback = false)";
 "Engine API" = "API рушія";
 "Pause while scrolling" = "Пауза під час прокручування";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Звільнити контролер панелі вкладок (через 3 с)";
+"teardown: not run" = "звільнення: не виконувалось";
+"teardown: releasing in %d s" = "звільнення: через %d с";
+"dealloc callbacks ran: %d / %d" = "виконано зворотних викликів dealloc: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "виконано зворотних викликів dealloc: %d / %d (%@)";
+"Tab bar controller released" = "Контролер панелі вкладок звільнено";
+"bridge: pause %d, resume %d" = "міст: пауза %d, відновлення %d";
+"last event: -" = "остання подія: -";
+"last event: %@" = "остання подія: %@";

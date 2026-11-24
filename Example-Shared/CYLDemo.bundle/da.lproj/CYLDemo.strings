@@ -470,3 +470,14 @@
 "Host-driven playback (drivesAnimationPlayback = false)" = "Værten styrer afspilningen (drivesAnimationPlayback = false)";
 "Engine API" = "Engine-API";
 "Pause while scrolling" = "Pause under rulning";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Frigiv fanebjælke-controlleren (om 3 s)";
+"teardown: not run" = "nedrivning: ikke kørt";
+"teardown: releasing in %d s" = "nedrivning: frigiver om %d s";
+"dealloc callbacks ran: %d / %d" = "dealloc-callbacks kørt: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "dealloc-callbacks kørt: %d / %d (%@)";
+"Tab bar controller released" = "Fanebjælke-controlleren er frigivet";
+"bridge: pause %d, resume %d" = "bro: pause %d, genoptag %d";
+"last event: -" = "seneste hændelse: -";
+"last event: %@" = "seneste hændelse: %@";

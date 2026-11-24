@@ -237,16 +237,18 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
                 self.viewModel.setInput(input, value: true)
                 self.viewModel.play()
                 self.isActive = true
-                guard duration > 0 else {
+                guard CYLRiveInputPass.hasEnd(activeDuration: duration) else {
                     return
                 }
                 try? await Task.sleep(nanoseconds: UInt64(duration * 1_000_000_000))
-                guard !Task.isCancelled else {
+                // [EN] The end rule is the pure function `CYLRiveInputPass.ending` (unit-tested without RiveRuntime).
+                // [CN] 结束规则是纯函数 `CYLRiveInputPass.ending`（无需 RiveRuntime 即可单元测试）。
+                guard case .ended(let notifiesEnd) = CYLRiveInputPass.ending(activeDuration: duration, isCancelled: Task.isCancelled, loops: self.loops) else {
                     return
                 }
                 self.viewModel.setInput(input, value: false)
                 self.isActive = false
-                if !self.loops {
+                if notifiesEnd {
                     self.endHandler?()
                 }
             }

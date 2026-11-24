@@ -470,3 +470,14 @@
 "Host-driven playback (drivesAnimationPlayback = false)" = "Reprodução controlada pelo host (drivesAnimationPlayback = false)";
 "Engine API" = "API do motor";
 "Pause while scrolling" = "Pausar ao rolar";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Liberar o controlador da barra de abas (em 3 s)";
+"teardown: not run" = "liberação: não executada";
+"teardown: releasing in %d s" = "liberação: em %d s";
+"dealloc callbacks ran: %d / %d" = "callbacks de dealloc executados: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "callbacks de dealloc executados: %d / %d (%@)";
+"Tab bar controller released" = "Controlador da barra de abas liberado";
+"bridge: pause %d, resume %d" = "ponte: pausa %d, retomada %d";
+"last event: -" = "último evento: -";
+"last event: %@" = "último evento: %@";

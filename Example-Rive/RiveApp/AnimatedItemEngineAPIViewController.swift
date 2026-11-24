@@ -282,7 +282,12 @@ final class AnimatedItemEngineAPIViewController: UIViewController {
         card.layer.cornerRadius = 10
         card.layer.cornerCurve = .continuous
 
-        let stack = UIStackView(arrangedSubviews: [intro, icons, card])
+        // [EN] The playback card of the other examples (docs/Lifecycle-Library.md, step 21): its "Pause while scrolling" switch
+        //      pauses the playing items above while this page is scrolled, and shows the last animation event name.
+        // [CN] 其他示例的播放卡片（docs/Lifecycle-Library.md，第 21 步）：其「滚动时暂停」开关在本页滚动时暂停上方播放中的条目，并显示最近的动画事件名称。
+        let playback = CYLDemoPlaybackControlsView.make(in: self)
+        playback.directionalLayoutMargins = .zero
+        let stack = UIStackView(arrangedSubviews: [intro, icons, card, playback])
         stack.axis = .vertical
         stack.spacing = 16
         stack.translatesAutoresizingMaskIntoConstraints = false

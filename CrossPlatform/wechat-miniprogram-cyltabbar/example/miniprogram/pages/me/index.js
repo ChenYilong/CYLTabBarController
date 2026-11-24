@@ -112,7 +112,9 @@ Component({
     // [EN] The tab bar of this page, whose icons the playback controls play through cyl_player() (utils/cyl_item_players.js).
     // [CN] 本页面的 TabBar，播放控件通过 cyl_player() 播放其图标（utils/cyl_item_players.js）。
     cyl_tabBar() {
-      return this.getTabBar?.()?.selectComponent('#cyl-tab-bar');
+      // [EN] No optional call `?.(`: WeChat DevTools may fail to compile it (test/cyl_syntax_guard.test.js). [CN] 不用可选调用 `?.(`：微信开发者工具可能无法编译（见 test/cyl_syntax_guard.test.js）。
+      const tabBar = typeof this.getTabBar === 'function' ? this.getTabBar() : null;
+      return tabBar ? tabBar.selectComponent('#cyl-tab-bar') : null;
     },
     cyl_playAll() {
       cylPlayAll(this.cyl_tabBar());

@@ -470,3 +470,14 @@
 "Host-driven playback (drivesAnimationPlayback = false)" = "A lejátszást a gazda vezérli (drivesAnimationPlayback = false)";
 "Engine API" = "Motor-API";
 "Pause while scrolling" = "Szüneteltetés görgetés közben";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "A lapfülsáv-vezérlő felszabadítása (3 mp múlva)";
+"teardown: not run" = "lebontás: nem futott";
+"teardown: releasing in %d s" = "lebontás: felszabadítás %d mp múlva";
+"dealloc callbacks ran: %d / %d" = "lefutott dealloc visszahívások: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "lefutott dealloc visszahívások: %d / %d (%@)";
+"Tab bar controller released" = "A lapfülsáv-vezérlő felszabadult";
+"bridge: pause %d, resume %d" = "híd: szünet %d, folytatás %d";
+"last event: -" = "utolsó esemény: -";
+"last event: %@" = "utolsó esemény: %@";

@@ -470,3 +470,14 @@
 "Host-driven playback (drivesAnimationPlayback = false)" = "Lecture pilotée par l'hôte (drivesAnimationPlayback = false)";
 "Engine API" = "API moteur";
 "Pause while scrolling" = "Pause pendant le défilement";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Libérer le contrôleur de la barre d’onglets (dans 3 s)";
+"teardown: not run" = "libération : non exécutée";
+"teardown: releasing in %d s" = "libération : dans %d s";
+"dealloc callbacks ran: %d / %d" = "callbacks dealloc exécutés : %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "callbacks dealloc exécutés : %d / %d (%@)";
+"Tab bar controller released" = "Contrôleur de la barre d’onglets libéré";
+"bridge: pause %d, resume %d" = "pont : pause %d, reprise %d";
+"last event: -" = "dernier événement : -";
+"last event: %@" = "dernier événement : %@";

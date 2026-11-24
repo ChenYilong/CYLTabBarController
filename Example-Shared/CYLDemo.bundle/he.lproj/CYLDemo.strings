@@ -470,3 +470,14 @@
 "Host-driven playback (drivesAnimationPlayback = false)" = "המארח שולט בהפעלה (drivesAnimationPlayback = false)";
 "Engine API" = "API של מנוע";
 "Pause while scrolling" = "השהה בזמן גלילה";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "שחרר את בקר סרגל הלשוניות (בעוד 3 שנ׳)";
+"teardown: not run" = "פירוק: לא הורץ";
+"teardown: releasing in %d s" = "פירוק: שחרור בעוד %d שנ׳";
+"dealloc callbacks ran: %d / %d" = "קריאות חוזרות של dealloc שהורצו: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "קריאות חוזרות של dealloc שהורצו: %d / %d (%@)";
+"Tab bar controller released" = "בקר סרגל הלשוניות שוחרר";
+"bridge: pause %d, resume %d" = "גשר: השהיה %d, חידוש %d";
+"last event: -" = "אירוע אחרון: -";
+"last event: %@" = "אירוע אחרון: %@";
