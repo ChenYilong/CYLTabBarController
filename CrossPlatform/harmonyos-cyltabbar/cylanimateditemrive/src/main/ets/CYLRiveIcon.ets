@@ -61,6 +61,12 @@ export const CYLTabBarAnimationOptionRiveNumberInput: string = 'numberInput';
  * [CN] 数字输入依次使用的值，"3,4,5,6"，循环；没有时 +1。
  */
 export const CYLTabBarAnimationOptionRiveNumberValues: string = 'values';
+/**
+ * [EN] `CYLTabBarAnimationOptionRiveColor`: "#RRGGBB" or "#RRGGBBAA", set on the view model color "color" when the file
+ *      loads (as iOS and Android).
+ * [CN] "#RRGGBB" 或 "#RRGGBBAA"，文件加载时设置到 view model 颜色 "color"（与 iOS、Android 一致）。
+ */
+export const CYLTabBarAnimationOptionRiveColor: string = 'color';
 
 /**
  * [EN] The file part and the options of a Rive URL. The options follow "#" (the fragment `CYLTabBarAnimationURLWithOptions`

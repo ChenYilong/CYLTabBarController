@@ -7,6 +7,20 @@ import assert from 'node:assert/strict';
 
 const R = await import('../src/main/ets/CYLAnimatedItemRiveOptions.ts');
 
+test('the color option is read for view model files only, as on iOS', () => {
+  const options = (map) => (name) => map[name];
+  assert.equal(R.CYLAnimatedItemRiveOption.COLOR, 'color');
+  assert.equal(R.CYL_RIVE_COLOR_PROPERTY_PATH, 'color');
+  assert.equal(R.cylRiveOptionColor(options({ color: '#FF3B30' })), 0xFFFF3B30 | 0);
+  assert.equal(R.cylRiveOptionColor(options({ color: '00FF0080' })), 0x8000FF00 | 0, 'RRGGBBAA, as iOS');
+  assert.equal(R.cylRiveOptionColor(options({})), undefined);
+  assert.equal(R.cylRiveOptionColor(options({ color: ' ' })), undefined);
+  assert.equal(R.cylRiveOptionColor(options({ color: '#12345' })), undefined);
+  assert.equal(R.cylRiveOptionColor(options({ color: 'zzzzzz' })), undefined);
+  assert.equal(R.cylRiveOptionColor(options({ color: '#FF3B30', legacy: '1' })), undefined);
+  assert.equal(R.cylRiveOptionColor(options({ color: '#FF3B30', animation: 'idle' })), undefined);
+});
+
 test('a number input steps through its values, cycling, else +1', () => {
   assert.equal(R.cylRiveNextNumber('3,4,5,6', 3), 4);
   assert.equal(R.cylRiveNextNumber('3,4,5,6', 6), 3);

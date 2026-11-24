@@ -28,7 +28,10 @@ import {
   CYLAnimatedItemEngineBinding, CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemEngines,
   CYLAnimatedItemPlayer, CYLAnimatedItemSource, cylAnimatedItemARGBInteger, cylAnimatedItemParseHexColor
 } from 'cylanimateditem';
-import { CYLAnimatedItemRiveOption, cylRiveActiveDuration, cylRiveNextNumber, cylRiveUsesLegacyRuntime } from './CYLAnimatedItemRiveOptions';
+import {
+  CYL_RIVE_COLOR_PROPERTY_PATH, CYLAnimatedItemRiveOption, cylRiveActiveDuration, cylRiveNextNumber, cylRiveOptionColor,
+  cylRiveUsesLegacyRuntime
+} from './CYLAnimatedItemRiveOptions';
 
 /** [EN] The native ABI of @ohos/rive 1.0.4. [CN] @ohos/rive 1.0.4 的原生 ABI。 */
 const CYL_RIVE_ABI: string = 'arm64-v8a';
@@ -98,6 +101,7 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
   private requestedColors?: Map<string, string>;
   private originalColors: Map<string, number> = new Map<string, number>();
   private overriddenColorPaths: Set<string> = new Set<string>();
+  private optionColorApplied: boolean = false;
 
   constructor(source: CYLAnimatedItemSource, view: RiveAnimationView) {
     super('Rive', source);
@@ -138,6 +142,8 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
     if (instance === null) {
       return;
     }
+    // [EN] The `color` option first, so it is the original that restoring returns to. [CN] 先应用 `color` 选项，使其成为恢复时的原值。
+    this.cylApplyOptionColor(view);
     const colors = this.requestedColors;
     if (colors !== undefined) {
       colors.forEach((text: string, path: string) => {
@@ -243,6 +249,32 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
     }
     const machines = view.getStateMachines();
     return machines.length > 0 ? machines[0].name : undefined;
+  }
+
+  /**
+   * [EN] The `color` option, once the view model exists: written to its "color" property and kept as that property's
+   *      original, so restoring after applyColors returns to it (iOS CYLRiveTabBarItemAnimationView `lightColor`). Moved
+   *      from CYLTableViewPlaceHolder's Rive animator (`applyLightColor`, deleted in its 3569628a).
+   * [CN] `color` 选项：视图模型存在后写入其 "color" 属性并作为该属性的原值保存，applyColors 之后恢复时回到它（iOS `lightColor`）。
+   *      从 CYLTableViewPlaceHolder 的 Rive 动画器（`applyLightColor`，在其 3569628a 中删除）迁移而来。
+   */
+  private cylApplyOptionColor(view: RiveAnimationView): void {
+    if (this.optionColorApplied) {
+      return;
+    }
+    const value = cylRiveOptionColor((name: string) => this.option(name));
+    const instance = value === undefined ? null : this.cylViewModel(view);
+    if (value === undefined || instance === null) {
+      this.optionColorApplied = value === undefined;
+      return;
+    }
+    this.optionColorApplied = true;
+    try {
+      instance.getColorProperty(CYL_RIVE_COLOR_PROPERTY_PATH).value = value;
+      this.originalColors.set(CYL_RIVE_COLOR_PROPERTY_PATH, value);
+    } catch (e) {
+      // [EN] No "color" property: the file keeps its colors, as on iOS. [CN] 没有 "color" 属性：文件保持原色，与 iOS 一致。
+    }
   }
 
   private cylViewModel(view: RiveAnimationView): ViewModelInstance | null {
@@ -355,6 +387,7 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
     }
     this.fileWaits = 0;
     this.hasPlayed = true;
+    this.cylApplyOptionColor(view);
     // [EN] Colors asked for before the file was built. [CN] 文件建好之前请求的颜色。
     if (this.requestedColors !== undefined) {
       this.cylApplyRequestedColors(view);
