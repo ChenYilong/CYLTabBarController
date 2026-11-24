@@ -212,6 +212,7 @@ docs/
 │   ├── android-api37-20261119-example-rive-live-uimode-switch.png
 │   ├── android-api37-20261119-rive-fixed-tint-unselected-only.png
 │   ├── android-api37-20261119-rive-follows-appearance.png
+│   ├── android-api37-x86_64-emulator-demo-teardown-en-zh-ar-c6b3e976-20261124.png
 │   ├── android-default-tab-bar-height-system-80dp.png
 │   ├── android-example-rive-svga-tab-switch.png
 │   ├── android-example-strings-en-zh-ja.png
