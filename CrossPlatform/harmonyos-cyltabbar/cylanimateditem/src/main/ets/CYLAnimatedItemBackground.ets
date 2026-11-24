@@ -21,10 +21,10 @@ export enum CYLAnimatedItemBackgroundStyle {
  * [EN] The one place that decides and applies an item background on HarmonyOS: `CYLAnimatedItemView` uses it for its own root, and a
  *      host whose item is not a `CYLAnimatedItemView` (CollectionViewClassifyMenu's tag) applies the same background to its container
  *      with `.attributeModifier(new CYLAnimatedItemBackgroundModifier(...))`, so it keeps no glass, blur or capsule code of its own.
- *      `cornerRadius` -1 is not set: a capsule for the drawn glass, square for flat; a value of 0 or more customizes it.
+ *      `cornerRadius` -1 is not set: a capsule for every style; a value of 0 or more customizes it.
  * [CN] 鸿蒙上决定并应用条目背景的唯一位置：`CYLAnimatedItemView` 用它处理自己的根节点；条目不是 `CYLAnimatedItemView` 的宿主（CollectionViewClassifyMenu 的
  *      标签）用 `.attributeModifier(new CYLAnimatedItemBackgroundModifier(...))` 把同样的背景应用到自己的容器，因此不保留任何玻璃、模糊或胶囊代码。
- *      `cornerRadius` 为 -1 表示未设置：绘制玻璃时为胶囊，扁平时为直角；0 及以上的值用于自定义。
+ *      `cornerRadius` 为 -1 表示未设置：所有样式均为胶囊；0 及以上的值用于自定义。
  */
 export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<CommonAttribute> {
   style: CYLAnimatedItemBackgroundStyle;
@@ -54,13 +54,13 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
   }
 
   /**
-   * [EN] The radius: the set value, else a capsule for the drawn glass and square for flat. [CN] 圆角：设置的值，否则绘制玻璃时为胶囊、扁平时为直角。
+   * [EN] The radius: the set value, else a capsule for every style. [CN] 圆角：设置的值，否则所有样式均为胶囊。
    */
   static resolvedCornerRadius(style: CYLAnimatedItemBackgroundStyle, cornerRadius: number): number {
     if (cornerRadius >= 0) {
       return cornerRadius;
     }
-    return CYLAnimatedItemBackgroundModifier.isGlassDrawn(style) ? CYLAnimatedItemCornerRadiusCapsule : 0;
+    return CYLAnimatedItemCornerRadiusCapsule;
   }
 
   applyNormalAttribute(instance: CommonAttribute): void {

@@ -1213,10 +1213,10 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     /**
      * [EN] The corner radius in dp, applied as `min(radius, height / 2)`: 0 is square, [CYLAnimatedItemCornerRadiusCapsule] (1000) is a capsule; no other value has a special meaning. null
-     *      (the default) is not set: the Liquid Glass style is a capsule (half the height), so a host gets a capsule without setting
-     *      anything and customizes it by setting this property; the flat style is square.
-     * [CN] 圆角半径（dp），实际取 `min(radius, height / 2)`：0 为直角，[CYLAnimatedItemCornerRadiusCapsule]（1000）为胶囊，其他值没有特殊含义。null（默认）表示未设置：液态玻璃样式为胶囊
-     *      （半高），宿主无需设置任何属性即可得到胶囊，要自定义时设置此属性即可；扁平样式为直角。
+     *      (the default) is not set: a capsule (half the height) for every background style, Liquid Glass and flat, so a host gets a capsule
+     *      without setting anything and customizes it by setting this property.
+     * [CN] 圆角半径（dp），实际取 `min(radius, height / 2)`：0 为直角，[CYLAnimatedItemCornerRadiusCapsule]（1000）为胶囊，其他值没有特殊含义。null（默认）表示未设置：所有背景样式（液态玻璃与扁平）均为胶囊
+     *      （半高），宿主无需设置任何属性即可得到胶囊，要自定义时设置此属性即可。
      */
     var itemCornerRadius: Float? = null
         set(value) { field = value; itemBackgroundDidChange() }
@@ -1263,13 +1263,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         // The host's value limited to half the height, else a capsule for Liquid Glass (the rule `0: automatic, a capsule` that
         // CollectionViewClassifyMenu's tags had, moved here) and square for flat.
         val requested = itemCornerRadius
-        val radius = if (requested != null) {
-            min(max(requested, 0f) * density, height / 2f)
-        } else if (resolvedItemBackgroundStyle == CYLAnimatedItemBackgroundStyle.LiquidGlass) {
-            height / 2f
-        } else {
-            0f
-        }
+        val radius = if (requested != null) min(max(requested, 0f) * density, height / 2f) else height / 2f
         itemBox.cornerRadius = radius
         itemBox.setStroke((itemBorderWidth * density).roundToInt(), itemBorderColor ?: Color.TRANSPARENT)
         var glassDrawn = false

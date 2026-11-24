@@ -437,10 +437,10 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
     /**
      [EN] The corner radius, applied as `min(radius, height / 2)`: 0 is square, `CYLAnimatedItemCornerRadiusCapsule` (1000) is a capsule; no other value has a special meaning. nil (the
-          default) is not set: the Liquid Glass style is a capsule (half the height), so a host gets a capsule without setting
-          anything and customizes it by setting this property; the flat style is square.
-     [CN] 圆角半径，实际取 `min(radius, height / 2)`：0 为直角，`CYLAnimatedItemCornerRadiusCapsule`（1000）为胶囊，其他值没有特殊含义。nil（默认）表示未设置：液态玻璃样式为胶囊（半高），
-          宿主无需设置任何属性即可得到胶囊，要自定义时设置此属性即可；扁平样式为直角。
+          default) is not set: a capsule (half the height) for every background style, Liquid Glass and flat, so a host gets a capsule
+          without setting anything and customizes it by setting this property.
+     [CN] 圆角半径，实际取 `min(radius, height / 2)`：0 为直角，`CYLAnimatedItemCornerRadiusCapsule`（1000）为胶囊，其他值没有特殊含义。nil（默认）表示未设置：所有背景样式（液态玻璃与扁平）均为胶囊（半高），
+          宿主无需设置任何属性即可得到胶囊，要自定义时设置此属性即可。
      */
     public var itemCornerRadius: CGFloat? {
         didSet { itemBackgroundDidChange() }
@@ -500,7 +500,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         if let requested = itemCornerRadius {
             radius = min(max(requested, 0), bounds.height / 2)
         } else {
-            radius = resolvedItemBackgroundStyle == .liquidGlass ? bounds.height / 2 : 0
+            radius = bounds.height / 2
         }
         layer.cornerRadius = radius
         layer.borderWidth = itemBorderWidth

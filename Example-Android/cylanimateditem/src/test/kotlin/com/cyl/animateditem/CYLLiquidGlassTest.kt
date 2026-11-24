@@ -62,13 +62,13 @@ class CYLLiquidGlassTest {
 
     @Test
     @Config(sdk = [34])
-    fun anUnsetRadiusIsACapsuleForGlassAndSquareForFlatAndASetRadiusWins() {
+    fun anUnsetRadiusIsACapsuleForEveryStyleAndASetRadiusWins() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val view = CYLAnimatedItemView(context)
         view.itemBackgroundColor = 0xFF336699.toInt()
         CYLAnimatedItemView.liquidGlassActiveOverride = true
         view.layout(0, 0, 200, 80)
-        assertEquals("flat, unset: square", 0f, (view.background as android.graphics.drawable.GradientDrawable).cornerRadius)
+        assertEquals("flat, unset: a capsule", 40f, (view.background as android.graphics.drawable.GradientDrawable).cornerRadius)
         view.itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.LiquidGlass
         view.layout(0, 0, 200, 80)
         assertEquals("glass, unset: a capsule", 40f, (view.background as android.graphics.drawable.GradientDrawable).cornerRadius)
