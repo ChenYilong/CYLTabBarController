@@ -475,7 +475,33 @@ function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, bord
   return { css, glass }
 }
 
+/**
+ * [EN] The reason of a failed animation for `resourcemissing`: "engine library missing" (no engine component, e.g.
+ *      `cyl-animation-placeholder`'s message), "not found" (a missing file, a failed download or request), "unreadable"
+ *      (no permission, an empty file), else "decode failed". The same four strings on every platform.
+ * [CN] 动画失败时 `resourcemissing` 的原因："engine library missing"（没有引擎组件，如 `cyl-animation-placeholder` 的消息）、
+ *      "not found"（文件不存在、下载或请求失败）、"unreadable"（无权限、文件为空），其余为 "decode failed"。各平台字符串相同。
+ */
+function cylAnimatedItemMissingReason(message) {
+  const text = String(message || '')
+  if (/no animation component|no engine|install its package/i.test(text)) return 'engine library missing'
+  if (/not found|no such file|ENOENT|404|file not exist|request:fail|downloadFile:fail|download fail|failed to (load|fetch|download)/i.test(text)) return 'not found'
+  if (/permission|unreadable|empty file|EACCES/i.test(text)) return 'unreadable'
+  return 'decode failed'
+}
+
+/**
+ * [EN] The file name or path as configured: the `#` options of a source are not part of it. [CN] 按配置给出的文件名或路径：不含 source 的 `#` 选项。
+ */
+function cylAnimatedItemResource(animationUrl) {
+  const text = String(animationUrl || '')
+  const hash = text.indexOf('#')
+  return hash < 0 ? text : text.slice(0, hash)
+}
+
 module.exports = {
+  cylAnimatedItemMissingReason,
+  cylAnimatedItemResource,
   cylAnimatedItemGlassTint,
   cylAnimatedItemCornerRadiusCapsule,
   cylAnimatedItemBackground,

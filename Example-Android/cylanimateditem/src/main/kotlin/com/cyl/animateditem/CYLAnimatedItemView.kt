@@ -446,6 +446,23 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     var onAnimationFailed: (() -> Unit)? = null
 
     /**
+     * [EN] Called on the main thread when the animation file cannot be shown, with the file name or path as configured
+     *      (`animationURL`) and a short reason (`CYLResourceMissingReason`: "not found", "unreadable", "decode failed",
+     *      "engine library missing"). Once per resource per view; the item still shows its image or the placeholder.
+     *      `CYLAnimationEngines.resourceMissingListener` hears the same call. iOS: `onResourceMissing`.
+     * [CN] 动画文件无法显示时在主线程调用，参数为按配置给出的文件名或路径（`animationURL`）与简短原因。每个视图每个资源一次；条目仍显示图片或占位图。
+     *      `CYLAnimationEngines.resourceMissingListener` 收到同一次调用。
+     */
+    var onResourceMissing: ((resource: String, reason: String) -> Unit)? = null
+
+    private val reportedMissingResources = HashSet<String>()
+
+    private fun resourceMissing(resource: String, reason: String) {
+        if (!reportedMissingResources.add(resource)) return
+        CYLAnimationEngines.dispatchResourceMissing(context, resource, reason, onResourceMissing)
+    }
+
+    /**
      * [EN] Whether the still image replaces the ended animation now (`showsImageWhenAnimationEnds`). [CN] 静态图片当前是否替换了已结束的动画。
      */
     var isShowingImageAfterAnimationEnd: Boolean = false
@@ -745,7 +762,11 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         endWatchGeneration++
         isShowingImageAfterAnimationEnd = false
         val url = animationURL
-        if (!url.isNullOrBlank() && !localFileIsMissing(url)) {
+        val fileMissing = !url.isNullOrBlank() && localFileIsMissing(url)
+        if (fileMissing && url != null) {
+            resourceMissing(url.substringBefore('#'), if (localFileExists(url)) CYLResourceMissingReason.UNREADABLE else CYLResourceMissingReason.NOT_FOUND)
+        }
+        if (!url.isNullOrBlank() && !fileMissing) {
             val (w, h) = iconSizeDp?.let { it.width to it.height } ?: (24f to 24f)
             // [EN] No engine, no library or a file it cannot read: no view, the static image stays (an app's own source that
             //      throws is treated the same way). [CN] 没有引擎、没有动画库或文件无法读取：不创建视图，保留静态图片（App 自己的来源抛出异常时同样处理）。
@@ -760,7 +781,15 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
                     player.progress = animationRestingProgress
                 }
                 if (drivesAnimationPlayback && isSelected) playAnimation()
-            } ?: CYLAnimationEngines.warnMissingEngine(context, null, url)
+            } ?: run {
+                CYLAnimationEngines.warnMissingEngine(context, null, url)
+                val type = CYLAnimationEngines.typeOf(null, url)
+                resourceMissing(url.substringBefore('#'), when {
+                    type != null && !CYLAnimationEngines.isAvailable(type) -> CYLResourceMissingReason.ENGINE_LIBRARY_MISSING
+                    type != null -> CYLResourceMissingReason.UNREADABLE
+                    else -> CYLResourceMissingReason.DECODE_FAILED
+                })
+            }
         }
         updateIcon()
         requestLayout()
@@ -784,6 +813,18 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             // [EN] An absolute path ("/..." on Android; also a drive path when the JVM tests run on Windows). [CN] 绝对路径（Android 上为 "/..."；JVM 测试在 Windows 上运行时也包括盘符路径）。
             java.io.File(file).isAbsolute -> missing(file)
             else -> false
+        }
+    }
+
+    /**
+     * [EN] Whether the local file of `url` exists (so a missing one is empty rather than absent). [CN] `url` 的本地文件是否存在（不存在与存在但为空的区别）。
+     */
+    private fun localFileExists(url: String): Boolean {
+        val file = url.substringBefore('#')
+        return when {
+            file.startsWith(ANDROID_ASSET_PREFIX) -> try { context.assets.open(file.removePrefix(ANDROID_ASSET_PREFIX)).close(); true } catch (error: java.io.IOException) { false }
+            file.startsWith("file:") -> android.net.Uri.parse(file).path?.let { java.io.File(it).isFile } == true
+            else -> java.io.File(file).isFile
         }
     }
 
@@ -930,7 +971,15 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     }
 
     override fun cyl_animationViewDidFail(animationView: View) {
-        if (animationView !== this.animationView) return
+        // [EN] The tab bar's own animation view (not `this.animationView`) reports the file it was made for. [CN] TabBar 自己的动画视图（不是 `this.animationView`）报告其对应的文件。
+        if (animationView !== this.animationView) {
+            CYLTabBarItemAnimationFailure.missingResource(animationView)?.let { (resource, reason) -> resourceMissing(resource, reason) }
+            return
+        }
+        animationURL?.takeIf { it.isNotBlank() }?.let {
+            val reason = CYLTabBarItemAnimationFailure.reasonOf(animationView)
+            resourceMissing(it.substringBefore('#'), reason)
+        }
         removeView(animationView)
         this.animationView = null
         playing = false

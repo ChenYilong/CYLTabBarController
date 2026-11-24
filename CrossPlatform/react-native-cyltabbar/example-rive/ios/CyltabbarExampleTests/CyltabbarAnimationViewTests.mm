@@ -434,4 +434,31 @@ static SharedColor CYLTestSharedColor(uint8_t red, uint8_t green, uint8_t blue) 
   XCTAssertEqual(ended, 2, @"no emitter: the callback still runs and the C++ call is skipped");
 }
 
+// [EN] `onResourceMissing` is passed through: a source that is a missing file reaches the view's block with the file as configured
+//      and "not found", and the C++ emitter call (`OnResourceMissing{resource, reason}`) returns without a crash.
+// [CN] `onResourceMissing` 原样传递：source 为不存在的文件时，视图的 block 收到按配置给出的文件与 "not found"，C++ 发射器调用正常返回不崩溃。
+- (void)testResourceMissingIsPassedThroughWithTheFileAndTheReason {
+  auto emitter = std::make_shared<CyltabbarAnimationViewEventEmitter>(nullptr, std::weak_ptr<const EventDispatcher>());
+  [self setEventEmitter:emitter];
+  __block NSMutableArray<NSString *> *heard = [NSMutableArray array];
+  void (^original)(NSString *, NSString *) = [_item valueForKey:@"onResourceMissing"];
+  XCTAssertNotNil(original, @"the bridge wires onResourceMissing");
+  [_item setValue:^(NSString *resource, NSString *reason) {
+    [heard addObject:[NSString stringWithFormat:@"%@|%@", resource.lastPathComponent, reason]];
+    original(resource, reason);
+  } forKey:@"onResourceMissing"];
+
+  // [EN] A file name that is not in the app (the bridge reports it), then a path that does not exist (the item reports it).
+  // [CN] App 中没有的文件名（由桥接报告），然后是不存在的路径（由条目报告）。
+  [self update:^(CyltabbarAnimationViewProps &props) { props.source = "cyl-no-such-icon.pag#artboard=A"; }];
+  [self spinMainQueue];
+  XCTAssertEqualObjects(heard, (@[ @"cyl-no-such-icon.pag|not found" ]));
+  NSString *missing = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-rn-missing.pag"];
+  [[NSFileManager defaultManager] removeItemAtPath:missing error:NULL];
+  [self update:^(CyltabbarAnimationViewProps &props) { props.source = std::string(missing.UTF8String); }];
+  [self spinMainQueue];
+  XCTAssertEqualObjects(heard.lastObject, @"cyl-rn-missing.pag|not found");
+  [self setEventEmitter:nullptr];
+}
+
 @end

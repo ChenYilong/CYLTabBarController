@@ -2,6 +2,8 @@ package com.cyl.animateditem
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 
 /**
@@ -15,6 +17,38 @@ import android.util.Log
  *      `CYLAnimationKeys`。
  */
 object CYLAnimationEngines {
+
+    /**
+     * [EN] Called on the main thread when an animation file cannot be shown, with the file name or path as configured and
+     *      a short reason (`CYLResourceMissingReason`): once per resource per view. The same signal as
+     *      `CYLAnimatedItemView.onResourceMissing`, for a host with no view reference (CYLPlaceholder's status bar).
+     *      Nothing else changes: the item still shows its static image or the placeholder. iOS:
+     *      `CYLAnimationEngines.resourceMissingListener`.
+     * [CN] 动画文件无法显示时在主线程调用，参数为按配置给出的文件名或路径与一个简短原因（`CYLResourceMissingReason`）：每个视图每个资源一次。
+     *      与 `CYLAnimatedItemView.onResourceMissing` 是同一信号，供没有视图引用的宿主使用（CYLPlaceholder 状态栏）。其他行为不变：条目仍显示
+     *      静态图片或占位图。
+     */
+    @JvmStatic
+    @Volatile
+    var resourceMissingListener: ((resource: String, reason: String) -> Unit)? = null
+
+    private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+
+    /**
+     * [EN] Delivers a missing resource on the main thread: logs a warning in a debuggable app, calls `viewCallback`, then
+     *      `resourceMissingListener`. A throwing callback does not stop the other.
+     * [CN] 在主线程上报缺失的资源：可调试的 App 中输出警告日志，先调用 `viewCallback`，再调用 `resourceMissingListener`。某个回调抛出异常不影响另一个。
+     */
+    internal fun dispatchResourceMissing(context: Context, resource: String, reason: String, viewCallback: ((String, String) -> Unit)?) {
+        val deliver = Runnable {
+            if (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+                Log.w("CYLAnimatedItem", "Animation resource \"$resource\" is missing: $reason. Shown in debuggable builds only.")
+            }
+            runCatching { viewCallback?.invoke(resource, reason) }
+            runCatching { resourceMissingListener?.invoke(resource, reason) }
+        }
+        if (Looper.myLooper() == Looper.getMainLooper()) deliver.run() else mainHandler.post(deliver)
+    }
 
     private class Type(val name: String, val extensions: List<String>, val keys: Map<String, String>, val dependency: String, val isAvailable: () -> Boolean)
 
@@ -116,4 +150,16 @@ object CYLAnimationEngines {
      */
     @androidx.annotation.VisibleForTesting
     internal fun resetWarnings() = synchronized(warned) { warned.clear() }
+}
+
+/**
+ * [EN] The `reason` of a missing resource (`CYLAnimatedItemView.onResourceMissing`,
+ *      `CYLAnimationEngines.resourceMissingListener`): the same four tokens on every platform.
+ * [CN] 缺失资源的 `reason`：各平台使用同样的四个字符串。
+ */
+object CYLResourceMissingReason {
+    const val NOT_FOUND = "not found"
+    const val UNREADABLE = "unreadable"
+    const val DECODE_FAILED = "decode failed"
+    const val ENGINE_LIBRARY_MISSING = "engine library missing"
 }

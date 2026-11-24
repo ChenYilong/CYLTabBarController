@@ -26,7 +26,8 @@ import { deviceInfo } from '@kit.BasicServicesKit';
 import { LifecycleController } from 'cyldeallocblockexecutor';
 import {
   CYLAnimatedItemEngineBinding, CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemEngines,
-  CYLAnimatedItemPlayer, CYLAnimatedItemSource, cylAnimatedItemARGBInteger, cylAnimatedItemParseHexColor
+  CYLAnimatedItemPlayer, CYLAnimatedItemSource, cylAnimatedItemARGBInteger, cylAnimatedItemParseHexColor,
+  CYL_RESOURCE_DECODE_FAILED, CYL_RESOURCE_ENGINE_LIBRARY_MISSING, CYL_RESOURCE_NOT_FOUND, CYL_RESOURCE_UNREADABLE
 } from 'cylanimateditem';
 import {
   CYL_RIVE_COLOR_PROPERTY_PATH, CYLAnimatedItemRiveOption, cylRiveActiveDuration, cylRiveNextNumber, cylRiveOffWindowEnds,
@@ -694,7 +695,7 @@ export struct CYLAnimatedItemRiveView {
       cylEnsureRiveInitialized();
     } catch (e) {
       this.unusable = true;
-      this.binding.failed(this.state);
+      this.binding.failed(this.state, CYL_RESOURCE_ENGINE_LIBRARY_MISSING);
       return;
     }
     this.cylReadFile();
@@ -731,13 +732,13 @@ export struct CYLAnimatedItemRiveView {
     this.bytes = null;
     if (/^https?:\/\//i.test(source.path)) {
       // [EN] @ohos/rive reads bytes only; remote files are not supported yet. [CN] @ohos/rive 只读取字节；尚不支持远程文件。
-      this.binding.failed(this.state);
+      this.binding.failed(this.state, CYL_RESOURCE_UNREADABLE);
       return;
     }
     const context = this.getUIContext().getHostContext();
     const content = context === undefined ? undefined : source.rawFileContent(context.resourceManager);
     if (content === undefined) {
-      this.binding.failed(this.state);
+      this.binding.failed(this.state, CYL_RESOURCE_NOT_FOUND);
       return;
     }
     this.bytes = content.buffer.slice(content.byteOffset, content.byteOffset + content.byteLength) as ArrayBuffer;
@@ -760,7 +761,7 @@ export struct CYLAnimatedItemRiveView {
       this.loaded = true;
       this.binding.ready(this.state, new CYLAnimatedItemRivePlayer(source, view));
     } catch (e) {
-      this.binding.failed(this.state);
+      this.binding.failed(this.state, CYL_RESOURCE_DECODE_FAILED);
     }
   }
 

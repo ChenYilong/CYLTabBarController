@@ -14,6 +14,10 @@ import { deviceInfo } from '@kit.BasicServicesKit';
 import { CYLAnimatedItemEngineState, CYLAnimatedItemEngineView } from './CYLAnimatedItemEngine';
 import { CYLAnimatedItemPlayer } from './CYLAnimatedItemPlayer';
 import { CYLAnimatedItemSource } from './CYLAnimatedItemSource';
+import {
+  CYLAnimatedItemMissingReporter, CYLAnimatedItemResourceMissingCallback, cylAnimatedItemResourceOf, CYL_RESOURCE_DECODE_FAILED,
+  CYL_RESOURCE_ENGINE_LIBRARY_MISSING
+} from './CYLAnimatedItemMissing';
 
 /** [EN] `maxLines` for a title without a line limit (`titleLines` 0). [CN] 标题不限行数（`titleLines` 为 0）时的 `maxLines`。 */
 const CYL_UNLIMITED_LINES: number = 1000;
@@ -113,7 +117,8 @@ export class CYLAnimatedItemAnimationContext {
   restartToken: number = 0;
   onLoaded: () => void = () => {
   };
-  onFailed: () => void = () => {
+  /** [EN] `reason` is optional: "decode failed" without one. [CN] `reason` 可省略：省略时为 "decode failed"。 */
+  onFailed: (reason?: string) => void = (_reason?: string) => {
   };
   /**
    * [EN] Called by the engine when a play-once pass (`loops` off) reaches its end; the item then shows its still image
@@ -200,6 +205,16 @@ export function cylAnimatedItemTypeOf(url: string): string {
  */
 export class CYLAnimatedItemEngines {
   private static warned: string[] = [];
+
+  /**
+   * [EN] Called when an animation file cannot be shown, with the file name or path as configured and a short reason ("not
+   *      found", "unreadable", "decode failed", "engine library missing"): once per resource per item. The same call as
+   *      `CYLAnimatedItemView.onResourceMissing`, for a host that holds no item (CYLPlaceholder's status bar). Nothing else
+   *      changes. iOS and Android: `CYLAnimationEngines.resourceMissingListener`.
+   * [CN] 动画文件无法显示时调用，参数为按配置给出的文件名或路径与简短原因：每个条目每个资源一次。与 `CYLAnimatedItemView.onResourceMissing`
+   *      是同一次调用，供不持有条目的宿主使用（CYLPlaceholder 状态栏）。其他行为不变。
+   */
+  static resourceMissingListener: CYLAnimatedItemResourceMissingCallback | undefined = undefined;
 
   /**
    * [EN] Reads the device's ABIs (`deviceInfo.abiList`) once, so engines whose native library is not built for this device
@@ -467,6 +482,17 @@ export struct CYLAnimatedItemView {
    * [EN] Called when a play-once animation ends (iOS / Android `animationEndListener`). [CN] 只播放一次的动画结束时调用。
    */
   onAnimationEnd?: () => void;
+  /**
+   * [EN] Called when the animation file cannot be shown, with the file name or path as configured (`animationUrl` without its
+   *      `#` options) and a short reason: "not found", "unreadable", "decode failed" or "engine library missing". Once per
+   *      resource per item; the item shows its image or the placeholder as before.
+   *      `CYLAnimatedItemEngines.resourceMissingListener` hears the same call. iOS and Android: `onResourceMissing`.
+   * [CN] 动画文件无法显示时调用，参数为按配置给出的文件名或路径（`animationUrl` 去掉 `#` 选项）与简短原因："not found"、"unreadable"、
+   *      "decode failed"、"engine library missing"。每个条目每个资源一次；条目仍显示图片或占位图。
+   *      `CYLAnimatedItemEngines.resourceMissingListener` 收到同一次调用。
+   */
+  onResourceMissing?: CYLAnimatedItemResourceMissingCallback;
+  private cylMissingReporter: CYLAnimatedItemMissingReporter = new CYLAnimatedItemMissingReporter();
   /** [EN] The still image replaces the ended animation. [CN] 静态图片替换了已结束的动画。 */
   @State cylShowsImageAfterEnd: boolean = false;
   private cylLastSelected: boolean = false;
@@ -829,7 +855,20 @@ export struct CYLAnimatedItemView {
     this.cylUpdateContext();
     if (this.animationUrl.length > 0 && !CYLAnimatedItemEngines.canPlay(this.animationUrl)) {
       CYLAnimatedItemEngines.warnMissingEngine(this.animationUrl);
+      // [EN] A known type without its engine (or its library for this device); a file of no known type cannot be decoded.
+      // [CN] 已知类型缺少引擎（或其库没有为本设备构建）；不属于任何已知类型的文件无法解码。
+      this.cylReportResourceMissing(this.animationUrl,
+        cylAnimatedItemTypeOf(this.animationUrl).length > 0 ? CYL_RESOURCE_ENGINE_LIBRARY_MISSING : CYL_RESOURCE_DECODE_FAILED);
     }
+  }
+
+  /**
+   * [EN] Tells `onResourceMissing` and `CYLAnimatedItemEngines.resourceMissingListener` that the file of `url` cannot be
+   *      shown, once per resource. [CN] 通知 `onResourceMissing` 与 `CYLAnimatedItemEngines.resourceMissingListener`：`url` 的文件无法显示，每个资源一次。
+   */
+  cylReportResourceMissing(url: string, reason: string): void {
+    this.cylMissingReporter.report(cylAnimatedItemResourceOf(url), reason, this.onResourceMissing,
+      CYLAnimatedItemEngines.resourceMissingListener);
   }
 
   /**
@@ -899,9 +938,10 @@ export struct CYLAnimatedItemView {
         this.animationLoaded = true;
       }
     };
-    context.onFailed = () => {
+    context.onFailed = (reason?: string) => {
       if (url === this.animationUrl) {
         this.animationFailed = true;
+        this.cylReportResourceMissing(url, reason ?? CYL_RESOURCE_DECODE_FAILED);
       }
     };
     context.onEnded = () => {

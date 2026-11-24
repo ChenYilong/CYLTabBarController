@@ -6,7 +6,7 @@
  */
 const test = require('node:test')
 const assert = require('node:assert/strict')
-const { cylAnimatedItemModel, cylAnimatedItemType, cylAnimatedItemPackage, cylAnimatedItemRestingProgress, cylAnimatedItemGifSource, CYL_ANIMATED_ITEM_PLACEHOLDER } = require('../src/cyl-animated-item/cyl_animated_item_model')
+const { cylAnimatedItemMissingReason, cylAnimatedItemResource, cylAnimatedItemModel, cylAnimatedItemType, cylAnimatedItemPackage, cylAnimatedItemRestingProgress, cylAnimatedItemGifSource, CYL_ANIMATED_ITEM_PLACEHOLDER } = require('../src/cyl-animated-item/cyl_animated_item_model')
 
 test('the animation type from the extension', () => {
   assert.deepEqual(['a.json', 'a.lottie', 'a.pag', 'a.riv', 'a.svga', 'a.gif', 'a.png', 'https://x/a.riv#artboard=HOME', ''].map(cylAnimatedItemType),
@@ -233,4 +233,19 @@ test('animationTint passes to the Rive engine as one color', () => {
   const { cylAnimatedItemModel: model } = require('../src/cyl-animated-item/cyl_animated_item_model')
   assert.equal(model({ animationUrl: 'a.riv', animationTint: ' #007AFF ' }).animationTint, '#007AFF')
   assert.equal(model({ animationUrl: 'a.riv' }).animationTint, '')
+})
+
+test('the reason of resourcemissing is one of the four strings every platform uses', () => {
+  assert.equal(cylAnimatedItemMissingReason('cyl-tab-bar: no animation component for a.riv; install its package and set the generic'), 'engine library missing')
+  assert.equal(cylAnimatedItemMissingReason('request:fail 404'), 'not found')
+  assert.equal(cylAnimatedItemMissingReason('ENOENT: no such file or directory'), 'not found')
+  assert.equal(cylAnimatedItemMissingReason('EACCES permission denied'), 'unreadable')
+  assert.equal(cylAnimatedItemMissingReason('bad file'), 'decode failed')
+  assert.equal(cylAnimatedItemMissingReason(undefined), 'decode failed')
+})
+
+test('the resource is the file as configured, without the # options', () => {
+  assert.equal(cylAnimatedItemResource('icons.riv#artboard=CHAT'), 'icons.riv')
+  assert.equal(cylAnimatedItemResource('https://x/a.json'), 'https://x/a.json')
+  assert.equal(cylAnimatedItemResource(undefined), '')
 })

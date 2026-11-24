@@ -113,6 +113,17 @@ test('the binding hands the player out, reports it loaded, forwards its end, and
   assert.deepEqual(player.calls.slice(-1), ['destroy']);
 });
 
+test('the binding passes the reason of a failure to the host, undefined when the engine gives none', () => {
+  const reasons = [];
+  const host = Object.assign(playback({ selected: false }), {
+    drivesPlayback: true, onLoaded: () => {}, onFailed: (reason) => reasons.push(reason), onEnded: () => {}, onPlayer: () => {}
+  });
+  const binding = new P.CYLAnimatedItemEngineBinding();
+  binding.failed(host, 'not found');
+  binding.failed(host);
+  assert.deepEqual(reasons, ['not found', undefined]);
+});
+
 test('a host that drives the player itself gets it untouched', () => {
   const host = Object.assign(playback({ selected: true }), {
     drivesPlayback: false, onLoaded: () => {}, onFailed: () => {}, onEnded: () => {}, onPlayer: () => {}

@@ -15,7 +15,9 @@
  *      不依赖任何动画包。没有安装引擎的文件显示静态图片或占位图，并在开发者工具中输出一次需要安装的包。无障碍：一个元素，角色为按钮，
  *      `accessibility-label`（否则为标题），带选中与禁用状态。
  */
-const { cylAnimatedItemBackground, cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemRestingProgress } = require('./cyl_animated_item_model')
+const {
+  cylAnimatedItemBackground, cylAnimatedItemMissingReason, cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemResource, cylAnimatedItemRestingProgress,
+} = require('./cyl_animated_item_model')
 const { cylGIFImageInfo } = require('./cyl_gif_image')
 const { CYLAnimatedItemPlayer } = require('./cyl_animated_item_player')
 const { CYLAnimatedItemCountdown, CYL_COUNTDOWN_TICK_INTERVAL } = require('./cyl_animated_item_countdown')
@@ -292,6 +294,8 @@ Component({
       const lottieData = animationData && typeof animationData === 'object' ? JSON.parse(JSON.stringify(animationData)) : null // NOSONAR: `structuredClone` is not in every mini program runtime
       this.setData({ animationLoaded: false, animationFailed: false, gifPlaying: false, animationEnded: false, lottieData })
       this.cyl_update()
+      // [EN] A file of no known type has no engine to report anything: it cannot be decoded. [CN] 不属于任何已知类型的文件没有引擎可以报告：无法解码。
+      if (animationUrl && this.data.m && !this.data.m.animationType) this.cyl_reportResourceMissing('decode failed')
     },
     'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, selectedIconTint, animationTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
       this.cyl_update()
@@ -743,12 +747,29 @@ Component({
       // [EN] Forwarded as `animationerror` with the engine's detail (`message`); the item still falls back to its image.
       // [CN] 以 `animationerror` 转发，带引擎的 detail（`message`）；条目仍回到静态图片。
       this.triggerEvent('animationerror', event?.detail || {})
+      this.cyl_reportResourceMissing(cylAnimatedItemMissingReason(event?.detail?.message))
       const type = this.data.m.animationType
       if (type && !cylWarnedTypes.includes(type)) {
         cylWarnedTypes.push(type)
         console.warn(`[cyl-animated-item] ${type} animation (${this.data.animationUrl}) cannot play: ${event?.detail?.message || 'no engine'}. ` +
           `Showing the static image, or the placeholder without one. Install ${cylAnimatedItemPackage(type)} and set generic:cyl-${type}-view.`)
       }
+    },
+
+    /**
+     * [EN] `resourcemissing` with `{ resource, reason }`: the file as configured (`animationUrl` without its `#` options) and
+     *      "not found", "unreadable", "decode failed" or "engine library missing". Once per resource per item; the item still
+     *      shows its image or the placeholder. A Lottie given as `animationData` has no file to name.
+     * [CN] 以 `{ resource, reason }` 发出 `resourcemissing`：按配置给出的文件（`animationUrl` 去掉 `#` 选项）与原因。每个条目每个资源一次；
+     *      条目仍显示图片或占位图。以 `animationData` 传入的 Lottie 没有文件可报告。
+     */
+    cyl_reportResourceMissing(reason) {
+      const resource = cylAnimatedItemResource(this.data.animationUrl)
+      if (!resource) return
+      this.cylMissingResources = this.cylMissingResources || []
+      if (this.cylMissingResources.includes(resource)) return
+      this.cylMissingResources.push(resource)
+      this.triggerEvent('resourcemissing', { resource, reason })
     },
 
     /**

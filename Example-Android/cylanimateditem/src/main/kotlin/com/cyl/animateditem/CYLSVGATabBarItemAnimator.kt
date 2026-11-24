@@ -52,7 +52,7 @@ object CYLSVGATabBarItemAnimator : CYLTabBarItemAnimator {
         CYLTabBarItemAnimationFailure.markLoading(view)
         CYLTabBarItemAnimationFiles.localFile(context, url.substringBefore('#')) { file ->
             // [EN] A missing file or a failed download: reported, so the host falls back. [CN] 文件不存在或下载失败：报告失败，宿主回退显示。
-            if (file != null) decode(appContext, file, view, state) else CYLTabBarItemAnimationFailure.reportLater(view)
+            if (file != null) decode(appContext, file, view, state) else CYLTabBarItemAnimationFailure.reportLater(view, CYLResourceMissingReason.NOT_FOUND)
         }
         return view
     }

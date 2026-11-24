@@ -48,7 +48,7 @@ class CYLAnimationController {
 /// The names follow the cross-platform engine contract (docs/Animated-Item.md, "Engine API across platforms"): [selected],
 /// [animationSpeed], [animationLoops], [animationRestartToken], [drivesAnimationPlayback], [showsImageWhenAnimationEnds], [image], [iconSize], [tintColor], the item background ([itemBackgroundStyle],
 /// [itemBackgroundColor], [itemCornerRadius], [itemBorderWidth], [itemBorderColor]), the
-/// callbacks [onAnimationLoaded], [onAnimationFailed], [onAnimationEnd] and the [controller]'s commands. Both native halves
+/// callbacks [onAnimationLoaded], [onAnimationFailed], [onAnimationEnd], [onResourceMissing] and the [controller]'s commands. Both native halves
 /// wrap `CYLAnimatedItemView`; there is no engine logic in Dart.
 class CYLAnimationView extends StatefulWidget {
   const CYLAnimationView({
@@ -73,6 +73,7 @@ class CYLAnimationView extends StatefulWidget {
     this.controller,
     this.onAnimationLoaded,
     this.onAnimationFailed,
+    this.onResourceMissing,
     this.onAnimationEnd,
   });
 
@@ -135,6 +136,10 @@ class CYLAnimationView extends StatefulWidget {
 
   /// The animation cannot play: a missing or corrupted file, a parse error, a failed download.
   final VoidCallback? onAnimationFailed;
+
+  /// The file cannot be shown: [resource] is the file as configured, [reason] one of "not found", "unreadable",
+  /// "decode failed", "engine library missing". Once per resource per view; the view still shows its image or the placeholder.
+  final void Function(String resource, String reason)? onResourceMissing;
 
   /// A play-once pass ended (not on a stop, not while looping).
   final VoidCallback? onAnimationEnd;
@@ -223,6 +228,11 @@ class _CYLAnimationViewState extends State<CYLAnimationView> {
           widget.onAnimationLoaded?.call();
         case 'onAnimationFailed':
           widget.onAnimationFailed?.call();
+        case 'onResourceMissing':
+          final arguments = call.arguments;
+          if (arguments is Map) {
+            widget.onResourceMissing?.call('${arguments['resource']}', '${arguments['reason']}');
+          }
         case 'onAnimationEnd':
           widget.onAnimationEnd?.call();
       }

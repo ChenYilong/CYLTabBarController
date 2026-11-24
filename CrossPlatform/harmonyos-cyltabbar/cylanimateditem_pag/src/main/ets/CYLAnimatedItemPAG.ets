@@ -13,7 +13,8 @@
 import { PAGFile, PAGView, PAGViewController } from '@tencent/libpag';
 import {
   CYLAnimatedItemEngineBinding, CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemSource,
-  CYLAnimatedItemTimedPlayer
+  CYLAnimatedItemTimedPlayer,
+  CYL_RESOURCE_DECODE_FAILED, CYL_RESOURCE_NOT_FOUND
 } from 'cylanimateditem';
 
 /**
@@ -83,7 +84,8 @@ export struct CYLAnimatedItemPAGView {
     }
     const file = PAGFile.LoadFromAssets(context.resourceManager, source.existingRawFilePath(context.resourceManager));
     if (file === null) {
-      this.binding.failed(this.state);
+      // [EN] No rawfile of that name: not found; a file PAG cannot open: decode failed. [CN] 没有该名称的 rawfile：not found；PAG 无法打开的文件：decode failed。
+      this.binding.failed(this.state, source.rawFileContent(context.resourceManager) === undefined ? CYL_RESOURCE_NOT_FOUND : CYL_RESOURCE_DECODE_FAILED);
       return;
     }
     this.controller.setComposition(file);

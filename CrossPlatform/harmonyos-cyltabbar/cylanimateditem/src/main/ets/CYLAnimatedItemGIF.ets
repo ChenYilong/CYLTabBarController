@@ -14,6 +14,7 @@ import { image } from '@kit.ImageKit';
 import { fileIo } from '@kit.CoreFileKit';
 import { CYLAnimatedItemEngineBinding, CYLAnimatedItemTimedPlayer } from './CYLAnimatedItemPlayer';
 import { CYLAnimatedItemSource } from './CYLAnimatedItemSource';
+import { CYL_RESOURCE_NOT_FOUND } from './CYLAnimatedItemMissing';
 import { CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews } from './CYLAnimatedItemEngine';
 import {
   cylGIFCacheFileName, cylGIFDelays, cylGIFDuration, cylGIFFrameIndex, cylGIFHasTrailer, cylGIFUsableFrameCount
@@ -97,7 +98,7 @@ export struct CYLAnimatedItemGIFView {
     const context = this.getUIContext().getHostContext();
     const bytes = context === undefined ? undefined : source.rawFileContent(context.resourceManager);
     if (context === undefined || bytes === undefined) {
-      this.binding.failed(this.state);
+      this.binding.failed(this.state, CYL_RESOURCE_NOT_FOUND);
       return;
     }
     this.cylDecode(source, bytes, context.cacheDir).catch(() => {

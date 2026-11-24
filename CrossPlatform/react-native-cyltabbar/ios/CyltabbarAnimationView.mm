@@ -141,6 +141,7 @@ static NSURL *CYLRNAnimationURL(NSString *source)
     [weakSelf emit:@"loaded"];
   };
   _item.onAnimationFailed = ^{ [weakSelf emit:@"failed"]; };
+  _item.onResourceMissing = ^(NSString *resource, NSString *reason) { [weakSelf emitResourceMissing:resource reason:reason]; };
   [self addSubview:_item];
 }
 
@@ -158,6 +159,19 @@ static NSURL *CYLRNAnimationURL(NSString *source)
   } else {
     emitter->onAnimationEnd(CyltabbarAnimationViewEventEmitter::OnAnimationEnd{});
   }
+}
+
+/// [EN] `onResourceMissing` with the file as configured and the reason, passed through unchanged. [CN] 原样传递文件与原因的 `onResourceMissing`。
+- (void)emitResourceMissing:(NSString *)resource reason:(NSString *)reason
+{
+  if (!_eventEmitter) {
+    return;
+  }
+  auto emitter = std::static_pointer_cast<CyltabbarAnimationViewEventEmitter const>(_eventEmitter);
+  CyltabbarAnimationViewEventEmitter::OnResourceMissing event;
+  event.resource = std::string([resource UTF8String] ?: "");
+  event.reason = std::string([reason UTF8String] ?: "");
+  emitter->onResourceMissing(event);
 }
 
 /// [EN] The icon fills the view, or is `iconSize` (points) when given. [CN] 图标铺满视图，给了 `iconSize`（点）时为该尺寸。
@@ -229,7 +243,13 @@ static NSURL *CYLRNAnimationURL(NSString *source)
   NSString *source = [NSString stringWithUTF8String:newProps.source.c_str()];
   if (![source isEqualToString:_source ?: @""]) {
     _source = source;
-    _item.animationURL = source.length > 0 ? CYLRNAnimationURL(source) : nil;
+    NSURL *URL = source.length > 0 ? CYLRNAnimationURL(source) : nil;
+    _item.animationURL = URL;
+    if (source.length > 0 && !URL) {
+      // [EN] A name that is not in the app: the item has no URL to report, so the bridge names the file as configured.
+      // [CN] 文件名不在 App 中：条目没有 URL 可报告，由桥接按配置给出文件名。
+      [_item reportResourceMissing:[source componentsSeparatedByString:@"#"].firstObject reason:@"not found"];
+    }
   }
   if (selectionChanged) {
     [self followSelection];

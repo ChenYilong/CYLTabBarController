@@ -516,6 +516,73 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL
     XCTAssertEqual(downloadFailed, 1, @"a failure after loading drops the animation");
 }
 
+/// [EN] Runs the main run loop until `condition` holds or 3 s passed (the reports arrive one or two main queue turns later).
+/// [CN] 运行主 run loop，直到 `condition` 成立或过去 3 秒（报告在一两次主队列循环之后到达）。
+static void CYLSpinUntil(BOOL (^condition)(void)) {
+    NSDate *end = [NSDate dateWithTimeIntervalSinceNow:3];
+    while (!condition() && end.timeIntervalSinceNow > 0) {
+        [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.02]];
+    }
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+}
+
+/// [EN] `onResourceMissing` and `CYLAnimationEngines.resourceMissingListener`: which file and why, once per resource per view, on the
+///      main queue; the placeholder or image shows as before.
+/// [CN] `onResourceMissing` 与 `CYLAnimationEngines.resourceMissingListener`：哪个文件、为什么；每个视图每个资源一次，在主队列；占位图或图片照常显示。
+- (void)testResourceMissingNamesTheFileAndTheReason {
+    NSMutableArray<NSString *> *heard = [NSMutableArray array];
+    NSMutableArray<NSString *> *global = [NSMutableArray array];
+    CYLAnimationEngines.resourceMissingListener = ^(NSString *resource, NSString *reason) {
+        XCTAssertTrue(NSThread.isMainThread);
+        [global addObject:[NSString stringWithFormat:@"%@|%@", resource.lastPathComponent, reason]];
+    };
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
+    item.onResourceMissing = ^(NSString *resource, NSString *reason) {
+        [heard addObject:[NSString stringWithFormat:@"%@|%@", resource.lastPathComponent, reason]];
+    };
+    NSString *missing = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-resource-missing.pag"];
+    [[NSFileManager defaultManager] removeItemAtPath:missing error:NULL];
+    item.animationURL = [NSURL fileURLWithPath:missing];
+    item.animationURL = nil;
+    item.animationURL = [NSURL fileURLWithPath:missing];
+    CYLSpinUntil(^BOOL{ return heard.count >= 1 && global.count >= 1; });
+    XCTAssertEqualObjects(heard, (@[ @"cyl-resource-missing.pag|not found" ]), @"once per resource per view");
+    XCTAssertEqualObjects(global, heard);
+    XCTAssertNotNil(item.imageView.image, @"the placeholder still shows");
+
+    NSString *empty = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-resource-empty.fake"];
+    [[NSData data] writeToFile:empty atomically:YES];
+    item.animationURL = [NSURL fileURLWithPath:empty];
+    CYLSpinUntil(^BOOL{ return heard.count >= 2; });
+    XCTAssertEqualObjects(heard.lastObject, @"cyl-resource-empty.fake|unreadable");
+
+    // [EN] A file the source does not play: a known type without its engine, or an unknown file. [CN] 来源不播放的文件：已知类型缺引擎，或未知文件。
+    NSString *unknown = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-resource-unknown.xyz"];
+    [[@"{}" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:unknown atomically:YES];
+    item.animationURL = [NSURL fileURLWithPath:unknown];
+    CYLSpinUntil(^BOOL{ return heard.count >= 3; });
+    XCTAssertEqualObjects(heard.lastObject, @"cyl-resource-unknown.xyz|decode failed");
+    CYLAnimationEngines.resourceMissingListener = nil;
+}
+
+- (void)testResourceMissingAfterTheViewWasMadeUsesTheErrorOfTheEngine {
+    NSMutableArray<NSString *> *heard = [NSMutableArray array];
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
+    item.onResourceMissing = ^(NSString *resource, NSString *reason) { [heard addObject:reason]; };
+    item.animationURL = [NSURL URLWithString:@"https://example.com/home.fake"];
+    CYLTabBarItemAnimationReportFailure(item.animationView, [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError userInfo:nil]);
+    CYLSpinUntil(^BOOL{ return heard.count >= 1; });
+    XCTAssertEqualObjects(heard, (@[ @"not found" ]));
+
+    [heard removeAllObjects];
+    item.animationURL = [NSURL URLWithString:@"https://example.com/other.fake"];
+    CYLTabBarItemAnimationReportFailure(item.animationView, [NSError errorWithDomain:@"CYLTest" code:1 userInfo:nil]);
+    CYLSpinUntil(^BOOL{ return heard.count >= 1; });
+    XCTAssertEqualObjects(heard, (@[ @"decode failed" ]));
+}
+
 - (void)testAFailureOfAnOldAnimationIsIgnored {
     CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
     item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
@@ -530,6 +597,15 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL
 }
 
 #else
+- (void)testWithoutTheEngineTheResourceIsReportedAsEngineLibraryMissing {
+    NSMutableArray<NSString *> *heard = [NSMutableArray array];
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.onResourceMissing = ^(NSString *resource, NSString *reason) { [heard addObject:[NSString stringWithFormat:@"%@|%@", resource.lastPathComponent, reason]]; };
+    item.animationURL = [NSURL fileURLWithPath:@"/tmp/cyl-home.pag"];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertEqualObjects(heard, (@[ @"cyl-home.pag|engine library missing" ]));
+}
+
 - (void)testWithoutTheEngineBothShowTheImage {
     UIImage *icon = [self icon];
     CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];

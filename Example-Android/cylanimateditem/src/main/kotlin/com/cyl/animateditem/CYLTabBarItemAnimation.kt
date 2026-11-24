@@ -421,6 +421,7 @@ open class CYLTabBarItemAnimationFactory(val registry: CYLTabBarItemAnimatorRegi
         (view as? ImageView)?.scaleType = contentMode
         val options = CYLTabBarAnimationFileAndOptions(url).second
         view.cyl_setTag(OPTIONS_TAG, options)
+        view.cyl_setTag(CYLTabBarItemAnimationFailure.RESOURCE_TAG, url.substringBefore('#'))
         view.cyl_setTag(PLAYER_TAG, animator.playerForAnimationView(view)?.let { tinting(it, view, options) })
         return view
     }
@@ -922,8 +923,10 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
         val listener = java.lang.reflect.Proxy.newProxyInstance(listenerType.classLoader, arrayOf(listenerType)) { proxy, method, args ->
             when (method.name) {
                 "onResult" -> {
-                    Log.w("CYLTabBarController", "Lottie could not load $file: ${(args?.firstOrNull() as? Throwable)?.message}")
-                    view.post { CYLTabBarItemAnimationFailure.report(view) }
+                    val error = args?.firstOrNull() as? Throwable
+                    Log.w("CYLTabBarController", "Lottie could not load $file: ${error?.message}")
+                    val reason = if (error is java.io.FileNotFoundException) CYLResourceMissingReason.NOT_FOUND else CYLResourceMissingReason.DECODE_FAILED
+                    view.post { CYLTabBarItemAnimationFailure.report(view, reason) }
                     null
                 }
                 "hashCode" -> System.identityHashCode(proxy)
@@ -1024,7 +1027,8 @@ object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
                 CYLReflection.call(view, "flush")
                 CYLTabBarItemAnimationFailure.reportLoaded(view)
             } else {
-                CYLTabBarItemAnimationFailure.reportLater(view)
+                // [EN] No local file: missing or unreadable; a file PAG cannot open: not decodable. [CN] 没有本地文件：不存在或无法读取；PAG 无法打开的文件：无法解码。
+                CYLTabBarItemAnimationFailure.reportLater(view, if (file == null) CYLResourceMissingReason.NOT_FOUND else CYLResourceMissingReason.DECODE_FAILED)
             }
         }
         return view
@@ -1601,7 +1605,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
             CYLTabBarItemAnimationFiles.localFile(context, fileURL) { file ->
                 val bytes = try { file?.readBytes() } catch (error: java.io.IOException) { null }
                 if (bytes == null || bytes.isEmpty()) {
-                    CYLTabBarItemAnimationFailure.reportLater(view)
+                    CYLTabBarItemAnimationFailure.reportLater(view, if (file == null) CYLResourceMissingReason.NOT_FOUND else CYLResourceMissingReason.UNREADABLE)
                     return@localFile
                 }
                 load(rive, bytes, options, contentMode)

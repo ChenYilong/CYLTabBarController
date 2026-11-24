@@ -43,7 +43,7 @@ export class CYLAnimatedItemEngineState implements CYLAnimatedItemEngineHost {
   tintColor: ResourceColor = '';
   onLoaded: () => void = () => {
   };
-  onFailed: () => void = () => {
+  onFailed: (reason?: string) => void = (_reason?: string) => {
   };
   onEnded: () => void = () => {
   };

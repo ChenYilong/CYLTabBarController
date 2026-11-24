@@ -17,6 +17,7 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		19E541665DCEE199CFD0487D /* libPods-CyltabbarExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 256A27524845609A291876B8 /* libPods-CyltabbarExampleTests.a */; };
 		37D5CDB16D6C4FEFBC4D2ACF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2D906181ECFC45AEA39758E1 /* Assets.xcassets */; };
+		5E1C0DE5B1D2E3F4A5B6C7D8 /* cyl_still_check.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E1C0DE6B1D2E3F4A5B6C7D8 /* cyl_still_check.png */; };
 		5F71C48B95D34678A88DD1E2 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5611864B62B047AA94EDDA3E /* Poppins-Bold.ttf */; };
 		65558C6784094752977EE53C /* check.riv in Resources */ = {isa = PBXBuildFile; fileRef = 35F4240BAEA4468486EEEE4A /* check.riv */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
@@ -25,7 +26,6 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8A09BEC5C2CB4489A12FE5E5 /* shapes.riv in Resources */ = {isa = PBXBuildFile; fileRef = 824A37227822460EBBB05705 /* shapes.riv */; };
 		8C9A21760F884E3993212C98 /* icons.riv in Resources */ = {isa = PBXBuildFile; fileRef = 633C5047B761428292C0A127 /* icons.riv */; };
-		5E1C0DE5B1D2E3F4A5B6C7D8 /* cyl_still_check.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E1C0DE6B1D2E3F4A5B6C7D8 /* cyl_still_check.png */; };
 		8E7F05B39AB54ED7B9D4076A /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6E9CF0354B5840858A0AE92F /* Inter-Regular.ttf */; };
 		92AE3D56AA595020E5110757 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		9A58ADCBE9DBA7A89A198B1F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CE2E1C64ED8C06A5D4454B /* Foundation.framework */; };
@@ -66,9 +66,9 @@
 		5709B34CF0A7D63546082F79 /* Pods-CyltabbarExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CyltabbarExample.release.xcconfig"; path = "Target Support Files/Pods-CyltabbarExample/Pods-CyltabbarExample.release.xcconfig"; sourceTree = "<group>"; };
 		5C9E3E71719C2AD9B9B4652F /* tab_chat.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_chat.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_chat.svga"; sourceTree = SOURCE_ROOT; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-CyltabbarExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CyltabbarExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5E1C0DE6B1D2E3F4A5B6C7D8 /* cyl_still_check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cyl_still_check.png; path = cyl_still_check.png; sourceTree = SOURCE_ROOT; };
 		60CE2E1C64ED8C06A5D4454B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		633C5047B761428292C0A127 /* icons.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = icons.riv; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets/icons.riv"; sourceTree = SOURCE_ROOT; };
-		5E1C0DE6B1D2E3F4A5B6C7D8 /* cyl_still_check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cyl_still_check.png; path = cyl_still_check.png; sourceTree = SOURCE_ROOT; };
 		6E9CF0354B5840858A0AE92F /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Regular.ttf"; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/Fonts/Inter-Regular.ttf"; sourceTree = SOURCE_ROOT; };
 		735D4DAE0416298B1623E20E /* tab_home.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_home.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_home.svga"; sourceTree = SOURCE_ROOT; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = CyltabbarExample/AppDelegate.swift; sourceTree = "<group>"; };
@@ -344,12 +344,14 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CyltabbarExample/Pods-CyltabbarExample-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/React-Core-prebuilt/React.framework/React",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ReactNativeDependencies/ReactNativeDependencies.framework/ReactNativeDependencies",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/RiveRuntime/RiveRuntime.framework/RiveRuntime",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermesvm.framework/hermesvm",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/React.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ReactNativeDependencies.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RiveRuntime.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermesvm.framework",
@@ -413,20 +415,18 @@
 				"${PODS_ROOT}/../../../../../CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle",
 				"${PODS_ROOT}/../../../../../CYLTabBarController/Resources/CYLTabBarController.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/Protobuf/Protobuf_Privacy.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/RCTI18nStrings.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/React-Core_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-cxxreact/React-cxxreact_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-timing/React-timing_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RiveRuntime/runtime_ios_privacy.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLAnimatedItem.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Protobuf_Privacy.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RCTI18nStrings.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-Core_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-cxxreact_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-timing_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/runtime_ios_privacy.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

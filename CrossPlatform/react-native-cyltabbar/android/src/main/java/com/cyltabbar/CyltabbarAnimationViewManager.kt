@@ -23,6 +23,9 @@ class CyltabbarAnimationViewManager : SimpleViewManager<CyltabbarAnimationView>(
     view.onEvent = { name ->
       UIManagerHelper.getEventDispatcher(context)?.dispatchEvent(AnimationEvent(UIManagerHelper.getSurfaceId(view), view.id, name))
     }
+    view.onResourceMissing = { resource, reason ->
+      UIManagerHelper.getEventDispatcher(context)?.dispatchEvent(ResourceMissingEvent(UIManagerHelper.getSurfaceId(view), view.id, resource, reason))
+    }
   }
 
   @ReactProp(name = "source")
@@ -121,6 +124,7 @@ class CyltabbarAnimationViewManager : SimpleViewManager<CyltabbarAnimationView>(
     "topAnimationLoaded" to mapOf("registrationName" to "onAnimationLoaded"),
     "topAnimationFailed" to mapOf("registrationName" to "onAnimationFailed"),
     "topAnimationEnd" to mapOf("registrationName" to "onAnimationEnd"),
+    "topResourceMissing" to mapOf("registrationName" to "onResourceMissing"),
   )
 
   /** `loaded`, `failed` or `end`, sent as `topAnimationLoaded`, `topAnimationFailed` or `topAnimationEnd`. */
@@ -128,6 +132,16 @@ class CyltabbarAnimationViewManager : SimpleViewManager<CyltabbarAnimationView>(
     override fun getEventName(): String = "topAnimation" + name.replaceFirstChar { it.uppercase() }
 
     override fun getEventData() = Arguments.createMap()
+  }
+
+  /** `onResourceMissing`: the file as configured and the reason, unchanged from `CYLAnimatedItemView.onResourceMissing`. */
+  private class ResourceMissingEvent(surfaceId: Int, viewId: Int, private val resource: String, private val reason: String) : Event<ResourceMissingEvent>(surfaceId, viewId) {
+    override fun getEventName(): String = "topResourceMissing"
+
+    override fun getEventData() = Arguments.createMap().apply {
+      putString("resource", resource)
+      putString("reason", reason)
+    }
   }
 
   companion object {

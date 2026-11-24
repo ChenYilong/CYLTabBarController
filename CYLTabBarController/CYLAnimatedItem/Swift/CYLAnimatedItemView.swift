@@ -208,19 +208,21 @@ private let cylAnimatedItemDefaultAnimationSide: CGFloat = 24
 /// [CN] 播放器没有 `loops` 时，循环动画检查是否播放到末尾的间隔。
 private let cylAnimatedItemLoopCheckInterval: TimeInterval = 0.05
 
-/// [EN] Whether `url` is a local file that is missing, not a regular file, or empty: no animation view is made for it, so
-///      the static image or the placeholder shows at once. Remote files are checked by the animator, which reports a failed
-///      download or a corrupted file (`CYLTabBarItemAnimationReportFailure`).
-/// [CN] `url` 是否为不存在、不是普通文件或为空的本地文件：不为其创建动画视图，立即显示静态图片或占位图。远程文件由 animator 检查，下载失败或文件损坏时报告
-///      （`CYLTabBarItemAnimationReportFailure`）。
-private func cylAnimatedItemLocalFileIsMissing(_ url: URL) -> Bool {
-    guard url.isFileURL else { return false }
+/// [EN] Why `url` is a local file that is missing ("not found"), not a regular file or empty ("unreadable"), else nil: no
+///      animation view is made for it, so the static image or the placeholder shows at once. Remote files are checked by the
+///      animator, which reports a failed download or a corrupted file (`CYLTabBarItemAnimationReportFailure`).
+/// [CN] `url` 是不存在的本地文件（"not found"）、不是普通文件或为空的本地文件（"unreadable"）时给出原因，否则为 nil：不为其创建动画视图，立即显示静态图片或占位图。
+///      远程文件由 animator 检查，下载失败或文件损坏时报告（`CYLTabBarItemAnimationReportFailure`）。
+private func cylAnimatedItemLocalFileProblem(_ url: URL) -> String? {
+    guard url.isFileURL else { return nil }
     let path = url.path
-    if path.isEmpty { return true }
-    guard let attributes = try? FileManager.default.attributesOfItem(atPath: path) else { return true }
+    if path.isEmpty { return CYLAnimationEngines.reasonNotFound }
+    guard let attributes = try? FileManager.default.attributesOfItem(atPath: path) else { return CYLAnimationEngines.reasonNotFound }
     let size = (attributes[.size] as? NSNumber)?.uint64Value ?? 0
-    return (attributes[.type] as? FileAttributeType) != .typeRegular || size == 0
+    return (attributes[.type] as? FileAttributeType) != .typeRegular || size == 0 ? CYLAnimationEngines.reasonUnreadable : nil
 }
+
+private func cylAnimatedItemLocalFileIsMissing(_ url: URL) -> Bool { cylAnimatedItemLocalFileProblem(url) != nil }
 #endif
 
 /**
@@ -765,6 +767,37 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
           同鸿蒙的 `onAnimationFailed`。
      */
     public var onAnimationFailed: (() -> Void)?
+    /**
+     [EN] Called on the main queue when the file of `animationURL` cannot be shown, with the file name or path as configured and a
+          short reason: "not found", "unreadable", "decode failed" or "engine library missing". Once per resource per view; the
+          static image or the placeholder shows as before. `CYLAnimationEngines.resourceMissingListener` hears the same call.
+          Android: `onResourceMissing`; HarmonyOS: the `onResourceMissing` prop; React Native and Flutter forward it.
+     [CN] `animationURL` 的文件无法显示时在主队列调用，参数为按配置给出的文件名或路径与简短原因："not found"、"unreadable"、
+          "decode failed"、"engine library missing"。每个视图每个资源一次；仍显示静态图片或占位图。
+          `CYLAnimationEngines.resourceMissingListener` 收到同一次调用。
+     */
+    public var onResourceMissing: ((String, String) -> Void)?
+    private var reportedMissingResources = Set<String>()
+
+    /**
+     [EN] For a host that resolves the file name itself (the React Native and Flutter bridges: a name that is not in the app) and
+          has no `animationURL` to give: reports `resource` as missing once per view, as `onResourceMissing` and
+          `CYLAnimationEngines.resourceMissingListener` do for the item's own failures, on the next main queue turn.
+     [CN] 供自行解析文件名的宿主（React Native 与 Flutter 桥接：App 中没有的文件名）使用，此时没有 `animationURL` 可传：
+          每个视图对 `resource` 只报告一次，与条目自身失败时的 `onResourceMissing`、`CYLAnimationEngines.resourceMissingListener` 相同，
+          在下一次主队列循环调用。
+     */
+    open func reportResourceMissing(_ resource: String, reason: String) {
+        guard reportedMissingResources.insert(resource).inserted else { return }
+        DispatchQueue.main.async { [weak self] in
+            self?.onResourceMissing?(resource, reason)
+            CYLAnimationEngines.resourceMissingListener?(resource, reason)
+        }
+    }
+
+    private func reportMissingAnimationURL(_ url: URL, reason: String) {
+        reportResourceMissing(url.isFileURL ? url.path : url.absoluteString, reason: reason)
+    }
     /** [EN] The progress shown while not playing, clamped to 0...1. [CN] 未播放时显示的进度，限制在 0...1。 */
     open var animationRestingProgress: CGFloat {
         get { storedRestingProgress }
@@ -1243,14 +1276,24 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             } else {
                 // [EN] Debug builds: a type whose engine is not in the build says which pod to add. [CN] debug 构建：引擎未参与构建的类型提示需要加入的 pod。
                 CYLAnimationWarnMissingEngine(nil, url)
+                var reason = CYLAnimationEngines.reasonDecodeFailed
+                if let type = CYLAnimationTypeOfFile(nil, url) {
+                    reason = CYLAnimationTypeIsAvailable(type) ? CYLAnimationEngines.reasonUnreadable : CYLAnimationEngines.reasonEngineLibraryMissing
+                }
+                reportMissingAnimationURL(url, reason: reason)
                 notifyAnimationFailed()
             }
-        } else if animationURL != nil {
+        } else if let url = animationURL {
+            reportMissingAnimationURL(url, reason: cylAnimatedItemLocalFileProblem(url) ?? CYLAnimationEngines.reasonNotFound)
             notifyAnimationFailed()
         }
         #else
         // [EN] No engine: debug builds say which pod to add. [CN] 没有引擎：debug 构建提示需要加入的 pod。
-        if let url = animationURL { CYLAnimationWarnMissingEngine(nil, url); notifyAnimationFailed() }
+        if let url = animationURL {
+            CYLAnimationWarnMissingEngine(nil, url)
+            reportMissingAnimationURL(url, reason: CYLAnimationEngines.reasonEngineLibraryMissing)
+            notifyAnimationFailed()
+        }
         #endif
         updateIcon()
         contentDidChange()
@@ -1808,8 +1851,11 @@ extension CYLAnimatedItemView: CYLTabBarItemAnimationFailureHandling {
      [EN] A corrupted file, a parse error or a failed download: drop the animation; the static image or the placeholder shows.
      [CN] 文件损坏、解析错误或下载失败：移除动画，显示静态图片或占位图。
      */
-    open func cylAnimationViewDidFail(_ animationView: UIView, error _: Error?) {
+    open func cylAnimationViewDidFail(_ animationView: UIView, error: Error?) {
         guard animationView === self.animationView else { return }
+        if let url = animationURL {
+            reportMissingAnimationURL(url, reason: CYLAnimationEngines.reason(for: error, remote: !url.isFileURL))
+        }
         stopLoopTimer()
         detachEndHandler()
         animationView.removeFromSuperview()

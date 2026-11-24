@@ -63,18 +63,21 @@
 /// [EN] A messenger that records the method names the native view calls on the Dart side. [CN] 记录原生视图调用 Dart 端的方法名的 messenger。
 @interface CYLFakeMessenger : NSObject <FlutterBinaryMessenger>
 @property (nonatomic, strong) NSMutableArray<NSString *> *sentMethods;
+@property (nonatomic, strong) NSMutableArray<FlutterMethodCall *> *sentCalls;
 @end
 
 @implementation CYLFakeMessenger
 - (instancetype)init {
     if (self = [super init]) {
         _sentMethods = [NSMutableArray array];
+        _sentCalls = [NSMutableArray array];
     }
     return self;
 }
 - (void)sendOnChannel:(NSString *)channel message:(NSData *)message {
     FlutterMethodCall *call = [[FlutterStandardMethodCodec sharedInstance] decodeMethodCall:message];
     [self.sentMethods addObject:call.method];
+    [self.sentCalls addObject:call];
 }
 - (void)sendOnChannel:(NSString *)channel message:(NSData *)message binaryReply:(FlutterBinaryReply)callback {
     [self sendOnChannel:channel message:message];
@@ -391,6 +394,28 @@
     [self callMethod:@"setItemBorderColor" argument:nil];
     XCTAssertEqualWithAccuracy([[_item valueForKey:@"itemBorderWidth"] doubleValue], 0, 0.0001);
     XCTAssertNil([_item valueForKey:@"itemBorderColor"], @"null clears it");
+}
+
+// [EN] `onResourceMissing` goes through the channel with {resource, reason}: a name that is not in the app (reported by the bridge),
+//      a path that does not exist (reported by the item), once per resource.
+// [CN] `onResourceMissing` 经 channel 发送 {resource, reason}：App 中没有的文件名（由桥接报告）、不存在的路径（由条目报告），每个资源一次。
+- (void)testResourceMissingIsSentThroughTheChannelWithTheFileAndTheReason {
+    [self makeBridgeWithArguments:@{}];
+    [self callMethod:@"setSource" argument:@"cyl-no-such-icon.pag#artboard=A"];
+    [self callMethod:@"setSource" argument:@"cyl-no-such-icon.pag#artboard=B"];
+    NSString *missing = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-flutter-missing.pag"];
+    [[NSFileManager defaultManager] removeItemAtPath:missing error:NULL];
+    [self callMethod:@"setSource" argument:missing];
+    [self spinMainQueue];
+    NSMutableArray<NSDictionary *> *reported = [NSMutableArray array];
+    for (FlutterMethodCall *call in _registrar.fakeMessenger.sentCalls) {
+        if ([call.method isEqualToString:@"onResourceMissing"]) {
+            [reported addObject:call.arguments];
+        }
+    }
+    NSArray *expected = @[ @{ @"resource" : @"cyl-no-such-icon.pag", @"reason" : @"not found" },
+                           @{ @"resource" : missing, @"reason" : @"not found" } ];
+    XCTAssertEqualObjects(reported, expected, @"once per resource, with the file as configured");
 }
 
 @end

@@ -77,7 +77,9 @@ object CYLTabBarItemAnimationFailure {
      * [CN] 报告 `animationView` 无法加载其文件（不存在、已损坏、下载失败、解析错误）。
      */
     @JvmStatic
-    fun reportLater(animationView: View) {
+    @JvmOverloads
+    fun reportLater(animationView: View, reason: String = CYLResourceMissingReason.DECODE_FAILED) {
+        animationView.cyl_setTag(REASON_TAG, reason)
         // [EN] After the view is in its host: a failure found while the view is being made (a missing local file) is not lost.
         // [CN] 在视图加入宿主之后再报告：创建视图期间发现的失败（例如本地文件不存在）不会丢失。
         animationView.post { report(animationView) }
@@ -87,9 +89,36 @@ object CYLTabBarItemAnimationFailure {
      * [EN] Reports now. Prefer `reportLater` from an animator, whose view may not have a parent yet. [CN] 立即报告。animator 中优先使用 `reportLater`，因为其视图可能还没有父视图。
      */
     @JvmStatic
-    fun report(animationView: View) {
+    @JvmOverloads
+    fun report(animationView: View, reason: String? = null) {
+        reason?.let { animationView.cyl_setTag(REASON_TAG, it) }
         animationView.cyl_setTag("cyl_tab_bar_item_animation_loading", null)
         val host = animationView.parent as? View ?: return
-        if (host is CYLTabBarItemAnimationFailureHandling) host.cyl_animationViewDidFail(animationView) else fallbackHandler?.invoke(host)
+        if (host is CYLTabBarItemAnimationFailureHandling) host.cyl_animationViewDidFail(animationView) else {
+            missingResource(animationView)?.let { (resource, why) -> CYLAnimationEngines.dispatchResourceMissing(animationView.context, resource, why, null) }
+            fallbackHandler?.invoke(host)
+        }
     }
+
+    internal const val RESOURCE_TAG = "cyl_tab_bar_item_animation_resource"
+    private const val REASON_TAG = "cyl_tab_bar_item_animation_failure_reason"
+    private const val REPORTED_TAG = "cyl_tab_bar_item_animation_missing_reported"
+
+    /**
+     * [EN] The file name or path an animator was made for, and why it failed (a reason an animator gave, else "decode
+     *      failed"); null when the view has no recorded file or was already reported. Marks the view as reported.
+     * [CN] animator 创建视图时所用的文件名或路径，以及失败原因（animator 给出的原因，否则为 "decode failed"）；视图没有记录文件或已经报告过时为 null。
+     *      同时标记该视图已报告。
+     */
+    internal fun missingResource(animationView: View): Pair<String, String>? {
+        val resource = animationView.cyl_getTag(RESOURCE_TAG) as? String ?: return null
+        if (animationView.cyl_getTag(REPORTED_TAG) == true) return null
+        animationView.cyl_setTag(REPORTED_TAG, true)
+        return resource to reasonOf(animationView)
+    }
+
+    /**
+     * [EN] Why `animationView` failed: the reason its animator gave, else "decode failed". [CN] `animationView` 失败的原因：animator 给出的原因，否则为 "decode failed"。
+     */
+    internal fun reasonOf(animationView: View): String = animationView.cyl_getTag(REASON_TAG) as? String ?: CYLResourceMissingReason.DECODE_FAILED
 }

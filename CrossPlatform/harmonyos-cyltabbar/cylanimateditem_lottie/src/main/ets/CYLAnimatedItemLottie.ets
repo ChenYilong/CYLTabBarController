@@ -17,7 +17,8 @@ import { util } from '@kit.ArkTS';
 import { LifecycleController } from 'cyldeallocblockexecutor';
 import {
   CYLAnimatedItemEngineBinding, CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemPlayer,
-  CYLAnimatedItemSource, cylAnimatedItemParseHexColor
+  CYLAnimatedItemSource, cylAnimatedItemParseHexColor,
+  CYL_RESOURCE_DECODE_FAILED, CYL_RESOURCE_NOT_FOUND
 } from 'cylanimateditem';
 
 let cylLottieCount: number = 0;
@@ -200,13 +201,13 @@ export struct CYLAnimatedItemLottieView {
       const remote: AnimationItem = lottie.loadAnimation({
         container: this.context2D, renderer: 'canvas', loop: false, autoplay: false, name: name, path: source.path
       });
-      remote.addEventListener('data_failed', () => this.binding.failed(this.state));
+      remote.addEventListener('data_failed', () => this.binding.failed(this.state, CYL_RESOURCE_NOT_FOUND));
       this.cylReady(new CYLAnimatedItemLottiePlayer(source, remote, name));
       return;
     }
     const data = context === undefined ? undefined : cylLottieData(context, source);
     if (context === undefined || data === undefined) {
-      this.binding.failed(this.state);
+      this.binding.failed(this.state, CYL_RESOURCE_NOT_FOUND);
       return;
     }
     const directory = source.directory;
@@ -235,7 +236,7 @@ export struct CYLAnimatedItemLottieView {
         }
       }
     });
-    item.addEventListener('data_failed', () => this.binding.failed(this.state));
+    item.addEventListener('data_failed', () => this.binding.failed(this.state, CYL_RESOURCE_DECODE_FAILED));
     this.cylReady(new CYLAnimatedItemLottiePlayer(source, item, name));
   }
 

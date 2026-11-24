@@ -160,6 +160,7 @@ test('engine ready, complete, loop complete and error are forwarded as item even
     ['animationend', {}],
     ['animationloopcomplete', {}],
     ['animationerror', { message: 'bad file' }],
+    ['resourcemissing', { resource: 'a.json', reason: 'decode failed' }],
   ])
 })
 
@@ -307,4 +308,28 @@ test('pausesAnimationsWhileUserScrolls pauses a playing item while a scroll sour
     LifecycleCenter.reset()
     item.stopAnimation()
   }
+})
+
+test('resourcemissing names the file as configured and the reason, once per resource per item', () => {
+  const engine = cylEngine(() => ({}))
+  const { item } = cylMount({ animationUrl: 'icons.riv#artboard=CHAT&input=active' }, engine)
+  item.cyl_onAnimationError({ detail: { message: 'cyl-tab-bar: no animation component for icons.riv; install its package' } })
+  item.cyl_onAnimationError({ detail: { message: 'bad file' } })
+  assert.deepEqual(item.events.filter(([name]) => name === 'resourcemissing'), [
+    ['resourcemissing', { resource: 'icons.riv', reason: 'engine library missing' }],
+  ])
+  item.set({ animationUrl: 'other.riv' })
+  item.cyl_onAnimationError({ detail: { message: 'request:fail 404' } })
+  assert.deepEqual(item.events.filter(([name]) => name === 'resourcemissing').slice(1), [
+    ['resourcemissing', { resource: 'other.riv', reason: 'not found' }],
+  ])
+})
+
+test('a file of no known type is reported as decode failed, inline Lottie data has no file to report', () => {
+  const engine = cylEngine(() => ({}))
+  const { item } = cylMount({ animationUrl: 'home.xyz' }, engine)
+  assert.deepEqual(item.events, [['resourcemissing', { resource: 'home.xyz', reason: 'decode failed' }]])
+  const inline = cylMount({ animationData: { v: '5.7', layers: [] } }, engine).item
+  inline.cyl_onAnimationError({ detail: { message: 'bad' } })
+  assert.deepEqual(inline.events.filter(([name]) => name === 'resourcemissing'), [])
 })

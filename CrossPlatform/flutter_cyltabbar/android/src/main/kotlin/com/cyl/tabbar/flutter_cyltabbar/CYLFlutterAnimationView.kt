@@ -18,7 +18,7 @@ import io.flutter.plugin.platform.PlatformView
  * `setSource`, `setSelected`, `setAnimationSpeed`, `setAnimationLoops`, `setAnimationRestartToken`,
  * `setDrivesAnimationPlayback`, `setShowsImageWhenAnimationEnds`, `setImage`, `setPlaying`, `setIconSize`, `setTintColor`, `setItemBackgroundStyle`, `setItemBackgroundColor`, `setItemCornerRadius`, `setItemBorderWidth`,
  * `setItemBorderColor` and the commands `play`, `stopAtProgress`,
- * `restart`; it calls back `onAnimationLoaded`, `onAnimationFailed` and `onAnimationEnd`. No engine logic here.
+ * `restart`; it calls back `onAnimationLoaded`, `onAnimationFailed`, `onAnimationEnd` and `onResourceMissing`. No engine logic here.
  * 由 CYLTabBarController 引擎通过 `CYLAnimatedItemView` 播放的动画（跨端引擎 API，见 `docs/Animated-Item.md`）。
  */
 internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments: Map<*, *>, messenger: BinaryMessenger) :
@@ -35,6 +35,7 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
     animationEndListener = CYLAnimatedItemAnimationEndListener { channel.invokeMethod("onAnimationEnd", null) }
     onAnimationLoaded = { channel.invokeMethod("onAnimationLoaded", null) }
     onAnimationFailed = { channel.invokeMethod("onAnimationFailed", null) }
+    onResourceMissing = { resource, reason -> channel.invokeMethod("onResourceMissing", mapOf("resource" to resource, "reason" to reason)) }
   }
 
   private val container = object : FrameLayout(context) {

@@ -12,7 +12,7 @@ import com.cyl.animateditem.CYLSize
  * `docs/Animated-Item.md`, "Engine API across platforms"). Props `source`, `playing`, `selected`, `animationSpeed`,
  * `animationLoops`, `animationRestartToken`, `drivesAnimationPlayback` (default true), `showsImageWhenAnimationEnds`, `image`, `iconSize`, `tintColor`, `itemBackgroundStyle`,
  * `itemBackgroundColor`, `itemCornerRadius`, `itemBorderWidth`, `itemBorderColor`; commands
- * `play`, `stopAtProgress`, `restart`; events `onAnimationLoaded`, `onAnimationFailed`, `onAnimationEnd`. No engine logic here.
+ * `play`, `stopAtProgress`, `restart`; events `onAnimationLoaded`, `onAnimationFailed`, `onAnimationEnd`, `onResourceMissing`. No engine logic here.
  * 由 CYLTabBarController 引擎通过 `CYLAnimatedItemView` 播放的动画（跨端引擎 API，见 `docs/Animated-Item.md`）。
  */
 class CyltabbarAnimationView(context: Context) : FrameLayout(context) {
@@ -23,12 +23,16 @@ class CyltabbarAnimationView(context: Context) : FrameLayout(context) {
   /** Called with the event name ("loaded", "failed", "end"); the manager turns it into a React Native event. */
   var onEvent: ((String) -> Unit)? = null
 
+  /** Called with the file as configured and the reason (`onResourceMissing`); the manager turns it into a React Native event. */
+  var onResourceMissing: ((resource: String, reason: String) -> Unit)? = null
+
   val item = CYLAnimatedItemView(context).apply {
     // Icon only: the view React Native lays out is the icon's frame. 只有图标：React Native 布局的视图就是图标的范围。
     drivesAnimationPlayback = true
     animationEndListener = CYLAnimatedItemAnimationEndListener { onEvent?.invoke("end") }
     onAnimationLoaded = { onEvent?.invoke("loaded") }
     onAnimationFailed = { onEvent?.invoke("failed") }
+    onResourceMissing = { resource, reason -> this@CyltabbarAnimationView.onResourceMissing?.invoke(resource, reason) }
   }
 
   init {

@@ -314,8 +314,11 @@ export interface CYLAnimatedItemEngineHost extends CYLAnimatedItemPlayback {
   drivesPlayback: boolean;
   /** [EN] The file is drawn. [CN] 文件已绘制。 */
   onLoaded: () => void;
-  /** [EN] The file cannot play. [CN] 文件无法播放。 */
-  onFailed: () => void;
+  /**
+   * [EN] The file cannot play; `reason` is one of "not found", "unreadable", "decode failed", "engine library missing"
+   *      (`CYLAnimatedItemMissing.ts`), "decode failed" when the engine gives none. [CN] 文件无法播放；`reason` 为四种原因之一，引擎未给出时为 "decode failed"。
+   */
+  onFailed: (reason?: string) => void;
   /** [EN] A play-once pass ended. [CN] 只播放一次的一遍播放结束。 */
   onEnded: () => void;
   /** [EN] The player once ready, undefined when the view goes away. [CN] 就绪的播放器，视图消失时为 undefined。 */
@@ -350,9 +353,9 @@ export class CYLAnimatedItemEngineBinding {
     host.onLoaded();
   }
 
-  /** [EN] The file cannot play. [CN] 文件无法播放。 */
-  failed(host: CYLAnimatedItemEngineHost): void {
-    host.onFailed();
+  /** [EN] The file cannot play, and why (the `reason` of `CYLAnimatedItemEngineHost.onFailed`). [CN] 文件无法播放及原因。 */
+  failed(host: CYLAnimatedItemEngineHost, reason?: string): void {
+    host.onFailed(reason);
   }
 
   /** [EN] The item's playback changed. [CN] 条目的播放设置发生变化。 */

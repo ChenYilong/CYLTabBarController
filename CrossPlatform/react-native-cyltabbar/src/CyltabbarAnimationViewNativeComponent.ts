@@ -15,6 +15,12 @@ import type * as React from 'react';
 type AnimationEvent = Readonly<{}>;
 
 /**
+ * [EN] The file that cannot be shown, as configured, and why: "not found", "unreadable", "decode failed" or "engine library
+ *      missing" (`CYLAnimatedItemView.onResourceMissing`). [CN] 无法显示的文件（按配置给出）及原因。
+ */
+type ResourceMissingEvent = Readonly<{ resource: string; reason: string }>;
+
+/**
  * [EN] The cross-platform engine contract, with the names frozen in docs/Animated-Item.md ("Engine API across platforms"):
  *      props `source` and `playing` as before, plus `selected`, `animationSpeed`, `animationLoops`, `animationRestartToken`,
  *      `drivesAnimationPlayback`, `showsImageWhenAnimationEnds`, `image`, `iconSize`, `tintColor` and the item background `itemBackgroundStyle`, `itemBackgroundColor`, `itemCornerRadius`, `itemBorderWidth`, `itemBorderColor`; the events `onAnimationLoaded`, `onAnimationFailed` and
@@ -96,6 +102,7 @@ export interface NativeProps extends ViewProps {
   onAnimationLoaded?: CodegenTypes.DirectEventHandler<AnimationEvent>;
   onAnimationFailed?: CodegenTypes.DirectEventHandler<AnimationEvent>;
   onAnimationEnd?: CodegenTypes.DirectEventHandler<AnimationEvent>;
+  onResourceMissing?: CodegenTypes.DirectEventHandler<ResourceMissingEvent>;
 }
 
 type ComponentType = HostComponent<NativeProps>;

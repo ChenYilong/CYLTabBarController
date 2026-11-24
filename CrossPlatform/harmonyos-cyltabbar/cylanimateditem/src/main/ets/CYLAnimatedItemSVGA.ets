@@ -13,6 +13,7 @@ import { image } from '@kit.ImageKit';
 import { http } from '@kit.NetworkKit';
 import { CYLAnimatedItemEngineBinding, CYLAnimatedItemTimedPlayer } from './CYLAnimatedItemPlayer';
 import { CYLAnimatedItemSource } from './CYLAnimatedItemSource';
+import { CYL_RESOURCE_DECODE_FAILED, CYL_RESOURCE_NOT_FOUND } from './CYLAnimatedItemMissing';
 import { CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews } from './CYLAnimatedItemEngine';
 import { CYLSVGAMovie, cylLoadSVGAMovie } from './svga/CYLSVGAMovie';
 import { cylDrawSVGAFrame } from './svga/CYLSVGARenderer';
@@ -132,6 +133,9 @@ export struct CYLAnimatedItemSVGAView {
     this.binding.update(this.state);
   }
 
+  /** [EN] The last read found no file (the reason of a failure is "not found"). [CN] 最近一次读取没有找到文件（失败原因为 "not found"）。 */
+  private cylMissingFile: boolean = false;
+
   private cylLoad(): void {
     const source = this.state.source;
     this.loadedUrl = source.url;
@@ -142,13 +146,14 @@ export struct CYLAnimatedItemSVGAView {
     }
     this.cylDecode(context, source).catch(() => {
       if (source.url === this.loadedUrl) {
-        this.binding.failed(this.state);
+        this.binding.failed(this.state, this.cylMissingFile ? CYL_RESOURCE_NOT_FOUND : CYL_RESOURCE_DECODE_FAILED);
       }
     });
   }
 
   private async cylDecode(context: Context, source: CYLAnimatedItemSource): Promise<void> {
     const bytes = await cylReadSVGA(context, source);
+    this.cylMissingFile = bytes === undefined;
     if (bytes === undefined) {
       throw new Error('no bytes');
     }

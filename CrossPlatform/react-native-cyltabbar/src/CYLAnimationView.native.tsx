@@ -101,6 +101,12 @@ export type CYLAnimationViewProps = ViewProps & {
   onAnimationFailed?: () => void;
   /** A play-once pass ended (not on a stop, not while looping). */
   onAnimationEnd?: () => void;
+  /**
+   * The file cannot be shown. The event is `{ resource, reason }`: `resource` is the file as configured, `reason` one of
+   * "not found", "unreadable", "decode failed", "engine library missing". Once per resource per view; the view still shows its
+   * image or the placeholder.
+   */
+  onResourceMissing?: (event: { resource: string; reason: string }) => void;
   /** The commands `play`, `stopAtProgress` and `restart`. */
   ref?: Ref<CYLAnimationViewHandle>;
 };
@@ -120,6 +126,7 @@ export function CYLAnimationView({
   onAnimationLoaded,
   onAnimationFailed,
   onAnimationEnd,
+  onResourceMissing,
   ref,
   ...rest
 }: CYLAnimationViewProps) {
@@ -142,6 +149,11 @@ export function CYLAnimationView({
       onAnimationLoaded={onAnimationLoaded ? () => onAnimationLoaded() : undefined}
       onAnimationFailed={onAnimationFailed ? () => onAnimationFailed() : undefined}
       onAnimationEnd={onAnimationEnd ? () => onAnimationEnd() : undefined}
+      onResourceMissing={
+        onResourceMissing
+          ? (event) => onResourceMissing({ resource: event.nativeEvent.resource, reason: event.nativeEvent.reason })
+          : undefined
+      }
     />
   );
 }

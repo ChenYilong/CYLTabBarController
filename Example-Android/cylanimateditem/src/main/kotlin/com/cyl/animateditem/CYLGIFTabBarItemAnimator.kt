@@ -265,7 +265,7 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
                 // [EN] A missing file, a failed download or an unreadable one: the host shows its image or placeholder.
                 // [CN] 文件不存在、下载失败或无法读取：宿主显示其图片或占位图。
                 val bytes = try { file?.readBytes() } catch (error: java.io.IOException) { null }
-                if (bytes == null || bytes.isEmpty()) CYLTabBarItemAnimationFailure.reportLater(view) else view.setData(bytes)
+                if (bytes == null || bytes.isEmpty()) CYLTabBarItemAnimationFailure.reportLater(view, if (file == null) CYLResourceMissingReason.NOT_FOUND else CYLResourceMissingReason.UNREADABLE) else view.setData(bytes)
             }
             return view
         }

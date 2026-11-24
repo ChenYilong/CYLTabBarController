@@ -288,7 +288,7 @@ static UIColor *CYLFlutterColor(id value) {
  *      `setSelected`, `setAnimationSpeed`, `setAnimationLoops`, `setAnimationRestartToken`, `setDrivesAnimationPlayback`,
  *      `setPlaying`, `setIconSize`, `setTintColor`, `setItemBackgroundStyle`, `setItemBackgroundColor`, `setItemCornerRadius`,
  *      `setItemBorderWidth`, `setItemBorderColor` and the commands `play`, `stopAtProgress`, `restart`; it calls back
- *      `onAnimationLoaded`, `onAnimationFailed` and `onAnimationEnd`. No engine logic here. The restart token is read-only on
+ *      `onAnimationLoaded`, `onAnimationFailed`, `onAnimationEnd` and `onResourceMissing`. No engine logic here. The restart token is read-only on
  *      iOS (`animationRestartToken` grows on every `restartAnimation()`), so a changed token calls `restartAnimation()`.
  * [CN] 由 CYLTabBarController 引擎通过 `CYLAnimatedItemView` 播放的动画，契约与 Android 视图相同（`CYLFlutterAnimationView.kt`）。
  *      通道 `flutter_cyltabbar/CYLAnimationView/<id>`：方法 `setSource`、`setSelected`、`setAnimationSpeed`、`setAnimationLoops`、
@@ -350,6 +350,9 @@ static UIColor *CYLFlutterColor(id value) {
         [channel invokeMethod:@"onAnimationLoaded" arguments:nil];
     };
     _item.onAnimationFailed = ^{ [channel invokeMethod:@"onAnimationFailed" arguments:nil]; };
+    _item.onResourceMissing = ^(NSString *resource, NSString *reason) {
+        [channel invokeMethod:@"onResourceMissing" arguments:@{ @"resource" : resource, @"reason" : reason }];
+    };
     [_view addSubview:_item];
     if ([arguments[@"drivesAnimationPlayback"] isKindOfClass:[NSNumber class]]) {
         _item.drivesAnimationPlayback = [arguments[@"drivesAnimationPlayback"] boolValue];
@@ -447,7 +450,13 @@ static UIColor *CYLFlutterColor(id value) {
 }
 
 - (void)applySource:(NSString *)source {
-    _item.animationURL = source.length > 0 ? CYLFlutterAnimationURL(source) : nil;
+    NSURL *URL = source.length > 0 ? CYLFlutterAnimationURL(source) : nil;
+    _item.animationURL = URL;
+    if (source.length > 0 && !URL) {
+        // [EN] A name that is not in the app: the item has no URL to report, so the bridge names the file as configured.
+        // [CN] 文件名不在 App 中：条目没有 URL 可报告，由桥接按配置给出文件名。
+        [_item reportResourceMissing:[source componentsSeparatedByString:@"#"].firstObject reason:@"not found"];
+    }
 }
 
 /// [EN] The icon fills the view, or is `iconSize` (points) when given. [CN] 图标铺满视图，给了 `iconSize`（点）时为该尺寸。

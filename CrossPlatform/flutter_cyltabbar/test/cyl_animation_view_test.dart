@@ -67,4 +67,11 @@ void main() {
     await controller.stopAtProgress(0.5);
     await controller.restart();
   });
+
+  test('onResourceMissing is optional and has the frozen signature', () {
+    const view = CYLAnimationView(file: 'a.riv');
+    expect(view.onResourceMissing, isNull);
+    void callback(String resource, String reason) {}
+    expect(CYLAnimationView(file: 'a.riv', onResourceMissing: callback).onResourceMissing, same(callback));
+  });
 }

@@ -8,7 +8,14 @@ jest.mock('../CyltabbarAnimationViewNativeComponent', () => ({
   Commands: { play: jest.fn(), stopAtProgress: jest.fn(), restart: jest.fn() },
 }));
 
-import { animationURLWithOptions, cylAnimatedItemCornerRadiusCapsule } from '../CYLAnimationView.native';
+// The component only needs `useRef` and `useImperativeHandle` here; calling it directly returns the element it renders.
+jest.mock('react', () => ({
+  ...(jest.requireActual('react') as object),
+  useRef: () => ({ current: null }),
+  useImperativeHandle: () => {},
+}));
+
+import { CYLAnimationView, animationURLWithOptions, cylAnimatedItemCornerRadiusCapsule } from '../CYLAnimationView.native';
 
 type Case = { input: string; file?: string; options: Record<string, string> };
 
@@ -51,5 +58,31 @@ describe('the item background props', () => {
     expect(spec).toContain('itemCornerRadius?: CodegenTypes.WithDefault<CodegenTypes.Float, -1>');
     expect(spec).toContain('itemBorderWidth?: CodegenTypes.WithDefault<CodegenTypes.Float, 0>');
     expect(spec).toContain('itemBorderColor?: ColorValue');
+  });
+});
+
+describe('onResourceMissing', () => {
+  it('declares the event with the frozen payload in the native spec', () => {
+    const spec = readFileSync(join(__dirname, '../CyltabbarAnimationViewNativeComponent.ts'), 'utf8');
+    expect(spec).toContain('onResourceMissing?: CodegenTypes.DirectEventHandler<ResourceMissingEvent>');
+    expect(spec).toContain('Readonly<{ resource: string; reason: string }>');
+  });
+
+  it('passes resource and reason from the native event through unchanged', () => {
+    const heard: Array<{ resource: string; reason: string }> = [];
+    const element = CYLAnimationView({ file: 'home.pag', onResourceMissing: (event) => heard.push(event) }) as unknown as {
+      props: { onResourceMissing?: (event: { nativeEvent: { resource: string; reason: string } }) => void };
+    };
+    element.props.onResourceMissing?.({ nativeEvent: { resource: 'home.pag', reason: 'not found' } });
+    element.props.onResourceMissing?.({ nativeEvent: { resource: 'a.riv', reason: 'engine library missing' } });
+    expect(heard).toEqual([
+      { resource: 'home.pag', reason: 'not found' },
+      { resource: 'a.riv', reason: 'engine library missing' },
+    ]);
+  });
+
+  it('sends no handler to the native view when the prop is not given', () => {
+    const element = CYLAnimationView({ file: 'home.pag' }) as unknown as { props: { onResourceMissing?: unknown } };
+    expect(element.props.onResourceMissing).toBeUndefined();
   });
 });
