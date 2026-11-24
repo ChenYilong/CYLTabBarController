@@ -241,16 +241,26 @@ class CYLGlassBackdrop {
      */
     fun draw(canvas: Canvas, source: View, sourceX: Float, sourceY: Float, rect: RectF, radius: Float, effects: CYLGlassEffects): Boolean {
         if (!CYLLiquidGlassSupport.rendersBlur || !canvas.isHardwareAccelerated || source.width <= 0 || rect.width() <= 0f) return false
+        // [EN] A glass inside the captured page (a Liquid Glass tag in a list: the source is the root view that contains it, and every
+        //      other glass tag) would capture the page again while the page is being captured: that nesting recurses without end. While a
+        //      capture is under way every glass view anywhere skips its backdrop (returns false: the caller draws its translucent tint).
+        // [CN] 被录制页面里的玻璃（列表中的液态玻璃标签：来源是包含它的根视图，还有其他所有玻璃标签）会在录制页面的过程中再次录制页面，这种嵌套会无限递归。
+        //      录制期间，任何位置的玻璃视图都跳过背景（返回 false：由调用方绘制半透明着色）。
+        return captureOnce { drawSampled(canvas, source, sourceX, sourceY, rect, radius, effects) } ?: false
+    }
+
+    /**
+     * [EN] Last resort for "Recording currently in progress": our two nodes are closed with `endRecording` (so the next frame can
+     *      record), a warning is logged once, and false is returned (the caller draws its tint). [CN] 对 "Recording currently in progress" 的最后手段：用 `endRecording` 关闭我们的两个节点（下一帧才能录制），只记录一次警告，返回 false（调用方绘制着色）。
+     */
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun drawSampled(canvas: Canvas, source: View, sourceX: Float, sourceY: Float, rect: RectF, radius: Float, effects: CYLGlassEffects): Boolean {
         return try {
             drawEffects(canvas, source, sourceX, sourceY, rect, radius, effects)
             true
         } catch (e: IllegalStateException) {
-            // [EN] Last resort ("Recording currently in progress"): close our nodes so the next frame can record, draw nothing.
-            // [CN] 最后手段（"Recording currently in progress"）：关闭我们的节点以便下一帧录制，不绘制。
-            if (CYLLiquidGlassSupport.rendersBlur) {
-                endRecordingQuietly(sourceNode)
-                endRecordingQuietly(shapeNode)
-            }
+            endRecordingQuietly(sourceNode)
+            endRecordingQuietly(shapeNode)
             if (!loggedFailure) {
                 loggedFailure = true
                 Log.w("CYLGlassBackdrop", "glass not sampled: " + e.message)
@@ -265,6 +275,26 @@ class CYLGlassBackdrop {
             (node as? RenderNode)?.endRecording()
         } catch (ignored: IllegalStateException) {
             // [EN] The node was not recording. [CN] 该节点没有在录制。
+        }
+    }
+
+    internal companion object {
+        /** True while any glass is recording its backdrop (the UI thread only). */
+        private var capturing = false
+
+        /**
+         * [EN] Runs `block` unless a capture is already under way (then null): the flag is reset in a `finally`, so an exception while recording
+         *      cannot leave every glass view on its fallback for good. [CN] 除非已有录制在进行（此时返回 null），否则运行 `block`：标志在 `finally` 中复位，
+         *      因此录制中的异常不会让所有玻璃视图永久停在降级绘制上。
+         */
+        fun <T> captureOnce(block: () -> T): T? {
+            if (capturing) return null
+            capturing = true
+            try {
+                return block()
+            } finally {
+                capturing = false
+            }
         }
     }
 
