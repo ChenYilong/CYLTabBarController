@@ -64,6 +64,34 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         didSet { if oldValue != itemCornerRadius { itemBackgroundDidChange() } }
     }
 
+    /**
+     [EN] The space between the OUTER border and the items, left and right only, added to `contentMargin` (top and bottom unchanged). nil (the default):
+          `CYLAnimatedItemLiquidGlassContentInset` where Liquid Glass is really drawn, 0 when flat; any number wins, including 0 on glass.
+          Same rules as `CYLAnimatedItemView.itemContentHorizontalInset`.
+     [CN] 外边框与条目之间的距离，仅左右，加在 `contentMargin` 上（上下不变）。nil（默认）：真正绘制液态玻璃时为 `CYLAnimatedItemLiquidGlassContentInset`，
+          扁平时为 0；任何数字都优先，包括液态玻璃上的 0。规则与 `CYLAnimatedItemView.itemContentHorizontalInset` 相同。
+     */
+    public var itemContentHorizontalInset: CGFloat? {
+        didSet {
+            guard oldValue != itemContentHorizontalInset else { return }
+            updateMarginConstraints()
+            setNeedsLayout()
+        }
+    }
+
+    /**
+     [EN] `itemContentHorizontalInset` for Objective-C: an `NSNumber` of points, nil for not set. [CN] 给 Objective-C 用的 `itemContentHorizontalInset`：点数的 `NSNumber`，nil 表示未设置。
+     */
+    public var itemContentHorizontalInsetNumber: NSNumber? {
+        get { itemContentHorizontalInset.map { NSNumber(value: Double($0)) } }
+        set { itemContentHorizontalInset = newValue.map { CGFloat($0.doubleValue) } }
+    }
+
+    /** [EN] The inset in use (see `itemContentHorizontalInset`). [CN] 实际使用的内缩（见 `itemContentHorizontalInset`）。 */
+    public var resolvedItemContentHorizontalInset: CGFloat {
+        CYLAnimatedItemBackgroundRenderer.resolvedContentHorizontalInset(itemContentHorizontalInset, style: itemBackgroundStyle)
+    }
+
     /** [EN] The border width, 0 by default. [CN] 边框宽度，默认 0。 */
     public var itemBorderWidth: CGFloat = 0 {
         didSet { if oldValue != itemBorderWidth { itemBackgroundDidChange() } }
@@ -98,6 +126,8 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     private func itemBackgroundDidChange() {
         usesItemBackground = true
         layoutItemBackground()
+        // [EN] The style decides the unset inset, hence the horizontal margin. [CN] 样式决定未设置时的内缩，也就决定左右边距。
+        updateMarginConstraints()
         setNeedsLayout()
     }
 
@@ -529,17 +559,20 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
 
     // MARK: - Layout 布局
 
+    /// [EN] `contentMargin` plus the content inset, left and right. [CN] 左右的 `contentMargin` 加内容内缩。
+    private var horizontalMargin: CGFloat { contentMargin + resolvedItemContentHorizontalInset }
+
     private func updateMarginConstraints() {
         NSLayoutConstraint.deactivate(marginConstraints)
         marginConstraints = [
-            stackView.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: contentMargin),
+            stackView.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: horizontalMargin),
             stackView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: contentMargin),
         ]
         NSLayoutConstraint.activate(marginConstraints)
     }
 
     private var itemMaxWidth: CGFloat {
-        bounds.width > 0 ? max(0, bounds.width - 2 * contentMargin) : 0
+        bounds.width > 0 ? max(0, bounds.width - 2 * horizontalMargin) : 0
     }
 
     /// [EN] Sizes an item for the view's width, so a long title wraps instead of widening the stack.

@@ -68,6 +68,14 @@ import UIKit
 public let CYLAnimatedItemCornerRadiusCapsule: CGFloat = 1000
 
 /**
+ [EN] The named constant of the default content inset on Liquid Glass (14 points): the space between the outer border and the content, left and right,
+      that `itemContentHorizontalInset` resolves to where Liquid Glass is really drawn and nothing is set. Pass it instead of a literal.
+ [CN] 液态玻璃上默认内容内缩的命名常量（14 点）：外边框与内容之间左右的距离，在真正绘制液态玻璃且未设置时 `itemContentHorizontalInset` 取此值。
+      传它，不要写字面量。
+ */
+public let CYLAnimatedItemLiquidGlassContentInset: CGFloat = 14
+
+/**
  [EN] What the view's background is made of: the solid `itemBackgroundColor` (`flat`, default), or Liquid Glass tinted with it
       (`liquidGlass`; drawn only where the system draws Liquid Glass, `CYLAnimatedItemView.isLiquidGlassActive()`: iOS 26 and
       later, as CYLTabBarController; elsewhere the style is ignored and the view stays flat).
@@ -459,6 +467,37 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         get { itemCornerRadius.map { NSNumber(value: Double($0)) } }
         set { itemCornerRadius = newValue.map { CGFloat($0.doubleValue) } }
     }
+    /**
+     [EN] The space between the OUTER border and the content, left and right only, on top of `contentInsets`. nil (the default) is not set:
+          `CYLAnimatedItemLiquidGlassContentInset` where Liquid Glass is really drawn (the condition that makes an unset `itemCornerRadius` a
+          capsule), 0 when flat. Any number wins, including 0 on glass. It changes the size, so the view lays out again.
+     [CN] 外边框与内容之间的距离，仅左右，叠加在 `contentInsets` 之上。nil（默认）表示未设置：真正绘制液态玻璃时（与未设置的 `itemCornerRadius`
+          成为胶囊的条件相同）为 `CYLAnimatedItemLiquidGlassContentInset`，扁平时为 0。任何数字都优先，包括液态玻璃上的 0。它改变尺寸，因此视图重新布局。
+     */
+    public var itemContentHorizontalInset: CGFloat? {
+        didSet {
+            guard oldValue != itemContentHorizontalInset else { return }
+            invalidateIntrinsicContentSize()
+            setNeedsLayout()
+        }
+    }
+    /**
+     [EN] `itemContentHorizontalInset` for Objective-C, which cannot see an optional `CGFloat`: an `NSNumber` of points, nil for not set. The React
+          Native and Flutter iOS bridges set it.
+     [CN] 给 Objective-C 用的 `itemContentHorizontalInset`（Objective-C 看不到可选的 `CGFloat`）：点数的 `NSNumber`，nil 表示未设置。React Native 与
+          Flutter 的 iOS 桥接使用它。
+     */
+    public var itemContentHorizontalInsetNumber: NSNumber? {
+        get { itemContentHorizontalInset.map { NSNumber(value: Double($0)) } }
+        set { itemContentHorizontalInset = newValue.map { CGFloat($0.doubleValue) } }
+    }
+    /**
+     [EN] The inset in use: `itemContentHorizontalInset`, or when that is nil the glass constant (Liquid Glass really drawn) or 0 (flat).
+     [CN] 实际使用的内缩：`itemContentHorizontalInset`；为 nil 时，真正绘制液态玻璃为玻璃常量，扁平为 0。
+     */
+    public var resolvedItemContentHorizontalInset: CGFloat {
+        CYLAnimatedItemBackgroundRenderer.resolvedContentHorizontalInset(itemContentHorizontalInset, style: itemBackgroundStyle)
+    }
     /** [EN] The border width in points. [CN] 边框宽度（点）。 */
     public var itemBorderWidth: CGFloat = 0 {
         didSet { if oldValue != itemBorderWidth { itemBackgroundDidChange() } }
@@ -514,6 +553,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     private func itemBackgroundDidChange() {
         usesItemBackground = true
         layoutItemBackground()
+        // [EN] The style decides the unset inset, which changes the size. [CN] 样式决定未设置时的内缩，从而改变尺寸。
+        invalidateIntrinsicContentSize()
         setNeedsLayout()
     }
 
@@ -1066,8 +1107,17 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                       height: max(icon.height + gap + titleSize.height, accessoryHeight))
     }
 
+    /// [EN] `contentInsets` plus `resolvedItemContentHorizontalInset` left and right. [CN] `contentInsets` 加上左右的 `resolvedItemContentHorizontalInset`。
+    private var effectiveContentInsets: UIEdgeInsets {
+        var insets = contentInsets
+        let extra = resolvedItemContentHorizontalInset
+        insets.left += extra
+        insets.right += extra
+        return insets
+    }
+
     open override func sizeThatFits(_ size: CGSize) -> CGSize {
-        let insets = contentInsets
+        let insets = effectiveContentInsets
         let limit = (size.width > 0 ? size.width : .greatestFiniteMagnitude) - insets.left - insets.right
         let content = contentSizeThatFits(CGSize(width: max(0, limit), height: size.height))
         return CGSize(width: ceil(content.width + insets.left + insets.right), height: ceil(content.height + insets.top + insets.bottom))
@@ -1079,7 +1129,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     open override func layoutSubviews() {
         super.layoutSubviews()
-        layoutContent(in: bounds.inset(by: contentInsets))
+        layoutContent(in: bounds.inset(by: effectiveContentInsets))
         applyCountdownAppearance()
         layoutItemBackground()
     }

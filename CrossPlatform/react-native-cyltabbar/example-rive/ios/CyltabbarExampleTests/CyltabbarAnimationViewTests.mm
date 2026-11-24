@@ -377,6 +377,19 @@ static SharedColor CYLTestSharedColor(uint8_t red, uint8_t green, uint8_t blue) 
   XCTAssertNil([_item valueForKey:@"itemCornerRadiusNumber"]);
 }
 
+- (void)testTheContentInsetIsPointsAndNegativeIsUnset {
+  CyltabbarAnimationViewProps defaults;
+  XCTAssertLessThan(defaults.itemContentHorizontalInset, 0, @"the codegen default is negative: not set");
+  [self update:^(CyltabbarAnimationViewProps &props) {}];
+  XCTAssertNil([_item valueForKey:@"itemContentHorizontalInsetNumber"], @"unset reaches the item as nil");
+  [self update:^(CyltabbarAnimationViewProps &props) { props.itemContentHorizontalInset = 20; }];
+  XCTAssertEqualWithAccuracy([[_item valueForKey:@"itemContentHorizontalInsetNumber"] doubleValue], 20, 0.0001);
+  [self update:^(CyltabbarAnimationViewProps &props) { props.itemContentHorizontalInset = 0; }];
+  XCTAssertEqualObjects([_item valueForKey:@"itemContentHorizontalInsetNumber"], @0, @"0 is explicit, not unset");
+  [self update:^(CyltabbarAnimationViewProps &props) { props.itemContentHorizontalInset = -1; }];
+  XCTAssertNil([_item valueForKey:@"itemContentHorizontalInsetNumber"]);
+}
+
 - (void)testTheBorderWidthAndColorReachTheItem {
   [self update:^(CyltabbarAnimationViewProps &props) {
     props.itemBorderWidth = 2;

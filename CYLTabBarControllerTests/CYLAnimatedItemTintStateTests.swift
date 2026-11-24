@@ -225,4 +225,73 @@ final class CYLAnimatedItemBackgroundTests: XCTestCase {
         XCTAssertEqual(stack.layer.cornerRadius, 40, accuracy: 0.01)
         XCTAssertNotNil(stack.itemLiquidGlassView)
     }
+
+    // MARK: - itemContentHorizontalInset 内容左右内缩
+
+    func testUnsetContentInsetIsZeroOnFlatAndTheConstantOnActiveGlass() {
+        let flat = makeItem()
+        XCTAssertNil(flat.itemContentHorizontalInset)
+        XCTAssertEqual(flat.resolvedItemContentHorizontalInset, 0)
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        let glass = makeItem()
+        glass.itemBackgroundStyle = .liquidGlass
+        XCTAssertEqual(CYLAnimatedItemLiquidGlassContentInset, 14)
+        XCTAssertEqual(glass.resolvedItemContentHorizontalInset, CYLAnimatedItemLiquidGlassContentInset)
+        XCTAssertNil(glass.itemContentHorizontalInsetNumber, "unset stays unset for the bridges")
+    }
+
+    func testUnsetContentInsetIsZeroWhenGlassIsRequestedButNotDrawn() {
+        CYLAnimatedItemView.liquidGlassActiveOverride = false
+        let item = makeItem()
+        item.itemBackgroundStyle = .liquidGlass
+        XCTAssertEqual(item.resolvedItemBackgroundStyle, .flat)
+        XCTAssertEqual(item.resolvedItemContentHorizontalInset, 0)
+    }
+
+    func testAnExplicitContentInsetWins() {
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        let glass = makeItem()
+        glass.itemBackgroundStyle = .liquidGlass
+        glass.itemContentHorizontalInset = 0
+        XCTAssertEqual(glass.resolvedItemContentHorizontalInset, 0, "0 on glass is explicit")
+        XCTAssertEqual(glass.itemContentHorizontalInsetNumber, 0)
+        let flat = makeItem()
+        flat.itemContentHorizontalInset = 20
+        XCTAssertEqual(flat.resolvedItemContentHorizontalInset, 20)
+        flat.itemContentHorizontalInsetNumber = nil
+        XCTAssertEqual(flat.resolvedItemContentHorizontalInset, 0)
+    }
+
+    func testWrapContentWidthGrowsByTwiceTheInsetOnGlass() {
+        let flat = makeItem()
+        let flatWidth = flat.intrinsicContentSize.width
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        let glass = makeItem()
+        glass.itemBackgroundStyle = .liquidGlass
+        XCTAssertEqual(glass.intrinsicContentSize.width, flatWidth + 2 * CYLAnimatedItemLiquidGlassContentInset, accuracy: 1)
+        glass.itemContentHorizontalInset = 20
+        XCTAssertEqual(glass.intrinsicContentSize.width, flatWidth + 40, accuracy: 1, "the setter changes the size")
+    }
+
+    func testStackViewMarginsAddTheInsetLeftAndRightOnly() {
+        func margins(_ stack: CYLAnimatedItemStackView) -> (leading: CGFloat, top: CGFloat) {
+            func constant(_ attribute: NSLayoutConstraint.Attribute) -> CGFloat {
+                stack.constraints.first { ($0.firstItem as? UIView) === stack.stackView && $0.firstAttribute == attribute }?.constant ?? -1
+            }
+            return (constant(.leading), constant(.top))
+        }
+        let flat = CYLAnimatedItemStackView(frame: CGRect(x: 0, y: 0, width: 300, height: 200))
+        flat.itemBackgroundStyle = .flat
+        let flatMargins = margins(flat)
+        XCTAssertEqual(flatMargins.leading, flat.contentMargin)
+        XCTAssertEqual(flatMargins.top, flat.contentMargin)
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        let glass = CYLAnimatedItemStackView(frame: CGRect(x: 0, y: 0, width: 300, height: 200))
+        glass.itemBackgroundStyle = .liquidGlass
+        XCTAssertEqual(margins(glass).leading, flatMargins.leading + CYLAnimatedItemLiquidGlassContentInset, "the margins follow the style")
+        XCTAssertEqual(margins(glass).top, flatMargins.top, "top and bottom unchanged")
+        glass.itemContentHorizontalInset = 0
+        XCTAssertEqual(margins(glass).leading, flatMargins.leading)
+        XCTAssertEqual(glass.contentMargin, 16, "the default of contentMargin is unchanged")
+    }
 }

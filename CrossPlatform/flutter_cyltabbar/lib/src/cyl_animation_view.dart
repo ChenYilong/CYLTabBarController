@@ -18,6 +18,10 @@ String animationURLWithOptions(String file, [Map<String, Object> options = const
 /// the native view treats it as exactly half the height.
 const double cylAnimatedItemCornerRadiusCapsule = 1000;
 
+/// The named constant of the default content inset on Liquid Glass (14 logical pixels): what [CYLAnimationView.itemContentHorizontalInset]
+/// resolves to where glass is really drawn and nothing is set.
+const double cylAnimatedItemLiquidGlassContentInset = 14;
+
 /// What the item's background is made of: the solid `itemBackgroundColor` ([flat], default), or Liquid Glass tinted with it
 /// ([liquidGlass]; drawn only where the platform draws Liquid Glass, elsewhere the view stays flat).
 enum CYLAnimatedItemBackgroundStyle { flat, liquidGlass }
@@ -68,6 +72,7 @@ class CYLAnimationView extends StatefulWidget {
     this.itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat,
     this.itemBackgroundColor,
     this.itemCornerRadius,
+    this.itemContentHorizontalInset,
     this.itemBorderWidth = 0,
     this.itemBorderColor,
     this.controller,
@@ -122,6 +127,10 @@ class CYLAnimationView extends StatefulWidget {
   /// The corner radius in logical pixels, limited to half the height; 0 is square, [cylAnimatedItemCornerRadiusCapsule] a
   /// capsule. null (default): a capsule for Liquid Glass, square for flat.
   final double? itemCornerRadius;
+
+  /// The space between the outer border and the content, left and right only, on top of the view's own padding, in logical pixels.
+  /// null (default): [cylAnimatedItemLiquidGlassContentInset] where Liquid Glass is really drawn, 0 for flat. Any number wins, including 0.
+  final double? itemContentHorizontalInset;
 
   /// The border width in logical pixels.
   final double itemBorderWidth;
@@ -193,6 +202,9 @@ class _CYLAnimationViewState extends State<CYLAnimationView> {
     if (widget.itemCornerRadius != oldWidget.itemCornerRadius) {
       channel.invokeMethod<void>('setItemCornerRadius', widget.itemCornerRadius);
     }
+    if (widget.itemContentHorizontalInset != oldWidget.itemContentHorizontalInset) {
+      channel.invokeMethod<void>('setItemContentHorizontalInset', widget.itemContentHorizontalInset);
+    }
     if (widget.itemBorderWidth != oldWidget.itemBorderWidth) {
       channel.invokeMethod<void>('setItemBorderWidth', widget.itemBorderWidth);
     }
@@ -259,6 +271,7 @@ class _CYLAnimationViewState extends State<CYLAnimationView> {
       'itemBackgroundStyle': widget.itemBackgroundStyle.name,
       if (widget.itemBackgroundColor != null) 'itemBackgroundColor': widget.itemBackgroundColor!.toARGB32(),
       if (widget.itemCornerRadius != null) 'itemCornerRadius': widget.itemCornerRadius,
+      if (widget.itemContentHorizontalInset != null) 'itemContentHorizontalInset': widget.itemContentHorizontalInset,
       'itemBorderWidth': widget.itemBorderWidth,
       if (widget.itemBorderColor != null) 'itemBorderColor': widget.itemBorderColor!.toARGB32(),
     };

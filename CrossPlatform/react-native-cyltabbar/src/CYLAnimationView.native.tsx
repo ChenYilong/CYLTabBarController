@@ -37,6 +37,12 @@ export function animationURLWithOptions(file: string, options: CYLAnimationOptio
 export const cylAnimatedItemCornerRadiusCapsule = 1000;
 
 /**
+ * [EN] The named constant of the default content inset on Liquid Glass (14 points): what `itemContentHorizontalInset` resolves to where glass
+ *      is really drawn and the prop is unset. [CN] 液态玻璃上默认内容内缩的命名常量（14 点）：真正绘制玻璃且未设置 `itemContentHorizontalInset` 时的取值。
+ */
+export const cylAnimatedItemLiquidGlassContentInset = 14;
+
+/**
  * [EN] The commands of the native view, for a `CYLAnimationView` whose `drivesAnimationPlayback` is false (the cross-platform
  *      engine contract, docs/Animated-Item.md): `play()`, `stopAtProgress(progress)` and `restart()`.
  * [CN] 原生视图的命令，用于 `drivesAnimationPlayback` 为 false 的 `CYLAnimationView`（跨端引擎契约，见 docs/Animated-Item.md）：
@@ -91,6 +97,11 @@ export type CYLAnimationViewProps = ViewProps & {
    * Unset: a capsule for `liquidGlass`, square for `flat`.
    */
   itemCornerRadius?: number;
+  /**
+   * The space between the outer border and the content, left and right only, on top of the view's own padding, in points. Unset:
+   * `cylAnimatedItemLiquidGlassContentInset` (14) where Liquid Glass is really drawn, 0 for `flat`. Any number wins, including 0 on glass.
+   */
+  itemContentHorizontalInset?: number;
   /** The border width in points; default 0. */
   itemBorderWidth?: number;
   /** The border color; unset for none. */

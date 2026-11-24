@@ -287,7 +287,7 @@ static UIColor *CYLFlutterColor(id value) {
  *      view (`CYLFlutterAnimationView.kt`). Channel `flutter_cyltabbar/CYLAnimationView/<id>`: the methods `setSource`,
  *      `setSelected`, `setAnimationSpeed`, `setAnimationLoops`, `setAnimationRestartToken`, `setDrivesAnimationPlayback`,
  *      `setPlaying`, `setIconSize`, `setTintColor`, `setItemBackgroundStyle`, `setItemBackgroundColor`, `setItemCornerRadius`,
- *      `setItemBorderWidth`, `setItemBorderColor` and the commands `play`, `stopAtProgress`, `restart`; it calls back
+ *      `setItemContentHorizontalInset`, `setItemBorderWidth`, `setItemBorderColor` and the commands `play`, `stopAtProgress`, `restart`; it calls back
  *      `onAnimationLoaded`, `onAnimationFailed`, `onAnimationEnd` and `onResourceMissing`. No engine logic here. The restart token is read-only on
  *      iOS (`animationRestartToken` grows on every `restartAnimation()`), so a changed token calls `restartAnimation()`.
  * [CN] 由 CYLTabBarController 引擎通过 `CYLAnimatedItemView` 播放的动画，契约与 Android 视图相同（`CYLFlutterAnimationView.kt`）。
@@ -377,6 +377,7 @@ static UIColor *CYLFlutterColor(id value) {
     [self applyItemBackgroundStyle:arguments[@"itemBackgroundStyle"]];
     _item.itemBackgroundColor = CYLFlutterColor(arguments[@"itemBackgroundColor"]);
     [self applyItemCornerRadius:arguments[@"itemCornerRadius"]];
+    [self applyItemContentHorizontalInset:arguments[@"itemContentHorizontalInset"]];
     [self applyItemBorderWidth:arguments[@"itemBorderWidth"]];
     _item.itemBorderColor = CYLFlutterColor(arguments[@"itemBorderColor"]);
     if ([arguments[@"selected"] isKindOfClass:[NSNumber class]]) {
@@ -401,6 +402,12 @@ static UIColor *CYLFlutterColor(id value) {
 /// [CN] `itemCornerRadius`（点；核心把它限制在半高以内，1000 是胶囊常量）；nil 表示未设置。
 - (void)applyItemCornerRadius:(id)radius {
     _item.itemCornerRadiusNumber = [radius isKindOfClass:[NSNumber class]] ? radius : nil;
+}
+
+/// [EN] `itemContentHorizontalInset` in points; nil is not set (14 where glass is drawn, 0 for flat).
+/// [CN] `itemContentHorizontalInset`（点）；nil 表示未设置（绘制玻璃时为 14，扁平为 0）。
+- (void)applyItemContentHorizontalInset:(id)inset {
+    _item.itemContentHorizontalInsetNumber = [inset isKindOfClass:[NSNumber class]] ? inset : nil;
 }
 
 /// [EN] `itemBorderWidth` in points; nil is 0. [CN] `itemBorderWidth`（点）；nil 为 0。
@@ -517,6 +524,8 @@ static UIColor *CYLFlutterColor(id value) {
         _item.itemBackgroundColor = CYLFlutterColor(argument);
     } else if ([method isEqualToString:@"setItemCornerRadius"]) {
         [self applyItemCornerRadius:argument];
+    } else if ([method isEqualToString:@"setItemContentHorizontalInset"]) {
+        [self applyItemContentHorizontalInset:argument];
     } else if ([method isEqualToString:@"setItemBorderWidth"]) {
         [self applyItemBorderWidth:argument];
     } else if ([method isEqualToString:@"setItemBorderColor"]) {

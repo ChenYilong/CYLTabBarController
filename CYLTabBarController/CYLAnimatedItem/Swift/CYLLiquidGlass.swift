@@ -165,6 +165,14 @@ final class CYLAnimatedItemBackgroundRenderer {
         return color.withAlphaComponent(alpha * (tintAlpha ?? glassTintAlpha))
     }
 
+    /**
+     * [EN] The content inset in use: `explicit` when set (0 included), else the glass constant where Liquid Glass is really drawn, 0 when flat.
+     * [CN] 实际使用的内容内缩：已设置时为 `explicit`（包括 0），否则真正绘制液态玻璃时为玻璃常量，扁平时为 0。
+     */
+    static func resolvedContentHorizontalInset(_ explicit: CGFloat?, style: CYLAnimatedItemBackgroundStyle) -> CGFloat {
+        explicit ?? (resolvedStyle(style) == .liquidGlass ? CYLAnimatedItemLiquidGlassContentInset : 0)
+    }
+
     func apply(on host: UIView, style: CYLAnimatedItemBackgroundStyle, color: UIColor?, cornerRadius: CGFloat?,
                borderWidth: CGFloat, borderColor: UIColor?, tintAlpha: CGFloat? = nil) {
         let resolved = Self.resolvedStyle(style)
