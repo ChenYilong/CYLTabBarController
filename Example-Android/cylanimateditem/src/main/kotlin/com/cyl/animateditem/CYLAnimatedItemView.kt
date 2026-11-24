@@ -457,7 +457,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     private val reportedMissingResources = HashSet<String>()
 
-    private fun resourceMissing(resource: String, reason: String) {
+    protected fun resourceMissing(resource: String, reason: String) {
         if (!reportedMissingResources.add(resource)) return
         CYLAnimationEngines.dispatchResourceMissing(context, resource, reason, onResourceMissing)
     }
