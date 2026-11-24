@@ -1179,7 +1179,9 @@ export struct CYLAnimatedItemView {
       this.cylContent()
     }
     .padding(this.cylPadding())
-    .backgroundEffect(this.cylItemGlassDrawn() ? { radius: 28, saturation: 1.6, brightness: 1.05 } : { radius: 0 })
+    .backgroundEffect(this.cylItemGlassDrawn() ?
+      { radius: CYLLiquidGlass.BLUR_RADIUS, saturation: CYLLiquidGlass.BLUR_SATURATION, brightness: CYLLiquidGlass.LIGHT_BRIGHTNESS } :
+      { radius: 0 })
     .backgroundColor(this.cylIsCountdown() ? '#F2F2F7' : this.cylItemBackgroundColor())
     .borderRadius(this.cylIsCountdown() ? 6 : (this.itemCornerRadius >= 0 ? this.itemCornerRadius : 0))
     .borderWidth(this.cylIsCountdown() ? 0.5 : this.itemBorderWidth)

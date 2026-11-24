@@ -11,6 +11,8 @@
  *      没有系统玻璃材质，因此玻璃使用模糊加浅色或深色着色、柔和阴影与浅色描边。
  */
 
+import { CYLLiquidGlass } from 'cylanimateditem';
+
 /**
  * [EN] Every Liquid Glass size in one place, measured on iOS 26 (vp = pt). [CN] 液态玻璃的全部尺寸，在 iOS 26 上测得（vp = pt）。
  */
@@ -51,11 +53,59 @@ export class CYLLiquidGlassTokens {
 }
 
 /**
- * [EN] The glass material and the glass capsule are part of `cylanimateditem` now (CYLAnimatedItemView draws the glass; the tab
- *      bar depends on it); re-exported here so that the tab bar's imports stay as they were.
- * [CN] 玻璃材质与玻璃胶囊现在属于 `cylanimateditem`（CYLAnimatedItemView 绘制玻璃；TabBar 依赖它）；在此重新导出，TabBar 的导入保持不变。
+ * [EN] The glass material, with the reference's compatibility rule: never create a material at module level or in a field
+ *      initializer, and fall back to a blur where the system material does not exist. On the SDKs this port builds with
+ *      (API 12 to 21) only the fallback exists.
+ * [CN] 玻璃材质，沿用参考工程的兼容规则：不在模块顶层或字段初始化器中创建材质，系统材质不存在时退化为模糊。本端使用的 SDK（API 12 到 21）只有退化方案。
  */
-export { CYLLiquidGlassMaterial, CYLLiquidGlassCapsuleModifier } from 'cylanimateditem';
+export class CYLLiquidGlassMaterial {
+  /**
+   * [EN] The fallback blur for a material strength 1 (thickest) to 5 (thinnest), as the reference's blurFallback.
+   * [CN] 材质强度 1（最厚）到 5（最薄）对应的退化模糊，与参考工程的 blurFallback 相同。
+   */
+  static blurFallback(strength: number): BlurStyle {
+    if (strength >= 4) {
+      return BlurStyle.Thin;
+    }
+    if (strength <= 2) {
+      return BlurStyle.Thick;
+    }
+    return BlurStyle.Regular;
+  }
+}
+
+/**
+ * [EN] The glass capsule (the expanded bar and the minimized ball): the fallback blur, the app's bar tint when it set one,
+ *      the material's shadow and a light rim for the highlight; the radius makes it a capsule at any height.
+ * [CN] 玻璃胶囊（展开的 TabBar 与缩小后的球）：退化模糊、App 设置的 TabBar 着色（如有）、材质阴影与作高光的浅色描边；圆角使其在任何高度都是胶囊。
+ */
+export class CYLLiquidGlassCapsuleModifier implements AttributeModifier<RowAttribute> {
+  barTintColor: ResourceColor | undefined;
+  height: number;
+  strength: number;
+
+  dark: boolean;
+
+  constructor(barTintColor: ResourceColor | undefined, height: number, strength: number = 3, dark: boolean = false) {
+    this.barTintColor = barTintColor;
+    this.height = height;
+    this.strength = strength;
+    this.dark = dark;
+  }
+
+  applyNormalAttribute(instance: RowAttribute): void {
+    // [EN] As iOS 26: near-white glass in a light app, dark grey glass in a dark one, the pages softly blurred behind it.
+    // [CN] 与 iOS 26 相同：浅色 App 中为近白色玻璃，深色 App 中为深灰色玻璃，后面的页面被柔和地模糊。
+    instance.backgroundEffect({
+      radius: CYLLiquidGlass.BLUR_RADIUS, saturation: CYLLiquidGlass.BLUR_SATURATION,
+      brightness: this.dark ? CYLLiquidGlass.DARK_BRIGHTNESS : CYLLiquidGlass.LIGHT_BRIGHTNESS
+    });
+    instance.backgroundColor(this.barTintColor ?? (this.dark ? '#C21C1C1E' : '#DBFAFAFC'));
+    instance.borderRadius(this.height / 2);
+    instance.shadow({ radius: 28, color: this.dark ? '#40000000' : '#1A000000', offsetY: 6 });
+    instance.clip(false);
+  }
+}
 
 /**
  * [EN] The bar container of Liquid Glass floats over the pages: out of the column's flow, pinned to the bottom, so the pages
