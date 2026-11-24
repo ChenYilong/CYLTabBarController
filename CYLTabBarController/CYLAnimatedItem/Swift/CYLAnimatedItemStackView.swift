@@ -74,6 +74,16 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         didSet { if oldValue != itemBorderColor { itemBackgroundDidChange() } }
     }
 
+    /**
+     [EN] The share of the color's alpha that tints a Liquid Glass: nil (the default) is 0.75, so an opaque color tints the glass instead of
+          covering it; 1 uses the color as it is (a selected tag keeps its full color, still glass). Not used by the flat style.
+     [CN] 颜色透明度中用于给液态玻璃着色的比例：nil（默认）为 0.75，不透明的颜色是给玻璃着色而不是盖住它；1 表示按原色（选中的标签保持完整颜色，
+          仍是玻璃）。扁平样式不使用。
+     */
+    public var itemGlassTintAlpha: CGFloat? {
+        didSet { if oldValue != itemGlassTintAlpha { itemBackgroundDidChange() } }
+    }
+
     /** [EN] The background really drawn (flat where the system draws no glass). [CN] 实际绘制的背景（系统不使用玻璃时为扁平）。 */
     public var resolvedItemBackgroundStyle: CYLAnimatedItemBackgroundStyle {
         CYLAnimatedItemBackgroundRenderer.resolvedStyle(itemBackgroundStyle)
@@ -94,7 +104,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     private func layoutItemBackground() {
         guard usesItemBackground else { return }
         backgroundRenderer.apply(on: self, style: itemBackgroundStyle, color: itemBackgroundColor, cornerRadius: itemCornerRadius,
-                                 borderWidth: itemBorderWidth, borderColor: itemBorderColor)
+                                 borderWidth: itemBorderWidth, borderColor: itemBorderColor, tintAlpha: itemGlassTintAlpha)
     }
 
     /**
