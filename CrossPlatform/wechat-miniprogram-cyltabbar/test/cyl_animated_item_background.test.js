@@ -42,3 +42,13 @@ test('a radius below zero is square and the glass has a default tint', () => {
   assert.match(cylAnimatedItemBackground('liquidGlass', '', 8, 0, '', false).css, /background-color:rgba\(225,222,220,0.5\);/)
   assert.match(cylAnimatedItemBackground('liquidGlass', '', 8, 0, '', true).css, /background-color:rgba\(255,255,255,0.14\);/)
 })
+
+test('an unset radius (-1) is a capsule for the drawn glass and square for flat; a set radius wins', () => {
+  cylAnimatedItemLiquidGlassSetActiveOverride(true)
+  assert.match(cylAnimatedItemBackground('liquidGlass', '', -1, 0, '', false).css, /border-radius:999px;/)
+  assert.match(cylAnimatedItemBackground('liquidGlass', '', 8, 0, '', false).css, /border-radius:8px;/)
+  assert.match(cylAnimatedItemBackground('liquidGlass', '', 0, 0, '', false).css, /border-radius:0px;/)
+  assert.match(cylAnimatedItemBackground('flat', '#fff', -1, 0, '', false).css, /border-radius:0px;/)
+  cylAnimatedItemLiquidGlassSetActiveOverride(false)
+  assert.match(cylAnimatedItemBackground('liquidGlass', '', -1, 0, '', false).css, /border-radius:0px;/)
+})

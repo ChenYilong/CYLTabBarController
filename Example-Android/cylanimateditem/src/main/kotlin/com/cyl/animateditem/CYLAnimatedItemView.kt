@@ -1196,10 +1196,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         set(value) { field = value; itemBackgroundDidChange() }
 
     /**
-     * [EN] The corner radius in dp, applied as `min(radius, height / 2)`: 0 is square, a large value such as 1000 is a capsule.
-     * [CN] 圆角半径（dp），实际取 `min(radius, height / 2)`：0 为直角，较大的值（如 1000）为胶囊。
+     * [EN] The corner radius in dp, applied as `min(radius, height / 2)`: 0 is square, a large value such as 1000 is a capsule. null
+     *      (the default) is not set: the Liquid Glass style is a capsule (half the height), so a host gets a capsule without setting
+     *      anything and customizes it by setting this property; the flat style is square.
+     * [CN] 圆角半径（dp），实际取 `min(radius, height / 2)`：0 为直角，较大的值（如 1000）为胶囊。null（默认）表示未设置：液态玻璃样式为胶囊
+     *      （半高），宿主无需设置任何属性即可得到胶囊，要自定义时设置此属性即可；扁平样式为直角。
      */
-    var itemCornerRadius: Float = 0f
+    var itemCornerRadius: Float? = null
         set(value) { field = value; itemBackgroundDidChange() }
 
     /** [EN] The border width in dp. [CN] 边框宽度（dp）。 */
@@ -1241,7 +1244,16 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     private fun applyItemBackground() {
         if (!usesItemBackground) return
         val density = resources.displayMetrics.density
-        val radius = min(max(itemCornerRadius, 0f) * density, height / 2f)
+        // The host's value limited to half the height, else a capsule for Liquid Glass (the rule `0: automatic, a capsule` that
+        // CollectionViewClassifyMenu's tags had, moved here) and square for flat.
+        val requested = itemCornerRadius
+        val radius = if (requested != null) {
+            min(max(requested, 0f) * density, height / 2f)
+        } else if (resolvedItemBackgroundStyle == CYLAnimatedItemBackgroundStyle.LiquidGlass) {
+            height / 2f
+        } else {
+            0f
+        }
         itemBox.cornerRadius = radius
         itemBox.setStroke((itemBorderWidth * density).roundToInt(), itemBorderColor ?: Color.TRANSPARENT)
         var glassDrawn = false

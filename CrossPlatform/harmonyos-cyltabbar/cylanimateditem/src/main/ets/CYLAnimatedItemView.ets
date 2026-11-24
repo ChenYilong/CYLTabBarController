@@ -511,7 +511,13 @@ export struct CYLAnimatedItemView {
   @Prop itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat;
   /** [EN] The solid fill when flat, the glass tint when liquid glass; '' for none. [CN] 扁平时的纯色填充，液态玻璃时的着色；'' 表示无。 */
   @Prop itemBackgroundColor: ResourceColor = '';
-  /** [EN] The corner radius in vp, `min(radius, height / 2)` is not computed here: the platform clamps a radius larger than half the height to a capsule; -1 (default) means not set. [CN] 圆角半径（vp）；大于半高的值由平台按胶囊处理；-1（默认）表示未设置。 */
+  /**
+   * [EN] The corner radius in vp: a larger value than half the height is a capsule (the platform clamps), 0 is square. -1 (the
+   *      default) is not set: the Liquid Glass style is a capsule, so a host gets a capsule without setting anything and customizes
+   *      it by setting this property; the flat style is square.
+   * [CN] 圆角半径（vp）：大于半高的值为胶囊（平台会截断），0 为直角。-1（默认）表示未设置：液态玻璃样式为胶囊，宿主无需设置任何属性即可得到
+   *      胶囊，要自定义时设置此属性即可；扁平样式为直角。
+   */
   @Prop itemCornerRadius: number = -1;
   /** [EN] The border width in vp. [CN] 边框宽度（vp）。 */
   @Prop itemBorderWidth: number = 0;
@@ -1164,6 +1170,18 @@ export struct CYLAnimatedItemView {
   }
 
   /**
+   * [EN] The corner radius: the host's value, else a capsule for the drawn Liquid Glass (the rule `0: automatic, a capsule` that
+   *      CollectionViewClassifyMenu's tags had, moved here) and square for flat. [CN] 圆角：宿主设置的值，否则绘制液态玻璃时为胶囊
+   *      （CollectionViewClassifyMenu 的标签曾有的「0 为自动，即胶囊」规则，移到这里），扁平时为直角。
+   */
+  private cylItemCornerRadius(): number {
+    if (this.itemCornerRadius >= 0) {
+      return this.itemCornerRadius;
+    }
+    return this.cylItemGlassDrawn() ? CYLLiquidGlass.CAPSULE_RADIUS : 0;
+  }
+
+  /**
    * [EN] The background color: the tint over the glass blur, else the solid fill, '' meaning transparent. [CN] 背景色：玻璃模糊之上的着色，否则为纯色填充；'' 表示透明。
    */
   private cylItemBackgroundColor(): ResourceColor {
@@ -1183,7 +1201,7 @@ export struct CYLAnimatedItemView {
       { radius: CYLLiquidGlass.BLUR_RADIUS, saturation: CYLLiquidGlass.BLUR_SATURATION, brightness: CYLLiquidGlass.LIGHT_BRIGHTNESS } :
       { radius: 0 })
     .backgroundColor(this.cylIsCountdown() ? '#F2F2F7' : this.cylItemBackgroundColor())
-    .borderRadius(this.cylIsCountdown() ? 6 : (this.itemCornerRadius >= 0 ? this.itemCornerRadius : 0))
+    .borderRadius(this.cylIsCountdown() ? 6 : this.cylItemCornerRadius())
     .borderWidth(this.cylIsCountdown() ? 0.5 : this.itemBorderWidth)
     .borderColor(this.cylIsRunning() ? '#C7C7CC' : (this.cylUsesItemBackground() && this.itemBorderColor !== '' ?
       this.itemBorderColor : this.countdownBorderColor))

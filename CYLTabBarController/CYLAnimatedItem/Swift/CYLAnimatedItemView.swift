@@ -430,10 +430,13 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         didSet { itemBackgroundDidChange() }
     }
     /**
-     [EN] The corner radius, applied as `min(radius, height / 2)`: 0 is square, a large value such as 1000 is a capsule.
-     [CN] 圆角半径，实际取 `min(radius, height / 2)`：0 为直角，较大的值（如 1000）为胶囊。
+     [EN] The corner radius, applied as `min(radius, height / 2)`: 0 is square, a large value such as 1000 is a capsule. nil (the
+          default) is not set: the Liquid Glass style is a capsule (half the height), so a host gets a capsule without setting
+          anything and customizes it by setting this property; the flat style is square.
+     [CN] 圆角半径，实际取 `min(radius, height / 2)`：0 为直角，较大的值（如 1000）为胶囊。nil（默认）表示未设置：液态玻璃样式为胶囊（半高），
+          宿主无需设置任何属性即可得到胶囊，要自定义时设置此属性即可；扁平样式为直角。
      */
-    public var itemCornerRadius: CGFloat = 0 {
+    public var itemCornerRadius: CGFloat? {
         didSet { itemBackgroundDidChange() }
     }
     /** [EN] The border width in points. [CN] 边框宽度（点）。 */
@@ -485,7 +488,14 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     /// [EN] Applies the background, radius and border for the current bounds. [CN] 按当前 bounds 应用背景、圆角与边框。
     private func layoutItemBackground() {
         guard usesItemBackground else { return }
-        let radius = min(max(itemCornerRadius, 0), bounds.height / 2)
+        // The corner radius: the host's value limited to half the height, else a capsule for Liquid Glass (the rule `0: automatic, a
+        // capsule` that CollectionViewClassifyMenu's tags had, moved here) and square for flat.
+        let radius: CGFloat
+        if let requested = itemCornerRadius {
+            radius = min(max(requested, 0), bounds.height / 2)
+        } else {
+            radius = resolvedItemBackgroundStyle == .liquidGlass ? bounds.height / 2 : 0
+        }
         layer.cornerRadius = radius
         layer.borderWidth = itemBorderWidth
         layer.borderColor = itemBorderColor?.resolvedColor(with: traitCollection).cgColor

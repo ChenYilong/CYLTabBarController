@@ -427,7 +427,9 @@ function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, bord
   const used = style === 'liquidGlass' || (color || '') !== '' || Number(cornerRadius) >= 0 || border > 0 || (borderColor || '') !== ''
   if (!used) return { css: '', glass: false }
   const glass = style === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive()
-  const radius = Number(cornerRadius) > 0 ? Number(cornerRadius) : 0
+  // The host's value (0 is square); not set (-1): a capsule for the drawn Liquid Glass (the rule `0: automatic, a capsule` that
+  // CollectionViewClassifyMenu's tags had, moved here), square for flat.
+  const radius = Number(cornerRadius) >= 0 ? Number(cornerRadius) : (glass ? 999 : 0)
   let css = `border-radius:${radius}px;`
   if (border > 0) css += `border:${border}px solid ${borderColor || 'transparent'};box-sizing:border-box;`
   if (glass) {
