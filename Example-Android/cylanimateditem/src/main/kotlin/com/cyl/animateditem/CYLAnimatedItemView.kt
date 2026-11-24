@@ -1205,11 +1205,11 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      *      设置任一 `item…` 背景属性后，视图绘制其背景、圆角与边框（倒计时样式保持自己的外观）。与 iOS、鸿蒙同名。
      */
     var itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.Flat
-        set(value) { field = value; itemBackgroundDidChange() }
+        set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
     /** [EN] The solid fill when flat, the glass tint when Liquid Glass (an ARGB color); null for none. [CN] 扁平时的纯色填充，液态玻璃时的着色（ARGB 颜色）；null 表示无。 */
     var itemBackgroundColor: Int? = null
-        set(value) { field = value; itemBackgroundDidChange() }
+        set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
     /**
      * [EN] The corner radius in dp, applied as `min(radius, height / 2)`: 0 is square, [CYLAnimatedItemCornerRadiusCapsule] (1000) is a capsule; no other value has a special meaning. null
@@ -1219,15 +1219,15 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      *      （半高），宿主无需设置任何属性即可得到胶囊，要自定义时设置此属性即可；扁平样式为直角。
      */
     var itemCornerRadius: Float? = null
-        set(value) { field = value; itemBackgroundDidChange() }
+        set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
     /** [EN] The border width in dp. [CN] 边框宽度（dp）。 */
     var itemBorderWidth: Float = 0f
-        set(value) { field = value; itemBackgroundDidChange() }
+        set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
     /** [EN] The border color (an ARGB color); null for none. [CN] 边框颜色（ARGB 颜色）；null 表示无。 */
     var itemBorderColor: Int? = null
-        set(value) { field = value; itemBackgroundDidChange() }
+        set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
     /**
      * [EN] The background really drawn: `itemBackgroundStyle`, or `Flat` where `isLiquidGlassActive()` is false.

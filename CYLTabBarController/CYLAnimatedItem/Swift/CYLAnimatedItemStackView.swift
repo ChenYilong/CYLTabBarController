@@ -46,12 +46,12 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
           于条目后面绘制液态玻璃，其他系统为扁平。设置任一 `item…` 背景属性之前不绘制任何背景。
      */
     public var itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = .flat {
-        didSet { itemBackgroundDidChange() }
+        didSet { if oldValue != itemBackgroundStyle { itemBackgroundDidChange() } }
     }
 
     /** [EN] The fill (flat) or the tint (glass). [CN] 填充色（扁平）或着色（玻璃）。 */
     public var itemBackgroundColor: UIColor? {
-        didSet { itemBackgroundDidChange() }
+        didSet { if oldValue != itemBackgroundColor { itemBackgroundDidChange() } }
     }
 
     /**
@@ -61,17 +61,17 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
           与 `CYLAnimatedItemView.itemCornerRadius` 相同。
      */
     public var itemCornerRadius: CGFloat? {
-        didSet { itemBackgroundDidChange() }
+        didSet { if oldValue != itemCornerRadius { itemBackgroundDidChange() } }
     }
 
     /** [EN] The border width, 0 by default. [CN] 边框宽度，默认 0。 */
     public var itemBorderWidth: CGFloat = 0 {
-        didSet { itemBackgroundDidChange() }
+        didSet { if oldValue != itemBorderWidth { itemBackgroundDidChange() } }
     }
 
     /** [EN] The border color. [CN] 边框颜色。 */
     public var itemBorderColor: UIColor? {
-        didSet { itemBackgroundDidChange() }
+        didSet { if oldValue != itemBorderColor { itemBackgroundDidChange() } }
     }
 
     /** [EN] The background really drawn (flat where the system draws no glass). [CN] 实际绘制的背景（系统不使用玻璃时为扁平）。 */

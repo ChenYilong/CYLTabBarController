@@ -361,11 +361,11 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
      *      绘制液态玻璃，其他设备为扁平。设置任一 `item…` 背景属性之前不绘制任何背景。
      */
     var itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.Flat
-        set(value) { field = value; itemBackgroundDidChange() }
+        set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
     /** [EN] The fill (flat) or the tint (glass), an ARGB color. [CN] 填充色（扁平）或着色（玻璃），ARGB 颜色。 */
     var itemBackgroundColor: Int? = null
-        set(value) { field = value; itemBackgroundDidChange() }
+        set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
     /**
      * [EN] The corner radius in dp: 0 is square, [CYLAnimatedItemCornerRadiusCapsule] a capsule, any other value dp limited to half the
@@ -374,15 +374,15 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
      *      与 [CYLAnimatedItemView.itemCornerRadius] 相同。
      */
     var itemCornerRadius: Float? = null
-        set(value) { field = value; itemBackgroundDidChange() }
+        set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
     /** [EN] The border width in dp. [CN] 边框宽度（dp）。 */
     var itemBorderWidth: Float = 0f
-        set(value) { field = value; itemBackgroundDidChange() }
+        set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
     /** [EN] The border color (an ARGB color); null for none. [CN] 边框颜色（ARGB 颜色）；null 表示无。 */
     var itemBorderColor: Int? = null
-        set(value) { field = value; itemBackgroundDidChange() }
+        set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
     /** [EN] The background really drawn (Flat where the device draws no glass). [CN] 实际绘制的背景（设备不绘制玻璃时为 Flat）。 */
     val resolvedItemBackgroundStyle: CYLAnimatedItemBackgroundStyle

@@ -429,11 +429,11 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
           设置任一 `item…` 背景属性后，视图绘制其背景、圆角与边框（倒计时样式保持自己的外观）。
      */
     public var itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = .flat {
-        didSet { itemBackgroundDidChange() }
+        didSet { if oldValue != itemBackgroundStyle { itemBackgroundDidChange() } }
     }
     /** [EN] The solid fill when flat, the glass tint when Liquid Glass; nil for none. [CN] 扁平时的纯色填充，液态玻璃时的着色；nil 表示无。 */
     public var itemBackgroundColor: UIColor? {
-        didSet { itemBackgroundDidChange() }
+        didSet { if oldValue != itemBackgroundColor { itemBackgroundDidChange() } }
     }
     /**
      [EN] The corner radius, applied as `min(radius, height / 2)`: 0 is square, `CYLAnimatedItemCornerRadiusCapsule` (1000) is a capsule; no other value has a special meaning. nil (the
@@ -443,15 +443,15 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
           宿主无需设置任何属性即可得到胶囊，要自定义时设置此属性即可；扁平样式为直角。
      */
     public var itemCornerRadius: CGFloat? {
-        didSet { itemBackgroundDidChange() }
+        didSet { if oldValue != itemCornerRadius { itemBackgroundDidChange() } }
     }
     /** [EN] The border width in points. [CN] 边框宽度（点）。 */
     public var itemBorderWidth: CGFloat = 0 {
-        didSet { itemBackgroundDidChange() }
+        didSet { if oldValue != itemBorderWidth { itemBackgroundDidChange() } }
     }
     /** [EN] The border color; nil for none. [CN] 边框颜色；nil 表示无。 */
     public var itemBorderColor: UIColor? {
-        didSet { itemBackgroundDidChange() }
+        didSet { if oldValue != itemBorderColor { itemBackgroundDidChange() } }
     }
     /**
      [EN] The background really drawn: `itemBackgroundStyle`, or `.flat` where `isLiquidGlassActive()` is false.
