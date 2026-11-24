@@ -239,8 +239,24 @@ class CYLGlassBackdrop {
      */
     fun draw(canvas: Canvas, source: View, sourceX: Float, sourceY: Float, rect: RectF, radius: Float, effects: CYLGlassEffects): Boolean {
         if (!CYLLiquidGlassSupport.rendersBlur || !canvas.isHardwareAccelerated || source.width <= 0 || rect.width() <= 0f) return false
-        drawEffects(canvas, source, sourceX, sourceY, rect, radius, effects)
+        // [EN] A glass inside the captured page (a Liquid Glass tag in a list: the source is the root view that contains it, and every
+        //      other glass tag) would capture the page again while the page is being captured: that nesting recurses without end. While a
+        //      capture is under way every glass view anywhere skips its backdrop (returns false: the caller draws its translucent tint).
+        // [CN] 被录制页面里的玻璃（列表中的液态玻璃标签：来源是包含它的根视图，还有其他所有玻璃标签）会在录制页面的过程中再次录制页面，这种嵌套会无限递归。
+        //      录制期间，任何位置的玻璃视图都跳过背景（返回 false：由调用方绘制半透明着色）。
+        if (capturing) return false
+        capturing = true
+        try {
+            drawEffects(canvas, source, sourceX, sourceY, rect, radius, effects)
+        } finally {
+            capturing = false
+        }
         return true
+    }
+
+    private companion object {
+        /** True while any glass is recording its backdrop (the UI thread only). */
+        var capturing = false
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
