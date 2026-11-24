@@ -14,8 +14,11 @@ fi
 mkdir -p "$DST"
 # [EN] Every module build-profile.json5 registers (the cyl* folders, e.g. cylanimateditem_lottie and cyldeallocblockexecutor), not a fixed list.
 # [CN] build-profile.json5 注册的每个模块（cyl* 目录，例如 cylanimateditem_lottie、cyldeallocblockexecutor），而不是固定列表。
-MODULES=$(cd "$SRC" && ls -d cyl*/ | tr -d '/')
-for d in AppScope entry hvigor $MODULES; do
+MODULES=()
+for dir in "$SRC"/cyl*/; do
+  [[ -d "$dir" ]] && MODULES+=("$(basename "$dir")")
+done
+for d in AppScope entry hvigor "${MODULES[@]}"; do
   rm -rf "$DST/$d/src"
   # [EN] `._*` are macOS AppleDouble files on an external drive; ArkTS compiles `._X.ets` and fails ("Invalid character").
   # [CN] `._*` 是外置磁盘上的 macOS AppleDouble 文件；ArkTS 会编译 `._X.ets` 并报错（"Invalid character"）。
