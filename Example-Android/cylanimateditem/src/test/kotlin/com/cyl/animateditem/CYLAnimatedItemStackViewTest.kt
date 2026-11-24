@@ -68,7 +68,7 @@ class CYLAnimatedItemStackViewTest {
         assertEquals(0f, (stack.background as android.graphics.drawable.GradientDrawable).cornerRadius, "flat, unset: square")
         stack.itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.LiquidGlass
         stack.layout(0, 0, 200, 80)
-        assertTrue("glass layer behind the items", stack.itemLiquidGlassView != null)
+        assertTrue(stack.itemLiquidGlassView != null, "glass layer behind the items")
         assertEquals(40f, (stack.background as android.graphics.drawable.GradientDrawable).cornerRadius, "glass, unset: a capsule")
         stack.itemCornerRadius = CYLAnimatedItemCornerRadiusCapsule
         stack.layout(0, 0, 200, 80)
