@@ -160,6 +160,12 @@ class CYLAnimatedItemPlayerTest {
     }
 
     @Test
+    fun aNewViewAppliesTheDefaultPlaybackRulesLikeIOSAndHarmonyOS() {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        assertTrue(CYLAnimatedItemView(activity).drivesAnimationPlayback)
+    }
+
+    @Test
     fun withoutAnimationViewThePlayerIsInert() {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
         val player = CYLAnimatedItemView(activity).animatedItemPlayer

@@ -100,6 +100,8 @@ class CYLTabBarAnimationFallbackTest {
         val component: com.cyl.animateditem.CYLAnimatedItemView = button
         val frame: android.widget.FrameLayout = button
         assertSame(component, frame)
+        // [EN] The tab bar plays its icons itself; the component must not restart them too. [CN] TabBar 自己播放图标，组件不能重复播放。
+        assertFalse(button.drivesAnimationPlayback)
         assertSame(button.titleView, button.titleLabel)
         assertEquals("Me", button.titleLabel.text.toString())
         assertEquals(android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP, 10f, activity.resources.displayMetrics), button.titleLabel.textSize, 0.01f)

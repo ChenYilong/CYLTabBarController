@@ -213,8 +213,12 @@ docs/
 │   ├── android-api37-20261119-rive-fixed-tint-unselected-only.png
 │   ├── android-api37-20261119-rive-follows-appearance.png
 │   ├── android-default-tab-bar-height-system-80dp.png
+│   ├── android-example-rive-svga-tab-switch.png
 │   ├── android-example-strings-en-zh-ja.png
 │   ├── android-flutter-engine-api-play-all.png
+│   ├── android-flutter-image-end-rule.png
+│   ├── android-flutter-rive-end-timer.png
+│   ├── android-flutter-rive-unselected-host-driven.png
 │   ├── android-gif-decoder-frame-clock.png
 │   ├── android-gif-image-rest-then-play.png
 │   ├── android-gif-tint-option.png
@@ -231,6 +235,7 @@ docs/
 │   ├── android-rive-menu-loop-pause-fix.png
 │   ├── android-rive-menu-settles-then-rests.png
 │   ├── android-rive-rest-same-frame-every-launch.png
+│   ├── android-rn-image-end-rule.png
 │   ├── animated-icons-demo-controls-request-android.jpg
 │   ├── animated-item-android-demo-interaction.png
 │   ├── animated-item-android-demo-page.png
