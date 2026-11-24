@@ -60,6 +60,26 @@ class CYLAnimatedItemStackViewTest {
     private fun nodeInfo(view: View): AccessibilityNodeInfo = AccessibilityNodeInfo.obtain().also { view.onInitializeAccessibilityNodeInfo(it) }
 
     @Test
+    fun theStackHasTheSameBackgroundRulesAsTheItemView() {
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        val stack = CYLAnimatedItemStackView(activity)
+        stack.itemBackgroundColor = 0xFF336699.toInt()
+        stack.layout(0, 0, 200, 80)
+        assertEquals("flat, unset: square", 0f, (stack.background as android.graphics.drawable.GradientDrawable).cornerRadius)
+        stack.itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.LiquidGlass
+        stack.layout(0, 0, 200, 80)
+        assertTrue("glass layer behind the items", stack.itemLiquidGlassView != null)
+        assertEquals("glass, unset: a capsule", 40f, (stack.background as android.graphics.drawable.GradientDrawable).cornerRadius)
+        stack.itemCornerRadius = CYLAnimatedItemCornerRadiusCapsule
+        stack.layout(0, 0, 200, 80)
+        assertEquals("the capsule constant", 40f, (stack.background as android.graphics.drawable.GradientDrawable).cornerRadius)
+        stack.itemCornerRadius = 0f
+        stack.layout(0, 0, 200, 80)
+        assertEquals("0 is square", 0f, (stack.background as android.graphics.drawable.GradientDrawable).cornerRadius)
+        CYLAnimatedItemView.liquidGlassActiveOverride = null
+    }
+
+    @Test
     fun itemsAreArrangedInOrderAndTheFirstIsReserved() {
         val first = item("No messages")
         val second = item("Pull to refresh")

@@ -458,13 +458,15 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      [CN] 实际绘制的背景：`itemBackgroundStyle`，`isLiquidGlassActive()` 为 false 时为 `.flat`。
      */
     public var resolvedItemBackgroundStyle: CYLAnimatedItemBackgroundStyle {
-        itemBackgroundStyle == .liquidGlass && Self.isLiquidGlassActive() ? .liquidGlass : .flat
+        CYLAnimatedItemBackgroundRenderer.resolvedStyle(itemBackgroundStyle)
     }
     /**
      [EN] The Liquid Glass layer behind the content while it is drawn; nil while the view is flat.
      [CN] 绘制液态玻璃时位于内容后面的玻璃层；视图为扁平时为 nil。
      */
-    public private(set) var itemLiquidGlassView: UIView?
+    public var itemLiquidGlassView: UIView? { backgroundRenderer.glassView }
+
+    private let backgroundRenderer = CYLAnimatedItemBackgroundRenderer()
     /**
      [EN] Whether the system draws Liquid Glass, the one rule CYLTabBarController uses too (`CYLUtils.isLiquidGlassActive()`
           forwards here): iOS 27 and later always; iOS 26 unless the app sets `UIDesignRequiresCompatibility`. Read once.
@@ -491,37 +493,11 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         setNeedsLayout()
     }
 
-    /// [EN] Applies the background, radius and border for the current bounds. [CN] 按当前 bounds 应用背景、圆角与边框。
+    /// [EN] Applies the background, radius and border for the current bounds (`CYLAnimatedItemBackgroundRenderer`). [CN] 按当前 bounds 应用背景、圆角与边框。
     private func layoutItemBackground() {
         guard usesItemBackground else { return }
-        // The corner radius, all of it decided here: `CYLAnimatedItemCornerRadiusCapsule` is the capsule (half the height, following the
-        // size); any other value is points limited to half the height; unset is a capsule for Liquid Glass and square for flat.
-        let radius: CGFloat
-        if let requested = itemCornerRadius {
-            radius = requested == CYLAnimatedItemCornerRadiusCapsule ? bounds.height / 2 : min(max(requested, 0), bounds.height / 2)
-        } else {
-            radius = resolvedItemBackgroundStyle == .liquidGlass ? bounds.height / 2 : 0
-        }
-        layer.cornerRadius = radius
-        layer.borderWidth = itemBorderWidth
-        layer.borderColor = itemBorderColor?.resolvedColor(with: traitCollection).cgColor
-        var glassDrawn = false
-        if resolvedItemBackgroundStyle == .liquidGlass {
-            let glass = (itemLiquidGlassView as? CYLLiquidGlassView) ?? CYLLiquidGlassView()
-            glass.glassTintColor = itemBackgroundColor
-            glass.cornerRadius = radius
-            glass.frame = bounds
-            if glass.superview == nil {
-                insertSubview(glass, at: 0)
-            }
-            itemLiquidGlassView = glass
-            glassDrawn = glass.isGlassDrawn
-        }
-        if !glassDrawn {
-            itemLiquidGlassView?.removeFromSuperview()
-            itemLiquidGlassView = nil
-        }
-        backgroundColor = glassDrawn ? nil : itemBackgroundColor
+        backgroundRenderer.apply(on: self, style: itemBackgroundStyle, color: itemBackgroundColor, cornerRadius: itemCornerRadius,
+                                 borderWidth: itemBorderWidth, borderColor: itemBorderColor)
     }
     /** [EN] The length in seconds, 60 by default. Used by `startCountdown()`. [CN] 总时长（秒），默认 60。`startCountdown()` 使用。 */
     public var countdownDuration: TimeInterval = 60

@@ -36,6 +36,67 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
      */
     public typealias ActionHandler = @convention(block) (CYLAnimatedItemStackView, String) -> Void
 
+    // MARK: - Background 背景
+
+    /**
+     [EN] The background of the whole stack, the same rules as `CYLAnimatedItemView`: `.flat` (default) fills it with `itemBackgroundColor`;
+          `.liquidGlass` draws Liquid Glass behind the items where the system draws it (`CYLAnimatedItemView.isLiquidGlassActive()`),
+          flat elsewhere. Nothing is drawn until one of the `item…` background properties is set.
+     [CN] 整个堆叠的背景，规则与 `CYLAnimatedItemView` 相同：`.flat`（默认）用 `itemBackgroundColor` 填充；`.liquidGlass` 在系统使用液态玻璃处
+          于条目后面绘制液态玻璃，其他系统为扁平。设置任一 `item…` 背景属性之前不绘制任何背景。
+     */
+    public var itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = .flat {
+        didSet { itemBackgroundDidChange() }
+    }
+
+    /** [EN] The fill (flat) or the tint (glass). [CN] 填充色（扁平）或着色（玻璃）。 */
+    public var itemBackgroundColor: UIColor? {
+        didSet { itemBackgroundDidChange() }
+    }
+
+    /**
+     [EN] The corner radius: 0 is square, `CYLAnimatedItemCornerRadiusCapsule` a capsule, any other value points limited to half the height;
+          nil (the default) is a capsule for Liquid Glass and square for flat, as `CYLAnimatedItemView.itemCornerRadius`.
+     [CN] 圆角半径：0 为直角，`CYLAnimatedItemCornerRadiusCapsule` 为胶囊，其他值为点数且最大取半高；nil（默认）时液态玻璃为胶囊、扁平为直角，
+          与 `CYLAnimatedItemView.itemCornerRadius` 相同。
+     */
+    public var itemCornerRadius: CGFloat? {
+        didSet { itemBackgroundDidChange() }
+    }
+
+    /** [EN] The border width, 0 by default. [CN] 边框宽度，默认 0。 */
+    public var itemBorderWidth: CGFloat = 0 {
+        didSet { itemBackgroundDidChange() }
+    }
+
+    /** [EN] The border color. [CN] 边框颜色。 */
+    public var itemBorderColor: UIColor? {
+        didSet { itemBackgroundDidChange() }
+    }
+
+    /** [EN] The background really drawn (flat where the system draws no glass). [CN] 实际绘制的背景（系统不使用玻璃时为扁平）。 */
+    public var resolvedItemBackgroundStyle: CYLAnimatedItemBackgroundStyle {
+        CYLAnimatedItemBackgroundRenderer.resolvedStyle(itemBackgroundStyle)
+    }
+
+    /** [EN] The Liquid Glass layer behind the items while it is drawn; nil otherwise. [CN] 绘制时位于条目后面的液态玻璃层；否则为 nil。 */
+    public var itemLiquidGlassView: UIView? { backgroundRenderer.glassView }
+
+    private let backgroundRenderer = CYLAnimatedItemBackgroundRenderer()
+    private var usesItemBackground = false
+
+    private func itemBackgroundDidChange() {
+        usesItemBackground = true
+        layoutItemBackground()
+        setNeedsLayout()
+    }
+
+    private func layoutItemBackground() {
+        guard usesItemBackground else { return }
+        backgroundRenderer.apply(on: self, style: itemBackgroundStyle, color: itemBackgroundColor, cornerRadius: itemCornerRadius,
+                                 borderWidth: itemBorderWidth, borderColor: itemBorderColor)
+    }
+
     /**
      [EN] The vertical stack holding the items: centered, sized by its items, 16 pt between items by default.
      [CN] 容纳条目的竖向堆叠视图：居中，大小由条目决定，条目间距默认 16 pt。
@@ -488,6 +549,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     open override func layoutSubviews() {
         entries.forEach(fit)
         super.layoutSubviews()
+        layoutItemBackground()
     }
 
     open override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {

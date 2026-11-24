@@ -1,0 +1,67 @@
+package com.cyl.animateditem
+
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.view.View
+import android.view.ViewGroup
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.roundToInt
+
+/**
+ * [EN] The one implementation of the background of an animated item (the flat color or Liquid Glass, the corner radius, the border),
+ *      shared by [CYLAnimatedItemView] and [CYLAnimatedItemStackView]: both only keep the `item…` properties and call [apply].
+ *      [CYLAnimatedItemCornerRadiusCapsule] is the capsule (half the height, following the size); any other value is dp limited to half
+ *      the height; null is a capsule for Liquid Glass and square for flat.
+ * [CN] 动效条目背景（纯色或液态玻璃、圆角、边框）的唯一实现，由 [CYLAnimatedItemView] 与 [CYLAnimatedItemStackView] 共用：二者只保存 `item…` 属性并调用
+ *      [apply]。[CYLAnimatedItemCornerRadiusCapsule] 为胶囊（半高，随尺寸变化）；其他值为 dp，最大取半高；null 时液态玻璃为胶囊、扁平为直角。
+ */
+internal class CYLAnimatedItemBackgroundRenderer(private val host: ViewGroup) {
+
+    private val box = GradientDrawable()
+    private var layer: CYLLiquidGlassView? = null
+
+    /** The Liquid Glass layer while it is drawn; null otherwise. */
+    val glassView: View? get() = layer?.takeIf { it.parent != null }
+
+    fun resolvedStyle(style: CYLAnimatedItemBackgroundStyle): CYLAnimatedItemBackgroundStyle =
+        if (style == CYLAnimatedItemBackgroundStyle.LiquidGlass && CYLAnimatedItemView.isLiquidGlassActive()) {
+            CYLAnimatedItemBackgroundStyle.LiquidGlass
+        } else {
+            CYLAnimatedItemBackgroundStyle.Flat
+        }
+
+    fun apply(style: CYLAnimatedItemBackgroundStyle, color: Int?, cornerRadius: Float?, borderWidth: Float, borderColor: Int?) {
+        val density = host.resources.displayMetrics.density
+        val resolved = resolvedStyle(style)
+        val height = host.height
+        val radius = if (cornerRadius != null) {
+            if (cornerRadius == CYLAnimatedItemCornerRadiusCapsule) height / 2f else min(max(cornerRadius, 0f) * density, height / 2f)
+        } else if (resolved == CYLAnimatedItemBackgroundStyle.LiquidGlass) {
+            height / 2f
+        } else {
+            0f
+        }
+        box.cornerRadius = radius
+        box.setStroke((borderWidth * density).roundToInt(), borderColor ?: Color.TRANSPARENT)
+        var glassDrawn = false
+        if (resolved == CYLAnimatedItemBackgroundStyle.LiquidGlass) {
+            val glass = layer ?: CYLLiquidGlassView(host.context).also { layer = it }
+            glass.glassTintColor = color
+            glass.cornerRadius = radius
+            if (glass.parent == null) host.addView(glass, 0)
+            glass.visibility = View.VISIBLE
+            glass.layout(0, 0, host.width, host.height)
+            glass.applyEffect()
+            glassDrawn = glass.isGlassDrawn
+        }
+        if (!glassDrawn) layer?.let { if (it.parent != null) host.removeView(it) }
+        box.setColor(if (glassDrawn) Color.TRANSPARENT else (color ?: Color.TRANSPARENT))
+        if (host.background !== box) host.background = box
+    }
+
+    /** Keeps the glass layer the size of the host in `onLayout`. */
+    fun layoutGlass(width: Int, height: Int) {
+        layer?.let { if (it.parent != null) it.layout(0, 0, width, height) }
+    }
+}

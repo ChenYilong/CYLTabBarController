@@ -114,3 +114,52 @@ final class CYLLiquidGlassView: UIVisualEffectView {
         isGlassDrawn = false
     }
 }
+
+/**
+ * [EN] The one implementation of the background of an animated item (the flat color or Liquid Glass, the corner radius, the border),
+ *      shared by `CYLAnimatedItemView` and `CYLAnimatedItemStackView`: both only keep the `item…` properties and call `apply`.
+ *      `CYLAnimatedItemCornerRadiusCapsule` is the capsule (half the height, following the size); any other value is points limited
+ *      to half the height; unset is a capsule for Liquid Glass and square for flat.
+ * [CN] 动效条目背景（纯色或液态玻璃、圆角、边框）的唯一实现，由 `CYLAnimatedItemView` 与 `CYLAnimatedItemStackView` 共用：二者只保存 `item…`
+ *      属性并调用 `apply`。`CYLAnimatedItemCornerRadiusCapsule` 为胶囊（半高，随尺寸变化）；其他值为点数，最大取半高；未设置时液态玻璃为胶囊、扁平为直角。
+ */
+final class CYLAnimatedItemBackgroundRenderer {
+
+    private(set) var glassView: CYLLiquidGlassView?
+
+    static func resolvedStyle(_ style: CYLAnimatedItemBackgroundStyle) -> CYLAnimatedItemBackgroundStyle {
+        style == .liquidGlass && CYLAnimatedItemView.isLiquidGlassActive() ? .liquidGlass : .flat
+    }
+
+    func apply(on host: UIView, style: CYLAnimatedItemBackgroundStyle, color: UIColor?, cornerRadius: CGFloat?,
+               borderWidth: CGFloat, borderColor: UIColor?) {
+        let resolved = Self.resolvedStyle(style)
+        let height = host.bounds.height
+        let radius: CGFloat
+        if let requested = cornerRadius {
+            radius = requested == CYLAnimatedItemCornerRadiusCapsule ? height / 2 : min(max(requested, 0), height / 2)
+        } else {
+            radius = resolved == .liquidGlass ? height / 2 : 0
+        }
+        host.layer.cornerRadius = radius
+        host.layer.borderWidth = borderWidth
+        host.layer.borderColor = borderColor?.resolvedColor(with: host.traitCollection).cgColor
+        var glassDrawn = false
+        if resolved == .liquidGlass {
+            let glass = glassView ?? CYLLiquidGlassView()
+            glass.glassTintColor = color
+            glass.cornerRadius = radius
+            glass.frame = host.bounds
+            if glass.superview == nil {
+                host.insertSubview(glass, at: 0)
+            }
+            glassView = glass
+            glassDrawn = glass.isGlassDrawn
+        }
+        if !glassDrawn {
+            glassView?.removeFromSuperview()
+            glassView = nil
+        }
+        host.backgroundColor = glassDrawn ? nil : color
+    }
+}

@@ -1,4 +1,5 @@
 import { CYLAnimatedItemView, CYLAnimatedItemAxis, CYLAnimatedItemAnimationContext } from './CYLAnimatedItemView';
+import { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier } from './CYLAnimatedItemBackground';
 import { CYLAnimatedItemStackModel, CYLAnimatedItemStackItem } from './CYLAnimatedItemStackModel';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { LifecycleController } from 'cyldeallocblockexecutor';
@@ -43,6 +44,26 @@ export struct CYLAnimatedItemStackView {
   /** [EN] The items, actions and handlers. [CN] 条目、动作与处理。 */
   model: CYLAnimatedItemStackModel = new CYLAnimatedItemStackModel();
   /** [EN] The title color of every item. [CN] 所有条目的标题颜色。 */
+  /**
+   * [EN] The background of the whole stack, the same rules as `CYLAnimatedItemView`: `flat` (default) fills it with `itemBackgroundColor`;
+   *      `liquidGlass` draws the glass (a blur imitation) behind the items where `CYLLiquidGlass.isActive()`, flat elsewhere. Nothing
+   *      is drawn until one of the `item…` background properties is set (the shared `CYLAnimatedItemBackgroundModifier`).
+   * [CN] 整个堆叠的背景，规则与 `CYLAnimatedItemView` 相同：`flat`（默认）用 `itemBackgroundColor` 填充；`liquidGlass` 在 `CYLLiquidGlass.isActive()` 时于
+   *      条目后面绘制玻璃（模糊仿制），否则为扁平。设置任一 `item…` 背景属性之前不绘制任何背景（共用 `CYLAnimatedItemBackgroundModifier`）。
+   */
+  @Prop itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat;
+  /** [EN] The fill (flat) or the tint (glass); '' for none. [CN] 填充色（扁平）或着色（玻璃）；'' 表示无。 */
+  @Prop itemBackgroundColor: ResourceColor = '';
+  /**
+   * [EN] The corner radius in vp: 0 is square, `CYLAnimatedItemCornerRadiusCapsule` a capsule, any other value vp (limited to half the
+   *      height by the platform); -1 (the default) is a capsule for Liquid Glass and square for flat.
+   * [CN] 圆角半径（vp）：0 为直角，`CYLAnimatedItemCornerRadiusCapsule` 为胶囊，其他值为 vp（平台会截断到半高）；-1（默认）时液态玻璃为胶囊、扁平为直角。
+   */
+  @Prop itemCornerRadius: number = -1;
+  /** [EN] The border width in vp. [CN] 边框宽度（vp）。 */
+  @Prop itemBorderWidth: number = 0;
+  /** [EN] The border color. [CN] 边框颜色。 */
+  @Prop itemBorderColor: ResourceColor = '';
   @Prop titleColor: ResourceColor = '#333333';
   /** [EN] The title font size of every item. [CN] 所有条目的标题字号。 */
   @Prop titleFontSize: number = 16;
@@ -172,6 +193,8 @@ export struct CYLAnimatedItemStackView {
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)
     .padding(this.model.contentMargin)
+    .attributeModifier(new CYLAnimatedItemBackgroundModifier(this.itemBackgroundStyle, this.itemBackgroundColor !== '' ? this.itemBackgroundColor : Color.Transparent,
+      this.itemCornerRadius, this.itemBorderWidth, this.itemBorderColor !== '' ? this.itemBorderColor : Color.Transparent))
     .onAreaChange((oldValue: Area, newValue: Area) => {
       this.viewWidth = Number(newValue.width);
     })

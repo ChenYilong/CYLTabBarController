@@ -351,12 +351,72 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
 
     private fun actsAsButton(entry: Entry) = isItemInteractive(entry.view) || (entry.view === firstItemView && backgroundAction != null)
 
+    // MARK: - Background 背景
+
+    /**
+     * [EN] The background of the whole stack, the same rules as [CYLAnimatedItemView]: Flat (default) fills it with [itemBackgroundColor];
+     *      LiquidGlass draws Liquid Glass behind the items where the device draws it ([CYLAnimatedItemView.isLiquidGlassActive]), flat
+     *      elsewhere. Nothing is drawn until one of the `item…` background properties is set.
+     * [CN] 整个堆叠的背景，规则与 [CYLAnimatedItemView] 相同：Flat（默认）用 [itemBackgroundColor] 填充；LiquidGlass 在设备绘制液态玻璃处于条目后面
+     *      绘制液态玻璃，其他设备为扁平。设置任一 `item…` 背景属性之前不绘制任何背景。
+     */
+    var itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.Flat
+        set(value) { field = value; itemBackgroundDidChange() }
+
+    /** [EN] The fill (flat) or the tint (glass), an ARGB color. [CN] 填充色（扁平）或着色（玻璃），ARGB 颜色。 */
+    var itemBackgroundColor: Int? = null
+        set(value) { field = value; itemBackgroundDidChange() }
+
+    /**
+     * [EN] The corner radius in dp: 0 is square, [CYLAnimatedItemCornerRadiusCapsule] a capsule, any other value dp limited to half the
+     *      height; null (the default) is a capsule for Liquid Glass and square for flat, as [CYLAnimatedItemView.itemCornerRadius].
+     * [CN] 圆角半径（dp）：0 为直角，[CYLAnimatedItemCornerRadiusCapsule] 为胶囊，其他值为 dp 且最大取半高；null（默认）时液态玻璃为胶囊、扁平为直角，
+     *      与 [CYLAnimatedItemView.itemCornerRadius] 相同。
+     */
+    var itemCornerRadius: Float? = null
+        set(value) { field = value; itemBackgroundDidChange() }
+
+    /** [EN] The border width in dp. [CN] 边框宽度（dp）。 */
+    var itemBorderWidth: Float = 0f
+        set(value) { field = value; itemBackgroundDidChange() }
+
+    /** [EN] The border color (an ARGB color); null for none. [CN] 边框颜色（ARGB 颜色）；null 表示无。 */
+    var itemBorderColor: Int? = null
+        set(value) { field = value; itemBackgroundDidChange() }
+
+    /** [EN] The background really drawn (Flat where the device draws no glass). [CN] 实际绘制的背景（设备不绘制玻璃时为 Flat）。 */
+    val resolvedItemBackgroundStyle: CYLAnimatedItemBackgroundStyle
+        get() = itemBackgroundRenderer.resolvedStyle(itemBackgroundStyle)
+
+    /** [EN] The Liquid Glass layer behind the items while it is drawn; null otherwise. [CN] 绘制时位于条目后面的液态玻璃层；否则为 null。 */
+    val itemLiquidGlassView: View? get() = itemBackgroundRenderer.glassView
+
+    private val itemBackgroundRenderer = CYLAnimatedItemBackgroundRenderer(this)
+    private var usesItemBackground = false
+
+    private fun itemBackgroundDidChange() {
+        usesItemBackground = true
+        applyItemBackground()
+        invalidate()
+    }
+
+    private fun applyItemBackground() {
+        if (!usesItemBackground) return
+        itemBackgroundRenderer.apply(itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor)
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        applyItemBackground()
+    }
+
     // MARK: - Layout 布局
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         // [EN] A title set after the item was added changes whether it is decoration. [CN] 条目加入后设置的标题会改变它是否为装饰。
         entries.forEach { updateAccessibility(it) }
         super.onLayout(changed, left, top, right, bottom)
+        itemBackgroundRenderer.layoutGlass(right - left, bottom - top)
     }
 
     private fun updateMargins() {
