@@ -203,6 +203,7 @@ NSDictionary *home = @{
 | iOS 的可运行示例：Example-Rive，User Tab，「Engine API」按钮。 | A working iOS example: Example-Rive, User tab, "Engine API" button. |
 | 见右列。 | iOS, React Native and Flutter: show the still image after the animation ends with `showsImageWhenAnimationEnds` (default false), as on HarmonyOS and Android; Example-Rive, Engine API page, "Show image when ended". |
 | 见右列。 | iOS Liquid Glass without the tab bar: `import CYLLiquidGlass` (pod `CYLLiquidGlass` or the Swift package): `CYLLiquidGlass.isActive()` and `CYLLiquidGlassView` (`glassTintColor`, `cornerRadius`, `isGlassDrawn`, `applyEffect()`); `CYLTabBarController` depends on it, so a Podfile that names `CYLAnimatedItem` also names `pod 'CYLLiquidGlass'`. Guide: [docs/Liquid-Glass-Component.md](Liquid-Glass-Component.md). |
+| 见右列。 | Liquid Glass without the tab bar on the other platforms (written statically, not yet run on a device): Android module `:cylliquidglass` (`io.github.chenyilong:cyltabbarcontroller-liquidglass`, `CYLLiquidGlassView`, `CYLLiquidGlass.activeOverride = false` for the flat fallback), HarmonyOS HAR `cylliquidglass` (`import { CYLLiquidGlass, CYLLiquidGlassView } from 'cylliquidglass'`), mini program component `cyl-liquid-glass`. Guide: [docs/Liquid-Glass-Component.md](Liquid-Glass-Component.md). |
 
 ## [CN]注意事项
 ## [EN]Things to watch for
