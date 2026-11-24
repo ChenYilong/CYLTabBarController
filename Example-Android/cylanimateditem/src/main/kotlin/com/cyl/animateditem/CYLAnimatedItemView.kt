@@ -51,8 +51,10 @@ import kotlin.math.roundToInt
  *      长度单位为 px，名称以 `Dp` 结尾的除外。
  */
 /**
- * [EN] The corner radius of a capsule, dp: pass this constant to `itemCornerRadius`, never the number 1000.
- * [CN] 胶囊的圆角半径（dp）：给 `itemCornerRadius` 传这个常量，不要传数字 1000。
+ * [EN] The named constant of the capsule (1000 dp): pass it to `itemCornerRadius` instead of a literal. The view treats it as exactly half the height,
+ *      following the size. (Any plain number is dp limited to half the height, so a number of half the height or more is a capsule too.)
+ * [CN] 胶囊的命名常量（1000 dp）：传给 `itemCornerRadius`，不要写字面量。视图把它当作恰好半高，随尺寸变化。（任何普通数字都是 dp 且最大取半高，所以不小于半高的数字
+ *      也是胶囊。）
  */
 const val CYLAnimatedItemCornerRadiusCapsule: Float = 1000f
 
@@ -1212,10 +1214,10 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
     /**
-     * [EN] The corner radius in dp, applied as `min(radius, height / 2)`: 0 is square, [CYLAnimatedItemCornerRadiusCapsule] (1000) is a capsule; no other value has a special meaning. null
+     * [EN] The corner radius in dp, applied as `min(radius, height / 2)`: 0 is square, [CYLAnimatedItemCornerRadiusCapsule] is the named constant of the capsule (exactly half the height, following the size); any other number is dp limited to half the height. null
      *      (the default) is not set: the Liquid Glass style is a capsule (half the height), so a host gets a capsule without setting
      *      anything and customizes it by setting this property; the flat style is square.
-     * [CN] 圆角半径（dp），实际取 `min(radius, height / 2)`：0 为直角，[CYLAnimatedItemCornerRadiusCapsule]（1000）为胶囊，其他值没有特殊含义。null（默认）表示未设置：液态玻璃样式为胶囊
+     * [CN] 圆角半径（dp），实际取 `min(radius, height / 2)`：0 为直角，[CYLAnimatedItemCornerRadiusCapsule] 是胶囊的命名常量（恰好半高，随尺寸变化），其他数字为 dp 且最大取半高。null（默认）表示未设置：液态玻璃样式为胶囊
      *      （半高），宿主无需设置任何属性即可得到胶囊，要自定义时设置此属性即可；扁平样式为直角。
      */
     var itemCornerRadius: Float? = null

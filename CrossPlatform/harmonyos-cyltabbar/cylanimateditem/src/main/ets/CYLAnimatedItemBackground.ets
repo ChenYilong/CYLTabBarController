@@ -6,9 +6,10 @@ import { CYLLiquidGlass } from './CYLLiquidGlass';
  * [CN] 条目背景的构成：纯色（`flat`，默认）或液态玻璃（带着色的模糊仿制，在 `CYLLiquidGlass.isActive()` 时；否则为扁平，其他参数保持）。
  */
 /**
- * [EN] The corner radius of a capsule, vp: pass this constant as `cornerRadius`, never the number 1000. 0 is square; no other value has a
- *      special meaning (-1 is not set: a capsule for the drawn glass).
- * [CN] 胶囊的圆角半径（vp）：作为 `cornerRadius` 传这个常量，不要传数字 1000。0 为直角；其他值没有特殊含义（-1 表示未设置：绘制玻璃时为胶囊）。
+ * [EN] The named constant of the capsule (1000 vp): pass it as `cornerRadius` instead of a literal; the platform limits any radius to half the height, so it is
+ *      exactly a capsule and follows the size (any plain number is vp with the same limit). -1 is not set: a capsule for the drawn glass, square for flat.
+ * [CN] 胶囊的命名常量（1000 vp）：作为 `cornerRadius` 传入，不要写字面量；平台会把任何圆角截断到半高，所以它恰好是胶囊并随尺寸变化（任何普通数字都是 vp，同样截断）。
+ *      -1 表示未设置：绘制玻璃时为胶囊，扁平时为直角。
  */
 export const CYLAnimatedItemCornerRadiusCapsule: number = 1000;
 
@@ -64,12 +65,36 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
     return CYLAnimatedItemBackgroundModifier.isGlassDrawn(style) ? CYLAnimatedItemCornerRadiusCapsule : 0;
   }
 
+  /**
+   * [EN] The tint a glass draws with: a '#RRGGBB', '#AARRGGBB' or ARGB number color made translucent (its alpha times
+   *      `CYLLiquidGlass.GLASS_TINT_ALPHA`), so an opaque color such as a selected tag's green tints the glass instead of covering it; the same rule as
+   *      iOS and Android. Other kinds of color (a resource, a `Color` value) are used as they are.
+   * [CN] 玻璃使用的着色：'#RRGGBB'、'#AARRGGBB' 或 ARGB 数值颜色变为半透明（其透明度乘以 `CYLLiquidGlass.GLASS_TINT_ALPHA`），因此选中标签的绿色这样的
+   *      不透明色是给玻璃着色而不是盖住它；与 iOS、Android 同一规则。其他类型的颜色（资源、`Color` 值）原样使用。
+   */
+  static glassTint(color: ResourceColor): ResourceColor {
+    let argb: number = -1;
+    if (typeof color === 'number') {
+      argb = color >>> 0;
+    } else if (typeof color === 'string') {
+      const hex: RegExpMatchArray | null = color.match(/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/);
+      if (hex !== null) {
+        argb = hex[1].length === 6 ? (0xFF000000 + parseInt(hex[1], 16)) : parseInt(hex[1], 16);
+      }
+    }
+    if (argb < 0) {
+      return color;
+    }
+    const alpha: number = Math.round(((argb >>> 24) & 0xFF) * CYLLiquidGlass.GLASS_TINT_ALPHA);
+    return ((alpha << 24) | (argb & 0xFFFFFF)) >>> 0;
+  }
+
   applyNormalAttribute(instance: CommonAttribute): void {
     const glass: boolean = CYLAnimatedItemBackgroundModifier.isGlassDrawn(this.style);
     instance.backgroundEffect(glass ?
       { radius: CYLLiquidGlass.BLUR_RADIUS, saturation: CYLLiquidGlass.BLUR_SATURATION, brightness: CYLLiquidGlass.LIGHT_BRIGHTNESS } :
       { radius: 0 });
-    instance.backgroundColor(this.color);
+    instance.backgroundColor(glass ? CYLAnimatedItemBackgroundModifier.glassTint(this.color) : this.color);
     instance.borderRadius(CYLAnimatedItemBackgroundModifier.resolvedCornerRadius(this.style, this.cornerRadius));
     instance.borderWidth(this.borderWidth);
     instance.borderColor(this.borderColor);

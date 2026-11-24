@@ -13,6 +13,10 @@ export class CYLLiquidGlass {
    */
   static readonly BLUR_RADIUS: number = 28;
   /**
+   * [EN] The share of a host color's alpha that tints the glass. [CN] 宿主颜色透明度中用于给玻璃着色的比例。
+   */
+  static readonly GLASS_TINT_ALPHA: number = 0.75;
+  /**
    * [EN] The saturation of the glass imitation. [CN] 玻璃仿制的饱和度。
    */
   static readonly BLUR_SATURATION: number = 1.6;

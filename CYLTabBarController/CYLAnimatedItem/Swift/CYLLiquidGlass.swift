@@ -137,7 +137,7 @@ final class CYLAnimatedItemBackgroundRenderer {
      * [CN] 玻璃使用的着色：宿主颜色变为半透明（其透明度乘以 `glassTintAlpha`），因此选中标签的绿色这样的不透明色是给玻璃着色，而不是盖住它（不透明的着色
      *      完全看不到玻璃）。所有宿主一个规则。
      */
-    static let glassTintAlpha: CGFloat = 0.5
+    static let glassTintAlpha: CGFloat = 0.75
 
     static func glassTint(_ color: UIColor?) -> UIColor? {
         guard let color else { return nil }

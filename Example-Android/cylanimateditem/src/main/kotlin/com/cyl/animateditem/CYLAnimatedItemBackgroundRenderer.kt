@@ -18,6 +18,11 @@ import kotlin.math.roundToInt
  */
 internal class CYLAnimatedItemBackgroundRenderer(private val host: ViewGroup) {
 
+    companion object {
+        /** The share of the host color's alpha that tints the glass. */
+        const val GLASS_TINT_ALPHA = 0.75f
+    }
+
     private val box = GradientDrawable()
     private var layer: CYLLiquidGlassView? = null
 
@@ -30,6 +35,14 @@ internal class CYLAnimatedItemBackgroundRenderer(private val host: ViewGroup) {
         } else {
             CYLAnimatedItemBackgroundStyle.Flat
         }
+
+    /**
+     * [EN] The tint a glass draws with: the host's color made translucent (its alpha times [GLASS_TINT_ALPHA]), so an opaque color such as a
+     *      selected tag's green tints the glass instead of covering it. One rule for every host, the same on every platform.
+     * [CN] 玻璃使用的着色：宿主颜色变为半透明（其透明度乘以 [GLASS_TINT_ALPHA]），因此选中标签的绿色这样的不透明色是给玻璃着色而不是盖住它。所有宿主、所有平台同一规则。
+     */
+    fun glassTint(color: Int?): Int? =
+        color?.let { Color.argb((Color.alpha(it) * GLASS_TINT_ALPHA).roundToInt(), Color.red(it), Color.green(it), Color.blue(it)) }
 
     fun apply(style: CYLAnimatedItemBackgroundStyle, color: Int?, cornerRadius: Float?, borderWidth: Float, borderColor: Int?) {
         val density = host.resources.displayMetrics.density
@@ -47,7 +60,7 @@ internal class CYLAnimatedItemBackgroundRenderer(private val host: ViewGroup) {
         var glassDrawn = false
         if (resolved == CYLAnimatedItemBackgroundStyle.LiquidGlass) {
             val glass = layer ?: CYLLiquidGlassView(host.context).also { layer = it }
-            glass.glassTintColor = color
+            glass.glassTintColor = glassTint(color)
             glass.cornerRadius = radius
             if (glass.parent == null) host.addView(glass, 0)
             glass.visibility = View.VISIBLE

@@ -408,7 +408,7 @@ function cylAnimatedItemModel(input) {
  *      淡淡的高光与边框，按圆角裁剪。`cylAnimatedItemLiquidGlassIsActive()`（与其他平台的 `CYLAnimatedItemView.isLiquidGlassActive()` 同一规则）
  *      在小程序中始终为真：WebView 不支持 `backdrop-filter` 时只剩着色，与 TabBar 相同。
  */
-/** [EN] The corner radius of a capsule: pass this constant, never the number 1000. 0 is square. [CN] 胶囊的圆角半径：传这个常量，不要传数字 1000。0 为直角。 */
+/** [EN] The named constant of the capsule (1000 px): pass it instead of a literal; CSS limits any radius to half the height, so it is exactly a capsule and follows the size. [CN] 胶囊的命名常量（1000 px）：传它而不是字面量；CSS 把任何圆角截断到半高，所以它恰好是胶囊并随尺寸变化。 */
 const cylAnimatedItemCornerRadiusCapsule = 1000
 
 const cylLiquidGlassState = { activeOverride: undefined }
@@ -420,6 +420,35 @@ function cylAnimatedItemLiquidGlassIsActive() {
 /** [EN] For tests: replaces the rule (`undefined` uses it). [CN] 供测试使用：替代该规则（`undefined` 表示使用该规则）。 */
 function cylAnimatedItemLiquidGlassSetActiveOverride(value) {
   cylLiquidGlassState.activeOverride = value
+}
+
+/** [EN] The share of a host color's alpha that tints the glass. [CN] 宿主颜色透明度中用于给玻璃着色的比例。 */
+const cylAnimatedItemGlassTintAlpha = 0.75
+
+/**
+ * [EN] The tint a glass draws with: a '#RGB', '#RRGGBB', '#RRGGBBAA', 'rgb()' or 'rgba()' color made translucent (its alpha times
+ *      `cylAnimatedItemGlassTintAlpha`), so an opaque color such as a selected tag's green tints the glass instead of covering it; the same
+ *      rule as iOS, Android and HarmonyOS. Other color text is used as it is.
+ * [CN] 玻璃使用的着色：'#RGB'、'#RRGGBB'、'#RRGGBBAA'、'rgb()' 或 'rgba()' 颜色变为半透明（其透明度乘以 `cylAnimatedItemGlassTintAlpha`），因此选中标签的
+ *      绿色这样的不透明色是给玻璃着色而不是盖住它；与 iOS、Android、鸿蒙同一规则。其他颜色文本原样使用。
+ */
+function cylAnimatedItemGlassTint(color) {
+  const text = String(color || '').trim()
+  let r, g, b, a = 1
+  let m = text.match(/^#([0-9a-fA-F]{3})$/)
+  if (m) {
+    const h = m[1]
+    r = parseInt(h[0] + h[0], 16); g = parseInt(h[1] + h[1], 16); b = parseInt(h[2] + h[2], 16)
+  } else if ((m = text.match(/^#([0-9a-fA-F]{6})([0-9a-fA-F]{2})?$/))) {
+    r = parseInt(m[1].slice(0, 2), 16); g = parseInt(m[1].slice(2, 4), 16); b = parseInt(m[1].slice(4, 6), 16)
+    if (m[2]) a = parseInt(m[2], 16) / 255
+  } else if ((m = text.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/))) {
+    r = Number(m[1]); g = Number(m[2]); b = Number(m[3])
+    if (m[4] !== undefined) a = Number(m[4])
+  } else {
+    return text
+  }
+  return `rgba(${r},${g},${b},${Math.round(a * cylAnimatedItemGlassTintAlpha * 1000) / 1000})`
 }
 
 /**
@@ -437,7 +466,7 @@ function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, bord
   let css = `border-radius:${radius}px;`
   if (border > 0) css += `border:${border}px solid ${borderColor || 'transparent'};box-sizing:border-box;`
   if (glass) {
-    const tint = color || (isDark ? 'rgba(255,255,255,0.14)' : 'rgba(225,222,220,0.5)')
+    const tint = color ? cylAnimatedItemGlassTint(color) : (isDark ? 'rgba(255,255,255,0.14)' : 'rgba(225,222,220,0.5)')
     css += `background-color:${tint};backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);`
     css += `box-shadow:inset 0 1px 0 rgba(255,255,255,${isDark ? 0.18 : 0.6});overflow:hidden;`
   } else if (color) {
@@ -447,6 +476,7 @@ function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, bord
 }
 
 module.exports = {
+  cylAnimatedItemGlassTint,
   cylAnimatedItemCornerRadiusCapsule,
   cylAnimatedItemBackground,
   cylAnimatedItemLiquidGlassIsActive,
