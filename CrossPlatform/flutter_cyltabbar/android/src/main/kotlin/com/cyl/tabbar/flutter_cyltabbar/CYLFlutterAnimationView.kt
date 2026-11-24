@@ -15,7 +15,7 @@ import io.flutter.plugin.platform.PlatformView
  * An animation played by CYLTabBarController's engine through a `CYLAnimatedItemView` (the cross-platform engine API:
  * `docs/Animated-Item.md`, "Engine API across platforms"). Channel `flutter_cyltabbar/CYLAnimationView/<id>`: the methods
  * `setSource`, `setSelected`, `setAnimationSpeed`, `setAnimationLoops`, `setAnimationRestartToken`,
- * `setDrivesAnimationPlayback`, `setPlaying`, `setIconSize`, `setTintColor` and the commands `play`, `stopAtProgress`,
+ * `setDrivesAnimationPlayback`, `setShowsImageWhenAnimationEnds`, `setImage`, `setPlaying`, `setIconSize`, `setTintColor` and the commands `play`, `stopAtProgress`,
  * `restart`; it calls back `onAnimationLoaded`, `onAnimationFailed` and `onAnimationEnd`. No engine logic here.
  * 由 CYLTabBarController 引擎通过 `CYLAnimatedItemView` 播放的动画（跨端引擎 API，见 `docs/Animated-Item.md`）。
  */
@@ -25,6 +25,7 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
   private val channel = MethodChannel(messenger, "flutter_cyltabbar/CYLAnimationView/$viewId")
   private val density = context.resources.displayMetrics.density
   private var iconSize: Float? = null
+  private var imageRequest = 0
 
   private val item = CYLAnimatedItemView(context).apply {
     // Icon only; the view the host gives is the icon's frame. 只有图标；宿主给的视图就是图标的范围。
@@ -46,6 +47,7 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
     channel.setMethodCallHandler(this)
     (arguments["drivesAnimationPlayback"] as? Boolean)?.let { item.drivesAnimationPlayback = it }
     (arguments["showsImageWhenAnimationEnds"] as? Boolean)?.let { item.showsImageWhenAnimationEnds = it }
+    (arguments["image"] as? String)?.let { setImage(it) }
     (arguments["animationSpeed"] as? Number)?.let { item.animationSpeed = it.toFloat() }
     (arguments["animationLoops"] as? Boolean)?.let { item.animationLoops = it }
     (arguments["animationRestartToken"] as? Number)?.let { item.animationRestartToken = it.toInt() }
@@ -60,6 +62,16 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
   override fun getView(): View = container
 
   override fun dispose() = channel.setMethodCallHandler(null)
+
+  /**
+   * The still image `showsImageWhenAnimationEnds` shows, loaded like `source`; it is the item's own `image` (not the
+   * placeholder), which `CYLAnimatedItemView` shows selected or not. null or blank clears it.
+   */
+  private fun setImage(value: String?) {
+    val request = ++imageRequest
+    val name = value?.takeIf { it.isNotBlank() } ?: run { item.image = null; return }
+    CYLFlutterStillImage.loadAsync(item.context, name) { drawable -> if (request == imageRequest) item.image = drawable }
+  }
 
   /** The icon fills the view, or is `iconSize` (dp) when given. 图标铺满视图，给了 `iconSize`（dp）时为该尺寸。 */
   private fun fitIcon() {
@@ -82,6 +94,7 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
       "setAnimationRestartToken" -> item.animationRestartToken = (argument as? Number)?.toInt() ?: 0
       "setDrivesAnimationPlayback" -> item.drivesAnimationPlayback = argument as? Boolean ?: true
       "setShowsImageWhenAnimationEnds" -> item.showsImageWhenAnimationEnds = argument as? Boolean ?: false
+      "setImage" -> setImage(argument as? String)
       "setPlaying" -> if (argument as? Boolean == true) item.playAnimation() else item.stopAnimation()
       "setIconSize" -> { iconSize = (argument as? Number)?.toFloat(); fitIcon() }
       "setTintColor" -> item.iconColor = (argument as? Number)?.toInt()

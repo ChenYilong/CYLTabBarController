@@ -3,6 +3,7 @@ package com.cyl.animateditem
 import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.GradientDrawable
 import android.view.View
 import android.widget.ImageView
 import org.junit.Assert.assertEquals
@@ -180,6 +181,74 @@ class CYLAnimatedItemAnimationEndTest {
         view.showsImageWhenAnimationEnds = false
         assertFalse(view.isShowingImageAfterAnimationEnd)
         assertEquals(View.VISIBLE, view.animationView!!.visibility)
+    }
+
+
+    /**
+     * [EN] The bridges (React Native, Flutter) set only `image`, selected or not: the end shows it, never the placeholder;
+     *      with the flag off the last frame stays. [CN] 桥接层只设置 `image`，无论是否选中：结束时显示它而不是占位图；开关关闭时保留最后一帧。
+     */
+    private fun endOfPass(selected: Boolean, shows: Boolean): Pair<CYLAnimatedItemView, EndSource> {
+        val source = EndSource()
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val placeholder = GradientDrawable().apply { setColor(0xFFFF0000.toInt()); setSize(24, 24); setBounds(0, 0, 24, 24) }
+        val image = ColorDrawable(0xFF00FF00.toInt()).apply { setBounds(0, 0, 24, 24) }
+        val view = CYLAnimatedItemView(activity).apply {
+            animationSource = source
+            placeholderImage = placeholder
+            animationURL = "success.fake"
+            activity.setContentView(this)
+            isSelected = selected
+            showsImageWhenAnimationEnds = shows
+            this.image = image
+        }
+        view.playAnimation()
+        frames()
+        source.players.getValue(view.animationView!!).running = false
+        frames()
+        return view to source
+    }
+
+    @Test
+    fun anImageOnlyViewShowsItsImageNotThePlaceholderWhenSelectedOrNot() {
+        for (selected in listOf(true, false)) {
+            val (view, _) = endOfPass(selected, shows = true)
+            assertTrue("selected=$selected", view.isShowingImageAfterAnimationEnd)
+            assertEquals(View.VISIBLE, view.iconView.visibility)
+            assertSame("selected=$selected", view.image, view.iconView.drawable)
+            assertEquals(View.INVISIBLE, view.animationView!!.visibility)
+        }
+    }
+
+    @Test
+    fun withTheFlagOffTheLastFrameStaysWhetherSelectedOrNot() {
+        for (selected in listOf(true, false)) {
+            val (view, _) = endOfPass(selected, shows = false)
+            assertFalse("selected=$selected", view.isShowingImageAfterAnimationEnd)
+            assertEquals(View.VISIBLE, view.animationView!!.visibility)
+            assertEquals(View.INVISIBLE, view.iconView.visibility)
+        }
+    }
+
+    @Test
+    fun withoutAnImageTheEndShowsThePlaceholder() {
+        val source = EndSource()
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val placeholder = GradientDrawable().apply { setColor(0xFFFF0000.toInt()); setSize(24, 24); setBounds(0, 0, 24, 24) }
+        val view = CYLAnimatedItemView(activity).apply {
+            animationSource = source
+            placeholderImage = placeholder
+            animationURL = "success.fake"
+            activity.setContentView(this)
+            isSelected = true
+            showsImageWhenAnimationEnds = true
+        }
+        view.playAnimation()
+        frames()
+        source.players.getValue(view.animationView!!).running = false
+        frames()
+        assertTrue(view.isShowingImageAfterAnimationEnd)
+        assertSame(placeholder, view.iconView.drawable)
     }
 
     @Test

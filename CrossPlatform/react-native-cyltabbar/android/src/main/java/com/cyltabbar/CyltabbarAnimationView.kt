@@ -9,13 +9,14 @@ import com.cyl.animateditem.CYLSize
 /**
  * An animation played by CYLTabBarController's engine through a `CYLAnimatedItemView` (the cross-platform engine API:
  * `docs/Animated-Item.md`, "Engine API across platforms"). Props `source`, `playing`, `selected`, `animationSpeed`,
- * `animationLoops`, `animationRestartToken`, `drivesAnimationPlayback` (default true), `iconSize`, `tintColor`; commands
+ * `animationLoops`, `animationRestartToken`, `drivesAnimationPlayback` (default true), `showsImageWhenAnimationEnds`, `image`, `iconSize`, `tintColor`; commands
  * `play`, `stopAtProgress`, `restart`; events `onAnimationLoaded`, `onAnimationFailed`, `onAnimationEnd`. No engine logic here.
  * 由 CYLTabBarController 引擎通过 `CYLAnimatedItemView` 播放的动画（跨端引擎 API，见 `docs/Animated-Item.md`）。
  */
 class CyltabbarAnimationView(context: Context) : FrameLayout(context) {
   private val density = resources.displayMetrics.density
   private var iconSize: Float? = null
+  private var imageRequest = 0
 
   /** Called with the event name ("loaded", "failed", "end"); the manager turns it into a React Native event. */
   var onEvent: ((String) -> Unit)? = null
@@ -63,6 +64,16 @@ class CyltabbarAnimationView(context: Context) : FrameLayout(context) {
   fun applyDrivesAnimationPlayback(value: Boolean) { item.drivesAnimationPlayback = value }
 
   fun applyShowsImageWhenAnimationEnds(value: Boolean) { item.showsImageWhenAnimationEnds = value }
+
+  /**
+   * The still image `showsImageWhenAnimationEnds` shows, loaded like `source`; it is the item's own `image` (not the
+   * placeholder), which `CYLAnimatedItemView` shows selected or not. null or blank clears it.
+   */
+  fun applyImage(value: String?) {
+    val request = ++imageRequest
+    val name = value?.takeIf { it.isNotBlank() } ?: run { item.image = null; return }
+    CyltabbarStillImage.loadAsync(context, name) { drawable -> if (request == imageRequest) item.image = drawable }
+  }
 
   /** `iconSize` in dp; 0 or less fills the view. */
   fun applyIconSize(value: Float) { iconSize = value.takeIf { it > 0f }; fitIcon() }

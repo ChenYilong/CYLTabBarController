@@ -65,6 +65,11 @@ class CyltabbarAnimationViewManager : SimpleViewManager<CyltabbarAnimationView>(
     view?.applyShowsImageWhenAnimationEnds(value)
   }
 
+  @ReactProp(name = "image")
+  override fun setImage(view: CyltabbarAnimationView?, value: String?) {
+    view?.applyImage(value)
+  }
+
   @ReactProp(name = "iconSize")
   override fun setIconSize(view: CyltabbarAnimationView?, value: Float) {
     view?.applyIconSize(value)
