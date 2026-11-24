@@ -9,7 +9,9 @@ import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLSVGAView } from './svga/CYLSVGAView';
 import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint,
   CYLTabBarAnimationTintTitle } from './CYLRiveTabBarItemAnimator';
-import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines } from 'cylanimateditem';
+import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines, cylSetPausesWhileUserScrolls } from 'cylanimateditem';
+// TODO: replace the file: dependency (cyltabbar/oh-package.json5, a vendored copy) with the ohpm package after the library is published (owner's OK).
+import { LifecycleController } from 'cyldeallocblockexecutor';
 import { CYLLocalizedString, cyl_textOf } from './CYLLocalization';
 import { CYLTabButtonAnimation, CYLTabButtonProperty, CYLTabButtonView, CYLTabButtonViewImpl } from './CYLTabButtonAnimation';
 
@@ -65,6 +67,43 @@ export function cyl_reportScroll(delta: number): void {
 }
 
 let cylScrollCounter: number = 0;
+
+/** [EN] The owner the scroll moments are reported on. [CN] 滚动时机所属的对象。 */
+class CYLScrollSource {
+}
+
+let cylScrollLifecycle: LifecycleController<CYLScrollSource> | undefined = undefined;
+
+function cylScrollController(): LifecycleController<CYLScrollSource> {
+  if (cylScrollLifecycle === undefined) {
+    cylScrollLifecycle = new LifecycleController<CYLScrollSource>(new CYLScrollSource());
+  }
+  return cylScrollLifecycle;
+}
+
+/**
+ * [EN] The user starts to scroll a List / Scroll (call it from `onScrollStart`): the global observers hear
+ *      `scrollWillBeginDragging`, and with `cyl_pausesAnimationsWhileUserScrolls(true)` every animated tab icon pauses.
+ * [CN] 用户开始滚动 List / Scroll（在 `onScrollStart` 中调用）：全局观察者收到 `scrollWillBeginDragging`，
+ *      设置 `cyl_pausesAnimationsWhileUserScrolls(true)` 后所有动画 Tab 图标暂停。
+ */
+export function cyl_reportScrollStarted(): void {
+  cylScrollController().scrollStarted();
+}
+
+/**
+ * [EN] true: every animated tab icon pauses while the user scrolls (between `cyl_reportScrollStarted()` and `cyl_reportScrollStopped()`)
+ *      and resumes afterwards. Set it before the tab bar appears. [CN] 为 true 时，用户滚动期间（`cyl_reportScrollStarted()` 与
+ *      `cyl_reportScrollStopped()` 之间）所有动画 Tab 图标暂停，之后恢复。请在 TabBar 出现之前设置。
+ */
+export function cyl_pausesAnimationsWhileUserScrolls(enabled: boolean): void {
+  cylSetPausesWhileUserScrolls(enabled);
+}
+
+/** [EN] The scroll stopped (call it from `onScrollStop`): `scrollDidEndScrolling`, the icons resume. [CN] 滚动停止（在 `onScrollStop` 中调用）：恢复图标动画。 */
+export function cyl_reportScrollStopped(): void {
+  cylScrollController().scrollStopped();
+}
 
 /** [EN] AppStorage key bumped by cyl_restoreTabBar. [CN] cyl_restoreTabBar 递增的 AppStorage 键。 */
 export const CYLRestoreTabBarStorageKey: string = 'cyl_restoreTabBar';
@@ -478,6 +517,13 @@ export struct CYLTabBarController {
    */
   @State private keyboardCoversTabBar: boolean = false;
   private cylKeyboardWindow: window.Window | undefined = undefined;
+  /**
+   * [EN] CYLDeallocBlockExecutor's controller of this page (iOS: the layout block; here the keyboard listener, as a keyed
+   *      dealloc callback `cyl.core.keyboardListener`, run by `aboutToDisappear()`).
+   * [CN] 本控制器的 CYLDeallocBlockExecutor 控制器（iOS 用于布局 block；这里用于键盘监听，作为带 key 的 dealloc 回调
+   *      `cyl.core.keyboardListener`，由 `aboutToDisappear()` 运行）。
+   */
+  private cylLifecycle: LifecycleController<CYLTabBarController> | undefined = undefined;
   private cylKeyboardListener: (height: number) => void = (height: number) => {
     let mode = KeyboardAvoidMode.OFFSET;
     try {
@@ -503,6 +549,8 @@ export struct CYLTabBarController {
   aboutToAppear(): void {
     // [EN] cyltabbar plays Lottie (@ohos/lottie), Rive (@ohos/rive) and SVGA (its own player): CYLAnimatedItemView draws them.
     // [CN] cyltabbar 播放 Lottie、Rive 与 SVGA（自带播放器）：由 CYLAnimatedItemView 绘制。
+    this.cylLifecycle = new LifecycleController<CYLTabBarController>(this);
+    this.cylLifecycle.registry.addLifecycleCallback<CYLTabBarController>('didReceiveMemoryWarning', (owner: CYLTabBarController) => owner.cylUnloadOnMemoryWarning(), { key: 'cyl.core.memoryWarning' });
     ['Lottie', 'Rive', 'SVGA'].forEach((type: string) => CYLAnimatedItemEngines.register(type));
     // [EN] Debug builds installed with the x86_64 debug engine kit: Rive also plays on the x86_64 emulator.
     // [CN] 安装了 x86_64 调试引擎包的 debug 构建：Rive 也能在 x86_64 模拟器上播放。
@@ -513,12 +561,30 @@ export struct CYLTabBarController {
     while (this.badges.length < this.tabBarItemsAttributes.length) {
       this.badges.push(new CYLBadge());
     }
+    // [EN] The badges post cyl.badge.didShow / didClear to the observers of this controller and of LifecycleCenter.
+    // [CN] 角标把 cyl.badge.didShow / didClear 发给本控制器与 LifecycleCenter 的观察者。
+    const poster: (name: string, info: Record<string, Object>) => void = (name: string, info: Record<string, Object>): void => {
+      this.cylLifecycle?.registry.postLifecycleEvent(name, info);
+    };
+    this.badges.forEach((badge: CYLBadge) => {
+      badge.eventPoster = poster;
+    });
+    this.plusButtonBadge.eventPoster = poster;
     this.cylObserveKeyboard();
     // [EN] The Liquid Glass lens starts on the selected slot. [CN] 液态玻璃镜片从选中槽位开始。
     this.glassLensPosition = this.cylGlassSelectedSlot();
+    this.cylLifecycle.aboutToAppear();
   }
 
   aboutToDisappear(): void {
+    this.cylLifecycle?.aboutToDisappear();
+  }
+
+  /**
+   * [EN] Removes the keyboard listener (the keyed dealloc callback `cyl.core.keyboardListener`).
+   * [CN] 移除键盘监听（带 key 的 dealloc 回调 `cyl.core.keyboardListener`）。
+   */
+  private cylRemoveKeyboardListener(): void {
     try {
       this.cylKeyboardWindow?.off('keyboardHeightChange', this.cylKeyboardListener);
     } catch (error) {
@@ -538,6 +604,14 @@ export struct CYLTabBarController {
     window.getLastWindow(context).then((found: window.Window) => {
       this.cylKeyboardWindow = found;
       found.on('keyboardHeightChange', this.cylKeyboardListener);
+      // [EN] If the component already disappeared (the window came late), the page is already torn down, so a new callback would never run: remove now.
+      // [CN] 若组件已消失（窗口回调较晚），此时新回调不会再执行：立即移除。
+      const lifecycle = this.cylLifecycle;
+      if (lifecycle === undefined || lifecycle.isDetached) {
+        this.cylRemoveKeyboardListener();
+      } else {
+        lifecycle.registry.addDeallocCallback<CYLTabBarController>((owner: CYLTabBarController) => owner.cylRemoveKeyboardListener(), { key: 'cyl.core.keyboardListener' });
+      }
       try {
         const area = found.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR);
         this.glassGestureBarHeight = this.getUIContext().px2vp(area.bottomRect.height);
@@ -825,6 +899,19 @@ export struct CYLTabBarController {
   }
 
   cylOnMemoryWarning(): void {
+    // [EN] Through CYLDeallocBlockExecutor, as on iOS: the keyed `afterSuper` block `cyl.core.memoryWarning` does the work.
+    //      `cyl_simulateMemoryWarning` and a real warning (`UIAbility.onMemoryLevel` calling it) both come here; level 2 is
+    //      MEMORY_LEVEL_CRITICAL, the level the controller treats as a warning.
+    // [CN] 与 iOS 相同，经由 CYLDeallocBlockExecutor：带 key 的 `afterSuper` block `cyl.core.memoryWarning` 完成工作。
+    //      `cyl_simulateMemoryWarning` 与真实警告（`UIAbility.onMemoryLevel` 调用它）都经过这里；级别 2 是 MEMORY_LEVEL_CRITICAL。
+    if (this.cylLifecycle === undefined) {
+      this.cylUnloadOnMemoryWarning();
+      return;
+    }
+    this.cylLifecycle.memoryLevel(2);
+  }
+
+  private cylUnloadOnMemoryWarning(): void {
     this.cylRestoreFromScroll();
     let unloaded: number[] = [];
     if (this.unloadsUnselectedViewsOnMemoryWarning) {

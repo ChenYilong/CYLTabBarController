@@ -461,3 +461,4 @@
 "n/a on Android: an app cannot post this system event." = "n/a บน Android: แอปไม่สามารถส่งเหตุการณ์ระบบนี้ได้";
 "Runs every automatic row, one after the other." = "เรียกใช้ทุกแถวอัตโนมัติทีละแถว";
 "Tab bar %@ · page ID \"%@\"" = "แท็บบาร์ %@ · ID หน้า \"%@\"";
+"Pause while scrolling" = "หยุดชั่วคราวขณะเลื่อน";

@@ -104,6 +104,14 @@ interface CYLTabBarItemAnimationPlayer {
      */
     fun stop()
     /**
+     * [EN] Pauses on the current frame (the user is scrolling). Optional: an engine without a pause keeps playing. [CN] 暂停在当前帧（用户正在滚动）。可选：没有暂停能力的引擎会继续播放。
+     */
+    fun pause() { /* [EN] Optional. [CN] 可选。 */ }
+    /**
+     * [EN] Continues from the paused frame. Optional. [CN] 从暂停的帧继续。可选。
+     */
+    fun resume() { /* [EN] Optional. [CN] 可选。 */ }
+    /**
      * [EN] The playback position, 0…1. [CN] 播放位置，0…1。
      */
     var progress: Float
@@ -460,6 +468,13 @@ interface CYLTabBarItemAnimationPlayableView {
     fun cyl_showAnimationViewLastFrame()
     fun cyl_stopAnimationView()
     /**
+     * [EN] Pauses a playing animation where it is (`cyl.animation.didPause` follows from the item); optional, default: keeps playing.
+     * [CN] 在当前位置暂停正在播放的动画（item 随后发出 `cyl.animation.didPause`）；可选，默认继续播放。
+     */
+    fun cyl_pauseAnimationView() { /* [EN] Optional. [CN] 可选。 */ }
+    /** [EN] Continues what [cyl_pauseAnimationView] paused. [CN] 继续被 [cyl_pauseAnimationView] 暂停的动画。 */
+    fun cyl_resumeAnimationView() { /* [EN] Optional. [CN] 可选。 */ }
+    /**
      * [EN] Colors for Dark Mode, already resolved; null restores the light colors. [CN] 深色模式颜色（已解析）；null 恢复浅色。
      */
     fun cyl_applyAnimationViewColors(colors: Map<String, Int>?) { /* [EN] Optional. [CN] 可选。 */ }
@@ -550,6 +565,8 @@ open class CYLTabBarItemViewAnimator(
             override fun play() = playable.cyl_playAnimationView()
             override fun showLastFrame() = playable.cyl_showAnimationViewLastFrame()
             override fun stop() = playable.cyl_stopAnimationView()
+            override fun pause() = playable.cyl_pauseAnimationView()
+            override fun resume() = playable.cyl_resumeAnimationView()
             override val isPlaying: Boolean? get() = playable.cyl_isAnimationViewPlaying()
             override var loops: Boolean = false
                 set(value) { field = value; playable.cyl_setAnimationViewLoops(value) }
@@ -872,6 +889,8 @@ object CYLLottieTabBarItemAnimator : CYLTabBarItemAnimator {
         override fun play() { animationView?.let { CYLReflection.call(it, "setProgress", 0f); CYLReflection.call(it, "playAnimation") } }
         override fun showLastFrame() { animationView?.let { CYLReflection.call(it, "cancelAnimation"); CYLReflection.call(it, "setProgress", 1f) } }
         override fun stop() { animationView?.let { CYLReflection.call(it, "cancelAnimation"); CYLReflection.call(it, "setProgress", 0f) } }
+        override fun pause() { animationView?.let { CYLReflection.call(it, "pauseAnimation") } }
+        override fun resume() { animationView?.let { CYLReflection.call(it, "resumeAnimation") } }
         override val isPlaying: Boolean? get() = animationView?.let { CYLReflection.call(it, "isAnimating") as? Boolean }
         override var progress: Float
             get() = animationView?.let { CYLReflection.call(it, "getProgress") as? Float } ?: 0f
@@ -1002,6 +1021,8 @@ object CYLPAGTabBarItemAnimator : CYLTabBarItemAnimator {
         override fun play() { animationView?.let { CYLReflection.call(it, "setRepeatCount", if (loops) 0 else 1); CYLReflection.call(it, "setProgress", 0.0); CYLReflection.call(it, "play") } }
         override fun showLastFrame() { animationView?.let { CYLReflection.call(it, "stop"); CYLReflection.call(it, "setProgress", 1.0); CYLReflection.call(it, "flush") } }
         override fun stop() { animationView?.let { CYLReflection.call(it, "stop"); CYLReflection.call(it, "setProgress", 0.0); CYLReflection.call(it, "flush") } }
+        override fun pause() { animationView?.let { CYLReflection.call(it, "pause") } }
+        override fun resume() { animationView?.let { CYLReflection.call(it, "play") } }
         override val isPlaying: Boolean? get() = animationView?.let { CYLReflection.call(it, "isPlaying") as? Boolean }
         override var progress: Float
             get() = animationView?.let { (CYLReflection.call(it, "getProgress") as? Double)?.toFloat() } ?: 0f
@@ -1421,6 +1442,24 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
      * [CN] rive-android 的 `isPlaying`：动画结束或状态机稳定（rive-android 会暂停它）后为 false。
      */
     override fun cyl_isAnimationViewPlaying(): Boolean? = CYLReflection.call(rive, "isPlaying") as? Boolean
+
+    /**
+     * [EN] rive-android's `pause()` keeps the pose; resuming plays the state machine again (not an unnamed `play()`, which would also
+     *      start the linear animations), or the linear animation. [CN] rive-android 的 `pause()` 保留当前姿态；恢复时重新播放状态机
+     *      （不用不带名字的 `play()`，它还会启动线性动画），或播放线性动画。
+     */
+    override fun cyl_pauseAnimationView() {
+        CYLReflection.call(rive, "pause")
+    }
+
+    override fun cyl_resumeAnimationView() {
+        val machineName = stateMachine
+        if (machineName != null) {
+            CYLReflection.callKotlin(rive, "play", machineName, CYLReflection.DEFAULT, CYLReflection.DEFAULT, true, false)
+        } else {
+            CYLReflection.call(rive, "play")
+        }
+    }
 
     override fun cyl_stopAnimationView() {
         handler.removeCallbacksAndMessages(null)

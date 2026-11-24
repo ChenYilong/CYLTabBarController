@@ -6,6 +6,8 @@
 //
 
 import UIKit
+// [EN] Internal: CYLTabBarController's public interface does not expose the library. [CN] internal：公开接口不暴露该库。
+internal import CYLDeallocBlockExecutor
 
 /**
  * [EN] The FlatDesign side of the life cycle, implemented in the FlatDesign subspec (CYLTabBarController+CYLFlatDesign.swift).
@@ -129,6 +131,39 @@ extension CYLTabBarController {
         cylApplyTabBarItemSelectedTitles(self)
         // [EN] Scroll hiding (issue #13): appearing ends any hide session. [CN] 滚动隐藏（issue #13）：出现时结束隐藏会话。
         cylTabBarMinimizeLifecycleEvent()
+    }
+
+    // MARK: - [EN] The appearance events through CYLDeallocBlockExecutor [CN] 通过 CYLDeallocBlockExecutor 派发的出现与消失事件
+
+    /**
+     [EN] The four appearance overrides of `CYLTabBarController` register (replace, by key) a `.afterSuper` block and then call
+          `super`, where the library's hook fires it: the order is the same as `super` followed by the body, and blocks an app
+          adds for the same events run after the core's, as before. The functions above keep their selectors and bodies.
+     [CN] `CYLTabBarController` 的四个出现与消失重写先登记（按 key 替换）一个 `.afterSuper` block，再调用 `super`，由库的 hook 在其中触发：
+          顺序与“`super` 之后执行主体”相同，App 为同一事件添加的 block 仍在核心之后执行。上面的函数保持原来的 selector 与实现。
+     */
+    func cylRegisterViewWillAppearCallback() {
+        cylAddLifecycleCallback(for: .viewWillAppear, key: "cyl.core.viewWillAppear") { controller, _, info in
+            controller.cylViewWillAppear(info.animated ?? false)
+        }
+    }
+
+    func cylRegisterViewDidAppearCallback() {
+        cylAddLifecycleCallback(for: .viewDidAppear, key: "cyl.core.viewDidAppear") { controller, _, info in
+            controller.cylViewDidAppear(info.animated ?? false)
+        }
+    }
+
+    func cylRegisterViewWillDisappearCallback() {
+        cylAddLifecycleCallback(for: .viewWillDisappear, key: "cyl.core.viewWillDisappear") { controller, _, info in
+            controller.cylViewWillDisappear(info.animated ?? false)
+        }
+    }
+
+    func cylRegisterViewDidDisappearCallback() {
+        cylAddLifecycleCallback(for: .viewDidDisappear, key: "cyl.core.viewDidDisappear") { controller, _, info in
+            controller.cylViewDidDisappear(info.animated ?? false)
+        }
     }
 
     // MARK: - Tab change (not FlatDesign)
@@ -287,7 +322,9 @@ extension CYLTabBarController {
     @objc(cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce)
     func cylRearmViewDidLayoutSubviewsBlockInvokeOnce() {
         cylPrivate.cylSetInvokeOnceViewDidLayoutSubViewsBlock(true)
-        objc_setAssociatedObject(self, CYLUtilsKeys.key("viewDidLayoutSubviews"), nil, .OBJC_ASSOCIATION_RETAIN)
+        // [EN] Only the core's keyed block is re-armed; the app's own invoke-once blocks keep their state.
+        // [CN] 只重新启用核心带 key 的 block；App 自己的只执行一次 block 保持原状态。
+        _ = cylRearmLifecycleCallback(key: Self.cylLayoutBlockKey)
         if isViewLoaded {
             view.setNeedsLayout()
         }

@@ -36,6 +36,7 @@ target 'Runner' do
   #      CYLTabBarRive* keys, in code or a configuration file) animate here as on iOS and Android natively.
   # [CN] 本仓库的 CYLTabBarController 及其 Rive 子库（RiveRuntime），使 Rive Tab 图标（CYLTabBarRive* 键，代码或配置文件）在本示例中播放。
   pod 'CYLTabBarController/Rive', :path => '../../../..'
+  pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => '4276a6dab5a428ccc3a5f3f347eab991881fb97c' # TODO: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md)
   # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
   # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
   pod 'CYLAnimatedItem', :path => '../../../..'

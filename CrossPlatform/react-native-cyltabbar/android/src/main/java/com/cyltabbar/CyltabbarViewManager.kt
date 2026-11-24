@@ -110,6 +110,12 @@ class CyltabbarViewManager : SimpleViewManager<CyltabbarView>(),
     view?.playAllRequest = value
   }
 
+  /** [EN] True pauses every playing tab icon animation, false resumes them. [CN] 为 true 时暂停所有正在播放的 Tab 图标动画，为 false 时恢复。 */
+  @ReactProp(name = "animationsPaused", defaultBoolean = false)
+  override fun setAnimationsPaused(view: CyltabbarView?, value: Boolean) {
+    view?.animationsPaused = value
+  }
+
   /** [EN] [horizontal, vertical], set at runtime; empty keeps the configuration's. [CN] [水平, 垂直]，运行时设置；为空时使用配置中的值。 */
   @ReactProp(name = "titlePositionAdjustment")
   override fun setTitlePositionAdjustment(view: CyltabbarView?, value: ReadableArray?) {
@@ -135,6 +141,7 @@ class CyltabbarViewManager : SimpleViewManager<CyltabbarView>(),
     "topLoginRequest" to mapOf("registrationName" to "onLoginRequest"),
     "topLoginStateChange" to mapOf("registrationName" to "onLoginStateChange"),
     "topMemoryWarning" to mapOf("registrationName" to "onMemoryWarning"),
+    "topLifecycleEvent" to mapOf("registrationName" to "onLifecycleEvent"),
     "topManifestApply" to mapOf("registrationName" to "onManifestApply"),
     "topManifestFail" to mapOf("registrationName" to "onManifestFail"),
   )

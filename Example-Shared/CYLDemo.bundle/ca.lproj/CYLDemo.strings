@@ -461,3 +461,4 @@
 "n/a on Android: an app cannot post this system event." = "n/a a Android: una app no pot enviar aquest esdeveniment del sistema.";
 "Runs every automatic row, one after the other." = "Executa totes les files automàtiques, una darrere l'altra.";
 "Tab bar %@ · page ID \"%@\"" = "Barra de pestanyes %@ · ID de pàgina «%@»";
+"Pause while scrolling" = "Pausa en desplaçar";

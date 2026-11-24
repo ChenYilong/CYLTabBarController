@@ -212,6 +212,7 @@ class CYLTabBar extends StatefulWidget {
     this.manifestURL,
     this.onManifestApply,
     this.onManifestFail,
+    this.onLifecycleEvent,
     this.configuration = const {},
     this.selectedIndex,
     this.badgeValues = const [],
@@ -232,6 +233,7 @@ class CYLTabBar extends StatefulWidget {
     this.playbackSpeed,
     this.playbackLoops = false,
     this.playAllRequest = 0,
+    this.animationsPaused = false,
     this.onMemoryWarning,
     this.titlePositionAdjustment,
   });
@@ -331,6 +333,10 @@ class CYLTabBar extends StatefulWidget {
   /// Each increase plays every tab icon animation again from progress 0, with [playbackSpeed] and [playbackLoops]
   /// ("Play all", `-[CYLTabBarController cyl_playAllTabBarItemAnimations]`).
   final int playAllRequest;
+
+  /// True pauses every playing tab icon animation, false resumes them (`cyl.animation.didPause` / `didResume` follow). Set it
+  /// from your list's scroll notifications. 为 true 时暂停所有正在播放的 Tab 图标动画，为 false 时恢复；据列表的滚动通知设置。
+  final bool animationsPaused;
   final ValueChanged<String>? onMemoryWarning;
 
   /// The title offset of every tab (dx horizontal, dy vertical), set at runtime
@@ -358,6 +364,12 @@ class CYLTabBar extends StatefulWidget {
 
   /// The manifest could not be downloaded: the message says why, and another source was used if there was one.
   final ValueChanged<String>? onManifestFail;
+
+  /// An animation (`cyl.animation.didStart` / `didPause` / `didResume` / `didStop`) or badge (`cyl.badge.didShow` /
+  /// `didClear` / `didBecomeReady` / `animationDidStart` / `animationDidStop`) moment of any tab view, with the info the
+  /// poster passed. Names match `AnimationEvents` and `BadgeEvents` of the CYLDeallocBlockExecutor library.
+  /// 任意 Tab 视图的动画或角标时机，附带发出方传入的信息；名称与 CYLDeallocBlockExecutor 库的 AnimationEvents、BadgeEvents 一致。
+  final void Function(String name, Map<String, String> userInfo)? onLifecycleEvent;
 
   /// The configuration sent to the native library.
   Map<String, Object?> buildConfiguration() => {
@@ -458,6 +470,9 @@ class _CYLTabBarState extends State<CYLTabBar> {
     if (widget.playbackLoops != oldWidget.playbackLoops) {
       channel?.invokeMethod<void>('setPlaybackLoops', widget.playbackLoops);
     }
+    if (widget.animationsPaused != oldWidget.animationsPaused) {
+      channel?.invokeMethod<void>('setAnimationsPaused', widget.animationsPaused);
+    }
     if (widget.playAllRequest > oldWidget.playAllRequest) {
       channel?.invokeMethod<void>('playAllAnimations');
     }
@@ -510,6 +525,10 @@ class _CYLTabBarState extends State<CYLTabBar> {
           }
         case 'onManifestApply':
           widget.onManifestApply?.call((arguments as String?) ?? '');
+        case 'onLifecycleEvent':
+          final moment = cylParseLifecycleEvent(arguments);
+          widget.onLifecycleEvent?.call(moment.name, moment.userInfo);
+          break;
         case 'onManifestFail':
           widget.onManifestFail?.call((arguments as String?) ?? '');
       }
@@ -566,4 +585,19 @@ class _CYLTabBarState extends State<CYLTabBar> {
         return const SizedBox.shrink();
     }
   }
+}
+
+
+/// Reads the `onLifecycleEvent` message of the native host: the event name and the info the poster passed. A malformed info
+/// still reports the moment, with an empty map. 解析原生宿主的 `onLifecycleEvent` 消息：事件名与发出方传入的信息；信息无效时仍报告该时机，信息为空。
+@visibleForTesting
+({String name, Map<String, String> userInfo}) cylParseLifecycleEvent(Object? arguments) {
+  final map = Map<Object?, Object?>.from((arguments as Map?) ?? const <Object?, Object?>{});
+  Map<String, String> info = <String, String>{};
+  try {
+    info = Map<String, String>.from(jsonDecode((map['userInfo'] as String?) ?? '{}') as Map<dynamic, dynamic>);
+  } catch (_) {
+    // A malformed payload still reports the moment. 载荷无效时仍报告该时机。
+  }
+  return (name: (map['name'] as String?) ?? '', userInfo: info);
 }

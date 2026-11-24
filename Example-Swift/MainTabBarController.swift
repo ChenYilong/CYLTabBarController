@@ -30,6 +30,8 @@ class MainTabBarController: CYLTabBarController {
         //      the default logic runs, which may cause your custom style to have no effect.
 
         self.tabBarStyleType = .liquidGlass
+        // [EN] The Playback card's "Pause while scrolling" switch turns `CYLAnimationEventBridge.pausesAnimationsWhileUserScrolls` on.
+        // [CN] Playback 卡片中的「滚动时暂停」开关会开启 `CYLAnimationEventBridge.pausesAnimationsWhileUserScrolls`。
 
         UIApplication.shared.applicationSupportsShakeToEdit = true
         self.becomeFirstResponder()

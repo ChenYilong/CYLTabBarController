@@ -6,6 +6,7 @@
 //
 
 import UIKit
+internal import CYLDeallocBlockExecutor
 
 /// [EN] The associated object key of `cyl_keepsLoadedTabBarItemIdentifiers` (selector-based, as in CYLTabBarController.m before).
 /// [CN] `cyl_keepsLoadedTabBarItemIdentifiers` 的关联对象 key（基于 selector，与原 CYLTabBarController.m 相同）。
@@ -29,6 +30,19 @@ extension CYLTabBarController {
     // [CN] 内部访问级别：生成的头文件不能声明它们（它在类之前被读取）；Objective-C 调用方与子类使用 CYLTabBarController.h 中
     //      `CYLTabBarController (CYLMemoryWarning)` 的声明，调用经由 Objective-C 派发，子类的重写仍然生效。`-didReceiveMemoryWarning` 留在
     //      Objective-C 类中：在公开类的扩展中重写必须是 public。
+
+    static let cylMemoryWarningKey = "cyl.core.memoryWarning"
+
+    /// [EN] Registers (replaces, by key) the block that unloads the unselected tabs; called before `super.didReceiveMemoryWarning()`.
+    ///      The flag is read when the block runs, as before. [CN] 登记（按 key 替换）卸载未选中 Tab 的 block；在 `super.didReceiveMemoryWarning()`
+    ///      之前调用。执行时才读取开关，与之前相同。
+    func cylRegisterMemoryWarningCallback() {
+        cylAddLifecycleCallback(for: .didReceiveMemoryWarning, key: Self.cylMemoryWarningKey) { controller, _, _ in
+            if controller.unloadsUnselectedViewsOnMemoryWarning {
+                controller.unloadViewsOfUnselectedViewControllers()
+            }
+        }
+    }
 
     @objc(shouldUnloadViewOfViewController:)
     open dynamic func shouldUnloadView(of viewController: UIViewController) -> Bool {

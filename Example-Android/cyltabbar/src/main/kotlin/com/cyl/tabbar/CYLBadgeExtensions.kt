@@ -199,9 +199,19 @@ open class CYLTabBarBadgeView(context: Context) : FrameLayout(context), CYLBadge
  * [EN] `-[UITabBarItem cyl_isShowBadge]`: the badge of the item's tab button. [CN] item 的 Tab 按钮上的角标是否显示。
  */
 fun CYLTabBarItem.cyl_isShowBadge(): Boolean = cyl_visiableTabButton?.cyl_isShowBadge() ?: false
-fun CYLTabBarItem.cyl_showBadge() { cyl_visiableTabButton?.cyl_showBadge() }
-fun CYLTabBarItem.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnimationType) { cyl_visiableTabButton?.cyl_showBadgeValue(value, animationType) }
-fun CYLTabBarItem.cyl_clearBadge() { cyl_visiableTabButton?.cyl_clearBadge() }
+/**
+ * [EN] The tab button forwards its events (and the posted badge moments) to its item, as the iOS tab button does to its `UITabBarItem`: `LifecycleRegistry.of(item)`
+ *      then hears `cyl.badge.*`. Called before every badge call; forwarding to the same target again replaces the earlier forward, so it stays one.
+ * [CN] Tab 按钮把自己的事件（以及发出的角标时机）转发给它的 item，与 iOS Tab 按钮转发给 `UITabBarItem` 相同：`LifecycleRegistry.of(item)` 即可收到
+ *      `cyl.badge.*`。每次角标调用前都会调用；再次转发给同一目标会替换原来的转发，所以始终只有一个。
+ */
+private fun CYLTabBarItem.badgeButton(): View? = cyl_visiableTabButton?.also {
+    com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry.of(it).forwardLifecycleEvents(com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry.of(this))
+}
+
+fun CYLTabBarItem.cyl_showBadge() { badgeButton()?.cyl_showBadge() }
+fun CYLTabBarItem.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnimationType) { badgeButton()?.cyl_showBadgeValue(value, animationType) }
+fun CYLTabBarItem.cyl_clearBadge() { badgeButton()?.cyl_clearBadge() }
 fun CYLTabBarItem.cyl_resumeBadge() { cyl_visiableTabButton?.cyl_resumeBadge() }
 fun CYLTabBarItem.cyl_isPauseBadge(): Boolean = cyl_visiableTabButton?.cyl_isPauseBadge() ?: false
 

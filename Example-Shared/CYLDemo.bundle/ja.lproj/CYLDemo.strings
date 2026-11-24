@@ -461,3 +461,4 @@
 "n/a on Android: an app cannot post this system event." = "Android では n/a：アプリはこのシステムイベントを送信できません。";
 "Runs every automatic row, one after the other." = "すべての自動行を順番に実行します。";
 "Tab bar %@ · page ID \"%@\"" = "タブバー %@ · ページ ID「%@」";
+"Pause while scrolling" = "スクロール中は一時停止";

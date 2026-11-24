@@ -96,6 +96,11 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         _hostView.didApplyManifest = ^(NSString *source) {
             [weakChannel invokeMethod:@"onManifestApply" arguments:source];
         };
+        _hostView.didPostLifecycleEvent = ^(NSString *name, NSString *userInfo) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakChannel invokeMethod:@"onLifecycleEvent" arguments:@{@"name": name, @"userInfo": userInfo}];
+            });
+        };
         _hostView.didFailManifest = ^(NSString *message) {
             [weakChannel invokeMethod:@"onManifestFail" arguments:message];
         };
@@ -198,6 +203,8 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         _hostView.animationSpeed = [arguments isKindOfClass:[NSNumber class]] ? [arguments doubleValue] : 0;
     } else if ([call.method isEqualToString:@"setPlaybackLoops"]) {
         _hostView.animationLoops = [arguments isKindOfClass:[NSNumber class]] && [arguments boolValue];
+    } else if ([call.method isEqualToString:@"setAnimationsPaused"]) {
+        _hostView.animationsPaused = [arguments isKindOfClass:[NSNumber class]] && [arguments boolValue];
     } else if ([call.method isEqualToString:@"playAllAnimations"]) {
         [_hostView playAllAnimations];
     } else if ([call.method isEqualToString:@"setTabBarHidden"]) {

@@ -1,4 +1,5 @@
 import { CYLAnimatedItemTypeRegistry } from './CYLAnimatedItemTypes';
+import { LifecycleCenter, LifecycleController } from 'cyldeallocblockexecutor';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
 import {
   CYLAnimatedItemCountdown, CYLAnimatedItemCountdownListener, CYLAnimatedItemCountdownStorage, CYLCountdownRunning, CYLCountdownFinished,
@@ -403,6 +404,28 @@ export function cylIconColorFilter(color: ResourceColor): number[] {
  *      显示规则与 iOS、Android 相同：已注册的引擎能播放时显示动画；否则在加载期间与失败之后显示静态图片（`image` / `selectedImage`）；只有没有静态图片时
  *      才显示占位图。它是一个无障碍元素：文本为 `itemTitle`（或 `itemAccessibilityText`），描述为 `itemDescription` 加上选中状态。
  */
+let cylPausesWhileScrolling: boolean = false;
+let cylScrollObserverNumber: number = 0;
+
+/**
+ * [EN] true: every animated item pauses while the user scrolls (the app reports the scrolling with `scrollStarted()` /
+ *      `scrollStopped()` of a LifecycleController, or `cyl_reportScrollStarted()` of cyltabbar) and resumes afterwards. Read when
+ *      an item appears. Module-level, because ArkTS keeps statics off structs. [CN] 为 true 时，用户滚动期间所有动画条目暂停，
+ *      滚动结束后恢复。条目出现时读取。放在模块级，因为 ArkTS 不在 struct 上放静态成员。
+ */
+export function cylSetPausesWhileUserScrolls(enabled: boolean): void {
+  cylPausesWhileScrolling = enabled;
+}
+
+export function cylPausesWhileUserScrolls(): boolean {
+  return cylPausesWhileScrolling;
+}
+
+function cylNextScrollObserverNumber(): number {
+  cylScrollObserverNumber += 1;
+  return cylScrollObserverNumber;
+}
+
 @Component
 export struct CYLAnimatedItemView {
   @Prop itemTitle: string = '';
@@ -564,7 +587,19 @@ export struct CYLAnimatedItemView {
   onItemDragEnd?: (dx: number, dy: number) => void;
   @State private animationContext: CYLAnimatedItemAnimationContext = new CYLAnimatedItemAnimationContext();
 
+  private cylLifecycle: LifecycleController<CYLAnimatedItemView> | undefined = undefined;
+  private cylScrollPaused: boolean = false;
+  private cylStopScrollObserver: (() => void) | undefined = undefined;
+
+
   aboutToAppear(): void {
+    this.cylLifecycle = new LifecycleController<CYLAnimatedItemView>(this);
+    this.cylLifecycle.registry.addDeallocCallback<CYLAnimatedItemView>((owner: CYLAnimatedItemView) => owner.cylTeardown(), { key: 'cyl.animatedItem.teardown' });
+    this.cylLifecycle.aboutToAppear();
+    if (cylPausesWhileUserScrolls()) {
+      this.cylStopScrollObserver = LifecycleCenter.whileUserScrolls(() => this.cylPauseAnimation(), () => this.cylResumeAnimation(),
+        { key: `cyl.animatedItem.scroll.${cylNextScrollObserverNumber()}` });
+    }
     CYLAnimatedItemEngines.loadX86_64DebugEngines(this.getUIContext().getHostContext());
     this.cylLastRestartToken = this.animationRestartToken + this.cylControllerRestarts;
     this.cylLastSelected = this.isItemSelected;
@@ -579,6 +614,13 @@ export struct CYLAnimatedItemView {
   }
 
   aboutToDisappear(): void {
+    this.cylLifecycle?.aboutToDisappear();
+  }
+
+  // [EN] The teardown block (CYLDeallocBlockExecutor), run by `aboutToDisappear`. [CN] 销毁块（CYLDeallocBlockExecutor），由 `aboutToDisappear` 运行。
+  private cylTeardown(): void {
+    this.cylPostAnimationEvent('cyl.animation.didStop');
+    this.cylStopScrollObserver?.();
     this.cylStopCountdownTimer();
     try {
       this.getUIContext().getHostContext()?.getApplicationContext().off('applicationStateChange', this.cylForegroundCallback);
@@ -744,8 +786,41 @@ export struct CYLAnimatedItemView {
     this.cylLastSelected = this.isItemSelected;
     if (token !== this.cylLastRestartToken) {
       this.cylLastRestartToken = token;
+      this.cylPostAnimationEvent('cyl.animation.didStart');
       this.cylRestartHandler?.();
     }
+  }
+
+  /**
+   * [EN] Posts an animation event (AnimationEvents of the core library) to the observers of this item.
+   * [CN] 向本控件的观察者发出动画事件（核心库的 AnimationEvents）。
+   */
+  cylPostAnimationEvent(name: string): void {
+    // [EN] ArkTS: a typed record, not an object literal. [CN] ArkTS：使用带类型的 Record，而不是对象字面量。
+    const info: Record<string, Object> = {};
+    info['url'] = this.animationUrl;
+    info['selected'] = this.isItemSelected;
+    this.cylLifecycle?.registry.postLifecycleEvent(name, info);
+  }
+
+  /** [EN] Scrolling pauses the engine: posts didPause. [CN] 滚动暂停动画：发出 didPause。 */
+  cylPauseAnimation(): void {
+    if (this.cylScrollPaused) {
+      return;
+    }
+    this.cylScrollPaused = true;
+    this.cylUpdateContext();
+    this.cylPostAnimationEvent('cyl.animation.didPause');
+  }
+
+  /** [EN] Scrolling ended: posts didResume. [CN] 滚动结束：发出 didResume。 */
+  cylResumeAnimation(): void {
+    if (!this.cylScrollPaused) {
+      return;
+    }
+    this.cylScrollPaused = false;
+    this.cylUpdateContext();
+    this.cylPostAnimationEvent('cyl.animation.didResume');
   }
 
   private cylUpdateContext(): void {
@@ -753,7 +828,8 @@ export struct CYLAnimatedItemView {
     context.url = this.animationUrl;
     context.size = this.iconSize;
     context.selected = this.isItemSelected;
-    context.speed = this.animationSpeed;
+    // [EN] Speed 0 while paused by scrolling: every engine already applies the context's speed. [CN] 滚动暂停时速度为 0：各引擎本来就应用 context 的速度。
+    context.speed = this.cylScrollPaused ? 0 : this.animationSpeed;
     context.loops = this.animationLoops;
     context.restartToken = this.animationRestartToken + this.cylControllerRestarts;
     context.setRestartHandler = this.cylSetRestartHandler;
@@ -1012,6 +1088,15 @@ export struct CYLAnimatedItemView {
     .accessibilityDescription(this.isItemSelected && this.selectedDescription.length > 0 ?
       [this.itemDescription, this.selectedDescription].filter((part: string) => part.length > 0).join(', ') : this.itemDescription)
     .id(this.itemId)
+    .onVisibleAreaChange([0.0, 0.01], (isVisible: boolean) => {
+      this.cylLifecycle?.visibleAreaChanged(isVisible);
+    })
+    .onAttach(() => {
+      this.cylLifecycle?.windowAttached();
+    })
+    .onDetach(() => {
+      this.cylLifecycle?.windowDetached();
+    })
     .onClick(() => {
       this.cylHandleTap();
     })

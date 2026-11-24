@@ -7,6 +7,7 @@
 //
 
 import UIKit
+internal import CYLDeallocBlockExecutor
 
 /**
  * [EN] Badges on any view (`UIView (CYLBadgeExtention)`, `CYLBadgeProtocol`), the default badge view, the overlay used when
@@ -384,8 +385,23 @@ extension UIView {
                                         attempt: attempt + 1)
                 return
             }
+            // [EN] The host is laid out now: the badge becomes ready (CYLDeallocBlockExecutor event `cyl.badge.didBecomeReady`).
+            // [CN] 宿主已布局：角标就绪（CYLDeallocBlockExecutor 事件 `cyl.badge.didBecomeReady`）。
+            self.cylPostBadgeEvent("cyl.badge.didBecomeReady")
             self.cylShowBadgeValueNow(value, animationTypeValue: animationTypeValue)
         }
+    }
+
+    /**
+     * [EN] Posts a badge moment through CYLDeallocBlockExecutor (`cylAddLifecycleCallback(forCustomEvent:)` on this view, on the
+     *      tab button's `UITabBarItem` through the forward, or `CYLLifecycleCenter.addCallback(forCustomEvent:)` for every badge):
+     *      `cyl.badge.didShow`, `cyl.badge.didClear`, `cyl.badge.didBecomeReady`, `cyl.badge.animationDidStart`,
+     *      `cyl.badge.animationDidStop`. `userInfo` holds `value`, `animationType` (raw value) or `finished`.
+     * [CN] 通过 CYLDeallocBlockExecutor 发出角标时机事件（可在本视图、经转发在 Tab 按钮对应的 `UITabBarItem` 上监听，或用
+     *      `CYLLifecycleCenter.addCallback(forCustomEvent:)` 监听所有角标）。
+     */
+    func cylPostBadgeEvent(_ name: String, _ userInfo: [String: Any]? = nil) {
+        cylPostLifecycleEvent(name, userInfo: userInfo)
     }
 
     private func cylPendingBadgeGeneration() -> UInt {
@@ -412,6 +428,7 @@ extension UIView {
         let animationType = CYLBadgeAnimationType(rawValue: animationTypeValue.uintValue) ?? .none
         cyl_badgeAnimationTypeValue = NSNumber(value: animationType.rawValue)
         cylShowBadge(withValue: value)
+        cylPostBadgeEvent("cyl.badge.didShow", ["value": value, "animationType": animationType.rawValue])
         if animationType != .none {
             cylBeginAnimation()
         }
@@ -493,6 +510,7 @@ extension UIView {
         cylInvalidatePendingBadgeValue()
         cyl_badge?.cylSetHidden(true)
         cylUpdateBadgeAccessibility()
+        cylPostBadgeEvent("cyl.badge.didClear")
     }
 
     @objc(cyl_isShowBadge)
@@ -985,7 +1003,11 @@ extension UIView {
         guard let layer = cyl_badge?.layer else {
             return
         }
+        let wasAnimating = !(layer.animationKeys() ?? []).isEmpty
         cylBadgeAllAnimationKeys().forEach { layer.removeAnimation(forKey: $0) }
+        if wasAnimating {
+            cylPostBadgeEvent("cyl.badge.animationDidStop", ["finished": false])
+        }
     }
 
     // MARK: Other private methods
@@ -1058,13 +1080,27 @@ extension UIView {
         let animationType = cyl_badgeAnimationType
         if let animation = cylBadgeAnimationForTypeEntryPoint(animationType, badge.bounds.size),
            let key = cylBadgeAnimationKeyForType(animationType) {
+            // [EN] A finite animation reports its end through the transaction's completion block; a repeating one ends when it is removed.
+            // [CN] 有限次动画通过 transaction 的完成回调报告结束；循环动画在被移除时结束。
+            CATransaction.begin()
+            if !cylBadgeAnimationTypeRepeats(animationType) {
+                CATransaction.setCompletionBlock { [weak self] in
+                    self?.cylPostBadgeEvent("cyl.badge.animationDidStop", ["finished": true])
+                }
+            }
             badge.layer.add(animation, forKey: key)
+            CATransaction.commit()
+            cylPostBadgeEvent("cyl.badge.animationDidStart", ["animationType": animationType.rawValue])
         }
     }
 
     @objc(cyl_removeAnimation)
     dynamic func cylRemoveAnimation() {
+        let wasAnimating = !(cyl_badge?.layer.animationKeys() ?? []).isEmpty
         cyl_badge?.layer.removeAllAnimations()
+        if wasAnimating {
+            cylPostBadgeEvent("cyl.badge.animationDidStop", ["finished": false])
+        }
     }
 
     // MARK: Setters and getters

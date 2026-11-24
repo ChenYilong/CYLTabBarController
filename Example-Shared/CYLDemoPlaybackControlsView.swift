@@ -27,6 +27,8 @@ final class CYLDemoPlaybackControlsView: UIView {
     private let speedSlider = UISlider()
     private let speedValueLabel = UILabel()
     private let loopSwitch = UISwitch()
+    private let pauseSwitch = UISwitch()
+    private let pauseCountLabel = UILabel()
 
     /**
      * [EN] Puts the controls above the rows of `tableView`, for the tab bar controller of `viewController`.
@@ -106,7 +108,27 @@ final class CYLDemoPlaybackControlsView: UIView {
         let loopRow = UIStackView(arrangedSubviews: [loopLabel, loopSwitch])
         loopRow.alignment = .center
 
-        let card = UIStackView(arrangedSubviews: [playAllButton, speedRow, loopRow])
+        // [EN] Pause while scrolling: every playing icon pauses while the user scrolls a list and resumes afterwards
+        //      (CYLAnimationEventBridge, the events cyl.animation.didPause / didResume). [CN] 滚动时暂停：用户滚动列表时所有播放中的图标暂停，滚动结束后恢复。
+        let pauseLabel = UILabel()
+        pauseLabel.text = cylDemoLocalizedString("Pause while scrolling")
+        pauseLabel.isAccessibilityElement = false
+        pauseSwitch.accessibilityLabel = cylDemoLocalizedString("Pause while scrolling")
+        pauseSwitch.addTarget(self, action: #selector(pauseChanged), for: .valueChanged)
+        // [EN] The counter (pauses / resumes since launch) shows the scroll pause working: digits only, so nothing to localize.
+        // [CN] 计数（自启动以来的暂停 / 恢复次数）显示滚动暂停在起作用：只有数字，无需本地化。
+        pauseCountLabel.font = .monospacedDigitSystemFont(ofSize: 15, weight: .regular)
+        pauseCountLabel.textColor = .secondaryLabel
+        pauseCountLabel.accessibilityLabel = cylDemoLocalizedString("Pause while scrolling")
+        pauseCountLabel.accessibilityIdentifier = "CYLDemoPauseCounter"
+        pauseCountLabel.setContentHuggingPriority(.required, for: .horizontal)
+        updatePauseCount()
+        NotificationCenter.default.addObserver(self, selector: #selector(updatePauseCount), name: CYLAnimationEventBridge.countsDidChangeNotification, object: nil)
+        let pauseRow = UIStackView(arrangedSubviews: [pauseLabel, pauseCountLabel, pauseSwitch])
+        pauseRow.spacing = 8
+        pauseRow.alignment = .center
+
+        let card = UIStackView(arrangedSubviews: [playAllButton, speedRow, loopRow, pauseRow])
         card.axis = .vertical
         card.spacing = 12
         card.isLayoutMarginsRelativeArrangement = true
@@ -142,6 +164,16 @@ final class CYLDemoPlaybackControlsView: UIView {
         speedSlider.value = (speedSlider.value / 0.05).rounded() * 0.05
         tabBarController?.tabBarItemAnimationSpeed = CGFloat(speedSlider.value)
         updateSpeedValue()
+    }
+
+    /// [EN] Shows "paused / resumed" counts. [CN] 显示「暂停 / 恢复」次数。
+    @objc private func updatePauseCount() {
+        pauseCountLabel.text = "⏸ \(CYLAnimationEventBridge.pauseCount)  ▶ \(CYLAnimationEventBridge.resumeCount)"
+        pauseCountLabel.accessibilityValue = "\(CYLAnimationEventBridge.pauseCount) / \(CYLAnimationEventBridge.resumeCount)"
+    }
+
+    @objc private func pauseChanged() {
+        CYLAnimationEventBridge.pausesAnimationsWhileUserScrolls(pauseSwitch.isOn)
     }
 
     @objc private func loopChanged() {

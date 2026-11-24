@@ -10,6 +10,7 @@
  *      行会修改 App 的 TabBar 状态；其他行提示仅 iOS 示例提供。
  */
 const cylTabPage = require('../../utils/cyl_tab_page');
+const { cylPageScrolled } = require('../../utils/cyl_scroll_pause');
 const { cylLanguage, cylMoreTable, cylSetLanguage, cylChosen, cylSystemLanguage } = require('../../utils/cyl_demo_localization');
 
 /**
@@ -449,6 +450,7 @@ Component({
      * [CN] 首页「滚动时隐藏 TabBar」行：向下滚动隐藏，向上显示。
      */
     onPageScroll(event) {
+      cylPageScrolled(this, event);
       const state = getApp().globalData.cylTabBarState;
       const top = event.scrollTop;
       const last = this.cylLastScrollTop || 0;

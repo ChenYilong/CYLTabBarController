@@ -117,7 +117,26 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
         invalidate()
     }
 
-    override fun cyl_playAnimationView() = playFrom(0f)
+    override fun cyl_playAnimationView() {
+        pausedMidPass = false
+        playFrom(0f)
+    }
+
+    private var pausedMidPass = false
+
+    /** [EN] Freezes the pass where it is (the time is kept). [CN] 在当前位置冻结这一遍播放（保留当前时刻）。 */
+    override fun cyl_pauseAnimationView() {
+        if (!playing) return
+        pausedMidPass = true
+        cancelPass()
+    }
+
+    /** [EN] Continues the frozen pass from its time. [CN] 从冻结的时刻继续播放。 */
+    override fun cyl_resumeAnimationView() {
+        if (!pausedMidPass) return
+        pausedMidPass = false
+        playFrom(playingFraction)
+    }
 
     override fun cyl_isAnimationViewPlaying(): Boolean = playing
 

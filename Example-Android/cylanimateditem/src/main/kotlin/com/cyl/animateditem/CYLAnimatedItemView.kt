@@ -1,6 +1,9 @@
 package com.cyl.animateditem
 
 import android.content.Context
+import com.chenyilong.cyldeallocblockexecutor.AnimationEvents
+import com.chenyilong.cyldeallocblockexecutor.LifecycleCenter
+import com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.drawable.GradientDrawable
@@ -382,6 +385,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     private var endWatchGeneration = 0
 
     private var playing = false
+    private var pausedByUser = false
 
     /**
      * [EN] The view's alpha while disabled (0.5 by default; 1 lets `onItemStateChanged` draw the disabled look).
@@ -712,10 +716,44 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val player = animationPlayer ?: return
         showAnimationAgain()
         playing = true
+        pausedByUser = false
         player.loops = animationLoops
         if (animationSpeed > 0f) player.animationSpeed = animationSpeed
         player.play()
         watchForAnimationEnd()
+        PlayingViews.add(this)
+        postAnimationEvent(AnimationEvents.didStart, mapOf("loops" to animationLoops))
+    }
+
+    /**
+     * [EN] Pauses the running animation on its current frame and posts `cyl.animation.didPause`. Nothing happens when no animation plays
+     *      or the engine has no pause. [CN] 把正在播放的动画暂停在当前帧，并发出 `cyl.animation.didPause`。没有动画在播放或引擎不支持暂停时无事发生。
+     */
+    fun pauseAnimation() {
+        val player = animationPlayer ?: return
+        if (!playing || pausedByUser) return
+        pausedByUser = true
+        player.pause()
+        postAnimationEvent(AnimationEvents.didPause, null)
+    }
+
+    /**
+     * [EN] Continues an animation paused by [pauseAnimation] and posts `cyl.animation.didResume`. [CN] 继续被 [pauseAnimation] 暂停的动画，并发出 `cyl.animation.didResume`。
+     */
+    fun resumeAnimation() {
+        val player = animationPlayer ?: return
+        if (!pausedByUser) return
+        pausedByUser = false
+        player.resume()
+        postAnimationEvent(AnimationEvents.didResume, null)
+    }
+
+    /**
+     * [EN] Posts a moment of this animation through CYLDeallocBlockExecutor: `LifecycleRegistry.of(view).addCustomCallback(AnimationEvents.didPause)`
+     *      for one item, or `LifecycleCenter.addCustomCallback` for every item. [CN] 通过 CYLDeallocBlockExecutor 发出本动画的时机事件。
+     */
+    private fun postAnimationEvent(name: String, userInfo: Map<String, Any?>?) {
+        LifecycleRegistry.of(this).postLifecycleEvent(name, userInfo)
     }
 
     override fun restartAnimation() {
@@ -725,11 +763,15 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     override fun stopAnimation() {
         val player = animationPlayer ?: return
+        val wasPlaying = playing
         playing = false
+        pausedByUser = false
         endWatchGeneration++
         showAnimationAgain()
         player.stop()
         player.progress = animationRestingProgress
+        PlayingViews.remove(this)
+        if (wasPlaying) postAnimationEvent(AnimationEvents.didStop, mapOf("finished" to false))
     }
 
     override fun showAnimationLastFrame() {
@@ -748,11 +790,16 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     private fun watchForAnimationEnd() {
         val generation = ++endWatchGeneration
-        if (!showsImageWhenAnimationEnds && animationEndListener == null) return
+        // [EN] Always watched now: `cyl.animation.didStop` (finished) needs the end of a play-once pass too. [CN] 现在总是检测：`cyl.animation.didStop`（finished）也需要知道只播放一次的动画何时结束。
         var started = false
         lateinit var check: Runnable
         check = Runnable {
             if (generation != endWatchGeneration || !playing) return@Runnable
+            // [EN] A paused animation is not an ended one. [CN] 暂停的动画不等于已结束的动画。
+            if (pausedByUser) {
+                postOnAnimationDelayed(check, END_WATCH_INTERVAL_MS)
+                return@Runnable
+            }
             // [EN] Looping: keep watching, a later `animationLoops = false` lets the pass end. [CN] 循环时继续检测，之后关闭循环会让这一遍结束。
             val player = animationPlayer ?: return@Runnable
             val running = !animationLoops && isPassRunning(player)
@@ -773,6 +820,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     private fun animationDidEnd() {
         playing = false
         endWatchGeneration++
+        PlayingViews.remove(this)
+        postAnimationEvent(AnimationEvents.didStop, mapOf("finished" to true))
         if (showsImageWhenAnimationEnds && animationView != null) {
             isShowingImageAfterAnimationEnd = true
             animationView?.visibility = View.INVISIBLE
@@ -1042,7 +1091,47 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     fun titleWidth(text: CharSequence?): Int = if (text.isNullOrEmpty()) 0 else ceil(titleView.paint.measureText(text.toString())).toInt()
 
+    /**
+     * [EN] The views that play now, held weakly: what `pausesAnimationsWhileUserScrolls` pauses and resumes. [CN] 正在播放的视图（弱引用）：`pausesAnimationsWhileUserScrolls` 暂停与恢复的对象。
+     */
+    private object PlayingViews {
+        private val views = java.util.WeakHashMap<CYLAnimatedItemView, Boolean>()
+        private var scrollObservers: (() -> Unit)? = null
+
+        fun add(view: CYLAnimatedItemView) { synchronized(views) { views[view] = true } }
+        fun remove(view: CYLAnimatedItemView) { synchronized(views) { views.remove(view) } }
+        private fun snapshot(): List<CYLAnimatedItemView> = synchronized(views) { views.keys.toList() }
+
+        fun pauseAll() = snapshot().forEach { it.pauseAnimation() }
+        fun resumeAll() = snapshot().forEach { it.resumeAnimation() }
+
+        fun setPausesWhileScrolling(enabled: Boolean) {
+            scrollObservers?.invoke()
+            scrollObservers = if (enabled) LifecycleCenter.whileUserScrolls(key = "cyl.animatedItem.scroll", pause = ::pauseAll, resume = ::resumeAll) else null
+        }
+
+        val pausesWhileScrolling: Boolean get() = scrollObservers != null
+    }
+
     companion object {
+        /**
+         * [EN] True: every playing animated item pauses while any observed scroll source (`LifecycleCenter`: a `RecyclerView` through
+         *      `AndroidBinding.observeScrolling`, a view controller's scroll view) is dragged or decelerating, and resumes when scrolling
+         *      ended. Default false. [CN] 为 true 时，任意被观察的滚动源（`LifecycleCenter`）被拖动或减速时，所有正在播放的动效 item 暂停，滚动结束后恢复。默认 false。
+         */
+        @JvmStatic var pausesAnimationsWhileUserScrolls: Boolean
+            get() = PlayingViews.pausesWhileScrolling
+            set(value) = PlayingViews.setPausesWhileScrolling(value)
+
+        /**
+         * [EN] Pauses every animated item that plays now (they post `cyl.animation.didPause`). For hosts that decide themselves,
+         *      such as the React Native and Flutter wrappers. [CN] 暂停当前所有正在播放的动效 item（发出 `cyl.animation.didPause`）。供自行决定的宿主使用，如 React Native 与 Flutter 包装层。
+         */
+        @JvmStatic fun pauseAllAnimations() = PlayingViews.pauseAll()
+
+        /** [EN] Resumes what [pauseAllAnimations] paused (`cyl.animation.didResume`). [CN] 恢复 [pauseAllAnimations] 暂停的动画。 */
+        @JvmStatic fun resumeAllAnimations() = PlayingViews.resumeAll()
+
         private const val ANDROID_ASSET_PREFIX = "file:///android_asset/"
         private const val END_WATCH_INTERVAL_MS = 16L
         private const val END_PROGRESS = 0.999f

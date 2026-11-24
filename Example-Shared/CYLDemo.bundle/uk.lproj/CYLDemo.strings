@@ -461,3 +461,4 @@
 "n/a on Android: an app cannot post this system event." = "n/a на Android: застосунок не може надіслати цю системну подію.";
 "Runs every automatic row, one after the other." = "Запускає всі автоматичні рядки один за одним.";
 "Tab bar %@ · page ID \"%@\"" = "Панель вкладок %@ · ID сторінки «%@»";
+"Pause while scrolling" = "Пауза під час прокручування";

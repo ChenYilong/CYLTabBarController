@@ -178,6 +178,23 @@ bump_version() {
   echo "Podspec: s.version $version → $new_version (commit this change, then tag the merged commit $new_version)"
 }
 
+# [EN] Pending: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md). The core subspec needs
+#      CYLDeallocBlockExecutor ~> 1.4, which is not on trunk yet, so `lib` lints against a local podspec that fetches
+#      the branch the Podfiles pin (--external-podspecs downloads its source). Set CYL_DEALLOC_EXECUTOR_BRANCH= (empty) to lint against trunk.
+# [CN] 待办：CYLDeallocBlockExecutor 1.4.0 发布后删除（docs/Lifecycle-Library.md）。核心子库依赖 CYLDeallocBlockExecutor ~> 1.4，
+#      trunk 上还没有，因此 `lib` 使用一个从 Podfile 所固定分支获取源码的本地 podspec。设置 CYL_DEALLOC_EXECUTOR_BRANCH=（空）
+#      则使用 trunk。
+CYL_DEALLOC_EXECUTOR_BRANCH="${CYL_DEALLOC_EXECUTOR_BRANCH-4276a6dab5a428ccc3a5f3f347eab991881fb97c}"  # a commit (or a branch), as the Podfiles pin
+lint_external_podspecs() {
+  [ -n "$CYL_DEALLOC_EXECUTOR_BRANCH" ] || return 0
+  dir="$PWD/build/pod-lint-podspecs"
+  mkdir -p "$dir"
+  curl -fsSL --proto '=https' --tlsv1.2 "https://raw.githubusercontent.com/ChenYilong/CYLDeallocBlockExecutor/$CYL_DEALLOC_EXECUTOR_BRANCH/CYLDeallocBlockExecutor.podspec" |
+    sed "s|:tag => s.version.to_s|:commit => \"$CYL_DEALLOC_EXECUTOR_BRANCH\"|" > "$dir/CYLDeallocBlockExecutor.podspec"
+  grep -q ":commit =>" "$dir/CYLDeallocBlockExecutor.podspec" || { echo "error: could not pin CYLDeallocBlockExecutor to $CYL_DEALLOC_EXECUTOR_BRANCH" >&2; exit 1; }
+  echo "--external-podspecs=$dir/CYLDeallocBlockExecutor.podspec"
+}
+
 case "$1" in
   push)      shift; pod trunk push "$COMPONENT_PODSPEC" --allow-warnings "$@"; pod trunk push "$PODSPEC" --allow-warnings "$@"; update_carthage; update_spm; update_navigation ;;
   version)   release_version; echo "$version" ;;
@@ -189,5 +206,6 @@ case "$1" in
   versions) update_carthage; update_spm; update_navigation ;;
   *)        [ "$1" = lib ] && shift
             pod lib lint "$COMPONENT_PODSPEC" --allow-warnings "$@"
-            pod lib lint "$PODSPEC" --allow-warnings --include-podspecs="$COMPONENT_PODSPEC" "$@" ;;
+            external_podspecs="$(lint_external_podspecs)"
+            pod lib lint "$PODSPEC" --allow-warnings --include-podspecs="$COMPONENT_PODSPEC" ${external_podspecs:+"$external_podspecs"} "$@" ;;
 esac

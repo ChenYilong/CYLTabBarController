@@ -6,6 +6,7 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+internal import CYLDeallocBlockExecutor
 import ObjectiveC
 import UIKit
 
@@ -191,6 +192,38 @@ open class CYLTabBarHostView: UIView {
      * [CN] 导致加载器回退到其他来源的失败原因。
      */
     @objc open var didFailManifest: ((String) -> Void)?
+
+    private static let relayNames = [
+        "cyl.animation.didStart", "cyl.animation.didPause", "cyl.animation.didResume", "cyl.animation.didStop",
+        "cyl.badge.didShow", "cyl.badge.didClear", "cyl.badge.didBecomeReady",
+        "cyl.badge.animationDidStart", "cyl.badge.animationDidStop",
+    ]
+    private var relayKeyPrefix: String { "cyl.hostview.relay.\(UInt(bitPattern: ObjectIdentifier(self).hashValue))." }
+
+    /**
+     [EN] Every animation (`cyl.animation.*`) and badge (`cyl.badge.*`) moment of any view: the event name and the posted info as a
+          JSON object string. Set by the React Native and Flutter wrappers; native code uses `CYLLifecycleCenter` directly.
+     [CN] 任意视图的所有动画（`cyl.animation.*`）与角标（`cyl.badge.*`）时机：事件名与以 JSON 对象字符串表示的附带信息。
+          由 React Native 与 Flutter 包装层设置；原生代码请直接使用 `CYLLifecycleCenter`。
+     */
+    @objc open var didPostLifecycleEvent: ((String, String) -> Void)? {
+        didSet {
+            let prefix = relayKeyPrefix
+            for name in Self.relayNames { CYLLifecycleCenter.cancelCallback(key: prefix + name) }
+            guard didPostLifecycleEvent != nil else { return }
+            for name in Self.relayNames {
+                CYLLifecycleCenter.addCallback(forCustomEvent: name, key: prefix + name) { [weak self] _, _, info in
+                    var json = "{}"
+                    if let userInfo = info.userInfo {
+                        let printable = userInfo.mapValues { "\($0)" }
+                        if let data = try? JSONSerialization.data(withJSONObject: printable),
+                           let text = String(data: data, encoding: .utf8) { json = text }
+                    }
+                    self?.didPostLifecycleEvent?(name, json)
+                }
+            }
+        }
+    }
 
     /**
      * [EN] Builds the tab bar again from the effective configuration (the manifest's first, the app's over it).
@@ -400,6 +433,19 @@ open class CYLTabBarHostView: UIView {
     }
 
     /**
+     [EN] True pauses every playing tab icon animation, false resumes them (`cyl.animation.didPause` / `didResume`). A React Native
+          or Flutter list sets it from its own scroll events, as those do not reach the native registry.
+     [CN] 为 true 时暂停所有正在播放的 Tab 图标动画，为 false 时恢复。React Native 或 Flutter 的列表据自己的滚动事件设置它，
+          因为这些事件到不了原生注册表。
+     */
+    @objc open var animationsPaused = false {
+        didSet {
+            guard animationsPaused != oldValue else { return }
+            CYLAnimationEventBridge.setAnimationsPaused(animationsPaused)
+        }
+    }
+
+    /**
      * [EN] The library's language (`CYLSetLocalizationLanguage`); the controller is built again. [CN] 库的语言
      *      （`CYLSetLocalizationLanguage`）；重新创建 controller。
      */
@@ -483,6 +529,8 @@ open class CYLTabBarHostView: UIView {
     }
 
     deinit {
+        let prefix = relayKeyPrefix
+        for name in Self.relayNames { CYLLifecycleCenter.cancelCallback(key: prefix + name) }
         removeTabBarController()
     }
 

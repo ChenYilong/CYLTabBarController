@@ -60,6 +60,9 @@ static id CYLRNJSONObject(NSString *JSON);
     _hostView.loginStateDidChange = ^(BOOL loggedIn) {
       [weakSelf emitLoginStateChange:loggedIn];
     };
+    _hostView.didPostLifecycleEvent = ^(NSString *name, NSString *userInfo) {
+      [weakSelf emitLifecycleEventNamed:name userInfo:userInfo];
+    };
     _hostView.didApplyManifest = ^(NSString *source) {
       [weakSelf emitManifestApplyWithSource:source];
     };
@@ -113,6 +116,7 @@ static id CYLRNJSONObject(NSString *JSON);
     [_hostView playAllAnimations];
   }
   _playAllRequest = newViewProps.playAllRequest;
+  _hostView.animationsPaused = newViewProps.animationsPaused;
   // [EN] After the selection: logging out may move it away from a tab that needs login. [CN] 在选中之后：退出登录可能使选中离开需要登录的 Tab。
   // [EN] -1: not set, the host uses the cached state. [CN] -1：未设置，宿主使用缓存的状态。
   if (newViewProps.loginState >= 0) {
@@ -267,6 +271,16 @@ static id CYLRNJSONObject(NSString *JSON)
   }
   std::static_pointer_cast<CyltabbarViewEventEmitter const>(_eventEmitter)
       ->onTabBarLayout(CyltabbarViewEventEmitter::OnTabBarLayout{.height = height});
+}
+
+- (void)emitLifecycleEventNamed:(NSString *)name userInfo:(NSString *)userInfo
+{
+  if (!_eventEmitter) {
+    return;
+  }
+  std::static_pointer_cast<CyltabbarViewEventEmitter const>(_eventEmitter)
+      ->onLifecycleEvent(CyltabbarViewEventEmitter::OnLifecycleEvent{
+          .name = std::string(name.UTF8String), .userInfo = std::string(userInfo.UTF8String)});
 }
 
 - (void)emitManifestApplyWithSource:(NSString *)source

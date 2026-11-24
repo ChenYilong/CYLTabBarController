@@ -40,6 +40,9 @@ android {
 
 dependencies {
     implementation(libs.androidx.appcompat)
+    // [EN] The animated item posts `cyl.animation.didStart` / `didPause` / `didResume` / `didStop` through CYLDeallocBlockExecutor (docs/Lifecycle-Library.md).
+    // [CN] 动效 item 通过 CYLDeallocBlockExecutor 发出 `cyl.animation.didStart` / `didPause` / `didResume` / `didStop`（docs/Lifecycle-Library.md）。
+    implementation(libs.cyldeallocblockexecutor)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)

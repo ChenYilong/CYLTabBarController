@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "cyldeallocblockexecutor",
+    "type": "har",
+    "deviceTypes": [
+      "phone",
+      "tablet"
+    ]
+  }
+}

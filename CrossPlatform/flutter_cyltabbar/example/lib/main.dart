@@ -508,6 +508,8 @@ class _ExamplePageState extends State<CYLExamplePage> {
   // example's first tab imitates its home table, so they are on the other tabs. 播放控件：一个实时生效的策略，在其他 Tab 上
   // （Objective-C 示例的第一个 Tab 模仿其首页表格）。
   int _playAllRequest = 0;
+  // True while the user scrolls the demo list: the tab icon animations pause. 用户滚动示例列表时为 true：Tab 图标动画暂停。
+  bool _animationsPaused = false;
   double _animationSpeed = 1;
   bool _animationLoops = false;
   // CYLSwitchTitlePositionAdjustment(): the title row cycles the vertical offset of every title through 0, -4 and 4 at
@@ -843,6 +845,7 @@ class _ExamplePageState extends State<CYLExamplePage> {
                       ),
                     )
                   : CYLDemoList(
+                      onScrollingChanged: (scrolling) => setState(() => _animationsPaused = scrolling),
                       colors: CYLDemoColors(dark),
                       tint: skin.tint != null
                           ? hexColor(skin.tint!)
@@ -945,6 +948,7 @@ class _ExamplePageState extends State<CYLExamplePage> {
         playbackSpeed: _animationSpeed,
         playbackLoops: _animationLoops,
         playAllRequest: _playAllRequest,
+        animationsPaused: _animationsPaused,
         titlePositionAdjustment: _titleOffset == null ? null : Offset(0, _titleOffset!),
         onMemoryWarning: (report) => showDialog<void>(
           context: context,

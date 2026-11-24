@@ -18,6 +18,25 @@
 const { cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemRestingProgress } = require('./cyl_animated_item_model')
 const { cylGIFImageInfo } = require('./cyl_gif_image')
 const { CYLAnimatedItemCountdown, CYL_COUNTDOWN_TICK_INTERVAL } = require('./cyl_animated_item_countdown')
+const { LifecycleController } = require('../cyl-dealloc-block-executor/index')
+const {
+  cylAnimationDidStart, cylAnimationDidStop, cylForgetAnimation, cylPauseAnimation, cylResumeAnimation,
+} = require('./cyl_animation_events')
+
+/**
+ * [EN] What `detached` releases: the countdown timer, the app-show and theme listeners and the GIF timers. It runs as the keyed
+ *      teardown block `cyl.animatedItem.teardown` of CYLDeallocBlockExecutor (see `lifetimes`).
+ * [CN] `detached` 释放的内容：倒计时定时器、App 显示与主题监听、GIF 定时器。它作为 CYLDeallocBlockExecutor 中带 key 的销毁块
+ *      `cyl.animatedItem.teardown` 运行（见 `lifetimes`）。
+ */
+function cylTeardown(item) {
+  cylForgetAnimation(item)
+  item.cyl_stopCountdownTimer()
+  if (typeof wx !== 'undefined' && typeof wx.offAppShow === 'function' && item.cylAppShowListener) wx.offAppShow(item.cylAppShowListener)
+  clearTimeout(item.cylGifTimer)
+  clearTimeout(item.cylGIFImageTimer)
+  if (typeof wx !== 'undefined' && typeof wx.offThemeChange === 'function' && item.cylThemeListener) wx.offThemeChange(item.cylThemeListener)
+}
 
 /**
  * [EN] The id of the engine node (only one is rendered), reached by `selectComponent` for the playback methods.
@@ -265,6 +284,13 @@ Component({
 
   lifetimes: {
     attached() {
+      this.cylLifecycle = new LifecycleController(this)
+      this.cylLifecycle.registry.addDeallocCallback(cylTeardown, { key: 'cyl.animatedItem.teardown' })
+      this.cylLifecycle.onLoad()
+      // [EN] The item's own screen events (`didEnterScreen` / `didLeaveScreen`) from a `wx.createIntersectionObserver`; stopped when it detaches.
+      // [CN] 条目自己的屏幕事件（`didEnterScreen` / `didLeaveScreen`）来自 `wx.createIntersectionObserver`；detached 时停止。
+      const stopObservingScreen = this.cylLifecycle.observeScreen('.cyl-animated-item')
+      this.cylLifecycle.registry.addDeallocCallback(() => stopObservingScreen(), { key: 'cyl.animatedItem.screenObserver' })
       // [EN] The system theme, kept current while attached. [CN] 系统主题，挂载期间保持最新。
       let theme = 'light'
       try {
@@ -284,11 +310,9 @@ Component({
       this.cyl_update()
     },
     detached() {
-      this.cyl_stopCountdownTimer()
-      if (typeof wx !== 'undefined' && typeof wx.offAppShow === 'function' && this.cylAppShowListener) wx.offAppShow(this.cylAppShowListener)
-      clearTimeout(this.cylGifTimer)
-      clearTimeout(this.cylGIFImageTimer)
-      if (typeof wx !== 'undefined' && typeof wx.offThemeChange === 'function' && this.cylThemeListener) wx.offThemeChange(this.cylThemeListener)
+      // [EN] Runs the teardown block; a component that never attached has no controller and is released directly. [CN] 运行销毁块；从未 attached 的组件没有控制器，直接释放。
+      if (this.cylLifecycle) this.cylLifecycle.onUnload()
+      else cylTeardown(this)
     },
   },
 
@@ -478,10 +502,12 @@ Component({
       const m = this.data.m
       if (m.gifImage && this.cylGIFImageInfo) {
         this.cyl_playGIFImage()
+        cylAnimationDidStart(this, { type: 'gifImage', loop: !!this.data.loop })
         return
       }
       if (m.animationType === 'gif' && m.gifPath) {
         this.cyl_playGif()
+        cylAnimationDidStart(this, { type: 'gif', loop: !!this.data.loop })
         return
       }
       if (!m.usesEngine) return
@@ -491,7 +517,23 @@ Component({
       }
       this.cylPendingPlay = false
       const engine = this.selectComponent(CYL_ENGINE_ID)
-      if (engine && typeof engine.cyl_playFromStart === 'function') engine.cyl_playFromStart()
+      if (engine && typeof engine.cyl_playFromStart === 'function') {
+        engine.cyl_playFromStart()
+        cylAnimationDidStart(this, { type: m.animationType, loop: !!this.data.loop })
+      }
+    },
+
+    /**
+     * [EN] Pauses the playing animation on its current frame (`cyl.animation.didPause`); the engine's `cyl_pause`. A GIF has no pause and keeps
+     *      playing. [CN] 把正在播放的动画暂停在当前帧（`cyl.animation.didPause`）；使用引擎的 `cyl_pause`。GIF 没有暂停，会继续播放。
+     */
+    pauseAnimation() {
+      return cylPauseAnimation(this)
+    },
+
+    /** [EN] Continues an animation paused by `pauseAnimation()` (`cyl.animation.didResume`). [CN] 继续被 `pauseAnimation()` 暂停的动画（`cyl.animation.didResume`）。 */
+    resumeAnimation() {
+      return cylResumeAnimation(this)
     },
 
     /** [EN] The same as `playAnimation()` (iOS `restartAnimation`). [CN] 与 `playAnimation()` 相同（iOS 的 `restartAnimation`）。 */
@@ -504,6 +546,7 @@ Component({
       this.cyl_showAnimationAgain()
       this.cyl_halt()
       this.cyl_rest()
+      cylAnimationDidStop(this, false)
     },
 
     /**
@@ -585,6 +628,7 @@ Component({
      * [CN] 只播放一次的一遍结束：开启 `showsImageWhenAnimationEnds` 时用静态图片替换动画。
      */
     cyl_animationDidEnd() {
+      cylAnimationDidStop(this, true)
       if (this.data.loop || !this.data.showsImageWhenAnimationEnds || this.data.animationEnded) return
       this.setData({ animationEnded: true })
       this.cyl_update()

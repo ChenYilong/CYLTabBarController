@@ -6,6 +6,8 @@
 //
 
 import UIKit
+// [EN] Internal: CYLTabBarController's public interface does not expose the library. [CN] internal：公开接口不暴露该库。
+internal import CYLDeallocBlockExecutor
 
 /**
  FIX: issue #91
@@ -106,17 +108,32 @@ extension CYLTabBarController {
             return
         }
         hooks.cylRunPendingReloadBadgesBlocksIfReady()
-        let block = hooks.cylViewDidLayoutSubviewsBlock()
-        guard hooks.cylShouldInvokeOnceViewDidLayoutSubViewsBlock() else {
-            block?(self)
-            return
+        cylRegisterLayoutBlockCallbackIfNeeded(invokeOnce: hooks.cylShouldInvokeOnceViewDidLayoutSubViewsBlock())
+        // [EN] The `.end` blocks of `-viewDidLayoutSubviews` (the layout block, keyed, and any the app added) run here, at the
+        //      end of the core's layout. [CN] `-viewDidLayoutSubviews` 的 `.end` block（带 key 的布局 block 与 App 添加的 block）在此执行。
+        cylInvokeLifecycleCallbacks(for: .viewDidLayoutSubviews, timing: .end)
+    }
+
+    /// [EN] The key of the layout block in CYLDeallocBlockExecutor; `cyl.core.` keys belong to the core.
+    /// [CN] 布局 block 在 CYLDeallocBlockExecutor 中的 key；`cyl.core.` 开头的 key 属于核心。
+    static let cylLayoutBlockKey = "cyl.core.layoutBlock"
+
+    /**
+     [EN] Registers the layout block with CYLDeallocBlockExecutor once, and again when the "once" mode changes (the new
+          registration starts unfired, as the re-arm did). The block is read when it runs, so setting
+          `viewDidLayoutSubviewsBlock` needs no new registration. The `.end` point is dispatched by the core: the class
+          overrides `-viewDidLayoutSubviews`.
+     [CN] 向 CYLDeallocBlockExecutor 注册一次布局 block，“只执行一次”模式变化时重新注册（新注册未执行过，与重新启用相同）。block 在执行时读取，
+          因此设置 `viewDidLayoutSubviewsBlock` 无需重新注册。`.end` 时机由核心派发：本类重写了 `-viewDidLayoutSubviews`。
+     */
+    func cylRegisterLayoutBlockCallbackIfNeeded(invokeOnce: Bool) {
+        guard cylLayoutBlockRegisteredInvokeOnce != invokeOnce else { return }
+        cylLayoutBlockRegisteredInvokeOnce = invokeOnce
+        cylSetManualLifecycleDispatch(true, for: [.viewDidLayoutSubviews], timings: [.end])
+        cylAddLifecycleCallback(for: .viewDidLayoutSubviews, timing: .end, invokeOnce: invokeOnce,
+                                 key: Self.cylLayoutBlockKey) { owner, _, _ in
+            owner.cylLayoutHooks.cylViewDidLayoutSubviewsBlock()?(owner)
         }
-        // [EN] Once in the controller's life (`-cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce` clears the mark).
-        // [CN] 在控制器生命周期内只执行一次（`-cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce` 会清除标记）。
-        let key = CYLUtilsKeys.key("viewDidLayoutSubviews")
-        guard objc_getAssociatedObject(self, key) == nil else { return }
-        block?(self)
-        objc_setAssociatedObject(self, key, "shouldInvokeOnceViewDidLayoutSubViewsBlock", .OBJC_ASSOCIATION_RETAIN)
     }
 
     /**

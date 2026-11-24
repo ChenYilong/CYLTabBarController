@@ -14,6 +14,8 @@
 const { cylReadConfiguration } = require('./cyl_configuration');
 const { cylBadgeAnimationClass } = require('./cyl_debug');
 const { cylTabBarItemStyle, cylTabBarItemStyleForStyleType, cylGlassLensStyle } = require('./cyl_tab_bar_item_style');
+// Pending: replace the vendored copy with the npm package after the library is published (owner's OK): see ../cyl-dealloc-block-executor/VENDORED.md.
+const { LifecycleController, BadgeEvents } = require('../cyl-dealloc-block-executor/index');
 
 /**
  * [EN] Heights in px from the stylesheets: the bar (index.wxss `.cyl-tab`, Liquid Glass `.cyl-style-liquidGlass .cyl-tab`),
@@ -376,22 +378,28 @@ Component({
       this.cylCovers = {};
       this.cylSystemTheme = cylSystemTheme();
       this.cylRequestedTheme = '';
+      // [EN] CYLDeallocBlockExecutor: each resource registers its own cleanup, keyed, where it is created; `detached` runs them.
+      // [CN] CYLDeallocBlockExecutor：每个资源在创建处注册各自带 key 的清理；`detached` 时运行。
+      this.cylLifecycle = new LifecycleController(this);
+      this.cylLifecycle.onLoad();
       this.cylThemeListener = (result) => {
         this.cylSystemTheme = result.theme === 'dark' ? 'dark' : 'light';
         this.cyl_render();
       };
       if (typeof wx.onThemeChange === 'function') {
         wx.onThemeChange(this.cylThemeListener);
+        this.cylLifecycle.registry.addDeallocCallback((bar) => {
+          if (typeof wx.offThemeChange === 'function') {
+            wx.offThemeChange(bar.cylThemeListener);
+          }
+        }, { key: 'cyl.core.themeListener' });
       }
       cylLiveBars.add(this);
+      this.cylLifecycle.registry.addDeallocCallback((bar) => cylLiveBars.delete(bar), { key: 'cyl.core.liveBar' });
       this.cyl_render();
     },
     detached() {
-      cylLiveBars.delete(this);
-      if (typeof wx.offThemeChange === 'function') {
-        wx.offThemeChange(this.cylThemeListener);
-      }
-      clearTimeout(this.cylAnimationTimer);
+      this.cylLifecycle.onUnload();
     },
   },
 
@@ -830,6 +838,11 @@ Component({
         this.setData({ cylAnimatingIdentifier: key, cylAnimatingName: name, cylFireworks: fireworks });
         this.cylAnimationTimer = setTimeout(() => this.setData({ cylAnimatingIdentifier: '', cylFireworks: null }),
           model.animationDuration + (fireworks ? 900 : 100));
+        // [EN] The timer is a resource of its own: cleared when the bar detaches (the keyed callback is replaced per timer).
+        // [CN] 定时器是独立的资源：TabBar detached 时清除（每个定时器替换同 key 的回调）。
+        if (this.cylLifecycle && !this.cylLifecycle.isDetached) {
+          this.cylLifecycle.registry.addDeallocCallback((bar) => clearTimeout(bar.cylAnimationTimer), { key: 'cyl.core.animationTimer' });
+        }
       });
     },
 
@@ -963,6 +976,14 @@ Component({
         this.cylBadgeAttributes[identifier] = { ...attributes };
       }
       this.cyl_render();
+      // [EN] The badge moment through CYLDeallocBlockExecutor: `registry.addCustomCallback(BadgeEvents.didShow, …)` on the bar, or
+      //      `LifecycleCenter.addCustomCallback` for every bar. A mini program badge is drawn by `setData`, so there is no separate `didBecomeReady`.
+      // [CN] 通过 CYLDeallocBlockExecutor 发出角标时机：在 TabBar 的 `registry` 或用 `LifecycleCenter` 监听。小程序角标由 `setData` 绘制，因此没有单独的 `didBecomeReady`。
+      this.cylPostBadgeEvent(BadgeEvents.didShow, { identifier, value });
+    },
+
+    cylPostBadgeEvent(name, userInfo) {
+      if (this.cylLifecycle && !this.cylLifecycle.isDetached) this.cylLifecycle.registry.postLifecycleEvent(name, userInfo);
     },
 
     /**
@@ -1004,9 +1025,11 @@ Component({
      * [CN] 移除该标识的 Tab 的角标。
      */
     cyl_removeBadge(identifier) {
+      const had = this.cylBadges[identifier] !== undefined && this.cylBadges[identifier] !== null;
       delete this.cylBadges[identifier];
       delete this.cylBadgeAttributes[identifier];
       this.cyl_render();
+      if (had) this.cylPostBadgeEvent(BadgeEvents.didClear, { identifier });
     },
 
     /**

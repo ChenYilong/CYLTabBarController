@@ -60,6 +60,8 @@ appears in the task). Instruction files (this file, `instructions.md`, `docs/ins
 - Fix bugs in the core, never only in the example: record the bug, screenshot it, fix the component (`docs/Example-Layer-Fixes.md` only with the owner's approval).
 - Never remove or change a public API; no warnings; `CYL` / `cyl_` prefixes; one documentation block format for public API comments; bilingual `[EN]` / `[CN]` comments.
 - Every published package ships the root `LICENSE` (`scripts/check-license-notices.py`). Swift migration of the core layer: `docs/Swift-Migration.md`.
+- Naming after SonarCloud (added 2026-11-22): in Swift, `CYL` on types, no prefix on members of our types, `cylFoo` (+ `@objc(cyl_foo)`) on system-type extensions; Objective-C selectors keep `cyl_`. Skill `cyl-naming`.
+- Swift protocols hold requirements only (no bodies, no stored properties); a new member of a released `@objc` protocol is `@objc optional`; insertion anchors are unique and include the declaration keyword; run `python3 scripts/check-swift-protocol-bodies.py CYLTabBarController` before pushing Swift written without a compiler.
 - Full text: [docs/instructions/code.md](docs/instructions/code.md).
 
 ## Accessibility and localization (tag: `accessibility-localization`)

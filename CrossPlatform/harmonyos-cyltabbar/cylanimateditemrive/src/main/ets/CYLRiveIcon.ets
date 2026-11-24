@@ -2,6 +2,7 @@ import { Fit, Loop, RendererType, RiveAnimationView, SMINumber, ViewModelInstanc
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { common } from '@kit.AbilityKit';
 import { CYLAnimatedItemEngines } from 'cylanimateditem';
+import { LifecycleController } from 'cyldeallocblockexecutor';
 import { CYLRiveLoopPolicy } from './CYLRiveLoopPolicy';
 
 /*
@@ -245,7 +246,12 @@ export struct CYLRiveIcon {
   /** [EN] Frames `cylPlay` has waited for @ohos/rive to build the file. [CN] `cylPlay` 等待 @ohos/rive 建好文件的帧数。 */
   private fileWaits: number = 0;
 
+  private cylLifecycle: LifecycleController<CYLRiveIcon> | undefined = undefined;
+
   aboutToAppear(): void {
+    this.cylLifecycle = new LifecycleController<CYLRiveIcon>(this);
+    this.cylLifecycle.registry.addDeallocCallback<CYLRiveIcon>((owner: CYLRiveIcon) => owner.cylTeardown(), { key: 'cyl.rive.teardown' });
+    this.cylLifecycle.aboutToAppear();
     this.registerReplay(() => this.cylReplay());
     try {
       cylEnsureRiveInitialized();
@@ -257,6 +263,11 @@ export struct CYLRiveIcon {
   }
 
   aboutToDisappear(): void {
+    this.cylLifecycle?.aboutToDisappear();
+  }
+
+  // [EN] The teardown block (CYLDeallocBlockExecutor), run by `aboutToDisappear`. [CN] 销毁块（CYLDeallocBlockExecutor），由 `aboutToDisappear` 运行。
+  private cylTeardown(): void {
     this.cylCancelDeactivate();
     this.cylCancelLoop();
     this.cylCancelEndWatch();

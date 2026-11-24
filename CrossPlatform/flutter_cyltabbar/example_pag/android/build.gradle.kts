@@ -2,6 +2,8 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // [EN] CYLDeallocBlockExecutor (com.github.ChenYilong) is only on JitPack: a dependency of the library sources. [CN] CYLDeallocBlockExecutor（com.github.ChenYilong）只在 JitPack 上：库源码的依赖。
+        maven("https://jitpack.io") { content { includeGroup("com.github.ChenYilong"); includeGroup("com.github.ChenYilong.CYLDeallocBlockExecutor") } }
     }
 }
 

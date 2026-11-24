@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### New dependency: CYLDeallocBlockExecutor / 新依赖：CYLDeallocBlockExecutor
+
+- **[EN]** The iOS core depends on [CYLDeallocBlockExecutor](https://github.com/ChenYilong/CYLDeallocBlockExecutor) 1.4 (CocoaPods Core subspec, Swift Package Manager, and the Xcode framework target that builds the Carthage XCFramework, linked statically). The one-time layout block (`viewDidLayoutSubviewsBlock`, `-setViewDidLayoutSubViewsBlockInvokeOnce:block:`, `-cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce`) is kept by it under the key `cyl.core.layoutBlock`; its behavior and selectors are unchanged. The first CYLTabBarController that lays out installs the library's UIViewController lifecycle hooks (once per app). Details: docs/Lifecycle-Library.md.
+- **[CN]** iOS 核心依赖 [CYLDeallocBlockExecutor](https://github.com/ChenYilong/CYLDeallocBlockExecutor) 1.4（CocoaPods Core 子库、Swift Package Manager，以及构建 Carthage XCFramework 的 Xcode framework target，静态链接）。只执行一次的布局 block（`viewDidLayoutSubviewsBlock`、`-setViewDidLayoutSubViewsBlockInvokeOnce:block:`、`-cyl_rearmViewDidLayoutSubviewsBlockInvokeOnce`）由它以 key `cyl.core.layoutBlock` 保存；行为与 selector 不变。第一个完成布局的 CYLTabBarController 会安装该库的 UIViewController 生命周期 hook（每个 App 一次）。详见 docs/Lifecycle-Library.md。
+- **TODO:** 1.4.0 is not published yet; until then the Podfiles, `Package.swift` and the Xcode project pin the commit `b768b47` of the branch `feat/lifecycle-callbacks`. / 1.4.0 尚未发布；发布前各 Podfile、`Package.swift` 与 Xcode 工程指定分支 `feat/lifecycle-callbacks`。
+
 ### Deprecated: Swift names renamed to lowerCamelCase / Swift 名称改为 lowerCamelCase
 
 - **[EN]** About 500 public Swift names (functions and properties of the `cyl_` extensions, the `CYL…` global functions, the `CYL…` configuration keys and notification names) have a lowerCamelCase replacement (`cyl_isTabButton()` to `cylIsTabButton()`, `CYLScreenWidth()` to `cylScreenWidth()`, `CYLTabBarItemTitle` to `cylTabBarItemTitle`). Every old Swift name still compiles: it is a deprecated forward (`@available(*, deprecated, renamed:)`, Xcode offers the fix-it) in the `Deprecated/` folders of each subspec, and they are removed at the next major version. Objective-C is not affected: every selector and `@_cdecl` name is unchanged. Names that apps override or implement (open members, the requirements of public protocols) keep their names. List and rule: `docs/Swift-Coding-Style.md`, "Sonar naming rename".

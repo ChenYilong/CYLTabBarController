@@ -21,6 +21,7 @@ TODO: please install following docs 开发者工具 Skills
 | `cyl-tab-animation` | Lottie, PAG, Rive or GIF tab icons; suggest running the matching demo first |
 | `cyl-theme` | Skins, in-place tab updates |
 | `cyl-api-map` | Finding the API and document for a feature |
+| `cyl-naming` | Naming new code or renaming a public name: `CYL` types, `cylFoo` on system-type extensions, SonarCloud S100 / S115 |
 | `cyl-docs` | Adding a feature, editing `README.md` or `docs/` |
 | `cyl-verify` | Building, testing, running the simulator, reading common failures |
 | `cyl-task-workflow` | Starting any task: other sessions, the TODO header with the branch, the task document and its score; restarting a hung emulator |

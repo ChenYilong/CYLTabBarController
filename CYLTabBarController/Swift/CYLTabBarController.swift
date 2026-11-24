@@ -145,6 +145,9 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     /// [EN] Backing flag of `automaticallyAdjustsImageOnlyTabs`, negated so that the default (false) means true (issues #257, #522). [CN] `automaticallyAdjustsImageOnlyTabs` 的存储标记，取反存储。
     @objc(cyl_imageOnlyTabsAdjustmentDisabled) var imageOnlyTabsAdjustmentDisabled = false
     private var invokeOnceViewDidLayoutSubViewsBlockStorage = false
+    /// [EN] The "once" mode the layout block was registered with in CYLDeallocBlockExecutor; nil before the first layout.
+    /// [CN] 布局 block 在 CYLDeallocBlockExecutor 中注册时的“只执行一次”模式；首次布局前为 nil。
+    var cylLayoutBlockRegisteredInvokeOnce: Bool?
     /// [EN] Getter `shouldInvokeOnce…`, setter `setInvokeOnce…:` (the selectors the Objective-C property had). [CN] getter 为 `shouldInvokeOnce…`、setter 为 `setInvokeOnce…:`（与原 Objective-C 属性的 selector 相同）。
     @objc(shouldInvokeOnceViewDidLayoutSubViewsBlock) var invokeOnceViewDidLayoutSubViewsBlock: Bool {
         @objc(shouldInvokeOnceViewDidLayoutSubViewsBlock) get { invokeOnceViewDidLayoutSubViewsBlockStorage }
@@ -370,23 +373,27 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     }
 
     open override func viewWillAppear(_ animated: Bool) {
+        // [EN] The core's work is the keyed `.afterSuper` block `cyl.core.viewWillAppear` (CYLDeallocBlockExecutor), fired inside `super`. [CN] 核心的工作是带 key 的 `.afterSuper` block `cyl.core.viewWillAppear`（CYLDeallocBlockExecutor），在 `super` 内触发。
+        cylRegisterViewWillAppearCallback()
         super.viewWillAppear(animated)
-        cylViewWillAppear(animated)
     }
 
     open override func viewDidAppear(_ animated: Bool) {
+        // [EN] The core's work is the keyed `.afterSuper` block `cyl.core.viewDidAppear` (CYLDeallocBlockExecutor), fired inside `super`. [CN] 核心的工作是带 key 的 `.afterSuper` block `cyl.core.viewDidAppear`（CYLDeallocBlockExecutor），在 `super` 内触发。
+        cylRegisterViewDidAppearCallback()
         super.viewDidAppear(animated)
-        cylViewDidAppear(animated)
     }
 
     open override func viewWillDisappear(_ animated: Bool) {
+        // [EN] The core's work is the keyed `.afterSuper` block `cyl.core.viewWillDisappear` (CYLDeallocBlockExecutor), fired inside `super`. [CN] 核心的工作是带 key 的 `.afterSuper` block `cyl.core.viewWillDisappear`（CYLDeallocBlockExecutor），在 `super` 内触发。
+        cylRegisterViewWillDisappearCallback()
         super.viewWillDisappear(animated)
-        cylViewWillDisappear(animated)
     }
 
     open override func viewDidDisappear(_ animated: Bool) {
+        // [EN] The core's work is the keyed `.afterSuper` block `cyl.core.viewDidDisappear` (CYLDeallocBlockExecutor), fired inside `super`. [CN] 核心的工作是带 key 的 `.afterSuper` block `cyl.core.viewDidDisappear`（CYLDeallocBlockExecutor），在 `super` 内触发。
+        cylRegisterViewDidDisappearCallback()
         super.viewDidDisappear(animated)
-        cylViewDidDisappear(animated)
     }
 
     open override func viewDidLayoutSubviews() {
@@ -400,10 +407,12 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     }
 
     open override func didReceiveMemoryWarning() {
+        // [EN] The unloading is the keyed `.afterSuper` block `cyl.core.memoryWarning` of CYLDeallocBlockExecutor, fired by the
+        //      library's hook inside `super`: a real warning and `cylSimulateMemoryWarning` (which calls this method) both run it.
+        // [CN] 卸载逻辑是 CYLDeallocBlockExecutor 中带 key 的 `.afterSuper` block `cyl.core.memoryWarning`，由库的 hook 在 `super` 内触发：
+        //      真实的内存警告与 `cylSimulateMemoryWarning`（调用本方法）都会执行它。
+        cylRegisterMemoryWarningCallback()
         super.didReceiveMemoryWarning()
-        if unloadsUnselectedViewsOnMemoryWarning {
-            unloadViewsOfUnselectedViewControllers()
-        }
     }
 
     open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?,

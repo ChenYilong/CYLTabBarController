@@ -634,6 +634,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         imageView.animationDuration = animated.duration
         imageView.animationRepeatCount = animationLoops ? 0 : 1
         imageView.startAnimating()
+        postAnimationEvent("cyl.animation.didStart")
         return true
     }
 
@@ -643,11 +644,18 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     @objc(stopAnimatedImage)
     open func stopAnimatedImage() {
         guard imageView.isAnimating || imageView.animationImages != nil else { return }
+        let wasAnimating = imageView.isAnimating || pausedAnimatedImage
         imageView.stopAnimating()
         imageView.animationImages = nil
+        pausedAnimatedImage = false
+        pausedByScroll = false
         updateIcon()
+        if wasAnimating { postAnimationEvent("cyl.animation.didStop") }
     }
     private var playing = false
+    private var pausedByScroll = false
+    private var pausedAnimatedImage = false
+    private var speedBeforePause: CGFloat = 1
     /// [EN] The icon tint applied last (`applyIconTintColor(_:)`), given again to a new animation view. [CN] 最近应用的图标着色，再次交给新的动画视图。
     private var lastIconTintColor: UIColor?
 
@@ -669,7 +677,20 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         NotificationCenter.default.removeObserver(self)
     }
 
+    /**
+     [EN] Asks CYLTabBarController's event bridge (when that module is linked) to install itself, once, so an item used on its
+          own (a stack view, a table placeholder, React Native, Flutter) also posts `cyl.animation.*` as lifecycle events and can
+          be paused. Found by name: this pod never depends on CYLTabBarController; without it nothing happens.
+     [CN] 请求 CYLTabBarController 的事件桥接（已链接该模块时）安装自己，只执行一次，使单独使用的控件（stack view、表格占位、
+          React Native、Flutter）同样把 `cyl.animation.*` 作为生命周期事件发出并可被暂停。按名称查找：本 pod 从不依赖
+          CYLTabBarController；没有它时什么都不发生。
+     */
+    private static let installEventBridge: Void = {
+        _ = (NSClassFromString("CYLAnimationEventBridgeInstaller") as AnyObject?)?.perform(NSSelectorFromString("install"))
+    }()
+
     private func animatedItemSetUp() {
+        _ = Self.installEventBridge
         imageView.contentMode = .scaleAspectFit
         imageView.isAccessibilityElement = false
         imageView.accessibilityElementsHidden = true
@@ -1036,8 +1057,55 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         applyPlayerSettings()
         player.play()
         startLoopTimerIfNeeded()
+        postAnimationEvent("cyl.animation.didStart")
         #else
         playAnimatedImage()
+        #endif
+    }
+
+    /**
+     [EN] Pauses a playing animation where it is (speed 0, loop timer off) and posts `cyl.animation.didPause`; does nothing
+          when nothing plays or it is already paused. Used while the user scrolls (docs/Lifecycle-Library.md).
+     [CN] 在当前位置暂停正在播放的动画（速度 0，关闭循环定时器）并发出 `cyl.animation.didPause`；未播放或已暂停时不做任何事。
+          用户滚动期间使用（docs/Lifecycle-Library.md）。
+     */
+    open func pauseAnimation() {
+        // [EN] A GIF icon (animated image): the frames stop and the icon shows its still frame; resume plays them again.
+        // [CN] GIF 图标（动图）：帧动画停止并显示静止帧；恢复时重新播放。
+        if imageView.isAnimating, !pausedByScroll {
+            pausedByScroll = true
+            pausedAnimatedImage = true
+            imageView.stopAnimating()
+            postAnimationEvent("cyl.animation.didPause")
+            return
+        }
+        #if CYL_ANIMATION_ENGINE_AVAILABLE
+        guard playing, !pausedByScroll, let player = animationPlayer as? NSObject else { return }
+        pausedByScroll = true
+        // [EN] `animationSpeed` is an optional protocol requirement: read and set it by key. [CN] `animationSpeed` 是可选协议要求：按 key 读取与设置。
+        speedBeforePause = player.responds(to: NSSelectorFromString("animationSpeed"))
+            ? ((player.value(forKey: "animationSpeed") as? CGFloat) ?? animationSpeed) : animationSpeed
+        setPlayerValue(CGFloat(0), for: "animationSpeed")
+        stopLoopTimer()
+        postAnimationEvent("cyl.animation.didPause")
+        #endif
+    }
+
+    /** [EN] Continues after `pauseAnimation()` and posts `cyl.animation.didResume`. [CN] 在 `pauseAnimation()` 之后继续播放并发出 `cyl.animation.didResume`。 */
+    open func resumeAnimation() {
+        if pausedAnimatedImage, pausedByScroll {
+            pausedByScroll = false
+            pausedAnimatedImage = false
+            imageView.startAnimating()
+            postAnimationEvent("cyl.animation.didResume")
+            return
+        }
+        #if CYL_ANIMATION_ENGINE_AVAILABLE
+        guard pausedByScroll, animationPlayer != nil else { return }
+        pausedByScroll = false
+        setPlayerValue(speedBeforePause, for: "animationSpeed")
+        startLoopTimerIfNeeded()
+        postAnimationEvent("cyl.animation.didResume")
         #endif
     }
 
@@ -1055,11 +1123,24 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         stopAnimatedImage()
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         let player = animationPlayer
+        let wasPlaying = playing
         playing = false
         stopLoopTimer()
         player?.stop()
         setPlayerValue(animationRestingProgress, for: "progress")
+        if wasPlaying { postAnimationEvent("cyl.animation.didStop") }
         #endif
+    }
+
+    /**
+     [EN] Posts an animation moment (`cyl.animation.didStart` / `didStop`) as a `NotificationCenter` notification whose object is
+          this view: the animation pod does not depend on CYLDeallocBlockExecutor, CYLTabBarController bridges the
+          notification into the library (CYLAnimationEventBridge), so observers hear it as a lifecycle event.
+     [CN] 以 `NotificationCenter` 通知发出动画时机（`cyl.animation.didStart` / `didStop`），object 为本视图：动画 pod 不依赖
+          CYLDeallocBlockExecutor，由 CYLTabBarController 桥接进库（CYLAnimationEventBridge），观察者即可作为生命周期事件收到。
+     */
+    private func postAnimationEvent(_ name: String) {
+        NotificationCenter.default.post(name: Notification.Name(name), object: self, userInfo: ["url": animationURL as Any])
     }
 
     /** [EN] Shows the last frame without playing. [CN] 不播放，直接显示最后一帧。 */

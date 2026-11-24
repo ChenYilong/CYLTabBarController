@@ -461,3 +461,4 @@
 "n/a on Android: an app cannot post this system event." = "n/a على Android: لا يمكن للتطبيق إرسال حدث النظام هذا.";
 "Runs every automatic row, one after the other." = "يشغّل كل الصفوف التلقائية، واحدًا تلو الآخر.";
 "Tab bar %@ · page ID \"%@\"" = "شريط علامات التبويب %@ · معرّف الصفحة «%@»";
+"Pause while scrolling" = "إيقاف مؤقت أثناء التمرير";

@@ -44,6 +44,8 @@ class CYLAnimatedItemViewTest {
         override fun play() { calls += "play" }
         override fun showLastFrame() { calls += "last" }
         override fun stop() { calls += "stop" }
+        override fun pause() { calls += "pause" }
+        override fun resume() { calls += "resume" }
         override fun applyDarkColors(darkColors: Map<String, Int>, configuration: Configuration) { /* [EN] Not needed. [CN] 不需要。 */ }
     }
 
@@ -246,5 +248,52 @@ class CYLAnimatedItemViewTest {
         val item = CYLAnimatedItemView(activity())
         assertNotNull(item.animationSource)
         assertSame(CYLAnimatedItemAnimationSource.shared, item.animationSource)
+    }
+
+    @Test
+    fun postsTheAnimationMomentsAndPausesAndResumes() {
+        val activity = activity()
+        val source = FakeSource()
+        val item = CYLAnimatedItemView(activity).apply { animationSource = source; image = icon(); animationLoops = true; animationURL = "home.fake" }
+        host(activity, item)
+        val player = source.players.values.single()
+        val seen = ArrayList<String>()
+        val registry = com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry.of(item)
+        for (name in listOf(com.chenyilong.cyldeallocblockexecutor.AnimationEvents.didStart, com.chenyilong.cyldeallocblockexecutor.AnimationEvents.didPause,
+            com.chenyilong.cyldeallocblockexecutor.AnimationEvents.didResume, com.chenyilong.cyldeallocblockexecutor.AnimationEvents.didStop)) {
+            registry.addCustomCallback<Any>(name) { _, _, info -> seen += "${info.customEvent}${info.userInfo?.get("finished")?.let { " finished=$it" } ?: ""}" }
+        }
+        item.pauseAnimation()
+        assertEquals("nothing plays yet: nothing to pause", emptyList<String>(), seen)
+        item.playAnimation()
+        item.pauseAnimation()
+        item.pauseAnimation()
+        item.resumeAnimation()
+        item.resumeAnimation()
+        item.stopAnimation()
+        assertEquals(listOf("cyl.animation.didStart", "cyl.animation.didPause", "cyl.animation.didResume", "cyl.animation.didStop finished=false"), seen)
+        assertEquals(listOf("play", "pause", "resume", "stop"), player.calls)
+    }
+
+    @Test
+    fun pausesPlayingItemsWhileTheUserScrollsAndResumesAfterwards() {
+        val activity = activity()
+        val source = FakeSource()
+        val item = CYLAnimatedItemView(activity).apply { animationSource = source; image = icon(); animationLoops = true; animationURL = "home.fake" }
+        host(activity, item)
+        val player = source.players.values.single()
+        item.playAnimation()
+        CYLAnimatedItemView.pausesAnimationsWhileUserScrolls = true
+        try {
+            val scroller = com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry.of(Any()).also { it.hookInstalled = true }
+            scroller.fireAutomatic(com.chenyilong.cyldeallocblockexecutor.LifecycleEvent.scrollWillBeginDragging, com.chenyilong.cyldeallocblockexecutor.LifecycleTiming.afterSuper)
+            assertEquals(listOf("play", "pause"), player.calls)
+            scroller.fireAutomatic(com.chenyilong.cyldeallocblockexecutor.LifecycleEvent.scrollDidEndScrolling, com.chenyilong.cyldeallocblockexecutor.LifecycleTiming.afterSuper)
+            assertEquals(listOf("play", "pause", "resume"), player.calls)
+        } finally {
+            CYLAnimatedItemView.pausesAnimationsWhileUserScrolls = false
+            com.chenyilong.cyldeallocblockexecutor.LifecycleCenter.reset()
+        }
+        assertFalse(CYLAnimatedItemView.pausesAnimationsWhileUserScrolls)
     }
 }

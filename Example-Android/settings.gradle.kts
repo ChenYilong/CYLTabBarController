@@ -18,8 +18,8 @@ dependencyResolutionManagement {
         //      会返回 HTTP 429（请求过多），导致 Android 任务失败。镜像提供相同的构件；Maven Central 作为第二个仓库保留。
         maven("https://maven-central.storage-download.googleapis.com/maven2")
         mavenCentral()
-        // [EN] SVGAPlayer-Android (com.github.yyued) is only on JitPack, for example-rive. [CN] SVGAPlayer-Android 只在 JitPack 上，供 example-rive 使用。
-        maven("https://jitpack.io") { content { includeGroup("com.github.yyued") } }
+        // [EN] SVGAPlayer-Android (com.github.yyued) is only on JitPack, for example-rive; so is CYLDeallocBlockExecutor (com.github.ChenYilong), a dependency of cyltabbar. [CN] SVGAPlayer-Android 只在 JitPack 上，供 example-rive 使用；CYLDeallocBlockExecutor（com.github.ChenYilong）也在 JitPack 上，是 cyltabbar 的依赖。
+        maven("https://jitpack.io") { content { includeGroup("com.github.yyued"); includeGroup("com.github.ChenYilong"); includeGroup("com.github.ChenYilong.CYLDeallocBlockExecutor") } }
     }
 }
 rootProject.name = "CYLTabBarControllerAndroid"

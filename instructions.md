@@ -29,6 +29,10 @@ Organized by tag (tag: `instructions`): each heading has its tag and a summary; 
 - The iOS core is Swift; every new piece of code is Swift first (added 2026-11-19, owner); Objective-C only where Swift
   cannot do the job, with the reason. Full text: [docs/instructions/code.md](docs/instructions/code.md).
 
+## Naming after the static analysis (tag: `code`, added 2026-11-22)
+
+- SonarCloud flags `cyl_` Swift names (`swift:S100`, 743 of 956 issues on PR #788). Swift: `CYL` on types, no prefix on members of our types, `cylFoo` (with `@objc(cyl_foo)`) on system-type extensions, released names as deprecated shims; other languages keep the prefix only on global names. Full text: [docs/instructions/code.md](docs/instructions/code.md); skill `cyl-naming`.
+
 ## Sessions (tag: `task-workflow`)
 
 - Session roles by name (added 2026-11-19): `Mac*` sessions take iOS, `Win*` sessions the other platforms; assign by
