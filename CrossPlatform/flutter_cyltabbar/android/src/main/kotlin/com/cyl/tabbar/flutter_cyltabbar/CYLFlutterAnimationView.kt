@@ -59,6 +59,7 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
     setItemBackgroundStyle(arguments["itemBackgroundStyle"])
     (arguments["itemBackgroundColor"] as? Number)?.let { item.itemBackgroundColor = it.toInt() }
     (arguments["itemCornerRadius"] as? Number)?.let { item.itemCornerRadius = it.toFloat() }
+    (arguments["itemContentHorizontalInset"] as? Number)?.let { item.itemContentHorizontalInset = it.toFloat() }
     (arguments["itemBorderWidth"] as? Number)?.let { item.itemBorderWidth = it.toFloat() }
     (arguments["itemBorderColor"] as? Number)?.let { item.itemBorderColor = it.toInt() }
     (arguments["selected"] as? Boolean)?.let { item.isSelected = it }
@@ -114,6 +115,7 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
       "setItemBackgroundStyle" -> setItemBackgroundStyle(argument)
       "setItemBackgroundColor" -> item.itemBackgroundColor = (argument as? Number)?.toInt()
       "setItemCornerRadius" -> item.itemCornerRadius = (argument as? Number)?.toFloat()
+      "setItemContentHorizontalInset" -> item.itemContentHorizontalInset = (argument as? Number)?.toFloat()
       "setItemBorderWidth" -> item.itemBorderWidth = (argument as? Number)?.toFloat() ?: 0f
       "setItemBorderColor" -> item.itemBorderColor = (argument as? Number)?.toInt()
       "play" -> item.animatedItemPlayer.play()

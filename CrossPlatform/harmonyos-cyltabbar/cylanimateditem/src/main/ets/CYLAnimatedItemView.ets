@@ -535,6 +535,14 @@ export struct CYLAnimatedItemView {
    *      胶囊，要自定义时设置此属性即可；扁平样式为直角。
    */
   @Prop itemCornerRadius: number = -1;
+  /**
+   * [EN] The space between the outer border and the content on the left and right, in vp, on top of the padding. -1 (the default) is not set:
+   *      the drawn Liquid Glass gets `CYLAnimatedItemLiquidGlassContentInset` (a capsule's round ends take room from the content), flat gets 0 (the
+   *      view looks as before); 0 or more is explicit, also 0 on glass. The partner of `itemCornerRadius`: the same condition decides both.
+   * [CN] 外侧边框与内容之间左右的间距（vp），叠加在 padding 之上。-1（默认）表示未设置：绘制液态玻璃时取 `CYLAnimatedItemLiquidGlassContentInset`
+   *      （胶囊圆端会占去内容空间），扁平为 0（与以往相同）；0 及以上为显式值，玻璃上也可为 0。与 `itemCornerRadius` 一一对应：由同一条件决定两者。
+   */
+  @Prop itemContentHorizontalInset: number = -1;
   /** [EN] The border width in vp. [CN] 边框宽度（vp）。 */
   @Prop itemBorderWidth: number = 0;
   /** [EN] The border color; '' for none. [CN] 边框颜色；'' 表示无。 */
@@ -816,11 +824,20 @@ export struct CYLAnimatedItemView {
         this.countdownDuration, this.titleFontSize) : 0;
   }
 
+  /** [EN] The inset really applied (vp). [CN] 实际应用的间距（vp）。 */
+  private cylContentInset(): number {
+    return CYLAnimatedItemBackgroundModifier.resolvedContentInset(this.itemBackgroundStyle, this.itemContentHorizontalInset);
+  }
+
   private cylPadding(): Padding | number {
+    const inset: number = this.cylContentInset();
     if (this.isBare) {
-      return 0;
+      return inset > 0 ? { top: 0, bottom: 0, left: inset, right: inset } : 0;
     }
-    return this.cylIsCountdown() ? { top: 8, bottom: 8, left: 12, right: 12 } : 4;
+    if (this.cylIsCountdown()) {
+      return { top: 8, bottom: 8, left: 12 + inset, right: 12 + inset };
+    }
+    return inset > 0 ? { top: 4, bottom: 4, left: 4 + inset, right: 4 + inset } : 4;
   }
 
   /** [EN] A tap: the callback, then the countdown when `startsCountdownOnTap`. [CN] 点击：先回调，再在 `startsCountdownOnTap` 时开始倒计时。 */

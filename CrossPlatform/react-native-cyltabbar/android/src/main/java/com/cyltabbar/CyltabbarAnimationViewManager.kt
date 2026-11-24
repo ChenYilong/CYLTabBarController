@@ -98,6 +98,11 @@ class CyltabbarAnimationViewManager : SimpleViewManager<CyltabbarAnimationView>(
     view?.applyItemCornerRadius(value)
   }
 
+  @ReactProp(name = "itemContentHorizontalInset", defaultFloat = -1f)
+  override fun setItemContentHorizontalInset(view: CyltabbarAnimationView?, value: Float) {
+    view?.applyItemContentHorizontalInset(value)
+  }
+
   @ReactProp(name = "itemBorderWidth")
   override fun setItemBorderWidth(view: CyltabbarAnimationView?, value: Float) {
     view?.applyItemBorderWidth(value)

@@ -37,6 +37,16 @@ export function animationURLWithOptions(file: string, options: CYLAnimationOptio
 export const cylAnimatedItemCornerRadiusCapsule = 1000;
 
 /**
+ * [EN] The space (points) between the outer border and the content, left and right, that a `liquidGlass` item gets while
+ *      `itemContentHorizontalInset` is unset: a capsule's round ends take room from the content, so the unset glass inset is wider; the unset
+ *      flat inset is 0. The same condition as the unset `itemCornerRadius`. Use the name, never the literal; the native core holds the same
+ *      constant (`CYLAnimatedItemLiquidGlassContentInset`).
+ * [CN] `liquidGlass` 条目在未设置 `itemContentHorizontalInset` 时，外侧边框与内容之间左右的间距（点）：胶囊的圆端会占去内容的空间，所以未设置时玻璃的
+ *      间距更宽；未设置时扁平的间距为 0。与未设置的 `itemCornerRadius` 条件相同。请用名称，不要写字面量；原生核心持有同一常量。
+ */
+export const cylAnimatedItemLiquidGlassContentInset = 14;
+
+/**
  * [EN] The commands of the native view, for a `CYLAnimationView` whose `drivesAnimationPlayback` is false (the cross-platform
  *      engine contract, docs/Animated-Item.md): `play()`, `stopAtProgress(progress)` and `restart()`.
  * [CN] 原生视图的命令，用于 `drivesAnimationPlayback` 为 false 的 `CYLAnimationView`（跨端引擎契约，见 docs/Animated-Item.md）：
@@ -91,6 +101,11 @@ export type CYLAnimationViewProps = ViewProps & {
    * Unset: a capsule for `liquidGlass`, square for `flat`.
    */
   itemCornerRadius?: number;
+  /**
+   * The space between the outer border and the content on the left and right, in points, on top of the padding. Unset: `cylAnimatedItemLiquidGlassContentInset`
+   * for `liquidGlass` (a capsule's round ends take room from the content), 0 for `flat`; any number is explicit, also 0 on glass. The partner of `itemCornerRadius`.
+   */
+  itemContentHorizontalInset?: number;
   /** The border width in points; default 0. */
   itemBorderWidth?: number;
   /** The border color; unset for none. */

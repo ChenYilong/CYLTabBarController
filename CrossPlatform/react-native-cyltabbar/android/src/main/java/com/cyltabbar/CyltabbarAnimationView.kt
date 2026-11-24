@@ -98,6 +98,9 @@ class CyltabbarAnimationView(context: Context) : FrameLayout(context) {
   /** `itemCornerRadius` in dp (the core limits it to half the height); a negative number is not set (null). */
   fun applyItemCornerRadius(value: Float) { item.itemCornerRadius = value.takeIf { it >= 0f } }
 
+  /** `itemContentHorizontalInset` in dp, left and right; a negative number is not set (null): the glass default or 0 for flat. */
+  fun applyItemContentHorizontalInset(value: Float) { item.itemContentHorizontalInset = value.takeIf { it >= 0f } }
+
   /** `itemBorderWidth` in dp. */
   fun applyItemBorderWidth(value: Float) { item.itemBorderWidth = value }
 

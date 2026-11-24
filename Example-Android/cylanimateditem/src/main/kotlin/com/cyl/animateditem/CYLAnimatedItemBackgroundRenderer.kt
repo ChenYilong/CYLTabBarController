@@ -27,6 +27,13 @@ internal class CYLAnimatedItemBackgroundRenderer(private val host: ViewGroup) {
          *      (alpha 0.14), so a Liquid Glass style alone is visible on a plain page (the same values on every platform).
          * [CN] 宿主未设置颜色时玻璃的着色：浅色模式为淡灰（225, 222, 220，透明度 0.5），深色模式为淡白（透明度 0.14），因此只设置液态玻璃样式在纯色页面上也看得见（各平台数值相同）。
          */
+        /**
+         * The content inset: the explicit value, else [CYLAnimatedItemLiquidGlassContentInset] where the glass is drawn (the unset radius's condition), else 0.
+         * Static, so a view can ask while it is still being built (its renderer does not exist yet).
+         */
+        fun resolvedContentInset(explicit: Float?, style: CYLAnimatedItemBackgroundStyle?): Float =
+            explicit?.let { max(it, 0f) } ?: if (style == CYLAnimatedItemBackgroundStyle.LiquidGlass && CYLAnimatedItemView.isLiquidGlassActive()) CYLAnimatedItemLiquidGlassContentInset else 0f
+
         fun defaultGlassTint(resources: android.content.res.Resources): Int {
             val night = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
                 android.content.res.Configuration.UI_MODE_NIGHT_YES

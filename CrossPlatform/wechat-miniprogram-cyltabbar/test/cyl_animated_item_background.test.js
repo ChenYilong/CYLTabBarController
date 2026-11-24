@@ -6,6 +6,7 @@ const assert = require('node:assert/strict')
 const {
   cylAnimatedItemBackground,
   cylAnimatedItemCornerRadiusCapsule,
+  cylAnimatedItemLiquidGlassContentInset,
   cylAnimatedItemLiquidGlassIsActive,
   cylAnimatedItemLiquidGlassSetActiveOverride,
 } = require('../src/cyl-animated-item/cyl_animated_item_model')
@@ -75,4 +76,16 @@ test('a fully transparent color means no color: the glass gets the default frost
     assert.match(cylAnimatedItemBackground('liquidGlass', clear, -1, 0, '', false).css, /background-color:rgba\(225,222,220,0.5\);backdrop-filter/, `"${clear}": the default tint`)
   }
   assert.match(cylAnimatedItemBackground('liquidGlass', 'transparent', -1, 0, '', true).css, /background-color:rgba\(255,255,255,0.14\);/)
+})
+
+test('itemContentHorizontalInset: unset is the glass constant on drawn glass and 0 on flat; an explicit value wins (the partner of the unset radius)', () => {
+  const inset = (css) => (css.match(/--cyl-item-inset:([0-9.]+)px;/) || [])[1]
+  const glass = cylAnimatedItemBackground('liquidGlass', '', -1, 0, '', false)
+  assert.equal(inset(glass.css), String(cylAnimatedItemLiquidGlassContentInset), 'unset on glass: the named constant')
+  assert.equal(inset(cylAnimatedItemBackground('flat', '#fff', -1, 0, '', false).css), undefined, 'unset on flat: 0, nothing added')
+  assert.equal(inset(cylAnimatedItemBackground('liquidGlass', '', -1, 0, '', false, 0).css), undefined, 'explicit 0 on glass stays 0')
+  assert.equal(inset(cylAnimatedItemBackground('flat', '#fff', -1, 0, '', false, 20).css), '20', 'explicit 20 on flat')
+  assert.equal(inset(cylAnimatedItemBackground('flat', '', -1, 0, '', false, 20).css), '20', 'an explicit inset alone also draws')
+  cylAnimatedItemLiquidGlassSetActiveOverride(false)
+  assert.equal(inset(cylAnimatedItemBackground('liquidGlass', '', -1, 0, '', false).css), undefined, 'glass the device does not draw: 0 like the unset radius')
 })

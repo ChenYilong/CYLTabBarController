@@ -411,6 +411,15 @@ function cylAnimatedItemModel(input) {
 /** [EN] The named constant of the capsule (1000 px): pass it instead of a literal; CSS limits any radius to half the height, so it is exactly a capsule and follows the size. [CN] 胶囊的命名常量（1000 px）：传它而不是字面量；CSS 把任何圆角截断到半高，所以它恰好是胶囊并随尺寸变化。 */
 const cylAnimatedItemCornerRadiusCapsule = 1000
 
+/**
+ * [EN] The space (px) between the outer border and the content, left and right, that an item with the drawn Liquid Glass gets while
+ *      `itemContentHorizontalInset` is not set (-1): a capsule's round ends take room from the content, so the unset glass inset is wider; the
+ *      unset flat inset is 0. The same condition as the unset `itemCornerRadius`. Use the name, never the literal.
+ * [CN] 绘制液态玻璃的条目在未设置（-1）`itemContentHorizontalInset` 时，外侧边框与内容之间左右的间距（px）：胶囊的圆端会占去内容的空间，所以未设置时
+ *      玻璃的间距更宽；未设置时扁平的间距为 0。与未设置的 `itemCornerRadius` 条件相同。请用名称，不要写字面量。
+ */
+const cylAnimatedItemLiquidGlassContentInset = 14
+
 const cylLiquidGlassState = { activeOverride: undefined }
 
 function cylAnimatedItemLiquidGlassIsActive() {
@@ -456,16 +465,21 @@ function cylAnimatedItemGlassTint(color) {
 /**
  * @returns {{css: string, glass: boolean}} the inline style of the root view, '' when no `item…` background property is set
  */
-function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, borderColor, isDark) {
+function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, borderColor, isDark, contentInset) {
   const border = Number(borderWidth) > 0 ? Number(borderWidth) : 0
-  const used = style === 'liquidGlass' || (color || '') !== '' || Number(cornerRadius) >= 0 || border > 0 || (borderColor || '') !== ''
+  const explicitInset = contentInset === undefined || contentInset === null || contentInset === '' ? -1 : Number(contentInset)
+  const used = style === 'liquidGlass' || (color || '') !== '' || Number(cornerRadius) >= 0 || border > 0 || (borderColor || '') !== '' || explicitInset >= 0
   if (!used) return { css: '', glass: false }
   const glass = style === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive()
   // The host's value (0 is square); not set (-1): a capsule for the drawn Liquid Glass (the rule `0: automatic, a capsule` that
   // CollectionViewClassifyMenu's tags had, moved here), square for flat.
   // cylAnimatedItemCornerRadiusCapsule is the capsule: CSS limits it to half the height, so it follows the size.
   const radius = Number(cornerRadius) >= 0 ? Number(cornerRadius) : (glass ? cylAnimatedItemCornerRadiusCapsule : 0)
+  // The content inset: the host's value (0 or more), else the glass default for the drawn glass and 0 for flat. The stylesheet adds it to the
+  // padding of every layout (--cyl-item-inset), left and right.
+  const inset = explicitInset >= 0 ? explicitInset : (glass ? cylAnimatedItemLiquidGlassContentInset : 0)
   let css = `border-radius:${radius}px;`
+  if (inset > 0) css += `--cyl-item-inset:${inset}px;`
   if (border > 0) css += `border:${border}px solid ${borderColor || 'transparent'};box-sizing:border-box;`
   if (glass) {
     const tint = (color ? cylAnimatedItemGlassTint(color) : '') || (isDark ? 'rgba(255,255,255,0.14)' : 'rgba(225,222,220,0.5)')
@@ -506,6 +520,7 @@ module.exports = {
   cylAnimatedItemResource,
   cylAnimatedItemGlassTint,
   cylAnimatedItemCornerRadiusCapsule,
+  cylAnimatedItemLiquidGlassContentInset,
   cylAnimatedItemBackground,
   cylAnimatedItemLiquidGlassIsActive,
   cylAnimatedItemLiquidGlassSetActiveOverride,

@@ -56,6 +56,7 @@ describe('the item background props', () => {
     expect(spec).toContain("itemBackgroundStyle?: CodegenTypes.WithDefault<'flat' | 'liquidGlass', 'flat'>");
     expect(spec).toContain('itemBackgroundColor?: ColorValue');
     expect(spec).toContain('itemCornerRadius?: CodegenTypes.WithDefault<CodegenTypes.Float, -1>');
+    expect(spec).toContain('itemContentHorizontalInset?: CodegenTypes.WithDefault<CodegenTypes.Float, -1>');
     expect(spec).toContain('itemBorderWidth?: CodegenTypes.WithDefault<CodegenTypes.Float, 0>');
     expect(spec).toContain('itemBorderColor?: ColorValue');
   });

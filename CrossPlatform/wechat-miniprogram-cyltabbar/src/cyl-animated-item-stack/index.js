@@ -22,6 +22,8 @@ Component({
      * [EN] The smallest space between the items and the component's edges, in px (16). [CN] 条目与组件边缘之间的最小间距，单位 px（16）。
      */
     contentMargin: { type: Number, value: 16 },
+    /** [EN] The space between the outer border and the items on the left and right, in px, added to contentMargin horizontally; -1 (default) is 0 here (no glass background). [CN] 外侧边框与条目之间左右的间距（px），仅在水平方向叠加到 contentMargin 上；-1（默认）在此为 0（无玻璃背景）。 */
+    itemContentHorizontalInset: { type: Number, value: -1 },
     /**
      * [EN] The action of a tap outside items with an action; '' (default) turns it off. [CN] 点击带动作条目以外位置时的动作；''（默认）关闭。
      */
@@ -37,8 +39,8 @@ Component({
   },
   data: { m: cylStackModel({}) },
   observers: {
-    'items, contentMargin, backgroundAction, axis, spacing, iconColor, selectedIconColor'(items, contentMargin, backgroundAction, axis, spacing, iconColor, selectedIconColor) {
-      this.setData({ m: cylStackModel({ items, contentMargin, backgroundAction, axis, spacing, iconColor, selectedIconColor }) })
+    'items, contentMargin, itemContentHorizontalInset, backgroundAction, axis, spacing, iconColor, selectedIconColor'(items, contentMargin, itemContentHorizontalInset, backgroundAction, axis, spacing, iconColor, selectedIconColor) {
+      this.setData({ m: cylStackModel({ items, contentMargin, itemContentHorizontalInset, backgroundAction, axis, spacing, iconColor, selectedIconColor }) })
     },
   },
   methods: {

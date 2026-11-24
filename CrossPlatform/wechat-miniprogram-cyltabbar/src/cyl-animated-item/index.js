@@ -59,6 +59,11 @@ Component({
     itemBackgroundStyle: { type: String, value: 'flat' },
     itemBackgroundColor: { type: String, value: '' },
     itemCornerRadius: { type: Number, value: -1 },
+    // [EN] The space between the outer border and the content on the left and right, in px, on top of the padding. -1 (default) is not set: the drawn
+    //      Liquid Glass gets cylAnimatedItemLiquidGlassContentInset (a capsule's round ends take room from the content), flat gets 0; 0 or more is explicit.
+    //      The partner of itemCornerRadius. [CN] 外侧边框与内容之间左右的间距（px），叠加在内边距之上。-1（默认）表示未设置：绘制液态玻璃时取
+    //      cylAnimatedItemLiquidGlassContentInset（胶囊圆端会占去内容空间），扁平为 0；0 及以上为显式值。与 itemCornerRadius 一一对应。
+    itemContentHorizontalInset: { type: Number, value: -1 },
     itemBorderWidth: { type: Number, value: 0 },
     itemBorderColor: { type: String, value: '' },
     title: { type: String, value: '' },
@@ -270,8 +275,8 @@ Component({
   },
 
   observers: {
-    'itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor': function (style, color, radius, width, borderColor) {
-      const background = cylAnimatedItemBackground(style, color, radius, width, borderColor, false)
+    'itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemContentHorizontalInset': function (style, color, radius, width, borderColor, inset) {
+      const background = cylAnimatedItemBackground(style, color, radius, width, borderColor, false, inset)
       this.setData({ itemBackgroundCss: background.css, itemGlassDrawn: background.glass })
     },
     'animationUrl, animationData, animationType': function (animationUrl, animationData, animationType) {

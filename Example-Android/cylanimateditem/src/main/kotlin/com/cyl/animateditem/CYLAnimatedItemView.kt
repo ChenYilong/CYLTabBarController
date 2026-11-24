@@ -59,6 +59,15 @@ import kotlin.math.roundToInt
 const val CYLAnimatedItemCornerRadiusCapsule: Float = 1000f
 
 /**
+ * [EN] The space between the outer border and the content on the left and right that an item with Liquid Glass gets while `itemContentHorizontalInset` is
+ *      not set (14 dp): a capsule's round ends take room from the content, so the unset glass inset is wider; the unset flat inset is 0. The same
+ *      condition as the unset `itemCornerRadius` (a capsule for Liquid Glass, square for flat). Pass it by name, never the literal.
+ * [CN] 液态玻璃条目在未设置 `itemContentHorizontalInset` 时，外侧边框与内容之间左右的间距（14 dp）：胶囊的圆端会占去内容的空间，所以未设置时
+ *      玻璃的间距更宽；未设置时扁平的间距为 0。与未设置的 `itemCornerRadius`（液态玻璃为胶囊、扁平为直角）条件相同。请用名称，不要写字面量。
+ */
+const val CYLAnimatedItemLiquidGlassContentInset: Float = 14f
+
+/**
  * [EN] What the view's background is made of: the solid `itemBackgroundColor` (`Flat`, default), or Liquid Glass tinted with it
  *      (`LiquidGlass`; drawn only where the device draws Liquid Glass, `CYLAnimatedItemView.isLiquidGlassActive()`: Android 12
  *      and later, as the tab bar; elsewhere the style is ignored and the view stays flat). Same names as iOS and HarmonyOS.
@@ -564,17 +573,19 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val widthLimit = if (MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.UNSPECIFIED) Int.MAX_VALUE / 2 else MeasureSpec.getSize(widthMeasureSpec)
         val (iconW, _) = if (showsIcon()) iconSize() else 0 to 0
-        val reserved = paddingLeft + paddingRight + (if (accessoryInline()) dp(accessorySizeDp + spacingDp).roundToInt() else 0) +
+        val inset = 2 * contentInsetPx()
+        val reserved = paddingLeft + paddingRight + inset + (if (accessoryInline()) dp(accessorySizeDp + spacingDp).roundToInt() else 0) +
             (if (axis == CYLAnimatedItemAxis.Horizontal && showsIcon()) iconW + dp(spacingDp).roundToInt() else 0)
         val (contentW, contentH) = measureContent(max(0, widthLimit - reserved))
-        val width = resolveSize(contentW + paddingLeft + paddingRight, widthMeasureSpec)
+        val width = resolveSize(contentW + paddingLeft + paddingRight + inset, widthMeasureSpec)
         val height = resolveSize(contentH + paddingTop + paddingBottom, heightMeasureSpec)
         setMeasuredDimension(width, height)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         itemBackgroundRenderer.layoutGlass(r - l, b - t)
-        layoutContent(paddingLeft, paddingTop, r - l - paddingRight, b - t - paddingBottom)
+        val inset = contentInsetPx()
+        layoutContent(paddingLeft + inset, paddingTop, r - l - paddingRight - inset, b - t - paddingBottom)
     }
 
     /**
@@ -1271,6 +1282,24 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     var itemCornerRadius: Float? = null
         set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
+
+    /**
+     * [EN] The space between the outer border and the content on the left and right, in dp, on top of the view's padding. null (the default) is not
+     *      set: Liquid Glass gets [CYLAnimatedItemLiquidGlassContentInset] (a capsule's round ends take room from the content), flat gets 0 (the
+     *      view looks as before); any number is explicit, also 0 on glass. The one-to-one partner of `itemCornerRadius`: the same condition
+     *      (`resolvedItemBackgroundStyle`) decides both.
+     * [CN] 外侧边框与内容之间左右的间距（dp），叠加在视图 padding 之上。null（默认）表示未设置：液态玻璃取 [CYLAnimatedItemLiquidGlassContentInset]
+     *      （胶囊圆端会占去内容空间），扁平为 0（与以往相同）；任何数字为显式值，玻璃上也可为 0。与 `itemCornerRadius` 一一对应：由同一条件
+     *      （`resolvedItemBackgroundStyle`）决定两者。
+     */
+    var itemContentHorizontalInset: Float? = null
+        set(value) { if (field != value) { field = value; requestLayout() } }
+
+    /** [EN] The inset really applied, in dp: the explicit value, else the glass default or 0. [CN] 实际应用的间距（dp）：显式值，否则玻璃默认值或 0。 */
+    val resolvedItemContentHorizontalInset: Float
+        get() = CYLAnimatedItemBackgroundRenderer.resolvedContentInset(itemContentHorizontalInset, itemBackgroundStyle)
+
+    private fun contentInsetPx(): Int = dp(resolvedItemContentHorizontalInset).roundToInt()
 
     /** [EN] The border width in dp. [CN] 边框宽度（dp）。 */
     var itemBorderWidth: Float = 0f

@@ -14,6 +14,15 @@ import { cylAnimatedItemGlassTintColor } from './CYLAnimatedItemColors';
  */
 export const CYLAnimatedItemCornerRadiusCapsule: number = 1000;
 
+/**
+ * [EN] The space (vp) between the outer border and the content, left and right, that an item with the drawn Liquid Glass gets while
+ *      `itemContentHorizontalInset` is not set (-1): a capsule's round ends take room from the content, so the unset glass inset is wider; the
+ *      unset flat inset is 0. The same condition as the unset `itemCornerRadius`. Pass it by name, never the literal.
+ * [CN] 绘制液态玻璃的条目在未设置（-1）`itemContentHorizontalInset` 时，外侧边框与内容之间左右的间距（vp）：胶囊的圆端会占去内容的空间，所以未设置时
+ *      玻璃的间距更宽；未设置时扁平的间距为 0。与未设置的 `itemCornerRadius` 条件相同。请用名称，不要写字面量。
+ */
+export const CYLAnimatedItemLiquidGlassContentInset: number = 14;
+
 export enum CYLAnimatedItemBackgroundStyle {
   flat = 0,
   liquidGlass = 1
@@ -67,6 +76,17 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
       return cornerRadius;
     }
     return CYLAnimatedItemBackgroundModifier.isGlassDrawn(style) ? CYLAnimatedItemCornerRadiusCapsule : 0;
+  }
+
+  /**
+   * [EN] The content inset (vp): the set value (0 or more), else `CYLAnimatedItemLiquidGlassContentInset` for the drawn glass and 0 for flat. The
+   *      unset radius's condition. [CN] 内容间距（vp）：设置的值（0 及以上），否则绘制玻璃时为 `CYLAnimatedItemLiquidGlassContentInset`，扁平时为 0。与未设置圆角的条件相同。
+   */
+  static resolvedContentInset(style: CYLAnimatedItemBackgroundStyle, inset: number): number {
+    if (inset >= 0) {
+      return inset;
+    }
+    return CYLAnimatedItemBackgroundModifier.isGlassDrawn(style) ? CYLAnimatedItemLiquidGlassContentInset : 0;
   }
 
   /**

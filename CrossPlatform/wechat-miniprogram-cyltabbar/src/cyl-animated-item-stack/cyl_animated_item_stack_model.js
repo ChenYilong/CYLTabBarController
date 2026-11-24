@@ -37,6 +37,9 @@ function cylStackAction(value) {
 function cylStackModel(p) {
   const backgroundAction = cylStackAction(p.backgroundAction)
   const margin = cylStackLength(p.contentMargin, CYL_STACK_DEFAULT_SPACING)
+  // [EN] `itemContentHorizontalInset` (px, left and right only, on top of the margin): the stack has no glass background here, so only an explicit value (0 or more) counts.
+  // [CN] `itemContentHorizontalInset`（px，仅左右，叠加在边距之上）：此处的堆叠没有玻璃背景，所以只有显式值（0 及以上）有效。
+  const sideInset = Number(p.itemContentHorizontalInset) >= 0 ? Number(p.itemContentHorizontalInset) : 0
   // [EN] iOS `axis` and `spacing`: 'horizontal' lays the items in one row (anything else is vertical); `spacing` is the space
   //      before items without their own `spacingBefore`. [CN] iOS 的 `axis` 与 `spacing`：'horizontal' 排成一行（其他值为竖向）；
   //      `spacing` 是没有自己 `spacingBefore` 的条目之前的间距。
@@ -88,7 +91,7 @@ function cylStackModel(p) {
       wrapperStyle,
     }
   })
-  return { items, backgroundAction, horizontal, containerStyle: `padding: ${margin}px;` }
+  return { items, backgroundAction, horizontal, containerStyle: sideInset > 0 ? `padding: ${margin}px ${margin + sideInset}px;` : `padding: ${margin}px;` }
 }
 
 /**

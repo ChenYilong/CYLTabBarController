@@ -92,6 +92,11 @@ export interface NativeProps extends ViewProps {
    */
   itemCornerRadius?: CodegenTypes.WithDefault<CodegenTypes.Float, -1>;
   /**
+   * The space between the outer border and the content on the left and right, in points; a negative number (the default) is not set:
+   * `cylAnimatedItemLiquidGlassContentInset` for `liquidGlass`, 0 for `flat`.
+   */
+  itemContentHorizontalInset?: CodegenTypes.WithDefault<CodegenTypes.Float, -1>;
+  /**
    * The border width in points.
    */
   itemBorderWidth?: CodegenTypes.WithDefault<CodegenTypes.Float, 0>;

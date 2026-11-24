@@ -376,6 +376,19 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
     var itemCornerRadius: Float? = null
         set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
+    /**
+     * [EN] The space between the stack's outer border and its items on the left and right, in dp, added to [contentMarginDp] horizontally only; null
+     *      (the default) is [CYLAnimatedItemLiquidGlassContentInset] for Liquid Glass and 0 for flat, as [CYLAnimatedItemView.itemContentHorizontalInset].
+     * [CN] 堆叠外侧边框与条目之间左右的间距（dp），仅在水平方向叠加到 [contentMarginDp] 上；null（默认）时液态玻璃为
+     *      [CYLAnimatedItemLiquidGlassContentInset]、扁平为 0，与 [CYLAnimatedItemView.itemContentHorizontalInset] 相同。
+     */
+    var itemContentHorizontalInset: Float? = null
+        set(value) { if (field != value) { field = value; updateMargins() } }
+
+    /** [EN] The inset really applied, in dp. [CN] 实际应用的间距（dp）。 */
+    val resolvedItemContentHorizontalInset: Float
+        get() = CYLAnimatedItemBackgroundRenderer.resolvedContentInset(itemContentHorizontalInset, itemBackgroundStyle)
+
     /** [EN] The border width in dp. [CN] 边框宽度（dp）。 */
     var itemBorderWidth: Float = 0f
         set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
@@ -397,6 +410,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
     private fun itemBackgroundDidChange() {
         usesItemBackground = true
         applyItemBackground()
+        updateMargins() // the unset content inset follows the resolved style
         invalidate()
     }
 
@@ -421,8 +435,9 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
 
     private fun updateMargins() {
         val margin = dp(contentMarginDp)
+        val side = margin + dp(resolvedItemContentHorizontalInset)
         (stackView.layoutParams as? LayoutParams)?.let {
-            it.setMargins(margin, margin, margin, margin)
+            it.setMargins(side, margin, side, margin)
             stackView.layoutParams = it
         }
     }

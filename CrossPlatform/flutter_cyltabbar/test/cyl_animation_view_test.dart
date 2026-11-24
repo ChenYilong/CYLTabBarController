@@ -52,6 +52,7 @@ void main() {
     expect(view.itemBackgroundStyle, CYLAnimatedItemBackgroundStyle.flat);
     expect(view.itemBackgroundColor, isNull);
     expect(view.itemCornerRadius, isNull);
+    expect(view.itemContentHorizontalInset, isNull, reason: 'unset: the glass constant on glass, 0 on flat (the partner of the radius)');
     expect(view.itemBorderWidth, 0);
     expect(view.itemBorderColor, isNull);
   });
@@ -59,6 +60,10 @@ void main() {
   test('the capsule constant is 1000 and the style names are the frozen strings', () {
     expect(cylAnimatedItemCornerRadiusCapsule, 1000);
     expect(CYLAnimatedItemBackgroundStyle.values.map((style) => style.name), ['flat', 'liquidGlass']);
+  });
+
+  test('the glass content inset is a named constant, not a literal at the call site', () {
+    expect(cylAnimatedItemLiquidGlassContentInset, 14);
   });
 
   test('commands before the view exists do nothing', () async {
