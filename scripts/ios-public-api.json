@@ -1,5 +1,5 @@
 {
- "source": "Public API of the Objective-C headers at 1fddee2 (2026-11-12), the commit before the Swift migration began; generated once from those headers (with the comments of scripts/harmonyos-api-map.py). The Public API rule forbids removing any of these symbols. Later public symbols whose declarations moved into Swift are appended (2026-11-13: -cyl_moveBadgeToCurrentTabButtonIfNeeded).",
+ "source": "Public API of the Objective-C headers at 1fddee2 (2026-11-12), the commit before the Swift migration began; generated once from those headers (with the comments of scripts/harmonyos-api-map.py). The Public API rule forbids removing any of these symbols. Later public symbols whose declarations moved into Swift are appended (2026-11-13: -cyl_moveBadgeToCurrentTabButtonIfNeeded; 2026-11-24: CYLTabBarController tabBarItemAnimationLoops and -cyl_playAllTabBarItemAnimations, moved to CYLTabBarController.swift).",
  "symbols": [
   {
    "header": "CYLTabBarController/CYLBadgeView/CAAnimation+CYLBadgeExtention.h",
@@ -5728,6 +5728,22 @@
    "name": "cyl_navigationTitleFollowsTabBarItemTitle",
    "key": "UIViewController(CYLTabBarItemTitle) cyl_navigationTitleFollowsTabBarItemTitle",
    "comment": "YES: `navigationItem.title` is the tab's title, now and after every change. Default NO."
+  },
+  {
+   "header": "CYLTabBarController/CYLTabBarController.h",
+   "kind": "property",
+   "owner": "CYLTabBarController",
+   "name": "tabBarItemAnimationLoops",
+   "key": "CYLTabBarController tabBarItemAnimationLoops",
+   "comment": "Whether the tab icon animations repeat until this is set to NO (default NO: each plays once). Settable at any time: the views already added change at once, during playback too. Only for libraries with a loop mode (Lottie, PAG)."
+  },
+  {
+   "header": "CYLTabBarController/CYLTabBarController.h",
+   "kind": "method",
+   "owner": "CYLTabBarController",
+   "name": "-cyl_playAllTabBarItemAnimations",
+   "key": "CYLTabBarController -cyl_playAllTabBarItemAnimations",
+   "comment": "Plays the icon animation of every tab once more, each from progress 0 (not from where it stopped), with the current `tabBarItemAnimationSpeed` and `tabBarItemAnimationLoops`. The selected tab does not change."
   },
   {
    "header": "CYLTabBarController/CYLTabBarHostView.h",

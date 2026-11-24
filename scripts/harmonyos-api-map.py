@@ -31,7 +31,10 @@ _spec.loader.exec_module(android)
 
 def comment_of(path, name):
     """[EN] The English part of the documentation comment right above `name`'s declaration. [CN] 声明上方文档注释的英文部分。"""
-    text = open(os.path.join(ROOT, path), encoding='utf-8', errors='replace').read()
+    full_path = os.path.join(ROOT, path)
+    if not os.path.exists(full_path):  # [EN] the header moved to Swift: its frozen comment is in scripts/ios-public-api.json. [CN] 头文件已移入 Swift：其注释已冻结在 scripts/ios-public-api.json。
+        return ''
+    text = open(full_path, encoding='utf-8', errors='replace').read()
     for match in re.finditer(re.escape(name), text):
         line_start = text.rfind('\n', 0, match.start()) + 1
         line = text[line_start:text.find('\n', match.start())]

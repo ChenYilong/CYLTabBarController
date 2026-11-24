@@ -17,7 +17,7 @@
 | 中文 | English |
 |:---|:---|
 | iOS 库的每个公开符号、其注释（英文部分）与 HarmonyOS NEXT（ArkTS / ArkUI）对应接口；尚未实现时为 TODO。液态玻璃相关接口也计入。任务与参考项目见 [Android-Library.md](Android-Library.md) 的任务记录。 | Every public symbol of the iOS library, its comment (English part) and its HarmonyOS NEXT (ArkTS / ArkUI) counterpart; TODO while not implemented. Liquid Glass APIs count too. Task and reference projects: the task log of [Android-Library.md](Android-Library.md). |
-| **完成率：58 / 100**（已实现 902 / 共 1552 个符号）。每实现一个接口，在 `scripts/harmonyos-api-map.json` 中写入其鸿蒙接口并重新生成本文档。 | **Score: 58 / 100** (902 of 1552 symbols implemented). For each API implemented, write its HarmonyOS API into `scripts/harmonyos-api-map.json` and regenerate this document. |
+| **完成率：57 / 100**（已实现 902 / 共 1579 个符号）。每实现一个接口，在 `scripts/harmonyos-api-map.json` 中写入其鸿蒙接口并重新生成本文档。 | **Score: 57 / 100** (902 of 1579 symbols implemented). For each API implemented, write its HarmonyOS API into `scripts/harmonyos-api-map.json` and regenerate this document. |
 
 
 ### `CYLBadgeView/CAAnimation+CYLBadgeExtention.h`
@@ -219,7 +219,7 @@
 | `CYLTabBarItemImagePlaceholderHeight` | — | `CYLTabBarItemImagePlaceholderHeight` (22 vp) (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLTabBarStyleType` | — | `CYLTabBarStyleType` (Default, System, FlatDesign, LiquidGlass) + `CYLTabBarController.tabBarStyleType` (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLTabBarMinimizeBehavior` | How the tab bar reacts to scrolling (issue #13). One value for every style, set with `-[CYLTabBarController cyl_tabBarMinimizeBehavior]`: - Liquid Glass (iOS 26+): passed to the native `UITabBarController.tabBarMinimizeBehavior`; the system minimizes (shrinks) the tab bar, and the plus button is centered on its tab meanwhile. - FlatDesign: the tab bar is hidden and shown with `-setTabBarHidden:animated:` while the current page scrolls. - Classic tab bar (iOS 25 and earlier, and iOS 26 in UI compatibility mode): the system tab bar, with its plus button, is hidden and shown with `-setTabBarHidden:animated:` while the current page scrolls. The values match `UITabBarMinimizeBehavior` one to one. | `CYLTabBarMinimizeBehavior` (Automatic, Never, OnScrollDown, OnScrollUp) (built; emulator check pending / 已编译，模拟器验证待做) |
-| `CYLConstants` | — | `CYLConstants` (`cyltabbar/CYLConstants.ets`) (built; emulator check pending / 已编译，模拟器验证待做) |
+| `CYLConstants` | `+[CYLConstants UIBasisWidthScale]` / `UIBasisHeightScale` as C functions (Swift, step 114), declared by the generated Swift interface imported at the end of this file (the header declarations went with the inline functions, phase 3). | `CYLConstants` (`cyltabbar/CYLConstants.ets`) (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLConstants +UIBasisWidthScale` | — | TODO: N/A on HarmonyOS: ArkUI sizes in density-independent vp, percentages and layoutWeight; no design-width scale factor is needed / 不适用：ArkUI 使用与密度无关的 vp、百分比和 layoutWeight，不需要设计稿宽度缩放系数 |
 | `CYLConstants +UIBasisHeightScale` | — | TODO: N/A on HarmonyOS: ArkUI sizes in density-independent vp, percentages and layoutWeight; no design-width scale factor is needed / 不适用：ArkUI 使用与密度无关的 vp、百分比和 layoutWeight，不需要设计稿宽度缩放系数 |
 | `CYLConstants +isLiquidGlassActive` | — | `tabBarStyleType === CYLTabBarStyleType.LiquidGlass` (built; emulator check pending / 已编译，模拟器验证待做) |
@@ -240,7 +240,7 @@
 
 | iOS 公开 API / iOS public API | 接口注释 / Comment | 鸿蒙对应接口 / HarmonyOS API |
 |:---|:---|:---|
-| `CYLFlatDesignTabBarDelegate` | The delegate of `CYLFlatDesignTabBar`, told about user taps. Declared before the imports below: they can reach the generated Swift header, which imports the umbrella header, which adopts this protocol (`CYLTabBarController <CYLFlatDesignTabBarDelegate>`) while this file is still being read. | `CYLTabBarController.didSelect` / `didSelectControl` callbacks (built; emulator check pending / 已编译，模拟器验证待做) |
+| `CYLFlatDesignTabBarDelegate` | — | `CYLTabBarController.didSelect` / `didSelectControl` callbacks (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLFlatDesignTabBarDelegate -tabBar:didSelectItem:` | — | `CYLTabBarController.didSelect(index, identifier)` (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLFlatDesignTabBar` | Called when the user taps an item (not when selection changes in code). | `CYLTabBarController` with `tabBarStyleType: CYLTabBarStyleType.FlatDesign` (`CYLFlatDesignTabBarModifier`) (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLFlatDesignTabBar delegate` | — | `CYLTabBarController.didSelect` / `didSelectControl` callbacks (built; emulator check pending / 已编译，模拟器验证待做) |
@@ -276,14 +276,14 @@
 
 | iOS 公开 API / iOS public API | 接口注释 / Comment | 鸿蒙对应接口 / HarmonyOS API |
 |:---|:---|:---|
-| `CYLFlatDesignTabBarHideTabBar` | `CYLFlatDesignTabBarHideTabBar` is implemented in Swift (`Swift/CYLFlatDesignTabBarHideTabBar.swift`, docs/Swift-Migration.md, step 47); Objective-C callers get its declaration from the generated Swift interface imported below. | `CYLTabBarController.tabBarHidden` / `tabBarHiddenAnimated` (built; emulator check pending / 已编译，模拟器验证待做) |
+| `CYLFlatDesignTabBarHideTabBar` | — | `CYLTabBarController.tabBarHidden` / `tabBarHiddenAnimated` (built; emulator check pending / 已编译，模拟器验证待做) |
 
 ### `CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBar/CYLFlatDesignTabBarItem.h`
 
 | iOS 公开 API / iOS public API | 接口注释 / Comment | 鸿蒙对应接口 / HarmonyOS API |
 |:---|:---|:---|
-| `CYLFlatDesignTabBarItemDidChange` | Posted with the item as its object whenever a shown value of a `CYLFlatDesignTabBarItem` changes. | TODO: N/A on HarmonyOS: items are @Prop state of CYLTabBarController; changing `tabBarItemsAttributes` re-renders the bar, so no notification is posted / 不适用：项是 CYLTabBarController 的 @Prop 状态；修改 `tabBarItemsAttributes` 即重绘 TabBar，无需通知 |
-| `CYLFlatDesignTabBarItem` | Posted with the item as its object whenever a shown value of a `CYLFlatDesignTabBarItem` changes. | `CYLFlatDesignTabBarItem` (type alias of `CYLTabBarItemAttributes`) (built; emulator check pending / 已编译，模拟器验证待做) |
+| `CYLFlatDesignTabBarItemDidChange` | — | TODO: N/A on HarmonyOS: items are @Prop state of CYLTabBarController; changing `tabBarItemsAttributes` re-renders the bar, so no notification is posted / 不适用：项是 CYLTabBarController 的 @Prop 状态；修改 `tabBarItemsAttributes` 即重绘 TabBar，无需通知 |
+| `CYLFlatDesignTabBarItem` | — | `CYLFlatDesignTabBarItem` (type alias of `CYLTabBarItemAttributes`) (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLFlatDesignTabBarItem -initWithTitle:image:` | — | `cyl_flatDesignTabBarItem(title, image)` (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLFlatDesignTabBarItem -initWithTitle:image:selectedImage:` | — | `cyl_flatDesignTabBarItem(title, image, selectedImage)` (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLFlatDesignTabBarItem -initWithTitle:image:selectedImage:index:titlePositionAdjustment:imagePositionAdjustment:imageInsets:lottieFilePath:lottieSizeValue:` | — | a `CYLFlatDesignTabBarItem` object literal `{ title, image, selectedImage, titlePositionAdjustment, imagePositionAdjustment, imageInsets, lottieFilePath, lottieSize }` (index = its position in `tabBarItemsAttributes`) (built; emulator check pending / 已编译，模拟器验证待做) |
@@ -320,7 +320,7 @@
 
 | iOS 公开 API / iOS public API | 接口注释 / Comment | 鸿蒙对应接口 / HarmonyOS API |
 |:---|:---|:---|
-| `UINavigationControllerExtensionDelegate` | The implementation is Swift (`Swift/UINavigationController+CYLFlatDesignTabBarPrivate.swift`, docs/Swift-Migration.md, step 48); the selectors below are unchanged. The delegate's methods are called by selector, so an implementer does not need to declare this protocol. | TODO: N/A on HarmonyOS: UINavigationController push / pop transition hook of the FlatDesign bar; HarmonyOS navigation is router / Navigation and the tab bar does not follow push transitions / 不适用：FlatDesign 标签栏的 UINavigationController 转场钩子；鸿蒙导航为 router / Navigation，标签栏不跟随 push 转场 |
+| `UINavigationControllerExtensionDelegate` | — | TODO: N/A on HarmonyOS: UINavigationController push / pop transition hook of the FlatDesign bar; HarmonyOS navigation is router / Navigation and the tab bar does not follow push transitions / 不适用：FlatDesign 标签栏的 UINavigationController 转场钩子；鸿蒙导航为 router / Navigation，标签栏不跟随 push 转场 |
 | `UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:navigationBarDidChangeHeight:` | — | TODO: N/A on HarmonyOS: UINavigationController push / pop transition hook of the FlatDesign bar; HarmonyOS navigation is router / Navigation and the tab bar does not follow push transitions / 不适用：FlatDesign 标签栏的 UINavigationController 转场钩子；鸿蒙导航为 router / Navigation，标签栏不跟随 push 转场 |
 | `UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didBeginTransitionFrom:to:operation:` | — | TODO: N/A on HarmonyOS: UINavigationController push / pop transition hook of the FlatDesign bar; HarmonyOS navigation is router / Navigation and the tab bar does not follow push transitions / 不适用：FlatDesign 标签栏的 UINavigationController 转场钩子；鸿蒙导航为 router / Navigation，标签栏不跟随 push 转场 |
 | `UINavigationControllerExtensionDelegate -cylflatdesign_navigationController:didUpdateInteractiveFrom:to:percentComplete:` | — | TODO: N/A on HarmonyOS: UINavigationController push / pop transition hook of the FlatDesign bar; HarmonyOS navigation is router / Navigation and the tab bar does not follow push transitions / 不适用：FlatDesign 标签栏的 UINavigationController 转场钩子；鸿蒙导航为 router / Navigation，标签栏不跟随 push 转场 |
@@ -404,9 +404,6 @@
 | `CYLPlusButton(CYLPlusButtonDeprecated)` | — | TODO: N/A on HarmonyOS: deprecated iOS category; the port starts from the current API / 不适用：iOS 已废弃的分类；鸿蒙版从当前 API 开始 |
 | `CYLPlusButton(CYLPlusButtonDeprecated) +registerSubclass` | — | TODO: N/A on HarmonyOS: no global plus button registry keyed by tab bar context; each CYLTabBarController instance takes its own `plusButton` (@Prop) / 不适用：没有按 tab bar context 区分的全局加号按钮注册表；每个 CYLTabBarController 实例通过自己的 `plusButton`（@Prop）配置 |
 | `CYLPlusButton(CYLPlusButtonDeprecated) +multiplerInCenterY` | — | TODO: N/A on HarmonyOS: deprecated iOS spelling; the port starts from the current API, `CYLPlusButton.centerYOffset` / 不适用：iOS 已废弃的写法；鸿蒙版从当前 API 开始，使用 `CYLPlusButton.centerYOffset` |
-| `+multiplerInCenterY` | — | TODO: N/A on HarmonyOS: deprecated iOS spelling; the port starts from the current API, `CYLPlusButton.centerYOffset` / 不适用：iOS 已废弃的写法；鸿蒙版从当前 API 开始，使用 `CYLPlusButton.centerYOffset` |
-| `CYLPlusButtonCurrentExternPlusButton()` | — | TODO: N/A on HarmonyOS: no global plus button registry keyed by tab bar context; each CYLTabBarController instance takes its own `plusButton` (@Prop) / 不适用：没有按 tab bar context 区分的全局加号按钮注册表；每个 CYLTabBarController 实例通过自己的 `plusButton`（@Prop）配置 |
-| `CYLPlusButtonCurrentPlusChildViewController()` | — | TODO: N/A on HarmonyOS: no global plus button registry keyed by tab bar context; each CYLTabBarController instance takes its own `plusButton` (@Prop) / 不适用：没有按 tab bar context 区分的全局加号按钮注册表；每个 CYLTabBarController 实例通过自己的 `plusButton`（@Prop）配置 |
 
 ### `CYLTabBar+CYLTabBarControllerExtention.h`
 
@@ -720,7 +717,7 @@
 | `CYLTabBarController -tabChangedToControl:` | — | TODO: N/A on HarmonyOS: an internal step that moves the selection to a UIControl; the component redraws from `selectedIndex` (@Link) / 不适用：把选中切到某个 UIControl 的内部步骤；组件依 `selectedIndex` 重绘 |
 | `CYLTabBarController noNeedUIDesignCompatibility` | Setting NO means flat design. This property is the code alternative to the UI compatibility mode and only takes effect on iOS26+. Since the name of the UI compatibility mode is obscure, the more elegant and intuitive way is to set CYLTabBarStyleType, which internally sets this property to decide whether flat design is used. @return means CYLTabBarStyleType == CYLTabBarStyleTypeFlatDesign if return NO, means CYLTabBarStyleType == CYLTabBarStyleTypeLiquidGlass if return YES; @attention better switch to property CYLTabBarStyleType | TODO: partial on HarmonyOS: `CYLTabBarController.tabBarStyleType` = `CYLTabBarStyleType.FlatDesign` (the iOS 26 compatibility switch itself has no HarmonyOS meaning) (cyltabbar; built / 已实现) |
 | `CYLTabBarController allowsVerticalBar` | Whether the system may show the bars in the vertical bar: a column on the leading or trailing edge that iOS 27.1 uses on some devices, such as the folded iPhone Duo. Defaults to NO. - NO: CYLTabBarController returns `UIVerticalBarBehaviorDisabled` from `preferredVerticalBarBehavior`, so the tab bar stays at the bottom and the status bar stays horizontal. Exception (issue #672): a screen that overrides `preferredVerticalBarBehavior` itself (the selected view controller, or the top view controller of a selected navigation controller) still decides for itself, e.g. return `UIVerticalBarBehaviorAutomatic` to opt in. - YES: the system default behaviour, as in 1.99.65 and earlier. `UITabBarController` passes the choice to the selected view controller, so each screen can still opt out by overriding `preferredVerticalBarBehavior`. This is a convenience switch for UIKit's `preferredVerticalBarBehavior`; a subclass may override that property directly instead. Changes apply immediately: the setter calls `setNeedsUpdateOfVerticalBarConfiguration`. Not related to `tabBarController.sidebar.preferredPlacement` / `sidebar.isAvailable` (iOS 27): those choose between the tab bar and an iPad-style sidebar when there is room for one (regular width) and need the `UITab` API; the vertical bar is used in compact width, where the sidebar is not available. Status with YES: Liquid Glass style verified on the iPhone Duo simulator (layout, Lottie icons, badges, plus button, re-tap, long press and drag). FlatDesign style verified on the iPhone Duo simulator: the status bar moves to the trailing column and the FlatDesign bar stays at the bottom with its items centered across the full width (see `CYLFlatDesignTabBar.respectsVerticalStatusBarSafeArea`). Folded iPhone Duo, FlatDesign, vertical status bar with centered items: tabBarController.allowsVerticalBar = YES; // respectsVerticalStatusBarSafeArea keeps its default NO No effect below iOS 27.1 or when built with an SDK older than iOS 27.1. | TODO: N/A on HarmonyOS: the vertical bar is an iOS 27.1 system feature of some devices / 不适用：竖向栏是 iOS 27.1 部分设备的系统特性 |
-| `CYLTabBarController lottieViewAdded` | Implemented in Swift (`Swift/CYLTabBarController+CYLCompatibility.swift`, step 104). | TODO: N/A on HarmonyOS: animated icons are created with the tab buttons from state; there is no added-state flag to wait for / 不适用：动效图标随 Tab 按钮依状态创建，没有需要等待的“已添加”标志 |
+| `CYLTabBarController lottieViewAdded` | — | TODO: N/A on HarmonyOS: animated icons are created with the tab buttons from state; there is no added-state flag to wait for / 不适用：动效图标随 Tab 按钮依状态创建，没有需要等待的“已添加”标志 |
 | `CYLTabBarController lottieURLs` | — | each tab carries its own: `tabBarItemsAttributes.map(item => item.lottieFilePath)` (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLTabBarController lottieSizes` | — | each tab carries its own: `tabBarItemsAttributes.map(item => item.lottieSize)` (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLTabBarController tabBarItemAnimationViewAdded` | YES once the tab icon animation views were added (any library). | TODO: N/A on HarmonyOS: animated icons are created with the tab buttons from state; there is no added-state flag to wait for / 不适用：动效图标随 Tab 按钮依状态创建，没有需要等待的“已添加”标志 |
@@ -858,9 +855,8 @@
 | `UIViewController(CYLTabBarItemTitle)` | — | `tabBarItemsAttributes[index].title` for the `index` that `pageBuilder(index, identifier)` receives (built; emulator check pending / 已编译，模拟器验证待做) |
 | `UIViewController(CYLTabBarItemTitle) cyl_tabBarItemTitle` | Title font of unselected tabs (and of selected ones without `cyl_tabBarItemSelectedTitleFont`). | `tabBarItemsAttributes[index].title` for the `index` that `pageBuilder(index, identifier)` receives (built; emulator check pending / 已编译，模拟器验证待做) |
 | `UIViewController(CYLTabBarItemTitle) cyl_navigationTitleFollowsTabBarItemTitle` | YES: `navigationItem.title` is the tab's title, now and after every change. Default NO. | TODO: N/A on HarmonyOS: the library owns no navigation bar; an ArkUI page binds its title to the same `tabBarItemsAttributes` state and redraws when it changes / 不适用：本库不管理导航栏；ArkUI 页面把标题绑定到同一 `tabBarItemsAttributes` 状态，变化时自动重绘 |
-| `CYLPlusButtonCurrentWidth()` | — | TODO: N/A on HarmonyOS: the plus button slot is laid out by the component; `cyl_plusButtonOverhang(plusButton, tabBarHeight)` gives how far it rises / 不适用：加号按钮槽位由组件布局；`cyl_plusButtonOverhang` 给出凸起高度 |
 | `CYLTabBarController tabBarItemAnimationLoops` | Whether the tab icon animations repeat until this is set to NO (default NO: each plays once). Settable at any time: the views already added change at once, during playback too. Only for libraries with a loop mode (Lottie, PAG). | `CYLTabBarController.tabBarItemAnimationLoops` (@Prop; Lottie, Rive, SVGA) (built; emulator check pending / 已编译，模拟器验证待做) |
-| `CYLTabBarController -cyl_playAllTabBarItemAnimations` | — | TODO: no "play every tab animation" call; only the selected tab plays (and replays on a re-tap) / 待做：没有“播放所有 Tab 动画”的方法；只有选中 Tab 播放（再次点击重播） |
+| `CYLTabBarController -cyl_playAllTabBarItemAnimations` | Plays the icon animation of every tab once more, each from progress 0 (not from where it stopped), with the current `tabBarItemAnimationSpeed` and `tabBarItemAnimationLoops`. The selected tab does not change. | TODO: no "play every tab animation" call; only the selected tab plays (and replays on a re-tap) / 待做：没有“播放所有 Tab 动画”的方法；只有选中 Tab 播放（再次点击重播） |
 
 ### `CYLTabBarHostView.h`
 
@@ -1809,6 +1805,12 @@
 | `UIViewController(CYLThemeSettings) -cyl_themeListCellForTableView:row:` | — | the skin section of entry `pages/Index.ets` (`DEMO_THEMES` rows, entry `demo/DemoThemes.ets`) (entry example) (built; emulator check pending / 已编译，模拟器验证待做) |
 | `UIViewController(CYLThemeSettings) -cyl_didSelectThemeListRow:` | — | a skin row sets `CYLThemeManagerCenter.defaultThemeManager.currentThemeIdentifier` (entry `pages/Index.ets`) (entry example) (built; emulator check pending / 已编译，模拟器验证待做) |
 
+### `CYLTabBarControllerTypedefs.h`
+
+| iOS 公开 API / iOS public API | 接口注释 / Comment | 鸿蒙对应接口 / HarmonyOS API |
+|:---|:---|:---|
+| `CYLPlusButtonCurrentWidth()` | — | TODO: N/A on HarmonyOS: the plus button slot is laid out by the component; `cyl_plusButtonOverhang(plusButton, tabBarHeight)` gives how far it rises / 不适用：加号按钮槽位由组件布局；`cyl_plusButtonOverhang` 给出凸起高度 |
+
 ### `CYLTabBarItemAnimation/SVGA/CYLSVGATabBarItemAnimator.h`
 
 | iOS 公开 API / iOS public API | 接口注释 / Comment | 鸿蒙对应接口 / HarmonyOS API |
@@ -1839,6 +1841,18 @@
 | `CYLAnimationFileExtensionsOfType()` | — | TODO: `CYLAnimatedItemEngines` has no public list of a type's / all registered extensions (`CYLAnimatedItemTypeRegistry.extensionsOf` is internal, not exported) / 待做：`CYLAnimatedItemEngines` 没有公开某类型或全部已注册扩展名的列表（`CYLAnimatedItemTypeRegistry.extensionsOf` 为内部方法，未导出） |
 | `CYLAnimationWarnMissingEngine()` | — | `CYLAnimatedItemEngines.warnMissingEngine(url)` (debug builds, once per type) (built; emulator check pending / 已编译，模拟器验证待做) |
 
+### `Package/ObjC/include/CYLTabBarItemAnimationEngine.h`
+
+| iOS 公开 API / iOS public API | 接口注释 / Comment | 鸿蒙对应接口 / HarmonyOS API |
+|:---|:---|:---|
+| `CYLTabBarItemAnimationEngine` | — | TODO |
+| `CYLTabBarItemAnimationEngine registry` | Chooses the library of a tab. | TODO |
+| `CYLTabBarItemAnimationEngine factory` | Makes the animation views and finds their players. | TODO |
+| `CYLTabBarItemAnimationEngine styleSource` | The animation for the current style (#442). | TODO |
+| `CYLTabBarItemAnimationEngine host` | The tab bar: its state, layout and notifications. | TODO |
+| `CYLTabBarItemAnimationEngine -initWithRegistry:factory:styleSource:host:` | — | TODO |
+| `CYLTabBarItemAnimationEngine -init` | — | TODO |
+
 ### `CYLAnimatedItem/Swift/CYLAnimatedItemView.swift`
 
 | iOS 公开 API / iOS public API | 接口注释 / Comment | 鸿蒙对应接口 / HarmonyOS API |
@@ -1846,6 +1860,8 @@
 | `CYLAnimatedItemAxis` | How the icon and the title are arranged: side by side (a tag, a chip) or the icon above the title (a tab, a placeholder, an empty state). | `CYLAnimatedItemAxis` enum (`Horizontal` default / `Vertical`), set through `CYLAnimatedItemView.axis` (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLAnimatedItemAlignment` | Where the content group sits: centered (default) or against the leading edge. | TODO: no alignment enum or prop; the content is always centered (`FlexAlign.Center`), no leading alignment / 待做：没有对齐枚举或属性；内容始终居中（`FlexAlign.Center`），不支持靠前对齐 |
 | `CYLAnimatedItemAccessoryPlacement` | Where the accessory icon goes: before the content, after it (default), or on the icon's top trailing corner (like a badge or a close button). | `CYLAnimatedItemAccessoryPlacement` enum (`Leading` / `Trailing` default / `TopTrailing`) (built; emulator check pending / 已编译，模拟器验证待做) |
+| `CYLAnimatedItemStyle` | The look of the control: the plain animated icon + title (default), or a countdown button, e.g. for "Get the SMS code" (see `CYLAnimatedItemView.startCountdown()`). | TODO |
+| `CYLAnimatedItemCountdownState` | Where a countdown is. | TODO |
 | `CYLAnimatedItemContent` | What the item shows. `CYLAnimatedItemView` stores every property; a subclass may compute them instead. | TODO: N/A on HarmonyOS: a Swift protocol for subclasses that compute their content; an ArkUI struct cannot be subclassed, the content is the props `itemTitle` / `image` / `selectedImage` / 不适用：Swift 协议，供子类计算内容；ArkUI struct 不能被继承，内容即 `itemTitle` / `image` / `selectedImage` 等 prop |
 | `CYLAnimatedItemContent title` | The title, or nil for an icon-only item. | `CYLAnimatedItemView.itemTitle` (`@Prop`, '' for an icon-only item) (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLAnimatedItemContent image` | The static icon, shown until an animation is ready and whenever there is none. | `CYLAnimatedItemView.image` (`@Prop ResourceStr`) (built; emulator check pending / 已编译，模拟器验证待做) |
@@ -1864,6 +1880,9 @@
 | `CYLAnimatedItemViewDelegate -animatedItemViewDidTap:` | The item was tapped (not on its accessory). `UIControlEventTouchUpInside` is sent as well. | `CYLAnimatedItemView.onItemTap` (`() => void`, only while `isItemEnabled`) (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLAnimatedItemViewDelegate -animatedItemViewDidLongPress:` | The item was long-pressed. | `CYLAnimatedItemView.onItemLongPress` (`LongPressGesture`, only while `isItemEnabled`) (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLAnimatedItemViewDelegate -animatedItemViewDidTapAccessory:` | The accessory icon was tapped. | `CYLAnimatedItemView.onAccessoryTap` (built; emulator check pending / 已编译，模拟器验证待做) |
+| `CYLAnimatedItemViewDelegate -animatedItemViewDidStartCountdown:` | The countdown started. | TODO |
+| `CYLAnimatedItemViewDelegate -animatedItemView:didTickCountdown:` | The whole seconds left changed, once per second. | TODO |
+| `CYLAnimatedItemViewDelegate -animatedItemViewDidFinishCountdown:` | The time is up. | TODO |
 | `CYLAnimatedItemViewDelegate -animatedItemViewShouldBeginDrag:` | Whether a drag may start (asked only when `isDragEnabled`). | TODO: no callback to veto a drag; only `isDragEnabled` gates `onItemDragStart` / 待做：没有可否决拖动的回调；只有 `isDragEnabled` 控制 `onItemDragStart` |
 | `CYLAnimatedItemViewDelegate -animatedItemViewDidBeginDrag:` | A drag started. | `CYLAnimatedItemView.onItemDragStart` (`PanGesture.onActionStart`, while `isDragEnabled`) (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLAnimatedItemViewDelegate -animatedItemView:didDragWithTranslation:` | The finger moved by `translation` points from where the drag started. | `CYLAnimatedItemView.onItemDragMove(dx, dy)` (`PanGesture` offsetX / offsetY from the start, in vp) (built; emulator check pending / 已编译，模拟器验证待做) |
@@ -1888,6 +1907,20 @@
 | `CYLAnimatedItemView accessoryView` | An optional second icon with its own tap (`animatedItemViewDidTapAccessory(_:)`), e.g. a delete cross; nil removes it. It is its own accessibility element: give it an `accessibilityLabel`. | `CYLAnimatedItemView.accessoryImage` / `accessoryText` (`@Prop`) with `accessoryAccessibilityText`, tapped through `onAccessoryTap` (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLAnimatedItemView accessoryPlacement` | Where the accessory goes (after the content by default). | `CYLAnimatedItemView.accessoryPlacement` (`@Prop CYLAnimatedItemAccessoryPlacement`, `Trailing` default) (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLAnimatedItemView accessorySize` | The accessory's size (18 x 18 by default). | TODO: no size prop; the accessory image is fixed at 18 x 18 vp / 待做：没有尺寸属性；附件图片固定为 18 x 18 vp |
+| `CYLAnimatedItemView itemStyle` | The look: plain (default) or a countdown button. Countdown gives the control a border and a rounded corner and manages its title; set the `countdown…` properties, then call `startCountdown()` (or set `startsCountdownOnTap`). The end is kept as a date, not counted by a timer: the seconds that pass while the app is in the background, or the device is locked, still count (the time left is read again on every tick and when the app returns), and a late timer cannot make it drift (FIX: issue #1 of SMSCodeButton). Only the title changes, once per second, on the same label: no system button is rebuilt, so nothing flickers; the control keeps the width of its widest title, so it does not jump either. While it runs the control is disabled, and VoiceOver reads the remaining seconds. | TODO |
+| `CYLAnimatedItemView countdownDuration` | The length in seconds, 60 by default. Used by `startCountdown()`. | TODO |
+| `CYLAnimatedItemView countdownIdleTitle` | The title before it starts, e.g. "Get code" (the default text is English; set the app's localized text). | TODO |
+| `CYLAnimatedItemView countdownRunningTitleFormat` | The title while counting: a format with one `%ld`, the whole seconds left, e.g. "%ld s left". | TODO |
+| `CYLAnimatedItemView countdownFinishedTitle` | The title once the time is up, e.g. "Resend". | TODO |
+| `CYLAnimatedItemView countdownImage` | The icon while counting (e.g. a clock); nil keeps `image`. | TODO |
+| `CYLAnimatedItemView countdownRunningTitleColor` | The title color while counting (gray by default). Idle and finished use `titleLabel.textColor`. | TODO |
+| `CYLAnimatedItemView startsCountdownOnTap` | Whether a tap starts the countdown after the delegate's `animatedItemViewDidTap(_:)` (off by default). With it off the app starts it itself, e.g. once the server accepted the request. | TODO |
+| `CYLAnimatedItemView countdownState` | Where the countdown is. | TODO |
+| `CYLAnimatedItemView countdownEndDate` | When the running countdown ends; nil when it is not running. | TODO |
+| `CYLAnimatedItemView countdownDateProvider` | The clock, for tests: `Date()` by default (nil). | TODO |
+| `CYLAnimatedItemView countdownRemainingSeconds` | The whole seconds left (rounded up): 0 when it is not running. | TODO |
+| `CYLAnimatedItemView countdownCacheKey` | A key that keeps the running countdown in `countdownCacheStore`, so it survives the app being ended in the background (or quit) and started again: a view with the same key, in the countdown style, takes it up again, with the seconds that passed meanwhile counted. The cache holds the start, the end and the longest duration; it is dropped when the time is up, on `resetCountdown()`, and when it is no longer valid (see `refreshCountdown()`). nil (default): nothing is kept. Use one key per thing counted, e.g. one per phone number. | TODO |
+| `CYLAnimatedItemView countdownCacheStore` | Where the cache is kept: `UserDefaults.standard` by default; an app group's suite, or one for tests. | TODO |
 | `CYLAnimatedItemView dragEnabled` | Whether the control reports drags (off by default). | `CYLAnimatedItemView.isDragEnabled` (`@Prop`, false by default) (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLAnimatedItemView dragMovesView` | Whether a drag moves the control (transform) and springs it back at the end. | TODO: no built-in move and spring-back; the app has to translate the item itself from `onItemDragMove` / 待做：没有内置的跟随移动与回弹；需 App 根据 `onItemDragMove` 自行平移 |
 | `CYLAnimatedItemView longPressGestureRecognizer` | The recognizers the control uses, for subclasses that combine their own gestures with them. | TODO: N/A on HarmonyOS: ArkUI gestures are declared in `build()` (`LongPressGesture`), there is no recognizer object to share / 不适用：ArkUI 手势在 `build()` 中声明（`LongPressGesture`），没有可共享的识别器对象 |
@@ -1913,6 +1946,10 @@
 | `CYLAnimatedItemView -restartAnimation` | Plays from progress 0 (the examples' "Play all"). | `CYLAnimatedItemController.restartAnimation()` (as `CYLAnimatedItemView.controller`), or a new `animationRestartToken` (`@Prop`) (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLAnimatedItemView -stopAnimation` | Stops and shows the resting progress. | TODO: no stop API on the item / 待做：条目没有停止接口 |
 | `CYLAnimatedItemView -showAnimationLastFrame` | Shows the last frame without playing. | TODO: no API to show the last frame without playing / 待做：没有不播放而显示最后一帧的接口 |
+| `CYLAnimatedItemView -startCountdown` | Starts (or restarts) for `countdownDuration` seconds. Switches the style to countdown when it is not. | TODO |
+| `CYLAnimatedItemView -startCountdownWithDuration:` | Starts for `duration` seconds, e.g. the "retry after" the server sent. | TODO |
+| `CYLAnimatedItemView -resetCountdown` | Stops and shows the idle title, with no finish callback. | TODO |
+| `CYLAnimatedItemView -refreshCountdown` | Reads the clock now: a tick on demand, e.g. after the app returns (done by the control itself). | TODO |
 | `CYLAnimatedItemView -itemAccessibilityLabel` | Subclass hook: what VoiceOver reads (the title by default); add a badge, a count or a state. Call `updateItemAccessibility()` after a change the control cannot see. | `CYLAnimatedItemView.itemAccessibilityText` (`@Prop`, falls back to `itemTitle`), with `itemDescription` / `selectedDescription` (built; emulator check pending / 已编译，模拟器验证待做) |
 | `CYLAnimatedItemView -updateItemAccessibility` | Refreshes `accessibilityLabel` from `itemAccessibilityLabel()`. | TODO: N/A on HarmonyOS: the accessibility text is a prop and ArkUI re-renders on change / 不适用：无障碍文本是 prop，变化时 ArkUI 自动重新渲染 |
 

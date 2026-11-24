@@ -12,7 +12,7 @@
     "12": "`cyl_simulateMemoryWarning()` + `CYLTabBarController.unloadsUnselectedViewsOnMemoryWarning` / `onMemoryWarning`: unselected pages unloaded, a dialog lists each tab (built; emulator check pending / 已编译，模拟器验证待做)",
     "13": "`CYLTabBarController.titlePositionAdjustment` (@Prop): the row cycles the vertical offset 0 / -4 / 4 (built; emulator check pending / 已编译，模拟器验证待做)",
     "14": "`tabBarBackgroundColor` / `tabBarShadowColor` / `unselectedColor` / `tintColor` (@Prop): System default, Dark, Centered capsule (`selectedBackgroundColor`), Green line (built; emulator check pending / 已编译，模拟器验证待做)",
-    "17": "`CYLTabBarController.tabBarHeight` (@Prop): `CYLTabBarDefaultHeight` (56 vp, the system tab bar's, since 2026-11-22) <-> 69 vp; default checked on the x86_64 emulator, [sheet](assets/harmonyos-default-tab-bar-height-system-56vp.png) / 默认值已在 x86_64 模拟器验证",
+    "17": "`CYLTabBarController.tabBarHeight` (@Prop): `CYLTabBarDefaultHeight` (56 vp, the system tab bar's, since 2026-11-22) <-> 69 vp; default checked on the x86_64 emulator, [sheet](assets/harmonyos-default-tab-bar-height-system-56vp.png) / 默认值已在 x86_64 模拟器验证; the 69 vp row (built; emulator check pending / 已编译，模拟器验证待做)",
     "18": "`CYLTabBarController.itemEdgeInsets` (cyl_itemEdgeInsets): centered / not centered rows (built; emulator check pending / 已编译，模拟器验证待做)",
     "19": "`CYLTabBarItemAttributes.backgroundColor` / `selectedBackgroundColor` (CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor) (built; emulator check pending / 已编译，模拟器验证待做)",
     "45": "`entry/pages/SystemTabs.ets`: ArkUI `Tabs` (system tab bar) with the same four tabs and a badge on Messages (built; emulator check pending / 已编译，模拟器验证待做)",
