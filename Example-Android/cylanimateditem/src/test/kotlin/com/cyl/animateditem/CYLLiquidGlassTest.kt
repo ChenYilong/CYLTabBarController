@@ -23,6 +23,22 @@ class CYLLiquidGlassTest {
     }
 
     @Test
+    fun aNestedCaptureIsRefusedAndTheFlagIsAlwaysReset() {
+        // The glass of a tag inside the captured page: while a capture runs, a nested one gets null (the caller draws the tint).
+        val outer = CYLGlassBackdrop.captureOnce { CYLGlassBackdrop.captureOnce { "nested" } }
+        assertEquals("the nested capture is refused", null, outer)
+        // After it, a capture works again.
+        assertEquals("again", CYLGlassBackdrop.captureOnce { "again" })
+        // An exception while recording must not leave every glass on its fallback for good.
+        try {
+            CYLGlassBackdrop.captureOnce<Unit> { throw IllegalStateException("recording failed") }
+        } catch (expected: IllegalStateException) {
+            // expected
+        }
+        assertEquals("the flag was reset in a finally", "ok", CYLGlassBackdrop.captureOnce { "ok" })
+    }
+
+    @Test
     @Config(sdk = [30])
     fun isInactiveBeforeAndroid12() {
         assertFalse(CYLLiquidGlass.isActive())

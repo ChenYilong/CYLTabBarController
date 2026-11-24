@@ -244,19 +244,27 @@ class CYLGlassBackdrop {
         //      capture is under way every glass view anywhere skips its backdrop (returns false: the caller draws its translucent tint).
         // [CN] 被录制页面里的玻璃（列表中的液态玻璃标签：来源是包含它的根视图，还有其他所有玻璃标签）会在录制页面的过程中再次录制页面，这种嵌套会无限递归。
         //      录制期间，任何位置的玻璃视图都跳过背景（返回 false：由调用方绘制半透明着色）。
-        if (capturing) return false
-        capturing = true
-        try {
-            drawEffects(canvas, source, sourceX, sourceY, rect, radius, effects)
-        } finally {
-            capturing = false
-        }
-        return true
+        return captureOnce { drawEffects(canvas, source, sourceX, sourceY, rect, radius, effects); true } ?: false
     }
 
-    private companion object {
+    internal companion object {
         /** True while any glass is recording its backdrop (the UI thread only). */
-        var capturing = false
+        private var capturing = false
+
+        /**
+         * [EN] Runs `block` unless a capture is already under way (then null): the flag is reset in a `finally`, so an exception while recording
+         *      cannot leave every glass view on its fallback for good. [CN] 除非已有录制在进行（此时返回 null），否则运行 `block`：标志在 `finally` 中复位，
+         *      因此录制中的异常不会让所有玻璃视图永久停在降级绘制上。
+         */
+        fun <T> captureOnce(block: () -> T): T? {
+            if (capturing) return null
+            capturing = true
+            try {
+                return block()
+            } finally {
+                capturing = false
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
