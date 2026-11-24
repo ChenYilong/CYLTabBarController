@@ -341,11 +341,13 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift-resources.sh",
 				"${PODS_ROOT}/../../CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle",
+				"${PODS_ROOT}/../../CYLTabBarController/CYLLiquidGlass/Resources/CYLLiquidGlass.bundle",
 				"${PODS_ROOT}/../../CYLTabBarController/Resources/CYLTabBarController.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLAnimatedItem.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLLiquidGlass.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;

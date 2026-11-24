@@ -15,6 +15,7 @@ target 'AnimatedApp' do
   # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
   # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
   pod 'CYLAnimatedItem', :path => '../'
+  pod 'CYLLiquidGlass', :path => '../'
   # FIX: issue #415 — SVGA tab icons (SVGAPlayer), one for one with the Rive ones, chosen on the Bell page.
   # SVGA Tab 图标（SVGAPlayer），与 Rive 图标一一对应，在 Bell 页面选择。
   pod 'CYLTabBarController/SVGA', :path => '../'

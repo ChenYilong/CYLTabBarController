@@ -12,6 +12,11 @@ import UIKit
 #if canImport(CYLAnimatedItem)
 @_exported import CYLAnimatedItem
 #endif
+// [EN] The Liquid Glass rule lives in the CYLLiquidGlass base library (CYLLiquidGlass.podspec); `isLiquidGlassActive()` forwards to it.
+// [CN] 液态玻璃的判断规则在基础库 CYLLiquidGlass 中（CYLLiquidGlass.podspec）；`isLiquidGlassActive()` 转发到它。
+#if canImport(CYLLiquidGlass)
+import CYLLiquidGlass
+#endif
 
 /**
  * [EN] Shared helpers of the CYLUtils subspec. Translated from Objective-C (docs/Swift-Migration.md); Objective-C
@@ -28,17 +33,6 @@ public class CYLUtils: NSObject {
      * [CN] 是否使用液态玻璃：iOS 27 及以上总是；iOS 26 上 App 未在 Info.plist 中设置 `UIDesignRequiresCompatibility` 时。只读取一次。
      */
     @objc public class func isLiquidGlassActive() -> Bool {
-        isLiquidGlassActiveOnce
+        CYLLiquidGlass.isActive()
     }
-
-    private static let isLiquidGlassActiveOnce: Bool = {
-        if #available(iOS 27.0, *) {
-            return true
-        }
-        if #available(iOS 26.0, *) {
-            let requiresCompatibility = Bundle.main.object(forInfoDictionaryKey: "UIDesignRequiresCompatibility") as? Bool
-            return !(requiresCompatibility ?? false)
-        }
-        return false
-    }()
 }

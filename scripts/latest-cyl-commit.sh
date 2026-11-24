@@ -26,7 +26,10 @@ case "$MODE" in
     --podfile) echo "pod 'CYLTabBarController', :git => '${REPO}', :commit => '${SHA}'"
                # [EN] The animated item component's pod, same repository and commit (not on the trunk yet).
                # [CN] 动效组件的 pod，同一仓库与 commit（尚未发布到 trunk）。
-               case "$REPO" in *CYLTabBarController*) echo "pod 'CYLAnimatedItem', :git => '${REPO}', :commit => '${SHA}'" ;; *) ;; esac ;;
+               case "$REPO" in *CYLTabBarController*) echo "pod 'CYLAnimatedItem', :git => '${REPO}', :commit => '${SHA}'"
+                   # [EN] The Liquid Glass base library, same repository and commit (CYLTabBarController depends on it).
+                   # [CN] 液态玻璃基础库，同一仓库与 commit（CYLTabBarController 依赖它）。
+                   echo "pod 'CYLLiquidGlass', :git => '${REPO}', :commit => '${SHA}'" ;; *) ;; esac ;;
     "") echo "$LINE" ;;
     *) echo "usage: $0 [--sha | --podfile]" >&2; exit 2 ;;
 esac

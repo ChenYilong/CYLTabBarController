@@ -26,6 +26,8 @@ Pod::Spec.new do |s|
     #      Objective-C 头文件）。
     utils.exclude_files = 'CYLTabBarController/CYLUtils/CYLAnimationKeys.{h,m}', 'CYLTabBarController/CYLUtils/Swift/CYLAnimationURLOptions.swift', 'CYLTabBarController/CYLUtils/Swift/CYLAnimationKeyLookup.swift'
     utils.dependency 'CYLAnimatedItem/Core', s.version.to_s
+    # [EN] The Liquid Glass rule (`+isLiquidGlassActive` forwards to it). [CN] 液态玻璃的判断规则（`+isLiquidGlassActive` 转发到它）。
+    utils.dependency 'CYLLiquidGlass', s.version.to_s
     utils.public_header_files = 'CYLTabBarController/CYLUtils/**/*.h'
     # FIX: issue #216 — theme switching (skins): public headers in `CYLUtils/CYLComponents/CYLTheme/`, implementation in
     # Swift (`CYLUtils/Swift/`); its private helpers are internal Swift. [CN] 换肤（主题切换）：公开头文件位于

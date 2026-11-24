@@ -39,6 +39,7 @@ target 'Runner' do
   # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
   # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
   pod 'CYLAnimatedItem', :path => '../../../..'
+  pod 'CYLLiquidGlass', :path => '../../../..'
   # FIX: issue #415 — SVGA tab icons (SVGAPlayer), one for one with the Rive ones, as Example-Rive. Static linking: the
   # Swift library imports these Objective-C pods, so they need module maps.
   # SVGA Tab 图标（SVGAPlayer），与 Rive 图标一一对应，与 Example-Rive 相同。静态链接：Swift 库导入这两个 Objective-C pod，因此需要 module map。

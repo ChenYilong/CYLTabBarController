@@ -21,6 +21,7 @@ NPM_WECHAT = "npm (WeChat Mini Program)"
 REQUIRED = [
     ("CocoaPods / SwiftPM / Carthage", "CYLTabBarController", "CYLTabBarController/Resources/CYLTabBarController.bundle/LICENSE", "CYLTabBarController.podspec"),
     ("CocoaPods / SwiftPM / Carthage", "CYLAnimatedItem", "CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle/LICENSE", "CYLAnimatedItem.podspec"),
+    ("CocoaPods / SwiftPM / Carthage", "CYLLiquidGlass", "CYLTabBarController/CYLLiquidGlass/Resources/CYLLiquidGlass.bundle/LICENSE", "CYLLiquidGlass.podspec"),
     (MAVEN, "cyltabbarcontroller", "Example-Android/cyltabbar/src/main/resources/META-INF/cyltabbar/LICENSE", "Example-Android/cyltabbar/build.gradle.kts"),
     (MAVEN, "cyltabbarcontroller-animateditem", "Example-Android/cylanimateditem/src/main/resources/META-INF/cylanimateditem/LICENSE", "Example-Android/cylanimateditem/build.gradle.kts"),
     ("npm (React Native)", "react-native-cyltabbar", "CrossPlatform/react-native-cyltabbar/LICENSE", "CrossPlatform/react-native-cyltabbar/package.json"),

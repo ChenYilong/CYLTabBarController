@@ -14,6 +14,7 @@ target 'GIFApp' do
   # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
   # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
   pod 'CYLAnimatedItem', :path => '../'
+  pod 'CYLLiquidGlass', :path => '../'
   # The FlatDesign style, chosen with the navigation bar button of the first tab. It also brings Lottie.
   # 扁平样式，通过第一个 Tab 的导航栏按钮选择。它同时会引入 Lottie。
   pod 'CYLTabBarController/CYLFlatDesignTabBar', :path => '../'

@@ -19,6 +19,11 @@ let package = Package(
         //      placeholder bundle and the animation engine, without the tab bar.
         // [CN] 单独的动效条目组件（CocoaPods `CYLAnimatedItem` pod，docs/Animated-Item.md）：视图、占位图资源包与动画引擎，不含 TabBar。
         .library(name: "CYLAnimatedItem", targets: ["CYLAnimatedItem", "CYLAnimatedItemViews"]),
+        // [EN] Liquid Glass as a base library (CocoaPods `CYLLiquidGlass` pod, docs/Liquid-Glass-Component.md): the
+        //      availability rule and a glass background view. It never depends on the tab bar.
+        // [CN] 作为基础库的液态玻璃（CocoaPods `CYLLiquidGlass` pod，docs/Liquid-Glass-Component.md）：可用性判断与玻璃背景视图。
+        //      它从不依赖 TabBar。
+        .library(name: "CYLLiquidGlass", targets: ["CYLLiquidGlass"]),
     ],
     dependencies: [
         // Same requirement as the podspec's `LottieSwift` subspec: 'lottie-ios', '>= 4.5.1' (`removeValueProvider(for:)`).
@@ -117,9 +122,16 @@ let package = Package(
             ]
         ),
         .target(
+            name: "CYLLiquidGlass",
+            path: "CYLTabBarController",
+            sources: ["CYLLiquidGlass/Swift"],
+            resources: [.copy("CYLLiquidGlass/Resources/CYLLiquidGlass.bundle")]
+        ),
+        .target(
             name: "CYLTabBarController",
             dependencies: [
                 "CYLTabBarControllerObjC",
+                "CYLLiquidGlass",
                 "CYLAnimatedItem",
                 "CYLAnimatedItemSwift",
                 "CYLAnimatedItemViews",
