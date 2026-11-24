@@ -1209,7 +1209,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     var itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.Flat
         set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
-    /** [EN] The solid fill when flat, the glass tint when Liquid Glass (an ARGB color); null for none. [CN] 扁平时的纯色填充，液态玻璃时的着色（ARGB 颜色）；null 表示无。 */
+    /** [EN] The solid fill when flat, the glass tint when Liquid Glass (an ARGB color); null for none. A Liquid Glass color with alpha 0 (`Color.TRANSPARENT`) draws the default frosted tint, as null. [CN] 扁平时的纯色填充，液态玻璃时的着色（ARGB 颜色）；null 表示无。液态玻璃的颜色透明度为 0（`Color.TRANSPARENT`）时使用默认的磨砂着色，与 null 相同。 */
     var itemBackgroundColor: Int? = null
         set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 

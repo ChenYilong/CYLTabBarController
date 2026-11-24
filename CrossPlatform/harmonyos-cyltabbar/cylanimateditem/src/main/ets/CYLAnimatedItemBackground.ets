@@ -1,4 +1,5 @@
 import { CYLLiquidGlass } from './CYLLiquidGlass';
+import { cylAnimatedItemGlassTintColor } from './CYLAnimatedItemColors';
 
 /**
  * [EN] What an item's background is made of: the solid color (`flat`, the default) or Liquid Glass (a blur imitation tinted with
@@ -28,6 +29,9 @@ export enum CYLAnimatedItemBackgroundStyle {
  *      `cornerRadius` 为 -1 表示未设置：绘制玻璃时为胶囊，扁平时为直角；0 及以上的值用于自定义。
  */
 export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<CommonAttribute> {
+  /** [EN] The tint of a glass with no color (225, 222, 220 at alpha 0.5). [CN] 未设置颜色时玻璃的着色（225, 222, 220，透明度 0.5）。 */
+  static readonly DEFAULT_GLASS_TINT: string = '#80E1DEDC';
+
   style: CYLAnimatedItemBackgroundStyle;
 
   color: ResourceColor;
@@ -75,27 +79,15 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
   static glassTint(color: ResourceColor): ResourceColor {
     // [EN] No color set: the default frosted tint (225, 222, 220 at alpha 0.5, as iOS in light mode). [CN] 未设置颜色：默认的磨砂着色（225, 222, 220，透明度 0.5，与 iOS 浅色模式相同）。
     if (color === Color.Transparent || color === '') {
-      return '#80E1DEDC';
+      return CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT;
     }
-    let argb: number = -1;
-    if (typeof color === 'number') {
-      argb = color >>> 0;
-    } else if (typeof color === 'string') {
-      const hex: RegExpMatchArray | null = color.match(/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/);
-      if (hex !== null) {
-        argb = hex[1].length === 6 ? (0xFF000000 + parseInt(hex[1], 16)) : parseInt(hex[1], 16);
+    if (typeof color === 'number' || typeof color === 'string') {
+      const tint: string | number | undefined = cylAnimatedItemGlassTintColor(color, CYLLiquidGlass.GLASS_TINT_ALPHA, CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT);
+      if (tint !== undefined) {
+        return tint;
       }
     }
-    if (argb < 0) {
-      return color;
-    }
-    const sourceAlpha: number = (argb >>> 24) & 0xFF;
-    // [EN] A fully transparent color (alpha 0) means "no color" too: the default frosted tint. [CN] 完全透明的颜色（透明度 0）同样表示「没有颜色」：使用默认磨砂着色。
-    if (sourceAlpha === 0) {
-      return '#80E1DEDC';
-    }
-    const alpha: number = Math.round(sourceAlpha * CYLLiquidGlass.GLASS_TINT_ALPHA);
-    return ((alpha << 24) | (argb & 0xFFFFFF)) >>> 0;
+    return color;
   }
 
   applyNormalAttribute(instance: CommonAttribute): void {

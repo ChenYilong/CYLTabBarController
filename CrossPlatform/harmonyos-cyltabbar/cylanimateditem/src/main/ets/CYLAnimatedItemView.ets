@@ -499,7 +499,7 @@ export struct CYLAnimatedItemView {
    *      背景、圆角与边框（倒计时样式保持自己的外观）。与 iOS、Android 同名。
    */
   @Prop itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat;
-  /** [EN] The solid fill when flat, the glass tint when liquid glass; '' for none. [CN] 扁平时的纯色填充，液态玻璃时的着色；'' 表示无。 */
+  /** [EN] The solid fill when flat, the glass tint when liquid glass; '' for none. A liquid glass color with alpha 0 ('#00000000', `Color.Transparent`) draws the default frosted tint, as ''. [CN] 扁平时的纯色填充，液态玻璃时的着色；'' 表示无。液态玻璃的颜色透明度为 0（'#00000000'、`Color.Transparent`）时使用默认的磨砂着色，与 '' 相同。 */
   @Prop itemBackgroundColor: ResourceColor = '';
   /**
    * [EN] The corner radius in vp: a larger value than half the height is a capsule (the platform clamps), 0 is square. -1 (the

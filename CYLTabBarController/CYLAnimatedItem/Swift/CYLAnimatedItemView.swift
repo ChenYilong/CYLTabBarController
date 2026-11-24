@@ -433,7 +433,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     public var itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = .flat {
         didSet { if oldValue != itemBackgroundStyle { itemBackgroundDidChange() } }
     }
-    /** [EN] The solid fill when flat, the glass tint when Liquid Glass; nil for none. [CN] 扁平时的纯色填充，液态玻璃时的着色；nil 表示无。 */
+    /** [EN] The solid fill when flat, the glass tint when Liquid Glass; nil for none. A Liquid Glass color with alpha 0 (`.clear`, after resolving a dynamic color) draws the default frosted tint, as nil. [CN] 扁平时的纯色填充，液态玻璃时的着色；nil 表示无。液态玻璃的颜色透明度为 0（`.clear`，先解析动态颜色）时使用默认的磨砂着色，与 nil 相同。 */
     public var itemBackgroundColor: UIColor? {
         didSet { if oldValue != itemBackgroundColor { itemBackgroundDidChange() } }
     }

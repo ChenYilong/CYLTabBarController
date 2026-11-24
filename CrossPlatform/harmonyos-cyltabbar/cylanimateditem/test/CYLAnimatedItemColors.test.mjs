@@ -19,3 +19,14 @@ test('ARGB integers as Rive color properties take them', () => {
   assert.equal(C.cylAnimatedItemARGBInteger(C.cylAnimatedItemParseHexColor('#00000000')), 0);
   assert.equal(C.cylAnimatedItemARGBInteger(C.cylAnimatedItemParseHexColor('#7F00FF00')), 0x7F00FF00);
 });
+
+test('a glass tint: alpha x 0.75; alpha 0 (clear) is the default frosted tint, as an unset color', () => {
+  const DEFAULT = '#80E1DEDC';
+  assert.equal(C.cylAnimatedItemGlassTintColor('#2AB9A0', 0.75, DEFAULT), 0xBF2AB9A0);
+  assert.equal(C.cylAnimatedItemGlassTintColor('#80FF0000', 0.75, DEFAULT), 0x60FF0000);
+  assert.equal(C.cylAnimatedItemGlassTintColor(0xFF336699, 0.75, DEFAULT), 0xBF336699);
+  for (const clear of ['#00000000', '#00FFFFFF', 'transparent', 'Transparent', 0, 0x00123456]) {
+    assert.equal(C.cylAnimatedItemGlassTintColor(clear, 0.75, DEFAULT), DEFAULT, String(clear));
+  }
+  assert.equal(C.cylAnimatedItemGlassTintColor('red', 0.75, DEFAULT), undefined, 'other text is used as it is');
+});
