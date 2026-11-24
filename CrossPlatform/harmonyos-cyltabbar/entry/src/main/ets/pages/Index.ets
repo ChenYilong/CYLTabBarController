@@ -1013,6 +1013,13 @@ struct Index {
         subtitle: CYLLocalizedString('showsImageWhenAnimationEnds: a play-once Lottie icon, then its still image'),
         action: () => this.push('pages/AnimatedItemEnd', {} as DemoPushParams),
       } as DemoRow] } as DemoSection] : []),
+      // [EN] The Rive colors hook (docs/Animated-Item.md, "Colors"): applyColors on a data-bound .riv.
+      // [CN] Rive 颜色钩子（docs/Animated-Item.md，“颜色”）：对数据绑定的 .riv 调用 applyColors。
+      ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('Rive colors'), rows: [{
+        id: 'rive-colors', title: CYLLocalizedString('Rive colors'),
+        subtitle: CYLLocalizedString('applyColors: a view model color property of a data-bound .riv'),
+        action: () => this.push('pages/RiveColors', {} as DemoPushParams),
+      } as DemoRow] } as DemoSection] : []),
       // [EN] The teardown row (iOS CYLDemoReleaseRow, docs/Lifecycle-Library.md step 21), on the second tab: leaves this page after 3 s
       //      and the released page shows how many dealloc callbacks ran. [CN] 销毁行（对应 iOS 的 CYLDemoReleaseRow），位于第二个 Tab：3 秒后离开本页，
       //      释放后的页面显示执行了多少个 dealloc 回调。

@@ -1,4 +1,4 @@
-const { LifecycleRegistry } = require('./registry.js');
+const { LifecycleRegistry } = require('./registry');
 
 /**
  * Fires the lifecycle events of a Mini Program Page or Component from the
@@ -134,7 +134,7 @@ class LifecycleController {
   }
 
   onResize(size) {
-    this.around('viewWillTransition', { size: { width: size.windowWidth ?? size.width, height: size.windowHeight ?? size.height } });
+    this.around('viewWillTransition', { size: { width: (size.windowWidth != null ? size.windowWidth : size.width), height: (size.windowHeight != null ? size.windowHeight : size.height) } });
   }
 
   themeChanged(theme) {
@@ -156,13 +156,16 @@ class LifecycleController {
  */
 function withLifecycle(options) {
   const out = { ...options };
-  const controllerOf = (page) => (page.cylController ??= new LifecycleController(page));
+  const controllerOf = (page) => {
+    if (!page.cylController) page.cylController = new LifecycleController(page);
+    return page.cylController;
+  };
   const wrap = (name, call) => {
     const original = options[name];
     out[name] = function (...args) {
       const controller = controllerOf(this);
       if (name === 'onLoad') call(controller, args);
-      const result = original?.apply(this, args);
+      const result = original ? original.apply(this, args) : undefined;
       if (name !== 'onLoad') call(controller, args);
       return result;
     };
@@ -172,8 +175,8 @@ function withLifecycle(options) {
   wrap('onReady', (c) => c.onReady());
   wrap('onHide', (c) => c.onHide());
   wrap('onUnload', (c) => c.onUnload());
-  wrap('onResize', (c, a) => c.onResize(a[0] ?? {}));
-  wrap('onPageScroll', (c, a) => c.onPageScroll(a[0] ?? {}));
+  wrap('onResize', (c, a) => c.onResize(a[0] != null ? a[0] : {}));
+  wrap('onPageScroll', (c, a) => c.onPageScroll(a[0] != null ? a[0] : {}));
   return out;
 }
 

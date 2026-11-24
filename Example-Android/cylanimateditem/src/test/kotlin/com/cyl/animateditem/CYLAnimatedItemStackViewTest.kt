@@ -65,17 +65,17 @@ class CYLAnimatedItemStackViewTest {
         val stack = CYLAnimatedItemStackView(activity)
         stack.itemBackgroundColor = 0xFF336699.toInt()
         stack.layout(0, 0, 200, 80)
-        assertEquals("flat, unset: square", 0f, (stack.background as android.graphics.drawable.GradientDrawable).cornerRadius)
+        assertEquals(0f, (stack.background as android.graphics.drawable.GradientDrawable).cornerRadius, "flat, unset: square")
         stack.itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.LiquidGlass
         stack.layout(0, 0, 200, 80)
-        assertTrue("glass layer behind the items", stack.itemLiquidGlassView != null)
-        assertEquals("glass, unset: a capsule", 40f, (stack.background as android.graphics.drawable.GradientDrawable).cornerRadius)
+        assertTrue(stack.itemLiquidGlassView != null, "glass layer behind the items")
+        assertEquals(40f, (stack.background as android.graphics.drawable.GradientDrawable).cornerRadius, "glass, unset: a capsule")
         stack.itemCornerRadius = CYLAnimatedItemCornerRadiusCapsule
         stack.layout(0, 0, 200, 80)
-        assertEquals("the capsule constant", 40f, (stack.background as android.graphics.drawable.GradientDrawable).cornerRadius)
+        assertEquals(40f, (stack.background as android.graphics.drawable.GradientDrawable).cornerRadius, "the capsule constant")
         stack.itemCornerRadius = 0f
         stack.layout(0, 0, 200, 80)
-        assertEquals("0 is square", 0f, (stack.background as android.graphics.drawable.GradientDrawable).cornerRadius)
+        assertEquals(0f, (stack.background as android.graphics.drawable.GradientDrawable).cornerRadius, "0 is square")
         CYLAnimatedItemView.liquidGlassActiveOverride = null
     }
 

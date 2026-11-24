@@ -6,6 +6,8 @@
   "author": "ChenYilong",
   "license": "MIT",
   "dependencies": {
-    "cyltabbar": "file:../cyltabbar"
+    "cyltabbar": "file:../cyltabbar",
+    "cylanimateditem": "file:../cylanimateditem",
+    "cylanimateditem_rive": "file:../cylanimateditem_rive"
   }
 }

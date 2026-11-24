@@ -11,8 +11,8 @@ export {
   CYLRiveIcon, CYLTabBarAnimationOptionRiveArtboard, CYLTabBarAnimationOptionRiveStateMachine, CYLTabBarAnimationOptionRiveActiveProperty,
   CYLTabBarAnimationOptionRiveActiveDuration, CYLTabBarAnimationOptionRiveTriggerProperty, CYLTabBarAnimationOptionRiveInput,
   CYLTabBarAnimationOptionRiveTriggerInput, CYLTabBarAnimationOptionRiveAnimation, CYLTabBarAnimationOptionRiveLegacyRuntime,
-  CYLTabBarAnimationOptionRiveNumberInput, CYLTabBarAnimationOptionRiveNumberValues, cylRiveNextNumber,
-  cylRiveFileAndOptions, cylRiveRendererType, cylEnsureRiveInitialized, cylRiveIsSupported
+  CYLTabBarAnimationOptionRiveNumberInput, CYLTabBarAnimationOptionRiveNumberValues, CYLTabBarAnimationOptionRiveColor,
+  cylRiveNextNumber, cylRiveFileAndOptions, cylRiveRendererType, cylEnsureRiveInitialized, cylRiveIsSupported
 } from './src/main/ets/CYLRiveIcon';
 export {
   CYLAnimatedItemRive, CYLAnimatedItemRivePlayer, CYLAnimatedItemRiveView

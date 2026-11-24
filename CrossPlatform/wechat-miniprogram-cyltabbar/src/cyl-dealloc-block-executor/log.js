@@ -8,8 +8,6 @@
  *   LifecycleLog.sink = (message) => myLogger(message); // your own destination
  */
 class LifecycleLog {
-  static enabled = false;
-  static sink          = (message) => console.log(message);
 
   static log(message              )       {
     if (LifecycleLog.enabled) LifecycleLog.sink(`[CYLLifecycle] ${message()}`);
@@ -19,11 +17,16 @@ class LifecycleLog {
   static describe(owner         )         {
     if (owner === null || owner === undefined) return 'nil';
     const o = owner                                                                     ;
-    const type = o.constructor?.name ?? typeof owner;
-    const tag = o.name ?? o.id;
+    const ctorName = o.constructor ? o.constructor.name : undefined;
+    const type = ctorName != null ? ctorName : typeof owner;
+    const tag = o.name != null ? o.name : o.id;
     return tag === undefined ? type : `${type}(${String(tag)})`;
   }
 }
+
+// Static fields are assigned here (no class-properties transform in WeChat DevTools' es6 compile).
+LifecycleLog.enabled = false;
+LifecycleLog.sink = (message) => console.log(message);
 
 /** Well-known custom event names posted by the components (the library never posts them itself). */
 const AnimationEvents = {

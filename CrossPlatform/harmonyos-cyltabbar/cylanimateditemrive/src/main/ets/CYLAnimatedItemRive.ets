@@ -28,7 +28,10 @@ import {
   CYLAnimatedItemEngineBinding, CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemEngines,
   CYLAnimatedItemPlayer, CYLAnimatedItemSource, cylAnimatedItemARGBInteger, cylAnimatedItemParseHexColor
 } from 'cylanimateditem';
-import { CYLAnimatedItemRiveOption, cylRiveActiveDuration, cylRiveNextNumber, cylRiveUsesLegacyRuntime } from './CYLAnimatedItemRiveOptions';
+import {
+  CYL_RIVE_COLOR_PROPERTY_PATH, CYLAnimatedItemRiveOption, cylRiveActiveDuration, cylRiveNextNumber, cylRiveOptionColor,
+  cylRiveUsesLegacyRuntime
+} from './CYLAnimatedItemRiveOptions';
 
 /** [EN] The native ABI of @ohos/rive 1.0.4. [CN] @ohos/rive 1.0.4 的原生 ABI。 */
 const CYL_RIVE_ABI: string = 'arm64-v8a';
@@ -88,6 +91,8 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
   /** [EN] Played and not stopped since (the tab's "selected"). [CN] 已播放且之后未停止（相当于 Tab 的“选中”）。 */
   private active: boolean = false;
   private endWatchTimer: number = -1;
+  /** [EN] Pauses again after a redraw of new colors. [CN] 为新颜色重绘后再次暂停。 */
+  private redrawTimer: number = -1;
   private startPending: boolean = false;
   private deactivateTimer: number = -1;
   private loopTimer: number = -1;
@@ -98,6 +103,7 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
   private requestedColors?: Map<string, string>;
   private originalColors: Map<string, number> = new Map<string, number>();
   private overriddenColorPaths: Set<string> = new Set<string>();
+  private optionColorApplied: boolean = false;
 
   constructor(source: CYLAnimatedItemSource, view: RiveAnimationView) {
     super('Rive', source);
@@ -130,6 +136,53 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
     const view = this.riveView;
     if (view !== null) {
       this.cylApplyRequestedColors(view);
+      this.cylRedrawIfPaused(view);
+    }
+  }
+
+  /**
+   * [EN] A paused @ohos/rive view does not draw a view model change, so new colors on an item resting after its pass (or on
+   *      its first frame) stayed invisible until the next play (seen on the emulator: the property read back the new color,
+   *      the shape kept the old one). Runs the state machine for a frame, then pauses it again.
+   * [CN] 暂停的 @ohos/rive 视图不会绘制视图模型的变化，因此一遍播完后（或停在第一帧时）设置的新颜色要到下次播放才可见（模拟器上属性已读回新颜色，
+   *      形状仍是旧颜色）。让状态机运行一帧后再次暂停。
+   */
+  private cylRedrawIfPaused(view: RiveAnimationView): void {
+    let playing = false;
+    try {
+      playing = view.isPlaying();
+    } catch (e) {
+      return;
+    }
+    if (playing) {
+      return;
+    }
+    const machine = this.cylStateMachine(view);
+    if (machine === undefined) {
+      return;
+    }
+    this.cylCancelRedraw();
+    try {
+      this.cylPlayMachine(view, machine);
+    } catch (e) {
+      return;
+    }
+    this.redrawTimer = setTimeout(() => {
+      this.redrawTimer = -1;
+      if (this.riveView === view) {
+        if (view.controller !== null) {
+          view.controller.pauseAllAnimations();
+        } else {
+          view.pause();
+        }
+      }
+    }, CYL_RIVE_FIRST_FRAME_MS);
+  }
+
+  private cylCancelRedraw(): void {
+    if (this.redrawTimer >= 0) {
+      clearTimeout(this.redrawTimer);
+      this.redrawTimer = -1;
     }
   }
 
@@ -138,6 +191,8 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
     if (instance === null) {
       return;
     }
+    // [EN] The `color` option first, so it is the original that restoring returns to. [CN] 先应用 `color` 选项，使其成为恢复时的原值。
+    this.cylApplyOptionColor(view);
     const colors = this.requestedColors;
     if (colors !== undefined) {
       colors.forEach((text: string, path: string) => {
@@ -185,6 +240,7 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
       return;
     }
     this.active = true;
+    this.cylCancelRedraw();
     this.cylPlay(view);
   }
 
@@ -243,6 +299,32 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
     }
     const machines = view.getStateMachines();
     return machines.length > 0 ? machines[0].name : undefined;
+  }
+
+  /**
+   * [EN] The `color` option, once the view model exists: written to its "color" property and kept as that property's
+   *      original, so restoring after applyColors returns to it (iOS CYLRiveTabBarItemAnimationView `lightColor`). Moved
+   *      from CYLTableViewPlaceHolder's Rive animator (`applyLightColor`, deleted in its 3569628a).
+   * [CN] `color` 选项：视图模型存在后写入其 "color" 属性并作为该属性的原值保存，applyColors 之后恢复时回到它（iOS `lightColor`）。
+   *      从 CYLTableViewPlaceHolder 的 Rive 动画器（`applyLightColor`，在其 3569628a 中删除）迁移而来。
+   */
+  private cylApplyOptionColor(view: RiveAnimationView): void {
+    if (this.optionColorApplied) {
+      return;
+    }
+    const value = cylRiveOptionColor((name: string) => this.option(name));
+    const instance = value === undefined ? null : this.cylViewModel(view);
+    if (value === undefined || instance === null) {
+      this.optionColorApplied = value === undefined;
+      return;
+    }
+    this.optionColorApplied = true;
+    try {
+      instance.getColorProperty(CYL_RIVE_COLOR_PROPERTY_PATH).value = value;
+      this.originalColors.set(CYL_RIVE_COLOR_PROPERTY_PATH, value);
+    } catch (e) {
+      // [EN] No "color" property: the file keeps its colors, as on iOS. [CN] 没有 "color" 属性：文件保持原色，与 iOS 一致。
+    }
   }
 
   private cylViewModel(view: RiveAnimationView): ViewModelInstance | null {
@@ -355,6 +437,7 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
     }
     this.fileWaits = 0;
     this.hasPlayed = true;
+    this.cylApplyOptionColor(view);
     // [EN] Colors asked for before the file was built. [CN] 文件建好之前请求的颜色。
     if (this.requestedColors !== undefined) {
       this.cylApplyRequestedColors(view);
@@ -521,6 +604,7 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
   }
 
   private cylCancelTimers(): void {
+    this.cylCancelRedraw();
     this.cylCancelDeactivate();
     this.cylCancelLoop();
     this.cylCancelEndWatch();

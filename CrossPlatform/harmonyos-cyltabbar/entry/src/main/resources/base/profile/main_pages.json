@@ -11,6 +11,7 @@
     "pages/GalleryScene",
     "pages/LiquidGlassDock",
     "pages/AnimatedItemEnd",
+    "pages/RiveColors",
     "pages/Released"
   ]
 }
