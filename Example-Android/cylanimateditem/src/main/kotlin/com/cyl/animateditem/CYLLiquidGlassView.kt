@@ -1,4 +1,4 @@
-package com.cyl.liquidglass
+package com.cyl.animateditem
 
 import android.content.Context
 import android.graphics.Canvas
@@ -17,7 +17,7 @@ import android.view.View
  *      以 `glassTintColor` 着色并加上玻璃高光边缘。`CYLLiquidGlass.isActive()` 为 false 或画布未硬件加速时不绘制（`isGlassDrawn` 为
  *      false），调用方保持其扁平背景。不接收触摸，对辅助功能隐藏。某个玻璃视图绘制页面时，页面中的其他玻璃视图不绘制（玻璃里不嵌玻璃）。
  */
-class CYLLiquidGlassView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
+internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
 
     private val backdrop = CYLGlassBackdrop()
     private val highlight = CYLGlassHighlight()

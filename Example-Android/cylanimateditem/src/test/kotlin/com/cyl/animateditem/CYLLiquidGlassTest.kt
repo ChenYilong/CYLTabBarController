@@ -1,4 +1,4 @@
-package com.cyl.liquidglass
+package com.cyl.animateditem
 
 import androidx.test.core.app.ApplicationProvider
 import org.junit.After
@@ -11,14 +11,15 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * The availability rule and the glass view's contract (the same names as iOS `CYLLiquidGlass` / `CYLLiquidGlassView`).
+ * The availability rule and the background API of `CYLAnimatedItemView` (the same names as iOS and HarmonyOS): flat color, Liquid
+ * Glass where the device draws it, corner radius and border.
  */
 @RunWith(RobolectricTestRunner::class)
 class CYLLiquidGlassTest {
 
     @After
     fun reset() {
-        CYLLiquidGlass.activeOverride = null
+        CYLAnimatedItemView.liquidGlassActiveOverride = null
     }
 
     @Test
@@ -57,6 +58,33 @@ class CYLLiquidGlassTest {
         assertFalse("flat where glass is inactive", view.isGlassDrawn)
         assertEquals(View_IMPORTANT_NO, view.importantForAccessibility)
         assertFalse(view.isClickable)
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun theItemDrawsItsFlatBackgroundRadiusAndBorderAndGlassOnlyWhereTheDeviceDrawsIt() {
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        val view = CYLAnimatedItemView(context)
+        view.itemBackgroundColor = 0xFF336699.toInt()
+        view.itemCornerRadius = 1000f
+        view.itemBorderWidth = 1f
+        view.itemBorderColor = android.graphics.Color.RED
+        view.layout(0, 0, 200, 80)
+        assertTrue("a background is drawn once an item… property is set", view.background != null)
+        assertEquals(CYLAnimatedItemBackgroundStyle.Flat, view.resolvedItemBackgroundStyle)
+        assertTrue("flat: no glass layer", view.itemLiquidGlassView == null)
+
+        view.itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.LiquidGlass
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        view.itemBackgroundColor = 0x66FF8800
+        view.layout(0, 0, 200, 80)
+        assertEquals(CYLAnimatedItemBackgroundStyle.LiquidGlass, view.resolvedItemBackgroundStyle)
+        assertTrue("glass layer behind the content", view.itemLiquidGlassView != null)
+
+        CYLAnimatedItemView.liquidGlassActiveOverride = false
+        view.itemBackgroundColor = 0x66FF8801
+        assertEquals("ignored where the device draws none", CYLAnimatedItemBackgroundStyle.Flat, view.resolvedItemBackgroundStyle)
+        assertTrue(view.itemLiquidGlassView == null)
     }
 
     private companion object {

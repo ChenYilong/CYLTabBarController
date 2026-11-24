@@ -30,7 +30,7 @@ val cylVersion: String = providers.gradleProperty("cylVersion").orNull ?: podspe
 val cylGroup: String = providers.gradleProperty("cylGroup").orNull ?: "io.github.chenyilong"
 
 subprojects {
-    if (name != "tabpages" && name != "cyltabbar" && name != "cylanimateditem" && name != "cylliquidglass") return@subprojects
+    if (name != "tabpages" && name != "cyltabbar" && name != "cylanimateditem") return@subprojects
     group = cylGroup
     version = cylVersion
     plugins.withId("maven-publish") {
@@ -40,13 +40,11 @@ subprojects {
                     name.set(when (project.name) {
                         "tabpages" -> "CYLTabBarController pages"
                         "cylanimateditem" -> "CYLAnimatedItem"
-                        "cylliquidglass" -> "CYLLiquidGlass"
                         else -> "CYLTabBarController"
                     })
                     description.set(when (project.name) {
                         "tabpages" -> "The page registry and configuration rules of CYLTabBarController for Android (pure Kotlin)."
                         "cylanimateditem" -> "The animation engine (Lottie, PAG, Rive, GIF, SVGA) and CYLAnimatedItemView, an animated icon + title view to subclass; no tab bar code."
-                        "cylliquidglass" -> "Liquid Glass as a base library: the AGSL glass (backdrop, effects, highlight), CYLLiquidGlass.isActive() and CYLLiquidGlassView, a glass background for any view; no tab bar code."
                         else -> "CYLTabBarController for Android: the iOS library's tab bar controller, plus button, badges, themes, animated tab icons and configuration files."
                     })
                     url.set("https://github.com/ChenYilong/CYLTabBarController")

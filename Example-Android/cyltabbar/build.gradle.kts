@@ -49,8 +49,6 @@ dependencies {
     // The page registry and the configuration rules (pure Kotlin). 页面注册表与配置规则（纯 Kotlin）。
     api(project(":tabpages"))
     api(project(":cylanimateditem"))
-    // [EN] Liquid Glass as a base library (the glass the tab bar draws; no dependency on the tab bar). [CN] 作为基础库的液态玻璃（TabBar 绘制的玻璃；不依赖 TabBar）。
-    api(project(":cylliquidglass"))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.fragment.ktx)
     // [EN] The callback registry of the layout block, the same logic as iOS (CYLDeallocBlockExecutor), from JitPack, pinned to a commit.

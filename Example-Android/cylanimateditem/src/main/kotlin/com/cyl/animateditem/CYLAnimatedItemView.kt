@@ -50,6 +50,15 @@ import kotlin.math.roundToInt
  *      无障碍文本（`accessibilityText`）、更多手势（`onItemTouchEvent`）或动画来源（`animationSource`）。
  *      长度单位为 px，名称以 `Dp` 结尾的除外。
  */
+/**
+ * [EN] What the view's background is made of: the solid `itemBackgroundColor` (`Flat`, default), or Liquid Glass tinted with it
+ *      (`LiquidGlass`; drawn only where the device draws Liquid Glass, `CYLAnimatedItemView.isLiquidGlassActive()`: Android 12
+ *      and later, as the tab bar; elsewhere the style is ignored and the view stays flat). Same names as iOS and HarmonyOS.
+ * [CN] 视图背景的构成：纯色 `itemBackgroundColor`（`Flat`，默认），或以它着色的液态玻璃（`LiquidGlass`；只在设备绘制液态玻璃处绘制，
+ *      `CYLAnimatedItemView.isLiquidGlassActive()`：与 TabBar 一样为 Android 12 及以上；其他设备忽略该样式，保持扁平）。与 iOS、鸿蒙同名。
+ */
+enum class CYLAnimatedItemBackgroundStyle { Flat, LiquidGlass }
+
 open class CYLAnimatedItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -529,6 +538,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        glassLayer?.let { if (it.parent != null) it.layout(0, 0, r - l, b - t) }
         layoutContent(paddingLeft, paddingTop, r - l - paddingRight, b - t - paddingBottom)
     }
 
@@ -1166,7 +1176,111 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val pausesWhileScrolling: Boolean get() = scrollObservers != null
     }
 
+    // MARK: Background (flat or Liquid Glass), corner radius and border
+
+    /**
+     * [EN] The background: `Flat` (default) fills the view with `itemBackgroundColor`; `LiquidGlass` draws Liquid Glass behind
+     *      the content, tinted with `itemBackgroundColor`, clipped to `itemCornerRadius`. Where the device draws no Liquid Glass
+     *      (`isLiquidGlassActive()`) the style is ignored and the view stays flat (`resolvedItemBackgroundStyle`). Setting any
+     *      `item…` background property makes the view draw its background, corner radius and border (the countdown style keeps
+     *      its own). Same names as iOS and HarmonyOS.
+     * [CN] 背景：`Flat`（默认）用 `itemBackgroundColor` 填充；`LiquidGlass` 在内容后面绘制液态玻璃，以 `itemBackgroundColor` 着色并按
+     *      `itemCornerRadius` 裁剪。设备不使用液态玻璃（`isLiquidGlassActive()`）时忽略该样式，保持扁平（`resolvedItemBackgroundStyle`）。
+     *      设置任一 `item…` 背景属性后，视图绘制其背景、圆角与边框（倒计时样式保持自己的外观）。与 iOS、鸿蒙同名。
+     */
+    var itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.Flat
+        set(value) { field = value; itemBackgroundDidChange() }
+
+    /** [EN] The solid fill when flat, the glass tint when Liquid Glass (an ARGB color); null for none. [CN] 扁平时的纯色填充，液态玻璃时的着色（ARGB 颜色）；null 表示无。 */
+    var itemBackgroundColor: Int? = null
+        set(value) { field = value; itemBackgroundDidChange() }
+
+    /**
+     * [EN] The corner radius in dp, applied as `min(radius, height / 2)`: 0 is square, a large value such as 1000 is a capsule.
+     * [CN] 圆角半径（dp），实际取 `min(radius, height / 2)`：0 为直角，较大的值（如 1000）为胶囊。
+     */
+    var itemCornerRadius: Float = 0f
+        set(value) { field = value; itemBackgroundDidChange() }
+
+    /** [EN] The border width in dp. [CN] 边框宽度（dp）。 */
+    var itemBorderWidth: Float = 0f
+        set(value) { field = value; itemBackgroundDidChange() }
+
+    /** [EN] The border color (an ARGB color); null for none. [CN] 边框颜色（ARGB 颜色）；null 表示无。 */
+    var itemBorderColor: Int? = null
+        set(value) { field = value; itemBackgroundDidChange() }
+
+    /**
+     * [EN] The background really drawn: `itemBackgroundStyle`, or `Flat` where `isLiquidGlassActive()` is false.
+     * [CN] 实际绘制的背景：`itemBackgroundStyle`，`isLiquidGlassActive()` 为 false 时为 `Flat`。
+     */
+    val resolvedItemBackgroundStyle: CYLAnimatedItemBackgroundStyle
+        get() = if (itemBackgroundStyle == CYLAnimatedItemBackgroundStyle.LiquidGlass && isLiquidGlassActive()) {
+            CYLAnimatedItemBackgroundStyle.LiquidGlass
+        } else {
+            CYLAnimatedItemBackgroundStyle.Flat
+        }
+
+    /**
+     * [EN] The Liquid Glass layer behind the content while it is drawn; null while the view is flat.
+     * [CN] 绘制液态玻璃时位于内容后面的玻璃层；视图为扁平时为 null。
+     */
+    val itemLiquidGlassView: View? get() = glassLayer?.takeIf { it.parent != null }
+
+    private val itemBox = GradientDrawable()
+    private var usesItemBackground = false
+    private var glassLayer: CYLLiquidGlassView? = null
+
+    private fun itemBackgroundDidChange() {
+        usesItemBackground = true
+        applyItemBackground()
+        invalidate()
+    }
+
+    /** [EN] Applies the background, radius and border for the current size. [CN] 按当前尺寸应用背景、圆角与边框。 */
+    private fun applyItemBackground() {
+        if (!usesItemBackground) return
+        val density = resources.displayMetrics.density
+        val radius = min(max(itemCornerRadius, 0f) * density, height / 2f)
+        itemBox.cornerRadius = radius
+        itemBox.setStroke((itemBorderWidth * density).roundToInt(), itemBorderColor ?: Color.TRANSPARENT)
+        var glassDrawn = false
+        if (resolvedItemBackgroundStyle == CYLAnimatedItemBackgroundStyle.LiquidGlass) {
+            val glass = glassLayer ?: CYLLiquidGlassView(context).also { glassLayer = it }
+            glass.glassTintColor = itemBackgroundColor
+            glass.cornerRadius = radius
+            if (glass.parent == null) addView(glass, 0)
+            glass.visibility = VISIBLE
+            glass.layout(0, 0, width, height)
+            glass.applyEffect()
+            glassDrawn = glass.isGlassDrawn
+        }
+        if (!glassDrawn) glassLayer?.let { if (it.parent != null) removeView(it) }
+        itemBox.setColor(if (glassDrawn) Color.TRANSPARENT else (itemBackgroundColor ?: Color.TRANSPARENT))
+        if (background !== itemBox) background = itemBox
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        applyItemBackground()
+    }
+
     companion object {
+        /**
+         * [EN] Whether the device draws Liquid Glass, the one rule the tab bar uses too: Android 12 and later (Android 13+ the full
+         *      glass with refraction, Android 12 the blur only); false on older versions. Same name as iOS and HarmonyOS.
+         * [CN] 设备是否绘制液态玻璃，TabBar 也使用这唯一的规则：Android 12 及以上（Android 13+ 完整玻璃含折射，Android 12 只有模糊）；更早的版本为 false。与 iOS、鸿蒙同名。
+         */
+        @JvmStatic fun isLiquidGlassActive(): Boolean = CYLLiquidGlass.isActive()
+
+        /**
+         * [EN] For tests: replaces the device check of `isLiquidGlassActive()` (null, the default, asks the device).
+         * [CN] 供测试使用：替代 `isLiquidGlassActive()` 对设备的检查（默认 null，询问设备）。
+         */
+        @JvmStatic var liquidGlassActiveOverride: Boolean?
+            get() = CYLLiquidGlass.activeOverride
+            set(value) { CYLLiquidGlass.activeOverride = value }
+
         /**
          * [EN] True: every playing animated item pauses while any observed scroll source (`LifecycleCenter`: a `RecyclerView` through
          *      `AndroidBinding.observeScrolling`, a view controller's scroll view) is dragged or decelerating, and resumes when scrolling

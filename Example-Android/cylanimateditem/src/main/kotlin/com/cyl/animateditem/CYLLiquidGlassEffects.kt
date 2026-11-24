@@ -20,7 +20,7 @@
    Changes: Compose modifiers replaced by RenderNode drawing in a View; only the rounded rectangle shapes the tab bar uses.
  */
 
-package com.cyl.liquidglass
+package com.cyl.animateditem
 
 import android.graphics.BlendMode
 import android.graphics.Canvas
