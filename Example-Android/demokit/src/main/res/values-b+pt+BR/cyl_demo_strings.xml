@@ -34,6 +34,7 @@
     <string name="cyl_demo_2db1db0706">Reprodução</string>
     <string name="cyl_demo_34bffc9c7a">Animações dos ícones das abas: Reproduzir tudo, velocidade, repetição</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">Velocidade %@, repetição %@; toque para ver os controles</string>
+    <string name="cyl_demo_2f63c1fff7">Liberar o controlador da barra de abas (em 3 s)</string>
     <string name="cyl_demo_a4fe65264e">Idioma</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">Atual: %@</string>
     <string name="cyl_demo_bbc5e661e1">sistema</string>
@@ -320,6 +321,7 @@
     <string name="cyl_demo_12e7b8220d">Reproduzir tudo</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">Velocidade: %@</string>
     <string name="cyl_demo_f2f6a01889">Repetir</string>
+    <string name="cyl_demo_08078d674a">Controlador da barra de abas liberado</string>
     <string name="cyl_demo_44a57b22e0">Alerta</string>
     <string name="cyl_demo_a127ceb079">Folha de ações</string>
     <string name="cyl_demo_9329618118">Folha de página</string>
@@ -338,6 +340,10 @@
     <string name="cyl_demo_1698b890f9">Executa todas as linhas automáticas, uma após a outra.</string>
     <string name="cyl_demo_afa158bdc8">Sobre o contexto atual</string>
     <string name="cyl_demo_0add8377e7" formatted="false">\"%@\" pressionado e segurado</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">callbacks de dealloc executados: %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">callbacks de dealloc executados: %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">liberação: em %d s</string>
+    <string name="cyl_demo_c0fd658b68">liberação: não executada</string>
     <string name="cyl_demo_d4f455fa45">Abrir: duas barras de abas, um ID de página</string>
     <string name="cyl_demo_5b88804382" formatted="false">Barra de abas %@ · ID da página “%@”</string>
 </resources>

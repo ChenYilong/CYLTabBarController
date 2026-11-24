@@ -34,6 +34,7 @@
     <string name="cyl_demo_2db1db0706">Prehrávanie</string>
     <string name="cyl_demo_34bffc9c7a">Animácie ikon kariet: Prehrať všetko, rýchlosť, opakovanie</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">Rýchlosť %@, opakovanie %@; ťuknutím zobrazíte ovládacie prvky</string>
+    <string name="cyl_demo_2f63c1fff7">Uvoľniť kontrolér panela kariet (o 3 s)</string>
     <string name="cyl_demo_a4fe65264e">Jazyk</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">Aktuálne: %@</string>
     <string name="cyl_demo_bbc5e661e1">systém</string>
@@ -320,6 +321,7 @@
     <string name="cyl_demo_12e7b8220d">Prehrať všetko</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">Rýchlosť: %@</string>
     <string name="cyl_demo_f2f6a01889">Slučka</string>
+    <string name="cyl_demo_08078d674a">Kontrolér panela kariet bol uvoľnený</string>
     <string name="cyl_demo_44a57b22e0">Upozornenie</string>
     <string name="cyl_demo_a127ceb079">Hárok akcií</string>
     <string name="cyl_demo_9329618118">Hárok stránky</string>
@@ -338,6 +340,10 @@
     <string name="cyl_demo_1698b890f9">Spustí všetky automatické riadky jeden po druhom.</string>
     <string name="cyl_demo_afa158bdc8">Nad aktuálnym kontextom</string>
     <string name="cyl_demo_0add8377e7" formatted="false">Dlho podržané „%@“</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">vykonané spätné volania dealloc: %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">vykonané spätné volania dealloc: %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">uvoľnenie: o %d s</string>
+    <string name="cyl_demo_c0fd658b68">uvoľnenie: nespustené</string>
     <string name="cyl_demo_d4f455fa45">Otvoriť: dva panely kariet, jedno ID stránky</string>
     <string name="cyl_demo_5b88804382" formatted="false">Panel kariet %@ · ID stránky „%@“</string>
 </resources>
