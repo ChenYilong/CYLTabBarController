@@ -397,6 +397,15 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
     var itemBorderColor: Int? = null
         set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
+    /**
+     * [EN] The share of the color's alpha that tints a Liquid Glass: null (the default) is 0.75, so an opaque color tints the glass instead of
+     *      covering it; 1 uses the color as it is (a selected tag keeps its full color, still glass). Not used by the flat style.
+     * [CN] 颜色透明度中用于给液态玻璃着色的比例：null（默认）为 0.75，不透明的颜色是给玻璃着色而不是盖住它；1 表示按原色（选中的标签保持完整颜色，仍是玻璃）。
+     *      扁平样式不使用。
+     */
+    var itemGlassTintAlpha: Float? = null
+        set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
+
     /** [EN] The background really drawn (Flat where the device draws no glass). [CN] 实际绘制的背景（设备不绘制玻璃时为 Flat）。 */
     val resolvedItemBackgroundStyle: CYLAnimatedItemBackgroundStyle
         get() = itemBackgroundRenderer.resolvedStyle(itemBackgroundStyle)
@@ -416,7 +425,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
 
     private fun applyItemBackground() {
         if (!usesItemBackground) return
-        itemBackgroundRenderer.apply(itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor)
+        itemBackgroundRenderer.apply(itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {

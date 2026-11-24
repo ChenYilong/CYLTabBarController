@@ -157,16 +157,24 @@ final class CYLAnimatedItemBackgroundRenderer {
      * [CN] nil 与完全透明的颜色（按 `traits` 解析动态色后透明度为 0，例如 `UIColor.clear`）都表示「没有颜色」：使用默认磨砂着色。把填充清除的宿主
      *      （标签样式唯一的「无颜色」）得到同样看得见的玻璃。
      */
-    static func glassTint(_ color: UIColor?, traits: UITraitCollection = .current) -> UIColor? {
+    static func glassTint(_ color: UIColor?, traits: UITraitCollection = .current, tintAlpha: CGFloat? = nil) -> UIColor? {
         guard let color else { return defaultGlassTint }
         var alpha: CGFloat = 1
         color.resolvedColor(with: traits).getRed(nil, green: nil, blue: nil, alpha: &alpha)
         if alpha == 0 { return defaultGlassTint }
-        return color.withAlphaComponent(alpha * glassTintAlpha)
+        return color.withAlphaComponent(alpha * (tintAlpha ?? glassTintAlpha))
+    }
+
+    /**
+     * [EN] The content inset in use: `explicit` when set (0 included), else the glass constant where Liquid Glass is really drawn, 0 when flat.
+     * [CN] 实际使用的内容内缩：已设置时为 `explicit`（包括 0），否则真正绘制液态玻璃时为玻璃常量，扁平时为 0。
+     */
+    static func resolvedContentHorizontalInset(_ explicit: CGFloat?, style: CYLAnimatedItemBackgroundStyle) -> CGFloat {
+        explicit ?? (resolvedStyle(style) == .liquidGlass ? CYLAnimatedItemLiquidGlassContentInset : 0)
     }
 
     func apply(on host: UIView, style: CYLAnimatedItemBackgroundStyle, color: UIColor?, cornerRadius: CGFloat?,
-               borderWidth: CGFloat, borderColor: UIColor?) {
+               borderWidth: CGFloat, borderColor: UIColor?, tintAlpha: CGFloat? = nil) {
         let resolved = Self.resolvedStyle(style)
         let height = host.bounds.height
         let radius: CGFloat
@@ -181,7 +189,7 @@ final class CYLAnimatedItemBackgroundRenderer {
         var glassDrawn = false
         if resolved == .liquidGlass {
             let glass = glassView ?? CYLLiquidGlassView()
-            glass.glassTintColor = Self.glassTint(color, traits: host.traitCollection)
+            glass.glassTintColor = Self.glassTint(color, traits: host.traitCollection, tintAlpha: tintAlpha)
             glass.cornerRadius = radius
             glass.frame = host.bounds
             if glass.superview == nil {

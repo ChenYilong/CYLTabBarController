@@ -1020,6 +1020,12 @@ struct Index {
         subtitle: CYLLocalizedString('applyColors: a view model color property of a data-bound .riv'),
         action: () => this.push('pages/RiveColors', {} as DemoPushParams),
       } as DemoRow] } as DemoSection] : []),
+      // [EN] onResourceMissing (docs/Animated-Item.md): a missing file per type reports its reason. [CN] onResourceMissing：每种类型的缺失文件报告原因。
+      ...(page === DEMO_CITY ? [{ title: 'onResourceMissing', rows: [{
+        id: 'resource-missing', title: 'onResourceMissing',
+        subtitle: 'A missing GIF, SVGA, PAG, Lottie and Rive file, and an unknown type: the callback and the global listener',
+        action: () => this.push('pages/ResourceMissing', {} as DemoPushParams),
+      } as DemoRow] } as DemoSection] : []),
       // [EN] The teardown row (iOS CYLDemoReleaseRow, docs/Lifecycle-Library.md step 21), on the second tab: leaves this page after 3 s
       //      and the released page shows how many dealloc callbacks ran. [CN] 销毁行（对应 iOS 的 CYLDemoReleaseRow），位于第二个 Tab：3 秒后离开本页，
       //      释放后的页面显示执行了多少个 dealloc 回调。

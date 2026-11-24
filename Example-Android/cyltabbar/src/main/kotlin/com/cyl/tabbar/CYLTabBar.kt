@@ -158,6 +158,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
     }
 
     override fun cyl_animationViewDidFail(animationView: View) {
+        CYLTabBarItemAnimationFailure.missingResource(animationView)?.let { (resource, reason) -> resourceMissing(resource, reason) }
         CYLTabBarItemAnimationFailure.fallbackHandler?.invoke(this)
     }
 

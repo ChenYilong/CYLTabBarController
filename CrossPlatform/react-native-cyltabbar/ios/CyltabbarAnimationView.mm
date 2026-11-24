@@ -38,7 +38,7 @@ using namespace facebook::react;
  * [EN] An animation played by CYLTabBarController's engine through a `CYLAnimatedItemView`, the same contract as the Android
  *      view (`CyltabbarAnimationView.kt`): the props `source`, `playing`, `selected`, `animationSpeed`, `animationLoops`,
  *      `animationRestartToken`, `drivesAnimationPlayback`, `iconSize`, `tintColor`, `itemBackgroundStyle`, `itemBackgroundColor`,
- *      `itemCornerRadius`, `itemBorderWidth`, `itemBorderColor`; the events `onAnimationLoaded`,
+ *      `itemCornerRadius`, `itemContentHorizontalInset`, `itemBorderWidth`, `itemBorderColor`; the events `onAnimationLoaded`,
  *      `onAnimationFailed`, `onAnimationEnd`; the commands `play`, `stopAtProgress`, `restart`. No engine logic here. The
  *      restart token is read-only on iOS (`animationRestartToken` grows on every `restartAnimation()`), so a changed token calls
  *      `restartAnimation()`; the token the view is created with is not a restart.
@@ -230,6 +230,8 @@ static NSURL *CYLRNAnimationURL(NSString *source)
       : CYLAnimatedItemBackgroundStyleFlat;
   _item.itemBackgroundColor = RCTUIColorFromSharedColor(newProps.itemBackgroundColor);
   _item.itemCornerRadiusNumber = newProps.itemCornerRadius >= 0 ? @(newProps.itemCornerRadius) : nil;
+  // [EN] A negative inset is not set (nil: 14 for drawn glass, 0 for flat). [CN] 负数内缩表示未设置（nil：绘制玻璃时为 14，扁平为 0）。
+  _item.itemContentHorizontalInsetNumber = newProps.itemContentHorizontalInset >= 0 ? @(newProps.itemContentHorizontalInset) : nil;
   _item.itemBorderWidth = newProps.itemBorderWidth;
   _item.itemBorderColor = RCTUIColorFromSharedColor(newProps.itemBorderColor);
   _item.selected = newProps.selected;

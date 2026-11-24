@@ -441,7 +441,7 @@ const cylAnimatedItemGlassTintAlpha = 0.75
  * [CN] 玻璃使用的着色：'#RGB'、'#RRGGBB'、'#RRGGBBAA'、'rgb()' 或 'rgba()' 颜色变为半透明（其透明度乘以 `cylAnimatedItemGlassTintAlpha`），因此选中标签的
  *      绿色这样的不透明色是给玻璃着色而不是盖住它；与 iOS、Android、鸿蒙同一规则。其他颜色文本原样使用。
  */
-function cylAnimatedItemGlassTint(color) {
+function cylAnimatedItemGlassTint(color, tintAlpha) {
   const text = String(color || '').trim()
   let r, g, b, a = 1
   let m = text.match(/^#([0-9a-fA-F]{3})$/)
@@ -459,13 +459,13 @@ function cylAnimatedItemGlassTint(color) {
   }
   // A fully transparent color means "no color" too: the caller then uses the default frosted tint.
   if (a === 0) return ''
-  return `rgba(${r},${g},${b},${Math.round(a * cylAnimatedItemGlassTintAlpha * 1000) / 1000})`
+  return `rgba(${r},${g},${b},${Math.round(a * (Number(tintAlpha) >= 0 ? Number(tintAlpha) : cylAnimatedItemGlassTintAlpha) * 1000) / 1000})`
 }
 
 /**
  * @returns {{css: string, glass: boolean}} the inline style of the root view, '' when no `item…` background property is set
  */
-function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, borderColor, isDark, contentInset) {
+function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, borderColor, isDark, tintAlpha, contentInset) {
   const border = Number(borderWidth) > 0 ? Number(borderWidth) : 0
   const explicitInset = contentInset === undefined || contentInset === null || contentInset === '' ? -1 : Number(contentInset)
   const used = style === 'liquidGlass' || (color || '') !== '' || Number(cornerRadius) >= 0 || border > 0 || (borderColor || '') !== '' || explicitInset >= 0
@@ -482,7 +482,7 @@ function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, bord
   if (inset > 0) css += `--cyl-item-inset:${inset}px;`
   if (border > 0) css += `border:${border}px solid ${borderColor || 'transparent'};box-sizing:border-box;`
   if (glass) {
-    const tint = (color ? cylAnimatedItemGlassTint(color) : '') || (isDark ? 'rgba(255,255,255,0.14)' : 'rgba(225,222,220,0.5)')
+    const tint = (color ? cylAnimatedItemGlassTint(color, tintAlpha) : '') || (isDark ? 'rgba(255,255,255,0.14)' : 'rgba(225,222,220,0.5)')
     css += `background-color:${tint};backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);`
     css += `box-shadow:inset 0 1px 0 rgba(255,255,255,${isDark ? 0.18 : 0.6});overflow:hidden;`
   } else if (color) {

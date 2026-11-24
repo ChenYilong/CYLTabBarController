@@ -51,8 +51,12 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
 
   borderColor: ResourceColor;
 
+  /** [EN] The share of the color's alpha that tints the glass, -1 for the default 0.75. [CN] 用于给玻璃着色的颜色透明度比例，-1 为默认的 0.75。 */
+  tintAlpha: number;
+
   constructor(style: CYLAnimatedItemBackgroundStyle, color: ResourceColor, cornerRadius: number = -1, borderWidth: number = 0,
-    borderColor: ResourceColor = Color.Transparent) {
+    borderColor: ResourceColor = Color.Transparent, tintAlpha: number = -1) {
+    this.tintAlpha = tintAlpha;
     this.style = style;
     this.color = color;
     this.cornerRadius = cornerRadius;
@@ -96,7 +100,7 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
    * [CN] 玻璃使用的着色：'#RRGGBB'、'#AARRGGBB' 或 ARGB 数值颜色变为半透明（其透明度乘以 `CYLLiquidGlass.GLASS_TINT_ALPHA`），因此选中标签的绿色这样的
    *      不透明色是给玻璃着色而不是盖住它；与 iOS、Android 同一规则。其他类型的颜色（资源、`Color` 值）原样使用。
    */
-  static glassTint(color: ResourceColor): ResourceColor {
+  static glassTint(color: ResourceColor, tintAlpha: number = -1): ResourceColor {
     // [EN] No color set: the default frosted tint (225, 222, 220 at alpha 0.5, as iOS in light mode). [CN] 未设置颜色：默认的磨砂着色（225, 222, 220，透明度 0.5，与 iOS 浅色模式相同）。
     if (color === Color.Transparent || color === '') {
       return CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT;
@@ -115,7 +119,7 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
     instance.backgroundEffect(glass ?
       { radius: CYLLiquidGlass.BLUR_RADIUS, saturation: CYLLiquidGlass.BLUR_SATURATION, brightness: CYLLiquidGlass.LIGHT_BRIGHTNESS } :
       { radius: 0 });
-    instance.backgroundColor(glass ? CYLAnimatedItemBackgroundModifier.glassTint(this.color) : this.color);
+    instance.backgroundColor(glass ? CYLAnimatedItemBackgroundModifier.glassTint(this.color, this.tintAlpha) : this.color);
     instance.borderRadius(CYLAnimatedItemBackgroundModifier.resolvedCornerRadius(this.style, this.cornerRadius));
     instance.borderWidth(this.borderWidth);
     instance.borderColor(this.borderColor);

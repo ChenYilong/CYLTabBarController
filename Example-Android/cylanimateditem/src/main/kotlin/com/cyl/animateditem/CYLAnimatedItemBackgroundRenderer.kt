@@ -59,14 +59,14 @@ internal class CYLAnimatedItemBackgroundRenderer(private val host: ViewGroup) {
      *      selected tag's green tints the glass instead of covering it. One rule for every host, the same on every platform.
      * [CN] 玻璃使用的着色：宿主颜色变为半透明（其透明度乘以 [GLASS_TINT_ALPHA]），因此选中标签的绿色这样的不透明色是给玻璃着色而不是盖住它。所有宿主、所有平台同一规则。
      */
-    fun glassTint(color: Int?): Int =
+    fun glassTint(color: Int?, tintAlpha: Float? = null): Int =
         // [EN] null and a fully transparent color (Color.TRANSPARENT) both mean "no color": the default frosted tint. [CN] null 与完全透明的颜色
         //      （Color.TRANSPARENT）都表示「没有颜色」：使用默认磨砂着色。
         color?.takeIf { Color.alpha(it) != 0 }
-            ?.let { Color.argb((Color.alpha(it) * GLASS_TINT_ALPHA).roundToInt(), Color.red(it), Color.green(it), Color.blue(it)) }
+            ?.let { Color.argb((Color.alpha(it) * (tintAlpha ?: GLASS_TINT_ALPHA)).roundToInt(), Color.red(it), Color.green(it), Color.blue(it)) }
             ?: defaultGlassTint(host.resources)
 
-    fun apply(style: CYLAnimatedItemBackgroundStyle, color: Int?, cornerRadius: Float?, borderWidth: Float, borderColor: Int?) {
+    fun apply(style: CYLAnimatedItemBackgroundStyle, color: Int?, cornerRadius: Float?, borderWidth: Float, borderColor: Int?, tintAlpha: Float? = null) {
         val density = host.resources.displayMetrics.density
         val resolved = resolvedStyle(style)
         val height = host.height
@@ -82,7 +82,7 @@ internal class CYLAnimatedItemBackgroundRenderer(private val host: ViewGroup) {
         var glassDrawn = false
         if (resolved == CYLAnimatedItemBackgroundStyle.LiquidGlass) {
             val glass = layer ?: CYLLiquidGlassView(host.context).also { layer = it }
-            glass.glassTintColor = glassTint(color)
+            glass.glassTintColor = glassTint(color, tintAlpha)
             glass.cornerRadius = radius
             if (glass.parent == null) host.addView(glass, 0)
             glass.visibility = View.VISIBLE

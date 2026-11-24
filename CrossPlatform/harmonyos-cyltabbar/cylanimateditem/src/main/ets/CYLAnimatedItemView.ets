@@ -548,6 +548,11 @@ export struct CYLAnimatedItemView {
   /** [EN] The border color; '' for none. [CN] 边框颜色；'' 表示无。 */
   @Prop itemBorderColor: ResourceColor = '';
   /**
+   * [EN] The share of the color's alpha that tints a Liquid Glass: -1 (the default) is 0.75; 1 uses the color as it is (a selected tag keeps its
+   *      full color, still glass). [CN] 颜色透明度中用于给液态玻璃着色的比例：-1（默认）为 0.75；1 表示按原色（选中的标签保持完整颜色，仍是玻璃）。
+   */
+  @Prop itemGlassTintAlpha: number = -1;
+  /**
    * [EN] The color the animation is drawn in, as one color, like a tinted template image (iOS / Android
    *      `CYLTabBarAnimationOptionTint`); '' keeps the file's own colors. Any engine: a layer of this color is
    *      composited "source in" over the engine view, in its own offscreen group, so the shape takes the color and its
@@ -1231,7 +1236,7 @@ export struct CYLAnimatedItemView {
   private cylItemBackgroundColor(): ResourceColor {
     // [EN] The glass tint is translucent (and a default frosted tint when none is set): the shared rule of the modifier. [CN] 玻璃着色是半透明的（未设置时为默认磨砂着色）：与修饰器共用同一规则。
     if (this.cylItemGlassDrawn()) {
-      return CYLAnimatedItemBackgroundModifier.glassTint(this.itemBackgroundColor !== '' ? this.itemBackgroundColor : Color.Transparent);
+      return CYLAnimatedItemBackgroundModifier.glassTint(this.itemBackgroundColor !== '' ? this.itemBackgroundColor : Color.Transparent, this.itemGlassTintAlpha);
     }
     return this.itemBackgroundColor !== '' ? this.itemBackgroundColor : Color.Transparent;
   }

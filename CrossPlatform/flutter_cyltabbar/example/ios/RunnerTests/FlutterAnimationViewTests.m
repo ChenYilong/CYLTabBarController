@@ -382,6 +382,17 @@
     XCTAssertNil([_item valueForKey:@"itemCornerRadiusNumber"]);
 }
 
+- (void)testTheContentInsetIsPointsAndNullIsUnset {
+    [self makeBridgeWithArguments:@{}];
+    XCTAssertNil([_item valueForKey:@"itemContentHorizontalInsetNumber"], @"unset: 14 for drawn glass, 0 for flat");
+    [self makeBridgeWithArguments:@{ @"itemContentHorizontalInset" : @20 }];
+    XCTAssertEqualWithAccuracy([[_item valueForKey:@"itemContentHorizontalInsetNumber"] doubleValue], 20, 0.0001);
+    [self callMethod:@"setItemContentHorizontalInset" argument:@0];
+    XCTAssertEqualObjects([_item valueForKey:@"itemContentHorizontalInsetNumber"], @0, @"0 is explicit, not unset");
+    [self callMethod:@"setItemContentHorizontalInset" argument:nil];
+    XCTAssertNil([_item valueForKey:@"itemContentHorizontalInsetNumber"]);
+}
+
 - (void)testTheBorderWidthAndColorReachTheItem {
     [self makeBridgeWithArguments:@{ @"itemBorderWidth" : @2, @"itemBorderColor" : @(0xFF0000FF) }];
     XCTAssertEqualWithAccuracy([[_item valueForKey:@"itemBorderWidth"] doubleValue], 2, 0.0001);

@@ -18,10 +18,8 @@ String animationURLWithOptions(String file, [Map<String, Object> options = const
 /// the native view treats it as exactly half the height.
 const double cylAnimatedItemCornerRadiusCapsule = 1000;
 
-/// The space (logical pixels) between the outer border and the content, left and right, that a Liquid Glass item gets while
-/// [CYLAnimationView.itemContentHorizontalInset] is null: a capsule's round ends take room from the content, so the unset glass
-/// inset is wider; the unset flat inset is 0. The same condition as the unset [CYLAnimationView.itemCornerRadius]. Use the name,
-/// never the literal; the native core holds the same constant (`CYLAnimatedItemLiquidGlassContentInset`).
+/// The named constant of the default content inset on Liquid Glass (14 logical pixels): what [CYLAnimationView.itemContentHorizontalInset]
+/// resolves to where glass is really drawn and nothing is set.
 const double cylAnimatedItemLiquidGlassContentInset = 14;
 
 /// What the item's background is made of: the solid `itemBackgroundColor` ([flat], default), or Liquid Glass tinted with it
@@ -130,9 +128,8 @@ class CYLAnimationView extends StatefulWidget {
   /// capsule. null (default): a capsule for Liquid Glass, square for flat.
   final double? itemCornerRadius;
 
-  /// The space between the outer border and the content on the left and right, in logical pixels, on top of the padding. null
-  /// (default): [cylAnimatedItemLiquidGlassContentInset] for Liquid Glass (a capsule's round ends take room from the content),
-  /// 0 for flat; any number is explicit, also 0 on glass. The partner of [itemCornerRadius].
+  /// The space between the outer border and the content, left and right only, on top of the view's own padding, in logical pixels.
+  /// null (default): [cylAnimatedItemLiquidGlassContentInset] where Liquid Glass is really drawn, 0 for flat. Any number wins, including 0.
   final double? itemContentHorizontalInset;
 
   /// The border width in logical pixels.

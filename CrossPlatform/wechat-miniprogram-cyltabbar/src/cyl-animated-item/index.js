@@ -66,6 +66,8 @@ Component({
     itemContentHorizontalInset: { type: Number, value: -1 },
     itemBorderWidth: { type: Number, value: 0 },
     itemBorderColor: { type: String, value: '' },
+    // The share of the color's alpha that tints a Liquid Glass: -1 (default) is 0.75, 1 the color as it is.
+    itemGlassTintAlpha: { type: Number, value: -1 },
     title: { type: String, value: '' },
     image: { type: String, value: '' },
     selectedImage: { type: String, value: '' },
@@ -275,8 +277,8 @@ Component({
   },
 
   observers: {
-    'itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemContentHorizontalInset': function (style, color, radius, width, borderColor, inset) {
-      const background = cylAnimatedItemBackground(style, color, radius, width, borderColor, false, inset)
+    'itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha, itemContentHorizontalInset': function (style, color, radius, width, borderColor, tintAlpha, inset) {
+      const background = cylAnimatedItemBackground(style, color, radius, width, borderColor, false, tintAlpha, inset)
       this.setData({ itemBackgroundCss: background.css, itemGlassDrawn: background.glass })
     },
     'animationUrl, animationData, animationType': function (animationUrl, animationData, animationType) {

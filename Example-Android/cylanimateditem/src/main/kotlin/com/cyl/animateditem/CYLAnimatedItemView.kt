@@ -466,7 +466,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     private val reportedMissingResources = HashSet<String>()
 
-    private fun resourceMissing(resource: String, reason: String) {
+    protected fun resourceMissing(resource: String, reason: String) {
         if (!reportedMissingResources.add(resource)) return
         CYLAnimationEngines.dispatchResourceMissing(context, resource, reason, onResourceMissing)
     }
@@ -1310,6 +1310,15 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
     /**
+     * [EN] The share of the color's alpha that tints a Liquid Glass: null (the default) is 0.75, so an opaque color tints the glass instead of
+     *      covering it; 1 uses the color as it is (a selected tag keeps its full color, still glass). Not used by the flat style.
+     * [CN] 颜色透明度中用于给液态玻璃着色的比例：null（默认）为 0.75，不透明的颜色是给玻璃着色而不是盖住它；1 表示按原色（选中的标签保持完整颜色，仍是玻璃）。
+     *      扁平样式不使用。
+     */
+    var itemGlassTintAlpha: Float? = null
+        set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
+
+    /**
      * [EN] The background really drawn: `itemBackgroundStyle`, or `Flat` where `isLiquidGlassActive()` is false.
      * [CN] 实际绘制的背景：`itemBackgroundStyle`，`isLiquidGlassActive()` 为 false 时为 `Flat`。
      */
@@ -1334,7 +1343,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     /** [EN] Applies the background, radius and border for the current size ([CYLAnimatedItemBackgroundRenderer]). [CN] 按当前尺寸应用背景、圆角与边框。 */
     private fun applyItemBackground() {
         if (!usesItemBackground) return
-        itemBackgroundRenderer.apply(itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor)
+        itemBackgroundRenderer.apply(itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
