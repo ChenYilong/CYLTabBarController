@@ -45,6 +45,10 @@
       "value": "깜박임 ×3"
     },
     {
+      "name": "cyl_l10n_9594eec95be7",
+      "value": "Blue"
+    },
+    {
       "name": "cyl_l10n_070554647306",
       "value": "테두리"
     },
@@ -95,6 +99,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem 가운데 정렬"
+    },
+    {
+      "name": "cyl_l10n_5adb0dc263ad",
+      "value": "Color: %@"
     },
     {
       "name": "cyl_l10n_f6da70b584ae",
@@ -281,6 +289,10 @@
       "value": "2초 뒤 플러스 버튼 이미지가 바뀌는 탭 바 컨트롤러를 엽니다. 레이아웃이 움직이면 안 됩니다"
     },
     {
+      "name": "cyl_l10n_ee38e4d5dd68",
+      "value": "Red"
+    },
+    {
       "name": "cyl_l10n_c27618b1aa9d",
       "value": "빨간 점"
     },
@@ -307,6 +319,10 @@
     {
       "name": "cyl_l10n_9d01c837b4bc",
       "value": "Rive 탭 아이콘: house.riv (숫자 입력 Rooms)"
+    },
+    {
+      "name": "cyl_l10n_bdd66081cc94",
+      "value": "Rive colors"
     },
     {
       "name": "cyl_l10n_f0c792c049bc",
@@ -421,6 +437,10 @@
       "value": "탭 바 모양"
     },
     {
+      "name": "cyl_l10n_abf44ef609ef",
+      "value": "The file's colors"
+    },
+    {
       "name": "cyl_l10n_7c4aecba91c3",
       "value": "이 페이지 탭의 이미지를 앱의 rawfile(iOS의 리소스 번들)에서 불러옵니다. 다시 탭하면 복원"
     },
@@ -435,6 +455,10 @@
     {
       "name": "cyl_l10n_a4d0d101d6a3",
       "value": "왼쪽 위"
+    },
+    {
+      "name": "cyl_l10n_e38d6ac40a62",
+      "value": "applyColors: a view model color property of a data-bound .riv"
     },
     {
       "name": "cyl_l10n_2306a585ae00",

@@ -73,7 +73,13 @@
     "teardown: releasing in %d s": "teardown: releasing in %d s",
     "dealloc callbacks ran: %d / %d": "dealloc callbacks ran: %d / %d",
     "dealloc callbacks ran: %d / %d (%@)": "dealloc callbacks ran: %d / %d (%@)",
-    "Tab bar controller released": "Tab bar controller released"
+    "Tab bar controller released": "Tab bar controller released",
+    "Rive colors": "Rive colors",
+    "applyColors: a view model color property of a data-bound .riv": "applyColors: a view model color property of a data-bound .riv",
+    "Color: %@": "Color: %@",
+    "The file's colors": "The file's colors",
+    "Red": "Red",
+    "Blue": "Blue"
   },
   "zh-Hans": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一个 Tab（cyl_selectPreviousTab，issue #535）",
@@ -149,7 +155,13 @@
     "teardown: releasing in %d s": "销毁：%d 秒后释放",
     "dealloc callbacks ran: %d / %d": "dealloc 回调已执行：%d / %d",
     "dealloc callbacks ran: %d / %d (%@)": "dealloc 回调已执行：%d / %d (%@)",
-    "Tab bar controller released": "TabBarController 已释放"
+    "Tab bar controller released": "TabBarController 已释放",
+    "Rive colors": "Rive 颜色",
+    "applyColors: a view model color property of a data-bound .riv": "applyColors：数据绑定 .riv 的视图模型颜色属性",
+    "Color: %@": "颜色：%@",
+    "The file's colors": "文件自身的颜色",
+    "Red": "红色",
+    "Blue": "蓝色"
   },
   "zh-Hant": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一個 Tab（cyl_selectPreviousTab，issue #535）",
@@ -225,7 +237,13 @@
     "teardown: releasing in %d s": "銷毀：%d 秒後釋放",
     "dealloc callbacks ran: %d / %d": "dealloc 回呼已執行：%d / %d",
     "dealloc callbacks ran: %d / %d (%@)": "dealloc 回呼已執行：%d / %d (%@)",
-    "Tab bar controller released": "TabBarController 已釋放"
+    "Tab bar controller released": "TabBarController 已釋放",
+    "Rive colors": "Rive 顏色",
+    "applyColors: a view model color property of a data-bound .riv": "applyColors：資料綁定 .riv 的視圖模型顏色屬性",
+    "Color: %@": "顏色：%@",
+    "The file's colors": "檔案自身的顏色",
+    "Red": "紅色",
+    "Blue": "藍色"
   },
   "de": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Vorheriger Tab (cyl_selectPreviousTab, issue #535)",

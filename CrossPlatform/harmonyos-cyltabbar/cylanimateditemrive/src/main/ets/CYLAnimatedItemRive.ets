@@ -91,6 +91,8 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
   /** [EN] Played and not stopped since (the tab's "selected"). [CN] 已播放且之后未停止（相当于 Tab 的“选中”）。 */
   private active: boolean = false;
   private endWatchTimer: number = -1;
+  /** [EN] Pauses again after a redraw of new colors. [CN] 为新颜色重绘后再次暂停。 */
+  private redrawTimer: number = -1;
   private startPending: boolean = false;
   private deactivateTimer: number = -1;
   private loopTimer: number = -1;
@@ -134,6 +136,53 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
     const view = this.riveView;
     if (view !== null) {
       this.cylApplyRequestedColors(view);
+      this.cylRedrawIfPaused(view);
+    }
+  }
+
+  /**
+   * [EN] A paused @ohos/rive view does not draw a view model change, so new colors on an item resting after its pass (or on
+   *      its first frame) stayed invisible until the next play (seen on the emulator: the property read back the new color,
+   *      the shape kept the old one). Runs the state machine for a frame, then pauses it again.
+   * [CN] 暂停的 @ohos/rive 视图不会绘制视图模型的变化，因此一遍播完后（或停在第一帧时）设置的新颜色要到下次播放才可见（模拟器上属性已读回新颜色，
+   *      形状仍是旧颜色）。让状态机运行一帧后再次暂停。
+   */
+  private cylRedrawIfPaused(view: RiveAnimationView): void {
+    let playing = false;
+    try {
+      playing = view.isPlaying();
+    } catch (e) {
+      return;
+    }
+    if (playing) {
+      return;
+    }
+    const machine = this.cylStateMachine(view);
+    if (machine === undefined) {
+      return;
+    }
+    this.cylCancelRedraw();
+    try {
+      this.cylPlayMachine(view, machine);
+    } catch (e) {
+      return;
+    }
+    this.redrawTimer = setTimeout(() => {
+      this.redrawTimer = -1;
+      if (this.riveView === view) {
+        if (view.controller !== null) {
+          view.controller.pauseAllAnimations();
+        } else {
+          view.pause();
+        }
+      }
+    }, CYL_RIVE_FIRST_FRAME_MS);
+  }
+
+  private cylCancelRedraw(): void {
+    if (this.redrawTimer >= 0) {
+      clearTimeout(this.redrawTimer);
+      this.redrawTimer = -1;
     }
   }
 
@@ -191,6 +240,7 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
       return;
     }
     this.active = true;
+    this.cylCancelRedraw();
     this.cylPlay(view);
   }
 
@@ -554,6 +604,7 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
   }
 
   private cylCancelTimers(): void {
+    this.cylCancelRedraw();
     this.cylCancelDeactivate();
     this.cylCancelLoop();
     this.cylCancelEndWatch();
