@@ -110,7 +110,15 @@ internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, at
                 drawingGlass = false
             }
         }
-        glassTintColor?.let {
+        // [EN] Without sampled glass (a tag in a list) a clear tint would draw nothing: the default frosted tint fills the shape then, so the tag is visible.
+        // [CN] 没有采样的玻璃（列表中的标签）时，透明着色什么也画不出来：此时用默认磨砂着色填充形状，标签才看得见。
+        val configured = glassTintColor
+        val fill = if (!drawn && (configured == null || android.graphics.Color.alpha(configured) == 0)) {
+            CYLAnimatedItemBackgroundRenderer.defaultGlassTint(resources)
+        } else {
+            configured
+        }
+        fill?.let {
             tintPaint.color = it
             canvas.drawRoundRect(rect, radius, radius, tintPaint)
         }
