@@ -286,7 +286,8 @@ static UIColor *CYLFlutterColor(id value) {
  * [EN] An animation played by CYLTabBarController's engine through a `CYLAnimatedItemView`, the same contract as the Android
  *      view (`CYLFlutterAnimationView.kt`). Channel `flutter_cyltabbar/CYLAnimationView/<id>`: the methods `setSource`,
  *      `setSelected`, `setAnimationSpeed`, `setAnimationLoops`, `setAnimationRestartToken`, `setDrivesAnimationPlayback`,
- *      `setPlaying`, `setIconSize`, `setTintColor` and the commands `play`, `stopAtProgress`, `restart`; it calls back
+ *      `setPlaying`, `setIconSize`, `setTintColor`, `setItemBackgroundStyle`, `setItemBackgroundColor`, `setItemCornerRadius`,
+ *      `setItemBorderWidth`, `setItemBorderColor` and the commands `play`, `stopAtProgress`, `restart`; it calls back
  *      `onAnimationLoaded`, `onAnimationFailed` and `onAnimationEnd`. No engine logic here. The restart token is read-only on
  *      iOS (`animationRestartToken` grows on every `restartAnimation()`), so a changed token calls `restartAnimation()`.
  * [CN] 由 CYLTabBarController 引擎通过 `CYLAnimatedItemView` 播放的动画，契约与 Android 视图相同（`CYLFlutterAnimationView.kt`）。
@@ -370,6 +371,11 @@ static UIColor *CYLFlutterColor(id value) {
     if (tint) {
         [_item applyIconTintColor:tint];
     }
+    [self applyItemBackgroundStyle:arguments[@"itemBackgroundStyle"]];
+    _item.itemBackgroundColor = CYLFlutterColor(arguments[@"itemBackgroundColor"]);
+    [self applyItemCornerRadius:arguments[@"itemCornerRadius"]];
+    [self applyItemBorderWidth:arguments[@"itemBorderWidth"]];
+    _item.itemBorderColor = CYLFlutterColor(arguments[@"itemBorderColor"]);
     if ([arguments[@"selected"] isKindOfClass:[NSNumber class]]) {
         _selected = [arguments[@"selected"] boolValue];
         _item.selected = _selected;
@@ -381,6 +387,22 @@ static UIColor *CYLFlutterColor(id value) {
         _playing = YES;
         [_item playAnimation];
     }
+}
+
+/// [EN] `itemBackgroundStyle`: "liquidGlass", or anything else (nil, "flat") for flat. [CN] `itemBackgroundStyle`："liquidGlass"，其他值（nil、"flat"）为扁平。
+- (void)applyItemBackgroundStyle:(id)style {
+    _item.itemBackgroundStyle = [style isEqual:@"liquidGlass"] ? CYLAnimatedItemBackgroundStyleLiquidGlass : CYLAnimatedItemBackgroundStyleFlat;
+}
+
+/// [EN] `itemCornerRadius` in points (the core limits it to half the height; 1000 is the capsule constant); nil is not set.
+/// [CN] `itemCornerRadius`（点；核心把它限制在半高以内，1000 是胶囊常量）；nil 表示未设置。
+- (void)applyItemCornerRadius:(id)radius {
+    _item.itemCornerRadiusNumber = [radius isKindOfClass:[NSNumber class]] ? radius : nil;
+}
+
+/// [EN] `itemBorderWidth` in points; nil is 0. [CN] `itemBorderWidth`（点）；nil 为 0。
+- (void)applyItemBorderWidth:(id)width {
+    _item.itemBorderWidth = [width isKindOfClass:[NSNumber class]] ? [width doubleValue] : 0;
 }
 
 /// [EN] The default rule of the bridge (`drivesAnimationPlayback` true): selected plays from the resting frame, unselected
@@ -480,6 +502,16 @@ static UIColor *CYLFlutterColor(id value) {
         [self fitIcon];
     } else if ([method isEqualToString:@"setTintColor"]) {
         [_item applyIconTintColor:CYLFlutterColor(argument)];
+    } else if ([method isEqualToString:@"setItemBackgroundStyle"]) {
+        [self applyItemBackgroundStyle:argument];
+    } else if ([method isEqualToString:@"setItemBackgroundColor"]) {
+        _item.itemBackgroundColor = CYLFlutterColor(argument);
+    } else if ([method isEqualToString:@"setItemCornerRadius"]) {
+        [self applyItemCornerRadius:argument];
+    } else if ([method isEqualToString:@"setItemBorderWidth"]) {
+        [self applyItemBorderWidth:argument];
+    } else if ([method isEqualToString:@"setItemBorderColor"]) {
+        _item.itemBorderColor = CYLFlutterColor(argument);
     } else if ([method isEqualToString:@"play"]) {
         [[self player] play];
     } else if ([method isEqualToString:@"stopAtProgress"]) {

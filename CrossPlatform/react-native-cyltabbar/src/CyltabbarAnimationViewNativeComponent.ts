@@ -17,7 +17,7 @@ type AnimationEvent = Readonly<{}>;
 /**
  * [EN] The cross-platform engine contract, with the names frozen in docs/Animated-Item.md ("Engine API across platforms"):
  *      props `source` and `playing` as before, plus `selected`, `animationSpeed`, `animationLoops`, `animationRestartToken`,
- *      `drivesAnimationPlayback`, `showsImageWhenAnimationEnds`, `image`, `iconSize` and `tintColor`; the events `onAnimationLoaded`, `onAnimationFailed` and
+ *      `drivesAnimationPlayback`, `showsImageWhenAnimationEnds`, `image`, `iconSize`, `tintColor` and the item background `itemBackgroundStyle`, `itemBackgroundColor`, `itemCornerRadius`, `itemBorderWidth`, `itemBorderColor`; the events `onAnimationLoaded`, `onAnimationFailed` and
  *      `onAnimationEnd`; the commands `play`, `stopAtProgress` and `restart`. Both native halves wrap `CYLAnimatedItemView`.
  * [CN] 跨端引擎契约，名称已在 docs/Animated-Item.md（「跨端引擎 API」）中冻结：属性 `source`、`playing` 不变，新增 `selected`、
  *      `animationSpeed`、`animationLoops`、`animationRestartToken`、`drivesAnimationPlayback`、`iconSize`、`tintColor`；事件
@@ -71,6 +71,28 @@ export interface NativeProps extends ViewProps {
    * Tints the icon and an animation that takes a tint.
    */
   tintColor?: ColorValue;
+  /**
+   * The item's background: `flat` (default) fills with `itemBackgroundColor`; `liquidGlass` draws Liquid Glass tinted with it
+   * (only where the platform draws Liquid Glass; elsewhere the view stays flat).
+   */
+  itemBackgroundStyle?: CodegenTypes.WithDefault<'flat' | 'liquidGlass', 'flat'>;
+  /**
+   * The solid fill when flat, the glass tint when `liquidGlass`; unset for none.
+   */
+  itemBackgroundColor?: ColorValue;
+  /**
+   * The corner radius in points, limited to half the height; a negative number (the default) is not set: a capsule for
+   * `liquidGlass`, square for `flat`. 1000 (`cylAnimatedItemCornerRadiusCapsule`) is exactly a capsule.
+   */
+  itemCornerRadius?: CodegenTypes.WithDefault<CodegenTypes.Float, -1>;
+  /**
+   * The border width in points.
+   */
+  itemBorderWidth?: CodegenTypes.WithDefault<CodegenTypes.Float, 0>;
+  /**
+   * The border color; unset for none.
+   */
+  itemBorderColor?: ColorValue;
   onAnimationLoaded?: CodegenTypes.DirectEventHandler<AnimationEvent>;
   onAnimationFailed?: CodegenTypes.DirectEventHandler<AnimationEvent>;
   onAnimationEnd?: CodegenTypes.DirectEventHandler<AnimationEvent>;

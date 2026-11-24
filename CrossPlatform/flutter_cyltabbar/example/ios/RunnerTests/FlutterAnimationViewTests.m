@@ -343,4 +343,54 @@
     XCTAssertNotNil([_item valueForKey:@"image"]);
 }
 
+- (void)testTheItemBackgroundDefaultsAreFlatAndUnset {
+    [self makeBridgeWithArguments:@{}];
+    XCTAssertEqualObjects([_item valueForKey:@"itemBackgroundStyle"], @0 /* flat */);
+    XCTAssertNil([_item valueForKey:@"itemBackgroundColor"]);
+    XCTAssertNil([_item valueForKey:@"itemCornerRadiusNumber"], @"unset: a capsule for glass, square for flat");
+    XCTAssertEqualWithAccuracy([[_item valueForKey:@"itemBorderWidth"] doubleValue], 0, 0.0001);
+    XCTAssertNil([_item valueForKey:@"itemBorderColor"]);
+}
+
+- (void)testTheLiquidGlassStyleAndItsTintAreAppliedAtCreationAndByMethod {
+    // [EN] ARGB ints as Dart's `Color.toARGB32()` sends them: 0xFFFF0000 is opaque red. [CN] 与 Dart 的 `Color.toARGB32()` 相同的 ARGB 整数：0xFFFF0000 为不透明红色。
+    [self makeBridgeWithArguments:@{ @"itemBackgroundStyle" : @"liquidGlass", @"itemBackgroundColor" : @(0xFFFF0000) }];
+    XCTAssertEqualObjects([_item valueForKey:@"itemBackgroundStyle"], @1 /* liquidGlass */);
+    UIColor *tint = [_item valueForKey:@"itemBackgroundColor"];
+    XCTAssertNotNil(tint);
+    CGFloat red = 0, green = 0, blue = 0, alpha = 0;
+    [tint getRed:&red green:&green blue:&blue alpha:&alpha];
+    XCTAssertEqualWithAccuracy(red, 1, 0.01);
+    XCTAssertEqualWithAccuracy(green, 0, 0.01);
+    [self callMethod:@"setItemBackgroundStyle" argument:@"flat"];
+    XCTAssertEqualObjects([_item valueForKey:@"itemBackgroundStyle"], @0 /* flat */);
+    [self callMethod:@"setItemBackgroundColor" argument:nil];
+    XCTAssertNil([_item valueForKey:@"itemBackgroundColor"]);
+}
+
+- (void)testTheCornerRadiusIsPointsTheCapsuleConstantAndNullIsUnset {
+    [self makeBridgeWithArguments:@{ @"itemCornerRadius" : @12 }];
+    XCTAssertEqualWithAccuracy([[_item valueForKey:@"itemCornerRadiusNumber"] doubleValue], 12, 0.0001);
+    [self callMethod:@"setItemCornerRadius" argument:@0];
+    XCTAssertEqualObjects([_item valueForKey:@"itemCornerRadiusNumber"], @0, @"0 is square, not unset");
+    [self callMethod:@"setItemCornerRadius" argument:@1000];
+    XCTAssertEqualWithAccuracy([[_item valueForKey:@"itemCornerRadiusNumber"] doubleValue], 1000, 0.0001, @"cylAnimatedItemCornerRadiusCapsule is passed as it is");
+    [self callMethod:@"setItemCornerRadius" argument:nil];
+    XCTAssertNil([_item valueForKey:@"itemCornerRadiusNumber"]);
+}
+
+- (void)testTheBorderWidthAndColorReachTheItem {
+    [self makeBridgeWithArguments:@{ @"itemBorderWidth" : @2, @"itemBorderColor" : @(0xFF0000FF) }];
+    XCTAssertEqualWithAccuracy([[_item valueForKey:@"itemBorderWidth"] doubleValue], 2, 0.0001);
+    UIColor *border = [_item valueForKey:@"itemBorderColor"];
+    XCTAssertNotNil(border);
+    CGFloat red = 0, green = 0, blue = 0, alpha = 0;
+    [border getRed:&red green:&green blue:&blue alpha:&alpha];
+    XCTAssertEqualWithAccuracy(blue, 1, 0.01);
+    [self callMethod:@"setItemBorderWidth" argument:@0];
+    [self callMethod:@"setItemBorderColor" argument:nil];
+    XCTAssertEqualWithAccuracy([[_item valueForKey:@"itemBorderWidth"] doubleValue], 0, 0.0001);
+    XCTAssertNil([_item valueForKey:@"itemBorderColor"], @"null clears it");
+}
+
 @end

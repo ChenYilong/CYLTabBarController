@@ -31,6 +31,12 @@ export function animationURLWithOptions(file: string, options: CYLAnimationOptio
 }
 
 /**
+ * [EN] The named constant of the capsule (1000 points): pass it to `itemCornerRadius` instead of a literal; the view treats it as
+ *      exactly half the height. [CN] 胶囊的命名常量（1000 点）：传给 `itemCornerRadius`，视图把它当作恰好半高。
+ */
+export const cylAnimatedItemCornerRadiusCapsule = 1000;
+
+/**
  * [EN] The commands of the native view, for a `CYLAnimationView` whose `drivesAnimationPlayback` is false (the cross-platform
  *      engine contract, docs/Animated-Item.md): `play()`, `stopAtProgress(progress)` and `restart()`.
  * [CN] 原生视图的命令，用于 `drivesAnimationPlayback` 为 false 的 `CYLAnimationView`（跨端引擎契约，见 docs/Animated-Item.md）：
@@ -73,6 +79,22 @@ export type CYLAnimationViewProps = ViewProps & {
   iconSize?: number;
   /** Tints the icon and an animation that takes a tint. */
   tintColor?: ColorValue;
+  /**
+   * The background: `flat` (default) fills with `itemBackgroundColor`; `liquidGlass` draws Liquid Glass tinted with it, where the
+   * platform draws Liquid Glass (iOS 26 and later, Android 12 and later with the glass available); elsewhere the view stays flat.
+   */
+  itemBackgroundStyle?: 'flat' | 'liquidGlass';
+  /** The solid fill when flat, the glass tint when `liquidGlass`; unset for none. */
+  itemBackgroundColor?: ColorValue;
+  /**
+   * The corner radius in points, limited to half the height; 0 is square, `cylAnimatedItemCornerRadiusCapsule` (1000) a capsule.
+   * Unset: a capsule for `liquidGlass`, square for `flat`.
+   */
+  itemCornerRadius?: number;
+  /** The border width in points; default 0. */
+  itemBorderWidth?: number;
+  /** The border color; unset for none. */
+  itemBorderColor?: ColorValue;
   /** The animation is in place (a local file once parsed, a download once it arrived). */
   onAnimationLoaded?: () => void;
   /** The animation cannot play: a missing or corrupted file, a parse error, a failed download. */

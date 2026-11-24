@@ -80,6 +80,31 @@ class CyltabbarAnimationViewManager : SimpleViewManager<CyltabbarAnimationView>(
     view?.applyTintColor(value)
   }
 
+  @ReactProp(name = "itemBackgroundStyle")
+  override fun setItemBackgroundStyle(view: CyltabbarAnimationView?, value: String?) {
+    view?.applyItemBackgroundStyle(value)
+  }
+
+  @ReactProp(name = "itemBackgroundColor", customType = "Color")
+  override fun setItemBackgroundColor(view: CyltabbarAnimationView?, value: Int?) {
+    view?.applyItemBackgroundColor(value)
+  }
+
+  @ReactProp(name = "itemCornerRadius", defaultFloat = -1f)
+  override fun setItemCornerRadius(view: CyltabbarAnimationView?, value: Float) {
+    view?.applyItemCornerRadius(value)
+  }
+
+  @ReactProp(name = "itemBorderWidth")
+  override fun setItemBorderWidth(view: CyltabbarAnimationView?, value: Float) {
+    view?.applyItemBorderWidth(value)
+  }
+
+  @ReactProp(name = "itemBorderColor", customType = "Color")
+  override fun setItemBorderColor(view: CyltabbarAnimationView?, value: Int?) {
+    view?.applyItemBorderColor(value)
+  }
+
   override fun play(view: CyltabbarAnimationView?) {
     view?.play()
   }

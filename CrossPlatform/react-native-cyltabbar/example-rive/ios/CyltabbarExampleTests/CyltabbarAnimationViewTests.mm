@@ -332,6 +332,66 @@ using namespace facebook::react;
   *reinterpret_cast<EventEmitter::Shared *>(reinterpret_cast<char *>((__bridge void *)_bridge) + ivar_getOffset(ivar)) = emitter;
 }
 
+/// [EN] A color prop as Fabric hands it over. [CN] Fabric 交来的颜色属性。
+static SharedColor CYLTestSharedColor(uint8_t red, uint8_t green, uint8_t blue) {
+  return SharedColor(hostPlatformColorFromRGBA(red, green, blue, 255));
+}
+
+- (void)testTheItemBackgroundDefaultsAreFlatAndUnset {
+  CyltabbarAnimationViewProps defaults;
+  XCTAssertEqual(defaults.itemBackgroundStyle, CyltabbarAnimationViewItemBackgroundStyle::Flat, @"the codegen default of itemBackgroundStyle is flat");
+  XCTAssertLessThan(defaults.itemCornerRadius, 0, @"the codegen default of itemCornerRadius is negative: not set");
+  XCTAssertEqual(defaults.itemBorderWidth, 0);
+  [self update:^(CyltabbarAnimationViewProps &props) {}];
+  XCTAssertEqualObjects([_item valueForKey:@"itemBackgroundStyle"], @0 /* flat */);
+  XCTAssertNil([_item valueForKey:@"itemBackgroundColor"]);
+  XCTAssertNil([_item valueForKey:@"itemCornerRadiusNumber"], @"unset reaches the item as nil: a capsule for glass, square for flat");
+  XCTAssertEqualWithAccuracy([[_item valueForKey:@"itemBorderWidth"] doubleValue], 0, 0.0001);
+  XCTAssertNil([_item valueForKey:@"itemBorderColor"]);
+}
+
+- (void)testTheLiquidGlassStyleAndItsTintReachTheItemAndFlatComesBack {
+  [self update:^(CyltabbarAnimationViewProps &props) {
+    props.itemBackgroundStyle = CyltabbarAnimationViewItemBackgroundStyle::LiquidGlass;
+    props.itemBackgroundColor = CYLTestSharedColor(255, 0, 0);
+  }];
+  XCTAssertEqualObjects([_item valueForKey:@"itemBackgroundStyle"], @1 /* liquidGlass */);
+  UIColor *tint = [_item valueForKey:@"itemBackgroundColor"];
+  XCTAssertNotNil(tint);
+  CGFloat red = 0, green = 0, blue = 0, alpha = 0;
+  [tint getRed:&red green:&green blue:&blue alpha:&alpha];
+  XCTAssertEqualWithAccuracy(red, 1, 0.01);
+  XCTAssertEqualWithAccuracy(green, 0, 0.01);
+  [self update:^(CyltabbarAnimationViewProps &props) { props.itemBackgroundStyle = CyltabbarAnimationViewItemBackgroundStyle::Flat; }];
+  XCTAssertEqualObjects([_item valueForKey:@"itemBackgroundStyle"], @0 /* flat */);
+}
+
+- (void)testTheCornerRadiusIsPointsTheCapsuleConstantAndNegativeIsUnset {
+  [self update:^(CyltabbarAnimationViewProps &props) { props.itemCornerRadius = 12; }];
+  XCTAssertEqualWithAccuracy([[_item valueForKey:@"itemCornerRadiusNumber"] doubleValue], 12, 0.0001);
+  [self update:^(CyltabbarAnimationViewProps &props) { props.itemCornerRadius = 0; }];
+  XCTAssertEqualObjects([_item valueForKey:@"itemCornerRadiusNumber"], @0, @"0 is square, not unset");
+  [self update:^(CyltabbarAnimationViewProps &props) { props.itemCornerRadius = 1000; }];
+  XCTAssertEqualWithAccuracy([[_item valueForKey:@"itemCornerRadiusNumber"] doubleValue], 1000, 0.0001, @"the capsule constant is passed as it is");
+  [self update:^(CyltabbarAnimationViewProps &props) { props.itemCornerRadius = -1; }];
+  XCTAssertNil([_item valueForKey:@"itemCornerRadiusNumber"]);
+}
+
+- (void)testTheBorderWidthAndColorReachTheItem {
+  [self update:^(CyltabbarAnimationViewProps &props) {
+    props.itemBorderWidth = 2;
+    props.itemBorderColor = CYLTestSharedColor(0, 0, 255);
+  }];
+  XCTAssertEqualWithAccuracy([[_item valueForKey:@"itemBorderWidth"] doubleValue], 2, 0.0001);
+  UIColor *border = [_item valueForKey:@"itemBorderColor"];
+  XCTAssertNotNil(border);
+  CGFloat red = 0, green = 0, blue = 0, alpha = 0;
+  [border getRed:&red green:&green blue:&blue alpha:&alpha];
+  XCTAssertEqualWithAccuracy(blue, 1, 0.01);
+  [self update:^(CyltabbarAnimationViewProps &props) { props.itemBorderWidth = 0; props.itemBorderColor = SharedColor(); }];
+  XCTAssertNil([_item valueForKey:@"itemBorderColor"], @"an unset color clears it");
+}
+
 - (void)testResourceBundleIsCallableFromObjectiveCPlusPlusAsNoexcept {
   static_assert(noexcept(CYLAnimatedItemResourceBundle()), "declared noexcept for C++ (CYLAnimatedItemMacros.h)");
   NSBundle *first = CYLAnimatedItemResourceBundle();

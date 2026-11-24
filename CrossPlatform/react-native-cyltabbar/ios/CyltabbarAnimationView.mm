@@ -37,7 +37,8 @@ using namespace facebook::react;
 /**
  * [EN] An animation played by CYLTabBarController's engine through a `CYLAnimatedItemView`, the same contract as the Android
  *      view (`CyltabbarAnimationView.kt`): the props `source`, `playing`, `selected`, `animationSpeed`, `animationLoops`,
- *      `animationRestartToken`, `drivesAnimationPlayback`, `iconSize`, `tintColor`; the events `onAnimationLoaded`,
+ *      `animationRestartToken`, `drivesAnimationPlayback`, `iconSize`, `tintColor`, `itemBackgroundStyle`, `itemBackgroundColor`,
+ *      `itemCornerRadius`, `itemBorderWidth`, `itemBorderColor`; the events `onAnimationLoaded`,
  *      `onAnimationFailed`, `onAnimationEnd`; the commands `play`, `stopAtProgress`, `restart`. No engine logic here. The
  *      restart token is read-only on iOS (`animationRestartToken` grows on every `restartAnimation()`), so a changed token calls
  *      `restartAnimation()`; the token the view is created with is not a restart.
@@ -207,6 +208,16 @@ static NSURL *CYLRNAnimationURL(NSString *source)
   _iconSide = newProps.iconSize;
   [self fitIcon];
   [_item applyIconTintColor:RCTUIColorFromSharedColor(newProps.tintColor)];
+  // [EN] The item background: a negative radius is not set (nil: a capsule for glass, square for flat). The core clamps a radius to
+  //      half the height; 1000 is the capsule constant. [CN] 条目背景：负数半径表示未设置（nil：玻璃为胶囊，扁平为直角）；核心把半径
+  //      限制在半高以内，1000 是胶囊常量。
+  _item.itemBackgroundStyle = newProps.itemBackgroundStyle == CyltabbarAnimationViewItemBackgroundStyle::LiquidGlass
+      ? CYLAnimatedItemBackgroundStyleLiquidGlass
+      : CYLAnimatedItemBackgroundStyleFlat;
+  _item.itemBackgroundColor = RCTUIColorFromSharedColor(newProps.itemBackgroundColor);
+  _item.itemCornerRadiusNumber = newProps.itemCornerRadius >= 0 ? @(newProps.itemCornerRadius) : nil;
+  _item.itemBorderWidth = newProps.itemBorderWidth;
+  _item.itemBorderColor = RCTUIColorFromSharedColor(newProps.itemBorderColor);
   _item.selected = newProps.selected;
   const BOOL selectionChanged = newProps.selected != _selected;
   _selected = newProps.selected;

@@ -3,13 +3,15 @@ package com.cyltabbar
 import android.content.Context
 import android.widget.FrameLayout
 import com.cyl.animateditem.CYLAnimatedItemAnimationEndListener
+import com.cyl.animateditem.CYLAnimatedItemBackgroundStyle
 import com.cyl.animateditem.CYLAnimatedItemView
 import com.cyl.animateditem.CYLSize
 
 /**
  * An animation played by CYLTabBarController's engine through a `CYLAnimatedItemView` (the cross-platform engine API:
  * `docs/Animated-Item.md`, "Engine API across platforms"). Props `source`, `playing`, `selected`, `animationSpeed`,
- * `animationLoops`, `animationRestartToken`, `drivesAnimationPlayback` (default true), `showsImageWhenAnimationEnds`, `image`, `iconSize`, `tintColor`; commands
+ * `animationLoops`, `animationRestartToken`, `drivesAnimationPlayback` (default true), `showsImageWhenAnimationEnds`, `image`, `iconSize`, `tintColor`, `itemBackgroundStyle`,
+ * `itemBackgroundColor`, `itemCornerRadius`, `itemBorderWidth`, `itemBorderColor`; commands
  * `play`, `stopAtProgress`, `restart`; events `onAnimationLoaded`, `onAnimationFailed`, `onAnimationEnd`. No engine logic here.
  * 由 CYLTabBarController 引擎通过 `CYLAnimatedItemView` 播放的动画（跨端引擎 API，见 `docs/Animated-Item.md`）。
  */
@@ -80,6 +82,23 @@ class CyltabbarAnimationView(context: Context) : FrameLayout(context) {
 
   /** `tintColor` as an ARGB int; null clears it. */
   fun applyTintColor(value: Int?) { item.iconColor = value }
+
+  /** `itemBackgroundStyle`: "liquidGlass" or anything else (null, "flat") for flat. */
+  fun applyItemBackgroundStyle(value: String?) {
+    item.itemBackgroundStyle = if (value == "liquidGlass") CYLAnimatedItemBackgroundStyle.LiquidGlass else CYLAnimatedItemBackgroundStyle.Flat
+  }
+
+  /** `itemBackgroundColor` as an ARGB int; null clears it. */
+  fun applyItemBackgroundColor(value: Int?) { item.itemBackgroundColor = value }
+
+  /** `itemCornerRadius` in dp (the core limits it to half the height); a negative number is not set (null). */
+  fun applyItemCornerRadius(value: Float) { item.itemCornerRadius = value.takeIf { it >= 0f } }
+
+  /** `itemBorderWidth` in dp. */
+  fun applyItemBorderWidth(value: Float) { item.itemBorderWidth = value }
+
+  /** `itemBorderColor` as an ARGB int; null clears it. */
+  fun applyItemBorderColor(value: Int?) { item.itemBorderColor = value }
 
   fun play() = item.animatedItemPlayer.play()
 
