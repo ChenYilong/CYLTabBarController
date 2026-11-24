@@ -26,7 +26,8 @@
 |:---|:---|
 | [iOS: CYLLiquidGlass](#ios-cylliquidglass) | [iOS: CYLLiquidGlass](#ios-cylliquidglass) |
 | [Android: `:cylliquidglass`](#android-cylliquidglass) | [Android: `:cylliquidglass`](#android-cylliquidglass) |
-| [HarmonyOS / mini program](#harmonyos--mini-program) | [HarmonyOS / mini program](#harmonyos--mini-program) |
+| [HarmonyOS: `cylliquidglass`](#harmonyos-cylliquidglass) | [HarmonyOS: `cylliquidglass`](#harmonyos-cylliquidglass) |
+| [Mini program](#mini-program) | [Mini program](#mini-program) |
 
 <!-- navigation:end -->
 
@@ -61,8 +62,16 @@ if !glass.isGlassDrawn {
 | `CYLLiquidGlassView`（与 iOS 同名）：任意视图的玻璃背景，`glassTintColor`（ARGB `Int?`）、`cornerRadius`（px）、`backdropSource`（玻璃后面绘制的视图，默认窗口视图根）、只读 `isGlassDrawn`、`applyEffect()`；不接收触摸、对辅助功能隐藏；玻璃里不嵌玻璃。 | `CYLLiquidGlassView` (the same name as iOS): a glass background for any view: `glassTintColor` (ARGB `Int?`), `cornerRadius` (px), `backdropSource` (the view drawn behind the glass, the window's view root by default), read-only `isGlassDrawn`, `applyEffect()`; it takes no touches and is hidden from accessibility; no glass inside glass. |
 | 已知限制：每个玻璃视图各自录制 `backdropSource`；标签很多时应提供共享的背景（性能 TODO，需在设备上测量帧耗时）。 | Known limit: every glass view records `backdropSource` itself; with many tags a shared backdrop should be supplied (performance TODO: measure frame time on a device). |
 
-## HarmonyOS / mini program
+## HarmonyOS: `cylliquidglass`
 
 | 中文 | English |
 |:--|:--|
-| HarmonyOS `cylliquidglass`、小程序 `cyl-liquid-glass`：TODO，按 iOS 与 Android 的接口形状把各自 TabBar 中的玻璃实现移入组件（见 CollectionViewClassifyMenu 的 `docs/tag-liquid-glass.md`）。 | HarmonyOS `cylliquidglass`, mini program `cyl-liquid-glass`: TODO, moving each tab bar's glass into the component in the interface shape of iOS and Android (see CollectionViewClassifyMenu's `docs/tag-liquid-glass.md`). |
+| ohpm 包 `cylliquidglass`（HAR 模块，`import { CYLLiquidGlass, CYLLiquidGlassView } from 'cylliquidglass'`）；TabBar（`cyltabbar`）依赖它，反之不成立。TabBar 的玻璃材质 `CYLLiquidGlassMaterial` 与玻璃胶囊 `CYLLiquidGlassCapsuleModifier` 移入本包（`cyltabbar` 重新导出，导入不变）。 | ohpm package `cylliquidglass` (a HAR module, `import { CYLLiquidGlass, CYLLiquidGlassView } from 'cylliquidglass'`); the tab bar (`cyltabbar`) depends on it, not the reverse. The tab bar's glass material `CYLLiquidGlassMaterial` and glass capsule `CYLLiquidGlassCapsuleModifier` moved into it (`cyltabbar` re-exports them, so its imports are unchanged). |
+| `CYLLiquidGlass.isActive()`（与 iOS、Android 同名）：鸿蒙上始终为真（TabBar 在每个受支持的 API 上都绘制模糊仿制，系统材质从 API 24 起替代它）；`CYLLiquidGlass.activeOverride` 供测试替换。 | `CYLLiquidGlass.isActive()` (the same name as iOS and Android): always true on HarmonyOS (the tab bar draws the blur imitation on every supported API, the system material replaces it from API 24); `CYLLiquidGlass.activeOverride` replaces it in tests. |
+| `CYLLiquidGlassView`（与 iOS、Android 同名的组件）：任意组件的玻璃背景，放在 `Stack` 中内容之后：`glassTintColor`（颜色字符串，'' 为不着色）、`cornerRadius`（vp）、`dark`；不接收触摸，对辅助功能隐藏。`isGlassDrawn` 在鸿蒙上就是 `CYLLiquidGlass.isActive()`：为 false 时调用方不创建该视图。 | `CYLLiquidGlassView` (a component named as on iOS and Android): a glass background for any component, placed behind the content in a `Stack`: `glassTintColor` (a color string, '' for none), `cornerRadius` (vp), `dark`; it takes no touches and is hidden from accessibility. `isGlassDrawn` is `CYLLiquidGlass.isActive()` on HarmonyOS: when false the caller does not create the view. |
+
+## Mini program
+
+| 中文 | English |
+|:--|:--|
+| 小程序 `cyl-liquid-glass`：TODO，最后一个平台：与 `cyl-glass-lens` 不重复（`cyl-glass-lens` 仍是玻璃组件，新包只放共用部分，或带文档说明的别名）。 | Mini program `cyl-liquid-glass`: TODO, the last platform: it does not duplicate `cyl-glass-lens` (which stays the glass component; the new package holds shared parts only, or a documented alias). |

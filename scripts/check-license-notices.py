@@ -28,6 +28,7 @@ REQUIRED = [
     ("npm (React Native)", "react-native-cyltabbar", "CrossPlatform/react-native-cyltabbar/LICENSE", "CrossPlatform/react-native-cyltabbar/package.json"),
     ("pub.dev (Flutter)", "flutter_cyltabbar", "CrossPlatform/flutter_cyltabbar/LICENSE", "CrossPlatform/flutter_cyltabbar/pubspec.yaml"),
     ("ohpm (HarmonyOS)", "cyltabbar", "CrossPlatform/harmonyos-cyltabbar/cyltabbar/LICENSE", "CrossPlatform/harmonyos-cyltabbar/cyltabbar/oh-package.json5"),
+    ("ohpm (HarmonyOS)", "cylliquidglass", "CrossPlatform/harmonyos-cyltabbar/cylliquidglass/LICENSE", "CrossPlatform/harmonyos-cyltabbar/cylliquidglass/oh-package.json5"),
     ("ohpm (HarmonyOS)", "cylanimateditem", "CrossPlatform/harmonyos-cyltabbar/cylanimateditem/LICENSE", "CrossPlatform/harmonyos-cyltabbar/cylanimateditem/oh-package.json5"),
     (NPM_WECHAT, "wechat-miniprogram-cyltabbar", "CrossPlatform/wechat-miniprogram-cyltabbar/LICENSE", "CrossPlatform/wechat-miniprogram-cyltabbar/package.json"),
     (NPM_WECHAT, "wechat-miniprogram-cyltabbar (component folder)", "CrossPlatform/wechat-miniprogram-cyltabbar/src/LICENSE", "CrossPlatform/wechat-miniprogram-cyltabbar/package.json"),

@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "cylliquidglass",
+    "type": "har",
+    "deviceTypes": [
+      "phone",
+      "tablet"
+    ]
+  }
+}
