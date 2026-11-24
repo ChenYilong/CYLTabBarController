@@ -156,7 +156,7 @@ static void CYLTestSamples(NSString *folder) {
     NSUInteger i;
     for (i = 0; i < [files count]; i++) {
         NSString *file = [files objectAtIndex:i];
-        if ([file hasSuffix:@".proto"] || [file hasPrefix:@"."] || file.pathExtension.length == 0) { // [EN] not the Localization folder [CN] 跳过 Localization 文件夹
+        if ([file hasSuffix:@".proto"] || [file hasPrefix:@"."] || file.pathExtension.length == 0 || [file hasSuffix:@".bundle"]) { // [EN] not the CYLConfigurationDemo.bundle folder (the localization tables) [CN] 跳过 CYLConfigurationDemo.bundle 文件夹（本地化字符串表）
             continue;
         }
         int sniff;
