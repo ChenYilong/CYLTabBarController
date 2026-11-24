@@ -8,6 +8,6 @@
 | TODO：库发布后改用 ohpm / npm 包（需要所有者同意）。 | TODO: replace this copy with the ohpm / npm package after the library is published (the owner's OK is needed). |
 
 - Library: https://github.com/ChenYilong/CYLDeallocBlockExecutor
-- Branch: `feat/lifecycle-callbacks` (pull request #12)
+- Branch: `master` (merge of pull request #26)
 - Folder in the library: `MiniProgram`
-- Commit: `c85c10c0dac23308a5373e4ab4f4e1da7bc41ed9`
+- Commit: `4276a6dab5a428ccc3a5f3f347eab991881fb97c`

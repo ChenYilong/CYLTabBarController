@@ -1,4 +1,4 @@
-const { LifecycleLog } = require('./log.js');
+const { LifecycleLog } = require('./log');
 
 /** Options of `whileUserScrolls` and `addDeallocObserver`. */
 
@@ -13,9 +13,6 @@ const { LifecycleLog } = require('./log.js');
 const cylWeakRef = (o) => (typeof WeakRef === 'function' ? new WeakRef(o) : { deref: () => o });
 
 class LifecycleCenter {
-          static entries                = [];
-          static nextIdentifier = 1;
-          static          scrolling = new Set();
 
   /** True while any observed scroll source is dragging or decelerating. */
   static get isUserScrolling()          {
@@ -41,7 +38,7 @@ class LifecycleCenter {
       callback,
       event,
       custom,
-      timing: options.timing ?? 'afterSuper',
+      timing: (options.timing != null ? options.timing : 'afterSuper'),
       ownerType: options.ownerType,
       key: options.key,
     });
@@ -54,7 +51,7 @@ class LifecycleCenter {
    * observers use the keys `<key>.pause` and `<key>.resume` (default key `cyl.scroll`), so calling it again replaces the earlier pair.
    */
   static whileUserScrolls(pause            , resume            , options             = {})             {
-    const key = options.key ?? 'cyl.scroll';
+    const key = (options.key != null ? options.key : 'cyl.scroll');
     LifecycleCenter.addCallback('scrollWillBeginDragging',() => pause(), { key: `${key}.pause` });
     LifecycleCenter.addCallback('scrollDidEndScrolling',() => resume(), { key: `${key}.resume` });
     return() => {
@@ -72,7 +69,6 @@ class LifecycleCenter {
     return LifecycleCenter.entries.length < before;
   }
 
-          static deallocObservers                                                                                                                  = [];
 
   /**
    * Observes the teardown of every owner that has a registry, to know when any object goes away. The callback gets a description
@@ -127,5 +123,11 @@ class LifecycleCenter {
     }
   }
 }
+
+// Static fields are assigned here, not declared in the class: WeChat DevTools' es6 compile has no class-properties transform.
+LifecycleCenter.entries = [];
+LifecycleCenter.nextIdentifier = 1;
+LifecycleCenter.scrolling = new Set();
+LifecycleCenter.deallocObservers = [];
 
 module.exports = { LifecycleCenter };

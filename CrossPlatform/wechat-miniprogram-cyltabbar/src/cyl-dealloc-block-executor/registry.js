@@ -1,6 +1,6 @@
-const { LifecycleCenter } = require('./center.js');
-const { LifecycleLog } = require('./log.js');
-const { allTimings } = require('./types.js');
+const { LifecycleCenter } = require('./center');
+const { LifecycleLog } = require('./log');
+const { allTimings } = require('./types');
 const cylWeakRef = (o) => (typeof WeakRef === 'function' ? new WeakRef(o) : { deref: () => o });
 
 const kindOf = (e       )       => (e.event !== null ? 'lifecycle' : e.custom !== undefined ? 'custom' : 'dealloc');
@@ -32,22 +32,22 @@ class LifecycleRegistry {
     return r;
   }
 
-                   owner                 ;
-          entries          = [];
-          nextIdentifier = 1;
-                   manual = new Set();
-                   performDepth = new Map();
-          forwards                                                                                    = [];
 
   /** Called when a block is added for `event` (the controller attaches its sources lazily). */
-  onRegister                                               ;
 
   /** The controller sets this once its automatic hooks fire `beforeSuper` / `afterSuper`. */
-  hookInstalled = false;
 
   constructor(owner        ) {
     // WeakRef is not guaranteed on every Mini Program JS engine: without it the owner is held strongly (the page's own lifetime ends it with onUnload).
     this.owner = cylWeakRef(owner);
+    // Instance fields are set here, not declared in the class (no class-properties transform in WeChat DevTools' es6 compile).
+    this.entries = [];
+    this.nextIdentifier = 1;
+    this.manual = new Set();
+    this.performDepth = new Map();
+    this.forwards = [];
+    this.onRegister = undefined;
+    this.hookInstalled = false;
   }
 
   hasBlocksFor(event                )          {
@@ -84,13 +84,13 @@ class LifecycleRegistry {
       callback,
       event,
       custom: undefined,
-      timing: options.timing ?? 'afterSuper',
-      invokeOnce: options.invokeOnce ?? false,
+      timing: (options.timing != null ? options.timing : 'afterSuper'),
+      invokeOnce: (options.invokeOnce != null ? options.invokeOnce : false),
       key: options.key,
       fired: false,
       cancelled: false,
     });
-    this.onRegister?.(event);
+    if (this.onRegister) this.onRegister(event);
     return identifier;
   }
 
@@ -111,7 +111,7 @@ class LifecycleRegistry {
       event: null,
       custom: name,
       timing: 'afterSuper',
-      invokeOnce: options.invokeOnce ?? false,
+      invokeOnce: (options.invokeOnce != null ? options.invokeOnce : false),
       key: options.key,
       fired: false,
       cancelled: false,
@@ -296,7 +296,7 @@ class LifecycleRegistry {
     event                ,
     parts                                                                            ,
   )       {
-    const depth = this.performDepth.get(event) ?? 0;
+    const depth = this.performDepth.get(event) || 0;
     const outermost = depth === 0;
     this.performDepth.set(event, depth + 1);
     try {
