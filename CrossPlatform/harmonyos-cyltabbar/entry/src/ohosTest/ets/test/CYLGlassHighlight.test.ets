@@ -2,17 +2,36 @@ import { describe, it, expect } from '@ohos/hypium';
 import { CYLLiquidGlass, CYLAnimatedItemBackgroundModifier } from 'cylanimateditem';
 
 /**
- * [EN] The liquid glass recipe of cylanimateditem for tags, section cards and items, the Android one: a hairline rim (black 16% light, white 22% dark, 1 vp,
- *      the same on every edge), no sheen, and the default tint that follows the mode (AppStorage `cyl_colorMode`). The tab bar capsule keeps its own light.
- * [CN] cylanimateditem 的液态玻璃配方（标签、分组卡片、条目），与 Android 相同：细边（浅色黑 16%、深色白 22%，1 vp，四边相同）、没有高光、随模式
- *      （AppStorage `cyl_colorMode`）变化的默认着色。TabBar 胶囊保留自己的光。
+ * [EN] The one liquid glass config of cylanimateditem (the hairline rim and the sheen), shared by tags, cards and the tab bar capsule: the rim is the
+ *      Android hairline, the same on every edge, the sheen runs from a bright top to a clear middle, and the mode comes from AppStorage `cyl_colorMode`.
+ * [CN] cylanimateditem 唯一的液态玻璃配置（细边与高光），标签、卡片与 TabBar 胶囊共用：细边是 Android 的细边，四条边相同；高光从明亮的顶部到透明的中部；
+ *      模式取自 AppStorage 的 `cyl_colorMode`。
  */
 export default function cylGlassHighlightTest() {
   describe('CYLGlassHighlight', () => {
-    it('the rim is the Android hairline, the same on every edge, no sheen', 0, () => {
-      expect(CYLLiquidGlass.rimColor(false)).assertEqual('#29000000');
-      expect(CYLLiquidGlass.rimColor(true)).assertEqual('#38FFFFFF');
-      expect(CYLLiquidGlass.RIM_WIDTH).assertEqual(1);
+    it('the rim is the Android bright hairline, the same on every edge, in light and dark', 0, () => {
+      const light: EdgeColors = CYLLiquidGlass.rimEdgeColors(false);
+      expect(light.top).assertEqual('#B3FFFFFF');
+      expect(light.right).assertEqual(light.top);
+      expect(light.bottom).assertEqual(light.top);
+      expect(light.left).assertEqual(light.top);
+      const dark: EdgeColors = CYLLiquidGlass.rimEdgeColors(true);
+      expect(dark.top).assertEqual('#38FFFFFF');
+      expect(dark.right).assertEqual(dark.top);
+      expect(dark.bottom).assertEqual(dark.top);
+      expect(dark.left).assertEqual(dark.top);
+    });
+
+    it('the sheen is bright at the top and clear in the middle, in both modes', 0, () => {
+      [false, true].forEach((dark: boolean) => {
+        const stops: Array<[ResourceColor, number]> = CYLLiquidGlass.sheenColors(dark);
+        expect(stops.length).assertEqual(4);
+        expect(stops[0][1]).assertEqual(0);
+        expect(stops[stops.length - 1][1]).assertEqual(1);
+        expect(stops[2][0]).assertEqual('#00FFFFFF');
+      });
+      expect(CYLLiquidGlass.sheenColors(false)[0][0]).assertEqual('#66FFFFFF');
+      expect(CYLLiquidGlass.sheenColors(true)[0][0]).assertEqual('#2EFFFFFF');
     });
 
     it('the default glass tint follows the mode: frosted light, white 14 percent in dark', 0, () => {

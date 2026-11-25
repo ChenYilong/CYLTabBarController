@@ -130,12 +130,17 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
       { radius: 0 });
     instance.backgroundColor(glass ? CYLAnimatedItemBackgroundModifier.glassTint(this.color, this.tintAlpha) : this.color);
     instance.borderRadius(CYLAnimatedItemBackgroundModifier.resolvedCornerRadius(this.style, this.cornerRadius));
-    // [EN] A drawn glass without an explicit border gets the hairline rim of Android's `CYLLiquidGlassView` (1 vp, black 16% on a light page, white 22% on a dark one, no sheen),
+    // [EN] A drawn glass without an explicit border gets the hairline rim of Android's `CYLLiquidGlassView` (1 vp, white: bright on a light page, faint on a dark one),
     //      so the edge of a tag or a section card is visible on a plain or gradient page. [CN] 绘制的玻璃在没有显式边框时带有 Android `CYLLiquidGlassView` 的
-    //      细边（1 vp，浅色页面上为黑色 16%、深色页面上为白色 22%，没有高光），使标签或分组卡片的边缘在纯色或渐变页面上可见。
+    //      细边（1 vp，白色：浅色页面上明亮、深色页面上微弱），使标签或分组卡片的边缘在纯色或渐变页面上可见。
     const rim: boolean = glass && this.borderWidth <= 0;
     instance.borderWidth(rim ? CYLLiquidGlass.RIM_WIDTH : this.borderWidth);
-    instance.borderColor(rim ? CYLLiquidGlass.rimColor(CYLLiquidGlass.isDark()) : this.borderColor);
+    instance.borderColor(rim ? CYLLiquidGlass.rimEdgeColors(CYLLiquidGlass.isDark()) : this.borderColor);
+    // [EN] Every glass has the sheen and the uniform rim of CYLLiquidGlass (the tab bar capsule uses the same values). [CN] 所有玻璃都有 CYLLiquidGlass 的高光与均匀细边（TabBar 胶囊使用相同的数值）。
+    const sheen: Array<[ResourceColor, number]> = CYLLiquidGlass.sheenColors(CYLLiquidGlass.isDark());
+    if (glass && sheen.length > 0) {
+      instance.linearGradient({ direction: GradientDirection.Bottom, colors: sheen });
+    }
     instance.clip(glass);
   }
 }
