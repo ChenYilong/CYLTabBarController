@@ -114,8 +114,14 @@ class DemoListFragment : Fragment() {
         val dark = (context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
         val colors = if (dark) intArrayOf(Color.parseColor("#5B2A3C"), Color.parseColor("#1F4A63"), Color.parseColor("#3B2D5C"))
                      else intArrayOf(Color.parseColor("#FFB199"), Color.parseColor("#7EC8E3"), Color.parseColor("#C3AED6"))
-        return FrameLayout(context).apply {
+        // [EN] The plate is a SIBLING behind the list, not the list's ancestor: the Liquid Glass of the tags samples it (`backdropSource`); a glass inside its own
+        //      source could only draw tint and rim. [CN] 背板是列表后面的同级视图，而不是列表的祖先：标签的液态玻璃采样它（`backdropSource`）；位于自己的源之内的玻璃只能绘制着色与边缘。
+        val plate = View(context).apply {
             background = android.graphics.drawable.GradientDrawable(android.graphics.drawable.GradientDrawable.Orientation.TL_BR, colors)
+        }
+        holder.view.backdropSource = plate
+        return FrameLayout(context).apply {
+            addView(plate, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
             addView(list)
         }
     }
