@@ -39,6 +39,8 @@
  *      深色模式下使用 `darkTint`。视图类没有该方法时在运行时添加，因此不导入任何动画库的头文件；没有这些选项的视图不做任何事。
  */
 static const void *CYLTabBarItemAnimationTintOptionsKey = &CYLTabBarItemAnimationTintOptionsKey;
+/// [EN] Set by a `CYLAnimatedItemView`: the color it hands over is final (already resolved with its own traits), so the view draws it as is. [CN] 由 `CYLAnimatedItemView` 设置：它交来的颜色是最终颜色（已按自身 trait 解析），视图原样绘制。
+static const void *CYLTabBarItemAnimationTintFinalKey = &CYLTabBarItemAnimationTintFinalKey;
 static const void *CYLTabBarItemAnimationTintPlayerKey = &CYLTabBarItemAnimationTintPlayerKey;
 static const void *CYLTabBarItemAnimationTintOverlayKey = &CYLTabBarItemAnimationTintOverlayKey;
 static const void *CYLTabBarItemAnimationTintOriginalFramesKey = &CYLTabBarItemAnimationTintOriginalFramesKey;
@@ -263,6 +265,10 @@ static void CYLTabBarItemAnimationTintMethod(UIView *view, SEL _cmd, UIColor *co
     if (!options) {
         return;
     }
+    if ([objc_getAssociatedObject(view, CYLTabBarItemAnimationTintFinalKey) boolValue]) {
+        CYLTabBarItemAnimationApplyTint(view, color);
+        return;
+    }
     UIColor *fixed = CYLTabBarItemAnimationFixedTintColor(options);
     if (fixed) {
         CYLTabBarItemAnimationApplyTint(view, fixed);
@@ -280,6 +286,10 @@ static void CYLTabBarItemAnimationTintMethod(UIView *view, SEL _cmd, UIColor *co
 static void CYLTabBarItemAnimationTintWithStateMethod(UIView *view, SEL _cmd, UIColor *color, BOOL selected) {
     NSDictionary<NSString *, NSString *> *options = objc_getAssociatedObject(view, CYLTabBarItemAnimationTintOptionsKey);
     if (!options) {
+        return;
+    }
+    if ([objc_getAssociatedObject(view, CYLTabBarItemAnimationTintFinalKey) boolValue]) {
+        CYLTabBarItemAnimationApplyTint(view, color);
         return;
     }
     UIColor *fixed = CYLTabBarItemAnimationFixedTintColor(options);
@@ -348,5 +358,6 @@ BOOL CYLTabBarItemAnimationPrepareItemTint(UIView *view, NSURL *sourceURL, id<CY
         objc_setAssociatedObject(view, CYLTabBarItemAnimationTintOptionsKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
         CYLTabBarItemAnimationApplyTint(view, nil);
     }
+    objc_setAssociatedObject(view, CYLTabBarItemAnimationTintFinalKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     return CYLTabBarItemAnimationPrepareTintWithOptions(view, options, player);
 }

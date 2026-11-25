@@ -1322,9 +1322,13 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         //      只有当前状态的）；回退由解析函数完成（"title"：选中的，否则普通的；固定颜色：只用选中的）。
         let normalColor = itemAppearance != nil ? itemAppearance?.normal.iconColor : (isSelected ? nil : color)
         let selectedColor = itemAppearance != nil ? itemAppearance?.selected.iconColor : (isSelected ? color : nil)
+        // [EN] Resolved against THIS item's traits and handed over as a plain color: inside `traitCollectionDidChange` the animation view
+        //      (a subview) still reports the OLD appearance, so a dynamic color resolved by the engine there came out white on white after
+        //      a live switch. [CN] 用本条目的 trait 解析并以普通颜色交出：在 `traitCollectionDidChange` 内，动画视图（子视图）仍报告旧的外观，
+        //      引擎在那里解析动态颜色会在运行中切换后得到白底白图标。
         let resolved = CYLTabBarItemAnimationItemTintColor(
             animationURL, animationTint, animationDarkTint, isSelected, traitCollection.userInterfaceStyle == .dark,
-            normalColor, selectedColor)
+            normalColor, selectedColor)?.resolvedColor(with: traitCollection)
         // [EN] A view that resolves its own tint from its URL options (Rive) takes the final color instead, so the properties reach it too.
         // [CN] 自行从 URL 选项解析着色的视图（Rive）改为接收最终颜色，使属性对它也生效。
         let resolvedSelector = NSSelectorFromString("cyl_applyAnimationViewResolvedTintColor:")
