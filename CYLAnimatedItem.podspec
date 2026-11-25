@@ -53,7 +53,7 @@ Pod::Spec.new do |s|
   s.subspec 'Engine' do |engine|
     engine.dependency 'CYLAnimatedItem/Core'
     files = %w[CYLTabBarItemAnimator CYLTabBarItemAnimationPlayer CYLTabBarItemAnimatorRegistry CYLTabBarItemAnimationFactory
-               CYLTabBarItemAnimationTint CYLTabBarItemAnimationPlayableView CYLTabBarItemViewAnimator]
+               CYLTabBarItemAnimationTint CYLTabBarItemAnimationColorCount CYLTabBarItemAnimationPlayableView CYLTabBarItemViewAnimator]
     engine.source_files = files.map { |name| "CYLTabBarController/CYLTabBarItemAnimation/#{name}.{h,m}" } +
                           ['CYLTabBarController/CYLTabBarItemAnimation/Swift/*.swift']
     engine.public_header_files = files.map { |name| "CYLTabBarController/CYLTabBarItemAnimation/#{name}.h" }
