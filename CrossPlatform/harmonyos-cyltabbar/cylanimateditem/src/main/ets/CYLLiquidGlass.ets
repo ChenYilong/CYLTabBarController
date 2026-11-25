@@ -34,6 +34,14 @@ export class CYLLiquidGlass {
    */
   static readonly RIM_WIDTH: number = 1;
   /**
+   * [EN] The rim on light glass: black at alpha 41/255. [CN] 浅色玻璃上的细边：黑色，透明度 41/255。
+   */
+  static readonly RIM_LIGHT: string = '#29000000';
+  /**
+   * [EN] The rim on dark glass: white at alpha 56/255. [CN] 深色玻璃上的细边：白色，透明度 56/255。
+   */
+  static readonly RIM_DARK: string = '#38FFFFFF';
+  /**
    * [EN] Whether the app's color mode is dark (AppStorage `cyl_colorMode`, set by cyltabbar's `cyl_updateColorMode`; light when unset). The rule
    *      of the rim and the sheen: read when the background is applied.
    * [CN] 应用颜色模式是否为深色（AppStorage 的 `cyl_colorMode`，由 cyltabbar 的 `cyl_updateColorMode` 设置；未设置时为浅色）。细边与高光的规则：
@@ -44,27 +52,15 @@ export class CYLLiquidGlass {
   }
 
   /**
-   * [EN] The rim of every glass (a tag, a section card behind tags, an item, the tab bar capsule): the hairline of Android's sampled glass, the same on all four edges
-   *      (white 70% on light glass, white 22% on dark glass: the bright edge of the Android screenshots). One definition: the tag list applies it to its cards and tags through
-   *      `CYLAnimatedItemBackgroundModifier`, and no host keeps its own.
-   * [CN] 所有玻璃（标签、标签后的分组卡片、条目、TabBar 胶囊）的细边：Android 采样玻璃的细边，四条边相同（浅色玻璃上为白色 70%，深色玻璃上为白色 22%：Android 截图里明亮的边缘）。
-   *      只有这一份定义：标签列表通过 `CYLAnimatedItemBackgroundModifier` 把它用于卡片与标签，宿主不保留自己的。
+   * [EN] The rim of a tag, a section card or an item: Android's hairline (`CYLLiquidGlassView`, 1 dp, the same on all four edges), black at alpha 41/255 on
+   *      light glass and white at alpha 56/255 on dark glass (measured on the Android example: rim (201,200,199) over a (240,238,237) fill). There is no
+   *      sheen and no directional edge. One definition: the tag list applies it to its cards and tags through `CYLAnimatedItemBackgroundModifier`.
+   * [CN] 标签、分组卡片或条目的细边：Android 的细边（`CYLLiquidGlassView`，1 dp，四条边相同），浅色玻璃上为黑色、透明度 41/255，深色玻璃上为白色、
+   *      透明度 56/255（在 Android 示例上测得：细边 (201,200,199)，底色 (240,238,237)）。没有高光，也没有方向性边缘。只有这一份定义：标签列表通过
+   *      `CYLAnimatedItemBackgroundModifier` 把它用于卡片与标签。
    */
-  static rimEdgeColors(dark: boolean): EdgeColors {
-    const edge: string = dark ? '#38FFFFFF' : '#B3FFFFFF';
-    const colors: EdgeColors = { top: edge, right: edge, bottom: edge, left: edge };
-    return colors;
-  }
-
-  /**
-   * [EN] The sheen of every glass over its tint, top to bottom: a specular band at the top fading down and a faint glow at the bottom (the light of
-   *      the tab bar capsule).
-   * [CN] 所有玻璃在着色之上的高光，自上而下：顶部向下渐隐的高光带与底部微弱的反光（TabBar 胶囊的光）。
-   */
-  static sheenColors(dark: boolean): Array<[ResourceColor, number]> {
-    return dark ?
-      [['#2EFFFFFF', 0], ['#0AFFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#12FFFFFF', 1]] :
-      [['#66FFFFFF', 0], ['#14FFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#1FFFFFFF', 1]];
+  static rimColor(dark: boolean): string {
+    return dark ? CYLLiquidGlass.RIM_DARK : CYLLiquidGlass.RIM_LIGHT;
   }
 
   /**
