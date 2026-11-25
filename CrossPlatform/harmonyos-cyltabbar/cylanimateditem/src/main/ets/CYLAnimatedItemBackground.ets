@@ -121,8 +121,12 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
       { radius: 0 });
     instance.backgroundColor(glass ? CYLAnimatedItemBackgroundModifier.glassTint(this.color, this.tintAlpha) : this.color);
     instance.borderRadius(CYLAnimatedItemBackgroundModifier.resolvedCornerRadius(this.style, this.cornerRadius));
-    instance.borderWidth(this.borderWidth);
-    instance.borderColor(this.borderColor);
+    // [EN] A drawn glass without an explicit border gets the hairline rim of Android's `CYLLiquidGlassView` (1 vp, dark on a light page, light on a dark one),
+    //      so the edge of a tag or a section card is visible on a plain or gradient page. [CN] 绘制的玻璃在没有显式边框时带有 Android `CYLLiquidGlassView` 的
+    //      细边（1 vp，浅色页面上为深色、深色页面上为浅色），使标签或分组卡片的边缘在纯色或渐变页面上可见。
+    const rim: boolean = glass && this.borderWidth <= 0;
+    instance.borderWidth(rim ? CYLLiquidGlass.RIM_WIDTH : this.borderWidth);
+    instance.borderColor(rim ? CYLLiquidGlass.rimColor() : this.borderColor);
     instance.clip(glass);
   }
 }

@@ -30,6 +30,27 @@ export class CYLLiquidGlass {
   static readonly DARK_BRIGHTNESS: number = 0.9;
 
   /**
+   * [EN] The width of the glass rim, vp (Android: 1 dp). [CN] 玻璃边缘细边的宽度，单位 vp（Android 为 1 dp）。
+   */
+  static readonly RIM_WIDTH: number = 1;
+  /**
+   * [EN] The rim on a light page: black at alpha 41/255 (Android). [CN] 浅色页面上的细边：黑色，透明度 41/255（Android）。
+   */
+  static readonly RIM_LIGHT: string = '#29000000';
+  /**
+   * [EN] The rim on a dark page: white at alpha 56/255 (Android). [CN] 深色页面上的细边：白色，透明度 56/255（Android）。
+   */
+  static readonly RIM_DARK: string = '#38FFFFFF';
+
+  /**
+   * [EN] The rim color of the app's color mode (AppStorage `cyl_colorMode`, set by cyltabbar's `cyl_updateColorMode`; light when unset).
+   * [CN] 应用颜色模式（AppStorage 的 `cyl_colorMode`，由 cyltabbar 的 `cyl_updateColorMode` 设置；未设置时为浅色）对应的细边颜色。
+   */
+  static rimColor(): string {
+    return AppStorage.get<string>('cyl_colorMode') === 'dark' ? CYLLiquidGlass.RIM_DARK : CYLLiquidGlass.RIM_LIGHT;
+  }
+
+  /**
    * [EN] For tests: replaces the rule of `isActive()` (`undefined`, the default, uses the rule). [CN] 供测试使用：替代 `isActive()` 的规则（默认 `undefined`，使用规则）。
    */
   static activeOverride: boolean | undefined = undefined;
