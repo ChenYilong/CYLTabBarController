@@ -296,6 +296,9 @@ docs/
 │   ├── demo-second-tap-refresh-ios.png
 │   ├── demo-test-list-objc-classic.png
 │   ├── docs-navigation-index.png
+│   ├── examples-dark-mode-default-tint-09bb7bec.png
+│   ├── examples-taglist-liquid-glass-903d0443.png
+│   ├── examples-taglist-short-titles-6e5e67ec.png
 │   ├── flat-design-more-icon-fix-ios.png
 │   ├── flatdesign-plus-button-fixed-ios.png
 │   ├── flatdesign-plus-button-missing-ios.png
@@ -341,6 +344,7 @@ docs/
 │   ├── harmonyos-emulator-resource-missing-92426d43.png
 │   ├── harmonyos-flatdesign-liquidglass-taps-mate70pro.png
 │   ├── harmonyos-flatdesign-tint-fixed.png
+│   ├── harmonyos-gallery-lottie-tint-urls-a93de1d8.png
 │   ├── harmonyos-gif-image-rest-then-play.png
 │   ├── harmonyos-gif-svga-tint-option.png
 │   ├── harmonyos-gif-svga-tint-x86_64.png
@@ -636,6 +640,7 @@ docs/
 │   ├── update-tab-network-icons-plus-button.png
 │   ├── update-tab-plus-page-navigation-title-changed.png
 │   ├── update-tab-plus-page-navigation-title.png
+│   ├── wechat-devtools-demo-taglist-0e5a788b.png
 │   ├── wechat-miniprogram-animated-item-stack-axis-tint.png
 │   ├── wechat-miniprogram-animated-item-stack.png
 │   ├── wechat-miniprogram-animated-item-still-image-after-end-devtools-sdk3.17.6.png

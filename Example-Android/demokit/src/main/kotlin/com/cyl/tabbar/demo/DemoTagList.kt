@@ -5,6 +5,8 @@ import com.cyl.classifymenu.CYLIndexPath
 import com.cyl.classifymenu.CYLMenuDelegate
 import com.cyl.classifymenu.CYLMenuFoldControlKeyContent
 import com.cyl.classifymenu.CYLMenuFoldControlKeyPosition
+import com.cyl.classifymenu.CYLMenuStyleBackgroundColor
+import com.cyl.classifymenu.CYLMenuStyleBackgroundStyle
 import com.cyl.classifymenu.CYLMenuStyleTitleMaxLines
 import com.cyl.classifymenu.CYLTagItemIdentifier
 import com.cyl.classifymenu.CYLTagItemSubtitle
@@ -34,6 +36,20 @@ object DemoTagList {
     const val TITLE_MAX_LINES = 3
     const val VISIBLE_ROWS = 3
 
+    private val BRACKETS = Regex("\\s*[（(]([^）)]*)[）)]")
+
+    /**
+     * [EN] A tag's title is short: what a row's title says in brackets, "(…)" or "（…）", moves behind the row's subtitle (shown on a long
+     *      press). A title that is only brackets stays as it is. Returns the title and the subtitle ("" for none).
+     * [CN] Tag 的标题要短：行标题中括号「(…)」或「（…）」里的内容追加到行的副标题之后（长按才显示）。只有括号的标题保持不变。
+     */
+    fun tagText(title: String, subtitle: String?): Pair<String, String> {
+        val notes = BRACKETS.findAll(title).map { it.groupValues[1].trim() }.filter { it.isNotEmpty() }.toList()
+        val stripped = title.replace(BRACKETS, "").replace(Regex("\\s+"), " ").trim()
+        if (stripped.isEmpty()) return title to (subtitle ?: "")
+        return stripped to (listOfNotNull(subtitle?.takeIf { it.isNotEmpty() }) + notes).joinToString(" · ")
+    }
+
     /** [EN] A section whose rows carry badge samples stays a list section. [CN] 含角标样例行的分组仍是列表分组。 */
     fun isBadgeSection(section: DemoSection) = section.rows.any { it.badgeRow >= 0 }
 
@@ -45,13 +61,16 @@ object DemoTagList {
         CYLTagListViewLongPressAction to "callout",
         CYLTagListViewDefaultVisibleRows to VISIBLE_ROWS,
         CYLTagListViewFoldControl to mapOf(CYLMenuFoldControlKeyPosition to "headerTrailing", CYLMenuFoldControlKeyContent to "iconAndTitle"),
-        CYLTagListViewStyle to mapOf(CYLMenuStyleTitleMaxLines to TITLE_MAX_LINES),
+        // [EN] Liquid Glass tags (docs/instructions/examples.md). [CN] 液态玻璃样式的 Tag（docs/instructions/examples.md）。
+        // [EN] The list sits on the page's own background: its default white would hide the (dark mode) header texts. [CN] 列表位于页面自己的背景之上：默认的白色会遮住（深色模式下的）标题文字。
+        CYLTagListViewStyle to mapOf(CYLMenuStyleTitleMaxLines to TITLE_MAX_LINES, CYLMenuStyleBackgroundStyle to "liquidGlass", CYLMenuStyleBackgroundColor to "#00000000"),
         CYLTagListViewSections to sections.mapIndexed { sectionIndex, section ->
             mapOf(
                 CYLTagSectionTitle to section.title,
                 CYLTagSectionItems to section.rows.mapIndexed { itemIndex, row ->
-                    val item = mutableMapOf<String, Any?>(CYLTagItemIdentifier to "$sectionIndex-$itemIndex", CYLTagItemTitle to row.title)
-                    subtitleOf(row)?.takeIf { it.isNotEmpty() }?.let { item[CYLTagItemSubtitle] = it }
+                    val (title, subtitle) = tagText(row.title, subtitleOf(row))
+                    val item = mutableMapOf<String, Any?>(CYLTagItemIdentifier to "$sectionIndex-$itemIndex", CYLTagItemTitle to title)
+                    subtitle.takeIf { it.isNotEmpty() }?.let { item[CYLTagItemSubtitle] = it }
                     item
                 },
             )

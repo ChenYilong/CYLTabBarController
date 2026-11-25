@@ -44,7 +44,7 @@ function propertyColors(property: object | undefined, into: number[][]): void {
   if (property === undefined || property === null) {
     return;
   }
-  const k: object | undefined = (property as Record<string, object>)['k'];
+  const k: object | undefined = (property as Record<string, Object>)['k'];
   if (!Array.isArray(k) || k.length === 0) {
     return;
   }
@@ -57,7 +57,7 @@ function propertyColors(property: object | undefined, into: number[][]): void {
   }
   for (const keyframe of k as object[]) {
     for (const key of ['s', 'e']) {
-      const value: object | undefined = (keyframe as Record<string, object>)[key];
+      const value: Object | undefined = (keyframe as Record<string, Object>)[key];
       if (Array.isArray(value)) {
         const c = lottieColor(value as number[]);
         if (c !== undefined) {
@@ -83,8 +83,8 @@ function scanLottie(node: object | undefined, scan: LottieScan): void {
     }
     return;
   }
-  const record = node as Record<string, object>;
-  const ty: object = record['ty'];
+  const record = node as Record<string, Object>;
+  const ty: Object = record['ty'];
   if (ty === 'gf' || ty === 'gs') {
     scan.multi = true; // [EN] gradient. [CN] 渐变。
     return;
@@ -98,7 +98,7 @@ function scanLottie(node: object | undefined, scan: LottieScan): void {
     return;
   }
   for (const key of Object.keys(record)) {
-    const child: object = record[key];
+    const child: Object = record[key];
     if (child !== null && typeof child === 'object') {
       scanLottie(child, scan);
     }
@@ -131,7 +131,7 @@ export function cylAnimatedItemLottieColorCount(json: string): number | undefine
   const assets: object[] | undefined = (root as Record<string, object[]>)['assets'];
   if (Array.isArray(assets)) {
     for (const asset of assets) {
-      const p: object = (asset as Record<string, object>)['p'];
+      const p: Object = (asset as Record<string, Object>)['p'];
       if (typeof p === 'string' && p.length > 0) {
         return -1;
       }

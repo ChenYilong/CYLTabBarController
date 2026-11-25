@@ -1025,6 +1025,13 @@ struct Index {
         subtitle: CYLLocalizedString('showsImageWhenAnimationEnds: a play-once Lottie icon, then its still image'),
         action: () => this.push('pages/AnimatedItemEnd', {} as DemoPushParams),
       } as DemoRow] } as DemoSection] : []),
+      // [EN] The built-in default tint (docs/Animated-Item.md, "Tint"): one-color and multi-color files, normal and selected, light and dark.
+      // [CN] 内置默认着色（docs/Animated-Item.md，“Tint”）：单色与多色文件，常态与选中，浅色与深色。
+      ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('Default tint'), rows: [{
+        id: 'default-tint', title: CYLLocalizedString('Default tint'),
+        subtitle: CYLLocalizedString('A one-color file takes the built-in tint of its state and color mode; a multi-color file keeps its colors'),
+        action: () => this.push('pages/DefaultTint', {} as DemoPushParams),
+      } as DemoRow] } as DemoSection] : []),
       // [EN] The Rive colors hook (docs/Animated-Item.md, "Colors"): applyColors on a data-bound .riv.
       // [CN] Rive 颜色钩子（docs/Animated-Item.md，“颜色”）：对数据绑定的 .riv 调用 applyColors。
       ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('Rive colors'), rows: [{

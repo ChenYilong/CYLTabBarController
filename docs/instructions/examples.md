@@ -46,6 +46,22 @@ A demo that shows another setup on purpose (no plus button, a plus button withou
     **3 lines**; text beyond that is cut.
   - Folding: a section that needs more than the maximum number of rows shows a **More / Less** toggle with the library's built-in
     icon; More expands the section, Less folds it again.
+  - Short titles: a tag's title is only the row's main title. What the row's title says in brackets, `(…)` or `（…）` (a parameter name, an issue
+    number, a note), is moved out of the title and **appended to the subtitle** (after the row's own subtitle, joined by ` · `), so it shows only on a
+    long press. A title that is only brackets stays as it is. Every example does this in the code that builds the tag list
+    (HarmonyOS `demoTagText`, Android `DemoTagList.tagText`, mini program `cylTagText`), never in the library and never in the row data.
+  - Liquid Glass style: every tag list in an example uses the library's Liquid Glass tag style (`backgroundStyle` `liquidGlass`: a glass background
+    behind each tag, with the library's own border, corner radius and content inset), never the flat style, on every platform. It is set in the code that
+    builds the tag list's configuration (HarmonyOS `demo/DemoTagList.ets`, Android `demo/DemoTagList.kt`, mini program `utils/cyl_demo_tags.js`), together with
+    `titleMaxLines`. Where the platform cannot draw glass (the mini program outside a glass-capable view), the library falls back to its flat look; do not
+    add example-only drawing to imitate it.
+  - Dark mode: an example's tag list is checked in light and dark mode, and a dark mode check always includes the built-in default tint (a one-color
+    animated file takes the library's color of its state and mode, a multi-color file keeps its own colors). The list's own default background is a fixed
+    white that does not follow dark mode, so an example sets the style `backgroundColor` to clear (`#00000000`) and lets the page's background show;
+    otherwise the header texts, which do follow dark mode, are white on white. HarmonyOS: `--ps cylColorMode dark|light` on `aa start` switches the app's
+    color mode, and the `Default tint` row of the second tab (`cylScreen default-tint`, `pages/DefaultTint.ets`) shows a one-color and a multi-color Lottie
+    file, normal and selected. Android: `adb shell cmd uimode night yes|no` (restore it afterwards: emulators are shared). Mini program: no real dark switch in
+    DevTools automation; override `wx.getAppBaseInfo` to return `theme: 'dark'` in the app service and open the page again (the page's own background stays light).
   - Tap: tapping a tag does exactly what tapping the old cell did.
   - Long press: shows the row's subtitle in a small floating callout with an arrow, built with the tag list's long-press
     custom API (never with example-only gesture code).
@@ -55,5 +71,9 @@ A demo that shows another setup on purpose (no plus button, a plus button withou
     Exception: the badge sample rows stay rows, because a badge is drawn over a row's icon and a tag has no place for it.
   - Android pins it the same way (`scripts/fetch-classifymenu.sh android` fetches `android/merged/library` into the git-ignored
     `Example-Android/cylclassifymenu/`, built with `Example-Android/cylclassifymenu.build.gradle.kts`); the tag list is the header view of the demo `ListView`,
-    so scroll hiding keeps working, and the badge rows follow as rows. On Android the callout is visible while the finger is down.
-  - Status (2026-11-25): HarmonyOS `entry` `Index.ets` (`demo/DemoTagList.ets`) and Android `DemoList.kt` (`demo/DemoTagList.kt`) done; the mini program, React Native and Flutter are not converted yet.
+    so scroll hiding keeps working, and the badge rows follow as rows. The callout stays until the next touch, tap or scroll (pin b79d2031 or later).
+  - The mini program pins it the same way (`scripts/fetch-classifymenu.sh miniprogram`, run by `npm run setup`, fetches `cyl-tag-list-miniprogram` into the git-ignored
+    `example/cylclassifymenu-miniprogram/`, installed as a `file:` dependency). A section becomes a tag list when every row is a plain row (no slider, switch, arrows or
+    color swatch); the other sections keep their rows (`example/miniprogram/utils/cyl_demo_tags.js`). The expanded control reads "Less" there.
+  - Status (2026-11-25): HarmonyOS `entry` `Index.ets`, Android `DemoList.kt` and the mini program home page done; React Native and Flutter are not converted yet
+    (each needs a native ClassifyMenu build chain; their demo rows also have switches, arrows and buttons).

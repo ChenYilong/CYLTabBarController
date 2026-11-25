@@ -36,12 +36,24 @@ enum CYLRiveInputPass {
     /// [EN] ... and at most this long, for a machine that never settles (shapes.riv, truck.riv). [CN] 至多保持这么久，用于永不稳定的状态机（shapes.riv、truck.riv）。
     static let maximumOffSeconds: TimeInterval = 1.5
 
+    /// [EN] The longest the NO window of a restart lasts: `maximumOffSeconds` for an input held YES (`activeDuration` 0), and for an
+    ///      input with an `activeDuration` that duration (not below `minimumOffSeconds`, not above `maximumOffSeconds`), so a machine
+    ///      that never settles does not delay a 0.3 s pass by the full 1.5 s. Android `CYLRiveInputPass.offWindowCapMilliseconds` and
+    ///      HarmonyOS `cylRiveOffWindowCapMs` follow the same rule.
+    ///      [CN] 重新播放的 NO 窗口最长持续多久：保持为 YES 的输入（`activeDuration` 为 0）为 `maximumOffSeconds`；带 `activeDuration` 的输入
+    ///      为该时长（不小于 `minimumOffSeconds`，不大于 `maximumOffSeconds`），永不稳定的状态机不会让 0.3 秒的一遍白等 1.5 秒。
+    ///      Android `CYLRiveInputPass.offWindowCapMilliseconds` 与 HarmonyOS `cylRiveOffWindowCapMs` 使用同一规则。
+    static func offWindowCap(activeDuration: TimeInterval) -> TimeInterval {
+        guard hasEnd(activeDuration: activeDuration) else { return maximumOffSeconds }
+        return min(maximumOffSeconds, max(minimumOffSeconds, activeDuration))
+    }
+
     /// [EN] Does the NO window of a restart end now? It lasts until the state machine has settled, so its NO pass is seen
-    ///      (menu_button.riv shows its X for about 0.5 s), within `minimumOffSeconds` ... `maximumOffSeconds`.
+    ///      (menu_button.riv shows its X for about 0.5 s), within `minimumOffSeconds` ... `offWindowCap(activeDuration:)`.
     ///      [CN] 重新播放的 NO 窗口现在是否结束？它持续到状态机稳定，使 NO 的那一遍被看到（menu_button.riv 约 0.5 秒显示 X），
-    ///      范围为 `minimumOffSeconds` ... `maximumOffSeconds`。
-    static func offWindowEnds(elapsed: TimeInterval, isSettled: Bool) -> Bool {
-        elapsed >= maximumOffSeconds || (elapsed >= minimumOffSeconds && isSettled)
+    ///      范围为 `minimumOffSeconds` ... `offWindowCap(activeDuration:)`。
+    static func offWindowEnds(elapsed: TimeInterval, isSettled: Bool, activeDuration: TimeInterval = 0) -> Bool {
+        elapsed >= offWindowCap(activeDuration: activeDuration) || (elapsed >= minimumOffSeconds && isSettled)
     }
 
     /// [EN] Does the input pass end now? Called after `activeDuration` seconds have elapsed. [CN] 输入的这一遍现在是否结束？在经过 `activeDuration` 秒之后调用。

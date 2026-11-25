@@ -514,7 +514,29 @@ async function cylTapElement(selector, wait = CYL_SETTLE_MS) {
   for (let attempt = 0; ; attempt += 1) {
     try {
       const { page } = await cylCurrentPage();
-      const element = await page.$(selector);
+      let element = await page.$(selector);
+      // [EN] A row of a section shown as a tag list (utils/cyl_demo_tags.js) is a tag of that list: the tag is tapped, the
+      //      section expanded first when the tag is folded away. [CN] 以 TagList 显示的分组中的行是该列表的一个 Tag：点击该 Tag；
+      //      Tag 被折叠时先展开分组。
+      const rowId = /^\.cyl-home-row\[data-id="([^"]+)"\]$/.exec(selector);
+      if (!element && rowId) {
+        const found = await miniProgram.evaluate((id) => {
+          const sections = getCurrentPages().pop().data.sections;
+          const section = sections.find((candidate) => candidate.tagConfiguration && candidate.rows.some((row) => row.id === id));
+          return section ? { section: section.id, index: section.rows.findIndex((row) => row.id === id) } : null;
+        }, rowId[1]);
+        if (found) {
+          const list = await page.$(`#cyl-tags-${found.section}`);
+          element = list && await list.$(`#cyl-item-0-${found.index}`);
+          if (!element && list) {
+            const fold = await list.$('.cyl-fold-header');
+            assert.ok(fold, `no fold control for ${selector}`);
+            await fold.tap();
+            await cylSleep(CYL_SETTLE_MS);
+            element = await list.$(`#cyl-item-0-${found.index}`);
+          }
+        }
+      }
       assert.ok(element, `no element ${selector}`);
       await element.tap();
       break;

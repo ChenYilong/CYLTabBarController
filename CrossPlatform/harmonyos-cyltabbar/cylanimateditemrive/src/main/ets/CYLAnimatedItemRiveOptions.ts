@@ -95,11 +95,27 @@ export const CYL_RIVE_MINIMUM_OFF_MS: number = 50;
 export const CYL_RIVE_MAXIMUM_OFF_MS: number = 1500;
 
 /**
- * [EN] Does the NO window of a restart end now? It lasts until the state machine has settled, so its NO pass is seen
- *      (menu_button.riv shows its X for about 0.5 s), within the minimum and maximum. As iOS `CYLRiveInputPass.offWindowEnds`.
- * [CN] 重新播放的 NO 窗口现在是否结束？它持续到状态机稳定，使 NO 的那一遍被看到（menu_button.riv 约 0.5 秒显示 X），范围在最小值与最大值之间。
- *      与 iOS `CYLRiveInputPass.offWindowEnds` 相同。
+ * [EN] The cap of the NO window of a restart: 1500 ms for an input held true (`activeDuration` 0), otherwise the input's
+ *      duration (seconds) between 50 ms and 1500 ms, so a machine that never settles does not delay a 0.3 s pass by the full
+ *      1.5 s. As iOS `CYLRiveInputPass.offWindowCap` and Android `CYLRiveInputPass.offWindowCapMilliseconds`.
+ * [CN] 重新播放的 NO 窗口的上限：保持为 true 的输入（`activeDuration` 为 0）为 1500 ms，否则为输入的时长（秒）折算的毫秒数，范围在 50 ms 与
+ *      1500 ms 之间，永不稳定的状态机不会让 0.3 秒的一遍白等 1.5 秒。与 iOS `CYLRiveInputPass.offWindowCap`、Android
+ *      `CYLRiveInputPass.offWindowCapMilliseconds` 相同。
  */
-export function cylRiveOffWindowEnds(elapsedMs: number, isSettled: boolean): boolean {
-  return elapsedMs >= CYL_RIVE_MAXIMUM_OFF_MS || (elapsedMs >= CYL_RIVE_MINIMUM_OFF_MS && isSettled);
+export function cylRiveOffWindowCapMs(activeDuration: number = 0): number {
+  if (!(activeDuration > 0)) {
+    return CYL_RIVE_MAXIMUM_OFF_MS;
+  }
+  return Math.min(CYL_RIVE_MAXIMUM_OFF_MS, Math.max(CYL_RIVE_MINIMUM_OFF_MS, Math.round(activeDuration * 1000)));
+}
+
+/**
+ * [EN] Does the NO window of a restart end now? It lasts until the state machine has settled, so its NO pass is seen
+ *      (menu_button.riv shows its X for about 0.5 s), within the minimum and `cylRiveOffWindowCapMs(activeDuration)`. As iOS
+ *      `CYLRiveInputPass.offWindowEnds`.
+ * [CN] 重新播放的 NO 窗口现在是否结束？它持续到状态机稳定，使 NO 的那一遍被看到（menu_button.riv 约 0.5 秒显示 X），范围在最小值与
+ *      `cylRiveOffWindowCapMs(activeDuration)` 之间。与 iOS `CYLRiveInputPass.offWindowEnds` 相同。
+ */
+export function cylRiveOffWindowEnds(elapsedMs: number, isSettled: boolean, activeDuration: number = 0): boolean {
+  return elapsedMs >= cylRiveOffWindowCapMs(activeDuration) || (elapsedMs >= CYL_RIVE_MINIMUM_OFF_MS && isSettled);
 }

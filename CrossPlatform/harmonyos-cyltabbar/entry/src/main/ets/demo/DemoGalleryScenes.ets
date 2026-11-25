@@ -26,6 +26,8 @@ export interface DemoGalleryScene {
   colors?: string[];
   backgrounds?: boolean;
   plus?: boolean;
+  /** [EN] Per-tab suffix of the Lottie file path: the URL options "#tint=title", "#tint=#RRGGBBAA&darkTint=#RRGGBBAA". [CN] 每个 Tab 的 Lottie 路径后缀：URL 选项。 */
+  lottieSuffixes?: string[];
   /** [EN] The plus button opens a menu instead of a page. [CN] 加号按钮打开菜单。 */
   plusMenu?: boolean;
   /** [EN] The identifier of a tab that opens a dialog instead of its page (cyl_customActionTabBarItemIdentifiers). [CN] 打开弹窗的 Tab。 */
@@ -87,6 +89,12 @@ export const DEMO_GALLERY: DemoGallerySection[] = [
   ] },
   { title: 'Lottie', scenes: [
     { id: 'lottie', title: 'Lottie', subtitle: 'Lottie tab icons that play on select', tabs: 4, lottie: true },
+    // [EN] The tint URL options (docs/Animated-Item.md, "Tint"): tab 1 "#tint=title" (the title color), tab 2 a fixed color with a dark one
+    //      (8 digits are #RRGGBBAA: #FF3B3080 is red at half alpha, read as #AARRGGBB it would be an opaque dark purple), tab 3 none, tab 4 a fixed blue.
+    // [CN] 着色 URL 选项（docs/Animated-Item.md，“Tint”）：Tab 1 "#tint=title"（标题颜色），Tab 2 固定颜色加深色模式颜色（8 位为 #RRGGBBAA：
+    //      #FF3B3080 是半透明红色，按 #AARRGGBB 读则是不透明的深紫色），Tab 3 无，Tab 4 固定蓝色。
+    { id: 'lottie-tint', title: 'Lottie tint URLs', subtitle: '#tint=title and a fixed #tint=#RRGGBBAA&darkTint=#RRGGBBAA tab icon', tabs: 4, lottie: true,
+      lottieSuffixes: ['#tint=title', '#tint=#FF3B3080&darkTint=#34C75980', '', '#tint=#007AFFFF'] },
   ] },
   { title: 'New APIs', scenes: [
     { id: 'custom-action', title: 'Custom action on a regular tab', subtitle: 'cyl_customActionTabBarItemIdentifiers', tabs: 5, customAction: 'video' },

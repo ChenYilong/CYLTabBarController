@@ -5,7 +5,8 @@
   "description": "The example mini program of cyl-tabbar-miniprogram (AppID wx5e29c9d33906f074)",
   "license": "MIT",
   "dependencies": {
-    "cyl-tabbar-miniprogram": "file:.."
+    "cyl-tabbar-miniprogram": "file:..",
+    "cyl-tag-list-miniprogram": "file:cylclassifymenu-miniprogram"
   },
   "cylExampleAnimation": "lottie",
   "scripts": {
