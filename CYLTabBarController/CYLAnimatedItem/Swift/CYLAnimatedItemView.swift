@@ -712,6 +712,34 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     // MARK: - Animation state 动画状态
 
+    /**
+     [EN] Draws the animation like a template image in one color, as Rive's `tint` option does, for every animation library: "title" (the
+          item's icon color, the selected state's icon color when selected) or "#RRGGBB" / "#RRGGBBAA" (a fixed color on the unselected
+          item; the selected item takes its icon color). nil (the default) keeps the file's own colors; set, it overrides the `tint` option
+          of `animationURL`. Setting or clearing it after the file loaded works. Use it for one-color files (a near-black Lottie in dark
+          mode: "title"); multi-color files keep nil. Same name and values on every platform.
+     [CN] 像 Rive 的 `tint` 选项那样，对所有动画库把动画像模板图片一样用一种颜色绘制："title"（条目的图标颜色，选中时为选中状态的图标颜色）或
+          "#RRGGBB" / "#RRGGBBAA"（未选中条目上的固定颜色；选中的条目使用其图标颜色）。nil（默认）保持文件自己的颜色；设置后覆盖 `animationURL` 的
+          `tint` 选项。文件加载之后再设置或清除也有效。用于单色文件（深色模式下近黑的 Lottie：用 "title"）；多色文件保持 nil。各平台同名同值。
+     */
+    @objc open dynamic var animationTint: String? {
+        didSet { if oldValue != animationTint { reapplyAnimationTint() } }
+    }
+
+    /**
+     [EN] The Dark Mode color of a fixed `animationTint` ("#RRGGBB" / "#RRGGBBAA"), as Rive's `darkTint`; not needed for "title". Same name and values on every platform.
+     [CN] 固定 `animationTint`（"#RRGGBB" / "#RRGGBBAA"）在深色模式下的颜色，与 Rive 的 `darkTint` 相同；"title" 不需要。各平台同名同值。
+     */
+    @objc open dynamic var animationDarkTint: String? {
+        didSet { if oldValue != animationDarkTint { reapplyAnimationTint() } }
+    }
+
+    private func reapplyAnimationTint() {
+        #if CYL_ANIMATION_ENGINE_AVAILABLE
+        if let view = animationView, let url = animationURL { prepareAnimationTint(view, url: url) }
+        #endif
+    }
+
     /** [EN] The animation file; nil removes the animation. [CN] 动画文件；nil 移除动画。 */
     @objc open dynamic var animationURL: URL? {
         didSet {
@@ -1327,6 +1355,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                 view.accessibilityElementsHidden = true
                 insertSubview(view, aboveSubview: imageView)
                 storedAnimationView = view
+                prepareAnimationTint(view, url: url)
                 attachEndHandler()
                 applyPlayerSettings()
                 if drivesAnimationPlayback { setPlayerValue(animationRestingProgress, for: "progress") }
@@ -1358,6 +1387,18 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         updateIcon()
         contentDidChange()
     }
+
+    #if CYL_ANIMATION_ENGINE_AVAILABLE
+    /// [EN] Gives the animation view its tint: `animationTint` / `animationDarkTint` over the source URL's `tint` / `darkTint` options (Rive's
+    ///      interface); none of them leaves the file's own colors. [CN] 为动画视图设置着色：`animationTint` / `animationDarkTint` 覆盖来源 URL 的
+    ///      `tint` / `darkTint` 选项（Rive 的接口）；都没有时保持文件自己的颜色。
+    private func prepareAnimationTint(_ view: UIView, url: URL) {
+        let prepared = CYLTabBarItemAnimationPrepareItemTint(view, url, animationSource.player(for: view), animationTint, animationDarkTint)
+        if prepared, let color = lastIconTintColor ?? currentItemStateAppearance?.iconColor {
+            applyIconTintColor(color)
+        }
+    }
+    #endif
 
     /// [EN] `onAnimationLoaded` on the next main queue turn, so a host that sets the callback after the URL still hears it; only
     ///      while `view` is still the animation. [CN] 在下一次主队列循环调用 `onAnimationLoaded`，宿主在设置 URL 之后才设置回调也能收到；仅当 `view` 仍是当前动画。

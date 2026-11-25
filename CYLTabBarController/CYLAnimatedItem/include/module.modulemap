@@ -9,6 +9,7 @@ module CYLAnimatedItem {
     header "../../CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayer.h"
     header "../../CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.h"
     header "../../CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.h"
+    header "../../CYLTabBarItemAnimation/CYLTabBarItemAnimationTint.h"
     header "../../CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.h"
     export *
 }

@@ -148,3 +148,4 @@ void CYLTabBarItemAnimationReportFailure(UIView *animationView, NSError *error) 
                                                           userInfo:error ? @{ NSUnderlyingErrorKey : error } : nil];
     });
 }
+

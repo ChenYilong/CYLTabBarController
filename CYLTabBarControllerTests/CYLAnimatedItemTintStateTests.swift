@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import ObjectiveC
 import XCTest
 import CYLAnimatedItem
 
@@ -200,6 +201,52 @@ final class CYLAnimatedItemBackgroundTests: XCTestCase {
         item.itemGlassTintAlpha = nil
         item.layoutIfNeeded()
         XCTAssertEqual(tintAlpha(), 0.75, accuracy: 0.01)
+    }
+
+    func testAnimationTintDrawsAnAnimationLikeATemplateOnlyWhenSetAndIsClearable() throws {
+        guard CYLAnimationTypeIsAvailable("Lottie") else {
+            throw XCTSkip("the Lottie engine is not in this test target")
+        }
+        let json = #"{"v":"5.7.0","fr":30,"ip":0,"op":30,"w":24,"h":24,"nm":"t","ddd":0,"assets":[],"layers":[]}"#
+        let file = FileManager.default.temporaryDirectory.appendingPathComponent("cyl-item-tint-\(UUID().uuidString).json")
+        try json.write(to: file, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: file) }
+        let tintSelector = NSSelectorFromString("cyl_applyAnimationViewTintColor:")
+        func take(_ item: CYLAnimatedItemView) -> Bool { item.animationView?.responds(to: tintSelector) ?? false }
+
+        // Unset (the default): the file keeps its own colors, even when the host set an icon color (tab bars and tags always do).
+        let untouched = makeItem()
+        untouched.iconSize = CGSize(width: 24, height: 24)
+        untouched.applyIconTintColor(.white)
+        untouched.animationURL = file
+        XCTAssertNotNil(untouched.animationView)
+        XCTAssertFalse(take(untouched), "no animationTint: not tinted")
+
+        // Set before the file: "title" tints it in the icon color.
+        let before = makeItem()
+        before.iconSize = CGSize(width: 24, height: 24)
+        before.animationTint = "title"
+        before.animationURL = file
+        XCTAssertTrue(take(before), "animationTint = title: the animation view takes the icon color")
+
+        // Set after the file loaded, then cleared: both work.
+        let later = makeItem()
+        later.iconSize = CGSize(width: 24, height: 24)
+        later.animationURL = file
+        XCTAssertFalse(take(later))
+        later.animationTint = "title"
+        XCTAssertTrue(take(later), "set after load")
+        later.animationTint = nil
+        later.applyIconTintColor(.red)
+        XCTAssertNil(later.animationTint, "cleared")
+
+        // A fixed color with its dark variant, and the URL's own option is overridden by the property.
+        let fixed = makeItem()
+        fixed.iconSize = CGSize(width: 24, height: 24)
+        fixed.animationTint = "#1C1C1E"
+        fixed.animationDarkTint = "#F2F2F7"
+        fixed.animationURL = file
+        XCTAssertTrue(take(fixed), "a fixed tint with its dark variant")
     }
 
     func testSettingTheSameValueAgainDoesNotRequestALayout() {
