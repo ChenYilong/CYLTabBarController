@@ -5,6 +5,7 @@ import com.cyl.classifymenu.CYLIndexPath
 import com.cyl.classifymenu.CYLMenuDelegate
 import com.cyl.classifymenu.CYLMenuFoldControlKeyContent
 import com.cyl.classifymenu.CYLMenuFoldControlKeyPosition
+import com.cyl.classifymenu.CYLMenuStyleBackgroundStyle
 import com.cyl.classifymenu.CYLMenuStyleTitleMaxLines
 import com.cyl.classifymenu.CYLTagItemIdentifier
 import com.cyl.classifymenu.CYLTagItemSubtitle
@@ -59,7 +60,8 @@ object DemoTagList {
         CYLTagListViewLongPressAction to "callout",
         CYLTagListViewDefaultVisibleRows to VISIBLE_ROWS,
         CYLTagListViewFoldControl to mapOf(CYLMenuFoldControlKeyPosition to "headerTrailing", CYLMenuFoldControlKeyContent to "iconAndTitle"),
-        CYLTagListViewStyle to mapOf(CYLMenuStyleTitleMaxLines to TITLE_MAX_LINES),
+        // [EN] Liquid Glass tags (docs/instructions/examples.md). [CN] 液态玻璃样式的 Tag（docs/instructions/examples.md）。
+        CYLTagListViewStyle to mapOf(CYLMenuStyleTitleMaxLines to TITLE_MAX_LINES, CYLMenuStyleBackgroundStyle to "liquidGlass"),
         CYLTagListViewSections to sections.mapIndexed { sectionIndex, section ->
             mapOf(
                 CYLTagSectionTitle to section.title,

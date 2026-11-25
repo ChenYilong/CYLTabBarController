@@ -63,6 +63,8 @@ export function demoTagListConfiguration(sections: DemoSection[]): CYLConfigurat
   configuration[CYLTagListKey.foldControl] = foldControl;
   const style: CYLConfiguration = {};
   style[CYLMenuStyleKey.titleMaxLines] = DEMO_TAG_TITLE_MAX_LINES;
+  // [EN] Liquid Glass tags (docs/instructions/examples.md). [CN] 液态玻璃样式的 Tag（docs/instructions/examples.md）。
+  style[CYLMenuStyleKey.backgroundStyle] = 'liquidGlass';
   configuration[CYLTagListKey.style] = style;
   const sectionList: CYLConfiguration[] = [];
   sections.forEach((section: DemoSection) => {

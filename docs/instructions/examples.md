@@ -50,6 +50,11 @@ A demo that shows another setup on purpose (no plus button, a plus button withou
     number, a note), is moved out of the title and **appended to the subtitle** (after the row's own subtitle, joined by ` · `), so it shows only on a
     long press. A title that is only brackets stays as it is. Every example does this in the code that builds the tag list
     (HarmonyOS `demoTagText`, Android `DemoTagList.tagText`, mini program `cylTagText`), never in the library and never in the row data.
+  - Liquid Glass style: every tag list in an example uses the library's Liquid Glass tag style (`backgroundStyle` `liquidGlass`: a glass background
+    behind each tag, with the library's own border, corner radius and content inset), never the flat style, on every platform. It is set in the code that
+    builds the tag list's configuration (HarmonyOS `demo/DemoTagList.ets`, Android `demo/DemoTagList.kt`, mini program `utils/cyl_demo_tags.js`), together with
+    `titleMaxLines`. Where the platform cannot draw glass (the mini program outside a glass-capable view), the library falls back to its flat look; do not
+    add example-only drawing to imitate it.
   - Tap: tapping a tag does exactly what tapping the old cell did.
   - Long press: shows the row's subtitle in a small floating callout with an arrow, built with the tag list's long-press
     custom API (never with example-only gesture code).

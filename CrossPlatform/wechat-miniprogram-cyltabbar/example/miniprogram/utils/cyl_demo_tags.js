@@ -45,7 +45,8 @@ function cylTagConfiguration(section) {
     longPressAction: 'callout',
     defaultVisibleRows: CYL_TAG_VISIBLE_ROWS,
     foldControl: { position: 'headerTrailing', content: 'iconAndTitle' },
-    style: { titleMaxLines: CYL_TAG_TITLE_MAX_LINES },
+    // Liquid Glass tags (docs/instructions/examples.md). 液态玻璃样式的 Tag（docs/instructions/examples.md）。
+    style: { titleMaxLines: CYL_TAG_TITLE_MAX_LINES, backgroundStyle: 'liquidGlass' },
     sections: [{
       title: section.title,
       items: section.rows.map((row) => {

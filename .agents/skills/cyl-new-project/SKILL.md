@@ -147,6 +147,6 @@ When a demo page needs a table-view-like list with section grouping (not the Obj
 
 1. One tag per row: the row's main title and its icon; the subtitle becomes the long-press callout.
 2. Every section header has a title. Tags use the adaptive width so a line holds as many tags as fit.
-3. Title labels wrap; an example sets the maximum to 3 lines. A section that needs more lines shows a More / Less toggle with the built-in icon.
+3. Tags use the library's Liquid Glass style (`backgroundStyle` `liquidGlass`). Title labels wrap; an example sets the maximum to 3 lines. A section that needs more lines shows a More / Less toggle with the built-in icon.
 4. Keep tag titles short: move what the title says in brackets, `(…)` or `（…）`, behind the subtitle (it shows on a long press). A tap does what the old cell did. A long press shows the subtitle in a small floating callout with an arrow, set up through the tag list's long-press API; do not write gesture code in the example.
 5. Check the page in light and dark mode and with a long title, and attach a labeled screenshot (`scripts/stitch-screenshots.py`).
