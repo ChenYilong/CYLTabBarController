@@ -90,6 +90,7 @@ appears in the task). Instruction files (this file, `instructions.md`, `docs/ins
 
 - Examples import only `CYLTabBarController`; tables use the inset grouped style; demo rows never on the first tab, spread over the others; the first tab mirrors the Objective-C example.
 - The demo adds the first tab's cover itself, later; animated icon pages offer Play all, speed and loop; default setup: plus button with its own page, a local configuration file, a raised plus button. New demos follow `cyl-new-project`.
+- A demo list that needs sections uses a CollectionViewClassifyMenu tag list (title and icon per row, a titled section header, adaptive tag width, titles wrap up to 3 lines in an example, a More / Less toggle with its built-in icon, tap as the old cell, long press shows the subtitle in an arrow callout through the tag list's long-press API).
 - Full text: [docs/instructions/examples.md](docs/instructions/examples.md).
 
 ## React Native and Flutter (tag: `cross-platform`)
