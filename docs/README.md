@@ -123,7 +123,6 @@ docs/
 ├── Android-Liquid-Glass.md
 ├── Android-QMUI-Comparison.md
 ├── Animated-Item.md
-├── Animated-Item.md-e
 ├── Badge-Debugging.md
 ├── Bilingual-Documentation.md
 ├── CYLTableViewPlaceHolder-Integration-Issues.md
