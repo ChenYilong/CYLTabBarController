@@ -1574,9 +1574,11 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     /**
      * [EN] The view a Liquid Glass background blurs and refracts: null (the default) is the root of the window's views. The source must be a view BEHIND this
      *      item and NOT an ancestor of it (a sibling plate, e.g. the gradient behind a list): a glass inside its own source cannot sample it and draws only
-     *      its tint and rim. Applied to the glass layer, also when the layer is created later. Not used by the flat style.
+     *      its tint and rim. Applied to the glass layer, also when the layer is created later, and re-applied to the shown glass when set. Below API 31
+     *      (no glass is drawn) the property is kept but has no effect and the item draws its flat color. Not used by the flat style.
      * [CN] 液态玻璃背景所模糊、折射的视图：null（默认）为窗口视图的根。源必须是位于该条目后面、且不是其祖先的视图（同级的背板，例如列表后面的渐变）：
-     *      位于自己的源之内的玻璃不能采样它，只绘制着色与边缘。应用到玻璃层，层稍后创建时也会应用。扁平样式不使用。
+     *      位于自己的源之内的玻璃不能采样它，只绘制着色与边缘。应用到玻璃层，层稍后创建时也会应用，设置时重新应用到正在显示的玻璃。API 31 以下
+     *      （不绘制玻璃）属性被保留但不起作用，条目绘制其扁平颜色。扁平样式不使用。
      */
     var itemGlassBackdropSource: View? = null
         set(value) { if (field !== value) { field = value; if (usesItemBackground) itemBackgroundDidChange() } }
