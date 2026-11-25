@@ -17,7 +17,7 @@
 | 中文 | English |
 |:---|:---|
 | iOS 库的每个公开符号（公开头文件中的类、协议、方法、属性、常量、枚举、函数）及其 Android 版本（`Example-Android/cyltabbar`，Kotlin 与 Java）。状态：done 行为相同；partial 部分行为（见说明）；planned 尚未移植；n/a 仅 iOS（UIKit、扁平样式、液态玻璃、Core Animation 等），不计入完成率。 | Every public symbol of the iOS library (classes, protocols, methods, properties, constants, enums and functions of the public headers) with its Android version (`Example-Android/cyltabbar`, Kotlin and Java). Status: done, the same behavior; partial, part of it (see the note); planned, not ported yet; n/a, iOS only (UIKit, FlatDesign, Liquid Glass, Core Animation...), left out of the score. |
-| **迁移完成率：100 / 100**（done + 0.5 × partial，共 1068 个计入的符号；done 1062、partial 6、planned 0、n/a 387）。 | **Migration score: 100 / 100** (done + 0.5 × partial over 1068 counted symbols; done 1062, partial 6, planned 0, n/a 387). |
+| **迁移完成率：99 / 100**（done + 0.5 × partial，共 1076 个计入的符号；done 1062、partial 6、planned 8、n/a 387）。 | **Migration score: 99 / 100** (done + 0.5 × partial over 1076 counted symbols; done 1062, partial 6, planned 8, n/a 387). |
 
 ## 目录 / Contents
 
@@ -50,6 +50,7 @@
 | [`CYLTabBarConfigurationParser.h`](#cyltabbarconfigurationparserh) | [`CYLTabBarConfigurationParser.h`](#cyltabbarconfigurationparserh) |
 | [`CYLTabBarController+CYLInteraction.h`](#cyltabbarcontrollercylinteractionh) | [`CYLTabBarController+CYLInteraction.h`](#cyltabbarcontrollercylinteractionh) |
 | [`CYLTabBarController.h`](#cyltabbarcontrollerh) | [`CYLTabBarController.h`](#cyltabbarcontrollerh) |
+| [`CYLTabBarControllerTypedefs.h`](#cyltabbarcontrollertypedefsh) | [`CYLTabBarControllerTypedefs.h`](#cyltabbarcontrollertypedefsh) |
 | [`CYLTabBarHostView.h`](#cyltabbarhostviewh) | [`CYLTabBarHostView.h`](#cyltabbarhostviewh) |
 | [`CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.h`](#cyltabbaritemanimationcyltabbaritemanimationfactoryh) | [`CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.h`](#cyltabbaritemanimationcyltabbaritemanimationfactoryh) |
 | [`CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h`](#cyltabbaritemanimationcyltabbaritemanimationplayableviewh) | [`CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h`](#cyltabbaritemanimationcyltabbaritemanimationplayableviewh) |
@@ -85,6 +86,7 @@
 | [`CYLUtils/UIView+CYLUtils.h`](#cylutilsuiviewcylutilsh) | [`CYLUtils/UIView+CYLUtils.h`](#cylutilsuiviewcylutilsh) |
 | [`CYLUtils/UIViewController+CYLUtils.h`](#cylutilsuiviewcontrollercylutilsh) | [`CYLUtils/UIViewController+CYLUtils.h`](#cylutilsuiviewcontrollercylutilsh) |
 | [`NSObject+CYLTabBarControllerExtention.h`](#nsobjectcyltabbarcontrollerextentionh) | [`NSObject+CYLTabBarControllerExtention.h`](#nsobjectcyltabbarcontrollerextentionh) |
+| [`Package/ObjC/include/CYLTabBarItemAnimationEngine.h`](#packageobjcincludecyltabbaritemanimationengineh) | [`Package/ObjC/include/CYLTabBarItemAnimationEngine.h`](#packageobjcincludecyltabbaritemanimationengineh) |
 | [`UIColor+CYLTabBarControllerExtention.h`](#uicolorcyltabbarcontrollerextentionh) | [`UIColor+CYLTabBarControllerExtention.h`](#uicolorcyltabbarcontrollerextentionh) |
 | [`UIControl+CYLTabBarControllerExtention.h`](#uicontrolcyltabbarcontrollerextentionh) | [`UIControl+CYLTabBarControllerExtention.h`](#uicontrolcyltabbarcontrollerextentionh) |
 | [`UIImage+CYLTabBarControllerExtention.h`](#uiimagecyltabbarcontrollerextentionh) | [`UIImage+CYLTabBarControllerExtention.h`](#uiimagecyltabbarcontrollerextentionh) |
@@ -719,7 +721,7 @@
 | `CYLPlusButtonIndex` | `CYLTabBar.CYLPlusButtonIndex` | done | updated by the latest tab bar layout (dp) |
 | `CYLPlusButtonWidth` | `CYLTabBar.CYLPlusButtonWidth` | done | updated by the latest tab bar layout (dp) |
 | `CYLTabBarItemWidth` | `CYLTabBar.CYLTabBarItemWidth` | done | updated by the latest tab bar layout (dp) |
-| `CYLTabBarHeight` | `CYLTabBar.CYLTabBarHeight` | done | updated by the latest tab bar layout (dp); the default height is the system tab bar's, `CYLConstants.cyl_systemTabBarHeight(context)` (Material 3: 80 dp), since 2026-11-22 |
+| `CYLTabBarHeight` | `CYLTabBar.CYLTabBarHeight` | done | updated by the latest tab bar layout (dp) |
 | `CYLTabBarLoginCompletion` | `typealias CYLTabBarLoginCompletion` | done |  |
 | `CYLTabBarLoginStateDidChangeNotification` | `CYLConstants.CYLTabBarLoginStateDidChangeNotification` | done |  |
 | `CYLTabBarReselectBehavior` | `CYLEnums.CYLTabBarReselectBehavior` | done |  |
@@ -940,6 +942,12 @@
 | `UIViewController(CYLTabBarItemTitle)` `cyl_navigationTitleFollowsTabBarItemTitle` | `Fragment.cyl_navigationTitleFollowsTabBarItemTitle` | done | one action bar per activity: the activity's title follows the selected page's tab title |
 | `CYLTabBarController` `tabBarItemAnimationLoops` | `CYLTabBarController.tabBarItemAnimationLoops` | done |  |
 | `CYLTabBarController` `-cyl_playAllTabBarItemAnimations` | `CYLTabBarController.cyl_playAllTabBarItemAnimations()` | done |  |
+
+## `CYLTabBarControllerTypedefs.h`
+
+| iOS API | Android API | 状态 Status | 说明 / Note |
+|:---|:---|:---|:---|
+| `CYLPlusButtonCurrentWidth()` | — | planned |  |
 
 ## `CYLTabBarHostView.h`
 
@@ -1544,6 +1552,18 @@
 | `NSObject(CYLTabBarControllerExtention)` `-cyl_removeObserver:forKeyPath:` | — | n/a | UIKit view / control / color / image / navigation helpers |
 | `NSObject(CYLTabBarControllerExtention)` `-cyl_removeObserver:forKeyPath:context:` | — | n/a | UIKit view / control / color / image / navigation helpers |
 | `CYLCatchException()` | — | n/a | Catches an Objective-C exception for Swift callers (Swift cannot catch NSException); Kotlin has try / catch |
+
+## `Package/ObjC/include/CYLTabBarItemAnimationEngine.h`
+
+| iOS API | Android API | 状态 Status | 说明 / Note |
+|:---|:---|:---|:---|
+| `CYLTabBarItemAnimationEngine` | — | planned |  |
+| `CYLTabBarItemAnimationEngine` `registry` | — | planned |  |
+| `CYLTabBarItemAnimationEngine` `factory` | — | planned |  |
+| `CYLTabBarItemAnimationEngine` `styleSource` | — | planned |  |
+| `CYLTabBarItemAnimationEngine` `host` | — | planned |  |
+| `CYLTabBarItemAnimationEngine` `-initWithRegistry:factory:styleSource:host:` | — | planned |  |
+| `CYLTabBarItemAnimationEngine` `-init` | — | planned |  |
 
 ## `UIColor+CYLTabBarControllerExtention.h`
 

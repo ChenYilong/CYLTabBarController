@@ -322,6 +322,10 @@
 		C3B0FDBE33063B20BA341B4B /* UIViewController+CYLDeprecatedNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = E512178A341EDACE86B6090E /* UIViewController+CYLDeprecatedNames.swift */; };
 		C4515A3C0B125116E95EE16D /* CYLTabBarItemViewAnimator.m in Sources */ = {isa = PBXBuildFile; fileRef = 960B1D09E23FCCE38A747AB1 /* CYLTabBarItemViewAnimator.m */; };
 		C519141473EF362AB972F657 /* CYLAnimatedItemViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A3950BF6A76EBE0344FCDD39 /* CYLAnimatedItemViewTests.m */; };
+		D7FC63F63FFB38293772402B /* CYLTestSubclasses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961BC0F62694C23750891477 /* CYLTestSubclasses.swift */; };
+		B7C0DE5A11A2233D4001FC04 /* CYLDefaultTabBarHeightTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7C0DE5A11A2233D4001FC03 /* CYLDefaultTabBarHeightTests.swift */; };
+		F53850E7A7B858FE08DA6371 /* CYLAnimatedItemTintStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEE6420896408BF196FDE8B1 /* CYLAnimatedItemTintStateTests.swift */; };
+		D7DE53073873012C7550BB8D /* CYLAnimatedItemStackViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B9742EEB9F5580FC8B76001C /* CYLAnimatedItemStackViewTests.m */; };
 		C55EB2BC5D6C89C66BF454DF /* UIViewController+CYLThemeSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B125B4B6B9CBD155357BAD3 /* UIViewController+CYLThemeSettings.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C6010A1B2C3D4E5F60718293 /* UIViewController+CYLTabBarItemUpdate.h in Headers */ = {isa = PBXBuildFile; fileRef = C6010A1B2C3D4E5F60718295 /* UIViewController+CYLTabBarItemUpdate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C63C581B21A7AF9B937CD46C /* CYLDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD0F35BF0BC3FB2C2B07B49 /* CYLDetailsViewController.swift */; };
@@ -340,8 +344,6 @@
 		D5262F58D57A91ECA4D8A182 /* CYLTabBarController.h in Headers */ = {isa = PBXBuildFile; fileRef = 391010CD30C0B5F2B3D1127F /* CYLTabBarController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D65C453A576885B48AE7D880 /* CYLLocalizedString+CYLUtilsDeprecatedNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE81276B4DA3B12D26000902 /* CYLLocalizedString+CYLUtilsDeprecatedNames.swift */; };
 		D6ED76F52724E1A27FDE3A83 /* UIView+CYLBadgeExtention.h in Headers */ = {isa = PBXBuildFile; fileRef = E1366512954555C342251BDB /* UIView+CYLBadgeExtention.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		D7DE53073873012C7550BB8D /* CYLAnimatedItemStackViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B9742EEB9F5580FC8B76001C /* CYLAnimatedItemStackViewTests.m */; };
-		D7FC63F63FFB38293772402B /* CYLTestSubclasses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 961BC0F62694C23750891477 /* CYLTestSubclasses.swift */; };
 		D8660E124D9664B56820A83C /* UIColor+CYLDeprecatedNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB368375D2639A93BD5C7D4E /* UIColor+CYLDeprecatedNames.swift */; };
 		D99D1956B90B199209C4C6DE /* CYLTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AB0062F644C26605D43E3E8 /* CYLTabBarController.swift */; };
 		D9B6D63DAD8574F07AEF1BD7 /* CYLBadgeProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B21C6E4F6DD55647C84249 /* CYLBadgeProtocol.swift */; };
@@ -370,7 +372,6 @@
 		F2584DE0CE5DF015B848AEB8 /* CYLLocalization.h in Headers */ = {isa = PBXBuildFile; fileRef = 122AD69C82D1C708D134796A /* CYLLocalization.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		F2958163E3C92D835247B0E3 /* CYLFlatDesignTabBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 323F8AB156FCDC8C7E0BFCB8 /* CYLFlatDesignTabBarButton.swift */; };
 		F2DD4E136A1610B5D5490E77 /* CYLTabBarController+CYLTabSetup.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C9166AD4EC51873347E2F2 /* CYLTabBarController+CYLTabSetup.swift */; };
-		F53850E7A7B858FE08DA6371 /* CYLAnimatedItemTintStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEE6420896408BF196FDE8B1 /* CYLAnimatedItemTintStateTests.swift */; };
 		F554F7394B9A80A20759A71C /* _CYLFlatDesignTabBarControllerTransitionAnimator.h in Headers */ = {isa = PBXBuildFile; fileRef = 04C2AF4F5157DB1DB2A68D1B /* _CYLFlatDesignTabBarControllerTransitionAnimator.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		F604B04D86A9619C89614430 /* UIImage+CYLTabBarControllerExtention.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66A2499221932F9785C03129 /* UIImage+CYLTabBarControllerExtention.swift */; };
 		F699FA9B7932CAE5514A3995 /* CYLTabBarItemViewAnimator.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A5CBF6706B3BDE81F9CD8BA /* CYLTabBarItemViewAnimator.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -727,6 +728,13 @@
 		A2B3147B77FFDF7425ADB784 /* CYLTabBarController+CYLSelection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLSelection.swift"; sourceTree = "<group>"; };
 		A3950BF6A76EBE0344FCDD39 /* CYLAnimatedItemViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLAnimatedItemViewTests.m; sourceTree = "<group>"; };
 		A45D5A42A9B49223C4D71D68 /* CYLTabBarController+CYLPlusSlot.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Swift/CYLTabBarController+CYLPlusSlot.swift"; sourceTree = "<group>"; };
+		B7C0DE5A11A2233D4001FB01 /* CYLAnimatedItemCountdownTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimatedItemCountdownTests.swift; sourceTree = "<group>"; };
+		B7C0DE5A11A2233D4001FC01 /* CYLFlatDesignDelegateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLFlatDesignDelegateTests.swift; sourceTree = "<group>"; };
+		B7C0DE5A11A2233D4001FC03 /* CYLDefaultTabBarHeightTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLDefaultTabBarHeightTests.swift; sourceTree = "<group>"; };
+		C0DE0B5E11A2233D4001AC01 /* CYLSelectorDumpTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLSelectorDumpTests.m; sourceTree = "<group>"; };
+		C0DE0B5E11A2233D4001AB01 /* CYLAnimationEngineSwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimationEngineSwiftTests.swift; sourceTree = "<group>"; };
+		BEE6420896408BF196FDE8B1 /* CYLAnimatedItemTintStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimatedItemTintStateTests.swift; sourceTree = "<group>"; };
+		B9742EEB9F5580FC8B76001C /* CYLAnimatedItemStackViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLAnimatedItemStackViewTests.m; sourceTree = "<group>"; };
 		A494E02A66D2AE6B5B42B9E8 /* UIColor+CYLTabBarControllerExtention.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIColor+CYLTabBarControllerExtention.h"; sourceTree = "<group>"; };
 		A51C0051D3E4F5061728394A /* CYLTabBar+CYLImplementation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBar+CYLImplementation.swift"; sourceTree = "<group>"; };
 		A52C0051D3E4F5061728394A /* CYLPlusButton+CYLImplementation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLPlusButton+CYLImplementation.swift"; sourceTree = "<group>"; };
@@ -746,22 +754,16 @@
 		B5F671E7E35F56C8C6EC15BE /* CYLTabBarItemAnimationStyleRegistry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLTabBarItemAnimationStyleRegistry.swift; sourceTree = "<group>"; };
 		B729F87F3CCDFE2739F84A66 /* CYLTabBarController+CYLTabBarItemColors.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLTabBarItemColors.swift"; sourceTree = "<group>"; };
 		B7867273EDC0A1A56B351CBE /* UIViewController+CYLTheme.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "UIViewController+CYLTheme.h"; sourceTree = "<group>"; };
-		B7C0DE5A11A2233D4001FB01 /* CYLAnimatedItemCountdownTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimatedItemCountdownTests.swift; sourceTree = "<group>"; };
-		B7C0DE5A11A2233D4001FC01 /* CYLFlatDesignDelegateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLFlatDesignDelegateTests.swift; sourceTree = "<group>"; };
 		B887D29E195F991B3BDC0011 /* CYLTabBarBadgeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLTabBarBadgeView.swift; sourceTree = "<group>"; };
 		B8E729FE6A6EC5674DC48A41 /* CYLAnimatedItem.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CYLAnimatedItem.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8EC53F13DFB7439CFABA029 /* CYLSettingsDemoRows.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLSettingsDemoRows.swift; sourceTree = "<group>"; };
-		B9742EEB9F5580FC8B76001C /* CYLAnimatedItemStackViewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLAnimatedItemStackViewTests.m; sourceTree = "<group>"; };
 		B9C988DED462DAAC2ABC7811 /* UIView+CYLTabBarControllerExtention.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UIView+CYLTabBarControllerExtention.swift"; sourceTree = "<group>"; };
 		BBEC547945F02BC7D75AC416 /* CYLThemeManagerCenter.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLThemeManagerCenter.h; sourceTree = "<group>"; };
 		BD3945C47C6C40A6579648D6 /* CYLTabBarController+CYLFlatDesignItemAppearance.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLFlatDesignItemAppearance.swift"; sourceTree = "<group>"; };
 		BD8C6D711D2A791542615558 /* CYLTabBarController+CYLFlatDesignLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLFlatDesignLayout.swift"; sourceTree = "<group>"; };
-		BEE6420896408BF196FDE8B1 /* CYLAnimatedItemTintStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimatedItemTintStateTests.swift; sourceTree = "<group>"; };
 		BEE716EED79F119874CF273C /* UIImage+CYLUtils+CYLUtilsDeprecatedNames.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UIImage+CYLUtils+CYLUtilsDeprecatedNames.swift"; sourceTree = "<group>"; };
 		C0DE0B5E00000000000AC001 /* CYLGIFTabBarItemAnimationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLGIFTabBarItemAnimationView.swift; sourceTree = "<group>"; };
 		C0DE0B5E11A2233D4001AA01 /* UIControl+CYLTabBarItemAnimationPlayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UIControl+CYLTabBarItemAnimationPlayer.swift"; sourceTree = "<group>"; };
-		C0DE0B5E11A2233D4001AB01 /* CYLAnimationEngineSwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimationEngineSwiftTests.swift; sourceTree = "<group>"; };
-		C0DE0B5E11A2233D4001AC01 /* CYLSelectorDumpTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CYLSelectorDumpTests.m; sourceTree = "<group>"; };
 		C19418B1096D86DC2ABBE61B /* UIImage+CYLDeprecatedNames.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UIImage+CYLDeprecatedNames.swift"; sourceTree = "<group>"; };
 		C225E663181904CA6393CDE6 /* CYLTabBarConfigurationParser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLTabBarConfigurationParser.swift; sourceTree = "<group>"; };
 		C34D8CE8144E577E0C873B94 /* CYLResourceRoute.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLResourceRoute.swift; sourceTree = "<group>"; };
@@ -1383,6 +1385,7 @@
 				9AC0FFEE2C3064BD00000401 /* CYLRiveInputPassTests.swift */,
 				9AC0FFEE2C3064BD00000201 /* CYLAnimationEventBridgeTests.swift */,
 				9AC0FFEE2C3064BD00000301 /* CYLAnimationEventBridgeLazyInstallTests.swift */,
+				B7C0DE5A11A2233D4001FC03 /* CYLDefaultTabBarHeightTests.swift */,
 				C0DE0B5E11A2233D4001AB01 /* CYLAnimationEngineSwiftTests.swift */,
 				C0DE0B5E11A2233D4001AC01 /* CYLSelectorDumpTests.m */,
 				BEE6420896408BF196FDE8B1 /* CYLAnimatedItemTintStateTests.swift */,
@@ -2347,6 +2350,7 @@
 				9AC0FFEE2C3064BD00000402 /* CYLRiveInputPassTests.swift in Sources */,
 				9AC0FFEE2C3064BD00000202 /* CYLAnimationEventBridgeTests.swift in Sources */,
 				9AC0FFEE2C3064BD00000302 /* CYLAnimationEventBridgeLazyInstallTests.swift in Sources */,
+				B7C0DE5A11A2233D4001FC04 /* CYLDefaultTabBarHeightTests.swift in Sources */,
 				C0DE0B5E11A2233D4001AB02 /* CYLAnimationEngineSwiftTests.swift in Sources */,
 				C0DE0B5E11A2233D4001AC02 /* CYLSelectorDumpTests.m in Sources */,
 				F53850E7A7B858FE08DA6371 /* CYLAnimatedItemTintStateTests.swift in Sources */,

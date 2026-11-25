@@ -45,16 +45,23 @@ if [ "$(uname)" != "Darwin" ]; then
     echo "Linux: the parser is Swift since 2026-11-13; run these tests on macOS (Xcode command line tools)." >&2
     exit 2
 fi
-xcrun swiftc -parse-as-library -wmo -c -module-name CYLTabBarController \
+# [EN] The Objective-C header imports UIKit (CYLTabBarControllerTypedefs.h), which macOS does not have: build for the iOS
+#      simulator and run the binary inside a simulator (CYL_SIMULATOR_UDID, default: the booted one). Added 2026-11-24.
+# [CN] Objective-C 头文件导入 UIKit（CYLTabBarControllerTypedefs.h），macOS 上没有：为 iOS 模拟器编译，并在模拟器内运行
+#      （CYL_SIMULATOR_UDID，默认：已启动的那台）。2026-11-24 加入。
+SDK=$(xcrun --sdk iphonesimulator --show-sdk-path)
+TARGET="$(uname -m)-apple-ios15.0-simulator"
+SIMULATOR="${CYL_SIMULATOR_UDID:-booted}"
+xcrun swiftc -sdk "$SDK" -target "$TARGET" -parse-as-library -wmo -c -module-name CYLTabBarController \
     -emit-objc-header-path "$WORK/CYLTabBarController-Swift.h" \
     "$SOURCES"/Swift/CYLTabBarConfigurationParser*.swift -o "$WORK/CYLTabBarConfigurationParser.o"
-clang -fobjc-arc -fmodules -Wall -Wextra -Wno-unused-parameter -I"$WORK" -I"$SOURCES" -I"$SOURCES/CYLUtils" \
+xcrun --sdk iphonesimulator clang -target "$TARGET" -fobjc-arc -fmodules -Wall -Wextra -Wno-unused-parameter -I"$WORK" -I"$SOURCES" -I"$SOURCES/CYLUtils" \
     -c "$HERE/ConfigurationParserTests.m" -o "$WORK/ConfigurationParserTests.o"
-xcrun swiftc "$WORK/CYLTabBarConfigurationParser.o" "$WORK/ConfigurationParserTests.o" -o "$WORK/ConfigurationParserTests"
+xcrun swiftc -sdk "$SDK" -target "$TARGET" "$WORK/CYLTabBarConfigurationParser.o" "$WORK/ConfigurationParserTests.o" -o "$WORK/ConfigurationParserTests"
 
 echo "== Running 运行"
 status=0
-"$WORK/ConfigurationParserTests" "$SAMPLES" "$WORK/fixtures" "$WORK/exports" > "$WORK/output.txt" 2>&1 || status=$?
+xcrun simctl spawn "$SIMULATOR" "$WORK/ConfigurationParserTests" "$SAMPLES" "$WORK/fixtures" "$WORK/exports" > "$WORK/output.txt" 2>&1 || status=$?
 # GNUstep logs (date-stamped lines) are left out. 省略 GNUstep 的日志（以日期开头的行）。
 grep -v '^[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} ' "$WORK/output.txt" || true
 exit "$status"

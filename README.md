@@ -199,6 +199,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [液态玻璃的健壮性改进](docs/Liquid-Glass-Robustness.md) | [Liquid Glass Robustness](docs/Liquid-Glass-Robustness.md) |
 | [需要登录的 Tab](docs/Login-Required-Tabs.md) | [Tabs That Need Login](docs/Login-Required-Tabs.md) |
 | [macOS CI/CD 调研报告：用 Mac 服务器构建本项目](docs/Mac-CI-CD.md) | [macOS CI/CD research: building this project on Mac servers](docs/Mac-CI-CD.md) |
+| [交给 macOS 会话的未满分项与待办（Windows 会话 chen-yilong-b6）](docs/Mac-Handoff.md) | [Hand-off to macOS sessions: missing points and TODOs of Windows session chen-yilong-b6](docs/Mac-Handoff.md) |
 | [PAG 动画 Tab 图标（与 Lottie 用法相同）](docs/PAG-Animation.md) | [PAG animated tab icons (used like Lottie)](docs/PAG-Animation.md) |
 | [只有部分 Tab 有动画（Lottie 或 PAG）](docs/Per-Tab-Animation.md) | [Only some tabs animated (Lottie or PAG)](docs/Per-Tab-Animation.md) |
 | [PlusButton 子控制器换肤测试](docs/Plus-Child-Theme-Switching-Test.md) | [Plus child theme switching test](docs/Plus-Child-Theme-Switching-Test.md) |

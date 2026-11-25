@@ -133,18 +133,21 @@ _Pragma("clang diagnostic pop") \
 
 NS_ASSUME_NONNULL_BEGIN
 
+/*
+ * [EN] Swift exports this function as `noexcept` in C++ (`SWIFT_NOEXCEPT` in CYLAnimatedItem-Swift.h): the prototype must match, or an Objective-C++ file (React Native's .mm) fails with "exception specification in declaration does not match previous declaration".
+ * [CN] Swift 在 C++ 中把此函数导出为 `noexcept`（CYLAnimatedItem-Swift.h 的 `SWIFT_NOEXCEPT`）：原型必须一致，否则 Objective-C++ 文件（React Native 的 .mm）报 "exception specification in declaration does not match previous declaration"。
+ */
+#if defined(__cplusplus) && __cplusplus >= 201103L
+#define CYL_ANIMATEDITEM_NOEXCEPT noexcept
+#else
+#define CYL_ANIMATEDITEM_NOEXCEPT
+#endif
+
 /*!
  * [EN] The component's resource bundle, `CYLAnimatedItem.bundle` (the placeholder, its LICENSE and POLICY.md), or nil.
  * [CN] 组件的资源包 `CYLAnimatedItem.bundle`（占位图及其 LICENSE 与 POLICY.md），找不到时为 nil。
  */
-// [EN] In Objective-C++ the declaration must say `noexcept` as the generated Swift header does, or a file that includes both fails
-//      ("exception specification in declaration does not match previous declaration", React Native's `.mm` files).
-// [CN] 在 Objective-C++ 中，声明必须与生成的 Swift 头文件一致地写 `noexcept`，否则同时包含两者的文件会编译失败（React Native 的 `.mm` 文件）。
-#if defined(__cplusplus)
-FOUNDATION_EXPORT NSBundle *_Nullable CYLAnimatedItemResourceBundle(void) noexcept;
-#else
-FOUNDATION_EXPORT NSBundle *_Nullable CYLAnimatedItemResourceBundle(void);
-#endif
+FOUNDATION_EXPORT NSBundle *_Nullable CYLAnimatedItemResourceBundle(void) CYL_ANIMATEDITEM_NOEXCEPT;
 
 NS_ASSUME_NONNULL_END
 
