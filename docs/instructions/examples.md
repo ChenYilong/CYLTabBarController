@@ -49,5 +49,11 @@ A demo that shows another setup on purpose (no plus button, a plus button withou
   - Tap: tapping a tag does exactly what tapping the old cell did.
   - Long press: shows the row's subtitle in a small floating callout with an arrow, built with the tag list's long-press
     custom API (never with example-only gesture code).
-  - Pin the library the same way as the other cross-repository dependencies (the latest commit that contains these APIs), and keep the
-    first tab's Objective-C table as it is (see "Demo table rows" above): this rule applies to tables in the other examples.
+  - Pin the library by commit, not by copy: HarmonyOS pins it in `CrossPlatform/harmonyos-cyltabbar/classifymenu.pin` and
+    `scripts/fetch-classifymenu.sh` fetches `harmony/classifymenu` into the git-ignored `cylclassifymenu/` (the build script runs it).
+    Every tab of an example uses it, the first one too (it keeps the Objective-C example's sections and rows, see "Demo table rows" above).
+    Exception: the badge sample rows stay rows, because a badge is drawn over a row's icon and a tag has no place for it.
+  - Android pins it the same way (`scripts/fetch-classifymenu.sh android` fetches `android/merged/library` into the git-ignored
+    `Example-Android/cylclassifymenu/`, built with `Example-Android/cylclassifymenu.build.gradle.kts`); the tag list is the header view of the demo `ListView`,
+    so scroll hiding keeps working, and the badge rows follow as rows. On Android the callout is visible while the finger is down.
+  - Status (2026-11-25): HarmonyOS `entry` `Index.ets` (`demo/DemoTagList.ets`) and Android `DemoList.kt` (`demo/DemoTagList.kt`) done; the mini program, React Native and Flutter are not converted yet.

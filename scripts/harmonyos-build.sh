@@ -11,6 +11,9 @@ else
   DST="${1:-/c/cyl-hm}"
   DEVECO="${DEVECO_HOME:-/c/Program Files/Huawei/DevEco Studio}"
 fi
+# [EN] The sectioned example lists use CollectionViewClassifyMenu's tag list, fetched at the pinned commit (classifymenu.pin).
+# [CN] 带分组的示例列表使用 CollectionViewClassifyMenu 的 TagList，按 classifymenu.pin 固定的提交拉取。
+"$(dirname "$0")/fetch-classifymenu.sh" || exit 1
 mkdir -p "$DST"
 # [EN] Every module build-profile.json5 registers (the cyl* folders, e.g. cylanimateditem_lottie and cyldeallocblockexecutor), not a fixed list.
 # [CN] build-profile.json5 注册的每个模块（cyl* 目录，例如 cylanimateditem_lottie、cyldeallocblockexecutor），而不是固定列表。

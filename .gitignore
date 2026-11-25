@@ -119,3 +119,7 @@ __pycache__/
 # [CN] 维护者本地的参考项目（RiveViewer-miniapp 为 PolyForm-Noncommercial 许可）：不提交。
 CrossPlatform/RiveViewer-miniapp/
 CrossPlatform/LottieWMC/
+
+# Fetched by scripts/fetch-classifymenu.sh (pinned in classifymenu.pin)
+CrossPlatform/harmonyos-cyltabbar/cylclassifymenu/
+Example-Android/cylclassifymenu/

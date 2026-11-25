@@ -23,4 +23,15 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "CYLTabBarControllerAndroid"
-include(":tabpages", ":cylanimateditem", ":cyltabbar", ":demokit", ":app", ":example-gif", ":example-pag", ":example-rive")
+// [EN] CollectionViewClassifyMenu's tag list (the demo's sectioned lists, docs/instructions/examples.md) is fetched at the commit pinned in
+//      CrossPlatform/harmonyos-cyltabbar/classifymenu.pin into the git-ignored cylclassifymenu/ (scripts/fetch-classifymenu.sh android).
+// [CN] CollectionViewClassifyMenu 的 TagList（演示中带分组的列表，docs/instructions/examples.md）按 classifymenu.pin 固定的提交拉取到不入库的
+//      cylclassifymenu/（scripts/fetch-classifymenu.sh android）。
+val classifyMenuPin = file("../CrossPlatform/harmonyos-cyltabbar/classifymenu.pin").readText().trim()
+val classifyMenuFetched = file("cylclassifymenu/.pinned-sha")
+if (!classifyMenuFetched.exists() || classifyMenuFetched.readText().trim() != classifyMenuPin) {
+    val fetch = ProcessBuilder(listOf("C:/Program Files/Git/bin/bash.exe", "/usr/bin/bash").firstOrNull { file(it).exists() } ?: "bash", file("../scripts/fetch-classifymenu.sh").absolutePath, "android").inheritIO().start().waitFor()
+    check(fetch == 0) { "scripts/fetch-classifymenu.sh android failed (needs bash, git and tar)" }
+}
+include(":tabpages", ":cylanimateditem", ":classifymenu", ":cyltabbar", ":demokit", ":app", ":example-gif", ":example-pag", ":example-rive")
+project(":classifymenu").projectDir = file("cylclassifymenu")

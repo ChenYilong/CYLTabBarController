@@ -40,6 +40,7 @@ android {
 
 dependencies {
     api(project(":cyltabbar"))
+    implementation(project(":classifymenu"))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.material)

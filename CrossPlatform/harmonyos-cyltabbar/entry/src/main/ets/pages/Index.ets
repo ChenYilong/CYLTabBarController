@@ -18,6 +18,8 @@ import {
   DemoRow, DemoSection, DEMO_APPEARANCES, DEMO_TITLE_OFFSETS, DEMO_HOME, DEMO_CITY, DEMO_MESSAGE, DEMO_ME,
   DEMO_LANGUAGES, DEMO_LANGUAGE_NAMES
 } from '../demo/DemoRows';
+import { CYLTagListView } from '@cyl/classifymenu';
+import { DemoTagLists } from '../demo/DemoTagList';
 
 /**
  * [EN] The tabs of the Objective-C Example (MainTabBarController): Home, Nearby, Messages, Me, with identifiers.
@@ -102,6 +104,9 @@ struct Index {
   @State loggedIn: boolean = true;
   /** [EN] Toggled update rows, by id. [CN] 已切换的更新行。 */
   @State toggled: string[] = [];
+  /** [EN] The tag lists of the sectioned demo lists and their content heights per page (docs/instructions/examples.md). [CN] 分组演示列表的 TagList 及各页内容高度。 */
+  private cylTagLists: DemoTagLists = new DemoTagLists();
+  @State cylTagHeights: Map<string, number> = new Map<string, number>();
   /** [EN] Items 33-37: tab interactions (#535). [CN] 第 33-37 项：Tab 交互（#535）。 */
   @State tapAnimation: CYLTabButtonTapAnimationType = CYLTabButtonTapAnimationType.None;
   @State feedbackStep: number = 0;
@@ -248,6 +253,13 @@ struct Index {
   }
 
   aboutToAppear(): void {
+    this.cylTagLists.onHeight = (page: string, height: number): void => {
+      if (this.cylTagHeights.get(page) !== height) {
+        const heights = new Map<string, number>(this.cylTagHeights);
+        heights.set(page, height);
+        this.cylTagHeights = heights;
+      }
+    };
     cyl_pausesAnimationsWhileUserScrolls(true);
     demoRegisterThemes();
     CYLThemeManagerCenter.defaultThemeManager.addListener(this.themeListener);
@@ -1048,6 +1060,19 @@ struct Index {
     ];
   }
 
+  /** [EN] The sections shown as tags: every section but the badge samples. [CN] 以 Tag 显示的分组：除角标样例外的所有分组。 */
+  private cylTagSections(page: string): DemoSection[] {
+    return this.sections(page).filter((section: DemoSection) => !this.cylIsBadgeSection(section));
+  }
+
+  private cylBadgeSections(page: string): DemoSection[] {
+    return this.sections(page).filter((section: DemoSection) => this.cylIsBadgeSection(section));
+  }
+
+  private cylIsBadgeSection(section: DemoSection): boolean {
+    return section.title === CYLLocalizedString('角标');
+  }
+
   // MARK: - Pages 页面
 
   @Builder
@@ -1191,7 +1216,15 @@ struct Index {
         .backgroundColor('#E6E6FA')
       } else if (index !== CYLPlusButtonPageIndex) {
         List() {
-          ForEach(this.sections(identifier), (section: DemoSection) => {
+          // [EN] The sections are one tag list (a titled header per section, More / Less after 3 rows, long press shows the subtitle);
+          //      the badge samples stay rows, because a badge is drawn over a row's icon, which a tag has no place for.
+          // [CN] 分组共用一个 TagList（每组带标题，超过 3 行出现 More / Less，长按显示副标题）；角标样例仍是行，因为角标画在行图标上，Tag 没有对应位置。
+          ListItem() {
+            CYLTagListView({ tagList: this.cylTagLists.listFor(identifier, this.cylTagSections(identifier)) })
+              .height(this.cylTagHeights.get(identifier) ?? 0)
+              .id(`cyl-taglist-${identifier}`)
+          }
+          ForEach(this.cylBadgeSections(identifier), (section: DemoSection) => {
             ListItemGroup({ header: this.cylSectionHeader(section.title) }) {
               ForEach(section.rows, (row: DemoRow) => {
                 ListItem() {
