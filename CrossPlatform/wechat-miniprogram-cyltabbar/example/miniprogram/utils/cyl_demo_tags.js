@@ -47,7 +47,7 @@ function cylTagConfiguration(section) {
     foldControl: { position: 'tail', content: 'icon' },
     // Liquid Glass tags (docs/instructions/examples.md). 液态玻璃样式的 Tag（docs/instructions/examples.md）。
     // The list sits on the page's own background: its default white would hide the (dark mode) header texts. 列表位于页面自己的背景之上：默认的白色会遮住（深色模式下的）标题文字。
-    style: { titleMaxLines: CYL_TAG_TITLE_MAX_LINES, backgroundStyle: 'liquidGlass', backgroundColor: '#00000000' },
+    style: { titleMaxLines: CYL_TAG_TITLE_MAX_LINES, backgroundStyle: 'liquidGlass', backgroundColor: '#00000000', sectionBackgroundStyle: 'liquidGlass' },
     sections: [{
       title: section.title,
       items: section.rows.map((row) => {

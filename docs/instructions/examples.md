@@ -61,6 +61,11 @@ A demo that shows another setup on purpose (no plus button, a plus button withou
     transparent so the page shows through), and the main page behind it has a GRADIENT background (light and dark variants), so the glass has colors to
     bend and blur: the liquid see-through effect is part of what the example tests. If the glass shows no see-through effect over the gradient on a
     platform, do not draw it in the example: report it to the CollectionViewClassifyMenu repository so its core code is fixed, and re-pin.
+  - The new liquid plate, liquid tag and tail control together (the section style of the ClassifyMenu tag list, pin `bbe56951` or newer): every example tag list sets
+    `style.backgroundStyle` `liquidGlass` (the tags), `style.sectionBackgroundStyle` `liquidGlass` (each section is a Liquid Glass card, `sectionStyle` insetGrouped), and
+    `foldControl` position `tail`, content `icon` (the tail control is itself a glass tag). The page behind the list has the colorful gradient (light and dark) set in one
+    shared place per example (HarmonyOS `cyl_plate_*` colors, Android `DemoList` gradient, mini program `pages/home/index.wxss`). Anything of these that a platform
+    cannot show is reported to the CollectionViewClassifyMenu repository at once, and the example is re-pinned when it is fixed.
   - Liquid Glass style: every tag list in an example uses the library's Liquid Glass tag style (`backgroundStyle` `liquidGlass`: a glass background
     behind each tag, with the library's own border, corner radius and content inset), never the flat style, on every platform. It is set in the code that
     builds the tag list's configuration (HarmonyOS `demo/DemoTagList.ets`, Android `demo/DemoTagList.kt`, mini program `utils/cyl_demo_tags.js`), together with

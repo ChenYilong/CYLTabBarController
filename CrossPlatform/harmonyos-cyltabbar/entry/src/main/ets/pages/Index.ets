@@ -1261,7 +1261,9 @@ struct Index {
         //      gesture bar instead of staying under them. [CN] 修复（鸿蒙截图问题 5）：最后几行可以滚动到 TabBar、凸起的 PlusButton
         //      与手势条之上，而不是被它们挡住。
         .contentEndOffset(CYL_LIST_END_INSET)
-        .backgroundColor($r('app.color.cyl_grouped_background'))
+        // [EN] The colorful backing plate of the example (light and dark colors in resources): a gradient behind the list, so the Liquid Glass tags,
+        //      cards and tail control have colors to bend (docs/instructions/examples.md). [CN] 示例的彩色背板（浅色与深色颜色在资源中）：列表后的渐变色，液态玻璃有可折射的颜色。
+        .linearGradient({ angle: 160, colors: [[$r('app.color.cyl_plate_start'), 0], [$r('app.color.cyl_plate_mid'), 0.5], [$r('app.color.cyl_plate_end'), 1]] })
         .onDidScroll((offset: number) => cyl_reportScroll(offset))
         // [EN] The tab icon animations pause while the user scrolls (cyl_pausesAnimationsWhileUserScrolls). [CN] 用户滚动时 Tab 图标动画暂停。
         .onScrollStart(() => cyl_reportScrollStarted())
