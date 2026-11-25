@@ -126,7 +126,10 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
     //      细边（1 vp，浅色页面上为深色、深色页面上为浅色），使标签或分组卡片的边缘在纯色或渐变页面上可见。
     const rim: boolean = glass && this.borderWidth <= 0;
     instance.borderWidth(rim ? CYLLiquidGlass.RIM_WIDTH : this.borderWidth);
-    instance.borderColor(rim ? CYLLiquidGlass.rimColor() : this.borderColor);
+    instance.borderColor(rim ? CYLLiquidGlass.rimEdgeColors(CYLLiquidGlass.isDark()) : this.borderColor);
+    if (glass) {
+      instance.linearGradient({ direction: GradientDirection.Bottom, colors: CYLLiquidGlass.sheenColors(CYLLiquidGlass.isDark()) });
+    }
     instance.clip(glass);
   }
 }

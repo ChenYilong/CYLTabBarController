@@ -3,6 +3,7 @@ import cylRiveLoopPolicyTest from './CYLRiveLoopPolicy.test';
 import cylRiveOptionsTest from './CYLRiveOptions.test';
 import cylTabBarHeightTest from './CYLTabBarHeight.test';
 import demoTeardownTest from './DemoTeardown.test';
+import cylGlassHighlightTest from './CYLGlassHighlight.test';
 
 export default function testsuite() {
   cylAnimatedItemFallbackTest();
@@ -10,4 +11,5 @@ export default function testsuite() {
   cylRiveOptionsTest();
   cylTabBarHeightTest();
   demoTeardownTest();
+  cylGlassHighlightTest();
 }

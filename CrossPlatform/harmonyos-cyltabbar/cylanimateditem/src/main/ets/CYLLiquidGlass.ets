@@ -34,20 +34,38 @@ export class CYLLiquidGlass {
    */
   static readonly RIM_WIDTH: number = 1;
   /**
-   * [EN] The rim on a light page: black at alpha 41/255 (Android). [CN] 浅色页面上的细边：黑色，透明度 41/255（Android）。
+   * [EN] Whether the app's color mode is dark (AppStorage `cyl_colorMode`, set by cyltabbar's `cyl_updateColorMode`; light when unset). The rule
+   *      of the rim and the sheen: read when the background is applied.
+   * [CN] 应用颜色模式是否为深色（AppStorage 的 `cyl_colorMode`，由 cyltabbar 的 `cyl_updateColorMode` 设置；未设置时为浅色）。细边与高光的规则：
+   *      应用背景时读取。
    */
-  static readonly RIM_LIGHT: string = '#29000000';
-  /**
-   * [EN] The rim on a dark page: white at alpha 56/255 (Android). [CN] 深色页面上的细边：白色，透明度 56/255（Android）。
-   */
-  static readonly RIM_DARK: string = '#38FFFFFF';
+  static isDark(): boolean {
+    return AppStorage.get<string>('cyl_colorMode') === 'dark';
+  }
 
   /**
-   * [EN] The rim color of the app's color mode (AppStorage `cyl_colorMode`, set by cyltabbar's `cyl_updateColorMode`; light when unset).
-   * [CN] 应用颜色模式（AppStorage 的 `cyl_colorMode`，由 cyltabbar 的 `cyl_updateColorMode` 设置；未设置时为浅色）对应的细边颜色。
+   * [EN] The rim per edge, the light coming from the top left as Android's `CYLGlassHighlight` (45 degrees): the top and left edges are the
+   *      bright highlight, the bottom and right edges a dim line (dark on a light page, where a white rim alone would wash out on the pale
+   *      glass; faint white on a dark one).
+   * [CN] 各边的细边，光从左上方来，与 Android `CYLGlassHighlight`（45 度）相同：上边与左边是明亮的高光，下边与右边是暗淡的线（浅色页面上为深色，
+   *      因为白色细边单独画在浅色玻璃上会淡掉；深色页面上为微弱的白色）。
    */
-  static rimColor(): string {
-    return AppStorage.get<string>('cyl_colorMode') === 'dark' ? CYLLiquidGlass.RIM_DARK : CYLLiquidGlass.RIM_LIGHT;
+  static rimEdgeColors(dark: boolean): EdgeColors {
+    const colors: EdgeColors = dark ?
+      { top: '#8CFFFFFF', right: '#24FFFFFF', bottom: '#24FFFFFF', left: '#8CFFFFFF' } :
+      { top: '#E6FFFFFF', right: '#2E000000', bottom: '#2E000000', left: '#E6FFFFFF' };
+    return colors;
+  }
+
+  /**
+   * [EN] The sheen over the glass tint: a specular band at the top fading down and a faint glow at the bottom (the tab bar capsule's light, as
+   *      `cylGlassSheen`), top to bottom.
+   * [CN] 玻璃着色之上的高光：顶部向下渐隐的高光带与底部微弱的反光（与 `cylGlassSheen` 的胶囊光相同），自上而下。
+   */
+  static sheenColors(dark: boolean): Array<[ResourceColor, number]> {
+    return dark ?
+      [['#2EFFFFFF', 0], ['#0AFFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#12FFFFFF', 1]] :
+      [['#66FFFFFF', 0], ['#14FFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#1FFFFFFF', 1]];
   }
 
   /**
