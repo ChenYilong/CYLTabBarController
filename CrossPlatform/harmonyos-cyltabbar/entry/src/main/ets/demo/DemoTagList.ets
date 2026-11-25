@@ -67,6 +67,8 @@ export function demoTagListConfiguration(sections: DemoSection[]): CYLConfigurat
   style[CYLMenuStyleKey.backgroundStyle] = 'liquidGlass';
   // [EN] The list sits on the page's own grouped background: its default white would hide the (dark mode) header texts. [CN] 列表位于页面自己的分组背景之上：默认的白色会遮住（深色模式下的）标题文字。
   style[CYLMenuStyleKey.backgroundColor] = '#00000000';
+  // [EN] The liquid plate: each section is a Liquid Glass card (docs/instructions/examples.md). [CN] 液态背景板：每个分组是一张液态玻璃卡片。
+  style[CYLMenuStyleKey.sectionBackgroundStyle] = 'liquidGlass';
   configuration[CYLTagListKey.style] = style;
   const sectionList: CYLConfiguration[] = [];
   sections.forEach((section: DemoSection) => {

@@ -7,6 +7,7 @@ import com.cyl.classifymenu.CYLMenuFoldControlKeyContent
 import com.cyl.classifymenu.CYLMenuFoldControlKeyPosition
 import com.cyl.classifymenu.CYLMenuStyleBackgroundColor
 import com.cyl.classifymenu.CYLMenuStyleBackgroundStyle
+import com.cyl.classifymenu.CYLMenuStyleSectionBackgroundStyle
 import com.cyl.classifymenu.CYLMenuStyleTitleMaxLines
 import com.cyl.classifymenu.CYLTagItemIdentifier
 import com.cyl.classifymenu.CYLTagItemSubtitle
@@ -50,9 +51,6 @@ object DemoTagList {
         return stripped to (listOfNotNull(subtitle?.takeIf { it.isNotEmpty() }) + notes).joinToString(" · ")
     }
 
-    /** [EN] A section whose rows carry badge samples stays a list section. [CN] 含角标样例行的分组仍是列表分组。 */
-    fun isBadgeSection(section: DemoSection) = section.rows.any { it.badgeRow >= 0 }
-
     /** [EN] The tag list configuration of `sections` (the order of the sections and rows is kept). [CN] `sections` 的 TagList 配置（保持分组与行的顺序）。 */
     fun configuration(sections: List<DemoSection>, subtitleOf: (DemoRow) -> String?): Map<String, Any?> = mapOf(
         // [EN] `none`: a tap selects nothing but still reports the item, so the host runs the row's action. [CN] `none`：点击不选中，仍回调条目，由宿主执行该行的动作。
@@ -63,7 +61,7 @@ object DemoTagList {
         CYLTagListViewFoldControl to mapOf(CYLMenuFoldControlKeyPosition to "tail", CYLMenuFoldControlKeyContent to "icon"),
         // [EN] Liquid Glass tags (docs/instructions/examples.md). [CN] 液态玻璃样式的 Tag（docs/instructions/examples.md）。
         // [EN] The list sits on the page's own background: its default white would hide the (dark mode) header texts. [CN] 列表位于页面自己的背景之上：默认的白色会遮住（深色模式下的）标题文字。
-        CYLTagListViewStyle to mapOf(CYLMenuStyleTitleMaxLines to TITLE_MAX_LINES, CYLMenuStyleBackgroundStyle to "liquidGlass", CYLMenuStyleBackgroundColor to "#00000000"),
+        CYLTagListViewStyle to mapOf(CYLMenuStyleTitleMaxLines to TITLE_MAX_LINES, CYLMenuStyleBackgroundStyle to "liquidGlass", CYLMenuStyleBackgroundColor to "#00000000", CYLMenuStyleSectionBackgroundStyle to "liquidGlass"),
         CYLTagListViewSections to sections.mapIndexed { sectionIndex, section ->
             mapOf(
                 CYLTagSectionTitle to section.title,

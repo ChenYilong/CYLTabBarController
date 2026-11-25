@@ -19,6 +19,18 @@
     {
       "name": "start_window_background",
       "value": "#000000"
+    },
+    {
+      "name": "cyl_plate_start",
+      "value": "#5B2A3C"
+    },
+    {
+      "name": "cyl_plate_mid",
+      "value": "#1F4A63"
+    },
+    {
+      "name": "cyl_plate_end",
+      "value": "#3B2D5C"
     }
   ]
 }

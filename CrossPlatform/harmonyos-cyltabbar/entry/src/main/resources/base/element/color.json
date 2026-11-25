@@ -19,6 +19,18 @@
     {
       "name": "cyl_bar_background",
       "value": "#F8F8F8"
+    },
+    {
+      "name": "cyl_plate_start",
+      "value": "#FFB199"
+    },
+    {
+      "name": "cyl_plate_mid",
+      "value": "#7EC8E3"
+    },
+    {
+      "name": "cyl_plate_end",
+      "value": "#C3AED6"
     }
   ]
 }

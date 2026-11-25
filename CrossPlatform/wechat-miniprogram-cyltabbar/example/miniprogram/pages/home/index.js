@@ -199,19 +199,13 @@ Component({
         rows: [{ id: 'releaseTabBar', title: this.t('Release the tab bar controller (in 3 s)'), subtitle: cylTeardown.cylStatus(), accessory: 'none' }],
       });
       // [EN] The badge rows of CYLHomeViewController, after the demo sections. [CN] CYLHomeViewController 的角标行，在演示 section 之后。
-      sections.push({
+      // [EN] The badge samples are tags like every other section: the main title, the long press callout (docs/instructions/examples.md). [CN] 角标样例与其他分组一样是 Tag：主标题，长按弹出浮框。
+      const badgeSection = {
         id: 'badges',
         title: this.t('Badges'),
-        badges: cylDemoList.badgeSamples.map((sample, index) => ({
-          key: index,
-          title: cylListText(sample.title),
-          text: this.cyl_badgeText(sample),
-          dot: !sample.value,
-          animation: CYL_BADGE_ANIMATIONS.find((name) => sample.animation?.startsWith(name)) || '',
-          style: this.cyl_badgeStyle(sample),
-          position: sample.position || 'topRight',
-        })),
-      });
+        rows: cylDemoList.badgeSamples.map((sample, index) => ({ id: `badge:${index}`, title: cylListText(sample.title), accessory: 'none' })),
+      };
+      sections.push({ ...badgeSection, tagConfiguration: cylTagConfiguration(badgeSection) });
       // [EN] MainTabBarController: the first page's title gets " (Liquid)" on Liquid Glass; a badge row sets "Home (N)".
       // [CN] MainTabBarController：液态玻璃下第一个页面的标题加上「 (Liquid)」；角标行设为「首页(N)」。
       const liquidGlass = state.itemStyle ? state.itemStyle === 'liquidGlass' : configuration.CYLTabBarControllerStyleType === 'liquidGlass';
@@ -418,6 +412,10 @@ Component({
     cyl_onRow(event) {
       const id = event.currentTarget.dataset.id;
       const state = getApp().globalData.cylTabBarState;
+      if (id.startsWith('badge:')) {
+        this.cyl_onBadge({ currentTarget: { dataset: { index: id.slice('badge:'.length) } } });
+        return;
+      }
       if (id.startsWith('skin:')) {
         getApp().cyl_setSkin(id.slice('skin:'.length));
         return;
