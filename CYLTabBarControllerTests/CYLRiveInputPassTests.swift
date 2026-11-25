@@ -54,4 +54,44 @@ final class CYLRiveInputPassTests: XCTestCase {
         XCTAssertFalse(CYLRiveInputPass.offWindowEnds(elapsed: 1.4, isSettled: false))
         XCTAssertTrue(CYLRiveInputPass.offWindowEnds(elapsed: 1.5, isSettled: false))
     }
+
+    /// [EN] The case table shared with Android (`CYLRiveInputPassTest`) and HarmonyOS (`CYLAnimatedItemRiveOptions.test.mjs`):
+    ///      `activeDuration` in seconds -> the cap of the NO window in seconds.
+    /// [CN] 与 Android（`CYLRiveInputPassTest`）、HarmonyOS（`CYLAnimatedItemRiveOptions.test.mjs`）共用的用例表：
+    ///      `activeDuration`（秒）-> NO 窗口的上限（秒）。
+    private let offWindowCapCases: [(activeDuration: TimeInterval, cap: TimeInterval)] = [
+        (0, 1.5), (-1, 1.5), (0.001, 0.05), (0.05, 0.05), (0.3, 0.3), (1, 1), (1.5, 1.5), (2, 1.5), (60, 1.5),
+    ]
+
+    func testTheOffWindowCapFollowsTheActiveDurationBetweenAFrameAndTheMaximum() {
+        for testCase in offWindowCapCases {
+            XCTAssertEqual(CYLRiveInputPass.offWindowCap(activeDuration: testCase.activeDuration), testCase.cap, accuracy: 1e-9,
+                           "activeDuration \(testCase.activeDuration)")
+        }
+    }
+
+    /// [EN] Proof of the bug: with the old rule (no `activeDuration`) a machine that never settles keeps a 0.3 s input off for the
+    ///      full 1.5 s; the same call with the input's duration ends the window at 0.3 s.
+    /// [CN] 缺陷的证明：旧规则（不带 `activeDuration`）下，永不稳定的状态机让 0.3 秒的输入白等整整 1.5 秒；带上输入时长则在 0.3 秒结束。
+    func testAMachineThatNeverSettlesDoesNotWaitTheFullCapForAShortInput() {
+        XCTAssertFalse(CYLRiveInputPass.offWindowEnds(elapsed: 0.3, isSettled: false), "without the duration the window runs to 1.5 s")
+        XCTAssertFalse(CYLRiveInputPass.offWindowEnds(elapsed: 1.4, isSettled: false))
+        XCTAssertFalse(CYLRiveInputPass.offWindowEnds(elapsed: 0.29, isSettled: false, activeDuration: 0.3))
+        XCTAssertTrue(CYLRiveInputPass.offWindowEnds(elapsed: 0.3, isSettled: false, activeDuration: 0.3))
+    }
+
+    func testAnInputHeldYesKeepsTheFullCap() {
+        XCTAssertFalse(CYLRiveInputPass.offWindowEnds(elapsed: 1.4, isSettled: false, activeDuration: 0))
+        XCTAssertTrue(CYLRiveInputPass.offWindowEnds(elapsed: 1.5, isSettled: false, activeDuration: 0))
+    }
+
+    func testALongDurationNeverRaisesTheCapAboveTheMaximum() {
+        XCTAssertTrue(CYLRiveInputPass.offWindowEnds(elapsed: 1.5, isSettled: false, activeDuration: 60))
+        XCTAssertFalse(CYLRiveInputPass.offWindowEnds(elapsed: 1.4, isSettled: false, activeDuration: 60))
+    }
+
+    func testASettledMachineStillEndsAtTheFrameFloorWhateverTheDuration() {
+        XCTAssertTrue(CYLRiveInputPass.offWindowEnds(elapsed: 0.05, isSettled: true, activeDuration: 1))
+        XCTAssertFalse(CYLRiveInputPass.offWindowEnds(elapsed: 0.03, isSettled: true, activeDuration: 0.001))
+    }
 }

@@ -258,6 +258,49 @@ private func cylAnimatedItemLocalFileProblem(_ url: URL) -> String? {
 }
 
 private func cylAnimatedItemLocalFileIsMissing(_ url: URL) -> Bool { cylAnimatedItemLocalFileProblem(url) != nil }
+
+/// [EN] The tab bar's side of `onResourceMissing`: a UIKit tab button is not a `CYLAnimatedItemView`, so the tab animation engine
+///      (`CYLTabBarItemAnimationEngine`, which finds this class at run time and so does not depend on the view module) reports
+///      the tab's file here. Same signal, reasons and "once per resource" rule as the item view; the owner is the tab button, so
+///      a rebuilt animation view (trait or style refresh) of the same file does not report again. Internal, not public API.
+/// [CN] Tab 栏一侧的 `onResourceMissing`：UIKit 的 Tab 按钮不是 `CYLAnimatedItemView`，因此 Tab 动画引擎（`CYLTabBarItemAnimationEngine`，
+///      运行时查找本类，不依赖视图模块）把 Tab 的文件报告到这里。信号、原因与"每个资源一次"的规则与条目视图相同；归属对象是 Tab 按钮，
+///      因此同一文件的动画视图因深浅色或风格刷新而重建时不会重复报告。内部接口，不是公开 API。
+extension CYLAnimationEngines {
+    private static var reportedResourcesKey: UInt8 = 0
+
+    /// [EN] An animation view of a tab button failed after it was made (a corrupted file, a parse error, a failed download). [CN] Tab 按钮的动画视图在创建后失败（文件损坏、解析错误、下载失败）。
+    @objc(cyl_reportTabAnimationFailureOfURL:error:owner:)
+    static func reportTabAnimationFailure(url: URL, error: NSError?, owner: AnyObject) {
+        reportTabResource(url: url, reason: reason(for: error, remote: !url.isFileURL), owner: owner)
+    }
+
+    /// [EN] No animation view was made for a tab's file: a missing or empty local file, a type whose engine is not in the build, or a file no engine plays. [CN] 没有为 Tab 的文件创建动画视图：本地文件不存在或为空、类型对应的引擎未参与构建，或没有引擎能播放该文件。
+    @objc(cyl_reportTabAnimationNotMadeForURL:owner:)
+    static func reportTabAnimationNotMade(url: URL, owner: AnyObject) {
+        reportTabResource(url: url, reason: tabAnimationNotMadeReason(url), owner: owner)
+    }
+
+    /// [EN] Why no animation view was made for `url`; the item view's rule. [CN] 没有为 `url` 创建动画视图的原因；与条目视图的规则相同。
+    static func tabAnimationNotMadeReason(_ url: URL) -> String {
+        if let problem = cylAnimatedItemLocalFileProblem(url) { return problem }
+        guard let type = CYLAnimationTypeOfFile(nil, url) else { return reasonDecodeFailed }
+        return CYLAnimationTypeIsAvailable(type) ? reasonUnreadable : reasonEngineLibraryMissing
+    }
+
+    private static func reportTabResource(url: URL, reason: String, owner: AnyObject) {
+        // [EN] The file as configured: a source's `#` options are not part of the name. [CN] 按配置给出的文件：来源的 `#` 选项不属于名称。
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        components?.fragment = nil
+        let clean = components?.url ?? url
+        let resource = clean.isFileURL ? clean.path : clean.absoluteString
+        let reported = objc_getAssociatedObject(owner, &reportedResourcesKey) as? NSMutableSet ?? NSMutableSet()
+        guard !reported.contains(resource) else { return }
+        reported.add(resource)
+        objc_setAssociatedObject(owner, &reportedResourcesKey, reported, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        DispatchQueue.main.async { resourceMissingListener?(resource, reason) }
+    }
+}
 #endif
 
 /**

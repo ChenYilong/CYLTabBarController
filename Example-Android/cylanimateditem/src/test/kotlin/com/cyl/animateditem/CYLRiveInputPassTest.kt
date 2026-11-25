@@ -96,4 +96,28 @@ class CYLRiveInputPassTest {
         rive.playing = false
         assertEquals(false, view.cyl_isAnimationViewPlaying())
     }
+
+    /**
+     * [EN] The case table shared with iOS (`CYLRiveInputPassTests`) and HarmonyOS (`CYLAnimatedItemRiveOptions.test.mjs`):
+     *      `activeDuration` in seconds to the cap of the NO window in milliseconds.
+     * [CN] 与 iOS（`CYLRiveInputPassTests`）、HarmonyOS（`CYLAnimatedItemRiveOptions.test.mjs`）共用的用例表：
+     *      `activeDuration`（秒）对应 NO 窗口上限（毫秒）。
+     */
+    @Test
+    fun theOffWindowCapFollowsTheActiveDurationBetweenAFrameAndTheMaximum() {
+        val cases = listOf(0.0 to 1500L, -1.0 to 1500L, 0.001 to 50L, 0.05 to 50L, 0.3 to 300L, 1.0 to 1000L, 1.5 to 1500L, 2.0 to 1500L, 60.0 to 1500L)
+        for ((duration, cap) in cases) assertEquals("activeDuration $duration", cap, CYLRiveInputPass.offWindowCapMilliseconds(duration))
+    }
+
+    @Test
+    fun aMachineThatNeverSettlesDoesNotWaitTheFullCapForAShortInput() {
+        assertFalse(CYLRiveInputPass.offWindowEnds(300, isSettled = false))
+        assertFalse(CYLRiveInputPass.offWindowEnds(1400, isSettled = false))
+        assertFalse(CYLRiveInputPass.offWindowEnds(290, isSettled = false, activeDuration = 0.3))
+        assertTrue(CYLRiveInputPass.offWindowEnds(300, isSettled = false, activeDuration = 0.3))
+        assertTrue(CYLRiveInputPass.offWindowEnds(1500, isSettled = false, activeDuration = 0.0))
+        assertFalse(CYLRiveInputPass.offWindowEnds(1400, isSettled = false, activeDuration = 60.0))
+        assertTrue(CYLRiveInputPass.offWindowEnds(50, isSettled = true, activeDuration = 1.0))
+        assertFalse(CYLRiveInputPass.offWindowEnds(30, isSettled = true, activeDuration = 0.001))
+    }
 }

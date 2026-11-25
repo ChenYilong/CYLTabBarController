@@ -250,8 +250,9 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
             viewModel.play()
             let duration = configuration.activeDuration
             deactivateTask = Task { @MainActor [weak self] in
-                // [EN] Until the NO pass has settled (at least a frame, at most `CYLRiveInputPass.maximumOffSeconds`), then YES.
-                // [CN] 等到 NO 的那一遍稳定（至少一帧，至多 `CYLRiveInputPass.maximumOffSeconds`），再设为 YES。
+                // [EN] Until the NO pass has settled (at least a frame, at most `CYLRiveInputPass.offWindowCap`: the input's
+                //      `activeDuration`, up to `maximumOffSeconds`), then YES.
+                // [CN] 等到 NO 的那一遍稳定（至少一帧，至多 `CYLRiveInputPass.offWindowCap`：输入的 `activeDuration`，不超过 `maximumOffSeconds`），再设为 YES。
                 var elapsed: TimeInterval = 0
                 repeat {
                     try? await Task.sleep(nanoseconds: 16_000_000)
@@ -259,7 +260,7 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
                     guard !Task.isCancelled, let self else {
                         return
                     }
-                    if CYLRiveInputPass.offWindowEnds(elapsed: elapsed, isSettled: !self.viewModel.isPlaying) {
+                    if CYLRiveInputPass.offWindowEnds(elapsed: elapsed, isSettled: !self.viewModel.isPlaying, activeDuration: duration) {
                         break
                     }
                 } while true
