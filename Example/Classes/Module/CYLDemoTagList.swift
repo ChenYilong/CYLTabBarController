@@ -141,7 +141,9 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
             CYLTagListKey.style: [CYLMenuStyleKey.titleMaxLines: titleMaxLines, CYLMenuStyleKey.backgroundStyle: "liquidGlass",
                                   CYLMenuStyleKey.backgroundColor: "#00000000",
                                   // [EN] Each section is a Liquid Glass card (pin bbe56951 or newer). [CN] 每个分组是一张液态玻璃卡片（pin bbe56951 或更新）。
-                                  CYLMenuStyleKey.sectionStyle: "insetGrouped", CYLMenuStyleKey.sectionBackgroundStyle: "liquidGlass"],
+                                  CYLMenuStyleKey.sectionStyle: "insetGrouped",
+                                  // [EN] No side inset: the cards line up with the table's own rounded sections (the cell is already inset). [CN] 左右无边距：卡片与表格自己的圆角分组对齐（cell 本身已有边距）。
+                                  CYLMenuStyleKey.sectionInsets: "{10, 0, 10, 0}", CYLMenuStyleKey.sectionBackgroundStyle: "liquidGlass"],
             CYLTagListKey.sections: sections,
         ]
     }
@@ -199,7 +201,7 @@ final class CYLDemoTagListCell: UITableViewCell {
         super.layoutSubviews()
         let width = contentView.bounds.width
         guard width > 0 else { return }
-        let height = ceil(list.heightThatFitsWidth(width))
+        let height = ceil(max(list.heightThatFitsWidth(width), list.contentHeight))
         guard height > 0, abs(heightConstraint.constant - height) > 0.5 else { return }
         heightConstraint.constant = height
         // [EN] The table measures its rows again (after this layout pass). [CN] 表格重新测量各行（在本次布局之后）。

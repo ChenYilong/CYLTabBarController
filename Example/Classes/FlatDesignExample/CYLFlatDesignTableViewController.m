@@ -123,7 +123,6 @@
     [CYLDemoPlaceholder installOnScrollView:self.tableView viewController:self animation:CYLDemoPlaceholderAnimationLottie refresh:nil];
     // [EN] The badge samples are tags too (docs/instructions/examples.md): a scratch cell gives each one's title and subtitle, a tap pushes the page the row pushed.
     // [CN] 角标样例也是 Tag（docs/instructions/examples.md）：用临时 cell 提供标题与副标题，点击后推入原行推入的页面。
-    __weak __typeof(self) weakSelf = self;
     self.demoTagList = [CYLDemoTagList installOnTableView:self.tableView host:self badgeRowCount:50 badgeCell:^UITableViewCell *(NSInteger row) {
         UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
         cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:row];
