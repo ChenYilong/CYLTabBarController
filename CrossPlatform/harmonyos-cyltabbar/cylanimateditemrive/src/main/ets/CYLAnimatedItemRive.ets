@@ -501,8 +501,8 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
       const duration = cylRiveActiveDuration(this.option(CYLAnimatedItemRiveOption.ACTIVE_DURATION));
       this.startPending = true;
       // [EN] Half a loop pass while looping a held input, so the machine spends real time closed; otherwise until the false
-      //      pass has settled (at least 50 ms, at most 1500 ms), polled every frame.
-      // [CN] 循环保持的输入时为半个循环周期，使状态机真正停留在关闭状态；否则等到 false 的那一遍稳定（至少 50 ms，至多 1500 ms），每帧轮询。
+      //      pass has settled (at least 50 ms, at most the input's duration, never above 1500 ms), polled every frame.
+      // [CN] 循环保持的输入时为半个循环周期，使状态机真正停留在关闭状态；否则等到 false 的那一遍稳定（至少 50 ms，至多输入的时长，不超过 1500 ms），每帧轮询。
       const fixedOffMs: number = this.loopsValue && duration <= 0 ? CYL_RIVE_LOOP_SECONDS * 500 : -1;
       const turnOn = (): void => {
         this.deactivateTimer = -1;
@@ -523,7 +523,7 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
       if (fixedOffMs >= 0) {
         this.deactivateTimer = setTimeout(turnOn, fixedOffMs);
       } else {
-        this.cylWaitForOffPass(view, 0, turnOn);
+        this.cylWaitForOffPass(view, 0, duration, turnOn);
       }
     } else {
       this.cylReset(view);
@@ -638,11 +638,11 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
   }
 
   /**
-   * [EN] Calls `turnOn` when the NO window ends (`cylRiveOffWindowEnds`), polling `isPlaying()` every frame on the
-   *      cancellable `deactivateTimer`.
-   * [CN] 在 NO 窗口结束（`cylRiveOffWindowEnds`）时调用 `turnOn`，在可取消的 `deactivateTimer` 上每帧轮询 `isPlaying()`。
+   * [EN] Calls `turnOn` when the NO window ends (`cylRiveOffWindowEnds`, capped by the input's `activeDuration`), polling
+   *      `isPlaying()` every frame on the cancellable `deactivateTimer`.
+   * [CN] 在 NO 窗口结束（`cylRiveOffWindowEnds`，上限为输入的 `activeDuration`）时调用 `turnOn`，在可取消的 `deactivateTimer` 上每帧轮询 `isPlaying()`。
    */
-  private cylWaitForOffPass(view: RiveAnimationView, elapsedMs: number, turnOn: () => void): void {
+  private cylWaitForOffPass(view: RiveAnimationView, elapsedMs: number, activeDuration: number, turnOn: () => void): void {
     this.deactivateTimer = setTimeout(() => {
       this.deactivateTimer = -1;
       const elapsed: number = elapsedMs + CYL_RIVE_OFF_POLL_MS;
@@ -652,10 +652,10 @@ export class CYLAnimatedItemRivePlayer extends CYLAnimatedItemPlayer {
       } catch (e) {
         settled = true;
       }
-      if (cylRiveOffWindowEnds(elapsed, settled)) {
+      if (cylRiveOffWindowEnds(elapsed, settled, activeDuration)) {
         turnOn();
       } else {
-        this.cylWaitForOffPass(view, elapsed, turnOn);
+        this.cylWaitForOffPass(view, elapsed, activeDuration, turnOn);
       }
     }, CYL_RIVE_OFF_POLL_MS);
   }

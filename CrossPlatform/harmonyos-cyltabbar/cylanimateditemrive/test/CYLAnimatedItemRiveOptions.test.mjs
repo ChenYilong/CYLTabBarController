@@ -57,3 +57,21 @@ test('the NO window of a restart lasts a frame, waits for the machine to settle,
   assert.equal(R.cylRiveOffWindowEnds(1400, false), false);
   assert.equal(R.cylRiveOffWindowEnds(1500, false), true);
 });
+
+test('the NO window cap follows the active duration between a frame and 1.5 s (the case table of iOS and Android)', () => {
+  const cases = [[0, 1500], [-1, 1500], [0.001, 50], [0.05, 50], [0.3, 300], [1, 1000], [1.5, 1500], [2, 1500], [60, 1500]];
+  for (const [duration, cap] of cases) {
+    assert.equal(R.cylRiveOffWindowCapMs(duration), cap, `activeDuration ${duration}`);
+  }
+});
+
+test('a machine that never settles does not wait the full cap for a short input', () => {
+  assert.equal(R.cylRiveOffWindowEnds(300, false), false);
+  assert.equal(R.cylRiveOffWindowEnds(1400, false), false);
+  assert.equal(R.cylRiveOffWindowEnds(290, false, 0.3), false);
+  assert.equal(R.cylRiveOffWindowEnds(300, false, 0.3), true);
+  assert.equal(R.cylRiveOffWindowEnds(1500, false, 0), true);
+  assert.equal(R.cylRiveOffWindowEnds(1400, false, 60), false);
+  assert.equal(R.cylRiveOffWindowEnds(50, true, 1), true);
+  assert.equal(R.cylRiveOffWindowEnds(30, true, 0.001), false);
+});
