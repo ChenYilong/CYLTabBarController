@@ -43,7 +43,7 @@ appears in the task). Instruction files (this file, `instructions.md`, `docs/ins
 ## Task workflow and sessions (tag: `task-workflow`)
 
 - Before any task: list the other sessions (`ListAgents`), avoid duplicate work, tell them the files you change; `Mac*` sessions take iOS, `Win*` sessions the other platforms.
-- Start with a `TODO` list and the branch; record the task in the most relevant `docs/` file with the prompt verbatim and a 100 / 60 rubric; score after each step, never stop below 60; print missing points as `TODO` at the end; `DONE` only at 100.
+- Start with a `TODO` list and the branch; record the task in the most relevant `docs/` file with the prompt verbatim and a 100 / 60 rubric; score after each step, never stop below 60; print missing points as `TODO` at the end, only on substantial progress, a score change or a new missing point (changed rows only; none for a pure notification); `DONE` only at 100.
 - A hung emulator: tell the sessions that use it, restart it, then tell all sessions it is back.
 - Full text: [docs/instructions/task-workflow.md](docs/instructions/task-workflow.md).
 
