@@ -10,7 +10,7 @@ export {
   CYLAnimatedItemEngines, cylAnimatedItemTypeOf, cylIconColorFilter, cylSetPausesWhileUserScrolls, cylPausesWhileUserScrolls
 } from './src/main/ets/CYLAnimatedItemView';
 export { CYLAnimatedItemStackView } from './src/main/ets/CYLAnimatedItemStackView';
-export { CYLLiquidGlass } from './src/main/ets/CYLLiquidGlass';
+export { CYLLiquidGlass, CYLLiquidGlassSurface } from './src/main/ets/CYLLiquidGlass';
 export { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier, CYLAnimatedItemCornerRadiusCapsule,
   CYLAnimatedItemLiquidGlassContentInset } from './src/main/ets/CYLAnimatedItemBackground';
 export {
