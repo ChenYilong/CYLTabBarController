@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "bridge: pause %d, resume %d";
 "last event: -" = "last event: -";
 "last event: %@" = "last event: %@";
+"Content inset" = "Content inset";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected";
+"Flat: itemContentHorizontalInset unset" = "Flat: itemContentHorizontalInset unset";
+"Normal" = "Normal";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset unset";

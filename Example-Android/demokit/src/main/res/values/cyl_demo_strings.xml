@@ -30,6 +30,8 @@
     <string name="cyl_demo_6a69211e0f">Every scene is a tab bar built with the public API: styles, animations, badges, Lottie and the newer tab API</string>
     <string name="cyl_demo_7efc907fe3">Animated item</string>
     <string name="cyl_demo_9244b5dc65">The animated icon + title component on its own: GIF, Lottie, a missing file, an accessory and dragging</string>
+    <string name="cyl_demo_5dbde9a698">Content inset</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected</string>
     <string name="cyl_demo_185d8ef0ae">Badges</string>
     <string name="cyl_demo_2db1db0706">Playback</string>
     <string name="cyl_demo_34bffc9c7a">Tab icon animations: Play all, speed, loop</string>
@@ -131,6 +133,10 @@
     <string name="cyl_demo_7108183f18">Request cancelled</string>
     <string name="cyl_demo_5fbceaee5f">Request without a URL</string>
     <string name="cyl_demo_4334569b3d">An HTML page (network)</string>
+    <string name="cyl_demo_e2917c5f0d">Flat: itemContentHorizontalInset unset</string>
+    <string name="cyl_demo_a7248eeb45">Normal</string>
+    <string name="cyl_demo_57fd7a0cf3">Selected</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset unset</string>
     <string name="cyl_demo_d84eebada9">Photo</string>
     <string name="cyl_demo_d47d7cb0e4">More</string>
     <string name="cyl_demo_0e35f6e974">Basic</string>

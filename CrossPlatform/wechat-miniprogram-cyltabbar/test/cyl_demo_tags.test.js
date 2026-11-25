@@ -29,7 +29,7 @@ test('the configuration: a titled section, no selection, a callout, 3 lines, Mor
   assert.equal(configuration.style.titleMaxLines, 3)
   assert.equal(configuration.style.backgroundStyle, 'liquidGlass')
   assert.equal(configuration.style.backgroundColor, '#00000000')
-  assert.deepEqual(configuration.foldControl, { position: 'headerTrailing', content: 'iconAndTitle' })
+  assert.deepEqual(configuration.foldControl, { position: 'tail', content: 'icon' })
   assert.equal(configuration.sections.length, 1)
   assert.equal(configuration.sections[0].title, 'General')
   assert.deepEqual(configuration.sections[0].items, [{ id: 'language', title: 'Language', subtitle: 'Current: en' }, { id: 'memory', title: 'Memory' }])
