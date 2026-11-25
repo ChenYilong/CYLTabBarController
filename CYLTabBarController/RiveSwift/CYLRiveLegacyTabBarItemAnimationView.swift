@@ -86,7 +86,23 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
 
     /// [EN] The tint for the current title color and state. [CN] 当前标题颜色与状态下的着色。
     private var currentTintColor: UIColor? {
-        configuration.tintColor(titleColor: titleTintColor, selected: tintSelected)
+        if hasResolvedTint { return resolvedTintColor }
+        return configuration.tintColor(titleColor: titleTintColor, selected: tintSelected)
+    }
+
+    /// [EN] Set once a `CYLAnimatedItemView` hands over its final color (`animationTint` / `animationDarkTint`, the URL options and the truth table
+    ///      already applied), so this view stops resolving its own: a state machine file without a view model (menu_button.riv) is tinted too.
+    /// [CN] 当 `CYLAnimatedItemView` 交来最终颜色（已应用 `animationTint` / `animationDarkTint`、URL 选项与真值表）后设置，本视图不再自行解析：
+    ///      没有 view model 的状态机文件（menu_button.riv）同样会被着色。
+    private var hasResolvedTint = false
+    private var resolvedTintColor: UIColor?
+
+    /// [EN] `cyl_applyAnimationViewResolvedTintColor:`: the final color (nil: no tint), from `CYLAnimatedItemView`. [CN] 来自 `CYLAnimatedItemView` 的最终颜色（nil 表示不着色）。
+    @objc(cyl_applyAnimationViewResolvedTintColor:)
+    public func applyResolvedAnimationTintColor(_ color: UIColor?) {
+        hasResolvedTint = true
+        resolvedTintColor = color
+        tintOverlay.apply(color, in: self)
     }
 
     private init(configuration: CYLRiveTabBarItemAnimationConfiguration, file: RiveFile) {

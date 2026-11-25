@@ -63,6 +63,7 @@
 		F2EA4C27D59FFEFFD097501A /* confetti.riv in Resources */ = {isa = PBXBuildFile; fileRef = C78A77277F5BF044CE896CCF /* confetti.riv */; };
 		F432E9BCEE4F345D5C02A425 /* shapes.riv in Resources */ = {isa = PBXBuildFile; fileRef = 8EEB743298095836BF9377D6 /* shapes.riv */; };
 		F6B77B5916BCCA956213941A /* Course.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699EFCFF1B05220558FC4D31 /* Course.swift */; };
+		A4F3C21A29DFA7451E1BD3CB /* AnimatedItemTintViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E738849D25E3ABCE23CB0DF9 /* AnimatedItemTintViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -127,6 +128,7 @@
 		ECDB16DD646E7F3ACB02BBD5 /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
 		F2CA8A7CB0D29489FB6E0420 /* SVGATabIcons.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SVGATabIcons.swift; sourceTree = "<group>"; };
 		FF928D71D024B7F90696E769 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E738849D25E3ABCE23CB0DF9 /* AnimatedItemTintViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedItemTintViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -264,6 +266,7 @@
 				C0A94E53C3C2459E59C39BB0 /* TabViewControllers.swift */,
 				29242C162EDC3294BE1BC4B0 /* RiveMenuButtonDemoView.swift */,
 				A1C0FFEE5A1D0F00D0000A01 /* AnimatedItemEngineAPIViewController.swift */,
+				E738849D25E3ABCE23CB0DF9 /* AnimatedItemTintViewController.swift */,
 				A1C0FFEE5A1D0F00D0000002 /* RivePlusButton.swift */,
 				A1C0FFEE5A1D0F00D0000006 /* RiveTabBarController.swift */,
 				9A25FDF1B50065AB34F5233C /* Info.plist */,
@@ -514,6 +517,7 @@
 				8C7CC7F169DF6D09CFED6CBE /* TabViewControllers.swift in Sources */,
 				D6F45F96F2196AB7B5E9E432 /* RiveMenuButtonDemoView.swift in Sources */,
 				A1C0FFEE5A1D0F00D0000A02 /* AnimatedItemEngineAPIViewController.swift in Sources */,
+				A4F3C21A29DFA7451E1BD3CB /* AnimatedItemTintViewController.swift in Sources */,
 				A1C0FFEE5A1D0F00D0000001 /* RivePlusButton.swift in Sources */,
 				A1C0FFEE5A1D0F00D0000005 /* RiveTabBarController.swift in Sources */,
 				C4F7F8B25F828E7C7B86E306 /* HCard.swift in Sources */,

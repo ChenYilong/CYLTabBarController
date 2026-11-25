@@ -412,6 +412,9 @@ docs/
 │   ├── ios-badges-on-animated-item-component.png
 │   ├── ios-demo-localized-playback-zh-hans.png
 │   ├── ios-engine-api-lottie-pag-end.png
+│   ├── ios-example-default-tint-light-dark.png
+│   ├── ios-example-glass-inset-normal-selected.png
+│   ├── ios-example-rive-animation-tint-light-dark.png
 │   ├── ios-flatdesign-animateditem-tab-ios26-4-a6e88609.png
 │   ├── ios-flatdesign-gif-no-image-under-animation-ios26-4-5ba3a089.png
 │   ├── ios-flatdesign-hide-show.png
