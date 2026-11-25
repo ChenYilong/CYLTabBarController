@@ -44,14 +44,14 @@ export class CYLLiquidGlass {
   }
 
   /**
-   * [EN] The rim of every glass (a tag, a section card behind tags, an item, the tab bar capsule): Android's hairline, the same on all four edges
-   *      (black 16% on light glass, white 22% on dark glass). One definition: the tag list applies it to its cards and tags through
+   * [EN] The rim of every glass (a tag, a section card behind tags, an item, the tab bar capsule): the hairline of Android's sampled glass, the same on all four edges
+   *      (white 70% on light glass, white 22% on dark glass: the bright edge of the Android screenshots). One definition: the tag list applies it to its cards and tags through
    *      `CYLAnimatedItemBackgroundModifier`, and no host keeps its own.
-   * [CN] 所有玻璃（标签、标签后的分组卡片、条目、TabBar 胶囊）的细边：Android 的细边，四条边相同（浅色玻璃上为黑色 16%，深色玻璃上为白色 22%）。
+   * [CN] 所有玻璃（标签、标签后的分组卡片、条目、TabBar 胶囊）的细边：Android 采样玻璃的细边，四条边相同（浅色玻璃上为白色 70%，深色玻璃上为白色 22%：Android 截图里明亮的边缘）。
    *      只有这一份定义：标签列表通过 `CYLAnimatedItemBackgroundModifier` 把它用于卡片与标签，宿主不保留自己的。
    */
   static rimEdgeColors(dark: boolean): EdgeColors {
-    const edge: string = dark ? '#38FFFFFF' : '#29000000';
+    const edge: string = dark ? '#38FFFFFF' : '#B3FFFFFF';
     const colors: EdgeColors = { top: edge, right: edge, bottom: edge, left: edge };
     return colors;
   }

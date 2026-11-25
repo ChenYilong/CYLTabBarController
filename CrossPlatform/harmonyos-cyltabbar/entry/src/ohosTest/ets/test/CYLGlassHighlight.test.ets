@@ -9,9 +9,9 @@ import { CYLLiquidGlass, CYLAnimatedItemBackgroundModifier } from 'cylanimatedit
  */
 export default function cylGlassHighlightTest() {
   describe('CYLGlassHighlight', () => {
-    it('the rim is the Android hairline, the same on every edge, in light and dark', 0, () => {
+    it('the rim is the Android bright hairline, the same on every edge, in light and dark', 0, () => {
       const light: EdgeColors = CYLLiquidGlass.rimEdgeColors(false);
-      expect(light.top).assertEqual('#29000000');
+      expect(light.top).assertEqual('#B3FFFFFF');
       expect(light.right).assertEqual(light.top);
       expect(light.bottom).assertEqual(light.top);
       expect(light.left).assertEqual(light.top);
