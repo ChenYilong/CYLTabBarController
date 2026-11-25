@@ -52,7 +52,7 @@ export class CYLLiquidGlass {
    */
   static rimEdgeColors(dark: boolean): EdgeColors {
     const colors: EdgeColors = dark ?
-      { top: '#8CFFFFFF', right: '#24FFFFFF', bottom: '#24FFFFFF', left: '#8CFFFFFF' } :
+      { top: '#38FFFFFF', right: '#38FFFFFF', bottom: '#38FFFFFF', left: '#38FFFFFF' } :
       { top: '#E6FFFFFF', right: '#2E000000', bottom: '#2E000000', left: '#E6FFFFFF' };
     return colors;
   }
@@ -63,8 +63,8 @@ export class CYLLiquidGlass {
    * [CN] 玻璃着色之上的高光：顶部向下渐隐的高光带与底部微弱的反光（与 `cylGlassSheen` 的胶囊光相同），自上而下。
    */
   static sheenColors(dark: boolean): Array<[ResourceColor, number]> {
-    return dark ?
-      [['#2EFFFFFF', 0], ['#0AFFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#12FFFFFF', 1]] :
+    // [EN] None in a dark app (Android draws none there). [CN] 深色应用中没有高光（Android 在那里也不画）。
+    return dark ? [] :
       [['#66FFFFFF', 0], ['#14FFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#1FFFFFFF', 1]];
   }
 

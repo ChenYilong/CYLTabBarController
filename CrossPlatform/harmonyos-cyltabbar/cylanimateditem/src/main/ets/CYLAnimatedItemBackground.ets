@@ -40,6 +40,15 @@ export enum CYLAnimatedItemBackgroundStyle {
 export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<CommonAttribute> {
   /** [EN] The tint of a glass with no color (225, 222, 220 at alpha 0.5). [CN] 未设置颜色时玻璃的着色（225, 222, 220，透明度 0.5）。 */
   static readonly DEFAULT_GLASS_TINT: string = '#80E1DEDC';
+  /** [EN] The tint of a glass with no color in a dark app: white at alpha 36/255 (Android `defaultGlassTint`), so the glass stays dark and translucent. [CN] 深色应用中未设置颜色时玻璃的着色：白色，透明度 36/255（Android `defaultGlassTint`），使玻璃保持深色半透明。 */
+  static readonly DEFAULT_GLASS_TINT_DARK: string = '#24FFFFFF';
+
+  /**
+   * [EN] The default tint of the app's color mode (`CYLLiquidGlass.isDark()`). [CN] 应用颜色模式（`CYLLiquidGlass.isDark()`）对应的默认着色。
+   */
+  static defaultGlassTint(): string {
+    return CYLLiquidGlass.isDark() ? CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT_DARK : CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT;
+  }
 
   style: CYLAnimatedItemBackgroundStyle;
 
@@ -103,10 +112,10 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
   static glassTint(color: ResourceColor, tintAlpha: number = -1): ResourceColor {
     // [EN] No color set: the default frosted tint (225, 222, 220 at alpha 0.5, as iOS in light mode). [CN] 未设置颜色：默认的磨砂着色（225, 222, 220，透明度 0.5，与 iOS 浅色模式相同）。
     if (color === Color.Transparent || color === '') {
-      return CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT;
+      return CYLAnimatedItemBackgroundModifier.defaultGlassTint();
     }
     if (typeof color === 'number' || typeof color === 'string') {
-      const tint: string | number | undefined = cylAnimatedItemGlassTintColor(color, CYLLiquidGlass.GLASS_TINT_ALPHA, CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT);
+      const tint: string | number | undefined = cylAnimatedItemGlassTintColor(color, CYLLiquidGlass.GLASS_TINT_ALPHA, CYLAnimatedItemBackgroundModifier.defaultGlassTint());
       if (tint !== undefined) {
         return tint;
       }
@@ -127,8 +136,10 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
     const rim: boolean = glass && this.borderWidth <= 0;
     instance.borderWidth(rim ? CYLLiquidGlass.RIM_WIDTH : this.borderWidth);
     instance.borderColor(rim ? CYLLiquidGlass.rimEdgeColors(CYLLiquidGlass.isDark()) : this.borderColor);
-    if (glass) {
-      instance.linearGradient({ direction: GradientDirection.Bottom, colors: CYLLiquidGlass.sheenColors(CYLLiquidGlass.isDark()) });
+    // [EN] The sheen is the light page's only: a dark glass is the flat translucent white of Android, with the uniform rim. [CN] 高光只用于浅色页面：深色玻璃与 Android 相同，是扁平的半透明白色，加均匀的细边。
+    const sheen: Array<[ResourceColor, number]> = CYLLiquidGlass.sheenColors(CYLLiquidGlass.isDark());
+    if (glass && sheen.length > 0) {
+      instance.linearGradient({ direction: GradientDirection.Bottom, colors: sheen });
     }
     instance.clip(glass);
   }
