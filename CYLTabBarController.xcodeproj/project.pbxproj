@@ -382,6 +382,9 @@
 		FEC20E6965F91FAAF716B9C8 /* CYLTabBarController+CYLFlatDesignKeyValueObserving.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3946DA87998D8A7FD73ED60C /* CYLTabBarController+CYLFlatDesignKeyValueObserving.swift */; };
 		FEC9F8C46A3B167916110B50 /* CYLTabBarItemAnimationEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 5423B525B553B0DAE94BC048 /* CYLTabBarItemAnimationEngine.h */; };
 		FFC33E2B2494981674C270CB /* UIBarItem+CYLUtilsDeprecatedNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA237BC59727E60283C935FF /* UIBarItem+CYLUtilsDeprecatedNames.swift */; };
+		46B09662B605629DFDD315EB /* CYLDefaultTintViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843F0D16B7BD04597E8D60B2 /* CYLDefaultTintViewController.swift */; };
+		36B9C657EFCE37C7D1984B9F /* default_tint_one_color.json in Resources */ = {isa = PBXBuildFile; fileRef = ED0F6118CB2F73BC04245302 /* default_tint_one_color.json */; };
+		B06C7BB0932CDE75A9EE8D28 /* default_tint_multi_color.json in Resources */ = {isa = PBXBuildFile; fileRef = 793BF7C11408C9EDC8AEB5DB /* default_tint_multi_color.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -846,6 +849,9 @@
 		FF128D8055C6E884727ED5E9 /* CYLTabBarController+CYLTabBarMinimize.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLTabBarMinimize.swift"; sourceTree = "<group>"; };
 		FF7122CC1ACE6F2A1B789434 /* CYLTabBarController+CYLAnimatedImages.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBarController+CYLAnimatedImages.swift"; sourceTree = "<group>"; };
 		FF9F2AB372724E429E82DE06 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = CYLDemo.bundle; path = "Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
+		843F0D16B7BD04597E8D60B2 /* CYLDefaultTintViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLDefaultTintViewController.swift; sourceTree = "<group>"; };
+		ED0F6118CB2F73BC04245302 /* default_tint_one_color.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = default_tint_one_color.json; path = "CrossPlatform/harmonyos-cyltabbar/entry/src/main/resources/rawfile/lottie/default_tint_one_color.json"; sourceTree = SOURCE_ROOT; };
+		793BF7C11408C9EDC8AEB5DB /* default_tint_multi_color.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = default_tint_multi_color.json; path = "CrossPlatform/harmonyos-cyltabbar/entry/src/main/resources/rawfile/lottie/default_tint_multi_color.json"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1234,6 +1240,7 @@
 			children = (
 				7FD0F35BF0BC3FB2C2B07B49 /* CYLDetailsViewController.swift */,
 				3E54D0C1079837F9C9129AD9 /* CYLSameCityViewController.swift */,
+				843F0D16B7BD04597E8D60B2 /* CYLDefaultTintViewController.swift */,
 				9A579C98225F6E3A00F3C8F0 /* Location.gpx */,
 			);
 			path = SameCity;
@@ -1280,6 +1287,8 @@
 				7F01DDCC6E3492E356050263 /* green_lottie_tab_home_dark.json */,
 				9A9801792461249F00E65289 /* green_lottie_tab_mine.json */,
 				9A98017B2461249F00E65289 /* green_lottie_tab_news.json */,
+				793BF7C11408C9EDC8AEB5DB /* default_tint_multi_color.json */,
+				ED0F6118CB2F73BC04245302 /* default_tint_one_color.json */,
 			);
 			path = LottieResources;
 			sourceTree = "<group>";
@@ -1977,6 +1986,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A9801802461249F00E65289 /* green_lottie_tab_home.json in Resources */,
+				B06C7BB0932CDE75A9EE8D28 /* default_tint_multi_color.json in Resources */,
+				36B9C657EFCE37C7D1984B9F /* default_tint_one_color.json in Resources */,
 				CA869DE29E041F70CA39174D /* green_lottie_tab_mine_dark.json in Resources */,
 				8ABC9F699A90C4F661803F89 /* green_lottie_tab_news_dark.json in Resources */,
 				8BFA3AA7E7243BEFC8252DDD /* green_lottie_tab_discover_dark.json in Resources */,
@@ -2359,6 +2370,7 @@
 				C63C581B21A7AF9B937CD46C /* CYLDetailsViewController.swift in Sources */,
 				E31EE2F4156384AF7CC89DC2 /* CYLPlusButtonSubclass.swift in Sources */,
 				AA6412D6C537B3A835C02181 /* CYLSameCityViewController.swift in Sources */,
+				46B09662B605629DFDD315EB /* CYLDefaultTintViewController.swift in Sources */,
 				2D6A5D836D92953A290358C3 /* CYLHomeViewController.swift in Sources */,
 				E86CDD18A373B09C64D8AF27 /* CYLDemoBadgeTableViewController.swift in Sources */,
 				9A1559C81CB6D4D300CAB1AF /*  AppDelegate.m in Sources */,

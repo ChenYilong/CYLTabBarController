@@ -25,6 +25,8 @@ final class RiveTabBarController: CourseTabBarController, CYLFlatDesignUITabBarC
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         demoShowPlusButtonBadgeAfterLayout()
+        // [EN] `-cylScreen tint`: opens the tint page from the second tab, once. [CN] `-cylScreen tint`：从第二个 Tab 打开着色页，仅一次。
+        AnimatedItemTintViewController.openAtLaunchIfRequested(in: self)
         // [EN] `-CYLDemoRiveFollowsAppearance YES`: tab badges on tinted Rive icons, to check that a tint never covers a badge.
         // [CN] `-CYLDemoRiveFollowsAppearance YES`：着色 Rive 图标上的 Tab 角标，用于检查着色不会遮盖角标。
         // [EN] Through the view controllers, as the ObjC demo: FlatDesign takes badges this way. [CN] 与 ObjC Demo 一样通过视图控制器设置：扁平样式通过这种方式接收角标。

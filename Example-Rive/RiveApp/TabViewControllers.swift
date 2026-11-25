@@ -22,6 +22,15 @@ extension Tab {
             rootViewController = UIHostingController(rootView: SideMenu()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 .background(Color(hex: "17203A").ignoresSafeArea()))
+            // [EN] The next tab in turn after the User tab's Engine API button (AGENTS.md, "Demo table rows"): the tint API of
+            //      `CYLAnimatedItemView` (`animationTint`, `animationDarkTint`), a page pushed from the navigation bar.
+            // [CN] 轮到 User Tab 的 Engine API 按钮之后的下一个 Tab（AGENTS.md「Demo table rows」）：`CYLAnimatedItemView` 的着色 API
+            //      （`animationTint`、`animationDarkTint`），从导航栏推入的页面。
+            let tintItem = UIBarButtonItem(title: cylDemoLocalizedString("Tint"), primaryAction: UIAction { [weak rootViewController] _ in
+                rootViewController?.navigationController?.pushViewController(AnimatedItemTintViewController(), animated: true)
+            })
+            tintItem.accessibilityIdentifier = "AnimatedItemTintButton"
+            rootViewController.navigationItem.rightBarButtonItem = tintItem
         case .timer:
             rootViewController = UIHostingController(rootView: OnboardingView(show: .constant(true)))
         case .bell:
