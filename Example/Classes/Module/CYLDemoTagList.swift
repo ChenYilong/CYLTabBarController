@@ -30,7 +30,7 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
 
     /**
      [EN] The badge of each badge sample, in the order of the core's samples (`UITableViewCell.cylBadgeTitle(forRow:)`; the rows repeat after the last one): the
-          text the old row's badge showed ("" is the red dot), and true when the old row had custom colors (purple). Every other badge is red.
+          text the old row's badge showed ("" is the red dot: an empty, non-nil `CYLTag.badgeText` draws the 8 pt dot since ClassifyMenu 00b40e8d), and true when the old row had custom colors (purple). Every other badge is red.
      [CN] 每个角标样例的角标，顺序与核心的样例相同（`UITableViewCell.cylBadgeTitle(forRow:)`；超出最后一个后循环）：旧行角标显示的文字（"" 为红点），
           以及旧行是否使用自定义颜色（紫色）。其余角标为红色。
      */
@@ -159,7 +159,8 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
     }
 
     private static let styleConfiguration: [String: Any] = [
-        CYLMenuStyleKey.titleMaxLines: titleMaxLines, CYLMenuStyleKey.backgroundStyle: "liquidGlass",
+        // [EN] `leading`: a wrapped title starts at the leading margin, not centered. [CN] `leading`：换行的标题从起始边距开始，不居中。
+        CYLMenuStyleKey.titleMaxLines: titleMaxLines, CYLMenuStyleKey.contentAlignment: "leading", CYLMenuStyleKey.backgroundStyle: "liquidGlass",
         CYLMenuStyleKey.backgroundColor: "#00000000",
         // [EN] Each section is a Liquid Glass card (pin bbe56951 or newer). [CN] 每个分组是一张液态玻璃卡片（pin bbe56951 或更新）。
         CYLMenuStyleKey.sectionStyle: "insetGrouped",

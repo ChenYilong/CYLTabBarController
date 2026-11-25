@@ -47,11 +47,12 @@ class CYLSameCityViewController: CYLDemoBadgeTableViewController {
         cell.accessibilityIdentifier = "cyl-default-tint"
         cell.cylWrapsTextLabels()
         cell.accessoryType = .disclosureIndicator
+        // [EN] A glass row, like the tag list's cards above it (a plain row is white on the gradient page); the row's own title is its header. [CN] 玻璃行，与上方 TagList 的卡片一致（普通行在渐变页面上是白色）；行标题即标题，不再重复分组标题。
+        var background = UIBackgroundConfiguration.listGroupedCell()
+        background.backgroundColor = .clear
+        background.customView = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
+        cell.backgroundConfiguration = background
         return cell
-    }
-
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        section == defaultTintSection ? cylDemoLocalizedString("Default tint") : super.tableView(tableView, titleForHeaderInSection: section)
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

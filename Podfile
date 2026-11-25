@@ -22,8 +22,8 @@ pod 'CYLAnimatedItem', :path => './'
 #      the same pin as the HarmonyOS, Android and mini program examples (CrossPlatform/harmonyos-cyltabbar/classifymenu.pin); no copy of its sources.
 # [CN] 演示 section 使用 ClassifyMenu 的 TagList（docs/instructions/examples.md）。按 commit 固定，与 HarmonyOS、Android、小程序示例使用同一个 pin
 #      （CrossPlatform/harmonyos-cyltabbar/classifymenu.pin）；不复制其源码。
-# [EN] iOS pin 0a654459 (branch fix/callout-scroll-badge-ios): callout closes on scroll, bubble below the tag, tag badges. [CN] iOS 的 pin 0a654459（分支 fix/callout-scroll-badge-ios）：滚动时关闭浮层、浮层位于 Tag 下方、Tag 角标。
-pod 'CollectionViewClassifyMenu', :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :commit => '0a6544595b9272376f9daeb1502028f9e3133633'
+# [EN] iOS pin 00b40e8d (branch feat/tag-final-merge-plus): callout closes on scroll, bubble below the tag, tag badges, an empty badgeText draws an 8 pt dot. [CN] iOS 的 pin 00b40e8d（分支 feat/tag-final-merge-plus）：滚动时关闭浮层、浮层位于 Tag 下方、Tag 角标、空 badgeText 绘制 8 pt 红点。
+pod 'CollectionViewClassifyMenu', :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :commit => '00b40e8dd222aeffab3002883175431c05e5dd1a'
 
 #only for test
 #pod 'CYLTabBarController/CYLFlatDesignTabBar', :git => 'https://github.com/ChenYilong/CYLTabBarController.git', :branch => 'fix/flatdesign-tabbar-position-during-transition'
