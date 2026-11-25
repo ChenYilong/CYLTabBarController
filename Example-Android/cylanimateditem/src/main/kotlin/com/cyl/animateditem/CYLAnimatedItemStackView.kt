@@ -426,6 +426,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
         entry.divider = makeDivider()
         stackView.addView(entry.divider, 2 * at + 1, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
         entries.add(at, entry)
+        if (itemGlassBackdropSource != null) itemView.itemGlassBackdropSource = itemGlassBackdropSource
         itemView.stackIconColor = iconColor
         itemView.stackSelectedIconColor = selectedIconColor
         itemView.stackTitleColor = titleColor
@@ -700,6 +701,23 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
     var itemGlassTintAlpha: Float? = null
         set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
+    /**
+     * [EN] The view a Liquid Glass background blurs and refracts, as [CYLAnimatedItemView.itemGlassBackdropSource]: null (the default) is the root of the
+     *      window's views; a view BEHIND the stack and NOT an ancestor of it (a sibling plate) is sampled; else only the tint and the hairline rim are drawn
+     *      (the same fallback as a single glass item, also per hosted item). It reaches the stack's own glass layer and the glass layer of every item the
+     *      stack hosts, items added later too; setting it again re-applies it to the existing ones. Not used by the flat style.
+     * [CN] 液态玻璃背景所模糊、折射的视图，同 [CYLAnimatedItemView.itemGlassBackdropSource]：null（默认）为窗口视图的根；位于堆叠后面且不是其祖先的视图
+     *      （同级背板）会被采样；否则只绘制着色与细边（与单个玻璃条目相同的回退，每个托管的条目也一样）。它作用于堆叠自己的玻璃层以及它托管的每个条目的玻璃层，
+     *      之后加入的条目也一样；再次设置会重新应用到已有条目。扁平样式不使用。
+     */
+    var itemGlassBackdropSource: View? = null
+        set(value) {
+            if (field === value) return
+            field = value
+            entries.forEach { it.view.itemGlassBackdropSource = value }
+            if (usesItemBackground) itemBackgroundDidChange()
+        }
+
     /** [EN] The background really drawn (Flat where the device draws no glass). [CN] 实际绘制的背景（设备不绘制玻璃时为 Flat）。 */
     val resolvedItemBackgroundStyle: CYLAnimatedItemBackgroundStyle
         get() = itemBackgroundRenderer.resolvedStyle(itemBackgroundStyle)
@@ -719,7 +737,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
 
     private fun applyItemBackground() {
         if (!usesItemBackground) return
-        itemBackgroundRenderer.apply(itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha)
+        itemBackgroundRenderer.apply(itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha, itemGlassBackdropSource)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
