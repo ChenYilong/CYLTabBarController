@@ -20,6 +20,8 @@ cyldeallocblockexecutor = "c85c10c0dac23308a5373e4ab4f4e1da7bc41ed9"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-customview = { module = "androidx.customview:customview", version = "1.1.0" }
+androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version = "1.3.2" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 json = { module = "org.json:json", version.ref = "json" }

@@ -54,7 +54,9 @@ class DemoListFragment : Fragment() {
     val page: String get() = requireArguments().getString(PAGE) ?: DemoCatalog.HOME
     /** [EN] `CYLTabBarItemPageParameters.url` of the tab, when its page ID is "web". [CN] 页面 ID 为 "web" 时 Tab 的 `CYLTabBarItemPageParameters.url`。 */
     val url: String? get() = requireArguments().getString(URL)
+    /** [EN] The sections the list shows as rows: the ones with badge samples (the others are tags). [CN] 列表以行显示的分组：含角标样例的分组（其余为 Tag）。 */
     private var sections: List<DemoSection> = emptyList()
+    private var tagList: DemoTagList.Holder? = null
     private val adapter = Adapter()
     /** [EN] The list, also the scrolling view of scroll hiding (issue #13). [CN] 列表，也是滚动隐藏的滚动视图（issue #13）。 */
     var listView: ListView? = null
@@ -74,7 +76,6 @@ class DemoListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val context = inflater.context
         val list = ListView(context).apply {
-            adapter = this@DemoListFragment.adapter
             // [EN] Under a floating bar (FlatDesign, Liquid Glass) the page's bottom inset is the bar's height: the last rows
             //      scroll above the bar, and the rows still pass under it while scrolling, as an iOS table view does.
             // [CN] 浮动 TabBar（扁平样式、液态玻璃）下，页面的底部 inset 就是 TabBar 的高度：最后几行可滚到 TabBar 上方，滚动时各行仍从 TabBar 下方经过，
@@ -84,10 +85,10 @@ class DemoListFragment : Fragment() {
                 view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars()).bottom)
                 insets
             }
-            setOnItemClickListener { _, _, position, _ -> (this@DemoListFragment.adapter.getItem(position) as? DemoRow)?.let(::run) }
+            setOnItemClickListener { parent, _, position, _ -> (parent.getItemAtPosition(position) as? DemoRow)?.let(::run) }
             // [EN] A context menu on long press, as the iOS rows have (and the scroll hiding simulation "long press a row"). [CN] 长按弹出菜单，与 iOS 行一致（也用于滚动隐藏模拟 "长按某行"）。
-            setOnItemLongClickListener { _, view, position, _ ->
-                val row = this@DemoListFragment.adapter.getItem(position) as? DemoRow ?: return@setOnItemLongClickListener false
+            setOnItemLongClickListener { parent, view, position, _ ->
+                val row = parent.getItemAtPosition(position) as? DemoRow ?: return@setOnItemLongClickListener false
                 android.widget.PopupMenu(context, view).apply {
                     menu.add(android.R.string.copy).setOnMenuItemClickListener {
                         context.getSystemService(android.content.ClipboardManager::class.java)?.setPrimaryClip(android.content.ClipData.newPlainText("row", row.title))
@@ -97,6 +98,13 @@ class DemoListFragment : Fragment() {
                 true
             }
         }
+        // [EN] The sections are one tag list at the top of the list (a titled header per section, More / Less after 3 rows, long press
+        //      shows the subtitle); the badge sample rows follow as rows (docs/instructions/examples.md).
+        // [CN] 分组是列表顶部的一个 TagList（每组带标题，超过 3 行出现 More / Less，长按显示副标题）；角标样例行作为行跟在后面。
+        val holder = DemoTagList.Holder(context) { run(it) }
+        tagList = holder
+        list.addHeaderView(holder.view, null, false)
+        list.adapter = adapter
         cyl_setUpAutomaticRowHeightForTableView(list)
         list.setOnScrollListener(ScrollBridge())
         listView = list
@@ -106,6 +114,7 @@ class DemoListFragment : Fragment() {
 
     override fun onDestroyView() {
         listView = null
+        tagList = null
         super.onDestroyView()
     }
 
@@ -116,7 +125,10 @@ class DemoListFragment : Fragment() {
 
     /** [EN] Reads the sections again (rows show the current state). [CN] 重新读取各 section（行显示当前状态）。 */
     fun reload() {
-        sections = DemoCatalog.sections(this)
+        val all = DemoCatalog.sections(this)
+        val (badgeSections, tagSections) = all.partition(DemoTagList::isBadgeSection)
+        sections = badgeSections
+        tagList?.update(tagSections) { it.subtitle?.invoke(this) }
         adapter.notifyDataSetChanged()
     }
 
