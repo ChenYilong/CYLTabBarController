@@ -45,6 +45,7 @@ final class AnimatedItemTintViewController: UIViewController {
     ]
 
     private var items: [CYLAnimatedItemView] = []
+    private let scrollView = UIScrollView()
 
     /**
      * [EN] `-cylScreen tint`: selects the second tab and opens this page, once (screenshots).
@@ -56,6 +57,17 @@ final class AnimatedItemTintViewController: UIViewController {
         didOpenLaunchScreen = true
         tabBarController.selectedIndex = 1
         navigationController.pushViewController(AnimatedItemTintViewController(), animated: false)
+    }
+
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        // [EN] Set before the push, so the page uses the full height. [CN] 在推入之前设置，使页面使用整个高度。
+        hidesBottomBarWhenPushed = true
+    }
+
+    @available(*, unavailable)
+    required init?(coder _: NSCoder) {
+        fatalError("init(coder:) is not supported")
     }
 
     override func viewDidLoad() {
@@ -78,7 +90,6 @@ final class AnimatedItemTintViewController: UIViewController {
         stack.axis = .vertical
         stack.spacing = 12
         stack.translatesAutoresizingMaskIntoConstraints = false
-        let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(stack)
         view.addSubview(scrollView)
@@ -97,6 +108,11 @@ final class AnimatedItemTintViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         items.forEach { $0.playAnimation() }
+        // [EN] `-cylScroll bottom`: shows the Liquid Glass rows (screenshots). [CN] `-cylScroll bottom`：显示液态玻璃行（用于截图）。
+        if UserDefaults.standard.string(forKey: "cylScroll") == "bottom" {
+            view.layoutIfNeeded()
+            scrollView.setContentOffset(CGPoint(x: 0, y: max(0, scrollView.contentSize.height - scrollView.bounds.height)), animated: false)
+        }
         // [EN] `-cylColorMode dark|light`, as the HarmonyOS launch parameter `cylColorMode`. [CN] `-cylColorMode dark|light`，同鸿蒙启动参数 `cylColorMode`。
         switch UserDefaults.standard.string(forKey: "cylColorMode") {
         case "dark": view.window?.overrideUserInterfaceStyle = .dark
