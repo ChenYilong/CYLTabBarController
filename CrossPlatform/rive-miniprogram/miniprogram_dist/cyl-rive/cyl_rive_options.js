@@ -61,7 +61,8 @@ function cylRiveRoute(route) {
   const value = trimmed.startsWith('asset:') ? trimmed.slice('asset:'.length) : trimmed
   const hash = value.indexOf('#')
   const query = /^https?:\/\//i.test(value) ? -1 : value.indexOf('?')
-  const index = query < 0 ? hash : (hash < 0 ? query : Math.min(query, hash))
+  // [EN] The earlier of the two marks that exist (-1 when neither). [CN] 两个标记中存在的较早者（都没有则为 -1）。
+  const index = query >= 0 && hash >= 0 ? Math.min(query, hash) : Math.max(query, hash)
   const options = {}
   if (index >= 0) {
     cylRiveOptionPairs(value.slice(index + 1)).forEach((pair) => {

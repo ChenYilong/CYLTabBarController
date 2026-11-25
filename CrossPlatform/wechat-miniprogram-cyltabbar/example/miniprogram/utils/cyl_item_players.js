@@ -13,13 +13,13 @@
  * [CN] TabBar 各图标的播放器：[{ key, selected, player }]，按 Tab 顺序；没有动画图标的条目不计入。
  */
 function cylItemPlayers(tabBar) {
-  const slots = (tabBar && tabBar.data && tabBar.data.cylSlots) || [];
+  const slots = tabBar?.data?.cylSlots || [];
   const entries = [];
   slots.forEach((slot) => {
     const tabItem = slot.item ? tabBar.selectComponent(`#cyl-item-${slot.key}`) : null;
     const icon = tabItem && typeof tabItem.selectComponent === 'function' ? tabItem.selectComponent('#cyl-item-icon') : null;
     if (icon && typeof icon.cyl_player === 'function') {
-      entries.push({ key: slot.key, selected: Boolean(icon.data && icon.data.selected), player: icon.cyl_player() });
+      entries.push({ key: slot.key, selected: Boolean(icon.data?.selected), player: icon.cyl_player() });
     }
   });
   return entries;

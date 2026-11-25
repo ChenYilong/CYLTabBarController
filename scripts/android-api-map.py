@@ -27,6 +27,7 @@ import sys
 
 # [EN] The separator row of the two-column tables. [CN] 两列表格的分隔行。
 TABLE_RULE = '|:---|:---|'
+HEADER_ROW = '| 中文 | English |'
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HEADERS_ROOT = os.path.join(ROOT, 'CYLTabBarController')
@@ -268,7 +269,7 @@ def document(rows, mapping):
     counts = dict.fromkeys(STATUSES, 0)
     for row in rows:
         counts[mapping.get(row['key'], {}).get('status', 'planned')] += 1
-    out += ['| 中文 | English |', TABLE_RULE,
+    out += [HEADER_ROW, TABLE_RULE,
             '| iOS 库的每个公开符号（公开头文件中的类、协议、方法、属性、常量、枚举、函数）及其 Android 版本（`Example-Android/cyltabbar`，Kotlin 与 Java）。状态：done 行为相同；partial 部分行为（见说明）；planned 尚未移植；n/a 仅 iOS（UIKit、扁平样式、液态玻璃、Core Animation 等），不计入完成率。 | Every public symbol of the iOS library (classes, protocols, methods, properties, constants, enums and functions of the public headers) with its Android version (`Example-Android/cyltabbar`, Kotlin and Java). Status: done, the same behavior; partial, part of it (see the note); planned, not ported yet; n/a, iOS only (UIKit, FlatDesign, Liquid Glass, Core Animation...), left out of the score. |',
             '| **迁移完成率：%d / 100**（done + 0.5 × partial，共 %d 个计入的符号；done %d、partial %d、planned %d、n/a %d）。 | **Migration score: %d / 100** (done + 0.5 × partial over %d counted symbols; done %d, partial %d, planned %d, n/a %d). |'
             % (percent, total, counts['done'], counts['partial'], counts['planned'], counts['n/a'], percent, total, counts['done'], counts['partial'], counts['planned'], counts['n/a']),
@@ -293,7 +294,7 @@ def document(rows, mapping):
     extensions = load_android_only()
     if extensions:
         out += ['## 仅 Android / Android only', '',
-                '| 中文 | English |', TABLE_RULE,
+                HEADER_ROW, TABLE_RULE,
                 '| 这些 API 只在 Android 上存在，iOS 库没有对应 API，不计入完成率。详见 [Android-Library](Android-Library.md) 的「仅 Android 的扩展」。 | These APIs exist on Android only; the iOS library has no counterpart, and they are left out of the score. Details: "Android-only extensions" in [Android-Library](Android-Library.md). |', '',
                 '| Android API | 说明 / Note |', TABLE_RULE]
         out += ['| `%s` | %s |' % (entry['android'], entry.get('note', '')) for entry in extensions]
@@ -301,7 +302,7 @@ def document(rows, mapping):
     contract = load_animated_item()
     if contract:
         out += ['## `CYLAnimatedItemView` 引擎契约 / `CYLAnimatedItemView` engine contract', '',
-                '| 中文 | English |', TABLE_RULE,
+                HEADER_ROW, TABLE_RULE,
                 '| 跨端动效引擎契约的成员（鸿蒙为准，见 [Animated-Item](Animated-Item.md)「Engine API across platforms」）。iOS 上 `CYLAnimatedItemView` 是 Swift 类，不在冻结的 Objective-C 头文件清单中，因此在这里单独列出，不计入完成率。 | Members of the cross-platform animation engine contract (HarmonyOS is the reference, see "Engine API across platforms" in [Animated-Item](Animated-Item.md)). On iOS `CYLAnimatedItemView` is a Swift class, not in the frozen Objective-C header list, so its members are listed here on their own, out of the score. |', '',
                 '| iOS API | Android API | 状态 Status | 说明 / Note |', '|:---|:---|:---|:---|']
         out += ['| `%s` | `%s` | %s | %s |' % (entry['ios'], entry['android'], entry['status'], entry.get('note', '')) for entry in contract]

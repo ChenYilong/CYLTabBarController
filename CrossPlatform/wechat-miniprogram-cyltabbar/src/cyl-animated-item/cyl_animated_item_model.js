@@ -101,7 +101,7 @@ function cylAnimatedItemSource(value) {
   const raw = trimmed.startsWith('asset:') ? trimmed.slice('asset:'.length) : trimmed
   const query = raw.indexOf('?')
   const hash = raw.indexOf('#')
-  const at = query < 0 ? hash : (hash < 0 ? query : Math.min(query, hash))
+  const at = query >= 0 && hash >= 0 ? Math.min(query, hash) : Math.max(query, hash)
   const options = {}
   if (at >= 0) {
     cylAnimatedItemOptionPairs(raw.slice(at + 1)).forEach((pair) => {
@@ -487,7 +487,10 @@ function cylAnimatedItemColorWithAlpha(color, alpha) {
     const channel = (index) => Number.parseInt(digits.slice(index * 2, index * 2 + 2), 16)
     return `rgba(${channel(0)},${channel(1)},${channel(2)},${alpha})`
   }
-  const fn = /^rgba?\(\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*(?:[,/]\s*[\d.]+%?\s*)?\)$/i.exec(text)
+  // [EN] The channels sit between the brackets; a separator is a comma or a space, each with optional whitespace around it. [CN] 通道位于括号之间；分隔符是逗号或空格，两侧可有空白。
+  const inner = /^rgba?\(([^)]*)\)$/i.exec(text)
+  const channels = /^(\d{1,3})(?:\s*,\s*|[^\S ]* \s*)(\d{1,3})(?:\s*,\s*|[^\S ]* \s*)(\d{1,3})(?:\s*[,/]\s*[\d.]+%?)?$/
+  const fn = inner && channels.exec(inner[1].trim())
   return fn ? `rgba(${fn[1]},${fn[2]},${fn[3]},${alpha})` : ''
 }
 
@@ -534,8 +537,26 @@ function cylAnimatedItemDividerStyle(input) {
   return `${size} background-color: ${cylAnimatedItemDividerColor(p)};`
 }
 
+/**
+ * [EN] The resting frame of the animation: 'last' when it rests at its end, else 'first'.
+ * [CN] 动画静止时所在的帧：停在结尾时为 'last'，否则为 'first'。
+ */
+function cylAnimatedItemRestingFrame(p) {
+  const atEnd = p.drivesAnimationPlayback === false ? cylAnimatedItemRestingProgress(p) >= 1 : p.selected
+  return atEnd ? 'last' : 'first'
+}
+
+/**
+ * [EN] The title color: the explicit one (the dark variant while dark), else the built-in one.
+ * [CN] 标题颜色：显式颜色（深色时用深色变体），否则为内置颜色。
+ */
+function cylAnimatedItemTitleColor(p, dark) {
+  const explicitTitleColor = dark && p.titleDarkColor ? p.titleDarkColor : p.titleColor
+  return explicitTitleColor || cylAnimatedItemEffectiveIconColor({ selected: p.selected, enabled: p.enabled, isDark: dark, builtInSelectedColor: p.builtInSelectedColor })
+}
+
 function cylAnimatedItemModel(input) {
-  if (input && input.cylInternalDivider) {
+  if (input?.cylInternalDivider) {
     // [EN] The divider mode shows no icon, title, animation or badge, only the line, and no screen reader element. [CN] 分割线模式不显示图标、标题、动画与角标，只有一条线，读屏也不朗读。
     const blank = cylAnimatedItemModel({ ...input, cylInternalDivider: false, animationUrl: '', animationData: null, image: '', selectedImage: '', title: '', accessibilityLabel: '', accessoryImage: '', accessoryText: '', itemStyle: 'plain', selected: false, embedded: false })
     return { ...blank, isDivider: true, ariaHidden: true, ariaDisabled: false, ariaSelected: false, dividerStyle: cylAnimatedItemDividerStyle(input) }
@@ -563,8 +584,7 @@ function cylAnimatedItemModel(input) {
   const dark = cylAnimatedItemIsDark(p)
   // [EN] Built-in title color (tint spec v2): no explicit color (own / dark variant) means label, or the selected color while selected (the disabled look while disabled).
   //      [CN] 内置标题颜色（着色规范 v2）：没有显式颜色（自己的 / 深色变体）时为 label，选中时为选中色（禁用时为禁用外观）。
-  const explicitTitleColor = dark && p.titleDarkColor ? p.titleDarkColor : p.titleColor
-  const titleColor = explicitTitleColor || cylAnimatedItemEffectiveIconColor({ selected: p.selected, enabled: p.enabled, isDark: dark, builtInSelectedColor: p.builtInSelectedColor })
+  const titleColor = cylAnimatedItemTitleColor(p, dark)
   const countdownWidth = cylAnimatedItemCountdownTitleWidth(p)
   const titleStyle = cylAnimatedItemTitleStyle(p, titleColor, titleLines) + (countdownWidth > 0 ? `min-width: ${countdownWidth}px; text-align: center;` : '')
   const titleLinesClass = cylAnimatedItemTitleLinesClass(titleLines)
@@ -575,7 +595,7 @@ function cylAnimatedItemModel(input) {
     dark,
     animationPath,
     animationType,
-    restingFrame: (p.drivesAnimationPlayback === false ? cylAnimatedItemRestingProgress(p) >= 1 : p.selected) ? 'last' : 'first',
+    restingFrame: cylAnimatedItemRestingFrame(p),
     usesEngine,
     // [EN] The engine is hidden: its play-once animation ended and the still image shows. [CN] 引擎被隐藏：只播放一次的动画已结束，显示静态图片。
     animationHidden: usesEngine && ended,
@@ -660,6 +680,28 @@ function cylAnimatedItemLiquidGlassSetActiveOverride(value) {
 const cylAnimatedItemGlassTintAlpha = 0.75
 
 /**
+ * [EN] The channels { r, g, b, a } of a '#RGB', '#RRGGBB', '#RRGGBBAA', 'rgb()' or 'rgba()' color text; null for any other text.
+ * [CN] '#RGB'、'#RRGGBB'、'#RRGGBBAA'、'rgb()' 或 'rgba()' 颜色文本的通道 { r, g, b, a }；其他文本为 null。
+ */
+function cylAnimatedItemGlassTintChannels(text) {
+  const short = /^#([0-9a-fA-F]{3})$/.exec(text)
+  if (short) {
+    const h = short[1]
+    return { r: Number.parseInt(h[0] + h[0], 16), g: Number.parseInt(h[1] + h[1], 16), b: Number.parseInt(h[2] + h[2], 16), a: 1 }
+  }
+  const hex = /^#([0-9a-fA-F]{6})([0-9a-fA-F]{2})?$/.exec(text)
+  if (hex) {
+    const h = hex[1]
+    return { r: Number.parseInt(h.slice(0, 2), 16), g: Number.parseInt(h.slice(2, 4), 16), b: Number.parseInt(h.slice(4, 6), 16), a: hex[2] ? Number.parseInt(hex[2], 16) / 255 : 1 }
+  }
+  const fn = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/.exec(text)
+  if (fn) {
+    return { r: Number(fn[1]), g: Number(fn[2]), b: Number(fn[3]), a: fn[4] === undefined ? 1 : Number(fn[4]) }
+  }
+  return null
+}
+
+/**
  * [EN] The tint a glass draws with: a '#RGB', '#RRGGBB', '#RRGGBBAA', 'rgb()' or 'rgba()' color made translucent (its alpha times
  *      `cylAnimatedItemGlassTintAlpha`), so an opaque color such as a selected tag's green tints the glass instead of covering it; the same
  *      rule as iOS, Android and HarmonyOS. Other color text is used as it is.
@@ -668,48 +710,72 @@ const cylAnimatedItemGlassTintAlpha = 0.75
  */
 function cylAnimatedItemGlassTint(color, tintAlpha) {
   const text = String(color || '').trim()
-  let r, g, b, a = 1
-  let m = text.match(/^#([0-9a-fA-F]{3})$/)
-  if (m) {
-    const h = m[1]
-    r = parseInt(h[0] + h[0], 16); g = parseInt(h[1] + h[1], 16); b = parseInt(h[2] + h[2], 16)
-  } else if ((m = text.match(/^#([0-9a-fA-F]{6})([0-9a-fA-F]{2})?$/))) {
-    r = parseInt(m[1].slice(0, 2), 16); g = parseInt(m[1].slice(2, 4), 16); b = parseInt(m[1].slice(4, 6), 16)
-    if (m[2]) a = parseInt(m[2], 16) / 255
-  } else if ((m = text.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/))) {
-    r = Number(m[1]); g = Number(m[2]); b = Number(m[3])
-    if (m[4] !== undefined) a = Number(m[4])
-  } else {
-    return text === 'transparent' ? '' : text
-  }
+  const channels = cylAnimatedItemGlassTintChannels(text)
+  if (!channels) return text === 'transparent' ? '' : text
+  const { r, g, b, a } = channels
   // A fully transparent color means "no color" too: the caller then uses the default frosted tint.
   if (a === 0) return ''
   return `rgba(${r},${g},${b},${Math.round(a * (Number(tintAlpha) >= 0 ? Number(tintAlpha) : cylAnimatedItemGlassTintAlpha) * 1000) / 1000})`
 }
 
 /**
+ * [EN] The content inset the host set (0 or more), or -1 when it is not set (undefined, null or '').
+ * [CN] 宿主设置的内容内边距（0 及以上）；未设置（undefined、null 或 ''）时为 -1。
+ */
+function cylAnimatedItemExplicitInset(contentInset) {
+  return contentInset === undefined || contentInset === null || contentInset === '' ? -1 : Number(contentInset)
+}
+
+/**
+ * [EN] The corner radius: the host's value (0 is square), else a capsule for the drawn glass and square for flat.
+ * [CN] 圆角：宿主的值（0 为方角），否则绘制的玻璃为胶囊，扁平为方角。
+ */
+function cylAnimatedItemBackgroundRadius(cornerRadius, glass) {
+  if (Number(cornerRadius) >= 0) return Number(cornerRadius)
+  return glass ? cylAnimatedItemCornerRadiusCapsule : 0
+}
+
+/**
+ * [EN] The content inset: the host's value, else the glass default for the drawn glass and 0 for flat.
+ * [CN] 内容内边距：宿主的值，否则绘制的玻璃为玻璃默认值，扁平为 0。
+ */
+function cylAnimatedItemBackgroundInset(explicitInset, glass) {
+  if (explicitInset >= 0) return explicitInset
+  return glass ? cylAnimatedItemLiquidGlassContentInset : 0
+}
+
+/**
+ * [EN] The style text of the drawn glass: the tint (the default frosted tint without a usable color), blur and highlight.
+ * [CN] 绘制的玻璃的样式文本：着色（没有可用颜色时为默认的磨砂着色）、模糊与高光。
+ */
+function cylAnimatedItemGlassCss(color, tintAlpha, isDark) {
+  const tint = (color ? cylAnimatedItemGlassTint(color, tintAlpha) : '') || (isDark ? 'rgba(255,255,255,0.14)' : 'rgba(225,222,220,0.5)')
+  let css = `background-color:${tint};backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);`
+  css += `box-shadow:inset 0 1px 0 rgba(255,255,255,${isDark ? 0.18 : 0.6});overflow:hidden;`
+  return css
+}
+
+/**
  * @returns {{css: string, glass: boolean}} the inline style of the root view, '' when no `item…` background property is set
  */
 function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, borderColor, isDark, tintAlpha, contentInset) {
-  const border = Number(borderWidth) > 0 ? Number(borderWidth) : 0
-  const explicitInset = contentInset === undefined || contentInset === null || contentInset === '' ? -1 : Number(contentInset)
+  const border = Math.max(0, Number(borderWidth) || 0)
+  const explicitInset = cylAnimatedItemExplicitInset(contentInset)
   const used = style === 'liquidGlass' || (color || '') !== '' || Number(cornerRadius) >= 0 || border > 0 || (borderColor || '') !== '' || explicitInset >= 0
   if (!used) return { css: '', glass: false }
   const glass = style === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive()
   // The host's value (0 is square); not set (-1): a capsule for the drawn Liquid Glass (the rule `0: automatic, a capsule` that
   // CollectionViewClassifyMenu's tags had, moved here), square for flat.
   // cylAnimatedItemCornerRadiusCapsule is the capsule: CSS limits it to half the height, so it follows the size.
-  const radius = Number(cornerRadius) >= 0 ? Number(cornerRadius) : (glass ? cylAnimatedItemCornerRadiusCapsule : 0)
+  const radius = cylAnimatedItemBackgroundRadius(cornerRadius, glass)
   // The content inset: the host's value (0 or more), else the glass default for the drawn glass and 0 for flat. The stylesheet adds it to the
   // padding of every layout (--cyl-item-inset), left and right.
-  const inset = explicitInset >= 0 ? explicitInset : (glass ? cylAnimatedItemLiquidGlassContentInset : 0)
+  const inset = cylAnimatedItemBackgroundInset(explicitInset, glass)
   let css = `border-radius:${radius}px;`
   if (inset > 0) css += `--cyl-item-inset:${inset}px;`
   if (border > 0) css += `border:${border}px solid ${borderColor || 'transparent'};box-sizing:border-box;`
   if (glass) {
-    const tint = (color ? cylAnimatedItemGlassTint(color, tintAlpha) : '') || (isDark ? 'rgba(255,255,255,0.14)' : 'rgba(225,222,220,0.5)')
-    css += `background-color:${tint};backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);`
-    css += `box-shadow:inset 0 1px 0 rgba(255,255,255,${isDark ? 0.18 : 0.6});overflow:hidden;`
+    css += cylAnimatedItemGlassCss(color, tintAlpha, isDark)
   } else if (color) {
     css += `background-color:${color};`
   }

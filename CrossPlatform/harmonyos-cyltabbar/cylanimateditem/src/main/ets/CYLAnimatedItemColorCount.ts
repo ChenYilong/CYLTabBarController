@@ -28,7 +28,7 @@ function lottieColor(values: number[]): number[] | undefined {
     return undefined;
   }
   for (let i = 0; i < Math.min(values.length, 4); i++) {
-    if (typeof values[i] !== 'number' || !isFinite(values[i])) {
+    if (typeof values[i] !== 'number' || !Number.isFinite(values[i])) {
       return undefined;
     }
   }
@@ -211,7 +211,7 @@ export function cylAnimatedItemColorDetectable(type: string): boolean {
  * [CN] 检测缓存，按动画文件（不含选项的 URL）：每个文件只检测一次。
  */
 export class CYLAnimatedItemColorCountCache {
-  private kinds: Map<string, string> = new Map<string, string>();
+  private readonly kinds: Map<string, string> = new Map<string, string>();
 
   get(key: string): string | undefined {
     return this.kinds.get(key);

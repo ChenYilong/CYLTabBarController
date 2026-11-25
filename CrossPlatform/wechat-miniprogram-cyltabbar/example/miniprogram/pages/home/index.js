@@ -403,7 +403,7 @@ Component({
     // [CN] 点击 Tag 与点击对应行效果相同：`tagtap` {section: 0, item}，来自 `data-section` 分组的 TagList。
     cyl_onTag(event) {
       const section = this.data.sections.find((candidate) => candidate.id === event.currentTarget.dataset.section);
-      const row = section && section.rows[event.detail.item];
+      const row = section?.rows[event.detail.item];
       if (row) {
         this.cyl_onRow({ currentTarget: { dataset: { id: row.id } } });
       }

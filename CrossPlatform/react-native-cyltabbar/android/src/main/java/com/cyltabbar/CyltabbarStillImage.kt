@@ -7,7 +7,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
-import java.net.URL
+import java.net.URI
 
 /**
  * Loads the still image of `image` like `source`: an asset name (or `asset:` / `file:///android_asset/`), a path or
@@ -20,13 +20,13 @@ internal object CyltabbarStillImage {
   fun load(context: Context, value: String): Drawable? {
     val bitmap: Bitmap? = try {
       when {
-        value.startsWith("http://") || value.startsWith("https://") -> URL(value).openStream().use(BitmapFactory::decodeStream)
+        value.startsWith("http://") || value.startsWith("https://") -> URI(value).toURL().openStream().use(BitmapFactory::decodeStream)
         value.startsWith(ASSET_URI) -> context.assets.open(value.removePrefix(ASSET_URI)).use(BitmapFactory::decodeStream)
         value.startsWith("file://") -> BitmapFactory.decodeFile(value.removePrefix("file://"))
         value.startsWith("/") -> BitmapFactory.decodeFile(value)
         else -> context.assets.open(value.removePrefix("asset:")).use(BitmapFactory::decodeStream)
       }
-    } catch (error: java.io.IOException) { null }
+    } catch (error: java.io.IOException) { null } catch (error: java.net.URISyntaxException) { null }
     return bitmap?.let { BitmapDrawable(context.resources, it) }
   }
 

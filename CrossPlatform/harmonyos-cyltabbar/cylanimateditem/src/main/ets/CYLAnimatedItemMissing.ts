@@ -34,12 +34,12 @@ export function cylAnimatedItemResourceOf(url: string): string {
  * [CN] 每个条目一个：对每个资源只调用一次条目的回调，再调用全局监听。回调抛出异常不影响另一个，也不会崩溃。
  */
 export class CYLAnimatedItemMissingReporter {
-  private reported: string[] = [];
+  private readonly reported: string[] = [];
 
   /** [EN] Returns whether it reported (false: the resource was already reported, or empty). [CN] 返回是否已报告（false：该资源已报告过，或为空）。 */
   report(resource: string, reason: string, callback?: CYLAnimatedItemResourceMissingCallback,
     listener?: CYLAnimatedItemResourceMissingCallback): boolean {
-    if (resource.length === 0 || this.reported.indexOf(resource) >= 0) {
+    if (resource.length === 0 || this.reported.includes(resource)) {
       return false;
     }
     this.reported.push(resource);

@@ -53,7 +53,8 @@ export function cylRiveOptionColor(option: (name: string) => string | undefined)
     return undefined;
   }
   const rgba = digits.length === 6 ? digits + 'FF' : digits;
-  return parseInt(rgba.substring(6, 8) + rgba.substring(0, 6), 16) | 0;
+  const unsigned = Number.parseInt(rgba.substring(6, 8) + rgba.substring(0, 6), 16);
+  return unsigned > 0x7FFFFFFF ? unsigned - 0x100000000 : unsigned;
 }
 
 /**
@@ -63,7 +64,7 @@ export function cylRiveOptionColor(option: (name: string) => string | undefined)
  */
 export function cylRiveNextNumber(values: string | undefined, current: number | undefined): number {
   const list: number[] = (values ?? '').split(',').map((value: string) => value.trim()).filter((value: string) => value !== '')
-    .map((value: string) => Number(value)).filter((value: number) => Number.isFinite(value));
+    .map(Number).filter((value: number) => Number.isFinite(value));
   if (list.length === 0) {
     return (current ?? 0) + 1;
   }
@@ -103,7 +104,7 @@ export const CYL_RIVE_MAXIMUM_OFF_MS: number = 1500;
  *      `CYLRiveInputPass.offWindowCapMilliseconds` 相同。
  */
 export function cylRiveOffWindowCapMs(activeDuration: number = 0): number {
-  if (!(activeDuration > 0)) {
+  if (activeDuration <= 0 || Number.isNaN(activeDuration)) {
     return CYL_RIVE_MAXIMUM_OFF_MS;
   }
   return Math.min(CYL_RIVE_MAXIMUM_OFF_MS, Math.max(CYL_RIVE_MINIMUM_OFF_MS, Math.round(activeDuration * 1000)));

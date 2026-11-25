@@ -142,7 +142,7 @@ Component({
      */
     cyl_applyPendingPage() {
       const tabBar = this.cylPendingPage ? this.selectComponent('#cyl-tab-bar') : null;
-      if (tabBar && tabBar.cyl_selectPage(this.cylPendingPage)) {
+      if (tabBar?.cyl_selectPage(this.cylPendingPage)) {
         this.cylPendingPage = '';
       }
     },

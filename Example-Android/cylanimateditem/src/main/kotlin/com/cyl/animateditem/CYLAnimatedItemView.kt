@@ -965,7 +965,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         } else CYLAnimationColorCount.Kind.Undetectable
         val color = CYLTabBarItemAnimationTint.resolveItem(
             tint, CYLTabBarItemAnimationTint.darkTintOption(options), mode, kind, isSelected, night,
-            resolvedIconColor(configuration), explicitSelectedIconColor,
+            CYLTabBarItemAnimationTint.IconColors(resolvedIconColor(configuration), explicitSelectedIconColor),
         )
         CYLTabBarItemAnimationTint.applyToAnimationView(view, color)
     }
@@ -1027,34 +1027,44 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         if (fileMissing && url != null) {
             resourceMissing(url.substringBefore('#'), if (localFileExists(url)) CYLResourceMissingReason.UNREADABLE else CYLResourceMissingReason.NOT_FOUND)
         }
-        if (!url.isNullOrBlank() && !fileMissing) {
-            val (w, h) = iconSizeDp?.let { it.width to it.height } ?: (24f to 24f)
-            // [EN] No engine, no library or a file it cannot read: no view, the static image stays (an app's own source that
-            //      throws is treated the same way). [CN] 没有引擎、没有动画库或文件无法读取：不创建视图，保留静态图片（App 自己的来源抛出异常时同样处理）。
-            val made = try { animationSource.animationViewWithURL(context, url, CYLSize(w, h), ImageView.ScaleType.FIT_CENTER) } catch (error: RuntimeException) { null }
-            made?.let { view ->
-                view.cyl_hideFromAccessibility()
-                addView(view, indexOfChild(iconView) + 1)
-                animationView = view
-                animationPlayer?.let { player ->
-                    player.loops = animationLoops
-                    if (animationSpeed > 0f) player.animationSpeed = animationSpeed
-                    player.progress = animationRestingProgress
-                }
-                refreshAnimationTint()
-                if (drivesAnimationPlayback && isSelected) playAnimation()
-            } ?: run {
-                CYLAnimationEngines.warnMissingEngine(context, null, url)
-                val type = CYLAnimationEngines.typeOf(null, url)
-                resourceMissing(url.substringBefore('#'), when {
-                    type != null && !CYLAnimationEngines.isAvailable(type) -> CYLResourceMissingReason.ENGINE_LIBRARY_MISSING
-                    type != null -> CYLResourceMissingReason.UNREADABLE
-                    else -> CYLResourceMissingReason.DECODE_FAILED
-                })
-            }
-        }
+        if (!url.isNullOrBlank() && !fileMissing) makeAnimationView(url)
         updateIcon()
         requestLayout()
+    }
+
+    /**
+     * [EN] Creates and attaches the animation view of `url`, or reports why there is none (the static image stays).
+     * [CN] 创建并添加 `url` 的动画视图；无法创建时报告原因（保留静态图片）。
+     */
+    private fun makeAnimationView(url: String) {
+        val (w, h) = iconSizeDp?.let { it.width to it.height } ?: (24f to 24f)
+        // [EN] No engine, no library or a file it cannot read: no view, the static image stays (an app's own source that
+        //      throws is treated the same way). [CN] 没有引擎、没有动画库或文件无法读取：不创建视图，保留静态图片（App 自己的来源抛出异常时同样处理）。
+        val made = try { animationSource.animationViewWithURL(context, url, CYLSize(w, h), ImageView.ScaleType.FIT_CENTER) } catch (error: RuntimeException) { null }
+        if (made == null) {
+            reportMissingEngine(url)
+            return
+        }
+        made.cyl_hideFromAccessibility()
+        addView(made, indexOfChild(iconView) + 1)
+        animationView = made
+        animationPlayer?.let { player ->
+            player.loops = animationLoops
+            if (animationSpeed > 0f) player.animationSpeed = animationSpeed
+            player.progress = animationRestingProgress
+        }
+        refreshAnimationTint()
+        if (drivesAnimationPlayback && isSelected) playAnimation()
+    }
+
+    private fun reportMissingEngine(url: String) {
+        CYLAnimationEngines.warnMissingEngine(context, null, url)
+        val type = CYLAnimationEngines.typeOf(null, url)
+        resourceMissing(url.substringBefore('#'), when {
+            type != null && !CYLAnimationEngines.isAvailable(type) -> CYLResourceMissingReason.ENGINE_LIBRARY_MISSING
+            type != null -> CYLResourceMissingReason.UNREADABLE
+            else -> CYLResourceMissingReason.DECODE_FAILED
+        })
     }
 
     /**

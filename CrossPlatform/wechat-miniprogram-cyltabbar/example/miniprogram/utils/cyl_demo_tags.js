@@ -17,10 +17,20 @@ const CYL_TAG_VISIBLE_ROWS = 3
  */
 function cylTagText(title, subtitle) {
   const notes = []
-  const stripped = String(title).replace(/\s*[（(]([^）)]*)[）)]/g, (match, inner) => {
-    if (inner.trim()) notes.push(inner.trim())
-    return ''
-  }).replace(/\s+/g, ' ').trim()
+  const text = String(title)
+  // [EN] Each bracket group is cut out together with the whitespace before it (trimEnd on the text before the group: linear, unlike a leading whitespace run in the pattern).
+  // [CN] 每个括号组连同它之前的空白一起被去掉（对括号组之前的文本做 trimEnd：线性复杂度，不像模式开头带空白匹配）。
+  const bracket = /[（(]([^）)]*)[）)]/g
+  let kept = ''
+  let last = 0
+  for (let match = bracket.exec(text); match; match = bracket.exec(text)) {
+    kept += text.slice(last, match.index).trimEnd()
+    last = bracket.lastIndex
+    const note = match[1].trim()
+    if (note) notes.push(note)
+  }
+  kept += text.slice(last)
+  const stripped = kept.replace(/\s+/g, ' ').trim()
   if (!stripped) return { title, subtitle: subtitle || '' }
   return { title: stripped, subtitle: [subtitle, ...notes].filter(Boolean).join(' · ') }
 }
@@ -29,7 +39,7 @@ function cylTagText(title, subtitle) {
 function cylRowIsTag(row) {
   const accessory = row.accessory || 'none'
   const hasSlider = row.slider !== null && row.slider !== undefined
-  return !hasSlider && !(row.preview && row.preview.swatch) && (accessory === 'none' || accessory === 'chevron' || accessory === 'check')
+  return !hasSlider && !row.preview?.swatch && (accessory === 'none' || accessory === 'chevron' || accessory === 'check')
 }
 
 /** [EN] A section is shown as tags when it has rows and every row is a tag. [CN] 分组有行且每一行都是 Tag 时显示为 Tag。 */

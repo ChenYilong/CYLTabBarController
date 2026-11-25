@@ -33,7 +33,7 @@ function cylLottieRGB(value) {
 
 /** [EN] Every color array of an animated property (`{ a, k }`): the static value, or each keyframe's `s` and `e`. [CN] 动画属性（`{ a, k }`）的所有颜色数组：静态值，或每个关键帧的 `s` 与 `e`。 */
 function cylLottieColorArrays(property) {
-  const k = property && property.k
+  const k = property?.k
   if (!Array.isArray(k)) return []
   if (k.length && typeof k[0] === 'object' && k[0] !== null && !Array.isArray(k[0])) {
     const arrays = []
@@ -45,7 +45,7 @@ function cylLottieColorArrays(property) {
 
 /** [EN] Whether the shape item is invisible: a static opacity of 0. [CN] 形状项是否不可见：静态不透明度为 0。 */
 function cylLottieInvisible(item) {
-  const o = item && item.o
+  const o = item?.o
   return !!o && o.a !== 1 && Number(o.k) === 0 && !Array.isArray(o.k)
 }
 

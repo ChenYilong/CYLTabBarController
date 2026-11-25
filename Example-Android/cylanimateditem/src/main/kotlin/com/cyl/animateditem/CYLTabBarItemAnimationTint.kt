@@ -127,6 +127,13 @@ object CYLTabBarItemAnimationTint {
         CYLAnimationRenderingMode.parse(options[CYLAnimationRenderingMode.OPTION_NAME])
 
     /**
+     * [EN] The icon colors `resolveItem` needs: `effective` is the icon color of the current state (explicit, else the stack's, else the built-in);
+     *      `explicitSelected` is the selected one WITHOUT built-ins (item / stack / host only).
+     * [CN] `resolveItem` 需要的图标颜色：`effective` 是当前状态的图标颜色（显式、其次堆叠、再次内置）；`explicitSelected` 是不含内置值的选中图标颜色（仅条目 / 堆叠 / 宿主）。
+     */
+    data class IconColors(val effective: Int?, val explicitSelected: Int?)
+
+    /**
      * [EN] The ITEM tint table (tint spec v2, the same on every platform), the only place that resolves the tint of an item's animation.
      *      `effectiveIconColor` is the icon color of the current state (explicit, else the stack's, else the built-in); `explicitSelectedIconColor`
      *      is the selected one WITHOUT built-ins (item / stack / host only). `tint` / `darkTint` are the merged texts.
@@ -145,8 +152,10 @@ object CYLTabBarItemAnimationTint {
      */
     fun resolveItem(
         tint: String?, darkTint: String?, mode: CYLAnimationRenderingMode, kind: CYLAnimationColorCount.Kind,
-        selected: Boolean, isDark: Boolean, effectiveIconColor: Int?, explicitSelectedIconColor: Int?,
+        selected: Boolean, isDark: Boolean, iconColors: IconColors,
     ): Int? {
+        val effectiveIconColor = iconColors.effective
+        val explicitSelectedIconColor = iconColors.explicitSelected
         val text = tint?.trim()?.takeIf { it.isNotEmpty() }
         if (text == TINT_TITLE) return effectiveIconColor
         val fixed = text?.let { parseHex(it) }

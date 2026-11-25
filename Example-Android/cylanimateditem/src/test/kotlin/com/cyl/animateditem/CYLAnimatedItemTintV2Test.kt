@@ -114,7 +114,8 @@ class CYLAnimatedItemTintV2Test {
     fun theItemTableOnThePureFunction() {
         pureTable.forEach { row ->
             assertEquals(describe(row), row.expected, CYLTabBarItemAnimationTint.resolveItem(
-                row.tint, row.dark, row.mode, row.kind, row.selected, row.night, row.effective, row.explicitSelected,
+                row.tint, row.dark, row.mode, row.kind, row.selected, row.night,
+                CYLTabBarItemAnimationTint.IconColors(row.effective, row.explicitSelected),
             ))
         }
     }
@@ -132,7 +133,7 @@ class CYLAnimatedItemTintV2Test {
         for (selected in listOf(false, true)) for (night in listOf(false, true)) {
             // Automatic (mode unset): a one-color file takes the effective color, a multi-color file keeps its colors
             add(Real(null, null, null, one, selected, night, null, null) { bn, bs -> if (selected) bs else bn })
-            add(Real(null, null, null, one, selected, night, n, null) { bn, bs -> if (selected) bs else n })          // selected without explicit: built-in selected
+            add(Real(null, null, null, one, selected, night, n, null) { _, bs -> if (selected) bs else n })          // selected without explicit: built-in selected
             add(Real(null, null, null, one, selected, night, n, s) { _, _ -> if (selected) s else n })
             add(Real(null, null, null, multi, selected, night, n, s) { _, _ -> null })
             add(Real(null, null, template, multi, selected, night, n, s) { _, _ -> if (selected) s else n })
@@ -141,7 +142,7 @@ class CYLAnimatedItemTintV2Test {
             // an explicit tint beats the mode
             add(Real("title", null, original, multi, selected, night, n, s) { _, _ -> if (selected) s else n })
             add(Real("title", null, automatic, one, selected, night, null, null) { bn, bs -> if (selected) bs else bn })
-            add(Real("#1C1C1E", "#FFFFFF", original, one, selected, night, n, null) { _, _ -> if (selected) (if (night) darkFixed else fixed) else (if (night) darkFixed else fixed) })
+            add(Real("#1C1C1E", "#FFFFFF", original, one, selected, night, n, null) { _, _ -> if (night) darkFixed else fixed })
             add(Real("#1C1C1E", null, template, multi, selected, night, n, s) { _, _ -> if (selected) s else fixed })
             // an invalid tint is unset: the mode applies
             add(Real("nonsense", null, automatic, one, selected, night, n, s) { _, _ -> if (selected) s else n })
@@ -307,7 +308,7 @@ class CYLAnimatedItemTintV2Test {
         path.writeBytes(File(oneColorGif).readBytes())
         path.deleteOnExit()
         assertEquals(one, CYLAnimationColorCount.kindOfSource(context, path.absolutePath + "#tint=title"))
-        path.delete()
+        assertTrue(path.delete())
         assertEquals("cached per file URL", one, CYLAnimationColorCount.kindOfSource(context, path.absolutePath))
     }
 
