@@ -18,6 +18,11 @@ pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDealloc
 # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
 # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
 pod 'CYLAnimatedItem', :path => './'
+# [EN] The demo sections are a ClassifyMenu tag list (docs/instructions/examples.md, "Demo lists that need sections use a ClassifyMenu tag list"). Pinned by commit,
+#      the same pin as the HarmonyOS, Android and mini program examples (CrossPlatform/harmonyos-cyltabbar/classifymenu.pin); no copy of its sources.
+# [CN] 演示 section 使用 ClassifyMenu 的 TagList（docs/instructions/examples.md）。按 commit 固定，与 HarmonyOS、Android、小程序示例使用同一个 pin
+#      （CrossPlatform/harmonyos-cyltabbar/classifymenu.pin）；不复制其源码。
+pod 'CollectionViewClassifyMenu', :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :commit => 'bbe569514eab77292d8ad8d03b3a83e5e1648283'
 
 #only for test
 #pod 'CYLTabBarController/CYLFlatDesignTabBar', :git => 'https://github.com/ChenYilong/CYLTabBarController.git', :branch => 'fix/flatdesign-tabbar-position-during-transition'

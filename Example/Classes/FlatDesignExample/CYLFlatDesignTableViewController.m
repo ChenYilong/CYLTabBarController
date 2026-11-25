@@ -34,6 +34,8 @@
 
 @interface CYLFlatDesignTableViewController ()
 
+/// [EN] The demo sections as a ClassifyMenu tag list, the first section of the table (docs/instructions/examples.md). [CN] 演示 section 以 ClassifyMenu 的 TagList 显示，是表格的第一个 section。
+@property (nonatomic, strong) CYLDemoTagList *demoTagList;
 
 @end
 
@@ -44,6 +46,7 @@
 - (void)cyl_themeDidChangeByManager:(CYLThemeManager *)manager identifier:(__kindof NSObject<NSCopying> *)identifier theme:(__kindof NSObject *)theme {
     [super cyl_themeDidChangeByManager:manager identifier:identifier theme:theme];
     if (self.isViewLoaded) {
+        [self.demoTagList reload];
         [self.tableView reloadData];
     }
 }
@@ -118,6 +121,26 @@
     // [EN] Pull to refresh, empty / no-network placeholders and the offline red bar (CYLTableViewPlaceHolder).
     // [CN] 下拉刷新、无数据 / 无网络占位图与断网红条（CYLTableViewPlaceHolder）。
     [CYLDemoPlaceholder installOnScrollView:self.tableView viewController:self animation:CYLDemoPlaceholderAnimationLottie refresh:nil];
+    // [EN] The badge samples are tags too (docs/instructions/examples.md): a scratch cell gives each one's title and subtitle, a tap pushes the page the row pushed.
+    // [CN] 角标样例也是 Tag（docs/instructions/examples.md）：用临时 cell 提供标题与副标题，点击后推入原行推入的页面。
+    __weak __typeof(self) weakSelf = self;
+    self.demoTagList = [CYLDemoTagList installOnTableView:self.tableView host:self badgeRowCount:50 badgeCell:^UITableViewCell *(NSInteger row) {
+        UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:nil];
+        cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:row];
+        cell.detailTextLabel.text = [NSString localizedStringWithFormat:CYLDemoLocalizedString(@"%@ CYLTabBarController on iOS %@"), weakSelf.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
+        return cell;
+    } didSelectBadgeRow:^(NSInteger row) {
+        UIViewController *vc = [[UIViewController alloc] init];
+        vc.hidesBottomBarWhenPushed = YES;
+        vc.cyl_hidesBottomBarWhenPushed = YES;
+        vc.view.backgroundColor = UIColor.systemBackgroundColor;
+        [weakSelf.navigationController pushViewController:vc animated:YES];
+    }];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.demoTagList reload];
 }
 
 - (void)refreshTabBar:(id)sender {
@@ -137,71 +160,21 @@
 
 #pragma mark - Table view data source
 
-// [EN] The grouped demo sections (shared with the Liquid Glass pages), then the badge rows.
-// [CN] 分组的演示 section（与液态玻璃页面共用），然后是角标行。
+// [EN] The demo sections (shared with the Liquid Glass pages) and the badge samples are one tag list: the table's only row.
+// [CN] 演示 section（与液态玻璃页面共用）和角标样例是一个 TagList：表格唯一的一行。
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return [self cyl_demoSectionCount] + 1;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (section < [self cyl_demoSectionCount]) {
-        return [self cyl_demoRowCountInSection:section];
-    }
-    return 50;
-}
-
-/*!
- * [EN] Issue #13: a context menu on the badge rows, for the "Manual: long press a row" simulation (a long press on the
- *      content ends the scroll hiding session).
- * [CN] issue #13：角标行的上下文菜单，用于“手动：长按某一行”模拟（在内容上长按会结束滚动隐藏会话）。
- */
-- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point {
-    if (indexPath.section < [self cyl_demoSectionCount]) {
-        return nil;
-    }
-    return [UIContextMenuConfiguration configurationWithIdentifier:nil previewProvider:nil actionProvider:^UIMenu *(NSArray<UIMenuElement *> *suggestedActions) {
-        UIAction *copy = [UIAction actionWithTitle:CYLDemoLocalizedString(@"复制") image:[UIImage systemImageNamed:@"doc.on.doc"] identifier:nil handler:^(__kindof UIAction *action) {
-            UIPasteboard.generalPasteboard.string = [tableView cellForRowAtIndexPath:indexPath].textLabel.text;
-        }];
-        return [UIMenu menuWithTitle:@"" children:@[ copy ]];
-    }];
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return section < [self cyl_demoSectionCount] ? [self cyl_demoTitleForSection:section] : CYLDemoLocalizedString(@"角标");
+    return 1;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section < [self cyl_demoSectionCount]) {
-        return [self cyl_demoCellForTableView:tableView indexPath:indexPath];
-    }
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"cell"];
-    }
-    // [EN] The badge sample is the title, the page the subtitle, as in the other demos.
-    // [CN] 与其他演示一致，以角标样例为主标题、页面为副标题。
-    cell.textLabel.text = [UITableViewCell cyl_badgeTitleForRow:indexPath.row];
-    cell.detailTextLabel.text = [NSString localizedStringWithFormat:CYLDemoLocalizedString(@"%@ CYLTabBarController on iOS %@"), self.title, @([[[UIDevice currentDevice] systemVersion] floatValue])];
-    [cell cyl_wrapsTextLabels];
-    [cell cyl_showBadgeForRow:indexPath.row];
-    return cell;
+    return self.demoTagList.cell;
 }
 
 #pragma mark UITableViewDelegate
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section < [self cyl_demoSectionCount]) {
-        [self cyl_demoDidSelectRowAtIndexPath:indexPath inTableView:tableView];
-        return;
-    }
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    UIViewController *vc = [[UIViewController alloc] init];
-    vc.hidesBottomBarWhenPushed = YES;
-    vc.cyl_hidesBottomBarWhenPushed = YES;
-    vc.view.backgroundColor = UIColor.systemBackgroundColor;
-    [self.navigationController pushViewController:vc animated:YES];
-}
 
 @end
 

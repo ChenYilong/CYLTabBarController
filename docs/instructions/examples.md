@@ -10,7 +10,8 @@ by tag and kept under 200 lines: see [instructions.md](instructions.md)).
   sections); use `systemGroupedBackgroundColor` or leave the default. A library helper that adds a plain table (e.g.
   `cyl_addBadgeHelperTable`) is created by the example itself with `.insetGrouped`. Keep this when porting a demo.
 - **Examples**: they import only `#import <CYLTabBarController/CYLTabBarController.h>` (Swift: `import CYLTabBarController`),
-  and their Podfiles must not need changes.
+  and their Podfiles must not need changes. **One explicit exception (owner, 2026-11-25):** the `Example/` Podfile adds `CollectionViewClassifyMenu` by commit for the
+  tag list (see "Demo lists that need sections use a ClassifyMenu tag list" below); no other pod is added for it.
 - **Demo behavior: the first tab's cover is added by the demo, later.** In the Objective-C example the big icon over
   the first tab (the "淘" cover, `-setSelectedCoverShow:`) is put on by the example itself, 1.5 s after launch
   (`-cyl_demo_decorateTabBarController:`), not by the library. Icons are replaced the normal way (skins, network icons,
@@ -79,5 +80,15 @@ A demo that shows another setup on purpose (no plus button, a plus button withou
   - The mini program pins it the same way (`scripts/fetch-classifymenu.sh miniprogram`, run by `npm run setup`, fetches `cyl-tag-list-miniprogram` into the git-ignored
     `example/cylclassifymenu-miniprogram/`, installed as a `file:` dependency). A section becomes a tag list when every row is a plain row (no slider, switch, arrows or
     color swatch); the other sections keep their rows (`example/miniprogram/utils/cyl_demo_tags.js`). The expanded control reads "Less" there.
+  - iOS pins it in the `Example/` Podfile (root `Podfile`; pin `bbe56951` or newer, the iOS API has `sectionBackgroundStyle`): `pod 'CollectionViewClassifyMenu', :git => '…/CollectionViewClassifyMenu.git', :commit => '<the classifymenu.pin SHA>'`
+    (it depends on `CYLAnimatedItem`, already a path pod there); no sources are copied. The helper is `Example/Classes/Module/CYLDemoTagList.swift`
+    (`CYLDemoTagList`, `@objc`, with `CYLDemoTagList.tagText(title:subtitle:)` as the iOS twin of `demoTagText` / `DemoTagList.tagText` / `cylTagText`): it reads the demo
+    sections (`UIViewController (CYLDemoSections)`: title, subtitle and icon of each row's cell), builds the tag list from the configuration dictionary
+    (`titleMaxLines` 3, `defaultVisibleRows` 3, `foldControl` tail + icon, `backgroundStyle` `liquidGlass`, `sectionBackgroundStyle` `liquidGlass` with `sectionStyle` `insetGrouped`,
+    `backgroundColor` `#00000000`, `longPressAction` `callout`, `selectionMode` none), the badge samples as one more section (a tag draws no badge: the iOS tag list has no configuration key for it),
+    a gradient page behind (`CYLDemoGradientView`, light and dark, the colors of the Android example),, and shows it as the only row of the table's first section (a clear cell), so the page's own rows (the tab bar gallery, Default tint) stay rows below it. A tap runs the
+    old row's action (`cyl_demoDidSelectRow`) and builds the tags again. `Example-Swift/` has no sectioned list (its pages are the library's badge helper table:
+    badge rows only), so the rule does not apply there and its Podfile is unchanged.
   - Status (2026-11-25): HarmonyOS `entry` `Index.ets`, Android `DemoList.kt` and the mini program home page done; React Native and Flutter are not converted yet
     (each needs a native ClassifyMenu build chain; their demo rows also have switches, arrows and buttons).
+  - iOS status (2026-11-25): `Example/` (ObjC example's pages and the FlatDesign page) uses the tag list; see the task log in docs/Animated-Item.md for the screenshots and the open points.
