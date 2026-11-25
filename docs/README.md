@@ -422,7 +422,7 @@ docs/
 │   ├── ios-example-tag-list-dark.png
 │   ├── ios-example-tag-list-flatdesign.png
 │   ├── ios-example-tag-list-light.png
-│   ├── ios-example-taglist-badges-00b40e8d.png
+│   ├── ios-example-taglist-badges-141740e8.png
 │   ├── ios-example-taglist-callout-scroll-below-00b40e8d.png
 │   ├── ios-example-taglist-pages-light-dark-00b40e8d.png
 │   ├── ios-flatdesign-animateditem-tab-ios26-4-a6e88609.png
