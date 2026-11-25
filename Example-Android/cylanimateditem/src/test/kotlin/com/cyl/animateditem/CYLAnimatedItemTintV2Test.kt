@@ -50,7 +50,7 @@ class CYLAnimatedItemTintV2Test {
         uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or (if (night) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO)
     }
 
-    private fun night(item: CYLAnimatedItemView, night: Boolean) {
+    private fun night(item: android.view.View, night: Boolean) {
         RuntimeEnvironment.setQualifiers(if (night) "+night" else "+notnight")
         item.dispatchConfigurationChanged(Configuration(item.resources.configuration))
     }

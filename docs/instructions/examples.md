@@ -55,6 +55,13 @@ A demo that shows another setup on purpose (no plus button, a plus button withou
     builds the tag list's configuration (HarmonyOS `demo/DemoTagList.ets`, Android `demo/DemoTagList.kt`, mini program `utils/cyl_demo_tags.js`), together with
     `titleMaxLines`. Where the platform cannot draw glass (the mini program outside a glass-capable view), the library falls back to its flat look; do not
     add example-only drawing to imitate it.
+  - Dark mode: an example's tag list is checked in light and dark mode, and a dark mode check always includes the built-in default tint (a one-color
+    animated file takes the library's color of its state and mode, a multi-color file keeps its own colors). The list's own default background is a fixed
+    white that does not follow dark mode, so an example sets the style `backgroundColor` to clear (`#00000000`) and lets the page's background show;
+    otherwise the header texts, which do follow dark mode, are white on white. HarmonyOS: `--ps cylColorMode dark|light` on `aa start` switches the app's
+    color mode, and the `Default tint` row of the second tab (`cylScreen default-tint`, `pages/DefaultTint.ets`) shows a one-color and a multi-color Lottie
+    file, normal and selected. Android: `adb shell cmd uimode night yes|no` (restore it afterwards: emulators are shared). Mini program: no real dark switch in
+    DevTools automation; override `wx.getAppBaseInfo` to return `theme: 'dark'` in the app service and open the page again (the page's own background stays light).
   - Tap: tapping a tag does exactly what tapping the old cell did.
   - Long press: shows the row's subtitle in a small floating callout with an arrow, built with the tag list's long-press
     custom API (never with example-only gesture code).

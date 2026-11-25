@@ -28,6 +28,7 @@ test('the configuration: a titled section, no selection, a callout, 3 lines, Mor
   assert.equal(configuration.defaultVisibleRows, 3)
   assert.equal(configuration.style.titleMaxLines, 3)
   assert.equal(configuration.style.backgroundStyle, 'liquidGlass')
+  assert.equal(configuration.style.backgroundColor, '#00000000')
   assert.deepEqual(configuration.foldControl, { position: 'headerTrailing', content: 'iconAndTitle' })
   assert.equal(configuration.sections.length, 1)
   assert.equal(configuration.sections[0].title, 'General')
