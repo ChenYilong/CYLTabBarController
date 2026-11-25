@@ -3,7 +3,8 @@
 # every platform): the HarmonyOS module (harmony/classifymenu) into CrossPlatform/harmonyos-cyltabbar/cylclassifymenu, the
 # Android library (android/merged/library) into Example-Android/cylclassifymenu, both git-ignored.
 # The examples' sectioned lists use its tag list (docs/instructions/examples.md). No copy is committed here.
-# Usage: scripts/fetch-classifymenu.sh [harmony|android]   (default: harmony)
+# The mini program package cyl-tag-list-miniprogram goes into CrossPlatform/wechat-miniprogram-cyltabbar/example/cylclassifymenu-miniprogram.
+# Usage: scripts/fetch-classifymenu.sh [harmony|android|miniprogram]   (default: harmony)
 # Env: CYL_CLASSIFYMENU_REPO (URL or local path; default: GitHub).
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -13,7 +14,8 @@ PLATFORM="${1:-harmony}"
 case "$PLATFORM" in
   harmony) DEST="$HM/cylclassifymenu"; SRCDIR="harmony/classifymenu"; STRIP=2 ;;
   android) DEST="$ROOT/Example-Android/cylclassifymenu"; SRCDIR="android/merged/library"; STRIP=3 ;;
-  *) echo "usage: $0 [harmony|android]" >&2; exit 2 ;;
+  miniprogram) DEST="$ROOT/CrossPlatform/wechat-miniprogram-cyltabbar/example/cylclassifymenu-miniprogram"; SRCDIR="CrossPlatform/wechat-miniprogram/packages/cyl-tag-list-miniprogram"; STRIP=4 ;;
+  *) echo "usage: $0 [harmony|android|miniprogram]" >&2; exit 2 ;;
 esac
 REPO="${CYL_CLASSIFYMENU_REPO:-https://github.com/ChenYilong/CollectionViewClassifyMenu.git}"
 if [[ -f "$DEST/.pinned-sha" && "$(cat "$DEST/.pinned-sha")" = "$SHA" ]]; then exit 0; fi

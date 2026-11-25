@@ -56,4 +56,8 @@ A demo that shows another setup on purpose (no plus button, a plus button withou
   - Android pins it the same way (`scripts/fetch-classifymenu.sh android` fetches `android/merged/library` into the git-ignored
     `Example-Android/cylclassifymenu/`, built with `Example-Android/cylclassifymenu.build.gradle.kts`); the tag list is the header view of the demo `ListView`,
     so scroll hiding keeps working, and the badge rows follow as rows. On Android the callout is visible while the finger is down.
-  - Status (2026-11-25): HarmonyOS `entry` `Index.ets` (`demo/DemoTagList.ets`) and Android `DemoList.kt` (`demo/DemoTagList.kt`) done; the mini program, React Native and Flutter are not converted yet.
+  - The mini program pins it the same way (`scripts/fetch-classifymenu.sh miniprogram`, run by `npm run setup`, fetches `cyl-tag-list-miniprogram` into the git-ignored
+    `example/cylclassifymenu-miniprogram/`, installed as a `file:` dependency). A section becomes a tag list when every row is a plain row (no slider, switch, arrows or
+    color swatch); the other sections keep their rows (`example/miniprogram/utils/cyl_demo_tags.js`). The expanded control reads "Less" there.
+  - Status (2026-11-25): HarmonyOS `entry` `Index.ets`, Android `DemoList.kt` and the mini program home page done; React Native and Flutter are not converted yet
+    (each needs a native ClassifyMenu build chain; their demo rows also have switches, arrows and buttons).

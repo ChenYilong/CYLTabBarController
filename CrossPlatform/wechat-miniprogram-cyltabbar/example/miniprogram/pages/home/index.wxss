@@ -285,3 +285,12 @@
   text-align: center;
   color: #007aff;
 }
+
+/* [EN] The tag list's long-press callout is position: absolute, but cyl-tag-list sets no positioned ancestor, so it lands against the page, not
+        the list. The component host is that ancestor here until the library sets `position: relative` on `.cyl-tag-list` (reported to CollectionViewClassifyMenu).
+   [CN] TagList 的长按浮层是 position: absolute，但 cyl-tag-list 没有设置定位祖先，浮层会相对页面而不是列表定位。在库给 `.cyl-tag-list` 设置
+        `position: relative` 之前，这里让组件宿主作为该祖先（已反馈给 CollectionViewClassifyMenu）。 */
+cyl-tag-list {
+  display: block;
+  position: relative;
+}

@@ -28,6 +28,7 @@ const { cylDemoConfiguration } = require('../../utils/cyl_demo_configuration');
 const cylDemoList = require('../../shared/demo_list');
 const { cylHomeAction, CYL_TAP_STEPS, CYL_SOUND_STEPS } = require('../../utils/cyl_home_actions');
 const cylTeardown = require('../../utils/cyl_demo_teardown');
+const { cylSectionIsTags, cylTagConfiguration } = require('../../utils/cyl_demo_tags');
 const { CYL_DEMO_SKINS, cylEffectiveSkin, cylSkinSummary, cylSkinPreview } = require('../../utils/cyl_demo_skins');
 
 // [EN] UIColor.cyl_randomColor. [CN] 随机颜色。
@@ -185,7 +186,9 @@ Component({
           : section.rows.map((row) => this.cyl_row(row, values, state, configuration));
         const title = section.skins
           ? this.t('Skins: holidays and colors (%@)').replace('%@', String(CYL_DEMO_SKINS.length)) : cylListText(section.title);
-        return { id: section.id, title, rows };
+        const shown = { id: section.id, title, rows };
+        // [EN] A section of plain rows is one tag list (utils/cyl_demo_tags.js); the others keep their rows. [CN] 只含普通行的分组是一个 TagList（utils/cyl_demo_tags.js），其余分组保持为行。
+        return cylSectionIsTags(shown) ? { ...shown, tagConfiguration: cylTagConfiguration(shown) } : shown;
       });
       // [EN] The teardown row (iOS CYLDemoReleaseRow, docs/Lifecycle-Library.md step 21): releases the tab bars after 3 s and the
       //      released page shows how many dealloc callbacks ran. [CN] 销毁行（对应 iOS 的 CYLDemoReleaseRow）：3 秒后释放 TabBar，
@@ -400,6 +403,16 @@ Component({
 
     cyl_override(change) {
       this.cyl_update({ overrides: { ...getApp().globalData.cylTabBarState.overrides, ...change } });
+    },
+
+    // [EN] A tap on a tag does what a tap on its row did: `tagtap` {section: 0, item}, from the tag list of the section `data-section`.
+    // [CN] 点击 Tag 与点击对应行效果相同：`tagtap` {section: 0, item}，来自 `data-section` 分组的 TagList。
+    cyl_onTag(event) {
+      const section = this.data.sections.find((candidate) => candidate.id === event.currentTarget.dataset.section);
+      const row = section && section.rows[event.detail.item];
+      if (row) {
+        this.cyl_onRow({ currentTarget: { dataset: { id: row.id } } });
+      }
     },
 
     cyl_onRow(event) {
