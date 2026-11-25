@@ -123,6 +123,7 @@ docs/
 ├── Android-Liquid-Glass.md
 ├── Android-QMUI-Comparison.md
 ├── Animated-Item.md
+├── Animated-Item.md-e
 ├── Badge-Debugging.md
 ├── Bilingual-Documentation.md
 ├── CYLTableViewPlaceHolder-Integration-Issues.md
@@ -344,6 +345,7 @@ docs/
 │   ├── harmonyos-emulator-resource-missing-92426d43.png
 │   ├── harmonyos-flatdesign-liquidglass-taps-mate70pro.png
 │   ├── harmonyos-flatdesign-tint-fixed.png
+│   ├── harmonyos-gallery-lottie-tint-urls-a93de1d8.png
 │   ├── harmonyos-gif-image-rest-then-play.png
 │   ├── harmonyos-gif-svga-tint-option.png
 │   ├── harmonyos-gif-svga-tint-x86_64.png
