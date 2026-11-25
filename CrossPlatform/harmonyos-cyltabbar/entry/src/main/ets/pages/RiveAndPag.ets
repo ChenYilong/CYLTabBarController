@@ -27,10 +27,11 @@ struct RiveAndPag {
   @State loops: boolean = false;
   @State restartToken: number = 0;
   @State pagAvailable: boolean = true;
+  /** [EN] The PAG cells are off until switched on: they register the PAG engine, which loads libpag. [CN] PAG 单元默认关闭：打开时才注册 PAG 引擎并加载 libpag。 */
+  @State showsPag: boolean = false;
 
   aboutToAppear(): void {
     CYLAnimatedItemRive.register();
-    CYLAnimatedItemPAG.register();
     try {
       const bytes = this.getUIContext().getHostContext()?.resourceManager.getRawFileContentSync(PAG_FILE);
       this.pagAvailable = bytes !== undefined && bytes.length > 0;
@@ -96,13 +97,30 @@ struct RiveAndPag {
       }
       .width('100%')
 
-      this.caption(CYLLocalizedString('PAG file: plain and tinted'))
       Row() {
-        this.cell('cyl-pag-plain', PAG_FILE, '', CYLLocalizedString('plain'))
-        this.cell('cyl-pag-tint', PAG_FILE, TINT_GREEN, CYLLocalizedString('tint #34C759FF'))
+        Text(CYLLocalizedString('PAG file: plain and tinted'))
+          .fontSize(13)
+          .fontColor('#8A8A8E')
+          .layoutWeight(1)
+        Toggle({ type: ToggleType.Switch, isOn: this.showsPag })
+          .id('cyl-pag-show')
+          .onChange((isOn: boolean) => {
+            if (isOn) {
+              CYLAnimatedItemPAG.register();
+            }
+            this.showsPag = isOn;
+          })
       }
       .width('100%')
-      if (!this.pagAvailable) {
+      .padding({ top: 24, bottom: 8 })
+      if (this.showsPag) {
+        Row() {
+          this.cell('cyl-pag-plain', PAG_FILE, '', CYLLocalizedString('plain'))
+          this.cell('cyl-pag-tint', PAG_FILE, TINT_GREEN, CYLLocalizedString('tint #34C759FF'))
+        }
+        .width('100%')
+      }
+      if (this.showsPag && !this.pagAvailable) {
         Text(CYLLocalizedString('pag/demo.pag is missing: run scripts/fetch-animation-resources.py PAGResources, then build again'))
           .fontSize(12)
           .fontColor('#FF3B30')

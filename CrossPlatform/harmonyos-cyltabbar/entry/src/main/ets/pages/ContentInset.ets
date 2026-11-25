@@ -1,4 +1,5 @@
-import { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemView, CYLLocalizedString } from 'cyltabbar';
+import { CYLAnimatedItemView, CYLLocalizedString } from 'cyltabbar';
+import { CYLAnimatedItemBackgroundStyle } from 'cylanimateditem';
 
 /**
  * [EN] `itemContentHorizontalInset` left unset (docs/Animated-Item.md): the space between an item's content and the edge of its background.

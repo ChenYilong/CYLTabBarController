@@ -10,6 +10,7 @@
     "@cyl/classifymenu": "file:../cylclassifymenu",
     "cylanimateditem": "file:../cylanimateditem",
     "cylanimateditem_rive": "file:../cylanimateditem_rive",
-    "cylanimateditem_pag": "file:../cylanimateditem_pag"
+    "cylanimateditem_pag": "file:../cylanimateditem_pag",
+    "@tencent/libpag": "4.4.31"
   }
 }
