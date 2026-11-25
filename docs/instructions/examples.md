@@ -37,3 +37,17 @@ Unless a task says otherwise, every CYLTabBarController in the example layer is 
 A demo that shows another setup on purpose (no plus button, a plus button without a page, attributes built in code, a
 `CYLPlusButtonSubclassing` subclass) says so in its title or comment.
 3. **A raised plus button (added 2026-11-12)**: when an example demonstrates the plus button, always prefer the raised look: the top of the plus button reaches above the top edge of the tab bar (an image taller than the bar, and/or `+multiplierOfTabBarHeight:` below 0.5 or a negative `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`), in every style (classic, Liquid Glass, FlatDesign). A demo that needs a flat plus button (inside the bar) says so in its title or comment.
+- **Demo lists that need sections use a ClassifyMenu tag list (added 2026-11-25).** Where an example needs a table-view-like list
+  with section grouping, use CollectionViewClassifyMenu's tag list instead of a table, taking the main title and the icon from each
+  row. Rules, on every platform that has the library:
+  - Sectioned layout: every section header **must have a title**. Tags are self-sized (adaptive width), so a line holds as many
+    tags as fit.
+  - Wrapping: the tag's title label may wrap (no one-line limit), using the library's wrapping API. An example sets the limit to
+    **3 lines**; text beyond that is cut.
+  - Folding: a section that needs more than the maximum number of rows shows a **More / Less** toggle with the library's built-in
+    icon; More expands the section, Less folds it again.
+  - Tap: tapping a tag does exactly what tapping the old cell did.
+  - Long press: shows the row's subtitle in a small floating callout with an arrow, built with the tag list's long-press
+    custom API (never with example-only gesture code).
+  - Pin the library the same way as the other cross-repository dependencies (the latest commit that contains these APIs), and keep the
+    first tab's Objective-C table as it is (see "Demo table rows" above): this rule applies to tables in the other examples.
