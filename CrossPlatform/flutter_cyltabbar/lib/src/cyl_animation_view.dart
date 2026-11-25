@@ -26,6 +26,61 @@ const double cylAnimatedItemLiquidGlassContentInset = 14;
 /// ([liquidGlass]; drawn only where the platform draws Liquid Glass, elsewhere the view stays flat).
 enum CYLAnimatedItemBackgroundStyle { flat, liquidGlass }
 
+/// Whether the animation is tinted with the icon color (tint spec v2), when no [CYLAnimationView.animationTint] is set; the
+/// native names are the same on every platform.
+///
+/// - [automatic] (default): tinted with the effective icon color only if the file is detected as one-color; undetectable and
+///   multi-color files keep their colors.
+/// - [alwaysTemplate]: tinted regardless.
+/// - [alwaysOriginal]: never tinted (an explicit animationTint still wins).
+enum CYLAnimationRenderingMode { automatic, alwaysTemplate, alwaysOriginal }
+
+/// The creation parameters of the platform view of [view]: the tint keys are always present, null meaning "built-in default".
+@visibleForTesting
+Map<String, Object?> cylAnimationCreationParams(CYLAnimationView view) => _creationParams(view);
+
+/// The method-channel calls (method, argument) that bring a native view built from [old] to [view], for the tint properties
+/// only; a value that goes from set to null is sent as null (the native side resets to its built-in).
+@visibleForTesting
+List<MapEntry<String, Object?>> cylAnimationTintUpdates(CYLAnimationView old, CYLAnimationView view) => [
+      if (view.tintColor != old.tintColor) MapEntry('setTintColor', view.tintColor?.toARGB32()),
+      if (view.animationTint != old.animationTint) MapEntry('setAnimationTint', view.animationTint),
+      if (view.animationDarkTint != old.animationDarkTint) MapEntry('setAnimationDarkTint', view.animationDarkTint),
+      if (view.animationRenderingMode != old.animationRenderingMode)
+        MapEntry('setAnimationRenderingMode', view.animationRenderingMode.name),
+    ];
+
+String _sourceOf(CYLAnimationView view) {
+  final options = Map<String, Object>.of(view.options);
+  if (view.animationRenderingMode != CYLAnimationRenderingMode.automatic) {
+    options.putIfAbsent('renderingMode', () => view.animationRenderingMode.name);
+  }
+  return animationURLWithOptions(view.file, options);
+}
+
+Map<String, Object?> _creationParams(CYLAnimationView widget) => <String, Object?>{
+      'source': _sourceOf(widget),
+      'playing': widget.playing,
+      'selected': widget.selected,
+      'animationSpeed': widget.animationSpeed,
+      'animationLoops': widget.animationLoops,
+      'animationRestartToken': widget.animationRestartToken,
+      'drivesAnimationPlayback': widget.drivesAnimationPlayback,
+      'showsImageWhenAnimationEnds': widget.showsImageWhenAnimationEnds,
+      if (widget.image != null) 'image': widget.image,
+      if (widget.iconSize != null) 'iconSize': widget.iconSize,
+      'tintColor': widget.tintColor?.toARGB32(),
+      'animationTint': widget.animationTint,
+      'animationDarkTint': widget.animationDarkTint,
+      'animationRenderingMode': widget.animationRenderingMode.name,
+      'itemBackgroundStyle': widget.itemBackgroundStyle.name,
+      if (widget.itemBackgroundColor != null) 'itemBackgroundColor': widget.itemBackgroundColor!.toARGB32(),
+      if (widget.itemCornerRadius != null) 'itemCornerRadius': widget.itemCornerRadius,
+      if (widget.itemContentHorizontalInset != null) 'itemContentHorizontalInset': widget.itemContentHorizontalInset,
+      'itemBorderWidth': widget.itemBorderWidth,
+      if (widget.itemBorderColor != null) 'itemBorderColor': widget.itemBorderColor!.toARGB32(),
+    };
+
 /// Plays an animation by hand, for a [CYLAnimationView] whose `drivesAnimationPlayback` is false (the cross-platform engine
 /// contract, docs/Animated-Item.md): the commands `play`, `stopAtProgress` and `restart` of the native view. Give it to the
 /// view's `controller`; a command before the view exists does nothing.
@@ -50,7 +105,7 @@ class CYLAnimationController {
 /// [file] is a file name in the app (the iOS main bundle, the Android assets), a path or a URL.
 ///
 /// The names follow the cross-platform engine contract (docs/Animated-Item.md, "Engine API across platforms"): [selected],
-/// [animationSpeed], [animationLoops], [animationRestartToken], [drivesAnimationPlayback], [showsImageWhenAnimationEnds], [image], [iconSize], [tintColor], the item background ([itemBackgroundStyle],
+/// [animationSpeed], [animationLoops], [animationRestartToken], [drivesAnimationPlayback], [showsImageWhenAnimationEnds], [image], [iconSize], [tintColor], [animationTint], [animationDarkTint], [animationRenderingMode], the item background ([itemBackgroundStyle],
 /// [itemBackgroundColor], [itemCornerRadius], [itemBorderWidth], [itemBorderColor]), the
 /// callbacks [onAnimationLoaded], [onAnimationFailed], [onAnimationEnd], [onResourceMissing] and the [controller]'s commands. Both native halves
 /// wrap `CYLAnimatedItemView`; there is no engine logic in Dart.
@@ -69,6 +124,9 @@ class CYLAnimationView extends StatefulWidget {
     this.image,
     this.iconSize,
     this.tintColor,
+    this.animationTint,
+    this.animationDarkTint,
+    this.animationRenderingMode = CYLAnimationRenderingMode.automatic,
     this.itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat,
     this.itemBackgroundColor,
     this.itemCornerRadius,
@@ -114,8 +172,20 @@ class CYLAnimationView extends StatefulWidget {
   /// The icon's side in logical pixels; null fills the view.
   final double? iconSize;
 
-  /// Tints the icon and an animation that takes a tint.
+  /// The explicit icon color. null (default): the built-in default (adaptive light/dark, selected state change), nothing is
+  /// forced; going from a color back to null resets the native item to its built-in.
   final Color? tintColor;
+
+  /// The tint of the animation (tint spec v2): "title" (the effective icon color) or "#RRGGBB" / "#RRGGBBAA". null: unset
+  /// (see [animationRenderingMode]). Forwarded to the native `animationTint`.
+  final String? animationTint;
+
+  /// The Dark Mode color of a fixed [animationTint] ("#RRGGBB" / "#RRGGBBAA"). null: unset. Forwarded to `animationDarkTint`.
+  final String? animationDarkTint;
+
+  /// Whether the animation is tinted when [animationTint] is unset; default [CYLAnimationRenderingMode.automatic]. Also written
+  /// as the URL option `renderingMode=` (an option already in [options] wins) unless it is automatic.
+  final CYLAnimationRenderingMode animationRenderingMode;
 
   /// The background: [CYLAnimatedItemBackgroundStyle.flat] (default) fills with [itemBackgroundColor];
   /// [CYLAnimatedItemBackgroundStyle.liquidGlass] draws Liquid Glass tinted with it, where the platform draws Liquid Glass.
@@ -160,7 +230,7 @@ class CYLAnimationView extends StatefulWidget {
 class _CYLAnimationViewState extends State<CYLAnimationView> {
   MethodChannel? _channel;
 
-  String get _source => animationURLWithOptions(widget.file, widget.options);
+  String get _source => _sourceOf(widget);
 
   @override
   void didUpdateWidget(CYLAnimationView oldWidget) {
@@ -190,8 +260,8 @@ class _CYLAnimationViewState extends State<CYLAnimationView> {
     if (widget.iconSize != oldWidget.iconSize) {
       channel.invokeMethod<void>('setIconSize', widget.iconSize);
     }
-    if (widget.tintColor != oldWidget.tintColor) {
-      channel.invokeMethod<void>('setTintColor', widget.tintColor?.toARGB32());
+    for (final update in cylAnimationTintUpdates(oldWidget, widget)) {
+      channel.invokeMethod<void>(update.key, update.value);
     }
     if (widget.itemBackgroundStyle != oldWidget.itemBackgroundStyle) {
       channel.invokeMethod<void>('setItemBackgroundStyle', widget.itemBackgroundStyle.name);
@@ -214,7 +284,7 @@ class _CYLAnimationViewState extends State<CYLAnimationView> {
     if (widget.selected != oldWidget.selected) {
       channel.invokeMethod<void>('setSelected', widget.selected);
     }
-    if (_source != animationURLWithOptions(oldWidget.file, oldWidget.options)) {
+    if (_source != _sourceOf(oldWidget)) {
       channel.invokeMethod<void>('setSource', _source);
     }
     if (widget.animationRestartToken != oldWidget.animationRestartToken) {
@@ -256,25 +326,7 @@ class _CYLAnimationViewState extends State<CYLAnimationView> {
 
   @override
   Widget build(BuildContext context) {
-    final params = <String, Object?>{
-      'source': _source,
-      'playing': widget.playing,
-      'selected': widget.selected,
-      'animationSpeed': widget.animationSpeed,
-      'animationLoops': widget.animationLoops,
-      'animationRestartToken': widget.animationRestartToken,
-      'drivesAnimationPlayback': widget.drivesAnimationPlayback,
-      'showsImageWhenAnimationEnds': widget.showsImageWhenAnimationEnds,
-      if (widget.image != null) 'image': widget.image,
-      if (widget.iconSize != null) 'iconSize': widget.iconSize,
-      if (widget.tintColor != null) 'tintColor': widget.tintColor!.toARGB32(),
-      'itemBackgroundStyle': widget.itemBackgroundStyle.name,
-      if (widget.itemBackgroundColor != null) 'itemBackgroundColor': widget.itemBackgroundColor!.toARGB32(),
-      if (widget.itemCornerRadius != null) 'itemCornerRadius': widget.itemCornerRadius,
-      if (widget.itemContentHorizontalInset != null) 'itemContentHorizontalInset': widget.itemContentHorizontalInset,
-      'itemBorderWidth': widget.itemBorderWidth,
-      if (widget.itemBorderColor != null) 'itemBorderColor': widget.itemBorderColor!.toARGB32(),
-    };
+    final params = _creationParams(widget);
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
         return UiKitView(

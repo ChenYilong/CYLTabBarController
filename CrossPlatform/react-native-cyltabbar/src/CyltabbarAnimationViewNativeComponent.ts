@@ -23,7 +23,7 @@ type ResourceMissingEvent = Readonly<{ resource: string; reason: string }>;
 /**
  * [EN] The cross-platform engine contract, with the names frozen in docs/Animated-Item.md ("Engine API across platforms"):
  *      props `source` and `playing` as before, plus `selected`, `animationSpeed`, `animationLoops`, `animationRestartToken`,
- *      `drivesAnimationPlayback`, `showsImageWhenAnimationEnds`, `image`, `iconSize`, `tintColor` and the item background `itemBackgroundStyle`, `itemBackgroundColor`, `itemCornerRadius`, `itemBorderWidth`, `itemBorderColor`; the events `onAnimationLoaded`, `onAnimationFailed` and
+ *      `drivesAnimationPlayback`, `showsImageWhenAnimationEnds`, `image`, `iconSize`, `tintColor`, `animationTint`, `animationDarkTint`, `animationRenderingMode` and the item background `itemBackgroundStyle`, `itemBackgroundColor`, `itemCornerRadius`, `itemBorderWidth`, `itemBorderColor`; the events `onAnimationLoaded`, `onAnimationFailed` and
  *      `onAnimationEnd`; the commands `play`, `stopAtProgress` and `restart`. Both native halves wrap `CYLAnimatedItemView`.
  * [CN] 跨端引擎契约，名称已在 docs/Animated-Item.md（「跨端引擎 API」）中冻结：属性 `source`、`playing` 不变，新增 `selected`、
  *      `animationSpeed`、`animationLoops`、`animationRestartToken`、`drivesAnimationPlayback`、`iconSize`、`tintColor`；事件
@@ -74,9 +74,25 @@ export interface NativeProps extends ViewProps {
    */
   iconSize?: CodegenTypes.WithDefault<CodegenTypes.Float, 0>;
   /**
-   * Tints the icon and an animation that takes a tint.
+   * The icon color, optional. Unset (undefined) is the built-in default, never a forced color: label-like when normal, the view's
+   * inherited tint when selected. Going from set to unset resets the native value to nil.
    */
   tintColor?: ColorValue;
+  /**
+   * The animation tint (tint spec v2): "title" or "#RRGGBB" / "#RRGGBBAA"; unset (empty) is not set. Forwarded to the item's
+   * `animationTint`.
+   */
+  animationTint?: string;
+  /**
+   * The Dark Mode color of a fixed `animationTint` ("#RRGGBB" / "#RRGGBBAA"); unset (empty) is not set. Forwarded to the item's
+   * `animationDarkTint`.
+   */
+  animationDarkTint?: string;
+  /**
+   * How a file is tinted while `animationTint` is unset (tint spec v2): `automatic` (default) tints only one-color files,
+   * `alwaysTemplate` always, `alwaysOriginal` never. Forwarded to the item's `animationRenderingMode`.
+   */
+  animationRenderingMode?: CodegenTypes.WithDefault<'automatic' | 'alwaysTemplate' | 'alwaysOriginal', 'automatic'>;
   /**
    * The item's background: `flat` (default) fills with `itemBackgroundColor`; `liquidGlass` draws Liquid Glass tinted with it
    * (only where the platform draws Liquid Glass; elsewhere the view stays flat).

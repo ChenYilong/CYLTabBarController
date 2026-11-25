@@ -215,10 +215,21 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     }
 
     /**
+     [EN] The default `animationRenderingMode` of every item (automatic, alwaysTemplate, alwaysOriginal), existing and appended later; an item's own
+          non-automatic value wins. Applies only where the tint is unset. automatic by default.
+     [CN] 每个条目的默认 `animationRenderingMode`（automatic、alwaysTemplate、alwaysOriginal），包括之后追加的条目；条目自己的非 automatic 值优先。
+          只在着色未设置时生效。默认 automatic。
+     */
+    public var animationRenderingMode: CYLAnimatedItemRenderingMode = .automatic {
+        didSet { if oldValue != animationRenderingMode { entries.forEach { applyInheritedValues(to: $0.view) } } }
+    }
+
+    /**
      [EN] The color of the dividers, resolved by each divider with its own traits (a dynamic color follows light and dark; a fixed one is used as it
-          is). nil (default): the normal-state icon color of `itemAppearance` at alpha `CYLAnimatedItemDividerAlpha` (0.3), else `UIColor.separator`.
+          is). nil (default): the EXPLICIT normal-state icon color of `itemAppearance` at alpha `CYLAnimatedItemDividerAlpha` (0.6), else `UIColor.secondaryLabel`
+          (about 3:1 on light and dark bars; re-resolved on every appearance change).
      [CN] 分隔条的颜色，由每条分隔条用自己的 trait 解析（动态颜色跟随浅色与深色；固定颜色原样使用）。nil（默认）：`itemAppearance` 普通状态的图标颜色
-          加 `CYLAnimatedItemDividerAlpha`（0.3）透明度，否则 `UIColor.separator`。
+          加 `CYLAnimatedItemDividerAlpha`（0.6）透明度，否则 `UIColor.secondaryLabel`（浅色与深色 Bar 上约 3:1；每次外观变化时重新解析）。
      */
     public var dividerColor: UIColor? {
         didSet { if oldValue != dividerColor { updateDividerLook() } }
@@ -324,6 +335,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     private func applyInheritedValues(to view: CYLAnimatedItemView) {
         view.inheritedAnimationTint = animationTint
         view.inheritedAnimationDarkTint = animationDarkTint
+        view.inheritedAnimationRenderingMode = animationRenderingMode
     }
 
     /**
@@ -665,6 +677,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         entry.observations.forEach { $0.invalidate() }
         itemView.inheritedAnimationTint = nil
         itemView.inheritedAnimationDarkTint = nil
+        itemView.inheritedAnimationRenderingMode = .automatic
         if itemView.itemAppearance === entry.givenAppearance { itemView.applyInheritedItemAppearance(nil) }
         itemView.removeTarget(self, action: #selector(itemTapped(_:)), for: .touchUpInside)
         NSLayoutConstraint.deactivate([entry.width, entry.height])

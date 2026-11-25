@@ -12,6 +12,7 @@
         icon-tint="{{m.divider.iconTint}}"
         animation-tint="{{m.divider.animationTint}}"
         animation-dark-tint="{{m.divider.animationDarkTint}}"
+        built-in-selected-color="{{m.divider.builtInSelectedColor}}"
         user-interface-style="{{m.divider.userInterfaceStyle}}"
         accessibility-hidden="{{true}}"
       />
@@ -39,6 +40,8 @@
         icon-tint="{{item.iconTint}}"
         animation-tint="{{item.animationTint}}"
         animation-dark-tint="{{item.animationDarkTint}}"
+        animation-rendering-mode="{{item.animationRenderingMode}}"
+        built-in-selected-color="{{item.builtInSelectedColor}}"
         animation-icon-tint="{{item.animationIconTint}}"
         animation-selected-icon-tint="{{item.animationSelectedIconTint}}"
         accessibility-label="{{item.accessibilityLabel}}"

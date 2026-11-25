@@ -22,15 +22,20 @@ const S = '#007AFF'
 const F = '#FF8800'
 const D = '#112233'
 const FA = 'rgba(255,136,0,0.502)'
+// [EN] The built-in colors (tint spec v2, section 10): label, and systemBlue as the selected default (light | dark). [CN] 内置颜色。
+const LBL = 'rgb(0,0,0)'
+const LBL_D = 'rgb(255,255,255)'
+const BLUE = 'rgb(0,136,255)'
+const BLUE_D = 'rgb(0,145,255)'
 const TABLE = [
   // unset, or invalid text = unset: the file's own colors, whatever else exists
   ['', D, false, false, N, S, ''], ['', D, true, true, N, S, ''], ['   ', '', true, false, N, S, ''],
   ['red', D, false, false, N, S, ''], ['red;x', D, true, true, N, S, ''], ['#12345', D, false, false, N, S, ''], ['#GG0000', '', true, false, N, S, ''],
   // "title": unselected normal icon color; selected selected icon color, else normal, else NO tint; darkTint never applies
-  ['title', D, false, false, N, S, N], ['title', D, false, true, N, S, N], ['title', D, false, false, N, '', N], ['title', D, false, false, '', S, ''],
-  ['title', D, false, false, '', '', ''],
-  ['title', D, true, false, N, S, S], ['title', D, true, true, N, S, S], ['title', D, true, false, N, '', N], ['title', D, true, false, N, null, N],
-  ['title', D, true, false, '', S, S], ['title', D, true, false, '', '', ''], ['title', D, true, true, '', '', ''],
+  ['title', D, false, false, N, S, N], ['title', D, false, true, N, S, N], ['title', D, false, false, N, '', N], ['title', D, false, false, '', S, LBL],
+  ['title', D, false, false, '', '', LBL], ['title', D, false, true, '', '', LBL_D],
+  ['title', D, true, false, N, S, S], ['title', D, true, true, N, S, S], ['title', D, true, false, N, '', BLUE], ['title', D, true, false, N, null, BLUE],
+  ['title', D, true, false, '', S, S], ['title', D, true, false, '', '', BLUE], ['title', D, true, true, '', '', BLUE_D],
   [' title ', '', true, false, N, S, S], [' TITLE ', '', true, false, N, S, ''], [' Title ', '', false, false, N, S, ''],
   // a fixed color, unselected: the fixed color; dark: darkTint when valid, else the fixed color; icon colors do not matter
   [F, '', false, false, N, S, F], [F, '', false, false, '', '', F], [F, D, false, false, N, S, F], [F, D, false, true, N, S, D], [F, D, false, true, '', '', D],
@@ -68,7 +73,7 @@ test('the truth table through the item model (dark from userInterfaceStyle / sys
 
 test('the selected icon color of the still image is not the animation\'s: a null one is absent for the animation', () => {
   assert.equal(model({ animationUrl: 'a.riv', animationTint: F, selected: true, iconTint: N }).animationTint, F)
-  assert.equal(model({ animationUrl: 'a.riv', animationTint: 'title', selected: true, iconTint: N }).animationTint, N)
+  assert.equal(model({ animationUrl: 'a.riv', animationTint: 'title', selected: true, iconTint: N }).animationTint, BLUE, 'selected without an explicit selected color: the built-in selected color, not the normal one')
 })
 
 test('#RRGGBBAA reaches a canvas as rgba(); unusable text is no color', () => {
@@ -109,7 +114,7 @@ test('the component declares both properties and observes them', () => {
   const path = require('node:path')
   const source = fs.readFileSync(path.join(__dirname, '../src/cyl-animated-item/index.js'), 'utf8')
   assert.match(source, /animationDarkTint: \{ type: String, value: '' \}/)
-  assert.match(source, /selectedIconTint, animationTint, animationDarkTint, animationIconTint, animationSelectedIconTint, titleColor/)
+  assert.match(source, /selectedIconTint, animationTint, animationDarkTint, animationIconTint, animationSelectedIconTint, animationRenderingMode, builtInSelectedColor, animationColorKind, titleColor/)
   const wxml = fs.readFileSync(path.join(__dirname, '../src/cyl-animated-item/index.wxml'), 'utf8')
   assert.match(wxml, /tint="\{\{m\.animationTint\}\}"/)
   assert.match(wxml, /drop-shadow\(\{\{m\.animationTint\}\} 200px 0\)/)

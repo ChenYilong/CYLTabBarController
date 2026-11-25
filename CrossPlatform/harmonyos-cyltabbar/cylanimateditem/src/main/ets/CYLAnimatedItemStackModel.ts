@@ -6,7 +6,9 @@
  *      不导入 ArkUI 的纯 TypeScript，因此规则可用 Node 做单元测试（cylanimateditem/test）；由组件负责绘制。
  */
 
-import { cylAnimatedItemEffective } from './CYLAnimatedItemColors';
+import {
+  cylAnimatedItemEffective, cylAnimatedItemRenderingMode, CYLAnimatedItemStateColorInput, cylAnimatedItemExplicitStateColor
+} from './CYLAnimatedItemColors';
 
 /**
  * [EN] Runs when an action is performed: a tap on an item, a tap on the background, or `performAction`.
@@ -66,8 +68,16 @@ export class CYLAnimatedItemStackItem {
   spacingBefore: number = -1;
   /** [EN] The icon color of the item (a template / symbol image takes it); '' uses the stack's `iconColor`. [CN] 条目的图标颜色（模板 / 符号图片按此着色）；'' 时使用堆叠的 `iconColor`。 */
   iconColor: string = '';
-  /** [EN] The icon color while the item view is selected; '' uses the stack's `selectedIconColor`, then `iconColor`. [CN] 条目视图选中时的图标颜色；'' 时依次使用堆叠的 `selectedIconColor` 与 `iconColor`。 */
+  /** [EN] The icon color while the item view is selected; '' uses the stack's `selectedIconColor`, then the built-in selected color (never `iconColor`: each property on its own). [CN] 条目视图选中时的图标颜色；'' 时依次使用堆叠的 `selectedIconColor`、内置选中色（不使用 `iconColor`：各属性互相独立）。 */
   selectedIconColor: string = '';
+  /** [EN] The icon color while disabled; '' uses the stack's, then the built-in disabled color. [CN] 不可用时的图标颜色；'' 时使用堆叠的，再使用内置禁用色。 */
+  disabledIconColor: string = '';
+  /** [EN] The title color; '' uses the stack's `titleColor`, then the built-in label color. [CN] 标题颜色；'' 时使用堆叠的 `titleColor`，再使用内置标签色。 */
+  titleColor: string = '';
+  /** [EN] The title color while selected; '' uses the stack's, then the built-in selected color. [CN] 选中时的标题颜色；'' 时使用堆叠的，再使用内置选中色。 */
+  selectedTitleColor: string = '';
+  /** [EN] 'automatic' (default, inherits the URL option, then the stack's) | 'alwaysTemplate' | 'alwaysOriginal'. [CN] 动画渲染模式，'automatic'（默认）继承 URL 选项，再继承堆叠的。 */
+  animationRenderingMode: string = 'automatic';
   /**
    * [EN] Whether the item is enabled (true by default). A disabled item is drawn dimmed and, by default, is not interactive
    *      (`CYLAnimatedItemStackModel.isItemInteractive`): its action does not run and a tap on it reaches the background.
@@ -131,6 +141,10 @@ export class CYLAnimatedItemStackModel {
   private stackSpacing: number = CYLAnimatedItemStackDefaultSpacing;
   private stackIconColor: string = '';
   private stackSelectedIconColor: string = '';
+  private stackDisabledIconColor: string = '';
+  private stackTitleColor: string = '';
+  private stackSelectedTitleColor: string = '';
+  private stackRenderingMode: string = 'automatic';
   private stackAnimationTint: string = '';
   private stackAnimationDarkTint: string = '';
   private stackDividerColor: string = '';
@@ -474,7 +488,47 @@ export class CYLAnimatedItemStackModel {
     this.update();
   }
 
-  /** [EN] The default icon color of selected item views; '' uses `iconColor`. [CN] 选中的条目视图的默认图标颜色；'' 时使用 `iconColor`。 */
+  /** [EN] The default icon color of disabled items; '' = the built-in disabled color. [CN] 不可用条目的默认图标颜色；'' 为内置禁用色。 */
+  get disabledIconColor(): string {
+    return this.stackDisabledIconColor;
+  }
+
+  set disabledIconColor(color: string) {
+    this.stackDisabledIconColor = color;
+    this.update();
+  }
+
+  /** [EN] The default title color (the stack's explicit level); '' = the built-in label color. [CN] 默认标题颜色（堆叠的显式层）；'' 为内置标签色。 */
+  get titleColor(): string {
+    return this.stackTitleColor;
+  }
+
+  set titleColor(color: string) {
+    this.stackTitleColor = color;
+    this.update();
+  }
+
+  /** [EN] The default selected title color; '' = the built-in selected color. [CN] 默认选中标题颜色；'' 为内置选中色。 */
+  get selectedTitleColor(): string {
+    return this.stackSelectedTitleColor;
+  }
+
+  set selectedTitleColor(color: string) {
+    this.stackSelectedTitleColor = color;
+    this.update();
+  }
+
+  /** [EN] The default `animationRenderingMode` of the items that leave it automatic. [CN] 条目保持 automatic 时的默认 `animationRenderingMode`。 */
+  get animationRenderingMode(): string {
+    return this.stackRenderingMode;
+  }
+
+  set animationRenderingMode(value: string) {
+    this.stackRenderingMode = cylAnimatedItemRenderingMode(value);
+    this.update();
+  }
+
+  /** [EN] The default icon color of selected item views; '' = the built-in selected color (never `iconColor`). [CN] 选中的条目视图的默认图标颜色；'' 为内置选中色（不使用 `iconColor`）。 */
   get selectedIconColor(): string {
     return this.stackSelectedIconColor;
   }
@@ -525,9 +579,9 @@ export class CYLAnimatedItemStackModel {
   }
 
   /**
-   * [EN] The color of the dividers the stack draws (`showsDividers`, `setDivider`, `appendDivider`); '' (default) derives it: the stack's normal
-   *      icon color (`iconColor`) at alpha 0.3, else the separator color of the color mode (`cylAnimatedItemDividerColor`).
-   * [CN] 堆叠绘制的分隔线（`showsDividers`、`setDividerAfter`）的颜色；''（默认）时推导：堆叠的普通图标颜色（`iconColor`）加透明度 0.3，否则为当前颜色模式的分隔色。
+   * [EN] The color of the dividers the stack draws (`showsDividers`, `setDivider`, `appendDivider`); '' (default) derives it: the stack's explicit
+   *      normal icon color (`iconColor`) at alpha 0.6, else the built-in divider color (secondary label, >= 3:1 on light and dark bars).
+   * [CN] 堆叠绘制的分隔线（`showsDividers`、`setDividerAfter`）的颜色；''（默认）时推导：堆叠的显式普通图标颜色（`iconColor`）加透明度 0.6，否则为内置分隔色（次级标签色，浅色与深色栏上对比度 >= 3:1）。
    */
   get dividerColor(): string {
     return this.stackDividerColor;
@@ -722,15 +776,24 @@ export class CYLAnimatedItemStackModel {
     return result;
   }
 
-  /** [EN] The icon color an item view draws with ('' leaves the image as it is). [CN] 条目视图绘制时使用的图标颜色（'' 表示保持图片原样）。 */
-  iconColorOf(item: CYLAnimatedItemStackItem, selected: boolean = false): string {
-    if (selected) {
-      const color = item.selectedIconColor || this.stackSelectedIconColor;
-      if (color) {
-        return color;
-      }
-    }
-    return item.iconColor || this.stackIconColor;
+  /**
+   * [EN] The EXPLICIT icon color an item view draws a static image with for a state (the item's, else the stack's; '' = none set, the image keeps
+   *      its colors). Each state's property on its own: a selected item with only `iconColor` has none (the view draws the built-in selected color
+   *      for symbols and the animation tint).
+   * [CN] 条目视图在某状态下绘制静态图片的显式图标颜色（条目的，否则堆叠的；'' = 均未设置，图片保持原色）。各状态的属性互相独立：只有 `iconColor` 的选中条目没有
+   *      显式颜色（符号图标与动画着色使用内置选中色）。
+   */
+  iconColorOf(item: CYLAnimatedItemStackItem, selected: boolean = false, enabled: boolean = true): string {
+    const input = new CYLAnimatedItemStateColorInput();
+    input.item.normal = item.iconColor;
+    input.item.selected = item.selectedIconColor;
+    input.item.disabled = item.disabledIconColor;
+    input.stack.normal = this.stackIconColor;
+    input.stack.selected = this.stackSelectedIconColor;
+    input.stack.disabled = this.stackDisabledIconColor;
+    input.selected = selected;
+    input.enabled = enabled;
+    return cylAnimatedItemExplicitStateColor(input);
   }
 
   /** [EN] The widest an item may be in a view `width` wide, so long titles wrap. [CN] 宽为 `width` 的视图中条目的最大宽度，使长标题换行。 */

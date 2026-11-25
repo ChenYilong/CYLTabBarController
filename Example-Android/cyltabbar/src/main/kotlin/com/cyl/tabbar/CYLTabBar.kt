@@ -144,10 +144,25 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
      * [CN] TabBar 创建 Tab 的动画视图（`cyl_addTabBarItemAnimationWithURL`）并交给组件：`animationView` 即
      *      `cyl_tabBarItemAnimationView`（docs/Animated-Item.md，任务 4）。移除动画时传 null。
      */
-    internal fun cyl_setTabBarItemAnimationView(view: View?) {
+    internal fun cyl_setTabBarItemAnimationView(view: View?, url: String? = null) {
         animationView = view
+        // [EN] Tab bars keep today's look: a tab URL with no usable `tint` and no `renderingMode` is never tinted (alwaysOriginal), so a one-color
+        //      tab icon without a tint option does not take the title color on its own. [CN] TabBar 保持现有外观：没有可用 `tint` 也没有 `renderingMode` 的
+        //      Tab URL 从不着色（alwaysOriginal），所以没有 tint 选项的单色 Tab 图标不会自行取标题颜色。
+        if (url != null) {
+            val options = com.cyl.animateditem.CYLTabBarAnimationFileAndOptions(url).second
+            val unset = !com.cyl.animateditem.CYLTabBarItemAnimationTint.isValidTint(com.cyl.animateditem.CYLTabBarItemAnimationTint.tintOption(options)) &&
+                com.cyl.animateditem.CYLTabBarItemAnimationTint.renderingModeOption(options) == null
+            animationRenderingMode = if (unset) com.cyl.animateditem.CYLAnimationRenderingMode.AlwaysOriginal else null
+        }
         refreshAnimationTint()
     }
+
+    /**
+     * [EN] The tab's own title colors are its icon colors (`cyl_passTitleColorsToAnimation`), so no built-in colors fill in. [CN] Tab 自己的标题颜色就是它的图标颜色
+     *      （`cyl_passTitleColorsToAnimation`），因此不使用内置颜色。
+     */
+    override val usesBuiltInColors: Boolean get() = false
 
     /**
      * [EN] The animation's load and failure go to the tab bar's handlers (the static image, else the placeholder), which

@@ -108,6 +108,56 @@ object CYLTabBarItemAnimationTint {
     }
 
     /**
+     * [EN] Whether `text` is a usable `tint`: "title" or "#RRGGBB" / "#RRGGBBAA"; anything else (null, empty, invalid) counts as unset.
+     * [CN] `text` 是否是可用的 `tint`："title" 或 "#RRGGBB" / "#RRGGBBAA"；其他（null、空、无效）都视为未设置。
+     */
+    fun isValidTint(text: String?): Boolean {
+        val value = text?.trim()?.takeIf { it.isNotEmpty() } ?: return false
+        return value == TINT_TITLE || parseHex(value) != null
+    }
+
+    /**
+     * [EN] The `renderingMode` option, trimmed; null when missing, empty or unknown. [CN] 去除空白后的 `renderingMode` 选项；缺失、为空或未知时为 null。
+     */
+    fun renderingModeOption(options: Map<String, String>): CYLAnimationRenderingMode? =
+        CYLAnimationRenderingMode.parse(options[CYLAnimationRenderingMode.OPTION_NAME])
+
+    /**
+     * [EN] The ITEM tint table (tint spec v2, the same on every platform), the only place that resolves the tint of an item's animation.
+     *      `effectiveIconColor` is the icon color of the current state (explicit, else the stack's, else the built-in); `explicitSelectedIconColor`
+     *      is the selected one WITHOUT built-ins (item / stack / host only). `tint` / `darkTint` are the merged texts.
+     *      - Valid `tint` "title": `effectiveIconColor`.
+     *      - Valid fixed `tint` ("#RRGGBB" / "#RRGGBBAA"): unselected: the color, in night mode `darkTint` when valid; selected: ONLY an explicit selected
+     *        icon color replaces it (never the built-in selected color, or every fixed tint would turn blue when selected), else the fixed color.
+     *      - `tint` unset or invalid: `mode` decides: `AlwaysOriginal` null; `AlwaysTemplate` `effectiveIconColor`; `Automatic` `effectiveIconColor`
+     *        only when `kind` is `OneColor`, else null (the file's own colors).
+     * [CN] 条目着色表（着色规范 v2，各平台相同），是唯一解析条目动画着色的地方。`effectiveIconColor` 是当前状态的图标颜色（显式、其次堆叠、再次内置）；
+     *      `explicitSelectedIconColor` 是不含内置值的选中图标颜色（仅条目 / 堆叠 / 宿主）。`tint` / `darkTint` 是已合并的文本。
+     *      - 有效 `tint` 为 "title"：`effectiveIconColor`。
+     *      - 有效固定 `tint`（"#RRGGBB" / "#RRGGBBAA"）：未选中：该颜色，夜间模式且 `darkTint` 有效时为 `darkTint`；选中：只有显式的选中图标颜色可以替换它
+     *        （绝不是内置选中色，否则每个固定着色选中时都会变蓝），否则为固定颜色。
+     *      - `tint` 未设置或无效：由 `mode` 决定：`AlwaysOriginal` 为 null；`AlwaysTemplate` 为 `effectiveIconColor`；`Automatic` 仅当 `kind` 为 `OneColor` 时
+     *        为 `effectiveIconColor`，否则为 null（文件自身颜色）。
+     */
+    fun resolveItem(
+        tint: String?, darkTint: String?, mode: CYLAnimationRenderingMode, kind: CYLAnimationColorCount.Kind,
+        selected: Boolean, isDark: Boolean, effectiveIconColor: Int?, explicitSelectedIconColor: Int?,
+    ): Int? {
+        val text = tint?.trim()?.takeIf { it.isNotEmpty() }
+        if (text == TINT_TITLE) return effectiveIconColor
+        val fixed = text?.let { parseHex(it) }
+        if (fixed != null) {
+            val forMode = (if (isDark) darkTint?.let { parseHex(it) } else null) ?: fixed
+            return if (selected) explicitSelectedIconColor ?: forMode else forMode
+        }
+        return when (mode) {
+            CYLAnimationRenderingMode.AlwaysOriginal -> null
+            CYLAnimationRenderingMode.AlwaysTemplate -> effectiveIconColor
+            CYLAnimationRenderingMode.Automatic -> if (kind == CYLAnimationColorCount.Kind.OneColor) effectiveIconColor else null
+        }
+    }
+
+    /**
      * [EN] "#RRGGBB" or "#RRGGBBAA" (the iOS / Rive order) as an ARGB int; null for any other text. `Color.parseColor` reads
      *      8 digits as #AARRGGBB, so it is not used. [CN] "#RRGGBB" 或 "#RRGGBBAA"（iOS / Rive 的顺序）转为 ARGB 整数；其他文本为 null。
      *      `Color.parseColor` 把 8 位当作 #AARRGGBB，因此不使用它。

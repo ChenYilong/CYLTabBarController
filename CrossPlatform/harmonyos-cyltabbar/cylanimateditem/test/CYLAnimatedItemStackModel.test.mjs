@@ -250,7 +250,7 @@ test('spacing applies to the items without their own spacingBefore', () => {
   assert.equal(stack.spacing, 0, 'never negative');
 });
 
-test('icon colors: the stack default, an item\'s own color wins, selected falls back to normal', () => {
+test('icon colors: the stack default, an item\'s own color wins, each property on its own (no selected fallback to normal)', () => {
   const stack = new CYLAnimatedItemStackModel();
   const edit = stack.appendItem('', 'edit.svg');
   const remove = stack.appendItem('', 'remove.svg');
@@ -259,7 +259,11 @@ test('icon colors: the stack default, an item\'s own color wins, selected falls 
   assert.equal(stack.iconColorOf(edit), '#8E8E93');
   remove.iconColor = '#FF3B30';
   assert.equal(stack.iconColorOf(remove), '#FF3B30');
-  assert.equal(stack.iconColorOf(edit, true), '#8E8E93', 'selected without a selected color uses the normal one');
+  assert.equal(stack.iconColorOf(edit, true), '', 'selected without an explicit selected color: none (the view draws the built-in selected color)');
+  assert.equal(stack.iconColorOf(edit, false, false), '', 'disabled: the built-in disabled color unless set');
+  stack.disabledIconColor = '#C7C7CC';
+  assert.equal(stack.iconColorOf(edit, false, false), '#C7C7CC');
+  stack.disabledIconColor = '';
   stack.selectedIconColor = '#007AFF';
   assert.equal(stack.iconColorOf(edit, true), '#007AFF');
   remove.selectedIconColor = '#34C759';

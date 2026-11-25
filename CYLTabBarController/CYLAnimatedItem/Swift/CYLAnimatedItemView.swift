@@ -76,16 +76,31 @@ public let CYLAnimatedItemCornerRadiusCapsule: CGFloat = 1000
 public let CYLAnimatedItemLiquidGlassContentInset: CGFloat = 14
 
 /**
- [EN] The alpha of a divider's line when it takes the stack's normal-state icon color (0.3). Same value on every platform.
- [CN] 分隔条的线使用堆叠视图普通状态图标颜色时的透明度（0.3）。各平台相同。
+ [EN] The alpha of a divider's line when it takes an EXPLICIT icon color (item or stack) (0.6; was 0.3). Same value on every platform. Without an
+      explicit icon color the divider is `UIColor.secondaryLabel` (about 3:1 on a white and on a dark bar).
+ [CN] 分隔条的线使用显式图标颜色（条目或堆叠视图）时的透明度（0.6；原为 0.3）。各平台相同。没有显式图标颜色时分隔条为 `UIColor.secondaryLabel`
+      （在白色与深色 Bar 上约 3:1）。
  */
-public let CYLAnimatedItemDividerAlpha: CGFloat = 0.3
+public let CYLAnimatedItemDividerAlpha: CGFloat = 0.6
 
 /**
  [EN] The default length of a divider's line (20 points), the value of `CYLAnimatedItemStackView.dividerLength`. Same value on every platform.
  [CN] 分隔条线条的默认长度（20 点），即 `CYLAnimatedItemStackView.dividerLength` 的默认值。各平台相同。
  */
 public let CYLAnimatedItemDividerLength: CGFloat = 20
+
+/**
+ [EN] How an animation is drawn when `animationTint` is unset (an explicit tint always wins; also the URL option `renderingMode=`): `automatic` (default)
+      tints with the EFFECTIVE icon color only when the file is detected as ONE color (Lottie JSON, GIF; PAG, SVGA, Rive and anything undetectable keep
+      their own colors), `alwaysTemplate` always tints, `alwaysOriginal` never. Same names on every platform.
+ [CN] `animationTint` 未设置时动画的绘制方式（显式着色总是优先；也是 URL 选项 `renderingMode=`）：`automatic`（默认）只在文件被检测为单色时（Lottie JSON、GIF；
+      PAG、SVGA、Rive 与无法判断的文件保持自己的颜色）用有效图标颜色着色，`alwaysTemplate` 总是着色，`alwaysOriginal` 从不着色。各平台同名。
+ */
+@objc public enum CYLAnimatedItemRenderingMode: Int {
+    case automatic = 0
+    case alwaysTemplate
+    case alwaysOriginal
+}
 
 /**
  [EN] What the view's background is made of: the solid `itemBackgroundColor` (`flat`, default), or Liquid Glass tinted with it
@@ -765,6 +780,22 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         didSet { if oldValue != inheritedAnimationDarkTint { reapplyAnimationTint() } }
     }
 
+    /**
+     [EN] How the animation is drawn while the tint is unset: `automatic` (default), `alwaysTemplate`, `alwaysOriginal` (`CYLAnimatedItemRenderingMode`). An
+          explicit `animationTint` (or the URL's `tint`) always wins. The item's own non-automatic value wins over the stack's, which wins over the URL's
+          `renderingMode` option. Same name on every platform.
+     [CN] 着色未设置时动画的绘制方式：`automatic`（默认）、`alwaysTemplate`、`alwaysOriginal`。显式 `animationTint`（或 URL 的 `tint`）总是优先。条目自己的非 automatic
+          值优先于堆叠视图的，后者优先于 URL 的 `renderingMode` 选项。各平台同名。
+     */
+    public var animationRenderingMode: CYLAnimatedItemRenderingMode = .automatic {
+        didSet { if oldValue != animationRenderingMode { reapplyAnimationTint() } }
+    }
+
+    /// [EN] The stack's `animationRenderingMode`, given by `CYLAnimatedItemStackView` (automatic: nothing inherited). Do not set it by hand. [CN] 堆叠视图的 `animationRenderingMode`，由 `CYLAnimatedItemStackView` 交给条目（automatic：不继承）。不要手动设置。
+    public var inheritedAnimationRenderingMode: CYLAnimatedItemRenderingMode = .automatic {
+        didSet { if oldValue != inheritedAnimationRenderingMode { reapplyAnimationTint() } }
+    }
+
     /// [EN] The tint in use: the item's own (non-empty) over the stack's. [CN] 实际使用的着色：条目自己的（非空）优先于堆叠视图的。
     private var effectiveAnimationTint: String? {
         if let own = animationTint, !own.isEmpty { return own }
@@ -801,11 +832,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         itemAppearance = appearance
     }
 
-    /// [EN] The icon color the item itself set through `applyIconTintColor(_:)` (not by `itemAppearance`). [CN] 条目自己通过 `applyIconTintColor(_:)` 设置的图标颜色（不是来自 `itemAppearance`）。
+    /// [EN] The SUBCLASS built-in level: the color a subclass (a tag button) gave through `applyIconTintColor(_:)`. Explicit item and stack values win over it, it wins over the component's built-ins. [CN] 子类内置层：子类通过 `applyIconTintColor(_:)` 给出的颜色。条目与堆叠视图的显式值优先于它，它优先于组件内置值。
     private var hostIconColor: UIColor?
-    private var appliesIconColorInternally = false
-    /// [EN] An inherited appearance's icon colors give way to the item's own. [CN] 继承的外观中的图标颜色让位于条目自己的。
-    private var inheritedAppearanceYields: Bool { isItemAppearanceInherited && hostIconColor != nil }
 
     private func reapplyAnimationTint() {
         #if CYL_ANIMATION_ENGINE_AVAILABLE
@@ -1027,8 +1055,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     private var pausedByScroll = false
     private var pausedAnimatedImage = false
     private var speedBeforePause: CGFloat = 1
-    /// [EN] The icon tint applied last (`applyIconTintColor(_:)`), given again to a new animation view. [CN] 最近应用的图标着色，再次交给新的动画视图。
-    private var lastIconTintColor: UIColor?
+    /// [EN] The title color this item applied last (explicit or built-in); a title color someone else set (a subclass, the countdown) is left alone. [CN] 本条目最近应用的标题颜色（显式或内置）；他人（子类、倒计时）设置的标题颜色不会被覆盖。
+    private var appliedTitleColor: UIColor?
 
     // MARK: - Life cycle 生命周期
 
@@ -1082,6 +1110,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.textAlignment = .center
         titleLabel.lineBreakMode = .byTruncatingTail
+        appliedTitleColor = titleLabel.textColor
         titleLabel.isAccessibilityElement = false
         addSubview(titleLabel)
 
@@ -1101,6 +1130,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         isAccessibilityElement = true
         accessibilityTraits = .button
         accessibilityIdentifier = "CYLAnimatedItemView"
+        refreshIconColor()
     }
 
     // MARK: - Icon 图标
@@ -1158,10 +1188,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         // [EN] `isIconHidden`: another view is shown in the icon's place. [CN] `isIconHidden`：另一个视图显示在图标的位置。
         imageView.isHidden = cylIsDivider || isIconHidden || animationShows()
         animationView?.isHidden = cylIsDivider || isIconHidden || isShowingImageAfterAnimationEnd
-        // [EN] A new animation view or icon takes the current icon tint. [CN] 新的动画视图或图标使用当前的图标着色。
-        if let color = currentIconColor ?? lastIconTintColor {
-            applyIconTintColorInternally(color)
-        }
+        // [EN] A new animation view or icon takes the current icon color. [CN] 新的动画视图或图标使用当前的图标颜色。
+        refreshIconColor()
     }
 
     private func contentDidChange() {
@@ -1328,8 +1356,6 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         didSet {
             guard isSelected != oldValue else { return }
             applyItemAppearance()
-            // [EN] Without `itemAppearance` the animation tint still depends on the state. [CN] 没有 `itemAppearance` 时，动画着色仍取决于状态。
-            if itemAppearance == nil || inheritedAppearanceYields { pushAnimationTint(iconColor: lastIconTintColor) }
             updateIcon()
             itemStateDidChange()
             updateItemAccessibility()
@@ -1365,62 +1391,95 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     // MARK: - Appearance 外观
 
     /**
-     [EN] Tints the icon: `imageView.tintColor`, and the animation view when it takes a tint (`-cyl_applyAnimationViewTintColor:`,
-          called by selector). Called with the current state's `iconColor`; a subclass with its own default colors calls it too.
-     [CN] 为图标着色：`imageView.tintColor`，以及接受着色的动画视图（通过 selector 调用 `-cyl_applyAnimationViewTintColor:`）。以当前状态的
-          `iconColor` 调用；有自己默认颜色的子类也可以调用。
+     [EN] The SUBCLASS built-in icon color (e.g. a tag button's tag colors): stored, then the icon is tinted with the EFFECTIVE color, which is the item's
+          or the stack's explicit `itemAppearance` icon color of the current state when there is one (they win), else this color, else the component's
+          built-in (normal `UIColor.label`, selected the view's `tintColor`, disabled the system disabled gray). nil forgets the subclass color.
+          Tints `imageView` and the animation view (`-cyl_applyAnimationViewTintColor:`, called by selector).
+     [CN] 子类的内置图标颜色（例如标签按钮的标签颜色）：先保存，然后以有效颜色为图标着色：当前状态下条目或堆叠视图 `itemAppearance` 的显式图标颜色优先，
+          否则为本颜色，再否则为组件内置值（普通 `UIColor.label`，选中为视图的 `tintColor`，不可用为系统禁用灰色）。nil 表示忘记子类颜色。
+          为 `imageView` 与动画视图（通过 selector 调用 `-cyl_applyAnimationViewTintColor:`）着色。
      */
     @objc(applyIconTintColor:)
     open func applyIconTintColor(_ color: UIColor?) {
-        if !appliesIconColorInternally { hostIconColor = color }
-        lastIconTintColor = color
-        imageView.tintColor = color
-        pushAnimationTint(iconColor: color)
+        hostIconColor = color
+        refreshIconColor()
+    }
+
+    private enum IconState { case normal, selected, disabled }
+
+    private var currentIconState: IconState { !isEnabled ? .disabled : (isSelected ? .selected : .normal) }
+
+    /// [EN] EXPLICIT icon color of a state: `itemAppearance` (the item's own, or the stack's given one); no built-ins, no subclass color. [CN] 某状态的显式图标颜色：`itemAppearance`（条目自己的或堆叠视图给的）；不含内置值与子类颜色。
+    private func explicitIconColor(_ state: IconState) -> UIColor? {
+        guard let appearance = itemAppearance else { return nil }
+        switch state {
+        case .normal: return appearance.normal.iconColor
+        case .selected: return appearance.selected.iconColor
+        case .disabled: return appearance.disabled.iconColor
+        }
+    }
+
+    /// [EN] The component's built-in colors, evaluated now with this item's own tint chain and traits (never stored): normal `UIColor.label`, selected
+    ///      `tintColor` (honours `tintAdjustmentMode`), disabled the UIButton disabled look (134,134,134 at 0.45 light, 140,140,140 at 0.35 dark).
+    /// [CN] 组件内置颜色，用本条目自己的 tint 链与 trait 即时求值（从不保存）：普通 `UIColor.label`，选中 `tintColor`（遵循 `tintAdjustmentMode`），
+    ///      不可用为 UIButton 的禁用外观（浅色 134,134,134 透明度 0.45，深色 140,140,140 透明度 0.35）。
+    private func builtInIconColor(_ state: IconState) -> UIColor {
+        switch state {
+        case .normal: return UIColor.label
+        case .selected: return tintColor ?? UIColor.systemBlue
+        case .disabled: return CYLAnimatedItemView.systemDisabledColor
+        }
+    }
+
+    /// [EN] The system disabled look, as a dynamic color (UIButton's disabled title, measured on iOS 27.2). [CN] 系统禁用外观的动态颜色（UIButton 的禁用标题，iOS 27.2 实测）。
+    public static let systemDisabledColor = UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 140 / 255, green: 140 / 255, blue: 140 / 255, alpha: 0.35)
+            : UIColor(red: 134 / 255, green: 134 / 255, blue: 134 / 255, alpha: 0.45)
+    }
+
+    /// [EN] The EFFECTIVE icon color of the current state: explicit, else subclass, else built-in (resolved with this item's traits). [CN] 当前状态的有效图标颜色：显式值，否则子类，否则内置（用本条目的 trait 解析）。
+    private func effectiveIconColor() -> UIColor {
+        let state = currentIconState
+        let color = explicitIconColor(state) ?? hostIconColor ?? builtInIconColor(state)
+        return color.resolvedColor(with: traitCollection)
+    }
+
+    /// [EN] The icon and the animation take the effective icon color; called on every change of state, appearance, tint and traits. [CN] 图标与动画使用有效图标颜色；状态、外观、tint 与 trait 每次变化时调用。
+    private func refreshIconColor() {
+        guard !cylIsDivider else { return }
+        imageView.tintColor = effectiveIconColor()
+        // [EN] The inherited tint is already adjusted by this item's `tintAdjustmentMode`; the image view must not dim it a second time.
+        // [CN] 继承的 tint 已按本条目的 `tintAdjustmentMode` 调整；图片视图不能再调暗一次。
+        let usesInheritedTint = currentIconState == .selected && explicitIconColor(.selected) == nil && hostIconColor == nil
+        imageView.tintAdjustmentMode = usesInheritedTint ? .normal : .automatic
+        pushAnimationTint()
         updateDividerLine()
     }
 
-    /// [EN] The item applies a color itself (not a host call). [CN] 条目自己应用颜色（不是宿主的调用）。
-    private func applyIconTintColorInternally(_ color: UIColor?) {
-        appliesIconColorInternally = true
-        defer { appliesIconColorInternally = false }
-        applyIconTintColor(color)
-    }
-
     /**
-     [EN] The icon color of the current state: the state's `iconColor`; a selected item without one takes the normal state's (the table of
-          `CYLTabBarItemAnimationResolveTint`). nil without `itemAppearance` or without any icon color.
-     [CN] 当前状态的图标颜色：该状态的 `iconColor`；选中而没有该值的 item 使用普通状态的（`CYLTabBarItemAnimationResolveTint` 的真值表）。没有
-          `itemAppearance` 或没有任何图标颜色时为 nil。
+     [EN] Gives the animation view the color the tint table resolves (`CYLTabBarItemAnimationItemTintColor`): the tint properties first, then the
+          rendering mode; nil removes the tint. Resolved against THIS item's traits and pushed as a plain color. By selector: the tint method is
+          declared by the tab bar's animation subspec.
+     [CN] 把着色真值表解析出的颜色（`CYLTabBarItemAnimationItemTintColor`）交给动画视图：先看着色属性，再看渲染模式；nil 表示移除着色。用本条目的 trait
+          解析并以普通颜色交出。通过 selector 调用：着色方法声明在 TabBar 的动画子库中。
      */
-    private var currentIconColor: UIColor? {
-        guard let appearance = itemAppearance, let state = currentItemStateAppearance, !inheritedAppearanceYields else { return nil }
-        if let color = state.iconColor { return color }
-        return (isSelected && isEnabled) ? appearance.normal.iconColor : nil
-    }
-
-    /**
-     [EN] Gives the animation view the color the tint table resolves for `iconColor` (the icon color of the current state): nil removes the
-          tint (no `animationTint`, "title" without an icon color). By selector: the tint method is declared by the tab bar's animation subspec.
-     [CN] 把着色真值表为 `iconColor`（当前状态的图标颜色）解析出的颜色交给动画视图：nil 表示移除着色（没有 `animationTint`，或 "title" 而没有图标颜色）。
-          通过 selector 调用：着色方法声明在 TabBar 的动画子库中。
-     */
-    private func pushAnimationTint(iconColor color: UIColor?) {
+    private func pushAnimationTint() {
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         guard let view = animationView else { return }
-        // [EN] The table's two inputs are the normal and the selected state's OWN icon colors (a host that only pushed one color through
-        //      `applyIconTintColor` has just the current state's); the resolver does the fallbacks ("title": selected, else normal; a fixed
-        //      color: the selected one only). [CN] 真值表的两个输入是普通状态与选中状态各自的图标颜色（只通过 `applyIconTintColor` 传入一个颜色的宿主
-        //      只有当前状态的）；回退由解析函数完成（"title"：选中的，否则普通的；固定颜色：只用选中的）。
-        let appearance = inheritedAppearanceYields ? nil : itemAppearance
-        let normalColor = appearance != nil ? appearance?.normal.iconColor : (isSelected ? nil : color)
-        let selectedColor = appearance != nil ? appearance?.selected.iconColor : (isSelected ? color : nil)
+        let traits = traitCollection
+        let effective = effectiveIconColor()
+        let explicitSelected = explicitIconColor(.selected)?.resolvedColor(with: traits)
+        var mode = CYLTabBarItemAnimationRenderingMode(rawValue: animationRenderingMode.rawValue) ?? .automatic
+        if mode == .automatic { mode = CYLTabBarItemAnimationRenderingMode(rawValue: inheritedAnimationRenderingMode.rawValue) ?? .automatic }
+        if mode == .automatic { mode = CYLTabBarItemAnimationTabFlowRenderingMode(view) }
         // [EN] Resolved against THIS item's traits and handed over as a plain color: inside `traitCollectionDidChange` the animation view
         //      (a subview) still reports the OLD appearance, so a dynamic color resolved by the engine there came out white on white after
         //      a live switch. [CN] 用本条目的 trait 解析并以普通颜色交出：在 `traitCollectionDidChange` 内，动画视图（子视图）仍报告旧的外观，
         //      引擎在那里解析动态颜色会在运行中切换后得到白底白图标。
         let resolved = CYLTabBarItemAnimationItemTintColor(
-            animationURL, effectiveAnimationTint, effectiveAnimationDarkTint, isSelected, traitCollection.userInterfaceStyle == .dark,
-            normalColor, selectedColor)?.resolvedColor(with: traitCollection)
+            animationURL, effectiveAnimationTint, effectiveAnimationDarkTint, mode, isSelected, traits.userInterfaceStyle == .dark,
+            effective, explicitSelected)?.resolvedColor(with: traits)
         // [EN] A view that resolves its own tint from its URL options (Rive) takes the final color instead, so the properties reach it too.
         // [CN] 自行从 URL 选项解析着色的视图（Rive）改为接收最终颜色，使属性对它也生效。
         let resolvedSelector = NSSelectorFromString("cyl_applyAnimationViewResolvedTintColor:")
@@ -1440,45 +1499,59 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         #endif
     }
 
+    /// [EN] The title color: the explicit `titleTextAttributes` color of the state, else the built-in (normal `UIColor.label`, selected `tintColor`,
+    ///      disabled the system disabled gray) unless someone else set `titleLabel.textColor` (a subclass, the countdown), which then stays.
+    /// [CN] 标题颜色：该状态 `titleTextAttributes` 中的显式颜色，否则为内置值（普通 `UIColor.label`，选中 `tintColor`，不可用为系统禁用灰色），
+    ///      除非他人（子类、倒计时）设置了 `titleLabel.textColor`，此时保持其值。
+    private func refreshTitleColor() {
+        guard !cylIsDivider else { return }
+        if let explicit = currentItemStateAppearance?.titleTextAttributes[.foregroundColor] as? UIColor {
+            titleLabel.textColor = explicit
+            appliedTitleColor = explicit
+            return
+        }
+        if itemStyle == .countdown && countdownState == .running { return }
+        let current: UIColor? = titleLabel.textColor
+        if current == nil || (appliedTitleColor != nil && current!.isEqual(appliedTitleColor)) { setBuiltInTitleColor() }
+    }
+
+    private func setBuiltInTitleColor() {
+        let color = builtInIconColor(currentIconState)
+        let applied = currentIconState == .normal ? color : color.resolvedColor(with: traitCollection)
+        titleLabel.textColor = applied
+        appliedTitleColor = applied
+    }
+
     /**
-     [EN] Applies `itemAppearance` for the current state; called on state, appearance and trait changes and when the
-          animation view loads.
-     [CN] 按当前状态应用 `itemAppearance`；在状态、外观与 trait 变化以及动画视图加载时调用。
+     [EN] Applies `itemAppearance` for the current state and the built-in colors where nothing is explicit; called on state, appearance, tint and
+          trait changes and when the animation view loads.
+     [CN] 按当前状态应用 `itemAppearance`，没有显式值的地方使用内置颜色；在状态、外观、tint 与 trait 变化以及动画视图加载时调用。
      */
     open func applyItemAppearance() {
-        guard let state = currentItemStateAppearance else { return }
-        if inheritedAppearanceYields {
-            // [EN] The item's own icon color stays; only the title part of the inherited appearance applies. [CN] 条目自己的图标颜色保持；只应用继承外观中的标题部分。
-            pushAnimationTint(iconColor: lastIconTintColor)
-        } else if let color = currentIconColor {
-            applyIconTintColorInternally(color)
-        } else {
-            // [EN] No icon color at all: the animation loses any tint ("title" has nothing to draw); the icon keeps its own look.
-            // [CN] 完全没有图标颜色：动画移除所有着色（"title" 没有可用的颜色）；图标保持自身外观。
-            lastIconTintColor = nil
-            pushAnimationTint(iconColor: nil)
-        }
-        let attributes = state.titleTextAttributes
-        if let font = attributes[.font] as? UIFont { titleLabel.font = font }
-        if let color = attributes[.foregroundColor] as? UIColor { titleLabel.textColor = color }
+        refreshIconColor()
+        refreshTitleColor()
+        if let font = currentItemStateAppearance?.titleTextAttributes[.font] as? UIFont { titleLabel.font = font }
         setNeedsLayout()
     }
 
     open override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
-        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) { updateDividerLine() }
-        // [EN] A dynamic icon color is resolved again for the animation view's tint. [CN] 动态图标颜色为动画视图的着色重新解析。
+        // [EN] Dynamic colors (icon, title, tint, divider) are resolved again against THIS item's new traits. [CN] 动态颜色（图标、标题、tint、分隔条）用本条目新的 trait 重新解析。
         if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
             applyItemAppearance()
-            // [EN] A fixed tint's dark color, and a dynamic icon color, follow the new appearance. [CN] 固定着色的深色颜色与动态图标颜色跟随新的外观。
-            pushAnimationTint(iconColor: lastIconTintColor)
         }
-        // [EN] A divider's line follows the new appearance, resolved with THIS item's traits. [CN] 分隔条的线跟随新外观，用本条目的 trait 解析。
         updateDividerLine()
+    }
+
+    /// [EN] The selected color is the inherited tint: it changes with the app tint, the superview chain and `tintAdjustmentMode`. [CN] 选中颜色是继承的 tint：随应用 tint、父视图链与 `tintAdjustmentMode` 变化。
+    open override func tintColorDidChange() {
+        super.tintColorDidChange()
+        applyItemAppearance()
     }
 
     open override func didMoveToWindow() {
         super.didMoveToWindow()
+        if window != nil { applyItemAppearance() }
         updateDividerLine()
     }
 
@@ -1487,10 +1560,10 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     // [EN] INTERNAL, not API: `CYLAnimatedItemStackView` makes one item per divider and puts it in this mode. The item shows no icon, title, animation or
     //      badge and draws one line (1 pixel, `cylDividerLength` long) centered in its bounds, across the stack's axis; no taps, hidden from VoiceOver;
     //      size 1 point by the length (swapped when horizontal), without insets. The line's color: `cylDividerColor`, else the normal-state icon color
-    //      (`itemAppearance`, handed down by the stack) at alpha `CYLAnimatedItemDividerAlpha`, else `UIColor.separator`, resolved with THIS item's traits.
+    //      (`itemAppearance`, handed down by the stack) at alpha `CYLAnimatedItemDividerAlpha` (0.6), else `UIColor.secondaryLabel`, resolved with THIS item's traits.
     // [CN] 内部接口，不是 API：`CYLAnimatedItemStackView` 为每条分隔条创建一个条目并置于此模式。条目不显示图标、标题、动画与角标，只在边界中央画一条线
     //      （1 像素，长 `cylDividerLength`），垂直于堆叠方向；不接收点击，对 VoiceOver 隐藏；尺寸为 1 点乘长度（横线时对调），不含内缩。线的颜色：
-    //      `cylDividerColor`，否则普通状态图标颜色（`itemAppearance`，由堆叠视图传下来）加 `CYLAnimatedItemDividerAlpha` 透明度，否则 `UIColor.separator`，
+    //      `cylDividerColor`，否则普通状态图标颜色（`itemAppearance`，由堆叠视图传下来）加 `CYLAnimatedItemDividerAlpha`（0.6）透明度，否则 `UIColor.secondaryLabel`，
     //      用本条目的 trait 解析。
     var cylIsDivider = false {
         didSet {
@@ -1531,7 +1604,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         } else if let icon = itemAppearance?.normal.iconColor {
             dividerLine.backgroundColor = icon.resolvedColor(with: traits).withAlphaComponent(CYLAnimatedItemDividerAlpha)
         } else {
-            dividerLine.backgroundColor = UIColor.separator.resolvedColor(with: traits)
+            dividerLine.backgroundColor = UIColor.secondaryLabel.resolvedColor(with: traits)
         }
     }
 
@@ -1610,7 +1683,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     private func prepareAnimationTint(_ view: UIView, url: URL) {
         _ = CYLTabBarItemAnimationPrepareItemTint(view, url, animationSource.player(for: view), effectiveAnimationTint, effectiveAnimationDarkTint)
         // [EN] Always pushed, so a cleared tint (nil) reaches the view too. [CN] 总是推送，因此清除着色（nil）也会到达视图。
-        pushAnimationTint(iconColor: lastIconTintColor ?? currentIconColor)
+        pushAnimationTint()
     }
     #endif
 

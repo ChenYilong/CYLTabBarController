@@ -221,7 +221,23 @@ static NSURL *CYLRNAnimationURL(NSString *source)
   _item.animationLoops = newProps.animationLoops;
   _iconSide = newProps.iconSize;
   [self fitIcon];
+  // [EN] Tint spec v2: nothing is forced. An unset `tintColor` is a null SharedColor, so RCTUIColorFromSharedColor gives nil, and nil resets
+  //      the item's host icon color to the built-in default (label-like normal, inherited tint when selected). `animationTint` /
+  //      `animationDarkTint` empty means nil. [CN] 着色规范 v2：不强制任何颜色。未设置的 `tintColor` 为空 SharedColor，得到 nil，
+  //      nil 把条目的宿主图标颜色重置为内置默认。`animationTint` / `animationDarkTint` 为空即 nil。
   [_item applyIconTintColor:RCTUIColorFromSharedColor(newProps.tintColor)];
+  _item.animationTint = newProps.animationTint.empty() ? nil : [NSString stringWithUTF8String:newProps.animationTint.c_str()];
+  _item.animationDarkTint = newProps.animationDarkTint.empty() ? nil : [NSString stringWithUTF8String:newProps.animationDarkTint.c_str()];
+  // [EN] Set by raw value (automatic 0, alwaysTemplate 1, alwaysOriginal 2: the order of the spec), so it does not depend on how the
+  //      core names its cases; the type is `CYLAnimatedItemRenderingMode`. [CN] 按原始值设置（automatic 0、alwaysTemplate 1、
+  //      alwaysOriginal 2，规范顺序），不依赖核心如何命名 case；类型为 `CYLAnimatedItemRenderingMode`。
+  NSInteger renderingModeRaw = 0;
+  switch (newProps.animationRenderingMode) {
+    case CyltabbarAnimationViewAnimationRenderingMode::AlwaysTemplate: renderingModeRaw = 1; break;
+    case CyltabbarAnimationViewAnimationRenderingMode::AlwaysOriginal: renderingModeRaw = 2; break;
+    default: renderingModeRaw = 0; break;
+  }
+  _item.animationRenderingMode = (CYLAnimatedItemRenderingMode)renderingModeRaw;
   // [EN] The item background: a negative radius is not set (nil: a capsule for glass, square for flat). The core clamps a radius to
   //      half the height; 1000 is the capsule constant. [CN] 条目背景：负数半径表示未设置（nil：玻璃为胶囊，扁平为直角）；核心把半径
   //      限制在半高以内，1000 是胶囊常量。

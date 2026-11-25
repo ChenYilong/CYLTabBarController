@@ -252,7 +252,7 @@ function cylTitleFont(fontStyle) {
  */
 function cylAnimationProperties(lottie, isDarkBar) {
   if (!lottie) {
-    return { animationPath: '', animationSize: null, animationColors: null, loopsWhenUnselected: false, animationTint: '', animationDarkTint: '' };
+    return { animationPath: '', animationSize: null, animationColors: null, loopsWhenUnselected: false, animationTint: '', animationDarkTint: '', animationRenderingMode: '' };
   }
   return {
     animationPath: (isDarkBar && lottie.darkPath) || lottie.path,
@@ -263,6 +263,10 @@ function cylAnimationProperties(lottie, isDarkBar) {
     //      选项；由 cyl-animated-item 解析。
     animationTint: lottie.tint || '',
     animationDarkTint: lottie.darkTint || '',
+    // [EN] Tab bars keep today's look (tint spec v2, section 6): without a `tint` option the animation is never recolored (alwaysOriginal);
+    //      an explicit `renderingMode` option wins. [CN] TabBar 保持现有外观（着色规范 v2 第 6 节）：没有 `tint` 选项时动画从不改色（alwaysOriginal）；
+    //      显式的 `renderingMode` 选项优先。
+    animationRenderingMode: lottie.renderingMode || (lottie.tint ? '' : 'alwaysOriginal'),
   };
 }
 

@@ -159,6 +159,7 @@ test('Lottie, PAG, Rive, generic animation and GIF keys', () => {
   }, env);
   assert.deepEqual(lottie, {
     library: 'lottie',
+    renderingMode: '',
     tint: '',
     darkTint: '',
     path: '/shared/lottie/home.json',

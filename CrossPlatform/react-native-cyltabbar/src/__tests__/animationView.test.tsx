@@ -87,3 +87,65 @@ describe('onResourceMissing', () => {
     expect(element.props.onResourceMissing).toBeUndefined();
   });
 });
+
+describe('the v2 tint props', () => {
+  type Sent = {
+    tintColor?: unknown;
+    animationTint?: string;
+    animationDarkTint?: string;
+    animationRenderingMode?: string;
+    selected?: boolean;
+    enabled?: boolean;
+  };
+  const sent = (props: Record<string, unknown>) =>
+    (CYLAnimationView({ file: 'a.json', ...props } as never) as unknown as { props: Sent }).props;
+
+  it('forwards animationTint, animationDarkTint and animationRenderingMode by their native names', () => {
+    const props = sent({ animationTint: 'title', animationDarkTint: '#FFFFFF', animationRenderingMode: 'alwaysTemplate', tintColor: '#FF0000' });
+    expect(props.animationTint).toBe('title');
+    expect(props.animationDarkTint).toBe('#FFFFFF');
+    expect(props.animationRenderingMode).toBe('alwaysTemplate');
+    expect(props.tintColor).toBe('#FF0000');
+  });
+
+  it('sends alwaysOriginal as is', () => {
+    expect(sent({ animationRenderingMode: 'alwaysOriginal' }).animationRenderingMode).toBe('alwaysOriginal');
+  });
+
+  it('forces nothing when the props are undefined: no tint, automatic mode', () => {
+    const props = sent({});
+    expect(props.tintColor).toBeUndefined();
+    expect('tintColor' in props && props.tintColor !== undefined).toBe(false);
+    expect(props.animationTint).toBeUndefined();
+    expect(props.animationDarkTint).toBeUndefined();
+    expect(props.animationRenderingMode).toBe('automatic');
+  });
+
+  it('resets when a prop goes from set to undefined or empty (the native side then gets undefined, i.e. nil)', () => {
+    expect(sent({ animationTint: '#112233', tintColor: 'red' }).animationTint).toBe('#112233');
+    const reset = sent({ animationTint: undefined, animationDarkTint: '', tintColor: undefined, animationRenderingMode: undefined });
+    expect(reset.animationTint).toBeUndefined();
+    expect(reset.animationDarkTint).toBeUndefined();
+    expect(reset.tintColor).toBeUndefined();
+    expect(reset.animationRenderingMode).toBe('automatic');
+  });
+
+  it('keeps passing selected through', () => {
+    expect(sent({ selected: true }).selected).toBe(true);
+    expect(sent({}).selected).toBeUndefined();
+  });
+
+  it('writes the URL option renderingMode= like any other option', () => {
+    expect(animationURLWithOptions('a.json', { renderingMode: 'alwaysOriginal' })).toBe('a.json#renderingMode=alwaysOriginal');
+    expect(animationURLWithOptions('a.riv', { tint: 'title', renderingMode: 'alwaysTemplate' })).toBe('a.riv#renderingMode=alwaysTemplate&tint=title');
+    expect(animationURLWithOptions('a.json', { renderingMode: '' })).toBe('a.json');
+  });
+
+  it('declares the three props in the native spec with automatic as the default and tintColor optional', () => {
+    const spec = readFileSync(join(__dirname, '../CyltabbarAnimationViewNativeComponent.ts'), 'utf8');
+    expect(spec).toContain('tintColor?: ColorValue');
+    expect(spec).toContain('animationTint?: string');
+    expect(spec).toContain('animationDarkTint?: string');
+    expect(spec).toContain("animationRenderingMode?: CodegenTypes.WithDefault<'automatic' | 'alwaysTemplate' | 'alwaysOriginal', 'automatic'>");
+  });
+});

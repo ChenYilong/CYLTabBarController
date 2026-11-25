@@ -19,7 +19,7 @@ export {
 } from './src/main/ets/CYLAnimatedItemStackModel';
 export {
   cylAnimatedItemEffective, cylAnimatedItemDividerColor, CYLAnimatedItemDividerInput, CYLAnimatedItemDividerResult, CYL_ANIMATED_ITEM_DIVIDER_ALPHA,
-  CYL_ANIMATED_ITEM_DIVIDER_LENGTH, CYL_ANIMATED_ITEM_SEPARATOR_LIGHT, CYL_ANIMATED_ITEM_SEPARATOR_DARK
+  CYL_ANIMATED_ITEM_DIVIDER_LENGTH
 } from './src/main/ets/CYLAnimatedItemColors';
 export { cylIsSymbolResource, CYL_SYMBOL_RESOURCE_TYPE } from './src/main/ets/CYLAnimatedItemResources';
 export {
@@ -41,8 +41,15 @@ export { CYL_GIF_DEFAULT_DELAY_MS, CYL_GIF_MIN_DELAY_MS, cylGIFDelays, cylGIFDur
 export { CYLAnimatedItemSVGA, CYLAnimatedItemSVGAPlayer, CYLAnimatedItemSVGAView } from './src/main/ets/CYLAnimatedItemSVGA';
 export {
   CYLAnimatedItemRGBA, cylAnimatedItemParseHexColor, cylAnimatedItemARGBInteger, CYL_ANIMATED_ITEM_TINT_TITLE, cylAnimatedItemTintArkColor,
-  CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint
+  CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint, CYL_RENDERING_MODE_AUTOMATIC, CYL_RENDERING_MODE_TEMPLATE,
+  CYL_RENDERING_MODE_ORIGINAL, cylAnimatedItemRenderingMode, cylAnimatedItemEffectiveRenderingMode, cylAnimatedItemBuiltInColor,
+  CYLAnimatedItemBuiltInColor, CYLAnimatedItemStateColors, CYLAnimatedItemStateColorInput, cylAnimatedItemStateColorSource,
+  cylAnimatedItemExplicitStateColor, cylAnimatedItemResolveStateColor, cylAnimatedItemContrast
 } from './src/main/ets/CYLAnimatedItemColors';
+export {
+  cylAnimatedItemLottieColorCount, cylAnimatedItemLottieColorKind, cylAnimatedItemGifColorKind, CYL_COLOR_COUNT_ONE, CYL_COLOR_COUNT_MULTI,
+  CYL_COLOR_COUNT_UNKNOWN, CYLAnimatedItemColorCountCache
+} from './src/main/ets/CYLAnimatedItemColorCount';
 export {
   CYLSVGALayout, CYLSVGATransform, CYLSVGAColor, CYLSVGAStyle, CYLSVGARect, CYLSVGAEllipse, CYLSVGAShape, CYLSVGAFrame,
   CYLSVGASprite, CYLSVGAMovie, cylLoadSVGAMovie, cylDecodeSVGAMovie

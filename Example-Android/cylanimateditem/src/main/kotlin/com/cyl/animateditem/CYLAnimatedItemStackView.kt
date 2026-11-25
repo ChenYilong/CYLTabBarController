@@ -147,10 +147,20 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
         set(value) { field = value?.takeIf { it.isNotEmpty() }; entries.forEach { it.view.stackAnimationDarkTint = field; it.divider.stackAnimationDarkTint = field } }
 
     /**
-     * [EN] The color of the divider lines (an ARGB color, used as it is); null (default) derives it: the stack's `iconColor` at
-     *      `CYLAnimatedItemDividerAlpha`, else a separator color (12% black, 12% white at night) of the divider's own night mode.
-     * [CN] 分隔线的颜色（ARGB 颜色，按原样使用）；null（默认）时推导：堆叠的 `iconColor` 以 `CYLAnimatedItemDividerAlpha` 的不透明度，
-     *      否则取分隔线自身夜间模式的分隔色（日间 12% 黑，夜间 12% 白）。
+     * [EN] How the items' animations WITHOUT a tint are drawn, inherited like `animationTint` (see [CYLAnimatedItemView.animationRenderingMode]): an item's
+     *      own non-null mode wins; null (default) lets the URL option `renderingMode=` and then `Automatic` decide.
+     * [CN] 条目中没有着色的动画如何绘制，继承规则同 `animationTint`（见 [CYLAnimatedItemView.animationRenderingMode]）：条目自己的非 null 模式优先；
+     *      null（默认）时由 URL 选项 `renderingMode=` 再到 `Automatic` 决定。
+     */
+    var animationRenderingMode: CYLAnimationRenderingMode? = null
+        set(value) { field = value; entries.forEach { it.view.stackAnimationRenderingMode = value } }
+
+    /**
+     * [EN] The color of the divider lines (an ARGB color, used as it is); null (default) derives it: the stack's EXPLICIT `iconColor` at
+     *      `CYLAnimatedItemDividerAlpha` (0.6), else the built-in secondary text color of the divider's own night mode
+     *      (`CYLAnimatedItemBuiltInColors.divider`, contrast >= 3:1 on a white and on a dark bar).
+     * [CN] 分隔线的颜色（ARGB 颜色，按原样使用）；null（默认）时推导：堆叠的显式 `iconColor` 以 `CYLAnimatedItemDividerAlpha`（0.6）的不透明度，
+     *      否则取分隔线自身夜间模式的内置次要文字色（`CYLAnimatedItemBuiltInColors.divider`，在白色与深色栏上对比度 >= 3:1）。
      */
     var dividerColor: Int? = null
         set(value) { if (field != value) { field = value; dividers.forEach { it.stackDividerColor = value } } }
@@ -417,6 +427,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
         itemView.stackTitleColor = titleColor
         itemView.stackAnimationTint = animationTint
         itemView.stackAnimationDarkTint = animationDarkTint
+        itemView.stackAnimationRenderingMode = animationRenderingMode
         updateSpacing()
         if (dispatchesItemTaps) installClickListener(itemView)
         setAction(action, itemView)
@@ -510,6 +521,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
         itemView.stackTitleColor = null
         itemView.stackAnimationTint = null
         itemView.stackAnimationDarkTint = null
+        itemView.stackAnimationRenderingMode = null
         // [EN] The new first item has no spacing before it, and may carry the background action.
         // [CN] 新的第一个条目前没有间距，并可能承载背景动作。
         updateSpacing()
@@ -741,11 +753,11 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
 }
 
 /**
- * [EN] The share of opacity (0.3) of the divider lines' color when it is derived from the stack's icon color
+ * [EN] The share of opacity (0.6, was 0.3) of the divider lines' color when it is derived from an EXPLICIT icon color
  *      (`CYLAnimatedItemStackView.showsDividers`). The same on iOS, HarmonyOS and the mini program.
- * [CN] 分隔线颜色由堆叠的图标颜色推导时的不透明度（0.3，`CYLAnimatedItemStackView.showsDividers`）。与 iOS、鸿蒙、小程序相同。
+ * [CN] 分隔线颜色由显式图标颜色推导时的不透明度（0.6，原为 0.3，`CYLAnimatedItemStackView.showsDividers`）。与 iOS、鸿蒙、小程序相同。
  */
-const val CYLAnimatedItemDividerAlpha: Float = 0.3f
+const val CYLAnimatedItemDividerAlpha: Float = 0.6f
 
 /**
  * [EN] The default length of a divider line, in dp (20): the line is 1 dp thick and this long, centered in its slot, never the full

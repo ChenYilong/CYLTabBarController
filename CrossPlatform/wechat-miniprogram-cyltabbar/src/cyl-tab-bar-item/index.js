@@ -16,7 +16,7 @@ const CYL_PROPERTIES = ['title', 'image', 'selectedImage', 'index', 'titlePositi
   'imageInsets', 'lottieFilePath', 'lottieURL', 'lottieSizeValue', 'enabled', 'selected', 'badgeValue', 'badgeColor',
   'badgeSize', 'badgeContentInset', 'badgePositionAdjustment', 'badgeAnimation', 'layoutCentered', 'backgroundColor',
   'selectedBackgroundColor', 'titleTextAttributes', 'badgeTextAttributes', 'standardAppearance', 'animationPath',
-  'animationSize', 'imageSize', 'iconTint', 'selectedIconTint', 'animationTint', 'animationDarkTint', 'label', 'animationColors', 'loopsWhenUnselected',
+  'animationSize', 'imageSize', 'iconTint', 'selectedIconTint', 'animationTint', 'animationDarkTint', 'animationRenderingMode', 'label', 'animationColors', 'loopsWhenUnselected',
   'animationClass', 'animationDuration', 'itemStyle', 'glassLensStyle', 'isDark', 'animationSpeed', 'animationLoop'];
 
 Component({
@@ -94,6 +94,8 @@ Component({
     animationTint: { type: String, value: '' },
     /** [EN] The `darkTint` option: the dark color of a fixed `animationTint`. [CN] `darkTint` 选项：固定 `animationTint` 的深色颜色。 */
     animationDarkTint: { type: String, value: '' },
+    /** [EN] The `renderingMode` option: '' (unset), 'automatic', 'alwaysTemplate' or 'alwaysOriginal'; applies only without a tint. [CN] `renderingMode` 选项；仅在没有着色时生效。 */
+    animationRenderingMode: { type: String, value: '' },
     /** [EN] The accessibility label (default: the title, with the badge). [CN] 无障碍标签（默认：标题与角标）。 */
     label: { type: String, value: '' },
     /** [EN] The tap animation class name (CYLTabBarControllerTabButtonTapAnimation). [CN] 点击动画类名。 */

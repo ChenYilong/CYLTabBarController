@@ -97,31 +97,86 @@ static UIColor *CYLTabBarItemAnimationFixedTintColor(NSDictionary<NSString *, NS
     }];
 }
 
+CYLTabBarItemAnimationRenderingMode CYLTabBarItemAnimationRenderingModeFromString(NSString *text, CYLTabBarItemAnimationRenderingMode fallback) {
+    NSString *trimmed = [text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+    if (trimmed.length == 0) {
+        return fallback;
+    }
+    if ([trimmed caseInsensitiveCompare:@"automatic"] == NSOrderedSame) {
+        return CYLTabBarItemAnimationRenderingModeAutomatic;
+    }
+    if ([trimmed caseInsensitiveCompare:@"alwaysTemplate"] == NSOrderedSame) {
+        return CYLTabBarItemAnimationRenderingModeAlwaysTemplate;
+    }
+    if ([trimmed caseInsensitiveCompare:@"alwaysOriginal"] == NSOrderedSame) {
+        return CYLTabBarItemAnimationRenderingModeAlwaysOriginal;
+    }
+    return fallback;
+}
+
+static const void *CYLTabBarItemAnimationTabFlowModeKey = &CYLTabBarItemAnimationTabFlowModeKey;
+
+CYLTabBarItemAnimationRenderingMode CYLTabBarItemAnimationTabFlowRenderingMode(UIView *view) {
+    NSNumber *mode = view ? objc_getAssociatedObject(view, CYLTabBarItemAnimationTabFlowModeKey) : nil;
+    return mode ? (CYLTabBarItemAnimationRenderingMode)mode.integerValue : CYLTabBarItemAnimationRenderingModeAutomatic;
+}
+
 UIColor *CYLTabBarItemAnimationResolveTint(NSString *tint, NSString *darkTint, BOOL selected, BOOL isDark,
-                                           UIColor *normalIconColor, UIColor *selectedIconColor) {
+                                           UIColor *effectiveIconColor, UIColor *explicitSelectedIconColor) {
     NSString *kind = [tint stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
     if ([kind isEqualToString:@"title"]) {
-        return selected ? (selectedIconColor ?: normalIconColor) : normalIconColor;
+        return effectiveIconColor;
     }
     UIColor *fixed = CYLTabBarItemAnimationTintColorFromHex(kind);
     if (!fixed) {
         return nil;
     }
-    // [EN] A fixed color: the selected item takes ITS OWN selected icon color only (not the normal one: the table, the same on every platform). [CN] 固定颜色：选中的条目只取它自己的选中图标颜色（不取普通状态的：真值表，各平台相同）。
-    if (selected && selectedIconColor) {
-        return selectedIconColor;
+    // [EN] A fixed color: the selected item yields ONLY to an EXPLICIT selected icon color (never a built-in or subclass one: the table, the same on every platform). [CN] 固定颜色：选中的条目只让位于显式的选中图标颜色（绝不是内置或子类的颜色：真值表，各平台相同）。
+    if (selected && explicitSelectedIconColor) {
+        return explicitSelectedIconColor;
     }
     UIColor *dark = isDark ? CYLTabBarItemAnimationTintColorFromHex([darkTint stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet]) : nil;
     return dark ?: fixed;
 }
 
+/// [EN] Whether the text is a usable tint: "title" or a valid hex. [CN] 文本是否为可用的着色："title" 或有效的十六进制。
+static BOOL CYLTabBarItemAnimationTintIsSet(NSString *tint) {
+    NSString *kind = [tint stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+    return [kind isEqualToString:@"title"] || CYLTabBarItemAnimationTintColorFromHex(kind) != nil;
+}
+
+UIColor *CYLTabBarItemAnimationResolveTintWithRenderingMode(NSString *tint, NSString *darkTint, CYLTabBarItemAnimationRenderingMode mode,
+                                                            CYLTabBarItemAnimationColorKind colorKind, BOOL selected, BOOL isDark,
+                                                            UIColor *effectiveIconColor, UIColor *explicitSelectedIconColor) {
+    if (CYLTabBarItemAnimationTintIsSet(tint)) {
+        return CYLTabBarItemAnimationResolveTint(tint, darkTint, selected, isDark, effectiveIconColor, explicitSelectedIconColor);
+    }
+    switch (mode) {
+        case CYLTabBarItemAnimationRenderingModeAlwaysTemplate:
+            return effectiveIconColor;
+        case CYLTabBarItemAnimationRenderingModeAlwaysOriginal:
+            return nil;
+        case CYLTabBarItemAnimationRenderingModeAutomatic:
+        default:
+            return colorKind == CYLTabBarItemAnimationColorKindOneColor ? effectiveIconColor : nil;
+    }
+}
+
 UIColor *CYLTabBarItemAnimationItemTintColor(NSURL *sourceURL, NSString *tintOverride, NSString *darkTintOverride,
-                                             BOOL selected, BOOL isDark, UIColor *normalIconColor, UIColor *selectedIconColor) {
+                                             CYLTabBarItemAnimationRenderingMode modeOverride,
+                                             BOOL selected, BOOL isDark, UIColor *effectiveIconColor, UIColor *explicitSelectedIconColor) {
     NSDictionary<NSString *, NSString *> *options = sourceURL ? CYLTabBarItemAnimationTintOptionsFromURL(sourceURL) : @{};
     NSString *tint = [tintOverride stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
     NSString *darkTint = [darkTintOverride stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
-    return CYLTabBarItemAnimationResolveTint(tint.length > 0 ? tint : options[@"tint"], darkTint.length > 0 ? darkTint : options[@"darkTint"],
-                                             selected, isDark, normalIconColor, selectedIconColor);
+    NSString *resolvedTint = tint.length > 0 ? tint : options[@"tint"];
+    CYLTabBarItemAnimationRenderingMode mode = modeOverride != CYLTabBarItemAnimationRenderingModeAutomatic
+        ? modeOverride : CYLTabBarItemAnimationRenderingModeFromString(options[@"renderingMode"], CYLTabBarItemAnimationRenderingModeAutomatic);
+    CYLTabBarItemAnimationColorKind kind = CYLTabBarItemAnimationColorKindUndetectable;
+    if (!CYLTabBarItemAnimationTintIsSet(resolvedTint) && mode == CYLTabBarItemAnimationRenderingModeAutomatic) {
+        kind = CYLTabBarItemAnimationColorKindOfURL(sourceURL);
+    }
+    return CYLTabBarItemAnimationResolveTintWithRenderingMode(resolvedTint, darkTint.length > 0 ? darkTint : options[@"darkTint"], mode, kind,
+                                                              selected, isDark, effectiveIconColor, explicitSelectedIconColor);
 }
 
 /// [EN] Draws `color` (nil: no tint) over the view by its library's means. [CN] 用动画库的方式在视图上绘制 `color`（nil 表示不着色）。
@@ -332,14 +387,30 @@ static BOOL CYLTabBarItemAnimationPrepareTintWithOptions(UIView *view, NSDiction
 }
 
 BOOL CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id<CYLTabBarItemAnimationPlayer> player) {
-    return CYLTabBarItemAnimationPrepareTintWithOptions(view, CYLTabBarItemAnimationTintOptionsFromURL(sourceURL), player);
+    NSMutableDictionary<NSString *, NSString *> *options = [CYLTabBarItemAnimationTintOptionsFromURL(sourceURL) mutableCopy];
+    // [EN] Tab bars keep today's look: without a tint option the tab flow's rendering mode is alwaysOriginal (the file's own colors), unless the URL
+    //      asks for `renderingMode=alwaysTemplate` (tinted like "title") or `renderingMode=automatic` (like "title" for a ONE-color file).
+    // [CN] TabBar 保持现有外观：没有着色选项时，Tab 流程的渲染模式为 alwaysOriginal（文件自己的颜色），除非 URL 要求 `renderingMode=alwaysTemplate`
+    //      （等同 "title" 着色）或 `renderingMode=automatic`（单色文件等同 "title"）。
+    CYLTabBarItemAnimationRenderingMode mode = CYLTabBarItemAnimationRenderingModeAlwaysOriginal;
+    if (!CYLTabBarItemAnimationTintIsSet(options[@"tint"])) {
+        mode = CYLTabBarItemAnimationRenderingModeFromString(options[@"renderingMode"], CYLTabBarItemAnimationRenderingModeAlwaysOriginal);
+        if (mode == CYLTabBarItemAnimationRenderingModeAlwaysTemplate
+            || (mode == CYLTabBarItemAnimationRenderingModeAutomatic && CYLTabBarItemAnimationColorKindOfURL(sourceURL) == CYLTabBarItemAnimationColorKindOneColor)) {
+            options[@"tint"] = @"title";
+        }
+    }
+    if (view) {
+        objc_setAssociatedObject(view, CYLTabBarItemAnimationTabFlowModeKey, @(mode), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return CYLTabBarItemAnimationPrepareTintWithOptions(view, options, player);
 }
 
 /*!
  * [EN] The tint of the animation view of a `CYLAnimatedItemView` (the item path does not go through the tab flow): the options of the source
  *      URL, overridden by the item's own `animationTint` / `animationDarkTint` (Rive's `tint` / `darkTint` values: "title" or "#RRGGBB(AA)"),
- *      prepared again each time so setting or clearing the tint after the file loaded works. Without either the view is left alone: the file
- *      keeps its own colors.
+ *      prepared again each time so setting or clearing the tint after the file loaded works. Without either the rendering mode decides (automatic: a ONE-color
+ *      file takes the effective icon color).
  * [CN] `CYLAnimatedItemView` 的动画视图的着色（条目路径不经过 Tab 流程）：来源 URL 的选项，由条目自己的 `animationTint` / `animationDarkTint`
  *      （与 Rive 的 `tint` / `darkTint` 取值相同："title" 或 "#RRGGBB(AA)"）覆盖；每次都重新准备，因此文件加载之后再设置或清除着色也有效。
  *      两者都没有时不处理视图：文件保持自己的颜色。
@@ -352,6 +423,12 @@ BOOL CYLTabBarItemAnimationPrepareItemTint(UIView *view, NSURL *sourceURL, id<CY
     }
     if (darkTintOverride.length > 0) {
         options[@"darkTint"] = darkTintOverride;
+    }
+    // [EN] The item hands over the FINAL color (its own resolver decided, rendering mode included), so the view only has to be able to take one:
+    //      without a usable tint text the method is still added ("title" stands for any color the item gives).
+    // [CN] 条目交来的是最终颜色（由它自己的解析函数决定，包括渲染模式），视图只需要能接受颜色：没有可用的着色文本时仍添加该方法（"title" 代表条目交来的任何颜色）。
+    if (!CYLTabBarItemAnimationTintIsSet(options[@"tint"])) {
+        options[@"tint"] = @"title";
     }
     // [EN] Prepared again: the previous tint is removed first. [CN] 重新准备：先移除之前的着色。
     if (objc_getAssociatedObject(view, CYLTabBarItemAnimationTintOptionsKey)) {

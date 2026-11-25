@@ -687,7 +687,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     override fun setSelected(selected: Boolean) {
         val changed = selected != isSelected
         super.setSelected(selected)
-        if (changed) { updateIcon(); applyIconColor(); onItemStateChanged(); updateAccessibility() }
+        if (changed) { updateIcon(); applyIconColor(); applyTitleColor(); onItemStateChanged(); updateAccessibility() }
         if (changed && drivesAnimationPlayback && animationView != null) { if (selected) restartAnimation() else stopAnimation() }
     }
 
@@ -736,13 +736,41 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         set(value) { if (field != value) { field = value; refreshAnimationTint() } }
     internal var stackAnimationDarkTint: String? = null
         set(value) { if (field != value) { field = value; refreshAnimationTint() } }
+    internal var stackAnimationRenderingMode: CYLAnimationRenderingMode? = null
+        set(value) { if (field != value) { field = value; refreshAnimationTint() } }
     internal var stackDividerColor: Int? = null
         set(value) { if (field != value) { field = value; invalidate() } }
     private var defaultTitleColor: Int? = null
     private var appliesTitleColor = false
 
-    private fun applyTitleColor() {
-        val color = titleColor ?: stackTitleColor
+    /**
+     * [EN] Whether the built-in colors (`CYLAnimatedItemBuiltInColors`: theme text color, `colorPrimary` when selected, dimmed when disabled) fill in
+     *      what neither the item nor its stack sets: the title color and the tint of the animation. true by default; a subclass that has its own colors per
+     *      state (the tab button, whose tab bar sets the title colors) returns false. A subclass that sets colors in `onItemStateChanged` wins anyway
+     *      (it runs after the built-ins). [CN] 内置颜色（`CYLAnimatedItemBuiltInColors`：主题文字色、选中时 `colorPrimary`、禁用时变淡）是否补上条目与堆叠都没有设置的
+     *      标题颜色与动画着色。默认 true；自己按状态设置颜色的子类（Tab 按钮，其颜色由 TabBar 设置）返回 false。在 `onItemStateChanged` 中设置颜色的子类始终优先（它在内置值之后执行）。
+     */
+    protected open val usesBuiltInColors: Boolean get() = true
+
+    /**
+     * [EN] Whether the disabled built-in color replaces the normal one: the view is disabled and does not dim itself (`disabledAlpha` 1), else the
+     *      alpha 0.5 default would dim twice. [CN] 禁用的内置颜色是否取代普通颜色：视图被禁用且自己不变淡（`disabledAlpha` 为 1），否则默认的 0.5 alpha 会变淡两次。
+     */
+    private fun showsDisabledColor() = !isEnabled && disabledAlpha >= 1f
+
+    /**
+     * [EN] The title color in effect: `titleColor`, else the stack's, else the built-in of the state (selected, disabled, normal); null without
+     *      built-ins. [CN] 生效的标题颜色：`titleColor`，其次堆叠的，再次当前状态的内置值（选中、禁用、普通）；没有内置值时为 null。
+     */
+    internal fun resolvedTitleColor(configuration: Configuration = resources.configuration): Int? =
+        titleColor ?: stackTitleColor ?: if (!usesBuiltInColors) null else when {
+            showsDisabledColor() -> CYLAnimatedItemBuiltInColors.disabled(context, configuration)
+            isSelected -> CYLAnimatedItemBuiltInColors.selected(context, configuration)
+            else -> CYLAnimatedItemBuiltInColors.normal(context, configuration)
+        }
+
+    private fun applyTitleColor(configuration: Configuration = resources.configuration) {
+        val color = resolvedTitleColor(configuration)
         if (color != null) {
             if (!appliesTitleColor) defaultTitleColor = titleView.currentTextColor
             titleView.setTextColor(color)
@@ -762,6 +790,29 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             if (isSelected) (selectedIconColor ?: stackSelectedIconColor)?.let { return it }
             return iconColor ?: stackIconColor
         }
+
+    /**
+     * [EN] The EXPLICIT icon colors (item, else stack, else host; NO built-ins) of the normal and the selected state. [CN] 普通与选中状态的显式图标颜色
+     *      （条目，其次堆叠，再次宿主；不含内置值）。
+     */
+    val explicitIconColor: Int? get() = iconColor ?: stackIconColor ?: hostIconColor
+    val explicitSelectedIconColor: Int? get() = selectedIconColor ?: stackSelectedIconColor ?: hostSelectedIconColor
+
+    /**
+     * [EN] The EFFECTIVE icon color of the current state for `configuration` (default: the item's own): disabled built-in while it shows the disabled
+     *      look, else for a selected item the explicit selected color, else the built-in selected color; for an unselected one the explicit color, else the
+     *      built-in normal color. A selected item with nothing set takes the built-in selected color, so selecting changes it. null only when the
+     *      state has none and `usesBuiltInColors` is false. The static `image` is NOT recolored by it (`effectiveIconColor` is explicit only).
+     * [CN] 当前状态在 `configuration`（默认：条目自己的）下的有效图标颜色：显示禁用外观时为内置禁用色；选中的条目为显式选中色，否则为内置选中色；
+     *      未选中的条目为显式颜色，否则为内置普通色。什么都没设置的选中条目取内置选中色，所以选中会改变颜色。仅当该状态没有颜色且 `usesBuiltInColors` 为 false 时为 null。
+     *      静态 `image` 不会被它重新着色（`effectiveIconColor` 仅为显式颜色）。
+     */
+    fun resolvedIconColor(configuration: Configuration = resources.configuration): Int? {
+        if (usesBuiltInColors && showsDisabledColor()) return CYLAnimatedItemBuiltInColors.disabled(context, configuration)
+        val explicit = if (isSelected) explicitSelectedIconColor else explicitIconColor
+        if (explicit != null || !usesBuiltInColors) return explicit
+        return if (isSelected) CYLAnimatedItemBuiltInColors.selected(context, configuration) else CYLAnimatedItemBuiltInColors.normal(context, configuration)
+    }
 
     private fun applyIconColor() {
         val color = effectiveIconColor
@@ -783,11 +834,11 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      * [EN] Internal, not API: `CYLAnimatedItemStackView` makes one item of this component per divider and puts it in this mode. The item
      *      then shows NO icon, title, animation or badge, only ONE line, 1 dp thick and `dividerLengthDp` long, centered in the item, and its
      *      own size is that line's (1 x length in a row, swapped in a column: `dividerAxis`). It takes no taps and is hidden from a screen
-     *      reader. Line color: `stackDividerColor`, else the normal icon color (own, the stack's, the host's) at `CYLAnimatedItemDividerAlpha`,
-     *      else the separator color; resolved with the item's own night mode, re-resolved on every configuration or color change.
+     *      reader. Line color: `stackDividerColor`, else the EXPLICIT normal icon color (own, the stack's, the host's) at `CYLAnimatedItemDividerAlpha` (0.6),
+     *      else the built-in secondary text color (`CYLAnimatedItemBuiltInColors.divider`, contrast >= 3:1); resolved with the item's own night mode, re-resolved on every configuration or color change.
      * [CN] 内部使用，不是 API：`CYLAnimatedItemStackView` 为每条分隔线创建一个本组件的条目并设为该模式。此时条目不显示图标、标题、动画与角标，只有一条线，
      *      粗 1 dp、长 `dividerLengthDp`，在条目内居中，条目自身尺寸即这条线的尺寸（行中为 1 x 长度，列中互换：`dividerAxis`）。不接收点击，对读屏隐藏。
-     *      线颜色：`stackDividerColor`，其次普通图标颜色（自身、堆叠、宿主）以 `CYLAnimatedItemDividerAlpha` 的不透明度，最后是分隔色；按条目自身的夜间模式解析，
+     *      线颜色：`stackDividerColor`，其次显式的普通图标颜色（自身、堆叠、宿主）以 `CYLAnimatedItemDividerAlpha`（0.6）的不透明度，最后是内置的次要文字色（`CYLAnimatedItemBuiltInColors.divider`，对比度 >= 3:1）；按条目自身的夜间模式解析，
      *      配置或颜色变化时重新解析。
      */
     internal var isDividerMode: Boolean = false
@@ -810,11 +861,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     internal fun resolvedDividerColor(configuration: Configuration = resources.configuration): Int {
         stackDividerColor?.let { return it }
-        (iconColor ?: stackIconColor ?: hostIconColor)?.let {
-            return Color.argb((CYLAnimatedItemDividerAlpha * 255f).roundToInt(), Color.red(it), Color.green(it), Color.blue(it))
-        }
-        val night = (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-        return if (night) 0x1FFFFFFF else 0x1F000000
+        explicitIconColor?.let { return CYLAnimatedItemBuiltInColors.withAlpha(it, CYLAnimatedItemDividerAlpha) }
+        return CYLAnimatedItemBuiltInColors.divider(context, configuration)
     }
 
     private val dividerPaint = android.graphics.Paint()
@@ -838,12 +886,12 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      * [EN] How the animation is drawn in the item's icon color, the same names and values as the `tint` option of the
      *      animation source (`CYLTabBarAnimationOptionTint`) and iOS `animationTint`. "title": drawn like a template image in
      *      `effectiveIconColor` (the selected icon color while selected). "#RRGGBB" / "#RRGGBBAA": that color on the UNSELECTED
-     *      item, the selected item takes its selected icon color. Without any icon color "title" removes the tint. Set, it replaces the option
+     *      item, the selected item takes its selected icon color. Without an explicit icon color "title" uses the built-in color of the state (`CYLAnimatedItemBuiltInColors`; `resolvedIconColor`). Set, it replaces the option
      *      of the source URL; null (default) leaves the URL's option, and without one the file's own colors. Works before and after the file loads, for every engine
      *      (`CYLTabBarItemAnimationTint`).
      * [CN] 动画如何以条目的图标颜色绘制，名称与取值同动画来源的 `tint` 选项（`CYLTabBarAnimationOptionTint`）及 iOS 的 `animationTint`。
      *      "title"：像模板图片一样以 `effectiveIconColor` 绘制（选中时为选中图标颜色）。"#RRGGBB" / "#RRGGBBAA"：该颜色只用于未选中的条目，
-     *      选中的条目使用其选中图标颜色。没有任何图标颜色时 "title" 移除着色。设置后替换来源 URL 中的选项；null（默认）保留 URL 中的选项，没有选项时保持文件自身颜色。文件加载前后设置都有效，
+     *      选中的条目使用其选中图标颜色。没有显式图标颜色时 "title" 使用该状态的内置颜色（`CYLAnimatedItemBuiltInColors`；`resolvedIconColor`）。设置后替换来源 URL 中的选项；null（默认）保留 URL 中的选项，没有选项时保持文件自身颜色。文件加载前后设置都有效，
      *      适用于所有引擎（`CYLTabBarItemAnimationTint`）。
      */
     var animationTint: String? = null
@@ -855,6 +903,16 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      * [CN] 固定 `animationTint` 的夜间模式颜色（`darkTint` 选项）；"title" 不需要。配置变化时重新应用。null（默认）保留 URL 中的选项。
      */
     var animationDarkTint: String? = null
+        set(value) { if (field != value) { field = value; refreshAnimationTint() } }
+
+    /**
+     * [EN] How an animation WITHOUT a tint is drawn (`automatic`, `alwaysTemplate`, `alwaysOriginal`; see `CYLAnimationRenderingMode`); an explicit
+     *      `animationTint` (or the URL's `tint`) always wins. Precedence: this, else the stack's, else the URL option `renderingMode=`, else
+     *      `Automatic`: tinted with `resolvedIconColor` only when the file is detected as one-color (`CYLAnimationColorCount`). null (default): inherit.
+     * [CN] 没有着色的动画如何绘制（`automatic`、`alwaysTemplate`、`alwaysOriginal`；见 `CYLAnimationRenderingMode`）；显式的 `animationTint`（或 URL 的 `tint`）始终优先。
+     *      优先级：本属性，其次堆叠的，再次 URL 选项 `renderingMode=`，最后 `Automatic`：仅当文件被检测为单色（`CYLAnimationColorCount`）时以 `resolvedIconColor` 着色。null（默认）：继承。
+     */
+    var animationRenderingMode: CYLAnimationRenderingMode? = null
         set(value) { if (field != value) { field = value; refreshAnimationTint() } }
 
     /**
@@ -876,9 +934,10 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     /**
      * [EN] Draws the animation's tint for the current state (selection, icon colors, night mode): the options of the source
      *      (`#name=value` and `?name=value` alike) with `animationTint` / `animationDarkTint` on top, resolved by the
-     *      truth table `CYLTabBarItemAnimationTint.resolve`. The normal icon color is `iconColor`, else the stack's, else the
-     *      host's title color; the selected one is `selectedIconColor`, else the stack's, else the host's. Nothing set: the
-     *      file's own colors, and a previous tint is removed. A subclass that makes the animation view itself (the tab button)
+     *      item table `CYLTabBarItemAnimationTint.resolveItem` (tint spec v2). The explicit normal icon color is `iconColor`, else the stack's,
+     *      else the host's title color; the selected one is `selectedIconColor`, else the stack's, else the host's; the effective color adds the
+     *      built-ins. No tint: `animationRenderingMode` decides (default `Automatic`: tinted only when the file is detected as one-color,
+     *      else the file's own colors, and a previous tint is removed). A subclass that makes the animation view itself (the tab button)
      *      calls it after setting `animationView`.
      * [CN] 按当前状态（选中、图标颜色、夜间模式）绘制动画着色：来源的选项（`#name=value` 与 `?name=value` 相同）加上 `animationTint` /
      *      `animationDarkTint`，由真值表 `CYLTabBarItemAnimationTint.resolve` 解析。普通图标颜色为 `iconColor`，其次堆叠的颜色，再次宿主的标题颜色；
@@ -897,15 +956,23 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             ?: animationURL?.takeIf { it.isNotBlank() }?.let { CYLTabBarAnimationFileAndOptions(it).second }.orEmpty()
         val options = CYLTabBarItemAnimationTint.effectiveOptions(view, source)
         val night = (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-        val color = CYLTabBarItemAnimationTint.resolve(
-            CYLTabBarItemAnimationTint.tintOption(options), CYLTabBarItemAnimationTint.darkTintOption(options), isSelected, night,
-            iconColor ?: stackIconColor ?: hostIconColor, selectedIconColor ?: stackSelectedIconColor ?: hostSelectedIconColor,
+        val tint = CYLTabBarItemAnimationTint.tintOption(options)
+        val tintIsSet = CYLTabBarItemAnimationTint.isValidTint(tint)
+        val mode = animationRenderingMode ?: stackAnimationRenderingMode ?: CYLTabBarItemAnimationTint.renderingModeOption(options) ?: CYLAnimationRenderingMode.Automatic
+        // [EN] The file is read only when it decides (no tint, automatic). [CN] 只有在它起决定作用时才读取文件（没有着色、自动模式）。
+        val kind = if (!tintIsSet && mode == CYLAnimationRenderingMode.Automatic) {
+            CYLAnimationColorCount.kindOfSource(context, animationURL?.takeIf { it.isNotBlank() } ?: (view.cyl_getTag(CYLTabBarItemAnimationFailure.RESOURCE_TAG) as? String))
+        } else CYLAnimationColorCount.Kind.Undetectable
+        val color = CYLTabBarItemAnimationTint.resolveItem(
+            tint, CYLTabBarItemAnimationTint.darkTintOption(options), mode, kind, isSelected, night,
+            resolvedIconColor(configuration), explicitSelectedIconColor,
         )
         CYLTabBarItemAnimationTint.applyToAnimationView(view, color)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        applyTitleColor(newConfig)
         refreshAnimationTint(newConfig)
         invalidate()
     }
@@ -913,6 +980,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     override fun setEnabled(enabled: Boolean) {
         super.setEnabled(enabled)
         alpha = if (enabled) 1f else disabledAlpha
+        applyTitleColor()
+        refreshAnimationTint()
         onItemStateChanged()
     }
 

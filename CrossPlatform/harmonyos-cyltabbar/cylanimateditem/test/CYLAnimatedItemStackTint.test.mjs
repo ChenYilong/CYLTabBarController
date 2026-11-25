@@ -10,18 +10,19 @@ const M = await import('../src/main/ets/CYLAnimatedItemStackModel.ts');
 
 const divider = (fields) => ({ ...C.cylAnimatedItemDividerColor({ ...new C.CYLAnimatedItemDividerInput(), ...fields }) });
 
-// [EN] Divider color, one row per case: dividerColor set / icon color at alpha 0.3 / separator, light and dark.
+// [EN] Divider color, one row per case: dividerColor set / explicit icon color at alpha 0.6 / built-in (secondary label), light and dark.
 // [CN] 分隔线颜色，每种情况一行。
+const BUILTIN = (dark) => ({ source: 'builtin', color: dark ? '#99EBEBF5' : '#993C3C43', resource: 'font_secondary', opacity: 1 });
 const DIVIDER_TABLE = [];
 for (const dark of [false, true]) {
-  DIVIDER_TABLE.push({ dark, dividerColor: '#FF8000', iconColor: '#112233', expect: { source: 'divider', color: '#FF8000', opacity: 1 } });
-  DIVIDER_TABLE.push({ dark, dividerColor: '#80FF8000', iconColor: '', expect: { source: 'divider', color: '#80FF8000', opacity: 1 } });
-  DIVIDER_TABLE.push({ dark, dividerColor: 'red', iconColor: '', expect: { source: 'divider', color: 'red', opacity: 1 } });
-  DIVIDER_TABLE.push({ dark, dividerColor: '', iconColor: '#112233', expect: { source: 'icon', color: '#4D112233', opacity: 1 } });
-  DIVIDER_TABLE.push({ dark, dividerColor: '', iconColor: '#FF112233', expect: { source: 'icon', color: '#4D112233', opacity: 1 } });
-  DIVIDER_TABLE.push({ dark, dividerColor: '', iconColor: '#ffaabbcc', expect: { source: 'icon', color: '#4DAABBCC', opacity: 1 } });
-  DIVIDER_TABLE.push({ dark, dividerColor: '', iconColor: 'blue', expect: { source: 'icon', color: 'blue', opacity: 0.3 } });
-  DIVIDER_TABLE.push({ dark, dividerColor: '  ', iconColor: '', expect: { source: 'separator', color: dark ? '#99545458' : '#4A3C3C43', opacity: 1 } });
+  DIVIDER_TABLE.push({ dark, dividerColor: '#FF8000', iconColor: '#112233', expect: { source: 'divider', color: '#FF8000', resource: '', opacity: 1 } });
+  DIVIDER_TABLE.push({ dark, dividerColor: '#80FF8000', iconColor: '', expect: { source: 'divider', color: '#80FF8000', resource: '', opacity: 1 } });
+  DIVIDER_TABLE.push({ dark, dividerColor: 'red', iconColor: '', expect: { source: 'divider', color: 'red', resource: '', opacity: 1 } });
+  DIVIDER_TABLE.push({ dark, dividerColor: '', iconColor: '#112233', expect: { source: 'icon', color: '#99112233', resource: '', opacity: 1 } });
+  DIVIDER_TABLE.push({ dark, dividerColor: '', iconColor: '#FF112233', expect: { source: 'icon', color: '#99112233', resource: '', opacity: 1 } });
+  DIVIDER_TABLE.push({ dark, dividerColor: '', iconColor: '#ffaabbcc', expect: { source: 'icon', color: '#99AABBCC', resource: '', opacity: 1 } });
+  DIVIDER_TABLE.push({ dark, dividerColor: '', iconColor: 'blue', expect: { source: 'icon', color: 'blue', resource: '', opacity: 0.6 } });
+  DIVIDER_TABLE.push({ dark, dividerColor: '  ', iconColor: '', expect: BUILTIN(dark) });
 }
 for (const row of DIVIDER_TABLE) {
   test(`divider color ${JSON.stringify(row)}`, () => {
@@ -29,8 +30,34 @@ for (const row of DIVIDER_TABLE) {
   });
 }
 
+// [EN] Contrast, >= 3:1 on light and dark bars: the built-in constants (iOS secondaryLabel probe values) and the SDK colors the view draws
+//      (sys.color.font_secondary, read from the SDK resource tables: light #99182431, dark #99FFFFFF). Bars: white / black, and the usual
+//      system grays.
+// [CN] 对比度，浅色与深色栏上 >= 3:1：内置常量（iOS secondaryLabel 实测值）与视图实际绘制的 SDK 颜色。
+test('divider contrast >= 3:1 on light and dark bars (built-in constants and SDK colors)', () => {
+  const rows = [
+    ['#993C3C43', '#FFFFFF'], ['#993C3C43', '#F2F2F7'], ['#99EBEBF5', '#000000'], ['#99EBEBF5', '#1C1C1E'],
+    ['#99182431', '#FFFFFF'], ['#99182431', '#F1F3F5'], ['#99FFFFFF', '#000000'], ['#A9FFFFFF', '#000000'], ['#99FFFFFF', '#1C1C1E']
+  ];
+  for (const [fg, bg] of rows) {
+    const ratio = C.cylAnimatedItemContrast(fg, bg);
+    assert.ok(ratio >= 3, `${fg} on ${bg} = ${ratio.toFixed(2)}`);
+  }
+  for (const dark of [false, true]) {
+    const builtIn = divider({ dark });
+    assert.ok(C.cylAnimatedItemContrast(builtIn.color, dark ? '#000000' : '#FFFFFF') >= 3, `built-in ${dark ? 'dark' : 'light'}`);
+  }
+  // [EN] The old default (separator 0.12 / 0.3 alpha) was the reason: 1.3:1. [CN] 旧的默认值（分隔色 0.12 / 透明度 0.3）仅 1.3:1，故改之。
+  assert.ok(C.cylAnimatedItemContrast('#3D3C3C43', '#FFFFFF') < 3);
+});
+
+test('explicit icon color at alpha 0.6: contrast of black and white icon colors on their bars', () => {
+  assert.ok(C.cylAnimatedItemContrast(divider({ iconColor: '#000000' }).color, '#FFFFFF') >= 3);
+  assert.ok(C.cylAnimatedItemContrast(divider({ iconColor: '#FFFFFF' }).color, '#000000') >= 3);
+});
+
 test('constants', () => {
-  assert.equal(C.CYL_ANIMATED_ITEM_DIVIDER_ALPHA, 0.3);
+  assert.equal(C.CYL_ANIMATED_ITEM_DIVIDER_ALPHA, 0.6);
   assert.equal(C.CYL_ANIMATED_ITEM_DIVIDER_LENGTH, 20);
   assert.equal(M.CYLAnimatedItemDividerLength, 20);
   assert.equal(new M.CYLAnimatedItemStackModel().dividerLength, 20);
@@ -64,8 +91,7 @@ test('stack tint: stack only, item wins, appended later, cleared, appearance cha
   }
   // [EN] The item's own value wins. [CN] 条目自己的值优先。
   b.animationTint = 'title';
-  assert.deepEqual(tint(stack, b, { hasIconColor: true }), { kind: 'icon', color: '' });
-  assert.deepEqual(tint(stack, b, {}), { kind: 'none', color: '' }, '"title" without icon colors: no tint');
+  assert.deepEqual(tint(stack, b, {}), { kind: 'icon', color: '' }, '"title" always has an effective icon color (built-in at least)');
   assert.equal(tint(stack, a, {}).kind, 'fixed', 'the others still inherit');
   b.animationDarkTint = '#00FF00';
   assert.equal(stack.animationDarkTintOf(b), '#00FF00');
@@ -263,23 +289,23 @@ test('dividers follow append, remove and reorder by themselves', () => {
   assert.equal(names(stack), 'a|b', 'b came back without its old override');
 });
 
-test('stack divider color: derived from the stack icon color at 0.3, else separator, light and dark', () => {
+test('stack divider color: derived from the stack icon color at 0.6, else built-in, light and dark', () => {
   const stack = new M.CYLAnimatedItemStackModel();
   const color = (dark) => divider({ dividerColor: stack.dividerColor, iconColor: stack.iconColor, dark });
   for (const dark of [false, true]) {
-    assert.deepEqual(color(dark), { source: 'separator', color: dark ? '#99545458' : '#4A3C3C43', opacity: 1 });
+    assert.deepEqual(color(dark), BUILTIN(dark));
   }
   stack.iconColor = '#112233';
   for (const dark of [false, true]) {
-    assert.deepEqual(color(dark), { source: 'icon', color: '#4D112233', opacity: 1 });
+    assert.deepEqual(color(dark), { source: 'icon', color: '#99112233', resource: '', opacity: 1 });
   }
   stack.dividerColor = '#FF8000';
   for (const dark of [false, true]) {
-    assert.deepEqual(color(dark), { source: 'divider', color: '#FF8000', opacity: 1 });
+    assert.deepEqual(color(dark), { source: 'divider', color: '#FF8000', resource: '', opacity: 1 });
   }
   stack.dividerColor = '';
   stack.iconColor = '';
-  assert.equal(color(true).source, 'separator', 'clearing both falls back again');
+  assert.equal(color(true).source, 'builtin', 'clearing both falls back again');
 });
 
 test('dividerLength: default 20, never negative', () => {

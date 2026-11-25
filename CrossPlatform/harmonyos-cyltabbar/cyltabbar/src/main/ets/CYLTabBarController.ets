@@ -9,7 +9,8 @@ import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLSVGAView } from './svga/CYLSVGAView';
 import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint } from './CYLRiveTabBarItemAnimator';
 import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines, CYLAnimatedItemSVGA, cylSetPausesWhileUserScrolls,
-  CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint } from 'cylanimateditem';
+  CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint, cylAnimatedItemEffectiveRenderingMode,
+  CYL_RENDERING_MODE_AUTOMATIC, CYL_RENDERING_MODE_ORIGINAL } from 'cylanimateditem';
 import { CYLAnimatedItemLottie } from 'cylanimateditem_lottie';
 // TODO: replace the file: dependency (cyltabbar/oh-package.json5, a vendored copy) with the ohpm package after the library is published (owner's OK).
 import { LifecycleController } from 'cyldeallocblockexecutor';
@@ -1524,6 +1525,20 @@ export struct CYLTabBarController {
   }
 
   /**
+   * [EN] The `animationRenderingMode` a tab gives its animated item (tint spec v2, section 6): the tab bar keeps its look, so a tab URL with no
+   *      `tint` option is 'alwaysOriginal' (a single-color tab icon without a tint option is not recolored); with a `tint` option, or with a
+   *      `renderingMode=` option of its own, it is 'automatic' (the option then decides, as for every animation).
+   * [CN] Tab 交给其动效条目的 `animationRenderingMode`（着色规范 v2 第 6 节）：Tab 栏保持原有外观，因此没有 `tint` 选项的 Tab URL 为 'alwaysOriginal'（没有着色选项的
+   *      单色 Tab 图标不会改色）；有 `tint` 选项或自带 `renderingMode=` 选项时为 'automatic'（由该选项决定，与其他动画相同）。
+   */
+  cylTabRenderingMode(path: string | undefined): string {
+    if (this.cylTabTintOption(path, CYLTabBarAnimationOptionTint) === '' && this.cylTabTintOption(path, 'renderingMode') === '') {
+      return CYL_RENDERING_MODE_ORIGINAL;
+    }
+    return CYL_RENDERING_MODE_AUTOMATIC;
+  }
+
+  /**
    * [EN] The tab's icon color while unselected: the item's `iconColor`, then the controller's, then the title color. The animated item
    *      takes it as `iconColor`. [CN] Tab 未选中时的图标颜色：先 Tab 的 `iconColor`，再控制器的，最后标题颜色。动效条目以此作为 `iconColor`。
    */
@@ -1572,8 +1587,9 @@ export struct CYLTabBarController {
     input.optionDarkTint = this.cylTabTintOption(path, CYLTabBarAnimationOptionDarkTint);
     input.selected = this.selectedIndex === index;
     input.dark = this.colorMode === 'dark';
-    input.hasIconColor = true;
     input.hasSelectedIconColor = true;
+    // [EN] No tint option: alwaysOriginal (the tab flow keeps its look). [CN] 没有着色选项：alwaysOriginal（Tab 流程保持原有外观）。
+    input.renderingMode = cylAnimatedItemEffectiveRenderingMode(this.cylTabRenderingMode(path), this.cylTabTintOption(path, 'renderingMode'), '');
     const result: CYLAnimatedItemTintResult = cylAnimatedItemResolveTint(input);
     if (result.kind === 'icon') {
       return cylTintColorFilter(this.selectedIndex === index ? this.cylTabSelectedIconColor(index) : this.cylTabNormalIconColor(index));
@@ -1708,6 +1724,7 @@ export struct CYLTabBarController {
               animationDarkTint: this.cylTabTintOption(this.cylTabAnimationPath(index), CYLTabBarAnimationOptionDarkTint),
               iconColor: this.cylTabItemIconColor(index, false),
               selectedIconColor: this.cylTabItemIconColor(index, true),
+              animationRenderingMode: this.cylTabRenderingMode(this.cylTabAnimationPath(index)),
               animationSpeed: this.tabBarItemAnimationSpeed,
               animationLoops: this.tabBarItemAnimationLoops,
               animationRestartToken: this.replayTokens[index] ?? 0,
@@ -1723,6 +1740,7 @@ export struct CYLTabBarController {
             animationDarkTint: this.cylTabTintOption(this.cylTabAnimationPath(index), CYLTabBarAnimationOptionDarkTint),
             iconColor: this.cylTabItemIconColor(index, false),
             selectedIconColor: this.cylTabItemIconColor(index, true),
+            animationRenderingMode: this.cylTabRenderingMode(this.cylTabAnimationPath(index)),
             // [EN] The playback goes through the component, which hands it to the engine in its context.
             // [CN] 播放设置经由组件传递，组件通过 context 交给引擎。
             animationSpeed: this.tabBarItemAnimationSpeed,
