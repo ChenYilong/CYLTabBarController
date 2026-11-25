@@ -20,6 +20,9 @@
             android:name="com.cyl.tabbar.demo.DemoAnimatedItemActivity"
             android:exported="false" />
         <activity
+            android:name="com.cyl.tabbar.demo.DemoContentInsetActivity"
+            android:exported="false" />
+        <activity
             android:name="com.cyl.tabbar.demo.DemoReleasedActivity"
             android:exported="false" />
         <!-- [EN] Keeps the language chosen in the demo (AppCompatDelegate.setApplicationLocales) before Android 13. [CN] 在 Android 13 之前保存演示中选择的语言。 -->

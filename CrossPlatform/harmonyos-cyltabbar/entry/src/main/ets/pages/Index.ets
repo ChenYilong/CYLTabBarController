@@ -1032,6 +1032,20 @@ struct Index {
         subtitle: CYLLocalizedString('A one-color file takes the built-in tint of its state and color mode; a multi-color file keeps its colors'),
         action: () => this.push('pages/DefaultTint', {} as DemoPushParams),
       } as DemoRow] } as DemoSection] : []),
+      // [EN] Rive and PAG (docs/Animated-Item.md): the menu button (menu_button.riv, isOpen, Loop on / off) and a PAG file, plain and with a SRC_IN tint.
+      // [CN] Rive 与 PAG（docs/Animated-Item.md）：菜单按钮（menu_button.riv，isOpen，循环开 / 关）与一个 PAG 文件，不着色与 SRC_IN 着色。
+      ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('Rive and PAG'), rows: [{
+        id: 'rive-and-pag', title: CYLLocalizedString('Rive and PAG'),
+        subtitle: CYLLocalizedString('The menu button (menu_button.riv, isOpen) with Loop on and off, and a PAG file, plain and tinted'),
+        action: () => this.push('pages/RiveAndPag', {} as DemoPushParams),
+      } as DemoRow] } as DemoSection] : []),
+      // [EN] itemContentHorizontalInset left unset: flat and Liquid Glass items, normal and selected.
+      // [CN] 未设置 itemContentHorizontalInset：扁平与液态玻璃条目，常态与选中。
+      ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('Content inset'), rows: [{
+        id: 'content-inset', title: CYLLocalizedString('Content inset'),
+        subtitle: CYLLocalizedString('itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected'),
+        action: () => this.push('pages/ContentInset', {} as DemoPushParams),
+      } as DemoRow] } as DemoSection] : []),
       // [EN] The Rive colors hook (docs/Animated-Item.md, "Colors"): applyColors on a data-bound .riv.
       // [CN] Rive 颜色钩子（docs/Animated-Item.md，“颜色”）：对数据绑定的 .riv 调用 applyColors。
       ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('Rive colors'), rows: [{

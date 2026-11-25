@@ -124,3 +124,5 @@ CrossPlatform/LottieWMC/
 CrossPlatform/harmonyos-cyltabbar/cylclassifymenu/
 Example-Android/cylclassifymenu/
 CrossPlatform/wechat-miniprogram-cyltabbar/example/cylclassifymenu-miniprogram/
+# Fetched by scripts/harmonyos-build.sh (scripts/fetch-animation-resources.py PAGResources) for the HarmonyOS "Rive and PAG" page
+CrossPlatform/harmonyos-cyltabbar/entry/src/main/resources/rawfile/pag/

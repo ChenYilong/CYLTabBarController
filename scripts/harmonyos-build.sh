@@ -1,15 +1,42 @@
 #!/usr/bin/env bash
 # Copy CrossPlatform/harmonyos-cyltabbar to an ASCII path without spaces (hvigor refuses others) and build the HAP.
-# Usage: scripts/harmonyos-build.sh [build dir, default /c/cyl-hm on Windows, ~/cyl-hm on macOS]. Exit code 0 only when the build succeeds.
+# Usage: scripts/harmonyos-build.sh [build dir, default /c/cyl-hm on Windows, ~/cyl-hm on macOS] [--ohos-test] [--run-ohos-test]
+#   --ohos-test      also builds the ohosTest HAP for the x86_64 emulator (-p buildMode=emulatorTest, cylanimateditem/README.md)
+#   --run-ohos-test  also installs it on the device and runs the hypium tests (`hdc shell aa test ... OpenHarmonyTestRunner`); env HDC_TARGET picks
+#                    the device (e.g. 127.0.0.1:5555), HDC the hdc binary. The exit code is 0 only when the build and, with this flag, every test pass.
+# Env: DEVECO_HOME, PYTHON (the interpreter that fetches the PAG sample; default python3, python or py).
+# Exit code 0 only when the build succeeds.
 set -uo pipefail
 SRC="$(cd "$(dirname "$0")/../CrossPlatform/harmonyos-cyltabbar" && pwd)"
 # [EN] Windows (Git Bash) and macOS defaults; override with the first argument and DEVECO_HOME.
+DST_ARG=""
+OHOS_TEST=0
+RUN_OHOS_TEST=0
+for ARG in "$@"; do
+  case "$ARG" in
+    --ohos-test) OHOS_TEST=1 ;;
+    --run-ohos-test) OHOS_TEST=1; RUN_OHOS_TEST=1 ;;
+    *) DST_ARG="$ARG" ;;
+  esac
+done
 if [[ "$(uname)" = "Darwin" ]]; then
-  DST="${1:-$HOME/cyl-hm}"
+  DST="${DST_ARG:-$HOME/cyl-hm}"
   DEVECO="${DEVECO_HOME:-/Applications/DevEco-Studio.app/Contents}"
 else
-  DST="${1:-/c/cyl-hm}"
+  DST="${DST_ARG:-/c/cyl-hm}"
   DEVECO="${DEVECO_HOME:-/c/Program Files/Huawei/DevEco Studio}"
+fi
+# [EN] The "Rive and PAG" page plays a PAG sample that the repository does not keep: fetch it (pinned, SHA-256 checked) and put it in the
+#      git-ignored rawfile folder. Without it the build still succeeds and the page says the file is missing.
+# [CN] “Rive 与 PAG”页面播放仓库不保存的 PAG 示例文件：获取（固定版本，校验 SHA-256）并放入不入库的 rawfile 目录。没有它构建仍然成功，页面会提示缺少文件。
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+PYTHON_BIN="${PYTHON:-$(command -v python3 || command -v python || command -v py || true)}"
+if [[ -n "$PYTHON_BIN" ]]; then
+  "$PYTHON_BIN" "$ROOT/scripts/fetch-animation-resources.py" PAGResources >/dev/null 2>&1 || echo "PAG sample not fetched (python: $PYTHON_BIN)" >&2
+fi
+if [[ -f "$ROOT/Example-Shared/PAGResources/pag-ios/0.pag" ]]; then
+  mkdir -p "$SRC/entry/src/main/resources/rawfile/pag"
+  cp "$ROOT/Example-Shared/PAGResources/pag-ios/0.pag" "$SRC/entry/src/main/resources/rawfile/pag/demo.pag"
 fi
 # [EN] The sectioned example lists use CollectionViewClassifyMenu's tag list, fetched at the pinned commit (classifymenu.pin).
 # [CN] 带分组的示例列表使用 CollectionViewClassifyMenu 的 TagList，按 classifymenu.pin 固定的提交拉取。
@@ -42,4 +69,34 @@ for HAR in cylanimateditem cyldeallocblockexecutor; do
   node "$DEVECO/tools/hvigor/bin/hvigorw.js" --mode module -p module=$HAR@default -p product=default assembleHar --no-daemon >>"$LOG" 2>&1
 done
 grep -E "ERROR|Error Message|At File|BUILD|COMPILE RESULT" "$LOG" | sed 's/\x1b\[[0-9;]*m//g' | head -40
-! grep -q "BUILD FAILED" "$LOG" && grep -q "BUILD SUCCESSFUL" "$LOG" && find "$DST/entry/build" -name "*.hap"
+if grep -q "BUILD FAILED" "$LOG" || ! grep -q "BUILD SUCCESSFUL" "$LOG"; then
+  exit 1
+fi
+find "$DST/entry/build" -name "*.hap"
+if [[ "$OHOS_TEST" = 1 ]]; then
+  # [EN] The ohosTest HAP for the x86_64 emulator (no arm64-v8a .so files): the recipe of cylanimateditem/README.md, "Device tests".
+  # [CN] 面向 x86_64 模拟器的 ohosTest HAP（不含 arm64-v8a .so）：cylanimateditem/README.md「Device tests」中的做法。
+  TEST_LOG="$DST/build-ohostest.log"
+  node "$DEVECO/tools/hvigor/bin/hvigorw.js" --mode module -p module=entry@ohosTest -p isOhosTest=true -p buildMode=emulatorTest -p product=default assembleHap --no-daemon >"$TEST_LOG" 2>&1
+  grep -E "ERROR|Error Message|At File|BUILD|COMPILE RESULT" "$TEST_LOG" | sed 's/\x1b\[[0-9;]*m//g' | head -40
+  if grep -q "BUILD FAILED" "$TEST_LOG" || ! grep -q "BUILD SUCCESSFUL" "$TEST_LOG"; then
+    exit 1
+  fi
+  TEST_HAP="$(find "$DST/entry/build" -name "entry-ohosTest*.hap" | head -1)"
+  echo "$TEST_HAP"
+  if [[ "$RUN_OHOS_TEST" = 1 ]]; then
+    HDC_BIN="${HDC:-$DEVECO/sdk/default/openharmony/toolchains/hdc}"
+    HDC_ARGS=()
+    if [[ -n "${HDC_TARGET:-}" ]]; then
+      HDC_ARGS=(-t "$HDC_TARGET")
+    fi
+    # [EN] MSYS_NO_PATHCONV: Git Bash must not turn /data/... into a Windows path for hdc. [CN] MSYS_NO_PATHCONV：Git Bash 不得把 /data/... 转成 Windows 路径。
+    export MSYS_NO_PATHCONV=1
+    "$HDC_BIN" ${HDC_ARGS[@]+"${HDC_ARGS[@]}"} install -r "$TEST_HAP" || exit 1
+    RESULT="$("$HDC_BIN" ${HDC_ARGS[@]+"${HDC_ARGS[@]}"} shell aa test -b com.cyl.tabbar.harmony -m entry_test -s unittest OpenHarmonyTestRunner -s timeout 15000 2>&1)"
+    echo "$RESULT"
+    # [EN] hypium prints "Tests run: N, Failure: F, Error: E, Pass: P, Ignore: I"; the run passes with no failure and no error.
+    # [CN] hypium 输出 "Tests run: N, Failure: F, Error: E, Pass: P, Ignore: I"；没有失败与错误才算通过。
+    echo "$RESULT" | grep -Eq "Failure: 0, Error: 0" || exit 1
+  fi
+fi

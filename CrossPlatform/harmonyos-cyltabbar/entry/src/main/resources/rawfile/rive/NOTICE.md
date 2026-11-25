@@ -4,6 +4,7 @@
 |:---|:---|:---|
 | `icons.riv` | `Example-SwiftUI-Rive/AnimatedApp/RiveAssets/icons.riv` of this repository (the Design+Code course "SwiftUI Animations", Meng To) | No license file in the course download; copyright of the original author (see `Example-SwiftUI-Rive/README.md`, "Source and license") |
 | `house.riv` | `Example-SwiftUI-Rive/AnimatedApp/RiveAssets/house.riv` of this repository (the same course) | The same as `icons.riv` |
+| `menu_button.riv` | `Example-SwiftUI-Rive/AnimatedApp/RiveAssets/menu_button.riv` of this repository (the same course): the menu button of the `Rive and PAG` page (state machine input `isOpen`) | The same as `icons.riv` |
 
 An unchanged copy, used by the HarmonyOS example (`configurations/cyl_tabbar_configuration_rive.json`), as the iOS
 (Example-Rive, Example-SwiftUI-Rive) and Android (Example-Android/example-rive) Rive demos use it. The file predates

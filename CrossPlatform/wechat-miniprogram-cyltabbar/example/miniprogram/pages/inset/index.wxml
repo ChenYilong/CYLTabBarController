@@ -1,0 +1,12 @@
+<view class="cyl-inset-page">
+  <text class="cyl-inset-caption">Flat: itemContentHorizontalInset unset</text>
+  <view class="cyl-inset-row">
+    <cyl-animated-item id="cyl-inset-flat-normal" class="cyl-inset-item" title="Normal" image="{{image}}" selected="{{false}}" item-background-style="flat" item-background-color="{{flatBackground}}" item-corner-radius="{{22}}" />
+    <cyl-animated-item id="cyl-inset-flat-selected" class="cyl-inset-item" title="Selected" image="{{image}}" selected="{{true}}" item-background-style="flat" item-background-color="{{flatBackground}}" item-corner-radius="{{22}}" />
+  </view>
+  <text class="cyl-inset-caption">Liquid Glass: itemContentHorizontalInset unset</text>
+  <view class="cyl-inset-row">
+    <cyl-animated-item id="cyl-inset-glass-normal" class="cyl-inset-item" title="Normal" image="{{image}}" selected="{{false}}" item-background-style="liquidGlass" item-corner-radius="{{22}}" />
+    <cyl-animated-item id="cyl-inset-glass-selected" class="cyl-inset-item" title="Selected" image="{{image}}" selected="{{true}}" item-background-style="liquidGlass" item-corner-radius="{{22}}" />
+  </view>
+</view>

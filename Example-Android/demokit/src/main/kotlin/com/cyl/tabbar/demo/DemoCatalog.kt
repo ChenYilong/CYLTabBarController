@@ -74,6 +74,10 @@ object DemoCatalog {
                 sections += DemoSection(cylDemoText("Animated item"), listOf(DemoRow("CYLAnimatedItemView", { cylDemoText("The animated icon + title component on its own: GIF, Lottie, a missing file, an accessory and dragging") }) {
                     startActivity(android.content.Intent(requireContext(), DemoAnimatedItemActivity::class.java))
                 }))
+                // [EN] itemContentHorizontalInset left unset: flat and Liquid Glass items, normal and selected. [CN] 未设置 itemContentHorizontalInset：扁平与液态玻璃条目，常态与选中。
+                sections += DemoSection(cylDemoText("Content inset"), listOf(DemoRow(cylDemoText("Content inset"), { cylDemoText("itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected") }) {
+                    startActivity(android.content.Intent(requireContext(), DemoContentInsetActivity::class.java))
+                }))
                 sections += DemoSection(cylDemoText("Badges"), badgeRows(page, maxOf(30, cyl_badgeStyleCount())))
             }
             MESSAGE -> {
