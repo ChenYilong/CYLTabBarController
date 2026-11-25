@@ -214,6 +214,7 @@ docs/
 │   ├── android-api37-20261119-rive-follows-appearance.png
 │   ├── android-api37-x86_64-emulator-demo-teardown-en-zh-ar-c6b3e976-20261124.png
 │   ├── android-default-tab-bar-height-system-80dp.png
+│   ├── android-emulator-demo-taglist-6ad22dc5.png
 │   ├── android-example-rive-svga-tab-switch.png
 │   ├── android-example-strings-en-zh-ja.png
 │   ├── android-flutter-engine-api-play-all.png
@@ -335,6 +336,7 @@ docs/
 │   ├── harmonyos-cvcm-issue27-filter-open.jpeg
 │   ├── harmonyos-cvcm-issue27-plus.jpeg
 │   ├── harmonyos-default-tab-bar-height-system-56vp.png
+│   ├── harmonyos-emulator-demo-taglist-282a4635.png
 │   ├── harmonyos-emulator-pages-b7fdf26.png
 │   ├── harmonyos-emulator-resource-missing-92426d43.png
 │   ├── harmonyos-flatdesign-liquidglass-taps-mate70pro.png
