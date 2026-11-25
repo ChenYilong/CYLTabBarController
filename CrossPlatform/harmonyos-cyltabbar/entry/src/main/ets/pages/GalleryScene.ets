@@ -61,7 +61,7 @@ struct GalleryScene {
         selectedTitleColor: scene.colors !== undefined ? scene.colors[i % scene.colors.length] : undefined,
         backgroundColor: scene.backgrounds ? '#FFF6E0' : undefined,
         selectedBackgroundColor: scene.backgrounds ? '#FFD966' : undefined,
-        lottieFilePath: scene.lottie ? LOTTIE[i % LOTTIE.length] : undefined,
+        lottieFilePath: scene.lottie ? LOTTIE[i % LOTTIE.length] + (scene.lottieSuffixes?.[i] ?? '') : undefined,
       };
       return item;
     });
