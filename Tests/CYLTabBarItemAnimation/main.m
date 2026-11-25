@@ -44,6 +44,28 @@ static int CYLChecks = 0;
 
 #pragma mark - Stand-ins
 
+/// [EN] Stands for the animated item component's `CYLAnimationEngines` (Swift, found by the engine at run time): records the calls the
+///      engine makes for a tab's missing resource. [CN] 代表动效组件的 `CYLAnimationEngines`（Swift，引擎在运行时查找）：记录引擎为 Tab 缺失的资源所做的调用。
+@interface CYLAnimationEngines : NSObject
++ (NSMutableArray<NSArray *> *)calls;
++ (void)cyl_reportTabAnimationFailureOfURL:(NSURL *)URL error:(nullable NSError *)error owner:(id)owner;
++ (void)cyl_reportTabAnimationNotMadeForURL:(NSURL *)URL owner:(id)owner;
+@end
+@implementation CYLAnimationEngines
++ (NSMutableArray<NSArray *> *)calls {
+    static NSMutableArray<NSArray *> *calls;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{ calls = [NSMutableArray array]; });
+    return calls;
+}
++ (void)cyl_reportTabAnimationFailureOfURL:(NSURL *)URL error:(NSError *)error owner:(id)owner {
+    [[self calls] addObject:@[ @"failure", URL, error ?: [NSNull null], owner ]];
+}
++ (void)cyl_reportTabAnimationNotMadeForURL:(NSURL *)URL owner:(id)owner {
+    [[self calls] addObject:@[ @"notMade", URL, owner ]];
+}
+@end
+
 /// [EN] Like Lottie: the fallback, takes every file. [CN] 与 Lottie 相同：兜底，接收所有文件。
 @interface CYLTestLottieAnimator : NSObject <CYLTabBarItemAnimator>
 @end
@@ -365,6 +387,32 @@ int main(void) {
         [engine addAnimationWithURL:lightFile size:CGSizeZero contentMode:UIViewContentModeScaleAspectFit animationSpeed:0 toControl:plusButton];
         CHECK(plusButton.subviews.count == 0, "the host's plus button gets no animation");
         host.plus = NO;
+
+        printf("\n# A tab's missing resource is reported to CYLAnimationEngines, found at run time\n");
+        NSMutableArray<NSArray *> *engineCalls = [CYLAnimationEngines calls];
+        [engineCalls removeAllObjects];
+        UIControl *missingTab = [[UIControl alloc] init];
+        NSURL *missingFile = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-engine-missing.riv"]];
+        [[NSFileManager defaultManager] removeItemAtURL:missingFile error:NULL];
+        [engine addAnimationWithURL:missingFile size:CGSizeZero contentMode:UIViewContentModeScaleAspectFit animationSpeed:0 toControl:missingTab];
+        CHECK(engineCalls.count == 1 && [engineCalls[0][0] isEqual:@"notMade"] && [engineCalls[0][1] isEqual:missingFile] && engineCalls[0][2] == missingTab,
+              "a local file that is not there is reported for its tab button");
+        [engineCalls removeAllObjects];
+        [engine addAnimationWithURL:nil size:CGSizeZero contentMode:UIViewContentModeScaleAspectFit animationSpeed:0 toControl:missingTab];
+        [engine addAnimationWithURL:[NSURL URLWithString:@"https://example.com/remote.riv"] size:CGSizeZero contentMode:UIViewContentModeScaleAspectFit animationSpeed:0 toControl:missingTab];
+        CHECK(engineCalls.count == 0, "no URL and a remote URL report nothing on the tab path");
+        UIControl *failingTab = [[UIControl alloc] init];
+        [engine addAnimationWithURL:lightFile size:CGSizeZero contentMode:UIViewContentModeScaleAspectFit animationSpeed:0 toControl:failingTab];
+        UIView *failingView = [engine animationViewInControl:failingTab];
+        CHECK(failingView != nil && engineCalls.count == 0, "a made view reports nothing");
+        NSError *parseError = [NSError errorWithDomain:@"CYLTest" code:7 userInfo:nil];
+        CYLTabBarItemAnimationReportFailure(failingView, parseError);
+        [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+        BOOL allForTheTab = engineCalls.count >= 1;
+        for (NSArray *call in engineCalls) {
+            allForTheTab = allForTheTab && [call[0] isEqual:@"failure"] && [call[1] isEqual:lightFile] && call[2] == parseError && call[3] == failingTab;
+        }
+        CHECK(allForTheTab, "a late failure reports the file the view was made for, with its error, for its tab button");
 
         printf("\n# Dark Mode through the injected style source (#442)\n");
         styleSource.lightURL = lightFile;

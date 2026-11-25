@@ -10,6 +10,8 @@ import XCTest
 import ImageIO
 import CYLTabBarController
 import CYLAnimatedItem
+@testable import CYLAnimatedItem
+@testable import CYLTabBarController
 
 /**
  [EN] The animation engine's move to Swift (docs/Swift-Migration.md, 2026-11-21): every ported type keeps its Objective-C
@@ -394,5 +396,148 @@ final class CYLAnimationEndCallbackTests: XCTestCase {
         item.showsImageWhenAnimationEnds = false
         XCTAssertFalse(item.isShowingImageAfterAnimationEnd, "turning it off shows the animation again")
         XCTAssertFalse(view.isHidden)
+    }
+}
+
+/**
+ [EN] The tab bar's `onResourceMissing` (docs/Animated-Item.md): a UIKit tab button is not a `CYLAnimatedItemView`, so the tab
+      animation engine reports a missing file of a tab to `CYLAnimationEngines.resourceMissingListener`, as Android's `CYLTabBar`
+      does: once per resource per tab button, on the main queue, with one of the four reasons.
+ [CN] Tab 栏的 `onResourceMissing`（docs/Animated-Item.md）：UIKit 的 Tab 按钮不是 `CYLAnimatedItemView`，因此 Tab 动画引擎把 Tab 缺失的文件报告给
+      `CYLAnimationEngines.resourceMissingListener`，与 Android 的 `CYLTabBar` 相同：每个 Tab 按钮每个资源一次，在主队列，原因为四种之一。
+ */
+@MainActor
+final class CYLTabBarResourceMissingTests: XCTestCase {
+
+    private var heard: [String] = []
+
+    override func setUp() {
+        super.setUp()
+        heard = []
+        CYLAnimationEngines.resourceMissingListener = { [weak self] resource, reason in
+            XCTAssertTrue(Thread.isMainThread)
+            self?.heard.append("\((resource as NSString).lastPathComponent)|\(reason)")
+        }
+    }
+
+    override func tearDown() {
+        CYLAnimationEngines.resourceMissingListener = nil
+        super.tearDown()
+    }
+
+    private func spin(_ seconds: TimeInterval = 0.1) {
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: seconds))
+    }
+
+    private func temporaryFile(_ name: String, contents: Data) throws -> URL {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + "-" + name)
+        try contents.write(to: url)
+        return url
+    }
+
+    /// [EN] The engine reaches the reporter by its Objective-C selectors (it finds the class at run time). [CN] 引擎通过 Objective-C selector 访问报告方法（运行时查找类）。
+    func testTheEngineFindsTheReporterByItsSelectors() {
+        let engines: AnyClass = CYLAnimationEngines.self
+        XCTAssertNotNil(NSClassFromString("CYLAnimationEngines"))
+        XCTAssertTrue(engines.responds(to: NSSelectorFromString("cyl_reportTabAnimationFailureOfURL:error:owner:")))
+        XCTAssertTrue(engines.responds(to: NSSelectorFromString("cyl_reportTabAnimationNotMadeForURL:owner:")))
+    }
+
+    func testALateFailureReportsTheFileOncePerTabButtonWithTheReasonOfTheError() {
+        let button = UIControl()
+        let url = URL(fileURLWithPath: "/tmp/cyl-tab-home.json")
+        let notFound = NSError(domain: NSCocoaErrorDomain, code: NSFileReadNoSuchFileError)
+        CYLAnimationEngines.reportTabAnimationFailure(url: url, error: notFound, owner: button)
+        CYLAnimationEngines.reportTabAnimationFailure(url: url, error: notFound, owner: button)
+        spin()
+        XCTAssertEqual(heard, ["cyl-tab-home.json|not found"], "once per resource per tab button")
+
+        // [EN] The same file for another tab button is another report; another file for the same button too. [CN] 同一文件在另一个 Tab 按钮上是另一次报告；同一按钮的另一个文件也是。
+        CYLAnimationEngines.reportTabAnimationFailure(url: url, error: nil, owner: UIControl())
+        CYLAnimationEngines.reportTabAnimationFailure(url: URL(fileURLWithPath: "/tmp/cyl-tab-mine.json"),
+                                                      error: NSError(domain: "CYLTest", code: 1), owner: button)
+        spin()
+        XCTAssertEqual(heard, ["cyl-tab-home.json|not found", "cyl-tab-home.json|decode failed", "cyl-tab-mine.json|decode failed"])
+    }
+
+    func testTheResourceIsTheFileAsConfiguredWithoutTheOptionsOfTheSource() {
+        CYLAnimationEngines.reportTabAnimationFailure(url: URL(string: "file:///tmp/cyl-tab-rive.riv#artboard=Main")!, error: nil, owner: UIControl())
+        spin()
+        XCTAssertEqual(heard, ["cyl-tab-rive.riv|decode failed"])
+    }
+
+    func testAMissingLocalFileIsNotFoundAndAnEmptyOneIsUnreadable() throws {
+        let missing = URL(fileURLWithPath: NSTemporaryDirectory() + "cyl-tab-missing.json")
+        XCTAssertEqual(CYLAnimationEngines.tabAnimationNotMadeReason(missing), "not found")
+        let empty = try temporaryFile("cyl-tab-empty.json", contents: Data())
+        XCTAssertEqual(CYLAnimationEngines.tabAnimationNotMadeReason(empty), "unreadable")
+        let unknown = try temporaryFile("cyl-tab-unknown.xyz", contents: Data("{}".utf8))
+        XCTAssertEqual(CYLAnimationEngines.tabAnimationNotMadeReason(unknown), "decode failed", "a file no engine claims")
+    }
+
+    /// [EN] Through the real tab flow: a tab button whose animation file is not there reports it once, however often the tab bar
+    ///      asks again (trait and style refreshes). [CN] 经过真实的 Tab 流程：动画文件不存在的 Tab 按钮只报告一次，无论 TabBar 再询问多少次（深浅色与风格刷新）。
+    func testTheTabFlowReportsAMissingFileOncePerTabButton() throws {
+        let service = try XCTUnwrap(cylTabBarItemAnimationGetServiceEntryPoint(), "needs the animation engine in the build")
+        let button = UIControl()
+        let missing = URL(fileURLWithPath: NSTemporaryDirectory() + "cyl-tab-flow-missing.json")
+        for _ in 0..<3 {
+            service.addAnimation(with: missing, size: CGSize(width: 24, height: 24), contentMode: .scaleAspectFit, animationSpeed: 0, to: button)
+        }
+        spin()
+        XCTAssertEqual(heard, ["cyl-tab-flow-missing.json|not found"])
+        service.addAnimation(with: nil, size: CGSize(width: 24, height: 24), contentMode: .scaleAspectFit, animationSpeed: 0, to: button)
+        service.addAnimation(with: URL(string: "https://example.com/remote.json"), size: CGSize(width: 24, height: 24), contentMode: .scaleAspectFit, animationSpeed: 0, to: button)
+        spin()
+        XCTAssertEqual(heard.count, 1, "no URL and a remote URL report nothing on the tab path")
+    }
+}
+
+/**
+ [EN] The title color of a plus button built from a configuration (`UIButton.Configuration`) once its title follows the tab item
+      titles (`+alignsTitleWithTabBarItemTitles`): the configuration's update handler used to put the default gray back after every
+      configuration change, so in dark mode the title stayed gray while the other tab titles were white (docs/PlusButton.md). The
+      default itself (`.gray` for a title the tab titles do not drive) is the owner's decision and stays.
+ [CN] 由配置（`UIButton.Configuration`）创建的 PlusButton，在标题跟随 Tab 标题（`+alignsTitleWithTabBarItemTitles`）之后的标题颜色：
+      配置的更新回调过去会在每次配置变化后把默认的灰色放回去，因此深色模式下其他 Tab 标题是白色，这个标题仍是灰色（docs/PlusButton.md）。
+      默认值本身（Tab 标题不控制的标题使用 `.gray`）是维护者的决定，保持不变。
+ */
+@MainActor
+final class CYLPlusButtonTitleColorTests: XCTestCase {
+
+    private func makePlusButton() -> CYLPlusButton {
+        let button = CYLPlusButton(frame: CGRect(x: 0, y: 0, width: 60, height: 60))
+        button.cylConfigurationPlusButtonSetUp(attributes: ["CYLTabBarItemTitle": "Search"])
+        return button
+    }
+
+    /// [EN] The color the title is drawn in after UIKit ran the configuration update (in a window, as the system does at layout).
+    /// [CN] UIKit 执行配置更新（在窗口中，与系统在布局时的做法相同）之后标题绘制所用的颜色。
+    private func shownTitleColor(_ button: CYLPlusButton) throws -> UIColor {
+        let window = button.window ?? UIWindow(frame: CGRect(x: 0, y: 0, width: 320, height: 200))
+        if button.window == nil {
+            window.addSubview(button)
+            window.isHidden = false
+        }
+        button.setNeedsUpdateConfiguration()
+        window.layoutIfNeeded()
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.05))
+        let transformer = try XCTUnwrap(button.configuration?.titleTextAttributesTransformer)
+        return try XCTUnwrap(transformer(AttributeContainer()).foregroundColor)
+    }
+
+    func testTheDefaultTitleColorIsStillGrayWhenTheTabTitlesDoNotDriveIt() throws {
+        let button = makePlusButton()
+        XCTAssertNotNil(button.configuration, "a titled plus button of a configuration uses UIButton.Configuration")
+        XCTAssertTrue(try shownTitleColor(button).isEqual(UIColor.gray))
+    }
+
+    func testTheColorsOfTheTabTitlesSurviveTheNextConfigurationUpdate() throws {
+        let button = makePlusButton()
+        // [EN] What `cylApplyTitleFont` stores for dark mode: white unselected (Liquid Glass label color), the selected color. [CN] `cylApplyTitleFont` 为深色模式保存的值：未选中为白色（液态玻璃的 label 颜色），以及选中颜色。
+        button.cylPlusButtonStorage.titleStyle = ["font": UIFont.systemFont(ofSize: 10), "normal": UIColor.white, "selected": UIColor.systemOrange]
+        XCTAssertTrue(try shownTitleColor(button).isEqual(UIColor.white), "the aligned unselected color, not the default gray")
+        button.isSelected = true
+        XCTAssertTrue(try shownTitleColor(button).isEqual(UIColor.systemOrange), "the aligned selected color")
     }
 }

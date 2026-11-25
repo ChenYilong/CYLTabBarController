@@ -2505,7 +2505,13 @@ extension CYLPlusButton {
         // [CN] 每次状态变化时设置字体与该状态的颜色，与没有 configuration 时 `-setTitleColor:forState:` 的效果相同。
         button.configurationUpdateHandler = { plusButton in
             guard var updated = plusButton.configuration else { return }
-            let color = (plusButton.isSelected ? plusButton.titleColor(for: .selected) : plusButton.titleColor(for: .normal))
+            // [EN] The colors of the tab item titles, once the title follows them (`+alignsTitleWithTabBarItemTitles`, kept in `titleStyle`
+            //      by `cylApplyTitleFont`, light and dark appearance resolved), win over the configuration's own colors: the update this
+            //      configuration change causes ran this handler again and put the default gray back in dark mode.
+            // [CN] 标题跟随 Tab 标题（`+alignsTitleWithTabBarItemTitles`）之后，Tab 标题的颜色（由 `cylApplyTitleFont` 保存在 `titleStyle` 中，
+            //      已按浅色与深色外观解析）优先于配置自己的颜色：该配置变化触发的更新会再次执行本回调，深色模式下又把默认的灰色放了回去。
+            let followedColor = (plusButton as? CYLPlusButton)?.cylPlusButtonStorage.titleStyle?[plusButton.isSelected ? "selected" : "normal"] as? UIColor
+            let color = followedColor ?? (plusButton.isSelected ? plusButton.titleColor(for: .selected) : plusButton.titleColor(for: .normal))
                 ?? (plusButton.isSelected ? selectedColor : normalColor)
             updated.baseForegroundColor = color
             updated.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { textAttributes in

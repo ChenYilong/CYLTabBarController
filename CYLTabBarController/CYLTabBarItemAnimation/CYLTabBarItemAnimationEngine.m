@@ -22,6 +22,7 @@
 // [CN] Tab 按钮使用引擎的部分，属于 Core：只有动画子库带入引擎时才编译。
 #if CYL_ANIMATION_ENGINE_AVAILABLE
 #import <objc/runtime.h>
+#import <objc/message.h>
 // [EN] `CYLTabBarItemAnimationSetService()`, `…DefaultStyleSource()` and `…DefaultHost()` are `@_cdecl` Swift functions (step 118): declared by the
 //      generated Swift interface, which this file must import itself (CI built it without any other header importing it).
 // [CN] 这三个函数是 `@_cdecl` 的 Swift 函数（第 118 步）：由生成的 Swift 接口声明，本文件必须自己导入它（CI 构建时没有其他头文件导入它）。
@@ -49,6 +50,31 @@
 
 static const void *CYLTabBarItemAnimationSourceURLKey = &CYLTabBarItemAnimationSourceURLKey;
 static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationShownURLKey;
+
+/*!
+ * [EN] Tells `CYLAnimationEngines` (the animated item component, found at run time like `CYLAnimatedItemView` below, so this engine
+ *      and its Foundation-only tests do not depend on the view module) that the file of a tab could not be shown: it fires
+ *      `CYLAnimationEngines.resourceMissingListener` once per resource per tab button on the main queue, as Android's tab bar does
+ *      (`CYLTabBar.kt`, `cyl_animationViewDidFail`). `owner` is the tab button, or the animation view when it has none.
+ * [CN] 通知 `CYLAnimationEngines`（动效组件，与下面的 `CYLAnimatedItemView` 一样在运行时查找，因此本引擎及其只链接 Foundation 的测试不依赖视图模块）：
+ *      Tab 的文件无法显示。它在主队列对每个 Tab 按钮的每个资源只触发一次 `CYLAnimationEngines.resourceMissingListener`，与 Android 的 Tab 栏
+ *      （`CYLTabBar.kt`，`cyl_animationViewDidFail`）相同。`owner` 为 Tab 按钮，没有时为动画视图。
+ */
+static void CYLTabBarItemAnimationReportTabFailure(NSURL *URL, NSError *error, id owner) {
+    Class engines = NSClassFromString(@"CYLAnimationEngines");
+    SEL selector = NSSelectorFromString(@"cyl_reportTabAnimationFailureOfURL:error:owner:");
+    if (URL && owner && [engines respondsToSelector:selector]) {
+        ((void (*)(id, SEL, NSURL *, NSError *, id))objc_msgSend)(engines, selector, URL, error, owner);
+    }
+}
+
+static void CYLTabBarItemAnimationReportTabNotMade(NSURL *URL, id owner) {
+    Class engines = NSClassFromString(@"CYLAnimationEngines");
+    SEL selector = NSSelectorFromString(@"cyl_reportTabAnimationNotMadeForURL:owner:");
+    if (URL && owner && [engines respondsToSelector:selector]) {
+        ((void (*)(id, SEL, NSURL *, id))objc_msgSend)(engines, selector, URL, owner);
+    }
+}
 
 @implementation CYLTabBarItemAnimationEngine
 
@@ -99,6 +125,13 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
             break;
         }
     }
+    // [EN] Reported before the tab button is looked for, as the Android tab bar does: the file the engine made this view for, once per
+    //      tab button and resource (a view rebuilt for the same file does not report again). A view with no recorded file was made elsewhere.
+    // [CN] 在查找 Tab 按钮之前报告（与 Android Tab 栏相同）：引擎为该视图使用的文件，每个 Tab 按钮每个资源一次（同一文件重建的视图不会再次报告）。
+    //      没有记录文件的视图是在别处创建的。
+    NSURL *failedURL = animationView ? objc_getAssociatedObject(animationView, CYLTabBarItemAnimationShownURLKey) : nil;
+    NSError *failure = [notification.userInfo[NSUnderlyingErrorKey] isKindOfClass:[NSError class]] ? notification.userInfo[NSUnderlyingErrorKey] : nil;
+    CYLTabBarItemAnimationReportTabFailure(failedURL, failure, control ?: animationView);
     if (!control) {
         return;
     }
@@ -140,11 +173,12 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
 
 /*!
  * [EN] An animation view playing `shownURL`, the version of `sourceURL` (the light animation the tab was given) for the
- *      current style. Both URLs are kept on the view, so it can be swapped when the style changes (#442).
+ *      current style. Both URLs are kept on the view, so it can be swapped when the style changes (#442). `owner` (the tab button) is
+ *      who a missing resource is reported for.
  * [CN] 播放 `shownURL` 的动画视图；`shownURL` 是 `sourceURL`（Tab 设置的浅色动画）在当前风格下的版本。两者都保存在视图上，以便风格变化时
- *      替换（#442）。
+ *      替换（#442）。`owner`（Tab 按钮）是资源缺失时的报告对象。
  */
-- (UIView *)makeAnimationViewWithSourceURL:(NSURL *)sourceURL shownURL:(NSURL *)shownURL size:(CGSize)size contentMode:(UIViewContentMode)contentMode {
+- (UIView *)makeAnimationViewWithSourceURL:(NSURL *)sourceURL shownURL:(NSURL *)shownURL size:(CGSize)size contentMode:(UIViewContentMode)contentMode owner:(id)owner {
     UIView *animationView = [self.factory animationViewWithURL:shownURL size:size contentMode:contentMode];
     // [EN] Always remembered (#216: a theme may replace the file, so the view must know which one it shows); the #442
     //      checks below still ask the style source.
@@ -153,6 +187,9 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
         objc_setAssociatedObject(animationView, CYLTabBarItemAnimationSourceURLKey, sourceURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         objc_setAssociatedObject(animationView, CYLTabBarItemAnimationShownURLKey, shownURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         CYLTabBarItemAnimationPrepareTint(animationView, sourceURL, [self.factory playerForView:animationView]);
+    } else {
+        // [EN] No library made a view for the file: its resource is missing (or its engine is not in the build). [CN] 没有动画库为该文件创建视图：资源缺失（或其引擎未参与构建）。
+        CYLTabBarItemAnimationReportTabNotMade(shownURL, owner);
     }
     return animationView;
 }
@@ -278,7 +315,14 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
     //      动画库绑定的 key。
     BOOL isLocalFile = [URL isKindOfClass:[NSURL class]] && URL.isFileURL && URL.path.length > 0;
     NSURL *animationURL = (isLocalFile && [[NSFileManager defaultManager] fileExistsAtPath:URL.path]) ? URL : nil;
-    if (!animationURL || !control || [self.host isPlusControl:control]) {
+    if (!control || [self.host isPlusControl:control]) {
+        return;
+    }
+    if (!animationURL) {
+        // [EN] A local file that is not there is reported as missing ("not found"); no URL, or a URL that is not a file, is not. [CN] 不存在的本地文件报告为缺失（"not found"）；没有 URL 或不是文件的 URL 不报告。
+        if (isLocalFile) {
+            CYLTabBarItemAnimationReportTabNotMade(URL, control);
+        }
         return;
     }
     // FIX: Lottie icons invisible in FlatDesign. No size means a zero size; every animation view needs the placeholder
@@ -301,7 +345,7 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
     }
     // The dark animation where the style is dark. 深色风格下使用深色动画。
     NSURL *styleURL = followsDarkMode ? [self.styleSource URL:animationURL forTraitCollection:control.traitCollection] : animationURL;
-    UIView *animationView = [self makeAnimationViewWithSourceURL:animationURL shownURL:styleURL size:size contentMode:contentMode];
+    UIView *animationView = [self makeAnimationViewWithSourceURL:animationURL shownURL:styleURL size:size contentMode:contentMode owner:control];
     if (!animationView) {
         return;
     }
@@ -365,7 +409,7 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
         }
         return;
     }
-    [self swapAnimationView:animationView withNewView:[self makeAnimationViewWithSourceURL:sourceURL shownURL:URL size:animationView.bounds.size contentMode:animationView.contentMode]];
+    [self swapAnimationView:animationView withNewView:[self makeAnimationViewWithSourceURL:sourceURL shownURL:URL size:animationView.bounds.size contentMode:animationView.contentMode owner:animationView.superview ?: animationView]];
 }
 
 /*!
@@ -410,7 +454,7 @@ static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationSh
     }
     CGSize viewSize = CGSizeEqualToSize(size, CGSizeZero) ? animationView.bounds.size : size;
     NSURL *shownURL = [self.styleSource hasStyleVariantForURL:URL] ? [self.styleSource URL:URL forTraitCollection:control.traitCollection] : URL;
-    UIView *newAnimationView = [self makeAnimationViewWithSourceURL:URL shownURL:shownURL size:viewSize contentMode:contentMode];
+    UIView *newAnimationView = [self makeAnimationViewWithSourceURL:URL shownURL:shownURL size:viewSize contentMode:contentMode owner:control];
     [self swapAnimationView:animationView withNewView:newAnimationView];
     if (newAnimationView.superview) {
         [self applyDarkColorsToAnimationView:newAnimationView traitCollection:control.traitCollection];
