@@ -363,7 +363,11 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
         if (params.marginStart == start && params.topMargin == top) return
         params.topMargin = top
         params.marginStart = start
-        if (relayout) view.layoutParams = params
+        // [EN] While measuring, the margins are read right after: `marginStart` reaches `leftMargin` only when the direction is resolved, which
+        //      `layoutParams =` does but this path does not, so resolve it here (a stale margin left the old first item's space in the width).
+        // [CN] 测量期间边距随后立即被读取：`marginStart` 只有在解析布局方向后才会写入 `leftMargin`；`layoutParams =` 会解析而此路径不会，所以在这里解析
+        //      （否则旧的第一个条目的间距会留在宽度里）。
+        if (relayout) view.layoutParams = params else params.resolveLayoutDirection(view.layoutDirection)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
