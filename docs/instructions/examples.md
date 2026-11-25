@@ -85,7 +85,7 @@ A demo that shows another setup on purpose (no plus button, a plus button withou
   - Pin the library by commit, not by copy: HarmonyOS pins it in `CrossPlatform/harmonyos-cyltabbar/classifymenu.pin` and
     `scripts/fetch-classifymenu.sh` fetches `harmony/classifymenu` into the git-ignored `cylclassifymenu/` (the build script runs it).
     Every tab of an example uses it, the first one too (it keeps the Objective-C example's sections and rows, see "Demo table rows" above).
-    Exception: the badge sample rows stay rows, because a badge is drawn over a row's icon and a tag has no place for it.
+    (Superseded 2026-11-25 by "Badge samples are tags too" below: the badge sample rows are tags as well; a tag draws no badge.)
   - Android pins it the same way (`scripts/fetch-classifymenu.sh android` fetches `android/merged/library` into the git-ignored
     `Example-Android/cylclassifymenu/`, built with `Example-Android/cylclassifymenu.build.gradle.kts`); the tag list is the header view of the demo `ListView`,
     so scroll hiding keeps working, and the badge rows follow as rows. The callout stays until the next touch, tap or scroll (pin b79d2031 or later).
