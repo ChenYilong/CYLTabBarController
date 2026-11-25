@@ -899,6 +899,16 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         plusButton?.cyl_reloadTabBarItemAnimationViewForCurrentStyle()
         // [EN] A manager that follows Dark Mode (`identifierForTrait`, e.g. a dark skin of a configuration) switches now, as iOS does. [CN] 跟随深色模式的管理器（`identifierForTrait`，例如配置中的深色皮肤）立即切换，与 iOS 一致。
         newConfig?.let { configuration -> tabBarController?.cyl_themeManager?.takeIf { it.identifierForTrait != null }?.updateThemeForTraitCollection(configuration) }
+        // [EN] A live light / dark switch (the app handles `uiMode` itself, as a Flutter or React Native host does): the style's mode-dependent colors are
+        //      resolved again (the bar background, the default tints that every tab's title and icon color follow) and the bar is repainted. Without it the bar kept the
+        //      old mode's background under the new mode's icon colors (near-white icons on a light bar).
+        // [CN] 运行中切换浅色 / 深色（App 自己处理 `uiMode`，如 Flutter 或 React Native 宿主）：重新解析样式随模式变化的颜色（TabBar 背景、各 Tab 标题与图标颜色所用的
+        //      默认着色），并重绘 TabBar。否则 TabBar 会在新模式的图标颜色下保留旧模式的背景（浅色 TabBar 上近乎白色的图标）。
+        tabBarController?.let { controller ->
+            styleRenderer.applyBackgroundColor(this, controller.cyl_tabBarBackgroundColor)
+            refreshSelection()
+        }
+        invalidate()
     }
 
     /**

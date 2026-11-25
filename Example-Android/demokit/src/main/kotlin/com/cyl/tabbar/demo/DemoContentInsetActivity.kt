@@ -66,6 +66,11 @@ class DemoContentInsetActivity : AppCompatActivity() {
         column.addView(row(item(cylDemoText("Normal"), CYLAnimatedItemBackgroundStyle.Flat, false), item(cylDemoText("Selected"), CYLAnimatedItemBackgroundStyle.Flat, true)))
         column.addView(caption(cylDemoText("Liquid Glass: itemContentHorizontalInset unset")))
         column.addView(row(item(cylDemoText("Normal"), CYLAnimatedItemBackgroundStyle.LiquidGlass, false), item(cylDemoText("Selected"), CYLAnimatedItemBackgroundStyle.LiquidGlass, true)))
+        // [EN] The window is edge to edge: the content starts under the action bar and the status bar, so it is padded by both. [CN] 窗口是边到边的：内容从操作栏与状态栏下方开始，所以两者都要留出空间。
+        val actionBar = TypedValue().let { if (theme.resolveAttribute(androidx.appcompat.R.attr.actionBarSize, it, true)) TypedValue.complexToDimensionPixelSize(it.data, resources.displayMetrics) else dp(56f) }
+        val statusBarId = resources.getIdentifier("status_bar_height", "dimen", "android")
+        val statusBar = if (statusBarId > 0) resources.getDimensionPixelSize(statusBarId) else dp(24f)
+        column.setPadding(0, actionBar + statusBar, 0, 0)
         setContentView(column)
     }
 }
