@@ -12,6 +12,8 @@
     "pages/LiquidGlassDock",
     "pages/AnimatedItemEnd",
     "pages/DefaultTint",
+    "pages/RiveAndPag",
+    "pages/ContentInset",
     "pages/RiveColors",
     "pages/Released",
     "pages/ResourceMissing"

@@ -96,3 +96,8 @@ Tests that today can only run on arm64 (PAG and Rive playback, their `onEnded`, 
 2. **Plan 2, if Plan 1 fails: hand the test to the macOS session.** A Mac (Apple silicon) is arm64, so its arm64 HarmonyOS emulator runs PAG and Rive natively. Send the task to the active session whose name starts with `Mac` (`ListAgents`), with the build, the commands and what to check; when none is reachable, record it as a TODO in the task's document for the next Mac session.
 
 Status (2026-11-22): Plan 1 done for Rive and PAG behind the debug guard (`cylanimateditem/x86_64-debug-engines/rive` and `/pag`, `CYLAnimatedItemEngines.loadX86_64DebugEngines`, `tools/cyl_hap_x86_64.py install`, which adds only the engines the app uses); removing the debug guard needs the owner's approval. Task and score: `docs/Animated-Item.md`, "Rive and PAG on the x86_64 emulator".
+- **Build and device tests of the HarmonyOS example (added 2026-11-25).** `scripts/harmonyos-build.sh <build dir> [--ohos-test] [--run-ohos-test]` builds the HAPs; `--ohos-test` also builds the 
+  ohosTest HAP for the x86_64 emulator (`-p buildMode=emulatorTest`), `--run-ohos-test` installs it and runs the hypium tests (`hdc shell aa test ... OpenHarmonyTestRunner`; env `HDC_TARGET`, `HDC`) and fails unless 
+  `Failure: 0, Error: 0`. The script also fetches the PAG sample of the `Rive and PAG` page (`scripts/fetch-animation-resources.py PAGResources`, env `PYTHON`) into the git-ignored `rawfile/pag/`. 
+  Install the app on the x86_64 emulator with `cylanimateditem/tools/cyl_hap_x86_64.py install` (adds the Rive and PAG debug engines), then run the ohosTest. Launch parameters of the example: `cylColorMode dark|light`, `cylScreen <row id>` 
+  (`rive-and-pag`, `content-inset`, `default-tint`, `gallery`).

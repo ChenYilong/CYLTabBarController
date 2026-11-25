@@ -56,8 +56,12 @@ object CYLTabBarItemAnimationTint {
      * [EN] Draws `color` on an animation view: on the layer of `view`, or on the inner view of a Rive view (which draws its own tint).
      * [CN] 在动画视图上绘制 `color`：绘制在 `view` 的图层上，Rive 视图则绘制在其内部视图上（它自己绘制着色）。
      */
+    // [EN] No "only when the color changes" test for a Rive view: its tint is a layer paint on rive-android's inner view, which is lost when that view
+    //      is created late or reset, so a skipped redraw left the file's own (dark) strokes on a dark tab bar (CYLRiveTintRedrawTest).
+    // [CN] Rive 视图没有「仅在颜色变化时」的判断：它的着色是 rive-android 内部视图上的 layer paint，该视图晚创建或被重置时会丢失，跳过重绘会让文件自身的（深色）
+    //      描边留在深色 TabBar 上（CYLRiveTintRedrawTest）。
     fun applyToAnimationView(view: View, color: Int?) {
-        if (view is CYLRiveTabBarItemAnimationView) { if (view.appliedTintColor != color) view.drawTint(color) } else apply(view, color)
+        if (view is CYLRiveTabBarItemAnimationView) view.drawTint(color) else apply(view, color)
     }
 
     // [EN] The views whose tint an item resolves (it knows both icon colors); their player and Rive view leave the tint to it. Weak, main thread only.

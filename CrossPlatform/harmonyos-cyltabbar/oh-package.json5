@@ -4,5 +4,8 @@
   "dependencies": {},
   "devDependencies": {
     "@ohos/hypium": "1.0.21"
+  },
+  "overrides": {
+    "@tencent/libpag": "4.4.31"
   }
 }
