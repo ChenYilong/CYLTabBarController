@@ -27,11 +27,24 @@ rootProject.name = "CYLTabBarControllerAndroid"
 //      CrossPlatform/harmonyos-cyltabbar/classifymenu.pin into the git-ignored cylclassifymenu/ (scripts/fetch-classifymenu.sh android).
 // [CN] CollectionViewClassifyMenu 的 TagList（演示中带分组的列表，docs/instructions/examples.md）按 classifymenu.pin 固定的提交拉取到不入库的
 //      cylclassifymenu/（scripts/fetch-classifymenu.sh android）。
-val classifyMenuPin = file("../CrossPlatform/harmonyos-cyltabbar/classifymenu.pin").readText().trim()
-val classifyMenuFetched = file("cylclassifymenu/.pinned-sha")
-if (!classifyMenuFetched.exists() || classifyMenuFetched.readText().trim() != classifyMenuPin) {
-    val fetch = ProcessBuilder(listOf("C:/Program Files/Git/bin/bash.exe", "/usr/bin/bash").firstOrNull { file(it).exists() } ?: "bash", file("../scripts/fetch-classifymenu.sh").absolutePath, "android").inheritIO().start().waitFor()
-    check(fetch == 0) { "scripts/fetch-classifymenu.sh android failed (needs bash, git and tar)" }
+// [EN] `standalone`: this build is the root (the demo). Included in another build (CollectionViewClassifyMenu includes this folder from a sparse checkout
+//      of Example-Android, Example-Shared and docs), only the three library modules it substitutes are included, and nothing outside this folder
+//      is read or run (the pin file and the fetch script are not in a sparse checkout, and the fetch would be circular).
+// [CN] `standalone`：本构建是根构建（演示）。被其他构建包含时（CollectionViewClassifyMenu 以 Example-Android、Example-Shared 与 docs 的稀疏检出包含本目录），
+//      只包含它替换的三个库模块，并且不读取、不运行本目录之外的任何内容（稀疏检出中没有固定提交文件与拉取脚本，拉取也会循环依赖）。
+val standalone = gradle.parent == null
+
+if (standalone) {
+    val classifyMenuPin = file("../CrossPlatform/harmonyos-cyltabbar/classifymenu.pin").readText().trim()
+    val classifyMenuFetched = file("cylclassifymenu/.pinned-sha")
+    if (!classifyMenuFetched.exists() || classifyMenuFetched.readText().trim() != classifyMenuPin) {
+        val fetch = ProcessBuilder(listOf("C:/Program Files/Git/bin/bash.exe", "/usr/bin/bash").firstOrNull { file(it).exists() } ?: "bash", file("../scripts/fetch-classifymenu.sh").absolutePath, "android").inheritIO().start().waitFor()
+        check(fetch == 0) { "scripts/fetch-classifymenu.sh android failed (needs bash, git and tar)" }
+    }
 }
-include(":tabpages", ":cylanimateditem", ":classifymenu", ":cyltabbar", ":demokit", ":app", ":example-gif", ":example-pag", ":example-rive")
-project(":classifymenu").projectDir = file("cylclassifymenu")
+if (standalone) {
+    include(":tabpages", ":cylanimateditem", ":classifymenu", ":cyltabbar", ":demokit", ":app", ":example-gif", ":example-pag", ":example-rive")
+    project(":classifymenu").projectDir = file("cylclassifymenu")
+} else {
+    include(":tabpages", ":cylanimateditem", ":cyltabbar")
+}

@@ -94,7 +94,7 @@ class CyltabbarAnimationView(context: Context) : FrameLayout(context) {
   fun applyAnimationDarkTint(value: String?) { item.animationDarkTint = value?.takeIf { it.isNotEmpty() } }
 
   /** `animationRenderingMode` raw value: "automatic", "alwaysTemplate" or "alwaysOriginal"; null is "automatic". */
-  fun applyAnimationRenderingMode(value: String?) { item.animationRenderingMode = value?.takeIf { it.isNotEmpty() } ?: "automatic" }
+  fun applyAnimationRenderingMode(value: String?) { item.animationRenderingMode = com.cyl.animateditem.CYLAnimationRenderingMode.parse(value) ?: com.cyl.animateditem.CYLAnimationRenderingMode.Automatic }
 
   /** `itemBackgroundStyle`: "liquidGlass" or anything else (null, "flat") for flat. */
   fun applyItemBackgroundStyle(value: String?) {

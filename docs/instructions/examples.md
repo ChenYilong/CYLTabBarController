@@ -50,6 +50,10 @@ A demo that shows another setup on purpose (no plus button, a plus button withou
     number, a note), is moved out of the title and **appended to the subtitle** (after the row's own subtitle, joined by ` · `), so it shows only on a
     long press. A title that is only brackets stays as it is. Every example does this in the code that builds the tag list
     (HarmonyOS `demoTagText`, Android `DemoTagList.tagText`, mini program `cylTagText`), never in the library and never in the row data.
+  - Fold control is a tail control: a section that folds (`defaultVisibleRows` 3) puts its expand / collapse button in the tag flow as the LAST tag,
+    showing only the icon (a chevron, turned when expanded): `foldControl` position `tail`, content `icon`, on every platform. Never a header button and
+    never a title on it. It is set in the same code that builds the tag list's configuration (HarmonyOS `demo/DemoTagList.ets`, Android `demo/DemoTagList.kt`,
+    mini program `utils/cyl_demo_tags.js`).
   - Liquid Glass style: every tag list in an example uses the library's Liquid Glass tag style (`backgroundStyle` `liquidGlass`: a glass background
     behind each tag, with the library's own border, corner radius and content inset), never the flat style, on every platform. It is set in the code that
     builds the tag list's configuration (HarmonyOS `demo/DemoTagList.ets`, Android `demo/DemoTagList.kt`, mini program `utils/cyl_demo_tags.js`), together with

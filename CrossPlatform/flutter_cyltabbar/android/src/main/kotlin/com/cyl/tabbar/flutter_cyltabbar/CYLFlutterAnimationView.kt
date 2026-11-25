@@ -58,7 +58,7 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
     (arguments["tintColor"] as? Number)?.let { item.iconColor = it.toInt() }
     item.animationTint = (arguments["animationTint"] as? String)?.takeIf { it.isNotEmpty() }
     item.animationDarkTint = (arguments["animationDarkTint"] as? String)?.takeIf { it.isNotEmpty() }
-    item.animationRenderingMode = arguments["animationRenderingMode"] as? String
+    item.animationRenderingMode = com.cyl.animateditem.CYLAnimationRenderingMode.parse(arguments["animationRenderingMode"] as? String)
     setItemBackgroundStyle(arguments["itemBackgroundStyle"])
     (arguments["itemBackgroundColor"] as? Number)?.let { item.itemBackgroundColor = it.toInt() }
     (arguments["itemCornerRadius"] as? Number)?.let { item.itemCornerRadius = it.toFloat() }
@@ -117,7 +117,7 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
       "setTintColor" -> item.iconColor = (argument as? Number)?.toInt()
       "setAnimationTint" -> item.animationTint = (argument as? String)?.takeIf { it.isNotEmpty() }
       "setAnimationDarkTint" -> item.animationDarkTint = (argument as? String)?.takeIf { it.isNotEmpty() }
-      "setAnimationRenderingMode" -> item.animationRenderingMode = argument as? String
+      "setAnimationRenderingMode" -> item.animationRenderingMode = com.cyl.animateditem.CYLAnimationRenderingMode.parse(argument as? String)
       "setItemBackgroundStyle" -> setItemBackgroundStyle(argument)
       "setItemBackgroundColor" -> item.itemBackgroundColor = (argument as? Number)?.toInt()
       "setItemCornerRadius" -> item.itemCornerRadius = (argument as? Number)?.toFloat()
