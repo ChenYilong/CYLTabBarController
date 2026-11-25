@@ -1,7 +1,6 @@
 package com.cyl.animateditem
 
 import android.content.res.Configuration
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
@@ -13,10 +12,10 @@ import android.view.View
  *      Lottie, PAG, SVGA, Rive), as on iOS. A one-color icon is drawn like a template image: the view's layer goes
  *      through a SRC_IN color filter (a `TextureView`, as PAG's and Rive's views, takes it as its layer paint), so no
  *      engine needs a color API of its own. "title" follows the tab's title color (the player's `tintColor`); a fixed
- *      color ("#RRGGBB" / "#AARRGGBB") uses `darkTint` in night mode when it is set.
+ *      color ("#RRGGBB" / "#RRGGBBAA") uses `darkTint` in night mode when it is set.
  * [CN] Tab 动画 URL 中的 `tint` / `darkTint` 选项，适用于所有引擎（GIF、Lottie、PAG、SVGA、Rive），与 iOS 相同。单色图标像模板图片一样绘制：
  *      视图的图层经过 SRC_IN 颜色滤镜（PAG 与 Rive 的视图是 `TextureView`，作为其 layer paint），因此任何引擎都不需要自己的颜色 API。
- *      "title" 跟随 Tab 的标题颜色（播放器的 `tintColor`）；固定颜色（"#RRGGBB" / "#AARRGGBB"）在夜间模式且设置了 `darkTint` 时使用它。
+ *      "title" 跟随 Tab 的标题颜色（播放器的 `tintColor`）；固定颜色（"#RRGGBB" / "#RRGGBBAA"）在夜间模式且设置了 `darkTint` 时使用它。
  */
 object CYLTabBarItemAnimationTint {
     /**
@@ -58,8 +57,23 @@ object CYLTabBarItemAnimationTint {
      * [CN] 在动画视图上绘制 `color`：绘制在 `view` 的图层上，Rive 视图则绘制在其内部视图上（它自己绘制着色）。
      */
     fun applyToAnimationView(view: View, color: Int?) {
-        if (view is CYLRiveTabBarItemAnimationView) view.drawTint(color) else apply(view, color)
+        if (view is CYLRiveTabBarItemAnimationView) { if (view.appliedTintColor != color) view.drawTint(color) } else apply(view, color)
     }
+
+    // [EN] The views whose tint an item resolves (it knows both icon colors); their player and Rive view leave the tint to it. Weak, main thread only.
+    // [CN] 由条目解析着色的视图（条目知道两种图标颜色）；其播放器与 Rive 视图不再自己处理着色。弱引用，仅主线程使用。
+    private val managed = java.util.Collections.newSetFromMap(java.util.WeakHashMap<View, Boolean>())
+
+    /**
+     * [EN] Marks `view`'s tint as resolved by the item that shows it (`CYLAnimatedItemView.refreshAnimationTint`).
+     * [CN] 标记 `view` 的着色由显示它的条目解析（`CYLAnimatedItemView.refreshAnimationTint`）。
+     */
+    fun setManaged(view: View) { managed.add(view) }
+
+    /**
+     * [EN] Whether an item resolves the tint of `view`. [CN] `view` 的着色是否由条目解析。
+     */
+    fun isManaged(view: View?): Boolean = view != null && managed.contains(view)
 
     /**
      * [EN] The `tint` option, trimmed; null when it is missing or empty. [CN] 去除空白后的 `tint` 选项；缺失或为空时为 null。
@@ -73,26 +87,67 @@ object CYLTabBarItemAnimationTint {
     fun hasTint(options: Map<String, String>): Boolean = tintOption(options) != null
 
     /**
-     * [EN] The fixed tint for `configuration`: `darkTint` in night mode when it is set, else `tint`; null for "title" or none.
-     * [CN] `configuration` 下的固定着色：夜间模式且设置了 `darkTint` 时使用它，否则使用 `tint`；"title" 或未设置时为 null。
+     * [EN] The tint truth table (the same on iOS, Android, HarmonyOS and the mini program), the only place that resolves a tint.
+     *      `tint` / `darkTint` are the already merged texts (the item's property over the source's option). Unset or invalid `tint`
+     *      (neither "title" nor "#RRGGBB" / "#RRGGBBAA"): null, the file's own colors. "title": unselected `normalIconColor`;
+     *      selected `selectedIconColor`, else `normalIconColor`; with neither: null (the tint is removed). A fixed color:
+     *      unselected the color, in night mode `darkTint` when it is valid; selected `selectedIconColor` when present, else the
+     *      fixed color (with `darkTint` in night mode). An 8-digit color is #RRGGBBAA.
+     * [CN] 着色真值表（iOS、Android、鸿蒙、小程序相同），是唯一解析着色的地方。`tint` / `darkTint` 是已合并的文本（条目属性优先于来源选项）。
+     *      `tint` 未设置或无效（既不是 "title"，也不是 "#RRGGBB" / "#RRGGBBAA"）：null，保持文件自身颜色。"title"：未选中为 `normalIconColor`；
+     *      选中为 `selectedIconColor`，否则 `normalIconColor`；两者都没有：null（移除着色）。固定颜色：未选中为该颜色，夜间模式且 `darkTint` 有效时为 `darkTint`；
+     *      选中且有 `selectedIconColor` 时为它，否则为固定颜色（夜间模式使用 `darkTint`）。8 位颜色为 #RRGGBBAA。
      */
-    fun fixedTintColor(options: Map<String, String>, configuration: Configuration): Int? {
-        val light = tintOption(options)?.takeIf { it != TINT_TITLE }?.let { parseColor(it) } ?: return null
-        // [EN] Only a fixed tint has a night color: "title" follows the title colors. [CN] 只有固定着色才有夜间颜色："title" 跟随标题颜色。
-        val dark = options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionDarkTint]?.trim()?.takeIf { it.isNotEmpty() }?.let { parseColor(it) }
-        return if (isNight(configuration)) dark ?: light else light
+    fun resolve(tint: String?, darkTint: String?, selected: Boolean, isDark: Boolean, normalIconColor: Int?, selectedIconColor: Int?): Int? {
+        val text = tint?.trim()?.takeIf { it.isNotEmpty() } ?: return null
+        if (text == TINT_TITLE) return if (selected) selectedIconColor ?: normalIconColor else normalIconColor
+        val fixed = parseHex(text) ?: return null
+        val night = if (isDark) darkTint?.let { parseHex(it) } else null
+        val fixedForMode = night ?: fixed
+        return if (selected) selectedIconColor ?: fixedForMode else fixedForMode
     }
 
     /**
-     * [EN] The color to draw for `options`: the fixed tint for `configuration`, or `titleColor` when the option is "title".
-     * [CN] `options` 应绘制的颜色：`configuration` 下的固定着色，或选项为 "title" 时的 `titleColor`。
+     * [EN] "#RRGGBB" or "#RRGGBBAA" (the iOS / Rive order) as an ARGB int; null for any other text. `Color.parseColor` reads
+     *      8 digits as #AARRGGBB, so it is not used. [CN] "#RRGGBB" 或 "#RRGGBBAA"（iOS / Rive 的顺序）转为 ARGB 整数；其他文本为 null。
+     *      `Color.parseColor` 把 8 位当作 #AARRGGBB，因此不使用它。
+     */
+    fun parseHex(text: String): Int? {
+        val value = text.trim()
+        if (!value.startsWith("#") || (value.length != 7 && value.length != 9)) return null
+        val digits = value.substring(1)
+        if (!digits.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }) return null
+        val rgb = digits.substring(0, 6).toInt(16)
+        val alpha = if (digits.length == 8) digits.substring(6).toInt(16) else 0xFF
+        return (alpha shl 24) or rgb
+    }
+
+    /**
+     * [EN] The `darkTint` option, trimmed; null when missing or empty. [CN] 去除空白后的 `darkTint` 选项；缺失或为空时为 null。
+     */
+    fun darkTintOption(options: Map<String, String>): String? =
+        options[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionDarkTint]?.trim()?.takeIf { it.isNotEmpty() }
+
+    /**
+     * [EN] The fixed tint for `configuration` (unselected): `darkTint` in night mode when it is valid, else `tint`; null for "title", an invalid or no tint.
+     * [CN] `configuration` 下（未选中）的固定着色：夜间模式且 `darkTint` 有效时使用它，否则使用 `tint`；"title"、无效或未设置时为 null。
+     */
+    fun fixedTintColor(options: Map<String, String>, configuration: Configuration): Int? {
+        return resolve(tintOption(options), darkTintOption(options), false, isNight(configuration), null, null)
+    }
+
+    /**
+     * [EN] The color to draw for `options` given the one color a player gets (`titleColor`, of the state `selected`): the table
+     *      with `titleColor` as the icon color of that state. No state (null) counts as unselected.
+     * [CN] 在播放器只得到一个颜色（状态 `selected` 的 `titleColor`）时，`options` 应绘制的颜色：真值表，其中 `titleColor` 作为该状态的图标颜色。
+     *      没有状态（null）视为未选中。
      */
     fun resolvedTintColor(options: Map<String, String>, titleColor: Int?, configuration: Configuration, selected: Boolean? = null): Int? {
-        if (tintOption(options) == TINT_TITLE) return titleColor
-        val fixed = fixedTintColor(options, configuration) ?: return null
-        // [EN] A fixed tint colors only the unselected tab; the selected one takes the title's selected color (iOS 9a64feea).
-        //      Without a state (null) the fixed tint stays in both states. [CN] 固定着色只用于未选中的 Tab；选中的 Tab 使用标题的选中颜色（iOS 9a64feea）。没有状态（null）时两种状态都使用固定着色。
-        return if (selected == true) titleColor ?: fixed else fixed
+        val isSelected = selected == true
+        return resolve(
+            tintOption(options), darkTintOption(options), isSelected, isNight(configuration),
+            if (isSelected) null else titleColor, if (isSelected) titleColor else null,
+        )
     }
 
     /**
@@ -116,8 +171,6 @@ object CYLTabBarItemAnimationTint {
      */
     fun appliedColor(view: View?): Int? = view?.cyl_getTag(TINT_TAG) as? Int
 
-    private fun parseColor(value: String): Int? = runCatching { Color.parseColor(value) }.getOrNull()
-
     private fun isNight(configuration: Configuration) =
         (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 }
@@ -140,6 +193,7 @@ internal class CYLTabBarItemAnimationTintingPlayer(
         set(value) {
             player.tintColor = value
             val view = animationView ?: return
+            if (CYLTabBarItemAnimationTint.isManaged(view)) return
             CYLTabBarItemAnimationTint.apply(view, CYLTabBarItemAnimationTint.resolvedTintColor(options, value, view.resources.configuration, tintSelected))
         }
     private var tintSelected: Boolean? = null
@@ -149,12 +203,14 @@ internal class CYLTabBarItemAnimationTintingPlayer(
         tintTitleColor = color
         player.setTintColor(color, selected)
         val view = animationView ?: return
+        if (CYLTabBarItemAnimationTint.isManaged(view)) return
         CYLTabBarItemAnimationTint.apply(view, CYLTabBarItemAnimationTint.resolvedTintColor(options, color, view.resources.configuration, selected))
     }
     override fun applyColors(colors: Map<String, Int>?, configuration: Configuration) {
         player.applyColors(colors, configuration)
         // [EN] Called when night mode changes: a fixed tint takes the new mode's color. [CN] 夜间模式变化时调用：固定着色使用新模式的颜色。
         val view = animationView ?: return
+        if (CYLTabBarItemAnimationTint.isManaged(view)) return
         if (CYLTabBarItemAnimationTint.fixedTintColor(options, configuration) != null) {
             CYLTabBarItemAnimationTint.apply(view, CYLTabBarItemAnimationTint.resolvedTintColor(options, tintTitleColor, configuration, tintSelected))
         }

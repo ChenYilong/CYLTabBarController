@@ -1086,7 +1086,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         imageView.isHidden = isIconHidden || animationShows()
         animationView?.isHidden = isIconHidden || isShowingImageAfterAnimationEnd
         // [EN] A new animation view or icon takes the current icon tint. [CN] 新的动画视图或图标使用当前的图标着色。
-        if let color = currentItemStateAppearance?.iconColor ?? lastIconTintColor {
+        if let color = currentIconColor ?? lastIconTintColor {
             applyIconTintColor(color)
         }
     }
@@ -1246,6 +1246,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         didSet {
             guard isSelected != oldValue else { return }
             applyItemAppearance()
+            // [EN] Without `itemAppearance` the animation tint still depends on the state. [CN] 没有 `itemAppearance` 时，动画着色仍取决于状态。
+            if itemAppearance == nil { pushAnimationTint(iconColor: lastIconTintColor) }
             updateIcon()
             itemStateDidChange()
             updateItemAccessibility()
@@ -1290,19 +1292,54 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     open func applyIconTintColor(_ color: UIColor?) {
         lastIconTintColor = color
         imageView.tintColor = color
+        pushAnimationTint(iconColor: color)
+    }
+
+    /**
+     [EN] The icon color of the current state: the state's `iconColor`; a selected item without one takes the normal state's (the table of
+          `CYLTabBarItemAnimationResolveTint`). nil without `itemAppearance` or without any icon color.
+     [CN] 当前状态的图标颜色：该状态的 `iconColor`；选中而没有该值的 item 使用普通状态的（`CYLTabBarItemAnimationResolveTint` 的真值表）。没有
+          `itemAppearance` 或没有任何图标颜色时为 nil。
+     */
+    private var currentIconColor: UIColor? {
+        guard let appearance = itemAppearance, let state = currentItemStateAppearance else { return nil }
+        if let color = state.iconColor { return color }
+        return (isSelected && isEnabled) ? appearance.normal.iconColor : nil
+    }
+
+    /**
+     [EN] Gives the animation view the color the tint table resolves for `iconColor` (the icon color of the current state): nil removes the
+          tint (no `animationTint`, "title" without an icon color). By selector: the tint method is declared by the tab bar's animation subspec.
+     [CN] 把着色真值表为 `iconColor`（当前状态的图标颜色）解析出的颜色交给动画视图：nil 表示移除着色（没有 `animationTint`，或 "title" 而没有图标颜色）。
+          通过 selector 调用：着色方法声明在 TabBar 的动画子库中。
+     */
+    private func pushAnimationTint(iconColor color: UIColor?) {
         #if CYL_ANIMATION_ENGINE_AVAILABLE
-        // [EN] By selector: the tint method is declared by the tab bar's animation subspec, which this component does not import.
-        // [CN] 通过 selector 调用：着色方法声明在 TabBar 的动画子库中，本组件不导入它。
-        // [EN] With the state when the view takes it: a fixed tint only on the unselected item (2026-11-19).
-        // [CN] 视图支持时带上状态：固定着色只用于未选中的 item（2026-11-19）。
+        guard let view = animationView else { return }
+        // [EN] The table's two inputs are the normal and the selected state's OWN icon colors (a host that only pushed one color through
+        //      `applyIconTintColor` has just the current state's); the resolver does the fallbacks ("title": selected, else normal; a fixed
+        //      color: the selected one only). [CN] 真值表的两个输入是普通状态与选中状态各自的图标颜色（只通过 `applyIconTintColor` 传入一个颜色的宿主
+        //      只有当前状态的）；回退由解析函数完成（"title"：选中的，否则普通的；固定颜色：只用选中的）。
+        let normalColor = itemAppearance != nil ? itemAppearance?.normal.iconColor : (isSelected ? nil : color)
+        let selectedColor = itemAppearance != nil ? itemAppearance?.selected.iconColor : (isSelected ? color : nil)
+        let resolved = CYLTabBarItemAnimationItemTintColor(
+            animationURL, animationTint, animationDarkTint, isSelected, traitCollection.userInterfaceStyle == .dark,
+            normalColor, selectedColor)
+        // [EN] A view that resolves its own tint from its URL options (Rive) takes the final color instead, so the properties reach it too.
+        // [CN] 自行从 URL 选项解析着色的视图（Rive）改为接收最终颜色，使属性对它也生效。
+        let resolvedSelector = NSSelectorFromString("cyl_applyAnimationViewResolvedTintColor:")
+        if view.responds(to: resolvedSelector) {
+            _ = view.perform(resolvedSelector, with: resolved)
+            return
+        }
         let tintWithState = NSSelectorFromString("cyl_applyAnimationViewTintColor:selected:")
         let tint = NSSelectorFromString("cyl_applyAnimationViewTintColor:")
-        if let view = animationView, view.responds(to: tintWithState) {
+        if view.responds(to: tintWithState) {
             typealias CYLTintWithState = @convention(c) (AnyObject, Selector, UIColor?, Bool) -> Void
             let implementation = unsafeBitCast(view.method(for: tintWithState), to: CYLTintWithState.self)
-            implementation(view, tintWithState, color, isSelected)
-        } else if let view = animationView, view.responds(to: tint) {
-            _ = view.perform(tint, with: color)
+            implementation(view, tintWithState, resolved, isSelected)
+        } else if view.responds(to: tint) {
+            _ = view.perform(tint, with: resolved)
         }
         #endif
     }
@@ -1314,7 +1351,14 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      */
     open func applyItemAppearance() {
         guard let state = currentItemStateAppearance else { return }
-        if let color = state.iconColor { applyIconTintColor(color) }
+        if let color = currentIconColor {
+            applyIconTintColor(color)
+        } else {
+            // [EN] No icon color at all: the animation loses any tint ("title" has nothing to draw); the icon keeps its own look.
+            // [CN] 完全没有图标颜色：动画移除所有着色（"title" 没有可用的颜色）；图标保持自身外观。
+            lastIconTintColor = nil
+            pushAnimationTint(iconColor: nil)
+        }
         let attributes = state.titleTextAttributes
         if let font = attributes[.font] as? UIFont { titleLabel.font = font }
         if let color = attributes[.foregroundColor] as? UIColor { titleLabel.textColor = color }
@@ -1326,9 +1370,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         // [EN] A dynamic icon color is resolved again for the animation view's tint. [CN] 动态图标颜色为动画视图的着色重新解析。
         if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
             applyItemAppearance()
-            if currentItemStateAppearance?.iconColor == nil, let color = lastIconTintColor {
-                applyIconTintColor(color)
-            }
+            // [EN] A fixed tint's dark color, and a dynamic icon color, follow the new appearance. [CN] 固定着色的深色颜色与动态图标颜色跟随新的外观。
+            pushAnimationTint(iconColor: lastIconTintColor)
         }
     }
 
@@ -1393,10 +1436,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     ///      interface); none of them leaves the file's own colors. [CN] 为动画视图设置着色：`animationTint` / `animationDarkTint` 覆盖来源 URL 的
     ///      `tint` / `darkTint` 选项（Rive 的接口）；都没有时保持文件自己的颜色。
     private func prepareAnimationTint(_ view: UIView, url: URL) {
-        let prepared = CYLTabBarItemAnimationPrepareItemTint(view, url, animationSource.player(for: view), animationTint, animationDarkTint)
-        if prepared, let color = lastIconTintColor ?? currentItemStateAppearance?.iconColor {
-            applyIconTintColor(color)
-        }
+        _ = CYLTabBarItemAnimationPrepareItemTint(view, url, animationSource.player(for: view), animationTint, animationDarkTint)
+        // [EN] Always pushed, so a cleared tint (nil) reaches the view too. [CN] 总是推送，因此清除着色（nil）也会到达视图。
+        pushAnimationTint(iconColor: lastIconTintColor ?? currentIconColor)
     }
     #endif
 

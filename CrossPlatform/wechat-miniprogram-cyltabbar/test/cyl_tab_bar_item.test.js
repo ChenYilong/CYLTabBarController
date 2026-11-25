@@ -91,15 +91,41 @@ test('cyl-tab-bar-item: the icon box size goes to cyl-animated-item (iconWidth /
   assert.equal(plain.iconHeight, 28)
 })
 
-test('animation tint: "title" takes the state title color, a color stays, anything else is none', () => {
+test('animation tint: the item hands the options and its title colors over, cyl-animated-item resolves them', () => {
   const titleTextAttributes = { normal: { color: '#8E8E93' }, selected: { color: '#007AFF' } };
-  assert.equal(cylItemModel({ animationTint: 'title', titleTextAttributes }).animationTint, '#8E8E93');
-  assert.equal(cylItemModel({ animationTint: 'title', titleTextAttributes, selected: true }).animationTint, '#007AFF');
-  assert.equal(cylItemModel({ animationTint: 'Title', titleTextAttributes, selected: true,
-    standardAppearance: { stackedLayoutAppearance: { selected: { titleTextAttributes: { color: '#FF3B30' } } } } }).animationTint, '#FF3B30');
-  assert.equal(cylItemModel({ animationTint: '#34C759', titleTextAttributes, selected: true }).animationTint, '#34C759');
-  assert.equal(cylItemModel({ animationTint: 'red', titleTextAttributes }).animationTint, '');
-  assert.equal(cylItemModel({ titleTextAttributes }).animationTint, '');
+  const standardAppearance = { stackedLayoutAppearance: { selected: { titleTextAttributes: { color: '#FF3B30' } } } };
+  const { cylAnimatedItemAnimationTint: resolve } = require('../src/cyl-animated-item/cyl_animated_item_model');
+  const resolved = (props) => {
+    const m = cylItemModel({ titleTextAttributes, ...props });
+    return resolve({ animationTint: m.animationTint, animationDarkTint: m.animationDarkTint, selected: m.selected,
+      isDark: Boolean(props.isDark), iconTint: m.animationIconTint, selectedIconTint: m.animationSelectedIconTint });
+  };
+  assert.equal(resolved({ animationTint: 'title' }), '#8E8E93');
+  assert.equal(resolved({ animationTint: 'title', selected: true }), '#007AFF');
+  assert.equal(resolved({ animationTint: 'title', selected: true, standardAppearance }), '#FF3B30');
+  assert.equal(resolved({ animationTint: 'Title', selected: true, standardAppearance }), '', '"title" is case-sensitive, as on every platform');
+  assert.equal(resolved({ animationTint: 'title', selected: true, titleTextAttributes: { normal: { color: '#8E8E93' } } }), '#8E8E93', 'no selected title color: the normal one');
+  assert.equal(resolved({ animationTint: 'title', titleTextAttributes: undefined }), '', 'no title color at all: no tint');
+  // a fixed tint on the unselected tab; the selected tab takes the title's selected color
+  assert.equal(resolved({ animationTint: '#34C759' }), '#34C759');
+  assert.equal(resolved({ animationTint: '#34C759', selected: true }), '#007AFF');
+  assert.equal(resolved({ animationTint: '#34C759', selected: true, titleTextAttributes: { normal: { color: '#8E8E93' } } }), '#34C759');
+  assert.equal(resolved({ animationTint: '#34C759', animationDarkTint: '#112233', isDark: true }), '#112233');
+  assert.equal(resolved({ animationTint: 'red' }), '');
+  assert.equal(resolved({}), '');
+  const m = cylItemModel({ animationTint: ' #34C759 ', animationDarkTint: '#112233', titleTextAttributes, selected: true });
+  assert.deepEqual([m.animationTint, m.animationDarkTint, m.animationIconTint, m.animationSelectedIconTint], ['#34C759', '#112233', '#8E8E93', '#007AFF']);
+});
+
+test('cyl-tab-bar-item binds the unresolved options and the dark style to cyl-animated-item', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const template = fs.readFileSync(path.join(__dirname, '../src/cyl-tab-bar-item/index.wxml'), 'utf8');
+  for (const attribute of ['animation-tint="{{m.animationTint}}"', 'animation-dark-tint="{{m.animationDarkTint}}"',
+    'animation-icon-tint="{{m.animationIconTint}}"', 'animation-selected-icon-tint="{{m.animationSelectedIconTint}}"',
+    "user-interface-style=\"{{isDark ? 'dark' : 'light'}}\""]) {
+    assert.ok(template.includes(attribute), attribute);
+  }
 });
 
 test('cyl-tab-bar passes every icon color option to cyl-tab-bar-item (B28)', () => {
@@ -110,7 +136,7 @@ test('cyl-tab-bar passes every icon color option to cyl-tab-bar-item (B28)', () 
   const path = require('node:path');
   const template = fs.readFileSync(path.join(__dirname, '../src/cyl-tab-bar/index.wxml'), 'utf8');
   const item = template.slice(template.indexOf('<cyl-tab-bar-item'), template.indexOf('/>', template.indexOf('<cyl-tab-bar-item')));
-  for (const [attribute, key] of [['animation-tint', 'animationTint'], ['icon-tint', 'iconTint'],
+  for (const [attribute, key] of [['animation-tint', 'animationTint'], ['animation-dark-tint', 'animationDarkTint'], ['icon-tint', 'iconTint'],
     ['selected-icon-tint', 'selectedIconTint'], ['animation-colors', 'animationColors']]) {
     assert.ok(item.includes(`${attribute}="{{item.item.${key}}}"`), `${attribute} is not bound`);
   }

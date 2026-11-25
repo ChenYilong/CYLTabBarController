@@ -93,16 +93,14 @@ function cylStateAttributes(attributes, stateKey, selected) {
 }
 
 /**
- * [EN] The animation's one color (the `tint` option): "title" takes this state's title color (the appearance's, then
- *      the title attributes'), like iOS and HarmonyOS; a color is used as it is; '' keeps the file's colors.
- * [CN] 动画的单一颜色（`tint` 选项）："title" 取当前状态的标题颜色（先取 appearance，再取标题属性），与 iOS 和鸿蒙一致；
- *      颜色原样使用；'' 保持文件自身的颜色。
+ * [EN] The title color of one state, the icon color "title" follows: the appearance's, then the title attributes' of that
+ *      state only (no fallback to the normal state: cyl-animated-item does that for "title", and a fixed tint must not).
+ * [CN] 某一状态的标题颜色，即 "title" 所跟随的图标颜色：先取 appearance 的，再取该状态自己的标题属性（不回退到普通状态：
+ *      "title" 的回退由 cyl-animated-item 完成，固定着色不应回退）。
  */
-function cylAnimationTint(animationTint, appearance, titleAttributes) {
-  const tintOption = String(animationTint || '').trim();
-  return tintOption.toLowerCase() === 'title'
-    ? (cylTextColor(appearance.titleTextAttributes) || cylTextColor(titleAttributes))
-    : reader.cylColor(tintOption);
+function cylStateTitleColor(p, selected) {
+  return cylTextColor(cylAppearanceState(p.standardAppearance, selected).titleTextAttributes)
+    || cylTextColor(p.titleTextAttributes?.[selected ? 'selected' : 'normal']);
 }
 
 /**
@@ -166,7 +164,6 @@ function cylItemModel(p) {
   const imageMoveY = imageOffset.vertical + (imageInsets.top - imageInsets.bottom) / 2;
   const iconTint = reader.cylColor(appearance.iconColor) || reader.cylColor(selected ? p.selectedIconTint : p.iconTint);
   const titleAttributes = cylStateAttributes(p.titleTextAttributes, stateKey, selected);
-  const animationTint = cylAnimationTint(p.animationTint, appearance, titleAttributes);
   const badgeAttributes = cylStateAttributes(p.badgeTextAttributes, stateKey, selected);
   const badgeValue = String(p.badgeValue === undefined || p.badgeValue === null ? '' : p.badgeValue);
   const showsBadge = badgeValue !== '' || Boolean(badgeSize);
@@ -188,7 +185,12 @@ function cylItemModel(p) {
     animationPath,
     animationType: cylAnimationType(animationPath),
     iconTint,
-    animationTint,
+    // [EN] The tab's configured tint options and its title colors go to cyl-animated-item unresolved: the component is the only
+    //      resolver (cylAnimatedItemAnimationTint). [CN] Tab 配置的着色选项与标题颜色原样交给 cyl-animated-item：只有该组件做解析。
+    animationTint: String(p.animationTint === undefined || p.animationTint === null ? '' : p.animationTint).trim(),
+    animationDarkTint: String(p.animationDarkTint === undefined || p.animationDarkTint === null ? '' : p.animationDarkTint).trim(),
+    animationIconTint: cylStateTitleColor(p, false),
+    animationSelectedIconTint: cylStateTitleColor(p, true),
     iconWidth: iconBox.width,
     iconHeight: iconBox.height,
     centered,

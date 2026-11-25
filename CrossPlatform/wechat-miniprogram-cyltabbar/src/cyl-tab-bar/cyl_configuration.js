@@ -408,7 +408,8 @@ function cylFragmentOptions(fragment) {
  */
 function cylTintOption(value, allowsTitle) {
   const text = String(value === undefined || value === null ? '' : value).trim()
-  if (allowsTitle && text.toLowerCase() === 'title') {
+  // [EN] "title" is case-sensitive, as on every platform. [CN] "title" 区分大小写，各平台相同。
+  if (allowsTitle && text === 'title') {
     return 'title'
   }
   return cylColor(text) || ''

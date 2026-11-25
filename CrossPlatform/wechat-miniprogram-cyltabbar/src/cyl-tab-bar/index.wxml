@@ -47,6 +47,7 @@
         animation-size="{{item.item.animationSize}}"
         animation-colors="{{item.item.animationColors}}"
         animation-tint="{{item.item.animationTint}}"
+        animation-dark-tint="{{item.item.animationDarkTint}}"
         loops-when-unselected="{{item.item.loopsWhenUnselected}}"
         image-size="{{item.item.imageSize}}"
         image-insets="{{item.item.imageInsets}}"

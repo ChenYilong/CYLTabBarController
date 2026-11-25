@@ -67,9 +67,8 @@ fun CYLTabBarAnimationURLWithOptions(fileURL: String?, options: Map<CYLTabBarAni
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun CYLTabBarAnimationFileAndOptions(url: String): Pair<String, Map<String, String>> {
-    val fragment = url.substringAfter('#', "")
-    val options = fragment.split('&').filter { it.contains('=') }.associate { Uri.decode(it.substringBefore('=')) to Uri.decode(it.substringAfter('=')) }
-    return url.substringBefore('#') to options
+    // [EN] One option parser for the whole component: `#name=value&..` and `?name=value&..` read the same way. [CN] 整个组件共用一个选项解析器：`#name=value&..` 与 `?name=value&..` 读取方式相同。
+    return url.substringBefore('#') to CYLAnimatedItemSource.parse(url).options
 }
 
 /**
@@ -1231,7 +1230,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
         addView(rive, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         // [EN] A tab icon is not a control: TalkBack reads the tab button. [CN] Tab 图标不是控件：TalkBack 读取 Tab 按钮。
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
-        // [EN] A fixed tint ("#RRGGBB" / "#AARRGGBB"), with its night-mode color (`darkTint`). [CN] 固定着色，及其夜间模式颜色（`darkTint`）。
+        // [EN] A fixed tint ("#RRGGBB" / "#RRGGBBAA"), with its night-mode color (`darkTint`). [CN] 固定着色，及其夜间模式颜色（`darkTint`）。
         fixedTintColor(resources.configuration)?.let { applyTint(it) }
     }
 
@@ -1254,7 +1253,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        if (fixedTintColor(newConfig) != null) applyTint(CYLTabBarItemAnimationTint.resolvedTintColor(tintOptions, tintTitleColor, newConfig, tintSelected))
+        if (!CYLTabBarItemAnimationTint.isManaged(this) && fixedTintColor(newConfig) != null) applyTint(CYLTabBarItemAnimationTint.resolvedTintColor(tintOptions, tintTitleColor, newConfig, tintSelected))
         cyl_bindThemeInstance(newConfig)
     }
 
@@ -1337,6 +1336,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
      * [EN] The tab's title color, drawn when the `tint` option is "title". [CN] Tab 的标题颜色，`tint` 选项为 "title" 时绘制。
      */
     override fun cyl_applyAnimationViewTintColor(color: Int?) {
+        if (CYLTabBarItemAnimationTint.isManaged(this)) return
         if (tintOption == TINT_TITLE) applyTint(color)
     }
 
@@ -1353,6 +1353,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
     override fun cyl_applyAnimationViewTintColor(color: Int?, selected: Boolean) {
         tintTitleColor = color
         tintSelected = selected
+        if (CYLTabBarItemAnimationTint.isManaged(this)) return
         if (tintOption != null) applyTint(CYLTabBarItemAnimationTint.resolvedTintColor(tintOptions, color, resources.configuration, selected))
     }
 

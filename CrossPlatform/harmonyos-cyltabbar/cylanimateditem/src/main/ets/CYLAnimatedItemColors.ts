@@ -77,10 +77,12 @@ export const CYL_ANIMATED_ITEM_TINT_TITLE: string = 'title';
  *      "#AARRGGBB" 字符串；不是时为 undefined。
  */
 export function cylAnimatedItemTintArkColor(text: string): string | undefined {
-  const hex = text.trim().replace(/^#/, '');
-  if (!/^([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(hex)) {
+  // [EN] The same rule on every platform: a '#' and exactly 6 (RRGGBB) or 8 (RRGGBBAA) hex digits. [CN] 各平台相同的规则：必须有 '#'，且恰好 6 位（RRGGBB）或 8 位（RRGGBBAA）十六进制。
+  const trimmed = text.trim();
+  if (!/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(trimmed)) {
     return undefined;
   }
+  const hex = trimmed.substring(1);
   const argb = hex.length === 6 ? 'FF' + hex : hex.substring(6, 8) + hex.substring(0, 6);
   return '#' + argb.toUpperCase();
 }
@@ -102,8 +104,10 @@ export class CYLAnimatedItemTintInput {
   selected: boolean = false;
   /** [EN] Whether the app is in dark mode. [CN] 是否为深色模式。 */
   dark: boolean = false;
-  /** [EN] Whether the host set an icon color (`iconColor` is not ''). [CN] 宿主是否设置了图标颜色（`iconColor` 不是 ''）。 */
+  /** [EN] Whether the host set a normal icon color (`iconColor` is not ''). [CN] 宿主是否设置了普通图标颜色（`iconColor` 不是 ''）。 */
   hasIconColor: boolean = false;
+  /** [EN] Whether the host set a selected icon color (`selectedIconColor` is not ''). [CN] 宿主是否设置了选中图标颜色（`selectedIconColor` 不是 ''）。 */
+  hasSelectedIconColor: boolean = false;
 }
 
 /**
@@ -117,22 +121,23 @@ export class CYLAnimatedItemTintResult {
 }
 
 /**
- * [EN] The unified animation tint, as iOS Rive's `tint` / `darkTint`: a set property overrides the same option of the source (each of
- *      the two on its own); unset keeps the source's. No tint, or one that is not "title" nor a color: 'none'. "title": the item's icon
- *      color (the selected state's when selected, the host passes the one of the current state), 'none' without an icon color (no
- *      automatic recolor). A fixed color: the item's icon color when selected (without one, the fixed color), else the fixed color,
- *      or the dark one in dark mode when it is set and valid. The dark tint does nothing with "title". Pure, unit tested with Node.
- * [CN] 统一的动画着色，与 iOS Rive 的 `tint` / `darkTint` 一致：设置了的属性覆盖来源的同名选项（两者各自独立）；未设置则沿用来源的。没有着色，
- *      或既不是 "title" 也不是颜色：'none'。"title"：条目的图标颜色（选中时为选中状态的，宿主传入当前状态的那个），没有图标颜色时为 'none'
- *      （不自动改色）。固定颜色：选中时为条目的图标颜色（没有时用固定颜色），否则为固定颜色，深色模式下且设置了有效的深色值时为深色值。
- *      深色着色对 "title" 无效。纯逻辑，用 Node 做单元测试。
+ * [EN] The unified animation tint, the truth table shared by iOS, Android, HarmonyOS and the mini program: a set property overrides the same
+ *      option of the source (each of the two on its own); unset keeps the source's. No tint, or text that is neither "title" nor a color
+ *      (= unset): 'none'. "title": 'icon' when selected with a selected icon color, else 'icon' with a normal icon color (the view then draws in
+ *      its selected icon color when selected and it has one, else the normal one), else 'none' (no automatic recolor). A fixed color:
+ *      selected with a selected icon color: 'icon'; else 'fixed' in the color, or the dark one in dark mode when it is valid. The dark tint
+ *      does nothing with "title". 8-digit hex is always #RRGGBBAA. Pure, unit tested with Node (table driven).
+ * [CN] 统一的动画着色，iOS、Android、HarmonyOS 与小程序共用的真值表：设置了的属性覆盖来源的同名选项（两者各自独立）；未设置则沿用来源的。没有着色，
+ *      或文本既不是 "title" 也不是颜色（即未设置）：'none'。"title"：选中且有选中图标颜色时为 'icon'，否则有普通图标颜色时为 'icon'（视图选中且有选中
+ *      图标颜色时用它绘制，否则用普通的），都没有时为 'none'（不自动改色）。固定颜色：选中且有选中图标颜色时为 'icon'；否则为 'fixed'，颜色为
+ *      固定颜色，深色模式下且深色值有效时为深色值。深色着色对 "title" 无效。8 位十六进制始终是 #RRGGBBAA。纯逻辑，用 Node 做表驱动单元测试。
  */
 export function cylAnimatedItemResolveTint(input: CYLAnimatedItemTintInput): CYLAnimatedItemTintResult {
   const result = new CYLAnimatedItemTintResult();
   const tint = (input.propTint.trim() !== '' ? input.propTint : input.optionTint).trim();
   const darkTint = (input.propDarkTint.trim() !== '' ? input.propDarkTint : input.optionDarkTint).trim();
   if (tint === CYL_ANIMATED_ITEM_TINT_TITLE) {
-    if (input.hasIconColor) {
+    if ((input.selected && input.hasSelectedIconColor) || input.hasIconColor) {
       result.kind = 'icon';
     }
     return result;
@@ -141,7 +146,7 @@ export function cylAnimatedItemResolveTint(input: CYLAnimatedItemTintInput): CYL
   if (fixed === undefined) {
     return result;
   }
-  if (input.selected && input.hasIconColor) {
+  if (input.selected && input.hasSelectedIconColor) {
     result.kind = 'icon';
     return result;
   }

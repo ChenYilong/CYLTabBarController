@@ -1,6 +1,7 @@
 package com.cyl.animateditem
 
 import android.content.Context
+import androidx.annotation.RestrictTo
 import android.content.res.Configuration
 import com.chenyilong.cyldeallocblockexecutor.AnimationEvents
 import com.chenyilong.cyldeallocblockexecutor.LifecycleCenter
@@ -736,13 +737,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     /**
      * [EN] How the animation is drawn in the item's icon color, the same names and values as the `tint` option of the
      *      animation source (`CYLTabBarAnimationOptionTint`) and iOS `animationTint`. "title": drawn like a template image in
-     *      `effectiveIconColor` (the selected icon color while selected). "#RRGGBB" / "#AARRGGBB": that color on the UNSELECTED
-     *      item, the selected item takes its icon color. Set, it replaces the option of the source URL; null (default) leaves the
-     *      file's own colors and the URL's option as they are. Works before and after the file loads, for every engine
+     *      `effectiveIconColor` (the selected icon color while selected). "#RRGGBB" / "#RRGGBBAA": that color on the UNSELECTED
+     *      item, the selected item takes its selected icon color. Without any icon color "title" removes the tint. Set, it replaces the option
+     *      of the source URL; null (default) leaves the URL's option, and without one the file's own colors. Works before and after the file loads, for every engine
      *      (`CYLTabBarItemAnimationTint`).
      * [CN] 动画如何以条目的图标颜色绘制，名称与取值同动画来源的 `tint` 选项（`CYLTabBarAnimationOptionTint`）及 iOS 的 `animationTint`。
-     *      "title"：像模板图片一样以 `effectiveIconColor` 绘制（选中时为选中图标颜色）。"#RRGGBB" / "#AARRGGBB"：该颜色只用于未选中的条目，
-     *      选中的条目使用其图标颜色。设置后替换来源 URL 中的选项；null（默认）保持文件自身颜色与 URL 中的选项不变。文件加载前后设置都有效，
+     *      "title"：像模板图片一样以 `effectiveIconColor` 绘制（选中时为选中图标颜色）。"#RRGGBB" / "#RRGGBBAA"：该颜色只用于未选中的条目，
+     *      选中的条目使用其选中图标颜色。没有任何图标颜色时 "title" 移除着色。设置后替换来源 URL 中的选项；null（默认）保留 URL 中的选项，没有选项时保持文件自身颜色。文件加载前后设置都有效，
      *      适用于所有引擎（`CYLTabBarItemAnimationTint`）。
      */
     var animationTint: String? = null
@@ -756,29 +757,47 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     var animationDarkTint: String? = null
         set(value) { if (field != value) { field = value; refreshAnimationTint() } }
 
-    private var animationTintOverrides = false
+    /**
+     * [EN] The title colors of a host that draws this item's title (the tab bar), used as the icon colors of the tint table when
+     *      the item has no icon color of its own; they never recolor the static icon. null (default): none.
+     * [CN] 绘制本条目标题的宿主（TabBar）的标题颜色，条目自己没有图标颜色时作为着色真值表的图标颜色；不会改变静态图标的颜色。null（默认）：没有。
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    var hostIconColor: Int? = null
+        set(value) { if (field != value) { field = value; refreshAnimationTint() } }
 
     /**
-     * [EN] Draws the animation's tint for the current state (selection, icon color, night mode): the options of the source
-     *      with `animationTint` / `animationDarkTint` on top, resolved by `CYLTabBarItemAnimationTint`. Does nothing for an item
-     *      that never set them. A subclass that makes the animation view itself (the tab button) calls it after setting `animationView`.
-     * [CN] 按当前状态（选中、图标颜色、夜间模式）绘制动画着色：来源的选项加上 `animationTint` / `animationDarkTint`，由
-     *      `CYLTabBarItemAnimationTint` 解析。从未设置它们的条目不做任何事。自己创建动画视图的子类（Tab 按钮）在设置 `animationView` 后调用。
+     * [EN] The selected counterpart of `hostIconColor`. [CN] `hostIconColor` 的选中状态对应值。
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    var hostSelectedIconColor: Int? = null
+        set(value) { if (field != value) { field = value; refreshAnimationTint() } }
+
+    /**
+     * [EN] Draws the animation's tint for the current state (selection, icon colors, night mode): the options of the source
+     *      (`#name=value` and `?name=value` alike) with `animationTint` / `animationDarkTint` on top, resolved by the
+     *      truth table `CYLTabBarItemAnimationTint.resolve`. The normal icon color is `iconColor`, else the stack's, else the
+     *      host's title color; the selected one is `selectedIconColor`, else the stack's, else the host's. Nothing set: the
+     *      file's own colors, and a previous tint is removed. A subclass that makes the animation view itself (the tab button)
+     *      calls it after setting `animationView`.
+     * [CN] 按当前状态（选中、图标颜色、夜间模式）绘制动画着色：来源的选项（`#name=value` 与 `?name=value` 相同）加上 `animationTint` /
+     *      `animationDarkTint`，由真值表 `CYLTabBarItemAnimationTint.resolve` 解析。普通图标颜色为 `iconColor`，其次堆叠的颜色，再次宿主的标题颜色；
+     *      选中的为 `selectedIconColor`，其次堆叠的，再次宿主的。什么都没设置：保持文件自身颜色，并移除之前的着色。自己创建动画视图的子类
+     *      （Tab 按钮）在设置 `animationView` 后调用。
      */
     fun refreshAnimationTint(configuration: Configuration = resources.configuration) {
         val view = animationView ?: return
-        val overrides = !animationTint.isNullOrBlank() || !animationDarkTint.isNullOrBlank()
-        if (!overrides && !animationTintOverrides) return
-        animationTintOverrides = overrides
         CYLTabBarItemAnimationTint.setOverride(view, animationTint, animationDarkTint)
+        CYLTabBarItemAnimationTint.setManaged(view)
         val source = CYLTabBarItemAnimationFactory.optionsOf(view)
             ?: animationURL?.takeIf { it.isNotBlank() }?.let { CYLTabBarAnimationFileAndOptions(it).second }.orEmpty()
         val options = CYLTabBarItemAnimationTint.effectiveOptions(view, source)
-        val iconColor = effectiveIconColor
-        // [EN] Without an icon color the title-dependent tints are left to the host (the tab bar passes its title color). [CN] 没有图标颜色时，依赖标题颜色的着色交给宿主（TabBar 传入其标题颜色）。
-        val tint = CYLTabBarItemAnimationTint.tintOption(options)
-        if (tint != null && iconColor == null && (tint == CYLTabBarItemAnimationTint.TINT_TITLE || isSelected)) return
-        CYLTabBarItemAnimationTint.applyToAnimationView(view, CYLTabBarItemAnimationTint.resolvedTintColor(options, iconColor, configuration, isSelected))
+        val night = (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        val color = CYLTabBarItemAnimationTint.resolve(
+            CYLTabBarItemAnimationTint.tintOption(options), CYLTabBarItemAnimationTint.darkTintOption(options), isSelected, night,
+            iconColor ?: stackIconColor ?: hostIconColor, selectedIconColor ?: stackSelectedIconColor ?: hostSelectedIconColor,
+        )
+        CYLTabBarItemAnimationTint.applyToAnimationView(view, color)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

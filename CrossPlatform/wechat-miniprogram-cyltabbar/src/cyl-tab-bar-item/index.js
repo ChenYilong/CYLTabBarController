@@ -16,7 +16,7 @@ const CYL_PROPERTIES = ['title', 'image', 'selectedImage', 'index', 'titlePositi
   'imageInsets', 'lottieFilePath', 'lottieURL', 'lottieSizeValue', 'enabled', 'selected', 'badgeValue', 'badgeColor',
   'badgeSize', 'badgeContentInset', 'badgePositionAdjustment', 'badgeAnimation', 'layoutCentered', 'backgroundColor',
   'selectedBackgroundColor', 'titleTextAttributes', 'badgeTextAttributes', 'standardAppearance', 'animationPath',
-  'animationSize', 'imageSize', 'iconTint', 'selectedIconTint', 'animationTint', 'label', 'animationColors', 'loopsWhenUnselected',
+  'animationSize', 'imageSize', 'iconTint', 'selectedIconTint', 'animationTint', 'animationDarkTint', 'label', 'animationColors', 'loopsWhenUnselected',
   'animationClass', 'animationDuration', 'itemStyle', 'glassLensStyle', 'isDark', 'animationSpeed', 'animationLoop'];
 
 Component({
@@ -92,6 +92,8 @@ Component({
      * [CN] 动画的单一颜色（`tint` 选项）："title"（当前状态的标题颜色）、颜色，或 '' 表示不着色。
      */
     animationTint: { type: String, value: '' },
+    /** [EN] The `darkTint` option: the dark color of a fixed `animationTint`. [CN] `darkTint` 选项：固定 `animationTint` 的深色颜色。 */
+    animationDarkTint: { type: String, value: '' },
     /** [EN] The accessibility label (default: the title, with the badge). [CN] 无障碍标签（默认：标题与角标）。 */
     label: { type: String, value: '' },
     /** [EN] The tap animation class name (CYLTabBarControllerTabButtonTapAnimation). [CN] 点击动画类名。 */

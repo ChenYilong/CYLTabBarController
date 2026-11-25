@@ -515,7 +515,14 @@ export struct CYLAnimatedItemView {
    *      keeps the image's own colors. A '#RRGGBB' / '#AARRGGBB' string tints bitmaps too; a resource color tints SVG
    *      only. [CN] 静态图标的颜色（如 iOS 的模板图着色）：SVG 与符号图作为填充色，位图通过保留透明度的颜色滤镜着色；''（默认）保留原色。
    */
-  @Prop iconColor: ResourceColor = '';
+  @Prop @Watch('cylTintDidChange') iconColor: ResourceColor = '';
+  /**
+   * [EN] The icon color while the item is selected (iOS / Android `selectedIconColor`); '' (the default) = not set: the selected item uses
+   *      `iconColor`, as before. Takes part in the animation tint ("title", and a fixed tint on the selected item: see `animationTint`).
+   * [CN] 条目选中时的图标颜色（iOS / Android 的 `selectedIconColor`）；''（默认）表示未设置：选中的条目使用 `iconColor`，与以往相同。
+   *      参与动画着色（"title"，以及选中条目上的固定着色：见 `animationTint`）。
+   */
+  @Prop @Watch('cylTintDidChange') selectedIconColor: ResourceColor = '';
   /**
    * [EN] The background: `flat` (default) fills the view with `itemBackgroundColor`; `liquidGlass` draws Liquid Glass (a blur
    *      with the tint `itemBackgroundColor`) clipped to `itemCornerRadius`; where `CYLLiquidGlass.isActive()` is false the style
@@ -565,15 +572,15 @@ export struct CYLAnimatedItemView {
   @Prop animationTintColor: ResourceColor = '';
   /**
    * [EN] The unified animation tint, the same names and values as Rive's `tint` option (iOS `CYLTabBarAnimationOptionTint`): "title" draws
-   *      the animation like a template image in the item's icon color (`iconColor`, which the host sets for the current state, so the
-   *      selected state's when selected); "#RRGGBB" / "#RRGGBBAA" draws it in that fixed color on the unselected item, the selected item
-   *      takes its icon color; '' (the default) is not set. A set value overrides the `tint` option of the animation source
+   *      the animation like a template image in the item's icon color (`selectedIconColor` when selected, else `iconColor`, else no tint);
+   *      "#RRGGBB" / "#RRGGBBAA" (8 digits are always RRGGBBAA) draws it in that fixed color; the selected item takes its `selectedIconColor`
+   *      when it has one; invalid text and '' (the default) are not set. A set value overrides the `tint` option of the animation source
    *      (`file#tint=title`); unset uses the option, and without one the file keeps its own colors. Without an icon color there is
    *      nothing to draw "title" in: no automatic recolor. Any engine, through the same layer as `animationTintColor` (which, when set,
    *      wins as the already resolved color). Reactive: setting or clearing it after the file loaded redraws.
    * [CN] 统一的动画着色，名称与取值同 Rive 的 `tint` 选项（iOS `CYLTabBarAnimationOptionTint`）："title" 像模板图片一样用条目的图标颜色
-   *      （`iconColor`，由宿主按当前状态设置，因此选中时为选中状态的颜色）绘制动画；"#RRGGBB" / "#RRGGBBAA" 在未选中的条目上用该固定颜色绘制，
-   *      选中的条目使用其图标颜色；''（默认）表示未设置。设置后覆盖动画来源的 `tint` 选项（`file#tint=title`）；未设置则使用该选项，
+   *      （选中时为 `selectedIconColor`，否则 `iconColor`，都没有则不着色）绘制动画；"#RRGGBB" / "#RRGGBBAA"（8 位始终是 RRGGBBAA）用该固定颜色
+   *      绘制，选中的条目有 `selectedIconColor` 时使用它；无效文本与 ''（默认）表示未设置。设置后覆盖动画来源的 `tint` 选项（`file#tint=title`）；未设置则使用该选项，
    *      都没有时文件保持自身颜色。没有图标颜色时 "title" 无颜色可用：不自动改色。适用于任何引擎，使用与 `animationTintColor` 相同的着色层
    *      （后者设置时作为已解析的颜色优先）。响应式：文件加载后设置或清除都会重绘。
    */
@@ -1030,11 +1037,20 @@ export struct CYLAnimatedItemView {
     input.selected = this.isItemSelected;
     input.dark = this.cylColorMode === 'dark';
     input.hasIconColor = this.iconColor !== '';
+    input.hasSelectedIconColor = this.selectedIconColor !== '';
     const result: CYLAnimatedItemTintResult = cylAnimatedItemResolveTint(input);
     if (result.kind === 'icon') {
-      return this.iconColor;
+      return this.cylCurrentIconColor();
     }
     return result.kind === 'fixed' ? result.color : '';
+  }
+
+  /**
+   * [EN] The icon color of the current state: `selectedIconColor` when selected and set, else `iconColor`.
+   * [CN] 当前状态的图标颜色：选中且设置了 `selectedIconColor` 时为它，否则为 `iconColor`。
+   */
+  cylCurrentIconColor(): ResourceColor {
+    return this.isItemSelected && this.selectedIconColor !== '' ? this.selectedIconColor : this.iconColor;
   }
 
   /** [EN] A tint input changed: the engine state follows (the layer itself reads the properties). [CN] 着色输入变化：引擎状态随之更新（着色层本身直接读取属性）。 */
@@ -1134,7 +1150,7 @@ export struct CYLAnimatedItemView {
         //      因此用 SymbolGlyph 按 `iconColor` 绘制（没有时为主题主色）。
         SymbolGlyph(this.cylFallbackImage() as Resource)
           .fontSize(this.iconSize)
-          .fontColor([this.iconColor === '' ? $r('sys.color.font_primary') : this.iconColor])
+          .fontColor([this.cylCurrentIconColor() === '' ? $r('sys.color.font_primary') : this.cylCurrentIconColor()])
           .width(this.iconSize)
           .height(this.iconSize)
           .opacity(this.cylAnimationShows() ? 0 : 1)
@@ -1143,8 +1159,8 @@ export struct CYLAnimatedItemView {
         Image(this.cylFallbackImage())
           .width(this.iconSize)
           .height(this.iconSize)
-          .fillColor(this.iconColor === '' ? undefined : this.iconColor)
-          .colorFilter(new ColorFilter(cylIconColorFilter(this.iconColor)))
+          .fillColor(this.cylCurrentIconColor() === '' ? undefined : this.cylCurrentIconColor())
+          .colorFilter(new ColorFilter(cylIconColorFilter(this.cylCurrentIconColor())))
           .objectFit(ImageFit.Contain)
           .opacity(this.cylAnimationShows() ? 0 : 1)
           .accessibilityLevel('no')

@@ -39,10 +39,10 @@ public final class CYLTabBarItemAnimationKeys {
      */
     public static final String CYLTabBarAnimationOptionTint = "tint";
     /**
-     * [EN] The night-mode color of a fixed `CYLTabBarAnimationOptionTint` ("#RRGGBB" / "#AARRGGBB"), re-applied when night
+     * [EN] The night-mode color of a fixed `CYLTabBarAnimationOptionTint` ("#RRGGBB" / "#RRGGBBAA"), re-applied when night
      *      mode changes: tint "#1C1C1E" with darkTint "#FFFFFF" keeps a one-color icon readable on light and dark bars. Not
      *      needed with tint "title". Same key as iOS.
-     * [CN] 固定 `CYLTabBarAnimationOptionTint`（"#RRGGBB" / "#AARRGGBB"）在夜间模式下的颜色，夜间模式变化时重新应用：tint "#1C1C1E" 配合
+     * [CN] 固定 `CYLTabBarAnimationOptionTint`（"#RRGGBB" / "#RRGGBBAA"）在夜间模式下的颜色，夜间模式变化时重新应用：tint "#1C1C1E" 配合
      *      darkTint "#FFFFFF"，单色图标在浅色与深色 TabBar 上都清晰可辨。tint 为 "title" 时不需要。与 iOS 同名。
      */
     public static final String CYLTabBarAnimationOptionDarkTint = "darkTint";

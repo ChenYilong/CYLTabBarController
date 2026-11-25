@@ -323,15 +323,15 @@ FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveNum
  * [EN] A tab icon tinted like a template image (bug B12; Android's key of the same name): "title" draws the icon in the tab's
  *      title color, the tab bar's tint when the tab is selected and its unselected tint otherwise, as UIKit draws a template
  *      static image; "#RRGGBB" or "#RRGGBBAA" draws it in that fixed color on the unselected tab, while the selected tab
- *      takes the title's selected color, as with "title" (2026-11-19). For one-color icons (icons.riv). Rive on iOS.
+ *      takes the title's selected color, as with "title" (2026-11-19). For one-color icons (icons.riv). Works for every animation library: Lottie 4 (a color value provider), GIF (template frames), PAG / SVGA / Lottie 2 (a sourceAtop overlay), Rive (the library's own method); `CYLAnimatedItemView.animationTint` overrides it.
  * [CN] 像模板图片一样为 Tab 图标着色（问题 B12；与 Android 同名的 key）："title" 用 Tab 标题的颜色绘制图标：选中时为 TabBar 的 tint，
  *      未选中时为未选中 tint，与 UIKit 绘制模板静态图片相同；"#RRGGBB" 或 "#RRGGBBAA" 在未选中的 Tab 上用该固定颜色绘制，选中的 Tab 使用标题的选中颜色，
- *      与 "title" 相同（2026-11-19）。用于单色图标（icons.riv）。iOS 上用于 Rive。
+ *      与 "title" 相同（2026-11-19）。用于单色图标（icons.riv）。对所有动画库有效：Lottie 4（color value provider）、GIF（模板帧）、PAG / SVGA / Lottie 2（sourceAtop 叠加图层）、Rive（动画库自己的方法）；`CYLAnimatedItemView.animationTint` 会覆盖它。
  */
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionTint;
 /*!
- * [EN] The Dark Mode color of a fixed `CYLTabBarAnimationOptionTint` ("#RRGGBB" or "#RRGGBBAA"): with tint @"#1C1C1E" and darkTint @"#F2F2F7" a one-color icon stays readable on a light and on a dark bar, switching with the appearance. Not needed with tint @"title", which follows the tab bar's (dynamic) tints already. Rive on iOS.
- * [CN] 固定 `CYLTabBarAnimationOptionTint`（"#RRGGBB" 或 "#RRGGBBAA"）在深色模式下的颜色：tint 为 @"#1C1C1E"、darkTint 为 @"#F2F2F7" 时，单色图标在浅色与深色 TabBar 上都清晰可辨，并随外观切换。tint 为 @"title" 时不需要，它已跟随 TabBar 的（动态）tint。iOS 上用于 Rive。
+ * [EN] The Dark Mode color of a fixed `CYLTabBarAnimationOptionTint` ("#RRGGBB" or "#RRGGBBAA"): with tint @"#1C1C1E" and darkTint @"#F2F2F7" a one-color icon stays readable on a light and on a dark bar, switching with the appearance. Not needed with tint @"title", which follows the tab bar's (dynamic) tints already. Works for every animation library, like the tint; `CYLAnimatedItemView.animationDarkTint` overrides it.
+ * [CN] 固定 `CYLTabBarAnimationOptionTint`（"#RRGGBB" 或 "#RRGGBBAA"）在深色模式下的颜色：tint 为 @"#1C1C1E"、darkTint 为 @"#F2F2F7" 时，单色图标在浅色与深色 TabBar 上都清晰可辨，并随外观切换。tint 为 @"title" 时不需要，它已跟随 TabBar 的（动态）tint。与 tint 相同，对所有动画库有效；`CYLAnimatedItemView.animationDarkTint` 会覆盖它。
  */
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionDarkTint;
 /*!

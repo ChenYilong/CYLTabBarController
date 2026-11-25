@@ -252,15 +252,17 @@ function cylTitleFont(fontStyle) {
  */
 function cylAnimationProperties(lottie, isDarkBar) {
   if (!lottie) {
-    return { animationPath: '', animationSize: null, animationColors: null, loopsWhenUnselected: false, animationTint: '' };
+    return { animationPath: '', animationSize: null, animationColors: null, loopsWhenUnselected: false, animationTint: '', animationDarkTint: '' };
   }
   return {
     animationPath: (isDarkBar && lottie.darkPath) || lottie.path,
     animationSize: `{${lottie.width}, ${lottie.height}}`,
     animationColors: (isDarkBar && lottie.darkColors) || lottie.colors,
     loopsWhenUnselected: Boolean(lottie.loopsWhenUnselected),
-    // [EN] The `tint` option; a dark bar takes `darkTint` when set. [CN] `tint` 选项；深色 TabBar 有 `darkTint` 时用它。
-    animationTint: (isDarkBar && lottie.darkTint) || lottie.tint || '',
+    // [EN] The `tint` and `darkTint` options as configured; cyl-animated-item resolves them. [CN] 按配置传递的 `tint` 与 `darkTint`
+    //      选项；由 cyl-animated-item 解析。
+    animationTint: lottie.tint || '',
+    animationDarkTint: lottie.darkTint || '',
   };
 }
 

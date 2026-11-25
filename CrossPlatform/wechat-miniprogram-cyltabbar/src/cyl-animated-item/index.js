@@ -183,11 +183,11 @@ Component({
     /**
      * [EN] One color for the animation, like a template image (the same names and values as Rive's `tint`): '' (default) keeps the
      *      file's colors; "title" draws it in the item's icon color (the selected state's icon color when selected); "#RRGGBB" /
-     *      "#RRGGBBAA" is a fixed color of the UNSELECTED item (the selected item takes its icon color). A set value overrides the same
+     *      "#RRGGBBAA" is a fixed color (the selected item takes its selected icon color when it has one). A set value overrides the same
      *      option of the animation source. Rive (canvas fill) and GIF (CSS filter) are recolored; Lottie, PAG and SVGA keep their
      *      colors. See `cylAnimatedItemAnimationTint`.
      * [CN] 动画使用的一种颜色，如同模板图片（名称与取值同 Rive 的 `tint`）：'' （默认）保持文件的颜色；"title" 用条目的图标颜色绘制（选中时用选中
-     *      状态的图标颜色）；"#RRGGBB" / "#RRGGBBAA" 是未选中条目的固定颜色（选中条目用其图标颜色）。已设置的值覆盖动画来源中的同名选项。
+     *      状态的图标颜色）；"#RRGGBB" / "#RRGGBBAA" 是固定颜色（选中条目有选中图标颜色时用它）。已设置的值覆盖动画来源中的同名选项。
      *      Rive（canvas 填充）与 GIF（CSS filter）会改色；Lottie、PAG、SVGA 保持自身颜色。见 `cylAnimatedItemAnimationTint`。
      */
     animationTint: { type: String, value: '' },
@@ -196,6 +196,14 @@ Component({
      * [CN] 固定 `animationTint` 的深色模式颜色（颜色；"title" 不需要），条目为深色时使用。
      */
     animationDarkTint: { type: String, value: '' },
+    /**
+     * [EN] The icon colors `animationTint` follows, when they differ from the static image's `iconTint` / `selectedIconTint` (a tab bar
+     *      item passes its title colors): '' (default) means `iconTint` / `selectedIconTint`. They never tint the static image.
+     * [CN] `animationTint` 所跟随的图标颜色，与静态图片的 `iconTint` / `selectedIconTint` 不同时使用（TabBar 项传入其标题颜色）：
+     *      '' （默认）表示用 `iconTint` / `selectedIconTint`。它们不会给静态图片着色。
+     */
+    animationIconTint: { type: String, value: '' },
+    animationSelectedIconTint: { type: String, value: '' },
     /**
      * [EN] The title's color (any CSS color); '' keeps the inherited color.
      * [CN] 标题颜色（任意 CSS 颜色）；'' 时沿用继承的颜色。
@@ -314,7 +322,7 @@ Component({
       // [EN] A file of no known type has no engine to report anything: it cannot be decoded. [CN] 不属于任何已知类型的文件没有引擎可以报告：无法解码。
       if (animationUrl && this.data.m && !this.data.m.animationType) this.cyl_reportResourceMissing('decode failed')
     },
-    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, selectedIconTint, animationTint, animationDarkTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
+    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, selectedIconTint, animationTint, animationDarkTint, animationIconTint, animationSelectedIconTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
       this.cyl_update()
     },
     'itemStyle, countdownIdleTitle, countdownRunningTitleFormat, countdownFinishedTitle, countdownImage, countdownRunningTitleColor, countdownDuration': function (itemStyle) {

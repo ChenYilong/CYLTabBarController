@@ -333,6 +333,24 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         com.cyl.animateditem.CYLAnimationEngines.warnMissingEngine(context, item.attributes, url)
     }
 
+    /**
+     * [EN] Hands the tab's normal and selected title colors to the component (`hostIconColor` / `hostSelectedIconColor`), which resolves
+     *      `tint` "title" and a fixed `tint` from them (`CYLTabBarItemAnimationTint.resolve`). Without a tab bar yet, the label's current
+     *      color stands for the current state.
+     * [CN] 把 Tab 的普通与选中标题颜色交给组件（`hostIconColor` / `hostSelectedIconColor`），由组件据此解析 `tint` 为 "title" 与固定 `tint`
+     *      （`CYLTabBarItemAnimationTint.resolve`）。还没有 TabBar 时，以标题当前颜色代表当前状态。
+     */
+    internal fun cyl_passTitleColorsToAnimation(tabBar: CYLTabBar? = parent as? CYLTabBar) {
+        if (tabBar != null) {
+            hostIconColor = titleColor(false, tabBar)
+            hostSelectedIconColor = titleColor(true, tabBar)
+        } else if (isSelected) {
+            hostSelectedIconColor = titleLabel.currentTextColor
+        } else {
+            hostIconColor = titleLabel.currentTextColor
+        }
+    }
+
     fun apply(selected: Boolean, tabBar: CYLTabBar) {
         val selectionChanged = isSelected != selected
         isSelected = selected
@@ -342,8 +360,8 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         cyl_warnMissingAnimationEngine()
         val controller = tabBar.tabBarController
         titleLabel.setTextColor(titleColor(selected, tabBar))
-        // [EN] The tint of an animation with the `tint` option "title" (bug B12). [CN] `tint` 选项为 "title" 的动画的着色（问题 B12）。
-        cyl_tabBarItemAnimationPlayer?.setTintColor(titleColor(selected, tabBar), selected)
+        // [EN] The title colors go to the component as icon colors; it alone resolves the animation's tint (bug B12). [CN] 标题颜色作为图标颜色交给组件；动画着色只由组件解析（问题 B12）。
+        cyl_passTitleColorsToAnimation(tabBar)
         val font = if (selected) item.cyl_selectedTitleFont ?: controller?.cyl_tabBarItemSelectedTitleFont ?: item.cyl_titleFont ?: controller?.cyl_tabBarItemTitleFont
                    else item.cyl_titleFont ?: controller?.cyl_tabBarItemTitleFont
         if (font != null) {

@@ -59,12 +59,17 @@ static NSDictionary<NSString *, NSString *> *CYLTabBarItemAnimationTintOptionsFr
 
 /// [EN] "#RRGGBB" or "#RRGGBBAA" ("#" optional), else nil. [CN] "#RRGGBB" 或 "#RRGGBBAA"（"#" 可省略），否则为 nil。
 static UIColor *CYLTabBarItemAnimationTintColorFromHex(NSString *hex) {
-    NSString *digits = [hex hasPrefix:@"#"] ? [hex substringFromIndex:1] : hex;
+    // [EN] The same rule on every platform: a "#" and exactly 6 (RRGGBB) or 8 (RRGGBBAA) hex digits. [CN] 各平台相同的规则：必须有 "#"，且恰好 6 位（RRGGBB）或 8 位（RRGGBBAA）十六进制。
+    if (![hex hasPrefix:@"#"]) {
+        return nil;
+    }
+    NSString *digits = [hex substringFromIndex:1];
     if (digits.length != 6 && digits.length != 8) {
         return nil;
     }
     unsigned long long value = 0;
-    if (![[NSScanner scannerWithString:digits] scanHexLongLong:&value]) {
+    NSScanner *scanner = [NSScanner scannerWithString:digits];
+    if (![scanner scanHexLongLong:&value] || !scanner.isAtEnd) {
         return nil;
     }
     if (digits.length == 6) {
@@ -88,6 +93,33 @@ static UIColor *CYLTabBarItemAnimationFixedTintColor(NSDictionary<NSString *, NS
     return [UIColor colorWithDynamicProvider:^UIColor *(UITraitCollection *traits) {
         return traits.userInterfaceStyle == UIUserInterfaceStyleDark ? dark : light;
     }];
+}
+
+UIColor *CYLTabBarItemAnimationResolveTint(NSString *tint, NSString *darkTint, BOOL selected, BOOL isDark,
+                                           UIColor *normalIconColor, UIColor *selectedIconColor) {
+    NSString *kind = [tint stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+    if ([kind isEqualToString:@"title"]) {
+        return selected ? (selectedIconColor ?: normalIconColor) : normalIconColor;
+    }
+    UIColor *fixed = CYLTabBarItemAnimationTintColorFromHex(kind);
+    if (!fixed) {
+        return nil;
+    }
+    // [EN] A fixed color: the selected item takes ITS OWN selected icon color only (not the normal one: the table, the same on every platform). [CN] 固定颜色：选中的条目只取它自己的选中图标颜色（不取普通状态的：真值表，各平台相同）。
+    if (selected && selectedIconColor) {
+        return selectedIconColor;
+    }
+    UIColor *dark = isDark ? CYLTabBarItemAnimationTintColorFromHex([darkTint stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet]) : nil;
+    return dark ?: fixed;
+}
+
+UIColor *CYLTabBarItemAnimationItemTintColor(NSURL *sourceURL, NSString *tintOverride, NSString *darkTintOverride,
+                                             BOOL selected, BOOL isDark, UIColor *normalIconColor, UIColor *selectedIconColor) {
+    NSDictionary<NSString *, NSString *> *options = sourceURL ? CYLTabBarItemAnimationTintOptionsFromURL(sourceURL) : @{};
+    NSString *tint = [tintOverride stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+    NSString *darkTint = [darkTintOverride stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+    return CYLTabBarItemAnimationResolveTint(tint.length > 0 ? tint : options[@"tint"], darkTint.length > 0 ? darkTint : options[@"darkTint"],
+                                             selected, isDark, normalIconColor, selectedIconColor);
 }
 
 /// [EN] Draws `color` (nil: no tint) over the view by its library's means. [CN] 用动画库的方式在视图上绘制 `color`（nil 表示不着色）。
@@ -260,7 +292,9 @@ static void CYLTabBarItemAnimationTintWithStateMethod(UIView *view, SEL _cmd, UI
 
 /// [EN] Gives a new animation view its tint options and method, and its fixed tint. [CN] 为新的动画视图设置着色选项与方法，以及固定着色。
 static BOOL CYLTabBarItemAnimationPrepareTintWithOptions(UIView *view, NSDictionary<NSString *, NSString *> *options, id<CYLTabBarItemAnimationPlayer> player) {
-    if (!options[@"tint"]) {
+    // [EN] An invalid tint text is unset. [CN] 无效的着色文本等同于未设置。
+    NSString *tintText = options[@"tint"];
+    if (!tintText || !([tintText isEqualToString:@"title"] || CYLTabBarItemAnimationTintColorFromHex(tintText))) {
         return NO;
     }
     // [EN] Prepared once: a view the tab flow prepared is not prepared again by an item that wraps it. [CN] 只准备一次：Tab 流程已准备过的视图不会被包着它的条目再次准备。

@@ -33,7 +33,9 @@ test('a glass tint: alpha x 0.75; alpha 0 (clear) is the default frosted tint, a
 
 test('tint colors: #RRGGBB / #RRGGBBAA to ArkUI #AARRGGBB', () => {
   assert.equal(C.cylAnimatedItemTintArkColor('#FF8000'), '#FFFF8000');
-  assert.equal(C.cylAnimatedItemTintArkColor('ff800080'), '#80FF8000');
+  assert.equal(C.cylAnimatedItemTintArkColor('#ff800080'), '#80FF8000');
+  assert.equal(C.cylAnimatedItemTintArkColor('ff800080'), undefined, 'a tint hex needs its #, as on every platform');
+  assert.equal(C.cylAnimatedItemTintArkColor('FF8000'), undefined);
   assert.equal(C.cylAnimatedItemTintArkColor('title'), undefined);
   assert.equal(C.cylAnimatedItemTintArkColor(''), undefined);
   assert.equal(C.cylAnimatedItemTintArkColor('#FFF'), undefined);
@@ -43,25 +45,57 @@ function resolve(fields) {
   return { ...C.cylAnimatedItemResolveTint({ ...new C.CYLAnimatedItemTintInput(), ...fields }) };
 }
 
-test('tint resolution: nothing set changes nothing', () => {
-  assert.deepEqual(resolve({ hasIconColor: true, selected: true, dark: true }), { kind: 'none', color: '' });
+// [EN] The shared truth table (/tmp/xpr/tint-table.txt; identical on iOS, Android, HarmonyOS and the mini program), one row per
+//      combination: the tint kind (unset / "title" / fixed / invalid), the state, which icon colors exist, dark mode.
+//      Expected: 'none' | 'icon' (the view draws in its current-state icon color) | the fixed "#AARRGGBB".
+// [CN] 共用真值表：每种组合一行：着色种类（未设置 / "title" / 固定 / 无效）、状态、存在哪些图标颜色、深色模式。
+const FIXED = '#1C1C1E';
+const FIXED_ARK = '#FF1C1C1E';
+const DARK = '#F2F2F7';
+const DARK_ARK = '#FFF2F2F7';
+const TABLE = [];
+for (const selected of [false, true]) {
+  for (const hasIconColor of [false, true]) {
+    for (const hasSelectedIconColor of [false, true]) {
+      for (const dark of [false, true]) {
+        const base = { selected, hasIconColor, hasSelectedIconColor, dark, propDarkTint: DARK };
+        // unset, and invalid text = unset: the file's own colors
+        TABLE.push([{ ...base, propDarkTint: '' }, 'none']);
+        TABLE.push([{ ...base, propTint: 'bogus' }, 'none']);
+        TABLE.push([{ ...base, propTint: '#FFF' }, 'none']);
+        // "title": selected = selected icon color, else normal icon color, else none; unselected = normal icon color, else none
+        const title = selected ? (hasSelectedIconColor || hasIconColor ? 'icon' : 'none') : (hasIconColor ? 'icon' : 'none');
+        TABLE.push([{ ...base, propTint: 'title' }, title]);
+        // fixed: selected with a selected icon color = icon; else the fixed color, the dark one in dark mode
+        const fixed = selected && hasSelectedIconColor ? 'icon' : (dark ? DARK_ARK : FIXED_ARK);
+        TABLE.push([{ ...base, propTint: FIXED }, fixed]);
+      }
+    }
+  }
+}
+
+test('tint resolution table: state x tint kind x icon colors x dark', () => {
+  for (const [fields, expected] of TABLE) {
+    const result = resolve(fields);
+    const label = JSON.stringify(fields);
+    if (expected === 'none' || expected === 'icon') {
+      assert.deepEqual(result, { kind: expected, color: '' }, label);
+    } else {
+      assert.deepEqual(result, { kind: 'fixed', color: expected }, label);
+    }
+  }
+  assert.equal(TABLE.length, 16 * 5);
 });
 
-test('tint "title" is the icon color, none without one, ignores the dark tint', () => {
-  assert.deepEqual(resolve({ propTint: 'title', hasIconColor: true }), { kind: 'icon', color: '' });
-  assert.deepEqual(resolve({ propTint: 'title', hasIconColor: true, selected: true, dark: true, propDarkTint: '#FFFFFF' }), { kind: 'icon', color: '' });
-  assert.deepEqual(resolve({ propTint: 'title' }), { kind: 'none', color: '' });
-});
-
-test('a fixed tint: unselected uses it (dark: the dark tint), selected takes the icon color', () => {
-  assert.deepEqual(resolve({ propTint: '#1C1C1E', propDarkTint: '#F2F2F7', hasIconColor: true }), { kind: 'fixed', color: '#FF1C1C1E' });
-  assert.deepEqual(resolve({ propTint: '#1C1C1E', propDarkTint: '#F2F2F7', dark: true }), { kind: 'fixed', color: '#FFF2F2F7' });
-  assert.deepEqual(resolve({ propTint: '#1C1C1E', propDarkTint: '#F2F2F7', dark: true, selected: true, hasIconColor: true }), { kind: 'icon', color: '' });
-  // [EN] Selected without an icon color: nothing to take, the fixed color. [CN] 选中但没有图标颜色：用固定颜色。
-  assert.deepEqual(resolve({ propTint: '#1C1C1E', selected: true }), { kind: 'fixed', color: '#FF1C1C1E' });
-  // [EN] Dark without a valid dark tint: the light one. [CN] 深色模式没有有效的深色值：用浅色值。
-  assert.deepEqual(resolve({ propTint: '#1C1C1E', dark: true, propDarkTint: 'oops' }), { kind: 'fixed', color: '#FF1C1C1E' });
+test('a fixed tint without a valid dark tint: dark mode keeps the fixed color; 8-digit hex is #RRGGBBAA', () => {
+  assert.deepEqual(resolve({ propTint: FIXED, dark: true }), { kind: 'fixed', color: FIXED_ARK });
+  assert.deepEqual(resolve({ propTint: FIXED, dark: true, propDarkTint: 'oops' }), { kind: 'fixed', color: FIXED_ARK });
   assert.deepEqual(resolve({ propTint: '#1C1C1E80' }), { kind: 'fixed', color: '#801C1C1E' });
+  assert.deepEqual(resolve({ propTint: '#FF000080', dark: true, propDarkTint: '#00FF0040' }), { kind: 'fixed', color: '#4000FF00' });
+});
+
+test('"title" ignores the dark tint', () => {
+  assert.deepEqual(resolve({ propTint: 'title', hasIconColor: true, dark: true, propDarkTint: '#FFFFFF' }), { kind: 'icon', color: '' });
 });
 
 test('a set property overrides the same source option, each on its own; unset uses the option', () => {

@@ -47,6 +47,7 @@ final class CYLAnimatedItemTintStateTests: XCTestCase {
     /// [CN] 带状态的钩子优先于普通钩子，并收到 item 的选中状态。
     func testIconTintPassesTheSelectedState() {
         let item = CYLRecordingItemView(frame: CGRect(x: 0, y: 0, width: 80, height: 49))
+        item.animationTint = "title"
         item.isSelected = false
         item.applyIconTintColor(.red)
         item.isSelected = true
@@ -203,52 +204,6 @@ final class CYLAnimatedItemBackgroundTests: XCTestCase {
         XCTAssertEqual(tintAlpha(), 0.75, accuracy: 0.01)
     }
 
-    func testAnimationTintDrawsAnAnimationLikeATemplateOnlyWhenSetAndIsClearable() throws {
-        guard CYLAnimationTypeIsAvailable("Lottie") else {
-            throw XCTSkip("the Lottie engine is not in this test target")
-        }
-        let json = #"{"v":"5.7.0","fr":30,"ip":0,"op":30,"w":24,"h":24,"nm":"t","ddd":0,"assets":[],"layers":[]}"#
-        let file = FileManager.default.temporaryDirectory.appendingPathComponent("cyl-item-tint-\(UUID().uuidString).json")
-        try json.write(to: file, atomically: true, encoding: .utf8)
-        defer { try? FileManager.default.removeItem(at: file) }
-        let tintSelector = NSSelectorFromString("cyl_applyAnimationViewTintColor:")
-        func take(_ item: CYLAnimatedItemView) -> Bool { item.animationView?.responds(to: tintSelector) ?? false }
-
-        // Unset (the default): the file keeps its own colors, even when the host set an icon color (tab bars and tags always do).
-        let untouched = makeItem()
-        untouched.iconSize = CGSize(width: 24, height: 24)
-        untouched.applyIconTintColor(.white)
-        untouched.animationURL = file
-        XCTAssertNotNil(untouched.animationView)
-        XCTAssertFalse(take(untouched), "no animationTint: not tinted")
-
-        // Set before the file: "title" tints it in the icon color.
-        let before = makeItem()
-        before.iconSize = CGSize(width: 24, height: 24)
-        before.animationTint = "title"
-        before.animationURL = file
-        XCTAssertTrue(take(before), "animationTint = title: the animation view takes the icon color")
-
-        // Set after the file loaded, then cleared: both work.
-        let later = makeItem()
-        later.iconSize = CGSize(width: 24, height: 24)
-        later.animationURL = file
-        XCTAssertFalse(take(later))
-        later.animationTint = "title"
-        XCTAssertTrue(take(later), "set after load")
-        later.animationTint = nil
-        later.applyIconTintColor(.red)
-        XCTAssertNil(later.animationTint, "cleared")
-
-        // A fixed color with its dark variant, and the URL's own option is overridden by the property.
-        let fixed = makeItem()
-        fixed.iconSize = CGSize(width: 24, height: 24)
-        fixed.animationTint = "#1C1C1E"
-        fixed.animationDarkTint = "#F2F2F7"
-        fixed.animationURL = file
-        XCTAssertTrue(take(fixed), "a fixed tint with its dark variant")
-    }
-
     func testSettingTheSameValueAgainDoesNotRequestALayout() {
         let item = makeItem()
         item.itemCornerRadius = 8
@@ -340,5 +295,238 @@ final class CYLAnimatedItemBackgroundTests: XCTestCase {
         glass.itemContentHorizontalInset = 0
         XCTAssertEqual(margins(glass).leading, flatMargins.leading)
         XCTAssertEqual(glass.contentMargin, 16, "the default of contentMargin is unchanged")
+    }
+}
+
+
+/**
+ * [EN] A factory that returns one recording view for any file, so the tint that reaches the animation view is observable without an animation
+ *      engine. [CN] 对任何文件都返回同一个记录视图的工厂，使到达动画视图的着色无需动画引擎即可观察。
+ */
+private final class CYLRecordingViewFactory: NSObject, CYLTabBarItemAnimationViewMaking {
+    let view = CYLRecordingTintView()
+
+    func animationView(url _: URL, size _: CGSize, contentMode _: UIView.ContentMode) -> UIView? { view }
+    func player(for _: UIView?) -> CYLTabBarItemAnimationPlayer? { nil }
+    func isAnimationView(_ view: UIView?) -> Bool { view === self.view }
+}
+
+/**
+ * [EN] THE tint truth table (identical on every platform) on iOS: the color that reaches the animation view for each row (nil = the tint is
+ *      removed). Needs no animation engine: the item's animation view is a recording view.
+ * [CN] 着色真值表（各平台一致）在 iOS 上的表现：每一行到达动画视图的颜色（nil 表示移除着色）。不需要动画引擎：条目的动画视图是记录视图。
+ */
+final class CYLAnimatedItemTintTableTests: XCTestCase {
+
+    private struct Row {
+        let name: String
+        var tint: String?
+        var darkTint: String?
+        var selected = false
+        var dark = false
+        var normal: UIColor?
+        var selectedColor: UIColor?
+        var expected: UIColor?
+    }
+
+    private let normal = UIColor(red: 0.1, green: 0.2, blue: 0.3, alpha: 1)
+    private let selectedColor = UIColor(red: 0.9, green: 0.8, blue: 0.7, alpha: 1)
+    private let fixed = UIColor(red: 0, green: 1, blue: 0, alpha: 1)
+    private let darkFixed = UIColor(red: 0, green: 0, blue: 1, alpha: 1)
+
+    private var file: URL!
+
+    override func setUpWithError() throws {
+        file = FileManager.default.temporaryDirectory.appendingPathComponent("cyl-item-tint-\(UUID().uuidString).json")
+        try "{}".write(to: file, atomically: true, encoding: .utf8)
+    }
+
+    override func tearDown() {
+        try? FileManager.default.removeItem(at: file)
+        super.tearDown()
+    }
+
+    private func components(_ color: UIColor?) -> [CGFloat]? {
+        guard let color else { return nil }
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        color.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light)).getRed(&r, green: &g, blue: &b, alpha: &a)
+        return [r, g, b, a]
+    }
+
+    private func assertColor(_ actual: UIColor?, _ expected: UIColor?, _ message: String, line: UInt = #line) {
+        guard let a = components(actual), let e = components(expected) else {
+            XCTAssertEqual(actual == nil, expected == nil, message, line: line)
+            return
+        }
+        for (x, y) in zip(a, e) { XCTAssertEqual(x, y, accuracy: 0.01, message, line: line) }
+    }
+
+    private func appearance(normal: UIColor?, selected: UIColor?) -> UITabBarItemAppearance {
+        let appearance = UITabBarItemAppearance()
+        appearance.normal.iconColor = normal
+        appearance.selected.iconColor = selected
+        return appearance
+    }
+
+    private var windows: [UIWindow] = []
+
+    /// The item sits in a window, whose style (light / dark) its traits follow.
+    private func makeItem(_ factory: CYLRecordingViewFactory, dark: Bool = false) -> CYLAnimatedItemView {
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
+        window.overrideUserInterfaceStyle = dark ? .dark : .light
+        window.isHidden = false
+        windows.append(window)
+        let item = CYLAnimatedItemView(frame: CGRect(x: 0, y: 0, width: 80, height: 49))
+        window.addSubview(item)
+        item.iconSize = CGSize(width: 24, height: 24)
+        item.animationSource = factory
+        return item
+    }
+
+    /// The color of the last call that reached the view; `.some(nil)` is a removal.
+    private func last(_ factory: CYLRecordingViewFactory) -> UIColor?? {
+        factory.view.stateCalls.last.map { $0.0 }
+    }
+
+    func testTheTruthTableRows() {
+        let rows: [Row] = [
+            Row(name: "unset, unselected", normal: normal, expected: nil),
+            Row(name: "unset, selected", selected: true, normal: normal, selectedColor: selectedColor, expected: nil),
+            Row(name: "invalid text is unset", tint: "banana", normal: normal, expected: nil),
+            Row(name: "invalid hex (5 digits) is unset", tint: "#12345", normal: normal, expected: nil),
+            Row(name: "title unselected: the normal color", tint: "title", normal: normal, expected: normal),
+            Row(name: "title unselected, no normal color: no tint", tint: "title", selectedColor: selectedColor, expected: nil),
+            Row(name: "title selected: the selected color", tint: "title", selected: true, normal: normal, selectedColor: selectedColor, expected: selectedColor),
+            Row(name: "title selected, only the selected color", tint: "title", selected: true, selectedColor: selectedColor, expected: selectedColor),
+            Row(name: "title selected, only the normal color (a)", tint: "title", selected: true, normal: normal, expected: normal),
+            Row(name: "title selected, no icon color at all: no tint (b)", tint: "title", selected: true, expected: nil),
+            Row(name: "title unselected, no icon color at all: no tint (b)", tint: "title", expected: nil),
+            Row(name: "title in dark mode follows the colors", tint: "title", dark: true, normal: normal, expected: normal),
+            Row(name: "fixed unselected", tint: "#00FF00", normal: normal, expected: fixed),
+            Row(name: "fixed unselected, no icon colors", tint: "#00FF00", expected: fixed),
+            Row(name: "fixed unselected, dark, darkTint", tint: "#00FF00", darkTint: "#0000FF", dark: true, normal: normal, expected: darkFixed),
+            Row(name: "fixed unselected, light, darkTint ignored", tint: "#00FF00", darkTint: "#0000FF", normal: normal, expected: fixed),
+            Row(name: "fixed unselected, dark, no darkTint", tint: "#00FF00", dark: true, expected: fixed),
+            Row(name: "fixed unselected, dark, invalid darkTint", tint: "#00FF00", darkTint: "blue", dark: true, expected: fixed),
+            Row(name: "fixed selected: the selected color", tint: "#00FF00", selected: true, normal: normal, selectedColor: selectedColor, expected: selectedColor),
+            Row(name: "fixed selected, only the normal color: the fixed color (the table)", tint: "#00FF00", selected: true, normal: normal, expected: fixed),
+            Row(name: "fixed selected, no icon colors: the fixed color", tint: "#00FF00", selected: true, expected: fixed),
+            Row(name: "fixed selected, no icon colors, dark: the darkTint", tint: "#00FF00", darkTint: "#0000FF", selected: true, dark: true, expected: darkFixed),
+            Row(name: "fixed selected with a color, dark: the icon color", tint: "#00FF00", darkTint: "#0000FF", selected: true, dark: true, selectedColor: selectedColor, expected: selectedColor),
+            Row(name: "8 digits are RRGGBBAA", tint: "#FF000080", expected: UIColor(red: 1, green: 0, blue: 0, alpha: 128 / 255)),
+        ]
+        for row in rows {
+            // Set before the file loads, then (below) after; both must give the same color.
+            let before = CYLRecordingViewFactory()
+            let early = makeItem(before, dark: row.dark)
+            if row.normal != nil || row.selectedColor != nil { early.itemAppearance = appearance(normal: row.normal, selected: row.selectedColor) }
+            early.animationTint = row.tint
+            early.animationDarkTint = row.darkTint
+            early.isSelected = row.selected
+            early.animationURL = file
+            XCTAssertNotNil(early.animationView, row.name)
+            if row.normal == nil && row.selectedColor == nil {
+                // No itemAppearance at all: a host that tints by hand (applyIconTintColor) is not part of this row.
+                early.itemAppearance = appearance(normal: nil, selected: nil)
+            }
+            guard let got = last(before) else {
+                XCTFail("\(row.name): nothing reached the view")
+                continue
+            }
+            assertColor(got, row.expected, "\(row.name) (set before load)")
+
+            let after = CYLRecordingViewFactory()
+            let late = makeItem(after, dark: row.dark)
+            late.itemAppearance = appearance(normal: row.normal, selected: row.selectedColor)
+            late.isSelected = row.selected
+            late.animationURL = file
+            late.animationTint = row.tint
+            late.animationDarkTint = row.darkTint
+            guard let gotLate = last(after) else {
+                XCTFail("\(row.name): nothing reached the view (set after load)")
+                continue
+            }
+            assertColor(gotLate, row.expected, "\(row.name) (set after load)")
+        }
+    }
+
+    /// (c) Clearing animationTint removes the tint, whenever it was set.
+    func testClearingRemovesTheTint() {
+        let factory = CYLRecordingViewFactory()
+        let item = makeItem(factory)
+        item.itemAppearance = appearance(normal: normal, selected: selectedColor)
+        item.animationURL = file
+        item.animationTint = "title"
+        assertColor(last(factory) ?? nil, normal, "title tints")
+        item.animationTint = nil
+        guard let cleared = last(factory) else { return XCTFail("clearing reached the view") }
+        XCTAssertNil(cleared, "cleared: no stale color")
+        item.animationTint = "#00FF00"
+        assertColor(last(factory) ?? nil, fixed, "set again")
+        item.animationTint = "not a color"
+        XCTAssertNil(last(factory) ?? nil, "an invalid text is unset")
+    }
+
+    /// (b) "title" with no icon color at all removes a previous tint.
+    func testTitleWithoutAnyIconColorRemovesAPreviousTint() {
+        let factory = CYLRecordingViewFactory()
+        let item = makeItem(factory)
+        item.animationURL = file
+        item.animationTint = "title"
+        item.itemAppearance = appearance(normal: normal, selected: nil)
+        assertColor(last(factory) ?? nil, normal, "tinted")
+        item.itemAppearance = appearance(normal: nil, selected: nil)
+        guard let removed = last(factory) else { return XCTFail("nothing reached the view") }
+        XCTAssertNil(removed, "no icon color: the file's own colors")
+    }
+
+    /// (a) A selected item falls back to the normal icon color when its own state has none; selecting and deselecting follows.
+    func testSelectionFollowsTheTableWithTheNormalColorAsFallback() {
+        let factory = CYLRecordingViewFactory()
+        let item = makeItem(factory)
+        item.itemAppearance = appearance(normal: normal, selected: nil)
+        item.animationURL = file
+        item.animationTint = "title"
+        item.isSelected = true
+        assertColor(last(factory) ?? nil, normal, "selected, normal fallback")
+        item.itemAppearance = appearance(normal: normal, selected: selectedColor)
+        assertColor(last(factory) ?? nil, selectedColor, "selected color")
+        item.isSelected = false
+        assertColor(last(factory) ?? nil, normal, "deselected")
+    }
+
+    /// (d) A fixed tint's dark color applies in dark mode and again on a trait change.
+    func testDarkTintFollowsATraitChange() {
+        let factory = CYLRecordingViewFactory()
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 200, height: 100))
+        let item = makeItem(factory)
+        window.addSubview(item)
+        window.isHidden = false
+        item.animationURL = file
+        item.animationTint = "#00FF00"
+        item.animationDarkTint = "#0000FF"
+        window.overrideUserInterfaceStyle = .light
+        item.itemAppearance = appearance(normal: normal, selected: nil)
+        assertColor(last(factory) ?? nil, fixed, "light")
+        window.overrideUserInterfaceStyle = .dark
+        item.layoutIfNeeded()
+        assertColor(last(factory) ?? nil, darkFixed, "dark after the trait change, without any other call")
+        window.overrideUserInterfaceStyle = .light
+        item.layoutIfNeeded()
+        assertColor(last(factory) ?? nil, fixed, "light again")
+    }
+
+    /// The `tint` option of the URL applies when the property is unset; the property overrides it.
+    func testThePropertyOverridesTheURLOption() {
+        let url = URL(string: file.absoluteString + "#tint=title")!
+        let factory = CYLRecordingViewFactory()
+        let item = makeItem(factory)
+        item.itemAppearance = appearance(normal: normal, selected: nil)
+        item.animationURL = url
+        assertColor(last(factory) ?? nil, normal, "the URL's title")
+        item.animationTint = "#00FF00"
+        assertColor(last(factory) ?? nil, fixed, "the property wins")
+        item.animationTint = nil
+        assertColor(last(factory) ?? nil, normal, "back to the URL's option")
     }
 }

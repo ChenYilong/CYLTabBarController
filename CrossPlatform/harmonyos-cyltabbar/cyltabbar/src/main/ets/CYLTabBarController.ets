@@ -7,9 +7,9 @@ import { CYLPlusButton, cyl_liquidGlassContentDy } from './CYLPlusButton';
 import { CYLBadge, CYLBadgeView } from './CYLBadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLSVGAView } from './svga/CYLSVGAView';
-import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint,
-  CYLTabBarAnimationTintTitle } from './CYLRiveTabBarItemAnimator';
-import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines, CYLAnimatedItemSVGA, cylSetPausesWhileUserScrolls } from 'cylanimateditem';
+import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint } from './CYLRiveTabBarItemAnimator';
+import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines, CYLAnimatedItemSVGA, cylSetPausesWhileUserScrolls,
+  CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint } from 'cylanimateditem';
 import { CYLAnimatedItemLottie } from 'cylanimateditem_lottie';
 // TODO: replace the file: dependency (cyltabbar/oh-package.json5, a vendored copy) with the ohpm package after the library is published (owner's OK).
 import { LifecycleController } from 'cyldeallocblockexecutor';
@@ -1511,52 +1511,74 @@ export struct CYLTabBarController {
   }
 
   /**
-   * [EN] The color a tab's animation is drawn in (`CYLTabBarAnimationOptionTint` in its path's query): "title" = the
-   *      tab's icon color for its state, as iOS draws a template image (the item's `iconColor` / `selectedIconColor`, then
-   *      the controller's, then the title color); a fixed color, with `CYLTabBarAnimationOptionDarkTint` in dark mode; '' = the
-   *      file's own colors.
-   * [CN] Tab 动画的绘制颜色（路径查询参数中的 `CYLTabBarAnimationOptionTint`）："title" = Tab 当前状态的图标颜色，与 iOS 模板图片一致（先 Tab 的
-   *      `iconColor` / `selectedIconColor`，再控制器的，最后标题颜色）；固定颜色，深色模式下使用
-   *      `CYLTabBarAnimationOptionDarkTint`；'' = 文件自身的颜色。
+   * [EN] A tab's `tint` or `darkTint` option in the query of `path` (`CYLTabBarAnimationOptionTint` / `CYLTabBarAnimationOptionDarkTint`),
+   *      as written; '' for none. The component resolves it (`CYLAnimatedItemView.animationTint` / `animationDarkTint`).
+   * [CN] `path` 查询参数中 Tab 的 `tint` 或 `darkTint` 选项（`CYLTabBarAnimationOptionTint` / `CYLTabBarAnimationOptionDarkTint`），原样返回；没有时为 ''。
+   *      由组件解析（`CYLAnimatedItemView.animationTint` / `animationDarkTint`）。
    */
-  cylTabAnimationTint(index: number): ResourceColor {
-    return this.cylTintForPath(index, this.cylTabAnimationPath(index));
-  }
-
-  /**
-   * [EN] The tint of `path`'s options for tab `index` (see `cylTabAnimationTint`); '' for none.
-   * [CN] Tab `index` 的 `path` 选项中的着色（见 `cylTabAnimationTint`）；没有时为 ''。
-   */
-  cylTintForPath(index: number, path: string | undefined): ResourceColor {
+  cylTabTintOption(path: string | undefined, key: string): string {
     if (path === undefined) {
       return '';
     }
-    const options = cylRiveFileAndOptions(path)[1];
-    const tint = (options[CYLTabBarAnimationOptionTint] ?? '').trim();
-    if (tint.length === 0) {
+    return (cylRiveFileAndOptions(path)[1][key] ?? '').trim();
+  }
+
+  /**
+   * [EN] The tab's icon color while unselected: the item's `iconColor`, then the controller's, then the title color. The animated item
+   *      takes it as `iconColor`. [CN] Tab 未选中时的图标颜色：先 Tab 的 `iconColor`，再控制器的，最后标题颜色。动效条目以此作为 `iconColor`。
+   */
+  cylTabNormalIconColor(index: number): ResourceColor {
+    const item = this.tabBarItemsAttributes[index];
+    return item.iconColor ?? this.iconColor ?? item.titleColor ?? this.unselectedColor;
+  }
+
+  /**
+   * [EN] The tab's icon color while selected: the item's `selectedIconColor`, then the controller's, then the selected title color. The
+   *      animated item takes it as `selectedIconColor`. [CN] Tab 选中时的图标颜色：先 Tab 的 `selectedIconColor`，再控制器的，最后选中标题颜色。
+   *      动效条目以此作为 `selectedIconColor`。
+   */
+  cylTabSelectedIconColor(index: number): ResourceColor {
+    const item = this.tabBarItemsAttributes[index];
+    return item.selectedIconColor ?? this.selectedIconColor ?? item.selectedTitleColor ?? this.tintColor;
+  }
+
+  /**
+   * [EN] The icon colors the animated item gets as `iconColor` / `selectedIconColor`: the tab's title-based ones when its animation path has
+   *      a `tint` option, '' otherwise (an untinted item keeps its static image's own colors). [CN] 动效条目的 `iconColor` / `selectedIconColor`：
+   *      动画路径有 `tint` 选项时为 Tab 基于标题的颜色，否则为 ''（未着色的条目保持静态图片自身颜色）。
+   */
+  cylTabItemIconColor(index: number, selected: boolean): ResourceColor {
+    if (this.cylTabTintOption(this.cylTabAnimationPath(index), CYLTabBarAnimationOptionTint) === '') {
       return '';
     }
-    if (tint === CYLTabBarAnimationTintTitle) {
-      const item = this.tabBarItemsAttributes[index];
-      return this.selectedIndex === index
-        ? (item.selectedIconColor ?? this.selectedIconColor ?? item.selectedTitleColor ?? this.tintColor)
-        : (item.iconColor ?? this.iconColor ?? item.titleColor ?? this.unselectedColor);
-    }
-    const dark = (options[CYLTabBarAnimationOptionDarkTint] ?? '').trim();
-    return this.colorMode === 'dark' && dark.length > 0 ? dark : tint;
+    return selected ? this.cylTabSelectedIconColor(index) : this.cylTabNormalIconColor(index);
   }
 
   /**
    * [EN] The color filter of a GIF tab icon with the `tint` option (`gifFilePath` "gif/a.gif?tint=title"): RGB = the tint,
    *      alpha = the GIF's alpha times the tint's, the same as the SRC_IN tint layer of the other engines
-   *      (`CYLAnimatedItemView.animationTintColor`), since a GIF is drawn as an Image, not an engine view. The identity
+   *      (`CYLAnimatedItemView.animationTint`), resolved by the same `cylAnimatedItemResolveTint`, since a GIF is drawn as an Image, not an engine view. The identity
    *      matrix without a tint (or with a color that is not "#RRGGBB" / "#AARRGGBB"): the GIF keeps its own colors.
    * [CN] 带 `tint` 选项的 GIF Tab 图标（`gifFilePath` "gif/a.gif?tint=title"）的颜色滤镜：RGB = 着色，alpha = GIF 的 alpha 乘以着色的 alpha，
-   *      与其他引擎的 SRC_IN 着色层（`CYLAnimatedItemView.animationTintColor`）相同，因为 GIF 由 Image 绘制而不是引擎视图。没有着色（或颜色
+   *      与其他引擎的 SRC_IN 着色层（`CYLAnimatedItemView.animationTint`）相同，由同一个 `cylAnimatedItemResolveTint` 解析，因为 GIF 由 Image 绘制而不是引擎视图。没有着色（或颜色
    *      不是 "#RRGGBB" / "#AARRGGBB"）时为单位矩阵：GIF 保持自身颜色。
    */
   cylGifColorFilter(index: number): ColorFilter {
-    return cylTintColorFilter(this.cylTintForPath(index, this.tabBarItemsAttributes[index].gifFilePath));
+    // [EN] A GIF is an Image, not an animated item: the component's resolver, with the same inputs the item gets. [CN] GIF 是 Image 而不是
+    //      动效条目：使用组件的解析函数，输入与条目相同。
+    const path = this.tabBarItemsAttributes[index].gifFilePath;
+    const input = new CYLAnimatedItemTintInput();
+    input.optionTint = this.cylTabTintOption(path, CYLTabBarAnimationOptionTint);
+    input.optionDarkTint = this.cylTabTintOption(path, CYLTabBarAnimationOptionDarkTint);
+    input.selected = this.selectedIndex === index;
+    input.dark = this.colorMode === 'dark';
+    input.hasIconColor = true;
+    input.hasSelectedIconColor = true;
+    const result: CYLAnimatedItemTintResult = cylAnimatedItemResolveTint(input);
+    if (result.kind === 'icon') {
+      return cylTintColorFilter(this.selectedIndex === index ? this.cylTabSelectedIconColor(index) : this.cylTabNormalIconColor(index));
+    }
+    return cylTintColorFilter(result.color);
   }
 
   /**
@@ -1682,7 +1704,10 @@ export struct CYLTabBarController {
               animationUrl: this.cylTabAnimationPath(index),
               iconSize: this.cylTabAnimationSize(index),
               isItemSelected: this.selectedIndex === index,
-              animationTintColor: this.cylTabAnimationTint(index),
+              animationTint: this.cylTabTintOption(this.cylTabAnimationPath(index), CYLTabBarAnimationOptionTint),
+              animationDarkTint: this.cylTabTintOption(this.cylTabAnimationPath(index), CYLTabBarAnimationOptionDarkTint),
+              iconColor: this.cylTabItemIconColor(index, false),
+              selectedIconColor: this.cylTabItemIconColor(index, true),
               animationSpeed: this.tabBarItemAnimationSpeed,
               animationLoops: this.tabBarItemAnimationLoops,
               animationRestartToken: this.replayTokens[index] ?? 0,
@@ -1694,7 +1719,10 @@ export struct CYLTabBarController {
             animationUrl: this.cylTabAnimationPath(index),
             iconSize: this.cylTabAnimationSize(index),
             isItemSelected: this.selectedIndex === index,
-            animationTintColor: this.cylTabAnimationTint(index),
+            animationTint: this.cylTabTintOption(this.cylTabAnimationPath(index), CYLTabBarAnimationOptionTint),
+            animationDarkTint: this.cylTabTintOption(this.cylTabAnimationPath(index), CYLTabBarAnimationOptionDarkTint),
+            iconColor: this.cylTabItemIconColor(index, false),
+            selectedIconColor: this.cylTabItemIconColor(index, true),
             // [EN] The playback goes through the component, which hands it to the engine in its context.
             // [CN] 播放设置经由组件传递，组件通过 context 交给引擎。
             animationSpeed: this.tabBarItemAnimationSpeed,
