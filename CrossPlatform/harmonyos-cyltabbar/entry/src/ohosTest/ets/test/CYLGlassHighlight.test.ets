@@ -2,25 +2,24 @@ import { describe, it, expect } from '@ohos/hypium';
 import { CYLLiquidGlass, CYLAnimatedItemBackgroundModifier } from 'cylanimateditem';
 
 /**
- * [EN] The light of the Liquid Glass of cylanimateditem (the hairline rim and the sheen, Android `CYLGlassHighlight`): the rim is lit from the
- *      top left (bright top and left, dim bottom and right) in both modes, the sheen runs from a bright top to a clear middle, and the mode
- *      comes from AppStorage `cyl_colorMode`.
- * [CN] cylanimateditem 液态玻璃的光（细边与高光，Android `CYLGlassHighlight`）：细边光从左上来（上边、左边明亮，下边、右边暗淡），两种模式都是；
- *      高光从明亮的顶部到透明的中部；模式取自 AppStorage 的 `cyl_colorMode`。
+ * [EN] The one liquid glass config of cylanimateditem (the hairline rim and the sheen), shared by tags, cards and the tab bar capsule: the rim is the
+ *      Android hairline, the same on every edge, the sheen runs from a bright top to a clear middle, and the mode comes from AppStorage `cyl_colorMode`.
+ * [CN] cylanimateditem 唯一的液态玻璃配置（细边与高光），标签、卡片与 TabBar 胶囊共用：细边是 Android 的细边，四条边相同；高光从明亮的顶部到透明的中部；
+ *      模式取自 AppStorage 的 `cyl_colorMode`。
  */
 export default function cylGlassHighlightTest() {
   describe('CYLGlassHighlight', () => {
-    it('the rim is lit from the top left in light and dark', 0, () => {
+    it('the rim is the Android hairline, the same on every edge, in light and dark', 0, () => {
       const light: EdgeColors = CYLLiquidGlass.rimEdgeColors(false);
-      expect(light.top).assertEqual(light.left);
-      expect(light.bottom).assertEqual(light.right);
-      expect(light.top).assertEqual('#E6FFFFFF');
-      expect(light.bottom).assertEqual('#2E000000');
+      expect(light.top).assertEqual('#29000000');
+      expect(light.right).assertEqual(light.top);
+      expect(light.bottom).assertEqual(light.top);
+      expect(light.left).assertEqual(light.top);
       const dark: EdgeColors = CYLLiquidGlass.rimEdgeColors(true);
-      expect(dark.top).assertEqual(dark.left);
-      expect(dark.bottom).assertEqual(dark.right);
-      expect(dark.top).assertEqual('#8CFFFFFF');
-      expect(dark.bottom).assertEqual('#24FFFFFF');
+      expect(dark.top).assertEqual('#38FFFFFF');
+      expect(dark.right).assertEqual(dark.top);
+      expect(dark.bottom).assertEqual(dark.top);
+      expect(dark.left).assertEqual(dark.top);
     });
 
     it('the sheen is bright at the top and clear in the middle, in both modes', 0, () => {

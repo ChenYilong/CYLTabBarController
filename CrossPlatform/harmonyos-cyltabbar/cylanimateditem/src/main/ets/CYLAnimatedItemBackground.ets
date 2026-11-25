@@ -136,7 +136,7 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
     const rim: boolean = glass && this.borderWidth <= 0;
     instance.borderWidth(rim ? CYLLiquidGlass.RIM_WIDTH : this.borderWidth);
     instance.borderColor(rim ? CYLLiquidGlass.rimEdgeColors(CYLLiquidGlass.isDark()) : this.borderColor);
-    // [EN] Every glass has the sheen and the lit rim of CYLLiquidGlass (the tab bar capsule uses the same values). [CN] 所有玻璃都有 CYLLiquidGlass 的高光与方向性细边（TabBar 胶囊使用相同的数值）。
+    // [EN] Every glass has the sheen and the uniform rim of CYLLiquidGlass (the tab bar capsule uses the same values). [CN] 所有玻璃都有 CYLLiquidGlass 的高光与均匀细边（TabBar 胶囊使用相同的数值）。
     const sheen: Array<[ResourceColor, number]> = CYLLiquidGlass.sheenColors(CYLLiquidGlass.isDark());
     if (glass && sheen.length > 0) {
       instance.linearGradient({ direction: GradientDirection.Bottom, colors: sheen });
