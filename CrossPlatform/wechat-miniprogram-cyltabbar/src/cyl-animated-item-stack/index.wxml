@@ -1,9 +1,22 @@
 <!-- [EN] A centered vertical stack of cyl-animated-item; the screen reader reads the items top to bottom. [CN] cyl-animated-item 的居中竖向堆叠；读屏自上而下朗读这些条目。 -->
-<view class="cyl-stack" style="{{m.containerStyle}}" bindtap="cyl_onBackgroundTap">
+<view class="cyl-stack {{m.containerClass}}" style="{{m.containerStyle}}" bindtap="cyl_onBackgroundTap">
   <view class="cyl-stack-column {{m.horizontal ? 'cyl-stack-row' : ''}}">
+    <block wx:for="{{m.items}}" wx:key="key">
+    <!-- [EN] A built-in divider: not tappable, hidden from screen readers. [CN] 内置分割线：不可点击，对读屏隐藏。 -->
+    <view wx:if="{{item.dividerBefore}}" class="cyl-stack-divider" style="{{item.dividerStyle}}" catchtap="cyl_noop">
+      <cyl-animated-item
+        cyl-internal-divider="{{true}}"
+        cyl-divider-color="{{m.divider.color}}"
+        cyl-divider-length="{{m.divider.length}}"
+        cyl-divider-vertical="{{m.divider.vertical}}"
+        icon-tint="{{m.divider.iconTint}}"
+        animation-tint="{{m.divider.animationTint}}"
+        animation-dark-tint="{{m.divider.animationDarkTint}}"
+        user-interface-style="{{m.divider.userInterfaceStyle}}"
+        accessibility-hidden="{{true}}"
+      />
+    </view>
     <view
-      wx:for="{{m.items}}"
-      wx:key="key"
       class="cyl-stack-item"
       style="{{item.wrapperStyle}}"
       data-index="{{index}}"
@@ -24,6 +37,10 @@
         title-font-size="{{item.titleFontSize}}"
         title-font-weight="{{item.titleFontWeight}}"
         icon-tint="{{item.iconTint}}"
+        animation-tint="{{item.animationTint}}"
+        animation-dark-tint="{{item.animationDarkTint}}"
+        animation-icon-tint="{{item.animationIconTint}}"
+        animation-selected-icon-tint="{{item.animationSelectedIconTint}}"
         accessibility-label="{{item.accessibilityLabel}}"
         accessibility-role="{{item.role}}"
         accessibility-hidden="{{item.hidden}}"
@@ -33,5 +50,6 @@
         generic:cyl-svga-view="cyl-svga-view"
       />
     </view>
+    </block>
   </view>
 </view>

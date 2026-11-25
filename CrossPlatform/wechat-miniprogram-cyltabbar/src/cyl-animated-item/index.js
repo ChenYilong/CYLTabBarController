@@ -203,6 +203,11 @@ Component({
      *      '' （默认）表示用 `iconTint` / `selectedIconTint`。它们不会给静态图片着色。
      */
     animationIconTint: { type: String, value: '' },
+    // [EN] INTERNAL, not API: cyl-animated-item-stack switches its built-in divider on through these (the item then draws only the line). [CN] 内部使用，不是 API：cyl-animated-item-stack 通过它们开启其内置分割线（此时条目只画那条线）。
+    cylInternalDivider: { type: Boolean, value: false },
+    cylDividerColor: { type: String, value: '' },
+    cylDividerLength: { type: Number, value: 20 },
+    cylDividerVertical: { type: Boolean, value: true },
     animationSelectedIconTint: { type: String, value: '' },
     /**
      * [EN] The title's color (any CSS color); '' keeps the inherited color.
@@ -322,7 +327,7 @@ Component({
       // [EN] A file of no known type has no engine to report anything: it cannot be decoded. [CN] 不属于任何已知类型的文件没有引擎可以报告：无法解码。
       if (animationUrl && this.data.m && !this.data.m.animationType) this.cyl_reportResourceMissing('decode failed')
     },
-    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, selectedIconTint, animationTint, animationDarkTint, animationIconTint, animationSelectedIconTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing': function () {
+    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, selectedIconTint, animationTint, animationDarkTint, animationIconTint, animationSelectedIconTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing, cylInternalDivider, cylDividerColor, cylDividerLength, cylDividerVertical': function () {
       this.cyl_update()
     },
     'itemStyle, countdownIdleTitle, countdownRunningTitleFormat, countdownFinishedTitle, countdownImage, countdownRunningTitleColor, countdownDuration': function (itemStyle) {
@@ -908,6 +913,7 @@ Component({
     },
 
     cyl_onTap() {
+      if (this.data.cylInternalDivider) return
       if (this.data.enabled && !this.data.embedded && this.data.countdownState !== 'running') {
         this.triggerEvent('itemtap', {})
         // [EN] After the page handled the tap (send the code there), the countdown starts. [CN] 页面处理点击（在那里发送验证码）之后开始倒计时。
@@ -916,7 +922,7 @@ Component({
     },
 
     cyl_onLongPress() {
-      if (this.data.enabled && !this.data.embedded) {
+      if (!this.data.cylInternalDivider && this.data.enabled && !this.data.embedded) {
         this.triggerEvent('itemlongpress', {})
       }
     },

@@ -418,7 +418,71 @@ function cylAnimatedItemHasValue(value) {
   return value !== null && value !== undefined && String(value).trim() !== ''
 }
 
+/**
+ * [EN] `color` (hex "#RGB" / "#RGBA" / "#RRGGBB" / "#RRGGBBAA", or rgb() / rgba()) with its alpha replaced by `alpha`, as an rgba() text; '' for anything
+ *      else (a name, blank): its channels are unknown. [CN] 把 `color`（十六进制或 rgb() / rgba()）的透明度替换为 `alpha`，返回 rgba() 文本；其他（名称、空白）为 ''，因为无法得知通道值。
+ */
+function cylAnimatedItemColorWithAlpha(color, alpha) {
+  const text = String(color === null || color === undefined ? '' : color).trim()
+  const hex = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(text)
+  if (hex) {
+    const digits = hex[1].length <= 4 ? hex[1].replace(/./g, '$&$&') : hex[1]
+    const channel = (index) => Number.parseInt(digits.slice(index * 2, index * 2 + 2), 16)
+    return `rgba(${channel(0)},${channel(1)},${channel(2)},${alpha})`
+  }
+  const fn = /^rgba?\(\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*(?:[,/]\s*[\d.]+%?\s*)?\)$/i.exec(text)
+  return fn ? `rgba(${fn[1]},${fn[2]},${fn[3]},${alpha})` : ''
+}
+
+/**
+ * [EN] Inheritance: the item's own value when it is set (not blank), else the stack's. [CN] 继承：条目自己设置了（非空白）就用自己的，否则用堆叠的。
+ */
+function cylAnimatedItemInherited(own, inherited) {
+  if (cylAnimatedItemHasValue(own)) return String(own).trim()
+  return cylAnimatedItemHasValue(inherited) ? String(inherited).trim() : ''
+}
+
+/**
+ * [EN] The built-in divider (an INTERNAL mode of this item, switched on only by cyl-animated-item-stack; not API): the line is 1 px thick, `cylDividerLength` px long
+ *      (default 20), and the alpha of the icon-color fallback is 0.3 (iOS `CYLAnimatedItemDividerAlpha`). [CN] 内置分割线（本条目的内部模式，只由
+ *      cyl-animated-item-stack 开启；不是 API）：线粗 1 px，长 `cylDividerLength` px（默认 20），图标颜色回退的透明度为 0.3（iOS `CYLAnimatedItemDividerAlpha`）。
+ */
+const CYL_ANIMATED_ITEM_DIVIDER_THICKNESS = 1
+const CYL_ANIMATED_ITEM_DIVIDER_LENGTH = 20
+const CYL_ANIMATED_ITEM_DIVIDER_ALPHA = 0.3
+
+/**
+ * [EN] The divider line's color, resolved with the item's OWN dark flag (`userInterfaceStyle` / `systemTheme`): `cylDividerColor` (the stack's `dividerColor`) as is;
+ *      else the item's effective normal icon color (`iconTint`) at alpha 0.3; else the separator (iOS UIColor.separator: light 60,60,67 at 0.29, dark 84,84,88 at 0.65).
+ * [CN] 分割线颜色，按条目「自己的」深色标志（`userInterfaceStyle` / `systemTheme`）解析：`cylDividerColor`（堆叠的 `dividerColor`）原样使用；
+ *      否则为条目有效的普通图标颜色（`iconTint`）的 0.3 透明度；否则为分隔线颜色（iOS UIColor.separator：浅色 60,60,67 透明度 0.29，深色 84,84,88 透明度 0.65）。
+ */
+function cylAnimatedItemDividerColor(input) {
+  const p = input || {}
+  if (cylAnimatedItemHasValue(p.cylDividerColor)) return String(p.cylDividerColor).trim()
+  const fromIcon = cylAnimatedItemColorWithAlpha(p.iconTint, CYL_ANIMATED_ITEM_DIVIDER_ALPHA)
+  if (fromIcon) return fromIcon
+  return cylAnimatedItemIsDark(p) ? 'rgba(84,84,88,0.65)' : 'rgba(60,60,67,0.29)'
+}
+
+/**
+ * [EN] The divider's CSS: 1 px x `cylDividerLength`; `cylDividerVertical` (default true: a vertical line, as in a horizontal stack) swaps the sides.
+ * [CN] 分割线的 CSS：1 px x `cylDividerLength`；`cylDividerVertical`（默认 true：竖线，用于横向堆叠）为 false 时互换两边。
+ */
+function cylAnimatedItemDividerStyle(input) {
+  const p = input || {}
+  const length = cylAnimatedItemDimension(p.cylDividerLength, CYL_ANIMATED_ITEM_DIVIDER_LENGTH)
+  const thickness = CYL_ANIMATED_ITEM_DIVIDER_THICKNESS
+  const size = p.cylDividerVertical === false ? `width: ${length}px; height: ${thickness}px;` : `width: ${thickness}px; height: ${length}px;`
+  return `${size} background-color: ${cylAnimatedItemDividerColor(p)};`
+}
+
 function cylAnimatedItemModel(input) {
+  if (input && input.cylInternalDivider) {
+    // [EN] The divider mode shows no icon, title, animation or badge, only the line, and no screen reader element. [CN] 分割线模式不显示图标、标题、动画与角标，只有一条线，读屏也不朗读。
+    const blank = cylAnimatedItemModel({ ...input, cylInternalDivider: false, animationUrl: '', animationData: null, image: '', selectedImage: '', title: '', accessibilityLabel: '', accessoryImage: '', accessoryText: '', itemStyle: 'plain', selected: false, embedded: false })
+    return { ...blank, isDivider: true, ariaHidden: true, ariaDisabled: false, ariaSelected: false, dividerStyle: cylAnimatedItemDividerStyle(input) }
+  }
   const p = cylAnimatedItemCountdownProperties(input)
   const animationPath = p.animationUrl || ''
   const hasAnimationData = !!p.animationData && typeof p.animationData === 'object'
@@ -623,6 +687,11 @@ module.exports = {
   cylAnimatedItemLiquidGlassSetActiveOverride,
   cylAnimatedItemCountdownTitleWidth,
   cylAnimatedItemIsDark,
+  cylAnimatedItemColorWithAlpha,
+  cylAnimatedItemDividerColor,
+  cylAnimatedItemDividerStyle,
+  CYL_ANIMATED_ITEM_DIVIDER_LENGTH,
+  cylAnimatedItemInherited,
   cylAnimatedItemAnimationTint,
   cylAnimatedItemTintColor,
   cylAnimatedItemTintHex,

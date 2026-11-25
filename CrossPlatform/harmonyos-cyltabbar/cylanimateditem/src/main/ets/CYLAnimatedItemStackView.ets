@@ -1,6 +1,6 @@
 import { CYLAnimatedItemView, CYLAnimatedItemAxis, CYLAnimatedItemAnimationContext } from './CYLAnimatedItemView';
 import { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier } from './CYLAnimatedItemBackground';
-import { CYLAnimatedItemStackModel, CYLAnimatedItemStackItem } from './CYLAnimatedItemStackModel';
+import { CYLAnimatedItemStackModel, CYLAnimatedItemStackItem, CYLAnimatedItemStackElement } from './CYLAnimatedItemStackModel';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { LifecycleController } from 'cyldeallocblockexecutor';
 
@@ -104,14 +104,14 @@ export struct CYLAnimatedItemStackView {
     this.cylLifecycle?.aboutToDisappear();
   }
 
-  /** [EN] The key of an item for ForEach: its id and the revision, so a changed field redraws it. [CN] ForEach 的键：id 加修订号，字段变化后重绘。 */
-  private cylKey(item: CYLAnimatedItemStackItem): string {
-    return `${item.id}#${this.revision}`;
-  }
-
   /** [EN] The items; reads `revision`, so every model change redraws the stack. [CN] 条目；读取 `revision`，模型每次变化都会重绘。 */
   private cylItems(): CYLAnimatedItemStackItem[] {
     return this.revision >= 0 ? this.model.items : [];
+  }
+
+  /** [EN] What is drawn: the visible items (a hidden item leaves no spacing) and the dividers between them. [CN] 绘制的内容：可见条目（隐藏的条目不留间距）及其间的分隔线。 */
+  private cylElementList(): CYLAnimatedItemStackElement[] {
+    return this.revision >= 0 ? this.model.elements : [];
   }
 
   /** [EN] The inset really applied (vp). [CN] 实际应用的间距（vp）。 */
@@ -120,7 +120,7 @@ export struct CYLAnimatedItemStackView {
   }
 
   private cylMaxItemWidth(): number | undefined {
-    return this.viewWidth > 0 ? this.model.maxItemWidth(this.viewWidth - 2 * this.cylContentInset()) : undefined;
+    return this.viewWidth > 0 && !this.model.hugsContent ? this.model.maxItemWidth(this.viewWidth - 2 * this.cylContentInset()) : undefined;
   }
 
   @Builder
@@ -137,21 +137,43 @@ export struct CYLAnimatedItemStackView {
       itemId: item.id,
       isItemEnabled: item.enabled,
       iconColor: this.model.iconColorOf(item),
+      animationTint: item.animationTint,
+      animationDarkTint: item.animationDarkTint,
+      stackAnimationTint: this.model.animationTint,
+      stackAnimationDarkTint: this.model.animationDarkTint,
       isBare: true,
       sizesToContent: true,
       animationBuilder: this.animationBuilder,
     })
   }
 
-  /** [EN] The space before an element: above it, or on its leading side in a row. [CN] 元素之前的间距：上方，或在一行中的前侧。 */
-  private cylMarginOf(item: CYLAnimatedItemStackItem): Margin {
-    const spacing = this.model.spacingBeforeOf(item);
-    return this.model.isHorizontal ? { left: spacing } : { top: spacing };
+  @Builder
+  cylElements() {
+        ForEach(this.cylElementList(), (element: CYLAnimatedItemStackElement) => {
+          if (element.isDivider) {
+            // [EN] The divider is an item view owned by the stack (internal divider mode), with the stack's effective icon color and
+            //      tint inheritance, like every item. [CN] 分隔线是堆叠拥有的条目视图（内部分隔线模式），与所有条目一样使用堆叠生效的图标颜色与着色继承。
+            CYLAnimatedItemView({
+              cylInternalDivider: true,
+              cylInternalDividerColor: this.model.dividerColor,
+              cylInternalDividerLength: this.model.dividerLength,
+              cylInternalDividerVertical: this.model.isHorizontal,
+              iconColor: this.model.iconColor,
+              stackAnimationTint: this.model.animationTint,
+              stackAnimationDarkTint: this.model.animationDarkTint,
+              isBare: true,
+              sizesToContent: true,
+              itemId: element.key
+            })
+              .margin(this.model.isHorizontal ? { left: element.spacingBefore } : { top: element.spacingBefore })
+          } else {
+            this.cylItemElement(element.item, element.spacingBefore)
+          }
+        }, (element: CYLAnimatedItemStackElement) => `${element.key}#${this.revision}`)
   }
 
   @Builder
-  cylElements() {
-        ForEach(this.cylItems(), (item: CYLAnimatedItemStackItem) => {
+  cylItemElement(item: CYLAnimatedItemStackItem, spacingBefore: number) {
           // [EN] Each element is a wrapper around a bare item view: the wrapper takes the tap and is what the screen reader
           //      reads; the item view only draws (`isBare`), sized by its content (B29). Only an element that acts gets a
           //      click, so the others are not announced as actionable and let a tap through to the background.
@@ -161,8 +183,9 @@ export struct CYLAnimatedItemStackView {
             Column() {
               this.cylItemView(item)
             }
-            .margin(this.cylMarginOf(item))
+            .margin(this.model.isHorizontal ? { left: spacingBefore } : { top: spacingBefore })
             .constraintSize({ maxWidth: this.cylMaxItemWidth() })
+            .opacity(item.alpha)
             .id(`${item.id}-element`)
             .onClick(() => {
               this.model.tapItem(item);
@@ -175,8 +198,9 @@ export struct CYLAnimatedItemStackView {
             Column() {
               this.cylItemView(item)
             }
-            .margin(this.cylMarginOf(item))
+            .margin(this.model.isHorizontal ? { left: spacingBefore } : { top: spacingBefore })
             .constraintSize({ maxWidth: this.cylMaxItemWidth() })
+            .opacity(item.alpha)
             .id(`${item.id}-element`)
             .hitTestBehavior(HitTestMode.None)
             .attributeModifier(new CYLStackItemRoleModifier(false))
@@ -184,7 +208,6 @@ export struct CYLAnimatedItemStackView {
             .accessibilityText(this.model.accessibilityTextOf(item))
             .accessibilityLevel(this.model.isAccessibilityHidden(item) ? 'no-hide-descendants' : 'yes')
           }
-        }, (item: CYLAnimatedItemStackItem) => this.cylKey(item))
   }
 
   build() {
@@ -202,8 +225,10 @@ export struct CYLAnimatedItemStackView {
         .alignItems(HorizontalAlign.Center)
       }
     }
-    .width('100%')
-    .height('100%')
+    .width(this.model.hugsContent ? undefined : '100%')
+    .height(this.model.hugsContent ? undefined : '100%')
+    // [EN] `dispatchesItemTaps` false: the stack takes no touches, the host row gets them. [CN] `dispatchesItemTaps` 为 false：堆叠不接收触摸，由宿主行处理。
+    .hitTestBehavior(this.model.dispatchesItemTaps ? HitTestMode.Default : HitTestMode.None)
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)
     .padding({ top: this.model.contentMargin, bottom: this.model.contentMargin,

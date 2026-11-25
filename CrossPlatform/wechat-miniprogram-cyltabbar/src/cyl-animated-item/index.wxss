@@ -113,3 +113,10 @@
 .cyl-animated-item-countdown.cyl-animated-item-disabled {
   border-color: #c7c7cc;
 }
+/* [EN] The internal divider mode: the root is the line itself (size and color inline). [CN] 内部分割线模式：根节点就是那条线（尺寸与颜色为内联样式）。 */
+.cyl-animated-item-divider {
+  display: block;
+  flex: none;
+  min-height: 0;
+  padding: 0;
+}

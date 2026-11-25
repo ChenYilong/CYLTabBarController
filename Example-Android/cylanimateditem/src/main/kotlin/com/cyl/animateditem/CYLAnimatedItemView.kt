@@ -573,6 +573,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        if (isDividerMode) {
+            val vertical = dividerAxis == CYLAnimatedItemAxis.Horizontal
+            val thickness = dividerThickness()
+            val length = dp(dividerLengthDp).roundToInt()
+            setMeasuredDimension(if (vertical) thickness else length, if (vertical) length else thickness)
+            return
+        }
         val widthLimit = if (MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.UNSPECIFIED) Int.MAX_VALUE / 2 else MeasureSpec.getSize(widthMeasureSpec)
         val (iconW, _) = if (showsIcon()) iconSize() else 0 to 0
         val inset = 2 * contentInsetPx()
@@ -586,6 +593,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         itemBackgroundRenderer.layoutGlass(r - l, b - t)
+        if (isDividerMode) return
         val inset = contentInsetPx()
         layoutContent(paddingLeft + inset, paddingTop, r - l - paddingRight - inset, b - t - paddingBottom)
     }
@@ -711,6 +719,42 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     private var appliesIconColor = false
 
     /**
+     * [EN] The title color (iOS `itemAppearance.normal.titleColor`); null (default) keeps the text view's own color, or uses the
+     *      stack's `titleColor` in a `CYLAnimatedItemStackView`.
+     * [CN] 标题颜色（iOS `itemAppearance.normal.titleColor`）；null（默认）保持文本视图自身颜色，在 `CYLAnimatedItemStackView` 中则使用堆叠的 `titleColor`。
+     */
+    var titleColor: Int? = null
+        set(value) { field = value; applyTitleColor() }
+
+    /**
+     * [EN] The stack's defaults, used when the item sets none (null / empty on the item means inherit). Set by `CYLAnimatedItemStackView`.
+     * [CN] 堆叠的默认值，条目自己没有设置时使用（条目上的 null / 空表示继承）。由 `CYLAnimatedItemStackView` 设置。
+     */
+    internal var stackTitleColor: Int? = null
+        set(value) { field = value; applyTitleColor() }
+    internal var stackAnimationTint: String? = null
+        set(value) { if (field != value) { field = value; refreshAnimationTint() } }
+    internal var stackAnimationDarkTint: String? = null
+        set(value) { if (field != value) { field = value; refreshAnimationTint() } }
+    internal var stackDividerColor: Int? = null
+        set(value) { if (field != value) { field = value; invalidate() } }
+    private var defaultTitleColor: Int? = null
+    private var appliesTitleColor = false
+
+    private fun applyTitleColor() {
+        val color = titleColor ?: stackTitleColor
+        if (color != null) {
+            if (!appliesTitleColor) defaultTitleColor = titleView.currentTextColor
+            titleView.setTextColor(color)
+            appliesTitleColor = true
+        } else if (appliesTitleColor) {
+            // [EN] Only a color this view set is undone. [CN] 只撤销本视图设置的颜色。
+            defaultTitleColor?.let { titleView.setTextColor(it) }
+            appliesTitleColor = false
+        }
+    }
+
+    /**
      * [EN] The icon color in effect now, or null. [CN] 当前生效的图标颜色，没有时为 null。
      */
     val effectiveIconColor: Int?
@@ -730,6 +774,62 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             appliesIconColor = false
         }
         refreshAnimationTint()
+        invalidate()
+    }
+
+    // MARK: - Divider mode 分隔线模式
+
+    /**
+     * [EN] Internal, not API: `CYLAnimatedItemStackView` makes one item of this component per divider and puts it in this mode. The item
+     *      then shows NO icon, title, animation or badge, only ONE line, 1 dp thick and `dividerLengthDp` long, centered in the item, and its
+     *      own size is that line's (1 x length in a row, swapped in a column: `dividerAxis`). It takes no taps and is hidden from a screen
+     *      reader. Line color: `stackDividerColor`, else the normal icon color (own, the stack's, the host's) at `CYLAnimatedItemDividerAlpha`,
+     *      else the separator color; resolved with the item's own night mode, re-resolved on every configuration or color change.
+     * [CN] 内部使用，不是 API：`CYLAnimatedItemStackView` 为每条分隔线创建一个本组件的条目并设为该模式。此时条目不显示图标、标题、动画与角标，只有一条线，
+     *      粗 1 dp、长 `dividerLengthDp`，在条目内居中，条目自身尺寸即这条线的尺寸（行中为 1 x 长度，列中互换：`dividerAxis`）。不接收点击，对读屏隐藏。
+     *      线颜色：`stackDividerColor`，其次普通图标颜色（自身、堆叠、宿主）以 `CYLAnimatedItemDividerAlpha` 的不透明度，最后是分隔色；按条目自身的夜间模式解析，
+     *      配置或颜色变化时重新解析。
+     */
+    internal var isDividerMode: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            isClickable = !value
+            isFocusable = !value
+            importantForAccessibility = if (value) IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS else IMPORTANT_FOR_ACCESSIBILITY_AUTO
+            requestLayout()
+            invalidate()
+        }
+    internal var dividerLengthDp: Float = CYLAnimatedItemDividerLength
+        set(value) { field = maxOf(0f, value); requestLayout(); invalidate() }
+    internal var dividerAxis: CYLAnimatedItemAxis = CYLAnimatedItemAxis.Horizontal
+        set(value) { if (field != value) { field = value; requestLayout(); invalidate() } }
+
+    /**
+     * [EN] The line color in effect for `configuration` (default: the item's own). [CN] 在 `configuration` 下生效的线颜色（默认：条目自身的）。
+     */
+    internal fun resolvedDividerColor(configuration: Configuration = resources.configuration): Int {
+        stackDividerColor?.let { return it }
+        (iconColor ?: stackIconColor ?: hostIconColor)?.let {
+            return Color.argb((CYLAnimatedItemDividerAlpha * 255f).roundToInt(), Color.red(it), Color.green(it), Color.blue(it))
+        }
+        val night = (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        return if (night) 0x1FFFFFFF else 0x1F000000
+    }
+
+    private val dividerPaint = android.graphics.Paint()
+
+    private fun dividerThickness() = max(1, dp(1f).roundToInt())
+
+    override fun dispatchDraw(canvas: android.graphics.Canvas) {
+        if (!isDividerMode) { super.dispatchDraw(canvas); return }
+        val vertical = dividerAxis == CYLAnimatedItemAxis.Horizontal
+        val w = if (vertical) dividerThickness().toFloat() else dp(dividerLengthDp)
+        val h = if (vertical) dp(dividerLengthDp) else dividerThickness().toFloat()
+        val left = (width - w) / 2f
+        val top = (height - h) / 2f
+        dividerPaint.color = resolvedDividerColor()
+        canvas.drawRect(left, top, left + w, top + h, dividerPaint)
     }
 
     // MARK: - Animation tint 动画着色
@@ -764,7 +864,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     var hostIconColor: Int? = null
-        set(value) { if (field != value) { field = value; refreshAnimationTint() } }
+        set(value) { if (field != value) { field = value; refreshAnimationTint(); invalidate() } }
 
     /**
      * [EN] The selected counterpart of `hostIconColor`. [CN] `hostIconColor` 的选中状态对应值。
@@ -787,7 +887,11 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     fun refreshAnimationTint(configuration: Configuration = resources.configuration) {
         val view = animationView ?: return
-        CYLTabBarItemAnimationTint.setOverride(view, animationTint, animationDarkTint)
+        CYLTabBarItemAnimationTint.setOverride(
+            view,
+            animationTint?.takeIf { it.isNotBlank() } ?: stackAnimationTint,
+            animationDarkTint?.takeIf { it.isNotBlank() } ?: stackAnimationDarkTint,
+        )
         CYLTabBarItemAnimationTint.setManaged(view)
         val source = CYLTabBarItemAnimationFactory.optionsOf(view)
             ?: animationURL?.takeIf { it.isNotBlank() }?.let { CYLTabBarAnimationFileAndOptions(it).second }.orEmpty()
@@ -803,6 +907,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         refreshAnimationTint(newConfig)
+        invalidate()
     }
 
     override fun setEnabled(enabled: Boolean) {
@@ -1090,7 +1195,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     @android.annotation.SuppressLint("ClickableViewAccessibility") // [EN] Taps go through performClick. [CN] 点击通过 performClick 触发。
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (!isEnabled) return false
+        if (!isEnabled || isDividerMode) return false
         if (onItemTouchEvent(event)) return true
         val consumed = when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> { downX = event.rawX; downY = event.rawY; dragging = false; longPressed = false; isPressed = true; false }
@@ -1148,6 +1253,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     protected open fun onItemTouchEvent(event: MotionEvent): Boolean = false
 
     override fun performClick(): Boolean {
+        if (isDividerMode) return false
         val handled = super.performClick()
         gestureListener?.onItemTapped(this)
         // [EN] After the listener handled the tap (send the code there), the countdown starts. [CN] 监听者处理点击（在那里发送验证码）之后开始倒计时。

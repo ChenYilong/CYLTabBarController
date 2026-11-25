@@ -76,6 +76,18 @@ public let CYLAnimatedItemCornerRadiusCapsule: CGFloat = 1000
 public let CYLAnimatedItemLiquidGlassContentInset: CGFloat = 14
 
 /**
+ [EN] The alpha of a divider's line when it takes the stack's normal-state icon color (0.3). Same value on every platform.
+ [CN] 分隔条的线使用堆叠视图普通状态图标颜色时的透明度（0.3）。各平台相同。
+ */
+public let CYLAnimatedItemDividerAlpha: CGFloat = 0.3
+
+/**
+ [EN] The default length of a divider's line (20 points), the value of `CYLAnimatedItemStackView.dividerLength`. Same value on every platform.
+ [CN] 分隔条线条的默认长度（20 点），即 `CYLAnimatedItemStackView.dividerLength` 的默认值。各平台相同。
+ */
+public let CYLAnimatedItemDividerLength: CGFloat = 20
+
+/**
  [EN] What the view's background is made of: the solid `itemBackgroundColor` (`flat`, default), or Liquid Glass tinted with it
       (`liquidGlass`; drawn only where the system draws Liquid Glass, `CYLAnimatedItemView.isLiquidGlassActive()`: iOS 26 and
       later, as CYLTabBarController; elsewhere the style is ignored and the view stays flat).
@@ -695,7 +707,10 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     @NSCopying public var itemAppearance: UITabBarItemAppearance? {
         didSet {
             if oldValue === itemAppearance { return }
+            // [EN] Set by anyone but the stack, it is the item's own. [CN] 由堆叠视图以外的任何人设置，都是条目自己的。
+            if !assigningInheritedAppearance { isItemAppearanceInherited = false }
             applyItemAppearance()
+            updateDividerLine()
             contentDidChange()
         }
     }
@@ -733,6 +748,64 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     @objc open dynamic var animationDarkTint: String? {
         didSet { if oldValue != animationDarkTint { reapplyAnimationTint() } }
     }
+
+    /**
+     [EN] The stack's `animationTint`, given by `CYLAnimatedItemStackView`; the item's own `animationTint` wins when it is set (non-empty).
+          nil (default): nothing inherited. Do not set it by hand.
+     [CN] 堆叠视图的 `animationTint`，由 `CYLAnimatedItemStackView` 交给条目；条目自己的 `animationTint` 已设置（非空）时优先。nil（默认）：不继承。不要手动设置。
+     */
+    @objc open dynamic var inheritedAnimationTint: String? {
+        didSet { if oldValue != inheritedAnimationTint { reapplyAnimationTint() } }
+    }
+
+    /**
+     [EN] The stack's `animationDarkTint`, resolved like `inheritedAnimationTint`. [CN] 堆叠视图的 `animationDarkTint`，规则同 `inheritedAnimationTint`。
+     */
+    @objc open dynamic var inheritedAnimationDarkTint: String? {
+        didSet { if oldValue != inheritedAnimationDarkTint { reapplyAnimationTint() } }
+    }
+
+    /// [EN] The tint in use: the item's own (non-empty) over the stack's. [CN] 实际使用的着色：条目自己的（非空）优先于堆叠视图的。
+    private var effectiveAnimationTint: String? {
+        if let own = animationTint, !own.isEmpty { return own }
+        if let inherited = inheritedAnimationTint, !inherited.isEmpty { return inherited }
+        return nil
+    }
+
+    private var effectiveAnimationDarkTint: String? {
+        if let own = animationDarkTint, !own.isEmpty { return own }
+        if let inherited = inheritedAnimationDarkTint, !inherited.isEmpty { return inherited }
+        return nil
+    }
+
+    /**
+     [EN] Whether `itemAppearance` was given by the stack (the item had none of its own). Then an icon color the item sets itself through
+          `applyIconTintColor(_:)` (a subclass with its own colors, e.g. a tag button) keeps winning over the appearance's icon color.
+          Set by `CYLAnimatedItemStackView`; any other assignment of `itemAppearance` makes it false. false by default.
+     [CN] `itemAppearance` 是否由堆叠视图给出（条目自己没有）。此时条目自己通过 `applyIconTintColor(_:)` 设置的图标颜色（有自己颜色的子类，
+          例如标签按钮）优先于外观中的图标颜色。由 `CYLAnimatedItemStackView` 设置；以其他方式给 `itemAppearance` 赋值会使其变为 false。默认 false。
+     */
+    public private(set) var isItemAppearanceInherited = false
+    private var assigningInheritedAppearance = false
+
+    /**
+     [EN] Gives the item the stack's appearance as `itemAppearance` (copied) and marks it inherited (`isItemAppearanceInherited`); nil removes it.
+          Called by `CYLAnimatedItemStackView`; set an own appearance with `itemAppearance`.
+     [CN] 把堆叠视图的外观作为 `itemAppearance`（复制）交给条目并标记为继承（`isItemAppearanceInherited`）；nil 移除。由 `CYLAnimatedItemStackView` 调用；
+          自己的外观请用 `itemAppearance` 设置。
+     */
+    public func applyInheritedItemAppearance(_ appearance: UITabBarItemAppearance?) {
+        assigningInheritedAppearance = true
+        defer { assigningInheritedAppearance = false }
+        isItemAppearanceInherited = appearance != nil
+        itemAppearance = appearance
+    }
+
+    /// [EN] The icon color the item itself set through `applyIconTintColor(_:)` (not by `itemAppearance`). [CN] 条目自己通过 `applyIconTintColor(_:)` 设置的图标颜色（不是来自 `itemAppearance`）。
+    private var hostIconColor: UIColor?
+    private var appliesIconColorInternally = false
+    /// [EN] An inherited appearance's icon colors give way to the item's own. [CN] 继承的外观中的图标颜色让位于条目自己的。
+    private var inheritedAppearanceYields: Bool { isItemAppearanceInherited && hostIconColor != nil }
 
     private func reapplyAnimationTint() {
         #if CYL_ANIMATION_ENGINE_AVAILABLE
@@ -1083,11 +1156,11 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             imageView.image = icon
         }
         // [EN] `isIconHidden`: another view is shown in the icon's place. [CN] `isIconHidden`：另一个视图显示在图标的位置。
-        imageView.isHidden = isIconHidden || animationShows()
-        animationView?.isHidden = isIconHidden || isShowingImageAfterAnimationEnd
+        imageView.isHidden = cylIsDivider || isIconHidden || animationShows()
+        animationView?.isHidden = cylIsDivider || isIconHidden || isShowingImageAfterAnimationEnd
         // [EN] A new animation view or icon takes the current icon tint. [CN] 新的动画视图或图标使用当前的图标着色。
         if let color = currentIconColor ?? lastIconTintColor {
-            applyIconTintColor(color)
+            applyIconTintColorInternally(color)
         }
     }
 
@@ -1115,6 +1188,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      [CN] 子类钩子：给定宽度上限时内容的自然尺寸（不含 `contentInsets`）。需要其他排列时与 `layoutContent(in:)` 一起重写。
      */
     open func contentSizeThatFits(_ size: CGSize) -> CGSize {
+        if cylIsDivider {
+            return cylDividerIsVertical ? CGSize(width: 1, height: cylDividerLength) : CGSize(width: cylDividerLength, height: 1)
+        }
         let icon = currentIconSize
         let showsIcon = cylShowsIcon
         let showsTitle = cylShowsTitle
@@ -1137,6 +1213,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     /// [EN] `contentInsets` plus `resolvedItemContentHorizontalInset` left and right. [CN] `contentInsets` 加上左右的 `resolvedItemContentHorizontalInset`。
     private var effectiveContentInsets: UIEdgeInsets {
+        if cylIsDivider { return .zero }
         var insets = contentInsets
         let extra = resolvedItemContentHorizontalInset
         insets.left += extra
@@ -1157,6 +1234,11 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     open override func layoutSubviews() {
         super.layoutSubviews()
+        if cylIsDivider {
+            layoutDividerLine()
+            layoutItemBackground()
+            return
+        }
         layoutContent(in: bounds.inset(by: effectiveContentInsets))
         applyCountdownAppearance()
         layoutItemBackground()
@@ -1247,7 +1329,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             guard isSelected != oldValue else { return }
             applyItemAppearance()
             // [EN] Without `itemAppearance` the animation tint still depends on the state. [CN] 没有 `itemAppearance` 时，动画着色仍取决于状态。
-            if itemAppearance == nil { pushAnimationTint(iconColor: lastIconTintColor) }
+            if itemAppearance == nil || inheritedAppearanceYields { pushAnimationTint(iconColor: lastIconTintColor) }
             updateIcon()
             itemStateDidChange()
             updateItemAccessibility()
@@ -1290,9 +1372,18 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      */
     @objc(applyIconTintColor:)
     open func applyIconTintColor(_ color: UIColor?) {
+        if !appliesIconColorInternally { hostIconColor = color }
         lastIconTintColor = color
         imageView.tintColor = color
         pushAnimationTint(iconColor: color)
+        updateDividerLine()
+    }
+
+    /// [EN] The item applies a color itself (not a host call). [CN] 条目自己应用颜色（不是宿主的调用）。
+    private func applyIconTintColorInternally(_ color: UIColor?) {
+        appliesIconColorInternally = true
+        defer { appliesIconColorInternally = false }
+        applyIconTintColor(color)
     }
 
     /**
@@ -1302,7 +1393,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
           `itemAppearance` 或没有任何图标颜色时为 nil。
      */
     private var currentIconColor: UIColor? {
-        guard let appearance = itemAppearance, let state = currentItemStateAppearance else { return nil }
+        guard let appearance = itemAppearance, let state = currentItemStateAppearance, !inheritedAppearanceYields else { return nil }
         if let color = state.iconColor { return color }
         return (isSelected && isEnabled) ? appearance.normal.iconColor : nil
     }
@@ -1320,14 +1411,15 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         //      `applyIconTintColor` has just the current state's); the resolver does the fallbacks ("title": selected, else normal; a fixed
         //      color: the selected one only). [CN] 真值表的两个输入是普通状态与选中状态各自的图标颜色（只通过 `applyIconTintColor` 传入一个颜色的宿主
         //      只有当前状态的）；回退由解析函数完成（"title"：选中的，否则普通的；固定颜色：只用选中的）。
-        let normalColor = itemAppearance != nil ? itemAppearance?.normal.iconColor : (isSelected ? nil : color)
-        let selectedColor = itemAppearance != nil ? itemAppearance?.selected.iconColor : (isSelected ? color : nil)
+        let appearance = inheritedAppearanceYields ? nil : itemAppearance
+        let normalColor = appearance != nil ? appearance?.normal.iconColor : (isSelected ? nil : color)
+        let selectedColor = appearance != nil ? appearance?.selected.iconColor : (isSelected ? color : nil)
         // [EN] Resolved against THIS item's traits and handed over as a plain color: inside `traitCollectionDidChange` the animation view
         //      (a subview) still reports the OLD appearance, so a dynamic color resolved by the engine there came out white on white after
         //      a live switch. [CN] 用本条目的 trait 解析并以普通颜色交出：在 `traitCollectionDidChange` 内，动画视图（子视图）仍报告旧的外观，
         //      引擎在那里解析动态颜色会在运行中切换后得到白底白图标。
         let resolved = CYLTabBarItemAnimationItemTintColor(
-            animationURL, animationTint, animationDarkTint, isSelected, traitCollection.userInterfaceStyle == .dark,
+            animationURL, effectiveAnimationTint, effectiveAnimationDarkTint, isSelected, traitCollection.userInterfaceStyle == .dark,
             normalColor, selectedColor)?.resolvedColor(with: traitCollection)
         // [EN] A view that resolves its own tint from its URL options (Rive) takes the final color instead, so the properties reach it too.
         // [CN] 自行从 URL 选项解析着色的视图（Rive）改为接收最终颜色，使属性对它也生效。
@@ -1355,8 +1447,11 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      */
     open func applyItemAppearance() {
         guard let state = currentItemStateAppearance else { return }
-        if let color = currentIconColor {
-            applyIconTintColor(color)
+        if inheritedAppearanceYields {
+            // [EN] The item's own icon color stays; only the title part of the inherited appearance applies. [CN] 条目自己的图标颜色保持；只应用继承外观中的标题部分。
+            pushAnimationTint(iconColor: lastIconTintColor)
+        } else if let color = currentIconColor {
+            applyIconTintColorInternally(color)
         } else {
             // [EN] No icon color at all: the animation loses any tint ("title" has nothing to draw); the icon keeps its own look.
             // [CN] 完全没有图标颜色：动画移除所有着色（"title" 没有可用的颜色）；图标保持自身外观。
@@ -1371,12 +1466,85 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     open override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) { updateDividerLine() }
         // [EN] A dynamic icon color is resolved again for the animation view's tint. [CN] 动态图标颜色为动画视图的着色重新解析。
         if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
             applyItemAppearance()
             // [EN] A fixed tint's dark color, and a dynamic icon color, follow the new appearance. [CN] 固定着色的深色颜色与动态图标颜色跟随新的外观。
             pushAnimationTint(iconColor: lastIconTintColor)
         }
+        // [EN] A divider's line follows the new appearance, resolved with THIS item's traits. [CN] 分隔条的线跟随新外观，用本条目的 trait 解析。
+        updateDividerLine()
+    }
+
+    open override func didMoveToWindow() {
+        super.didMoveToWindow()
+        updateDividerLine()
+    }
+
+    // MARK: - Divider mode 分隔条模式（内部）
+
+    // [EN] INTERNAL, not API: `CYLAnimatedItemStackView` makes one item per divider and puts it in this mode. The item shows no icon, title, animation or
+    //      badge and draws one line (1 pixel, `cylDividerLength` long) centered in its bounds, across the stack's axis; no taps, hidden from VoiceOver;
+    //      size 1 point by the length (swapped when horizontal), without insets. The line's color: `cylDividerColor`, else the normal-state icon color
+    //      (`itemAppearance`, handed down by the stack) at alpha `CYLAnimatedItemDividerAlpha`, else `UIColor.separator`, resolved with THIS item's traits.
+    // [CN] 内部接口，不是 API：`CYLAnimatedItemStackView` 为每条分隔条创建一个条目并置于此模式。条目不显示图标、标题、动画与角标，只在边界中央画一条线
+    //      （1 像素，长 `cylDividerLength`），垂直于堆叠方向；不接收点击，对 VoiceOver 隐藏；尺寸为 1 点乘长度（横线时对调），不含内缩。线的颜色：
+    //      `cylDividerColor`，否则普通状态图标颜色（`itemAppearance`，由堆叠视图传下来）加 `CYLAnimatedItemDividerAlpha` 透明度，否则 `UIColor.separator`，
+    //      用本条目的 trait 解析。
+    var cylIsDivider = false {
+        didSet {
+            guard oldValue != cylIsDivider else { return }
+            dividerLine.isHidden = !cylIsDivider
+            titleLabel.isHidden = cylIsDivider
+            accessoryView?.isHidden = cylIsDivider
+            isUserInteractionEnabled = !cylIsDivider
+            updateIcon()
+            if !cylIsDivider {
+                isAccessibilityElement = true
+                accessibilityElementsHidden = false
+            }
+            updateItemAccessibility()
+            updateDividerLine()
+            contentDidChange()
+        }
+    }
+    var cylDividerIsVertical = true { didSet { if oldValue != cylDividerIsVertical { contentDidChange() } } }
+    var cylDividerLength = CYLAnimatedItemDividerLength { didSet { if oldValue != cylDividerLength { contentDidChange() } } }
+    var cylDividerColor: UIColor? { didSet { if oldValue != cylDividerColor { updateDividerLine() } } }
+
+    private lazy var dividerLine: UIView = {
+        let line = UIView()
+        line.isUserInteractionEnabled = false
+        line.isHidden = !cylIsDivider
+        line.isAccessibilityElement = false
+        addSubview(line)
+        return line
+    }()
+
+    /// [EN] A plain color: inside `traitCollectionDidChange` a subview still reports the OLD appearance. [CN] 普通颜色：在 `traitCollectionDidChange` 内子视图仍报告旧的外观。
+    private func updateDividerLine() {
+        guard cylIsDivider else { return }
+        let traits = traitCollection
+        if let color = cylDividerColor {
+            dividerLine.backgroundColor = color.resolvedColor(with: traits)
+        } else if let icon = itemAppearance?.normal.iconColor {
+            dividerLine.backgroundColor = icon.resolvedColor(with: traits).withAlphaComponent(CYLAnimatedItemDividerAlpha)
+        } else {
+            dividerLine.backgroundColor = UIColor.separator.resolvedColor(with: traits)
+        }
+    }
+
+    private func layoutDividerLine() {
+        dividerLine.isHidden = false
+        updateDividerLine()
+        let scale = traitCollection.displayScale > 0 ? traitCollection.displayScale : 2
+        let thickness = 1 / scale
+        let size = cylDividerIsVertical ? CGSize(width: thickness, height: min(cylDividerLength, bounds.height))
+                                        : CGSize(width: min(cylDividerLength, bounds.width), height: thickness)
+        func snap(_ value: CGFloat) -> CGFloat { (value * scale).rounded() / scale }
+        dividerLine.frame = CGRect(x: snap((bounds.width - size.width) / 2), y: snap((bounds.height - size.height) / 2),
+                                   width: size.width, height: size.height)
     }
 
     // MARK: - Animation 动画
@@ -1440,7 +1608,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     ///      interface); none of them leaves the file's own colors. [CN] 为动画视图设置着色：`animationTint` / `animationDarkTint` 覆盖来源 URL 的
     ///      `tint` / `darkTint` 选项（Rive 的接口）；都没有时保持文件自己的颜色。
     private func prepareAnimationTint(_ view: UIView, url: URL) {
-        _ = CYLTabBarItemAnimationPrepareItemTint(view, url, animationSource.player(for: view), animationTint, animationDarkTint)
+        _ = CYLTabBarItemAnimationPrepareItemTint(view, url, animationSource.player(for: view), effectiveAnimationTint, effectiveAnimationDarkTint)
         // [EN] Always pushed, so a cleared tint (nil) reaches the view too. [CN] 总是推送，因此清除着色（nil）也会到达视图。
         pushAnimationTint(iconColor: lastIconTintColor ?? currentIconColor)
     }
@@ -1649,6 +1817,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     // MARK: - Gesture handling 手势处理
 
     @objc(cyl_handleTap) private func handleTap() {
+        guard !cylIsDivider else { return }
         delegate?.animatedItemViewDidTap?(self)
         if itemStyle == .countdown, startsCountdownOnTap, countdownState != .running {
             startCountdown()
@@ -1660,7 +1829,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
 
     @objc(cyl_handleLongPress:) private func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
-        if recognizer.state == .began { delegate?.animatedItemViewDidLongPress?(self) }
+        if recognizer.state == .began, !cylIsDivider { delegate?.animatedItemViewDidLongPress?(self) }
     }
 
     @objc(cyl_handlePan:) private func handlePan(_ recognizer: UIPanGestureRecognizer) {
@@ -1955,6 +2124,12 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     /** [EN] Refreshes `accessibilityLabel` from `itemAccessibilityLabel()`. [CN] 根据 `itemAccessibilityLabel()` 刷新 `accessibilityLabel`。 */
     open func updateItemAccessibility() {
+        if cylIsDivider {
+            accessibilityLabel = nil
+            isAccessibilityElement = false
+            accessibilityElementsHidden = true
+            return
+        }
         accessibilityLabel = itemAccessibilityLabel()
         var traits: UIAccessibilityTraits = .button
         if isSelected { traits.insert(.selected) }

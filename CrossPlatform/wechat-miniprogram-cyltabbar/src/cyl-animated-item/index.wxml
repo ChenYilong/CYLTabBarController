@@ -1,7 +1,7 @@
 <!-- [EN] One accessibility element: an icon (animation, static image or placeholder), a title and an optional accessory. [CN] 一个无障碍元素：图标（动画、静态图片或占位图）、标题与可选的附加图标。 -->
 <view
-  style="{{itemBackgroundCss}}"
-  class="cyl-animated-item {{m.axisClass}} {{bare ? 'cyl-animated-item-bare' : ''}} {{m.ariaDisabled ? 'cyl-animated-item-disabled' : ''}}"
+  style="{{itemBackgroundCss}}{{m.isDivider ? m.dividerStyle : ''}}"
+  class="cyl-animated-item {{m.axisClass}} {{bare ? 'cyl-animated-item-bare' : ''}} {{m.isDivider ? 'cyl-animated-item-divider' : ''}} {{m.ariaDisabled ? 'cyl-animated-item-disabled' : ''}}"
   aria-role="{{(accessibilityHidden || m.ariaHidden) ? '' : (accessibilityRole || 'button')}}"
   aria-hidden="{{accessibilityHidden || m.ariaHidden}}"
   aria-label="{{m.ariaLabel}}"
@@ -13,6 +13,7 @@
   bindtouchmove="cyl_onTouchMove"
   bindtouchend="cyl_onTouchEnd"
 >
+  <block wx:if="{{!m.isDivider}}">
   <view wx:if="{{m.hasAccessory && m.accessoryPlacement === 'leading'}}" class="cyl-animated-item-accessory" aria-role="button" aria-label="{{m.accessoryLabel}}" catchtap="cyl_onAccessoryTap">
     <image wx:if="{{accessoryImage}}" class="cyl-animated-item-accessory-image" src="{{accessoryImage}}" mode="aspectFit" aria-hidden="true" />
     <text wx:else aria-hidden="true">{{accessoryText}}</text>
@@ -56,4 +57,5 @@
     <image wx:if="{{accessoryImage}}" class="cyl-animated-item-accessory-image" src="{{accessoryImage}}" mode="aspectFit" aria-hidden="true" />
     <text wx:else aria-hidden="true">{{accessoryText}}</text>
   </view>
+  </block>
 </view>

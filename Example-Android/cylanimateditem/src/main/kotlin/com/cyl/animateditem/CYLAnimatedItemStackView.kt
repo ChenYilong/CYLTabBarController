@@ -68,7 +68,15 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
     /**
      * [EN] One item and its action. [CN] 一个条目及其动作。
      */
-    private class Entry(val view: CYLAnimatedItemView, var action: String?, var spacingBeforeDp: Float? = null)
+    private class Entry(val view: CYLAnimatedItemView, var action: String?, var spacingBeforeDp: Float? = null) {
+        /** [EN] Set when the entry is made. [CN] 条目创建时设置。 */
+        lateinit var divider: CYLAnimatedItemView
+        /** [EN] This gap's own choice: true a divider (`setDivider`), false none (`removeDivider`), null follows `showsDividers`. [CN] 本间隙自己的选择：true 有分隔线（`setDivider`），false 没有（`removeDivider`），null 跟随 `showsDividers`。 */
+        var dividerOwn: Boolean? = null
+        /** [EN] The divider's own spacing before and after it, dp; null falls back. [CN] 分隔线自己的前后间距（dp）；null 时回退。 */
+        var dividerBeforeDp: Float? = null
+        var dividerAfterDp: Float? = null
+    }
 
     /**
      * [EN] Every item, top to bottom. [CN] 所有条目，自上而下。
@@ -98,6 +106,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
             field = value
             stackView.orientation = if (value == CYLAnimatedItemAxis.Horizontal) LinearLayout.HORIZONTAL else LinearLayout.VERTICAL
             stackView.gravity = if (value == CYLAnimatedItemAxis.Horizontal) Gravity.CENTER_VERTICAL else Gravity.CENTER_HORIZONTAL
+            dividers.forEach { it.dividerAxis = value }
             updateSpacing()
         }
 
@@ -113,39 +122,244 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
      * [CN] 条目的默认图标颜色（iOS 堆叠的 `itemAppearance`）：条目自己的 `iconColor` 优先；null 表示没有。
      */
     var iconColor: Int? = null
-        set(value) { field = value; entries.forEach { it.view.stackIconColor = value } }
+        set(value) { field = value; entries.forEach { it.view.stackIconColor = value; it.divider.stackIconColor = value } }
 
     /**
      * [EN] The default icon color of selected items; null uses `iconColor`. [CN] 选中条目的默认图标颜色；null 时使用 `iconColor`。
      */
     var selectedIconColor: Int? = null
-        set(value) { field = value; entries.forEach { it.view.stackSelectedIconColor = value } }
+        set(value) { field = value; entries.forEach { it.view.stackSelectedIconColor = value; it.divider.stackSelectedIconColor = value } }
 
     /**
-     * [EN] The space before an item in dp: 0 for the first, else its own spacing or `spacingDp`. [CN] 条目之前的间距（dp）：第一个为 0，否则为其自身间距或 `spacingDp`。
+     * [EN] The default animation tint of the items (the same names and values as [CYLAnimatedItemView.animationTint]): set once, it
+     *      applies to every item held now and appended later, and again after a night-mode change. An item's own non-empty value wins;
+     *      null / empty on the item inherits this; clearing it removes the inherited value from the items that set none.
+     * [CN] 条目的默认动画着色（名称与取值同 [CYLAnimatedItemView.animationTint]）：设置一次，对现有及之后追加的所有条目生效，夜间模式变化后重新应用。
+     *      条目自己的非空值优先；条目上的 null / 空表示继承此值；清除后，没有自己设置的条目不再继承。
      */
-    fun spacingBeforeDpOf(itemView: CYLAnimatedItemView): Float {
-        val index = entries.indexOfFirst { it.view === itemView }
-        if (index <= 0) return 0f
-        return entries[index].spacingBeforeDp ?: spacingDp
+    var animationTint: String? = null
+        set(value) { field = value?.takeIf { it.isNotEmpty() }; entries.forEach { it.view.stackAnimationTint = field; it.divider.stackAnimationTint = field } }
+
+    /**
+     * [EN] The default night-mode color of a fixed `animationTint`, inherited like `animationTint`. [CN] 固定 `animationTint` 的默认夜间颜色，继承规则同 `animationTint`。
+     */
+    var animationDarkTint: String? = null
+        set(value) { field = value?.takeIf { it.isNotEmpty() }; entries.forEach { it.view.stackAnimationDarkTint = field; it.divider.stackAnimationDarkTint = field } }
+
+    /**
+     * [EN] The color of the divider lines (an ARGB color, used as it is); null (default) derives it: the stack's `iconColor` at
+     *      `CYLAnimatedItemDividerAlpha`, else a separator color (12% black, 12% white at night) of the divider's own night mode.
+     * [CN] 分隔线的颜色（ARGB 颜色，按原样使用）；null（默认）时推导：堆叠的 `iconColor` 以 `CYLAnimatedItemDividerAlpha` 的不透明度，
+     *      否则取分隔线自身夜间模式的分隔色（日间 12% 黑，夜间 12% 白）。
+     */
+    var dividerColor: Int? = null
+        set(value) { if (field != value) { field = value; dividers.forEach { it.stackDividerColor = value } } }
+
+    /**
+     * [EN] The length of the divider lines in dp (`CYLAnimatedItemDividerLength`, 20, by default; never negative). A line is 1 dp
+     *      thick and centered in its slot: the slot is 1 x length in a horizontal stack, swapped in a vertical one.
+     * [CN] 分隔线的长度，单位 dp（默认 `CYLAnimatedItemDividerLength`，20；不为负）。线粗 1 dp，在其位置内居中：水平堆叠中位置为 1 x 长度，垂直堆叠中互换。
+     */
+    var dividerLengthDp: Float = CYLAnimatedItemDividerLength
+        set(value) { field = maxOf(0f, value); dividers.forEach { it.dividerLengthDp = field } }
+
+    /**
+     * [EN] Whether every gap has a divider line (false by default); `removeDivider` turns one gap off, `setDivider` one on. A divider is
+     *      owned by the stack, never an item: it is not in `itemViews`, takes no taps, is hidden from a screen reader. It belongs to the
+     *      gap AFTER an item (it moves with that item and goes with it), and shows only if that item is not GONE and a later item
+     *      that is not GONE exists (hidden items leave neither divider nor spacing). Appending, removing, moving and hiding update it by itself.
+     *      The gap with a divider is `before + 1 dp + after` (see `dividerSpacingBeforeDp`); the next item's spacing is never added on top.
+     * [CN] 是否每个间隙都有分隔线（默认 false）；`removeDivider` 关闭某个间隙，`setDivider` 开启某个间隙。分隔线由堆叠拥有，不是条目：不在 `itemViews` 中、
+     *      不接收点击、对读屏隐藏。它属于某个条目「之后」的间隙（随该条目移动、随它删除），只有该条目不是 GONE 且之后还有非 GONE 的条目时才显示
+     *      （隐藏的条目既不留分隔线也不留间距）。追加、移除、移动、隐藏都会自动更新。带分隔线的间隙为 `前 + 1 dp + 后`（见 `dividerSpacingBeforeDp`）；
+     *      不会再叠加下一个条目的间距。
+     */
+    var showsDividers: Boolean = false
+        set(value) { if (field != value) { field = value; updateSpacing() } }
+
+    /**
+     * [EN] The default space before a divider line, in dp, for dividers without their own value; null (default) is `spacingDp`.
+     *      Gap with a divider = before + 1 dp + after; before = the divider's own value, else this, else `spacingDp`. Example: `spacingDp` 12, a
+     *      divider of (8, 8) makes the gap 8 + 1 + 8 = 17, not 12 + 8 + 1 + 8 + 12.
+     * [CN] 没有自己取值的分隔线之前的默认间距（dp）；null（默认）为 `spacingDp`。带分隔线的间隙 = 前 + 1 dp + 后；前 = 分隔线自己的值，其次本属性，
+     *      再次 `spacingDp`。例：`spacingDp` 为 12、分隔线为 (8, 8) 时间隙为 8 + 1 + 8 = 17，而不是 12 + 8 + 1 + 8 + 12。
+     */
+    var dividerSpacingBeforeDp: Float? = null
+        set(value) { field = value?.let { maxOf(0f, it) }; updateSpacing() }
+
+    /**
+     * [EN] The default space after a divider line, in dp, for dividers without their own value; null (default): the NEXT item's
+     *      own `spacingBeforeDp`, else `spacingDp`. That value is only a fallback, never added to the divider's space.
+     * [CN] 没有自己取值的分隔线之后的默认间距（dp）；null（默认）：下一个条目自己的 `spacingBeforeDp`，否则 `spacingDp`。该值只是回退值，
+     *      不会叠加到分隔线的间距上。
+     */
+    var dividerSpacingAfterDp: Float? = null
+        set(value) { field = value?.let { maxOf(0f, it) }; updateSpacing() }
+
+    /**
+     * [EN] Attaches a divider after the CURRENT LAST item (nothing on an empty stack), with its own spacing before and after in dp
+     *      (null: the stack's `dividerSpacingBeforeDp` / `dividerSpacingAfterDp`, then the fallbacks). Use between two appends:
+     *      `append(camera); appendDivider(8f, 8f); append(searchButton)`.
+     * [CN] 在当前最后一个条目之后附加分隔线（空堆叠上什么都不做），可带自己的前后间距（dp）（null：堆叠的 `dividerSpacingBeforeDp` /
+     *      `dividerSpacingAfterDp`，再回退）。用在两次追加之间：`append(camera); appendDivider(8f, 8f); append(searchButton)`。
+     */
+    @JvmOverloads
+    fun appendDivider(spacingBeforeDp: Float? = null, spacingAfterDp: Float? = null) {
+        entries.lastOrNull()?.let { setDivider(it.view, spacingBeforeDp, spacingAfterDp) }
     }
 
     /**
-     * [EN] Sets every item's margin on the stack's axis. [CN] 按堆叠方向设置每个条目的外边距。
+     * [EN] Gives the gap right after `itemView` a divider with its own spacing (see `appendDivider`); replaces the one it has. Does
+     *      nothing for an item not in the stack. [CN] 给 `itemView` 之后的间隙设置分隔线及自己的间距（见 `appendDivider`）；替换已有的。条目不在堆叠中时什么都不做。
      */
-    private fun updateSpacing() {
-        entries.forEach { entry ->
-            val params = entry.view.layoutParams as? LinearLayout.LayoutParams ?: return@forEach
-            val space = dp(spacingBeforeDpOf(entry.view))
-            if (axis == CYLAnimatedItemAxis.Horizontal) {
-                params.topMargin = 0
-                params.marginStart = space
-            } else {
-                params.marginStart = 0
-                params.topMargin = space
+    @JvmOverloads
+    fun setDivider(itemView: CYLAnimatedItemView, spacingBeforeDp: Float? = null, spacingAfterDp: Float? = null) {
+        val entry = entries.firstOrNull { it.view === itemView } ?: return
+        entry.dividerOwn = true
+        entry.dividerBeforeDp = spacingBeforeDp?.let { maxOf(0f, it) }
+        entry.dividerAfterDp = spacingAfterDp?.let { maxOf(0f, it) }
+        updateSpacing()
+    }
+
+    /**
+     * [EN] Turns the gap right after `itemView` off, also while `showsDividers` is true. [CN] 关闭 `itemView` 之后的间隙，`showsDividers` 为 true 时也一样。
+     */
+    fun removeDivider(itemView: CYLAnimatedItemView) {
+        val entry = entries.firstOrNull { it.view === itemView } ?: return
+        entry.dividerOwn = false
+        entry.dividerBeforeDp = null
+        entry.dividerAfterDp = null
+        updateSpacing()
+    }
+
+    /**
+     * [EN] Whether the gap after `itemView` has a divider: set by `setDivider` / `appendDivider`, not removed, or `showsDividers`
+     *      (false for an item not in the stack). Whether it is on screen also depends on the neighbours being shown.
+     * [CN] `itemView` 之后的间隙是否有分隔线：由 `setDivider` / `appendDivider` 设置且未被移除，或 `showsDividers`（不在堆叠中的条目为 false）。
+     *      是否显示在屏幕上还取决于相邻条目是否显示。
+     */
+    fun hasDivider(itemView: CYLAnimatedItemView): Boolean {
+        val entry = entries.firstOrNull { it.view === itemView } ?: return false
+        return entry.dividerOwn ?: showsDividers
+    }
+
+    private val dividers: List<CYLAnimatedItemView> get() = entries.map { it.divider }
+
+    /**
+     * [EN] The internal item that draws the divider after `itemView` (an item of this component in its internal divider mode; never in
+     *      `itemViews`): visible while the divider shows. Internal, for tests. [CN] 绘制 `itemView` 之后分隔线的内部条目（本组件的条目，处于内部分隔线模式；
+     *      永远不在 `itemViews` 中）：分隔线显示时可见。内部使用，供测试。
+     */
+    internal fun dividerViewAfter(itemView: CYLAnimatedItemView): CYLAnimatedItemView? = entries.firstOrNull { it.view === itemView }?.divider
+
+    /**
+     * [EN] Makes the internal item of a divider and hands it the stack's defaults like any other item.
+     * [CN] 创建分隔线的内部条目，并像其他条目一样交给它堆叠的默认值。
+     */
+    private fun makeDivider(): CYLAnimatedItemView = CYLAnimatedItemView(context).apply {
+        isDividerMode = true
+        visibility = View.GONE
+        stackIconColor = this@CYLAnimatedItemStackView.iconColor
+        stackSelectedIconColor = this@CYLAnimatedItemStackView.selectedIconColor
+        stackAnimationTint = this@CYLAnimatedItemStackView.animationTint
+        stackAnimationDarkTint = this@CYLAnimatedItemStackView.animationDarkTint
+        stackDividerColor = this@CYLAnimatedItemStackView.dividerColor
+        dividerLengthDp = this@CYLAnimatedItemStackView.dividerLengthDp
+        dividerAxis = this@CYLAnimatedItemStackView.axis
+    }
+
+    /**
+     * [EN] The default title color of the items (iOS `itemAppearance.normal.titleColor`); an item's own `titleColor` wins; null for none.
+     * [CN] 条目的默认标题颜色（iOS `itemAppearance.normal.titleColor`）；条目自己的 `titleColor` 优先；null 表示没有。
+     */
+    var titleColor: Int? = null
+        set(value) { field = value; entries.forEach { it.view.stackTitleColor = value } }
+
+    /**
+     * [EN] Whether the stack handles taps itself (default true): sets the items' click listeners, performs their actions and
+     *      `backgroundAction`, takes over touches on items without an action, and sets the items' clickable and accessibility state.
+     *      False: the stack touches none of that (no listener, no interception, no accessibility change, the item order for a screen
+     *      reader is the view order), so a host that handles taps (a search bar row, a tab bar) keeps full control.
+     * [CN] 堆叠是否自己处理点击（默认 true）：设置条目的点击监听、执行其动作与 `backgroundAction`、接管无动作条目上的触摸，并设置条目的可点击与
+     *      无障碍状态。false：堆叠不做其中任何一项（不设监听、不拦截、不改无障碍，读屏顺序就是视图顺序），自行处理点击的宿主（搜索栏行、TabBar）完全掌控。
+     */
+    var dispatchesItemTaps: Boolean = true
+        set(value) {
+            if (field == value) return
+            field = value
+            entries.forEach { entry ->
+                if (value) {
+                    installClickListener(entry.view)
+                    updateAccessibility(entry)
+                } else {
+                    entry.view.setOnClickListener(null)
+                    entry.view.isClickable = true
+                    entry.view.importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_AUTO
+                }
             }
-            entry.view.layoutParams = params
         }
+
+    private fun isShowing(entry: Entry) = entry.view.visibility != View.GONE
+
+    /**
+     * [EN] Whether the divider after `entries[index]` is on screen: wanted, its owner showing, and a later item showing.
+     * [CN] `entries[index]` 之后的分隔线是否显示：已设置、所属条目显示，且之后还有显示的条目。
+     */
+    private fun dividerShows(index: Int): Boolean {
+        val entry = entries[index]
+        return isShowing(entry) && (entry.dividerOwn ?: showsDividers) && entries.drop(index + 1).any { isShowing(it) }
+    }
+
+    private fun dividerBeforeDpOf(owner: Entry) = owner.dividerBeforeDp ?: dividerSpacingBeforeDp ?: spacingDp
+
+    private fun dividerAfterDpOf(owner: Entry, next: Entry) =
+        owner.dividerAfterDp ?: dividerSpacingAfterDp ?: next.spacingBeforeDp ?: spacingDp
+
+    /**
+     * [EN] The space before an item in dp: 0 for the first item showing (an item that is GONE takes no space), the space after the
+     *      divider when the item showing before it has a divider, else its own spacing or `spacingDp`.
+     * [CN] 条目之前的间距（dp）：第一个显示的条目为 0（GONE 的条目不占空间）；前一个显示的条目带分隔线时为分隔线之后的间距；否则为其自身间距或 `spacingDp`。
+     */
+    fun spacingBeforeDpOf(itemView: CYLAnimatedItemView): Float {
+        val index = entries.indexOfFirst { it.view === itemView }
+        if (index < 0) return 0f
+        val previous = entries.take(index).indexOfLast { isShowing(it) }
+        if (previous < 0) return 0f
+        return if (dividerShows(previous)) dividerAfterDpOf(entries[previous], entries[index]) else entries[index].spacingBeforeDp ?: spacingDp
+    }
+
+    /**
+     * [EN] Shows the dividers that belong, then sets the margin of every item and divider on the stack's axis: a divider has the space
+     *      before it, the next item the space after it. `relayout` false: while measuring (the margins are read right after).
+     * [CN] 显示应当显示的分隔线，然后按堆叠方向设置每个条目与分隔线的外边距：分隔线带「前」间距，下一个条目带「后」间距。`relayout` 为 false：测量期间调用
+     *      （边距随后立即被读取）。
+     */
+    private fun updateSpacing(relayout: Boolean = true) {
+        entries.forEachIndexed { index, entry ->
+            val visibility = if (dividerShows(index)) View.VISIBLE else View.GONE
+            if (entry.divider.visibility != visibility) entry.divider.visibility = visibility
+        }
+        entries.forEachIndexed { index, entry ->
+            applyMargin(entry.view, dp(spacingBeforeDpOf(entry.view)), relayout)
+            applyMargin(entry.divider, if (dividerShows(index)) dp(dividerBeforeDpOf(entry)) else 0, relayout)
+        }
+    }
+
+    private fun applyMargin(view: View, space: Int, relayout: Boolean) {
+        val params = view.layoutParams as? LinearLayout.LayoutParams ?: return
+        val horizontal = axis == CYLAnimatedItemAxis.Horizontal
+        val start = if (horizontal) space else 0
+        val top = if (horizontal) 0 else space
+        if (params.marginStart == start && params.topMargin == top) return
+        params.topMargin = top
+        params.marginStart = start
+        if (relayout) view.layoutParams = params
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        // [EN] An item hidden or shown since the last pass changes who is first. [CN] 自上次测量后隐藏或显示的条目会改变谁是第一个。
+        updateSpacing(relayout = false)
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
     /**
@@ -177,18 +391,45 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
      */
     @JvmOverloads
     open fun append(itemView: CYLAnimatedItemView, action: String? = null, spacingBeforeDp: Float? = null) {
+        insert(itemView, entries.size, action, spacingBeforeDp)
+    }
+
+    /**
+     * [EN] Inserts an item at `index` (clamped to 0..count), like `append` otherwise. An item already in the stack is left where it
+     *      is: use `move`. Items may be subclasses of `CYLAnimatedItemView`.
+     * [CN] 在 `index`（限制在 0..数量）处插入条目，其余同 `append`。已在堆叠中的条目保持原位：请用 `move`。条目可以是 `CYLAnimatedItemView` 的子类。
+     */
+    @JvmOverloads
+    open fun insert(itemView: CYLAnimatedItemView, index: Int, action: String? = null, spacingBeforeDp: Float? = null) {
         if (entries.any { it.view === itemView }) return
+        val at = index.coerceIn(0, entries.size)
         val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        stackView.addView(itemView, params)
+        // [EN] Each item is followed by its divider view (GONE unless it shows), so item i sits at child 2 * i.
+        // [CN] 每个条目之后跟着它的分隔线视图（不显示时为 GONE），所以第 i 个条目位于子视图 2 * i。
+        stackView.addView(itemView, 2 * at, params)
         // [EN] null: the stack's `spacingDp`. [CN] null：使用堆叠的 `spacingDp`。
         val entry = Entry(itemView, null, spacingBeforeDp?.let { maxOf(0f, it) })
-        entries.add(entry)
+        entry.divider = makeDivider()
+        stackView.addView(entry.divider, 2 * at + 1, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+        entries.add(at, entry)
         itemView.stackIconColor = iconColor
         itemView.stackSelectedIconColor = selectedIconColor
+        itemView.stackTitleColor = titleColor
+        itemView.stackAnimationTint = animationTint
+        itemView.stackAnimationDarkTint = animationDarkTint
         updateSpacing()
-        // [EN] Its own action, or for the first item without one the background action (reached by a screen reader: touches
-        //      on items without an action go to the background). [CN] 执行自己的动作；没有动作的第一个条目执行背景动作（由读屏触发：
-        //      落在无动作条目上的触摸交给背景）。
+        if (dispatchesItemTaps) installClickListener(itemView)
+        setAction(action, itemView)
+        // [EN] The item before and after it may have been the first or last. [CN] 前后的条目可能是原来的第一个或最后一个。
+        entries.forEach { updateAccessibility(it) }
+    }
+
+    /**
+     * [EN] Its own action, or for the first item without one the background action (reached by a screen reader: touches
+     *      on items without an action go to the background). [CN] 执行自己的动作；没有动作的第一个条目执行背景动作（由读屏触发：
+     *      落在无动作条目上的触摸交给背景）。
+     */
+    private fun installClickListener(itemView: CYLAnimatedItemView) {
         itemView.setOnClickListener { view ->
             val item = view as CYLAnimatedItemView
             val ownAction = if (isItemInteractive(item)) action(item) else null
@@ -196,7 +437,37 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
             val resolved = ownAction ?: fallbackAction
             if (resolved != null) performAction(resolved)
         }
-        setAction(action, itemView)
+    }
+
+    /**
+     * [EN] Moves an item to `index` (clamped to 0..count-1); its action and spacing go with it. Does nothing for an item not in the stack.
+     * [CN] 把条目移到 `index`（限制在 0..数量-1）；其动作与间距随之移动。条目不在堆叠中时什么都不做。
+     */
+    open fun move(itemView: CYLAnimatedItemView, index: Int) {
+        val from = entries.indexOfFirst { it.view === itemView }
+        if (from < 0) return
+        val to = index.coerceIn(0, entries.size - 1)
+        if (from == to) return
+        val entry = entries.removeAt(from)
+        entries.add(to, entry)
+        stackView.removeView(itemView)
+        stackView.removeView(entry.divider)
+        stackView.addView(itemView, 2 * to)
+        stackView.addView(entry.divider, 2 * to + 1)
+        updateSpacing()
+        entries.forEach { updateAccessibility(it) }
+    }
+
+    /**
+     * [EN] Makes the stack hold exactly `itemViews`, in that order: the others are removed, new ones appended (no action), the ones
+     *      already held keep their action and spacing and are moved into place.
+     * [CN] 让堆叠恰好容纳 `itemViews` 并按此顺序：其他条目被移除，新条目被追加（无动作），已有的条目保留动作与间距并移到相应位置。
+     */
+    open fun setItemViews(itemViews: List<CYLAnimatedItemView>) {
+        entries.map { it.view }.filter { held -> itemViews.none { it === held } }.forEach { remove(it) }
+        itemViews.forEachIndexed { index, view ->
+            if (entries.any { it.view === view }) move(view, index) else insert(view, index)
+        }
     }
 
     /**
@@ -228,13 +499,17 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
     open fun remove(itemView: CYLAnimatedItemView) {
         val index = entries.indexOfFirst { it.view === itemView }
         if (index < 0) return
-        entries.removeAt(index)
+        val removed = entries.removeAt(index)
         itemView.setOnClickListener(null)
         itemView.isClickable = true
         itemView.importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_AUTO
         stackView.removeView(itemView)
+        stackView.removeView(removed.divider)
         itemView.stackIconColor = null
         itemView.stackSelectedIconColor = null
+        itemView.stackTitleColor = null
+        itemView.stackAnimationTint = null
+        itemView.stackAnimationDarkTint = null
         // [EN] The new first item has no spacing before it, and may carry the background action.
         // [CN] 新的第一个条目前没有间距，并可能承载背景动作。
         updateSpacing()
@@ -300,6 +575,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
      */
     override fun performClick(): Boolean {
         val handled = super.performClick()
+        if (!dispatchesItemTaps) return handled
         return backgroundAction?.let { performAction(it) } ?: handled
     }
 
@@ -311,7 +587,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
      * [CN] 从没有动作的条目（以及空白处）接管触摸，使其成为背景点击；带动作的条目保留自己的触摸。
      */
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
-        if (event.actionMasked != MotionEvent.ACTION_DOWN) return false
+        if (!dispatchesItemTaps || event.actionMasked != MotionEvent.ACTION_DOWN) return false
         downX = event.x
         downY = event.y
         return itemWithActionAt(event.x, event.y) == null
@@ -319,6 +595,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility") // [EN] Taps go through performClick. [CN] 点击通过 performClick 触发。
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (!dispatchesItemTaps) return super.onTouchEvent(event)
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> { downX = event.x; downY = event.y }
             MotionEvent.ACTION_UP -> if (abs(event.x - downX) <= touchSlop && abs(event.y - downY) <= touchSlop) performClick()
@@ -343,6 +620,7 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
      */
     private fun updateAccessibility(entry: Entry) {
         val view = entry.view
+        if (!dispatchesItemTaps) return
         // [EN] Clickable decides the role the item reports (button or text). [CN] 是否可点击决定条目报告的角色（按钮或文字）。
         view.isClickable = actsAsButton(entry)
         val reads = actsAsButton(entry) || !view.contentDescription.isNullOrEmpty() || !view.title.isNullOrEmpty()
@@ -461,3 +739,17 @@ open class CYLAnimatedItemStackView @JvmOverloads constructor(
         const val DEFAULT_SPACING_DP = 16f
     }
 }
+
+/**
+ * [EN] The share of opacity (0.3) of the divider lines' color when it is derived from the stack's icon color
+ *      (`CYLAnimatedItemStackView.showsDividers`). The same on iOS, HarmonyOS and the mini program.
+ * [CN] 分隔线颜色由堆叠的图标颜色推导时的不透明度（0.3，`CYLAnimatedItemStackView.showsDividers`）。与 iOS、鸿蒙、小程序相同。
+ */
+const val CYLAnimatedItemDividerAlpha: Float = 0.3f
+
+/**
+ * [EN] The default length of a divider line, in dp (20): the line is 1 dp thick and this long, centered in its slot, never the full
+ *      height or width (`CYLAnimatedItemStackView.dividerLengthDp`). Pass it by name, never the literal.
+ * [CN] 分隔线的默认长度，单位 dp（20）：线粗 1 dp、长度为该值，在其位置内居中，而不是整个高度或宽度（`CYLAnimatedItemStackView.dividerLengthDp`）。请用名称，不要写字面量。
+ */
+const val CYLAnimatedItemDividerLength: Float = 20f

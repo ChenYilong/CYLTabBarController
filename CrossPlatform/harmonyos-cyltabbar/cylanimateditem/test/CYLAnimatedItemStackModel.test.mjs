@@ -3,11 +3,12 @@
 //      node --test CrossPlatform/harmonyos-cyltabbar/cylanimateditem/test/*.test.mjs
 // [CN] CYLAnimatedItemStackModel（鸿蒙 CYLAnimatedItemStackView 的规则）的单元测试，用例与 iOS CYLAnimatedItemStackViewTests.m 相同。
 //      用 Node 22.18+（类型擦除）运行：node --test CrossPlatform/harmonyos-cyltabbar/cylanimateditem/test/*.test.mjs
+import './cyl-ts-import.mjs';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import {
+const {
   CYLAnimatedItemStackModel, CYLAnimatedItemStackItem, CYLAnimatedItemStackDefaultSpacing,
-} from '../src/main/ets/CYLAnimatedItemStackModel.ts';
+} = await import('../src/main/ets/CYLAnimatedItemStackModel.ts');
 
 function recorder() {
   const performed = [];

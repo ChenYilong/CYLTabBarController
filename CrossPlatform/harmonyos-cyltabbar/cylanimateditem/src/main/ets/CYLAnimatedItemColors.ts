@@ -155,3 +155,76 @@ export function cylAnimatedItemResolveTint(input: CYLAnimatedItemTintInput): CYL
   result.color = dark ?? fixed;
   return result;
 }
+
+/**
+ * [EN] Stack inheritance: the effective value of a setting is the item's own when it is set (not '' after trimming), else the stack's
+ *      (iOS `item ?? stack`). A set but invalid own value still wins (it is "set"); clearing it to '' inherits again.
+ * [CN] 堆叠继承：设置项的生效值为条目自己的值（trim 后不为 ''），否则为堆叠的（iOS 的 `item ?? stack`）。设置了但无效的自有值仍然优先（它「已设置」）；
+ *      清空为 '' 后重新继承。
+ */
+export function cylAnimatedItemEffective(own: string, inherited: string): string {
+  return own.trim() !== '' ? own : inherited;
+}
+
+/** [EN] The alpha of a divider drawn in the icon color (CYLAnimatedItemDividerAlpha). [CN] 以图标颜色绘制分隔线时的透明度。 */
+export const CYL_ANIMATED_ITEM_DIVIDER_ALPHA: number = 0.3;
+
+/** [EN] The default length of a divider line in vp (CYLAnimatedItemDividerLength); its thickness is 1 vp. [CN] 分隔线的默认长度（vp）；粗细为 1 vp。 */
+export const CYL_ANIMATED_ITEM_DIVIDER_LENGTH: number = 20;
+
+/** [EN] The separator color of the platform fallback (iOS `UIColor.separator`), light, "#AARRGGBB". [CN] 平台后备分隔色（iOS `UIColor.separator`），浅色。 */
+export const CYL_ANIMATED_ITEM_SEPARATOR_LIGHT: string = '#4A3C3C43';
+/** [EN] The same, dark. [CN] 同上，深色。 */
+export const CYL_ANIMATED_ITEM_SEPARATOR_DARK: string = '#99545458';
+
+/**
+ * [EN] What the divider color resolution looks at (see `cylAnimatedItemDividerColor`). Colors are '' when not set; they are ArkUI color
+ *      texts ('#RRGGBB' / '#AARRGGBB'). `iconColor` is the NORMAL-state icon color (the effective one: own, else the stack's).
+ * [CN] 分隔线颜色解析的输入（见 `cylAnimatedItemDividerColor`）。未设置的颜色为 ''；均为 ArkUI 颜色文本。`iconColor` 是普通状态的图标颜色（生效值：自有，否则堆叠的）。
+ */
+export class CYLAnimatedItemDividerInput {
+  dividerColor: string = '';
+  iconColor: string = '';
+  dark: boolean = false;
+}
+
+/**
+ * [EN] The outcome: `source` 'divider' | 'icon' | 'separator', the `color` text to draw and the `opacity` to draw it with (1, except for an
+ *      icon color that is not a hex text: the text as it is with opacity 0.3).
+ * [CN] 结果：`source` 为 'divider' | 'icon' | 'separator'，绘制用的 `color` 文本与 `opacity`（均为 1，图标颜色不是十六进制文本时除外：原文本加透明度 0.3）。
+ */
+export class CYLAnimatedItemDividerResult {
+  source: string = 'separator';
+  color: string = '';
+  opacity: number = 1;
+}
+
+/**
+ * [EN] The divider line color: `dividerColor` as it is when set; else the icon color at alpha 0.3 (the alpha REPLACES the color's own, as
+ *      iOS `withAlphaComponent`); else the separator color of the mode. Pure, unit tested with Node (table driven).
+ * [CN] 分隔线颜色：设置了 `dividerColor` 时原样使用；否则为透明度 0.3 的图标颜色（透明度替换颜色自带的，同 iOS `withAlphaComponent`）；否则为当前模式的分隔色。
+ *      纯逻辑，用 Node 做表驱动单元测试。
+ */
+export function cylAnimatedItemDividerColor(input: CYLAnimatedItemDividerInput): CYLAnimatedItemDividerResult {
+  const result = new CYLAnimatedItemDividerResult();
+  if (input.dividerColor.trim() !== '') {
+    result.source = 'divider';
+    result.color = input.dividerColor;
+    return result;
+  }
+  if (input.iconColor.trim() !== '') {
+    result.source = 'icon';
+    const rgba = cylAnimatedItemParseHexColor(input.iconColor);
+    if (input.iconColor.trim().startsWith('#') && rgba !== undefined) {
+      const alpha = Math.round(255 * CYL_ANIMATED_ITEM_DIVIDER_ALPHA).toString(16).toUpperCase().padStart(2, '0');
+      const hex = (value: number): string => value.toString(16).toUpperCase().padStart(2, '0');
+      result.color = '#' + alpha + hex(rgba.red) + hex(rgba.green) + hex(rgba.blue);
+    } else {
+      result.color = input.iconColor;
+      result.opacity = CYL_ANIMATED_ITEM_DIVIDER_ALPHA;
+    }
+    return result;
+  }
+  result.color = input.dark ? CYL_ANIMATED_ITEM_SEPARATOR_DARK : CYL_ANIMATED_ITEM_SEPARATOR_LIGHT;
+  return result;
+}

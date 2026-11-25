@@ -14,8 +14,13 @@ export { CYLLiquidGlass } from './src/main/ets/CYLLiquidGlass';
 export { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier, CYLAnimatedItemCornerRadiusCapsule,
   CYLAnimatedItemLiquidGlassContentInset } from './src/main/ets/CYLAnimatedItemBackground';
 export {
-  CYLAnimatedItemStackModel, CYLAnimatedItemStackItem, CYLAnimatedItemStackActionHandler, CYLAnimatedItemStackDefaultSpacing
+  CYLAnimatedItemStackModel, CYLAnimatedItemStackItem, CYLAnimatedItemStackActionHandler, CYLAnimatedItemStackDefaultSpacing,
+  CYLAnimatedItemDividerLength, CYLAnimatedItemDividerThickness
 } from './src/main/ets/CYLAnimatedItemStackModel';
+export {
+  cylAnimatedItemEffective, cylAnimatedItemDividerColor, CYLAnimatedItemDividerInput, CYLAnimatedItemDividerResult, CYL_ANIMATED_ITEM_DIVIDER_ALPHA,
+  CYL_ANIMATED_ITEM_DIVIDER_LENGTH, CYL_ANIMATED_ITEM_SEPARATOR_LIGHT, CYL_ANIMATED_ITEM_SEPARATOR_DARK
+} from './src/main/ets/CYLAnimatedItemColors';
 export { cylIsSymbolResource, CYL_SYMBOL_RESOURCE_TYPE } from './src/main/ets/CYLAnimatedItemResources';
 export {
   CYLAnimatedItemCountdown, CYLAnimatedItemCountdownStorage, CYLAnimatedItemCountdownListener, CYLCountdownIdle, CYLCountdownRunning,

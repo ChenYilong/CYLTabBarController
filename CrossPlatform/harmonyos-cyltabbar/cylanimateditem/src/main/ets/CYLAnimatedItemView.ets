@@ -14,7 +14,11 @@ import { deviceInfo } from '@kit.BasicServicesKit';
 import { CYLAnimatedItemEngineState, CYLAnimatedItemEngineView } from './CYLAnimatedItemEngine';
 import { CYLAnimatedItemPlayer } from './CYLAnimatedItemPlayer';
 import { CYLAnimatedItemSource } from './CYLAnimatedItemSource';
-import { CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint } from './CYLAnimatedItemColors';
+import {
+  CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint, cylAnimatedItemEffective,
+  CYLAnimatedItemDividerInput, CYLAnimatedItemDividerResult, cylAnimatedItemDividerColor, CYL_ANIMATED_ITEM_DIVIDER_LENGTH,
+  CYL_ANIMATED_ITEM_DIVIDER_ALPHA
+} from './CYLAnimatedItemColors';
 import {
   CYLAnimatedItemMissingReporter, CYLAnimatedItemResourceMissingCallback, cylAnimatedItemResourceOf, CYL_RESOURCE_DECODE_FAILED,
   CYL_RESOURCE_ENGINE_LIBRARY_MISSING
@@ -594,6 +598,29 @@ export struct CYLAnimatedItemView {
    */
   @Prop @Watch('cylTintDidChange') animationDarkTint: string = '';
   /** [EN] The app's color mode ('dark' / 'light'), the key cyltabbar's `CYLColorModeStorageKey` names. [CN] App 的颜色模式。 */
+  /**
+   * [EN] The stack defaults (`CYLAnimatedItemStackView` fills them; a standalone item leaves them ''): the effective value is the item's own
+   *      property when set, else this one. Resolved here, so a change of either re-resolves the item.
+   * [CN] 堆叠的默认值（由 `CYLAnimatedItemStackView` 填写；独立使用的条目保持 ''）：生效值为条目自己的属性（已设置时），否则为这里的值。在此解析，
+   *      任一变化都会重新解析。
+   */
+  @Prop @Watch('cylTintDidChange') stackAnimationTint: string = '';
+  @Prop @Watch('cylTintDidChange') stackAnimationDarkTint: string = '';
+  /**
+   * [EN] INTERNAL, not API (a host never sets these; `CYLAnimatedItemStackView` does for the dividers it owns): `cylInternalDivider` makes this
+   *      item view a divider: no icon, title, animation or badge, ONE line 1 vp thick and `cylInternalDividerLength` long (vertical when
+   *      `cylInternalDividerVertical`), centered; no taps, hidden from the screen reader. The color goes through the same pipeline as
+   *      every item: `cylInternalDividerColor` (the stack's `dividerColor`) as it is; else the effective normal `iconColor` at alpha 0.3;
+   *      else the separator color; resolved with the app's color mode (`cyl_colorMode`), so a light / dark switch re-resolves it.
+   * [CN] 内部使用，非 API（宿主从不设置；由 `CYLAnimatedItemStackView` 为其拥有的分隔线设置）：`cylInternalDivider` 使该条目视图成为分隔线：没有图标、
+   *      标题、动画、角标，只画一条粗 1 vp、长 `cylInternalDividerLength` 的线（`cylInternalDividerVertical` 时为竖线），居中；不接收点击，对读屏隐藏。
+   *      颜色走与所有条目相同的流程：`cylInternalDividerColor`（堆叠的 `dividerColor`）原样使用；否则为生效的普通 `iconColor` 加透明度 0.3；再否则为分隔色；
+   *      按 App 的颜色模式（`cyl_colorMode`）解析，深浅色切换时重新解析。
+   */
+  @Prop cylInternalDivider: boolean = false;
+  @Prop cylInternalDividerColor: string = '';
+  @Prop cylInternalDividerLength: number = CYL_ANIMATED_ITEM_DIVIDER_LENGTH;
+  @Prop cylInternalDividerVertical: boolean = false;
   @StorageProp('cyl_colorMode') @Watch('cylTintDidChange') private cylColorMode: string = 'light';
   private cylTintSource: CYLAnimatedItemSource | undefined = undefined;
   /**
@@ -881,7 +908,7 @@ export struct CYLAnimatedItemView {
 
   /** [EN] A tap: the callback, then the countdown when `startsCountdownOnTap`. [CN] 点击：先回调，再在 `startsCountdownOnTap` 时开始倒计时。 */
   private cylHandleTap(): void {
-    if (!this.cylEnabled()) {
+    if (this.cylInternalDivider || !this.cylEnabled()) {
       return;
     }
     this.onItemTap?.();
@@ -1023,15 +1050,17 @@ export struct CYLAnimatedItemView {
     if (this.animationTintColor !== '') {
       return this.animationTintColor;
     }
-    if (this.animationTint === '' && this.animationDarkTint === '' && this.animationUrl === '') {
+    const tint: string = cylAnimatedItemEffective(this.animationTint, this.stackAnimationTint);
+    const darkTint: string = cylAnimatedItemEffective(this.animationDarkTint, this.stackAnimationDarkTint);
+    if (tint === '' && darkTint === '' && this.animationUrl === '') {
       return '';
     }
     if (this.cylTintSource === undefined || this.cylTintSource.url !== this.animationUrl) {
       this.cylTintSource = CYLAnimatedItemSource.parse(this.animationUrl);
     }
     const input = new CYLAnimatedItemTintInput();
-    input.propTint = this.animationTint;
-    input.propDarkTint = this.animationDarkTint;
+    input.propTint = tint;
+    input.propDarkTint = darkTint;
     input.optionTint = this.cylTintSource.option('tint') ?? '';
     input.optionDarkTint = this.cylTintSource.option('darkTint') ?? '';
     input.selected = this.isItemSelected;
@@ -1043,6 +1072,42 @@ export struct CYLAnimatedItemView {
       return this.cylCurrentIconColor();
     }
     return result.kind === 'fixed' ? result.color : '';
+  }
+
+  /** [EN] The divider's color and opacity (`cylAnimatedItemDividerColor`). [CN] 分隔线的颜色与透明度。 */
+  private cylDividerStyle(): CYLAnimatedItemDividerResult {
+    const input = new CYLAnimatedItemDividerInput();
+    input.dividerColor = this.cylInternalDividerColor;
+    input.dark = this.cylColorMode === 'dark';
+    const icon: ResourceColor = this.iconColor;
+    if (typeof icon === 'string') {
+      input.iconColor = icon;
+    }
+    const result: CYLAnimatedItemDividerResult = cylAnimatedItemDividerColor(input);
+    if (typeof icon !== 'string' && input.dividerColor.trim() === '') {
+      // [EN] A resource / number icon color has no text to convert: draw it as it is at alpha 0.3. [CN] 资源 / 数值图标颜色无文本可转换：原样以透明度 0.3 绘制。
+      result.source = 'icon';
+      result.opacity = CYL_ANIMATED_ITEM_DIVIDER_ALPHA;
+    }
+    return result;
+  }
+
+  /** [EN] The line's fill: the text color, or a non-text icon color. [CN] 线的填充：文本颜色，或非文本的图标颜色。 */
+  private cylDividerFill(): ResourceColor {
+    const style: CYLAnimatedItemDividerResult = this.cylDividerStyle();
+    if (style.source === 'icon' && typeof this.iconColor !== 'string') {
+      return this.iconColor;
+    }
+    return style.color;
+  }
+
+  @Builder
+  cylDividerLine() {
+    Row()
+      .width(this.cylInternalDividerVertical ? 1 : this.cylInternalDividerLength)
+      .height(this.cylInternalDividerVertical ? this.cylInternalDividerLength : 1)
+      .backgroundColor(this.cylDividerFill())
+      .opacity(this.cylDividerStyle().opacity)
   }
 
   /**
@@ -1326,9 +1391,13 @@ export struct CYLAnimatedItemView {
       alignItems: ItemAlign.Center,
       justifyContent: FlexAlign.Center
     }) {
-      this.cylContent()
+      if (this.cylInternalDivider) {
+        this.cylDividerLine()
+      } else {
+        this.cylContent()
+      }
     }
-    .padding(this.cylPadding())
+    .padding(this.cylInternalDivider ? 0 : this.cylPadding())
     .backgroundEffect(this.cylItemGlassDrawn() ?
       { radius: CYLLiquidGlass.BLUR_RADIUS, saturation: CYLLiquidGlass.BLUR_SATURATION, brightness: CYLLiquidGlass.LIGHT_BRIGHTNESS } :
       { radius: 0 })
@@ -1344,12 +1413,14 @@ export struct CYLAnimatedItemView {
     //      default size everywhere else.
     // [CN] 未设置尺寸的 Flex 会填满父组件。纯图标（宿主的 Tab 图标，无标题、无附件）的尺寸就是图标尺寸，宿主才能依据其边缘布局：TabBar 把角标放在
     //      图标右上角，而与 Tab 槽位同宽的条目把角标挪到了图标左上角（鸿蒙问题列表 #51）。其他情况为 `undefined`，保持默认尺寸。
-    .width(this.cylIsBareIcon() ? this.iconSize : (this.sizesToContent ? 'auto' : undefined))
-    .height(this.cylIsBareIcon() ? this.iconSize : (this.sizesToContent ? 'auto' : undefined))
+    .width(this.cylInternalDivider ? (this.cylInternalDividerVertical ? 1 : this.cylInternalDividerLength) :
+      (this.cylIsBareIcon() ? this.iconSize : (this.sizesToContent ? 'auto' : undefined)))
+    .height(this.cylInternalDivider ? (this.cylInternalDividerVertical ? this.cylInternalDividerLength : 1) :
+      (this.cylIsBareIcon() ? this.iconSize : (this.sizesToContent ? 'auto' : undefined)))
     .opacity(this.cylEnabled() ? 1 : 0.5)
-    .constraintSize({ minHeight: this.isBare ? 0 : 44 })
-    .hitTestBehavior(this.isBare ? HitTestMode.None : HitTestMode.Default)
-    .accessibilityLevel(this.isBare ? 'no-hide-descendants' : 'auto')
+    .constraintSize({ minHeight: this.isBare || this.cylInternalDivider ? 0 : 44 })
+    .hitTestBehavior(this.isBare || this.cylInternalDivider ? HitTestMode.None : HitTestMode.Default)
+    .accessibilityLevel(this.isBare || this.cylInternalDivider ? 'no-hide-descendants' : 'auto')
     .accessibilityGroup(true)
     .accessibilityText(this.cylAccessibilityText())
     .accessibilityDescription(this.isItemSelected && this.selectedDescription.length > 0 ?
