@@ -10,6 +10,21 @@
 const CYL_TAG_TITLE_MAX_LINES = 3
 const CYL_TAG_VISIBLE_ROWS = 3
 
+/**
+ * [EN] A tag's title is short: what a row's title says in brackets, "(…)" or "（…）", moves behind the row's subtitle (shown on a long press).
+ *      A title that is only brackets stays as it is.
+ * [CN] Tag 的标题要短：行标题中括号「(…)」或「（…）」里的内容追加到行的副标题之后（长按才显示）。只有括号的标题保持不变。
+ */
+function cylTagText(title, subtitle) {
+  const notes = []
+  const stripped = String(title).replace(/\s*[（(]([^）)]*)[）)]/g, (match, inner) => {
+    if (inner.trim()) notes.push(inner.trim())
+    return ''
+  }).replace(/\s+/g, ' ').trim()
+  if (!stripped) return { title, subtitle: subtitle || '' }
+  return { title: stripped, subtitle: [subtitle, ...notes].filter(Boolean).join(' · ') }
+}
+
 /** [EN] A row a tag can stand for. [CN] Tag 可以代表的行。 */
 function cylRowIsTag(row) {
   const accessory = row.accessory || 'none'
@@ -34,12 +49,13 @@ function cylTagConfiguration(section) {
     sections: [{
       title: section.title,
       items: section.rows.map((row) => {
-        const item = { id: row.id, title: row.title }
-        if (row.subtitle) item.subtitle = row.subtitle
+        const text = cylTagText(row.title, row.subtitle)
+        const item = { id: row.id, title: text.title }
+        if (text.subtitle) item.subtitle = text.subtitle
         return item
       }),
     }],
   }
 }
 
-module.exports = { cylRowIsTag, cylSectionIsTags, cylTagConfiguration, CYL_TAG_TITLE_MAX_LINES, CYL_TAG_VISIBLE_ROWS }
+module.exports = { cylTagText, cylRowIsTag, cylSectionIsTags, cylTagConfiguration, CYL_TAG_TITLE_MAX_LINES, CYL_TAG_VISIBLE_ROWS }

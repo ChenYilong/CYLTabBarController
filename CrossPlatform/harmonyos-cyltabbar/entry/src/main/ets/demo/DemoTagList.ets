@@ -12,6 +12,41 @@ import { DemoRow, DemoSection } from './DemoRows';
  *      每个分组有标题，Tag 宽度随标题自适应，标题最多换行 3 行，超过 3 行 Tag 后出现 More / Less 控件。点击 Tag 与点击原行效果相同。
  */
 export const DEMO_TAG_TITLE_MAX_LINES: number = 3;
+
+export interface DemoTagText {
+  title: string;
+  subtitle: string;
+}
+
+/**
+ * [EN] A tag's title is short: what a row's title says in brackets, "(…)" or "（…）", moves behind the row's subtitle (shown on a long press).
+ *      A title that is only brackets stays as it is.
+ * [CN] Tag 的标题要短：行标题中括号「(…)」或「（…）」里的内容追加到行的副标题之后（长按才显示）。只有括号的标题保持不变。
+ */
+export function demoTagText(title: string, subtitle: string | undefined): DemoTagText {
+  const notes: string[] = [];
+  const pattern = /\s*[（(]([^）)]*)[）)]/g;
+  let match = pattern.exec(title);
+  while (match !== null) {
+    const inner = match[1].trim();
+    if (inner.length > 0) {
+      notes.push(inner);
+    }
+    match = pattern.exec(title);
+  }
+  const stripped = title.replace(pattern, '').replace(/\s+/g, ' ').trim();
+  if (stripped.length === 0) {
+    const kept: DemoTagText = { title: title, subtitle: subtitle ?? '' };
+    return kept;
+  }
+  const parts: string[] = [];
+  if (subtitle !== undefined && subtitle.length > 0) {
+    parts.push(subtitle);
+  }
+  notes.forEach((note: string) => parts.push(note));
+  const text: DemoTagText = { title: stripped, subtitle: parts.join(' · ') };
+  return text;
+}
 export const DEMO_TAG_VISIBLE_ROWS: number = 3;
 
 /** [EN] The tag list configuration of `sections` (the order of the sections and rows is kept). [CN] `sections` 的 TagList 配置（保持分组与行的顺序）。 */
@@ -37,9 +72,10 @@ export function demoTagListConfiguration(sections: DemoSection[]): CYLConfigurat
     section.rows.forEach((row: DemoRow) => {
       const item: CYLConfiguration = {};
       item[CYLTagItemKey.identifier] = row.id;
-      item[CYLTagItemKey.title] = row.title;
-      if (row.subtitle !== undefined && row.subtitle.length > 0) {
-        item[CYLTagItemKey.subtitle] = row.subtitle;
+      const text = demoTagText(row.title, row.subtitle);
+      item[CYLTagItemKey.title] = text.title;
+      if (text.subtitle.length > 0) {
+        item[CYLTagItemKey.subtitle] = text.subtitle;
       }
       items.push(item);
     });

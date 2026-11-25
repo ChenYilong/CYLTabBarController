@@ -34,6 +34,20 @@ object DemoTagList {
     const val TITLE_MAX_LINES = 3
     const val VISIBLE_ROWS = 3
 
+    private val BRACKETS = Regex("\\s*[（(]([^）)]*)[）)]")
+
+    /**
+     * [EN] A tag's title is short: what a row's title says in brackets, "(…)" or "（…）", moves behind the row's subtitle (shown on a long
+     *      press). A title that is only brackets stays as it is. Returns the title and the subtitle ("" for none).
+     * [CN] Tag 的标题要短：行标题中括号「(…)」或「（…）」里的内容追加到行的副标题之后（长按才显示）。只有括号的标题保持不变。
+     */
+    fun tagText(title: String, subtitle: String?): Pair<String, String> {
+        val notes = BRACKETS.findAll(title).map { it.groupValues[1].trim() }.filter { it.isNotEmpty() }.toList()
+        val stripped = title.replace(BRACKETS, "").replace(Regex("\\s+"), " ").trim()
+        if (stripped.isEmpty()) return title to (subtitle ?: "")
+        return stripped to (listOfNotNull(subtitle?.takeIf { it.isNotEmpty() }) + notes).joinToString(" · ")
+    }
+
     /** [EN] A section whose rows carry badge samples stays a list section. [CN] 含角标样例行的分组仍是列表分组。 */
     fun isBadgeSection(section: DemoSection) = section.rows.any { it.badgeRow >= 0 }
 
@@ -50,8 +64,9 @@ object DemoTagList {
             mapOf(
                 CYLTagSectionTitle to section.title,
                 CYLTagSectionItems to section.rows.mapIndexed { itemIndex, row ->
-                    val item = mutableMapOf<String, Any?>(CYLTagItemIdentifier to "$sectionIndex-$itemIndex", CYLTagItemTitle to row.title)
-                    subtitleOf(row)?.takeIf { it.isNotEmpty() }?.let { item[CYLTagItemSubtitle] = it }
+                    val (title, subtitle) = tagText(row.title, subtitleOf(row))
+                    val item = mutableMapOf<String, Any?>(CYLTagItemIdentifier to "$sectionIndex-$itemIndex", CYLTagItemTitle to title)
+                    subtitle.takeIf { it.isNotEmpty() }?.let { item[CYLTagItemSubtitle] = it }
                     item
                 },
             )

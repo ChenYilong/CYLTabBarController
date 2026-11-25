@@ -46,6 +46,10 @@ A demo that shows another setup on purpose (no plus button, a plus button withou
     **3 lines**; text beyond that is cut.
   - Folding: a section that needs more than the maximum number of rows shows a **More / Less** toggle with the library's built-in
     icon; More expands the section, Less folds it again.
+  - Short titles: a tag's title is only the row's main title. What the row's title says in brackets, `(…)` or `（…）` (a parameter name, an issue
+    number, a note), is moved out of the title and **appended to the subtitle** (after the row's own subtitle, joined by ` · `), so it shows only on a
+    long press. A title that is only brackets stays as it is. Every example does this in the code that builds the tag list
+    (HarmonyOS `demoTagText`, Android `DemoTagList.tagText`, mini program `cylTagText`), never in the library and never in the row data.
   - Tap: tapping a tag does exactly what tapping the old cell did.
   - Long press: shows the row's subtitle in a small floating callout with an arrow, built with the tag list's long-press
     custom API (never with example-only gesture code).
@@ -55,7 +59,7 @@ A demo that shows another setup on purpose (no plus button, a plus button withou
     Exception: the badge sample rows stay rows, because a badge is drawn over a row's icon and a tag has no place for it.
   - Android pins it the same way (`scripts/fetch-classifymenu.sh android` fetches `android/merged/library` into the git-ignored
     `Example-Android/cylclassifymenu/`, built with `Example-Android/cylclassifymenu.build.gradle.kts`); the tag list is the header view of the demo `ListView`,
-    so scroll hiding keeps working, and the badge rows follow as rows. On Android the callout is visible while the finger is down.
+    so scroll hiding keeps working, and the badge rows follow as rows. The callout stays until the next touch, tap or scroll (pin b79d2031 or later).
   - The mini program pins it the same way (`scripts/fetch-classifymenu.sh miniprogram`, run by `npm run setup`, fetches `cyl-tag-list-miniprogram` into the git-ignored
     `example/cylclassifymenu-miniprogram/`, installed as a `file:` dependency). A section becomes a tag list when every row is a plain row (no slider, switch, arrows or
     color swatch); the other sections keep their rows (`example/miniprogram/utils/cyl_demo_tags.js`). The expanded control reads "Less" there.
