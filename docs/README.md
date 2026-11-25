@@ -214,6 +214,7 @@ docs/
 │   ├── android-api37-20261119-rive-follows-appearance.png
 │   ├── android-api37-x86_64-emulator-demo-teardown-en-zh-ar-c6b3e976-20261124.png
 │   ├── android-default-tab-bar-height-system-80dp.png
+│   ├── android-emulator-demo-liquid-plate-tail-5c1f.png
 │   ├── android-emulator-demo-taglist-6ad22dc5.png
 │   ├── android-example-rive-svga-tab-switch.png
 │   ├── android-example-strings-en-zh-ja.png
@@ -416,6 +417,9 @@ docs/
 │   ├── ios-example-default-tint-light-dark.png
 │   ├── ios-example-glass-inset-normal-selected.png
 │   ├── ios-example-rive-animation-tint-light-dark.png
+│   ├── ios-example-tag-list-dark.png
+│   ├── ios-example-tag-list-flatdesign.png
+│   ├── ios-example-tag-list-light.png
 │   ├── ios-flatdesign-animateditem-tab-ios26-4-a6e88609.png
 │   ├── ios-flatdesign-gif-no-image-under-animation-ios26-4-5ba3a089.png
 │   ├── ios-flatdesign-hide-show.png

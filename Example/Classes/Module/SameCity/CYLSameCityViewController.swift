@@ -25,9 +25,9 @@ class CYLSameCityViewController: CYLDemoBadgeTableViewController {
     override var placeholderAnimation: CYLDemoPlaceholderAnimation { .pag }
 
     /// [EN] The default tint section, then the badge rows. [CN] 默认着色一组，然后是角标行。
-    override var pageSectionCount: Int { 2 }
+    override var pageSectionCount: Int { 1 }
 
-    private var defaultTintSection: Int { cyl_demoSectionCount() }
+    private var defaultTintSection: Int { tagListSectionCount }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
