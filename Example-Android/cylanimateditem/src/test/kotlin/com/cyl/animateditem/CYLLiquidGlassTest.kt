@@ -60,6 +60,48 @@ class CYLLiquidGlassTest {
 
     @Test
     @Config(sdk = [34])
+    fun theStackForwardsItsGlassBackdropSourceToEveryHostedItem() {
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        val plate = android.view.View(context)
+        val stack = CYLAnimatedItemStackView(context)
+        val first = CYLAnimatedItemView(context).apply { itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.LiquidGlass }
+        stack.append(first)
+        stack.itemGlassBackdropSource = plate
+        assertEquals("an existing item takes it", plate, first.itemGlassBackdropSource)
+        val later = CYLAnimatedItemView(context).apply { itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.LiquidGlass }
+        stack.append(later)
+        assertEquals("an item added later takes it", plate, later.itemGlassBackdropSource)
+        first.layout(0, 0, 200, 80)
+        assertEquals("it reaches the glass layer of a hosted item", plate, (first.itemLiquidGlassView as CYLLiquidGlassView).backdropSource)
+        stack.itemGlassBackdropSource = null
+        assertEquals("null restores the window root", null, first.itemGlassBackdropSource)
+        assertEquals(null, (first.itemLiquidGlassView as CYLLiquidGlassView).backdropSource)
+        assertEquals(null, later.itemGlassBackdropSource)
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun aGlassInsideItsOwnSourceDrawsTheFrostedTintAndTheRimInsteadOfNothing() {
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        val host = android.widget.FrameLayout(context)
+        val item = CYLAnimatedItemView(context).apply { itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.LiquidGlass }
+        host.addView(item, android.widget.FrameLayout.LayoutParams(200, 80))
+        host.measure(android.view.View.MeasureSpec.makeMeasureSpec(400, android.view.View.MeasureSpec.EXACTLY), android.view.View.MeasureSpec.makeMeasureSpec(300, android.view.View.MeasureSpec.EXACTLY))
+        host.layout(0, 0, 400, 300)
+        item.itemGlassBackdropSource = host // an ancestor: nothing can be sampled
+        var roundRects = 0
+        val canvas = object : android.graphics.Canvas() {
+            override fun drawRoundRect(rect: android.graphics.RectF, rx: Float, ry: Float, paint: android.graphics.Paint) { roundRects++ }
+            override fun drawRoundRect(left: Float, top: Float, right: Float, bottom: Float, rx: Float, ry: Float, paint: android.graphics.Paint) { roundRects++ }
+        }
+        (item.itemLiquidGlassView as CYLLiquidGlassView).draw(canvas)
+        assertEquals("the frosted tint and the hairline rim are drawn", 2, roundRects)
+    }
+
+    @Test
+    @Config(sdk = [34])
     fun aTintAlphaOfOneKeepsTheColorAsItIs() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val renderer = CYLAnimatedItemBackgroundRenderer(android.widget.FrameLayout(context))

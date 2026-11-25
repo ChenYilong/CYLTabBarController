@@ -1579,7 +1579,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      *      位于自己的源之内的玻璃不能采样它，只绘制着色与边缘。应用到玻璃层，层稍后创建时也会应用。扁平样式不使用。
      */
     var itemGlassBackdropSource: View? = null
-        set(value) { if (field !== value) { field = value; itemBackgroundDidChange() } }
+        set(value) { if (field !== value) { field = value; if (usesItemBackground) itemBackgroundDidChange() } }
 
     /**
      * [EN] The background really drawn: `itemBackgroundStyle`, or `Flat` where `isLiquidGlassActive()` is false.
