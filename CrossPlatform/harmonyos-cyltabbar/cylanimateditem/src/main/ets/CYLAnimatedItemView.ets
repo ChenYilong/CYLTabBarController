@@ -14,6 +14,7 @@ import { deviceInfo } from '@kit.BasicServicesKit';
 import { CYLAnimatedItemEngineState, CYLAnimatedItemEngineView } from './CYLAnimatedItemEngine';
 import { CYLAnimatedItemPlayer } from './CYLAnimatedItemPlayer';
 import { CYLAnimatedItemSource } from './CYLAnimatedItemSource';
+import { CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint } from './CYLAnimatedItemColors';
 import {
   CYLAnimatedItemMissingReporter, CYLAnimatedItemResourceMissingCallback, cylAnimatedItemResourceOf, CYL_RESOURCE_DECODE_FAILED,
   CYL_RESOURCE_ENGINE_LIBRARY_MISSING
@@ -563,6 +564,32 @@ export struct CYLAnimatedItemView {
    */
   @Prop animationTintColor: ResourceColor = '';
   /**
+   * [EN] The unified animation tint, the same names and values as Rive's `tint` option (iOS `CYLTabBarAnimationOptionTint`): "title" draws
+   *      the animation like a template image in the item's icon color (`iconColor`, which the host sets for the current state, so the
+   *      selected state's when selected); "#RRGGBB" / "#RRGGBBAA" draws it in that fixed color on the unselected item, the selected item
+   *      takes its icon color; '' (the default) is not set. A set value overrides the `tint` option of the animation source
+   *      (`file#tint=title`); unset uses the option, and without one the file keeps its own colors. Without an icon color there is
+   *      nothing to draw "title" in: no automatic recolor. Any engine, through the same layer as `animationTintColor` (which, when set,
+   *      wins as the already resolved color). Reactive: setting or clearing it after the file loaded redraws.
+   * [CN] 统一的动画着色，名称与取值同 Rive 的 `tint` 选项（iOS `CYLTabBarAnimationOptionTint`）："title" 像模板图片一样用条目的图标颜色
+   *      （`iconColor`，由宿主按当前状态设置，因此选中时为选中状态的颜色）绘制动画；"#RRGGBB" / "#RRGGBBAA" 在未选中的条目上用该固定颜色绘制，
+   *      选中的条目使用其图标颜色；''（默认）表示未设置。设置后覆盖动画来源的 `tint` 选项（`file#tint=title`）；未设置则使用该选项，
+   *      都没有时文件保持自身颜色。没有图标颜色时 "title" 无颜色可用：不自动改色。适用于任何引擎，使用与 `animationTintColor` 相同的着色层
+   *      （后者设置时作为已解析的颜色优先）。响应式：文件加载后设置或清除都会重绘。
+   */
+  @Prop @Watch('cylTintDidChange') animationTint: string = '';
+  /**
+   * [EN] The dark-mode color of a fixed `animationTint` ("#RRGGBB" / "#RRGGBBAA"; Rive's `darkTint` option); not needed for "title". A set
+   *      value overrides the `darkTint` option of the source. The mode is the app's (`cyl_colorMode` in AppStorage, set by cyltabbar's
+   *      `cyl_updateColorMode`; light when unset).
+   * [CN] 固定 `animationTint` 在深色模式下的颜色（"#RRGGBB" / "#RRGGBBAA"；Rive 的 `darkTint` 选项）；"title" 不需要。设置后覆盖来源的
+   *      `darkTint` 选项。模式取自 App（AppStorage 中的 `cyl_colorMode`，由 cyltabbar 的 `cyl_updateColorMode` 设置；未设置时为浅色）。
+   */
+  @Prop @Watch('cylTintDidChange') animationDarkTint: string = '';
+  /** [EN] The app's color mode ('dark' / 'light'), the key cyltabbar's `CYLColorModeStorageKey` names. [CN] App 的颜色模式。 */
+  @StorageProp('cyl_colorMode') @Watch('cylTintDidChange') private cylColorMode: string = 'light';
+  private cylTintSource: CYLAnimatedItemSource | undefined = undefined;
+  /**
    * [EN] The gap in vp between the icon and the title, and between an inline accessory and the rest (iOS `spacing`,
    *      Android `spacingDp`, the mini program's `titleSpacing`). Bug B21: it was declared but never read.
    * [CN] 图标与标题之间、行内附件与其余内容之间的间距（vp）（iOS `spacing`、Android `spacingDp`、小程序 `titleSpacing`）。问题 B21：此前声明了却从未使用。
@@ -980,6 +1007,42 @@ export struct CYLAnimatedItemView {
   }
 
   /**
+   * [EN] The color the animation is drawn in, '' for the file's own colors: `animationTintColor` when set; else `animationTint` /
+   *      `animationDarkTint` over the source's `tint` / `darkTint` options (`cylAnimatedItemResolveTint`, with `iconColor`, the selection and
+   *      the color mode). [CN] 动画的绘制颜色，'' 表示文件自身的颜色：设置了 `animationTintColor` 时用它；否则按 `animationTint` /
+   *      `animationDarkTint` 覆盖来源的 `tint` / `darkTint` 选项解析（结合 `iconColor`、选中状态与颜色模式）。
+   */
+  cylAnimationTint(): ResourceColor {
+    if (this.animationTintColor !== '') {
+      return this.animationTintColor;
+    }
+    if (this.animationTint === '' && this.animationDarkTint === '' && this.animationUrl === '') {
+      return '';
+    }
+    if (this.cylTintSource === undefined || this.cylTintSource.url !== this.animationUrl) {
+      this.cylTintSource = CYLAnimatedItemSource.parse(this.animationUrl);
+    }
+    const input = new CYLAnimatedItemTintInput();
+    input.propTint = this.animationTint;
+    input.propDarkTint = this.animationDarkTint;
+    input.optionTint = this.cylTintSource.option('tint') ?? '';
+    input.optionDarkTint = this.cylTintSource.option('darkTint') ?? '';
+    input.selected = this.isItemSelected;
+    input.dark = this.cylColorMode === 'dark';
+    input.hasIconColor = this.iconColor !== '';
+    const result: CYLAnimatedItemTintResult = cylAnimatedItemResolveTint(input);
+    if (result.kind === 'icon') {
+      return this.iconColor;
+    }
+    return result.kind === 'fixed' ? result.color : '';
+  }
+
+  /** [EN] A tint input changed: the engine state follows (the layer itself reads the properties). [CN] 着色输入变化：引擎状态随之更新（着色层本身直接读取属性）。 */
+  cylTintDidChange(): void {
+    this.cylEngineState.tintColor = this.cylAnimationTint();
+  }
+
+  /**
    * [EN] The default engine view's state, updated in place so the engine view sees each change; a new file gets a new
    *      source. [CN] 默认引擎视图的 state，原地更新使引擎视图看到每次变化；新文件得到新的 source。
    */
@@ -993,7 +1056,7 @@ export struct CYLAnimatedItemView {
     state.speed = context.speed;
     state.loops = context.loops;
     state.drivesPlayback = this.drivesAnimationPlayback;
-    state.tintColor = this.animationTintColor;
+    state.tintColor = this.cylAnimationTint();
     state.onLoaded = context.onLoaded;
     state.onFailed = context.onFailed;
     state.onEnded = context.onEnded;
@@ -1107,13 +1170,13 @@ export struct CYLAnimatedItemView {
         }
         .width(this.iconSize)
         .height(this.iconSize)
-          if (this.animationTintColor !== '') {
+          if (this.cylAnimationTint() !== '') {
             // [EN] The tint: kept only where the animation draws, with the animation's alpha (source in).
             // [CN] 着色：只保留动画绘制的区域，并乘以动画的透明度（source in）。
             Column()
               .width(this.iconSize)
               .height(this.iconSize)
-              .backgroundColor(this.animationTintColor)
+              .backgroundColor(this.cylAnimationTint())
               .blendMode(BlendMode.SRC_IN)
               .hitTestBehavior(HitTestMode.Transparent)
               .id('cyl-animated-item-tint')
@@ -1123,7 +1186,7 @@ export struct CYLAnimatedItemView {
         .height(this.iconSize)
         // [EN] An offscreen group, so the tint only meets the animation, never what is behind the item.
         // [CN] 离屏组，使着色只与动画合成，不影响条目背后的内容。
-        .blendMode(this.animationTintColor !== '' ? BlendMode.SRC_OVER : BlendMode.NONE, BlendApplyType.OFFSCREEN)
+        .blendMode(this.cylAnimationTint() !== '' ? BlendMode.SRC_OVER : BlendMode.NONE, BlendApplyType.OFFSCREEN)
         .opacity(this.animationLoaded && !this.cylShowsImageAfterEnd ? 1 : 0)
         .accessibilityLevel('no')
       }

@@ -336,6 +336,7 @@ docs/
 │   ├── harmonyos-cvcm-issue27-plus.jpeg
 │   ├── harmonyos-default-tab-bar-height-system-56vp.png
 │   ├── harmonyos-emulator-pages-b7fdf26.png
+│   ├── harmonyos-emulator-resource-missing-92426d43.png
 │   ├── harmonyos-flatdesign-liquidglass-taps-mate70pro.png
 │   ├── harmonyos-flatdesign-tint-fixed.png
 │   ├── harmonyos-gif-image-rest-then-play.png

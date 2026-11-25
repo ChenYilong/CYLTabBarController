@@ -334,6 +334,52 @@ function cylAnimatedItemStillLayers(p, fallbackImage, fallbackHidden) {
   }
 }
 
+/**
+ * [EN] A color the animation can be drawn in as a canvas / CSS color: '#RGB', '#RRGGBB' and '#RRGGBBAA' ('#RGBA' too) as written
+ *      ('#RRGGBBAA' as rgba(), which every canvas understands), any other plain color text (a name, rgb(), hsl()) as it is; '' for
+ *      blank text, "title" or text outside a plain color's characters (it could break out of a style value). The shared contract is "#RRGGBB" / "#RRGGBBAA".
+ * [CN] 动画可以使用的 canvas / CSS 颜色：'#RGB'、'#RRGGBB'、'#RRGGBBAA'（及 '#RGBA'）；'#RRGGBBAA' 转为 rgba()（所有 canvas 都认识），
+ *      其他普通颜色文本（名称、rgb()、hsl()）原样使用；空白文本、"title" 或含有普通颜色以外字符的文本（可能破坏样式值）为 ''。共同约定为 "#RRGGBB" / "#RRGGBBAA"。
+ */
+function cylAnimatedItemTintColor(value) {
+  const text = String(value === null || value === undefined ? '' : value).trim()
+  if (!text || text.toLowerCase() === 'title' || /[^\w#(),.%\s/-]/.test(text)) return ''
+  const hex = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(text)
+  if (!hex || hex[1].length === 3 || hex[1].length === 6) return text
+  const digits = hex[1].length === 4 ? hex[1].replace(/./g, '$&$&') : hex[1]
+  const channel = (index) => Number.parseInt(digits.slice(index * 2, index * 2 + 2), 16)
+  return `rgba(${channel(0)},${channel(1)},${channel(2)},${Math.round((channel(3) / 255) * 1000) / 1000})`
+}
+
+/**
+ * [EN] The one color an animation is drawn in (the same names and values as Rive's `tint` / `darkTint`), or '' for the file's own
+ *      colors. `animationTint`: '' (not set) keeps the file's colors and changes nothing; "title" draws it like a template image in the
+ *      item's icon color, the selected state's icon color (`selectedIconTint`, else `iconTint`) while `selected`; a color
+ *      ("#RRGGBB" / "#RRGGBBAA") is a fixed color of the UNSELECTED item, and the selected item takes its icon color instead (a
+ *      selected item without any icon color keeps the fixed color). `animationDarkTint` (a color, never "title") replaces a fixed
+ *      color while `isDark`. A set `animationTint` overrides the same option in the animation source; setting or clearing it
+ *      is just another call with the new values (the item re-runs this on every property change). The same inputs as `iconTint` /
+ *      `selectedIconTint` (see `cylAnimatedItemStillLayers`): there is one tint path.
+ * [CN] 动画使用的唯一颜色（名称与取值同 Rive 的 `tint` / `darkTint`），'' 表示保持文件自身的颜色。`animationTint`：'' （未设置）保持
+ *      文件颜色、不改变任何行为；"title" 像模板图片一样用条目的图标颜色绘制，选中时用选中状态的图标颜色（`selectedIconTint`，否则 `iconTint`）；
+ *      颜色（"#RRGGBB" / "#RRGGBBAA"）是未选中条目的固定颜色，选中条目改用其图标颜色（没有任何图标颜色的选中条目保持固定颜色）。
+ *      `animationDarkTint`（颜色，不能是 "title"）在 `isDark` 时代替固定颜色。已设置的 `animationTint` 覆盖动画来源中的同名选项；
+ *      设置或清除只是用新值再调用一次（条目在每次属性变化时重新运行）。输入与 `iconTint` / `selectedIconTint` 相同
+ *      （见 `cylAnimatedItemStillLayers`）：只有一条着色路径。
+ */
+function cylAnimatedItemAnimationTint(input) {
+  const p = input || {}
+  const option = String(p.animationTint === null || p.animationTint === undefined ? '' : p.animationTint).trim()
+  if (!option) return ''
+  const normal = String(p.iconTint || '').trim()
+  const selectedColor = p.selectedIconTint === null || p.selectedIconTint === undefined ? normal : String(p.selectedIconTint).trim()
+  const icon = p.selected ? selectedColor || normal : normal
+  if (option.toLowerCase() === 'title') return icon
+  if (p.selected && icon) return icon
+  const dark = p.isDark ? cylAnimatedItemTintColor(p.animationDarkTint) : ''
+  return dark || cylAnimatedItemTintColor(option)
+}
+
 function cylAnimatedItemModel(input) {
   const p = cylAnimatedItemCountdownProperties(input)
   const animationPath = p.animationUrl || ''
@@ -383,8 +429,16 @@ function cylAnimatedItemModel(input) {
     // [EN] A tint applies to the static image only; an animation keeps its own colors. [CN] 着色只作用于静态图片。
     iconTint: layers.currentTint,
     still: layers,
-    // [EN] The animation's one color (cyl-rive `tint`). [CN] 动画的单一颜色（cyl-rive 的 `tint`）。
-    animationTint: String(p.animationTint || '').trim(),
+    // [EN] The animation's one color (cyl-rive `tint`; GIF through a CSS filter): see `cylAnimatedItemAnimationTint`.
+    //      [CN] 动画的单一颜色（cyl-rive 的 `tint`；GIF 通过 CSS filter）：见 `cylAnimatedItemAnimationTint`。
+    animationTint: cylAnimatedItemAnimationTint({
+      animationTint: p.animationTint,
+      animationDarkTint: p.animationDarkTint,
+      selected: p.selected,
+      isDark: dark,
+      iconTint: layers.normalTint,
+      selectedIconTint: layers.selectedTint,
+    }),
     axisClass: (p.axis === 'vertical' ? 'cyl-animated-item-vertical' : 'cyl-animated-item-horizontal') + (p.embedded ? ' cyl-animated-item-embedded' : '') + (p.itemStyle === 'countdown' ? ' cyl-animated-item-countdown' : ''),
     ariaHidden: !!p.embedded,
     accessoryPlacement: ['leading', 'trailing', 'topTrailing'].includes(p.accessoryPlacement) ? p.accessoryPlacement : 'trailing',
@@ -526,6 +580,8 @@ module.exports = {
   cylAnimatedItemLiquidGlassSetActiveOverride,
   cylAnimatedItemCountdownTitleWidth,
   cylAnimatedItemIsDark,
+  cylAnimatedItemAnimationTint,
+  cylAnimatedItemTintColor,
   cylAnimatedItemModel,
   cylAnimatedItemType,
   cylAnimatedItemSource,

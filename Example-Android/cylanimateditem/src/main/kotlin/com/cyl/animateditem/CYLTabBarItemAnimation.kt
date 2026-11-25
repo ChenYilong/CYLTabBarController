@@ -451,6 +451,12 @@ open class CYLTabBarItemAnimationFactory(val registry: CYLTabBarItemAnimatorRegi
     companion object {
         private const val PLAYER_TAG = "cyl_tab_bar_item_animation_player"
         private const val OPTIONS_TAG = "cyl_tab_bar_item_animation_options"
+        /**
+         * [EN] The options of the URL `view` was made for; null for a view this factory did not make.
+         * [CN] `view` 创建时所用 URL 中的选项；不是本工厂创建的视图时为 null。
+         */
+        @Suppress("UNCHECKED_CAST")
+        internal fun optionsOf(view: View): Map<String, String>? = view.cyl_getTag(OPTIONS_TAG) as? Map<String, String>
         @JvmStatic
         val sharedFactory: CYLTabBarItemAnimationFactory by lazy { CYLTabBarItemAnimationFactory() }
         fun animationViewWithURL(context: Context, url: String, size: CYLSize, contentMode: ImageView.ScaleType) = sharedFactory.animationViewWithURL(context, url, size, contentMode)
@@ -1229,13 +1235,15 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
         fixedTintColor(resources.configuration)?.let { applyTint(it) }
     }
 
-    private val tintOption get() = CYLTabBarItemAnimationTint.tintOption(options)
+    // [EN] The options with the item's `animationTint` / `animationDarkTint` on top. [CN] 选项，加上条目的 `animationTint` / `animationDarkTint`。
+    private val tintOptions get() = CYLTabBarItemAnimationTint.effectiveOptions(this, options)
+    private val tintOption get() = CYLTabBarItemAnimationTint.tintOption(tintOptions)
 
     /**
      * [EN] The fixed tint for `configuration`: `darkTint` in night mode when it is set, else `tint`; null for "title" or none.
      * [CN] `configuration` 下的固定着色：夜间模式且设置了 `darkTint` 时使用它，否则使用 `tint`；"title" 或未设置时为 null。
      */
-    internal fun fixedTintColor(configuration: Configuration): Int? = CYLTabBarItemAnimationTint.fixedTintColor(options, configuration)
+    internal fun fixedTintColor(configuration: Configuration): Int? = CYLTabBarItemAnimationTint.fixedTintColor(tintOptions, configuration)
 
     private fun isNight(configuration: Configuration) =
         (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
@@ -1246,7 +1254,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        if (fixedTintColor(newConfig) != null) applyTint(CYLTabBarItemAnimationTint.resolvedTintColor(options, tintTitleColor, newConfig, tintSelected))
+        if (fixedTintColor(newConfig) != null) applyTint(CYLTabBarItemAnimationTint.resolvedTintColor(tintOptions, tintTitleColor, newConfig, tintSelected))
         cyl_bindThemeInstance(newConfig)
     }
 
@@ -1313,6 +1321,8 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
      * [CN] 问题 B12：icons.riv 绘制浅色描边，在浅色 TabBar 上几乎不可见，而 Rive 文件本身没有着色。单色图标像模板图片一样着色：通过 SRC_IN
      *      颜色滤镜绘制其图层（rive-android 的视图是 TextureView，作为其 layer paint）。null 移除着色。
      */
+    internal fun drawTint(color: Int?) = applyTint(color)
+
     private fun applyTint(color: Int?) {
         appliedTintColor = color
         val paint = color?.let { android.graphics.Paint().apply { colorFilter = android.graphics.PorterDuffColorFilter(it, android.graphics.PorterDuff.Mode.SRC_IN) } }
@@ -1343,7 +1353,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
     override fun cyl_applyAnimationViewTintColor(color: Int?, selected: Boolean) {
         tintTitleColor = color
         tintSelected = selected
-        if (tintOption != null) applyTint(CYLTabBarItemAnimationTint.resolvedTintColor(options, color, resources.configuration, selected))
+        if (tintOption != null) applyTint(CYLTabBarItemAnimationTint.resolvedTintColor(tintOptions, color, resources.configuration, selected))
     }
 
     /**

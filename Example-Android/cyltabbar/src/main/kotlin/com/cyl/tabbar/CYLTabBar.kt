@@ -146,6 +146,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
      */
     internal fun cyl_setTabBarItemAnimationView(view: View?) {
         animationView = view
+        refreshAnimationTint()
     }
 
     /**

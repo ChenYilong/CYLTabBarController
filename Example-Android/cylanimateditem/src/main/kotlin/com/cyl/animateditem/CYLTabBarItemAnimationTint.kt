@@ -26,6 +26,41 @@ object CYLTabBarItemAnimationTint {
 
     private const val TINT_TAG = "cyl_tab_bar_item_animation_tint"
 
+    // [EN] The `tint` / `darkTint` an item's `animationTint` / `animationDarkTint` set on an animation view; weak, main thread only.
+    // [CN] 条目的 `animationTint` / `animationDarkTint` 设置在动画视图上的 `tint` / `darkTint`；弱引用，仅主线程使用。
+    private val overrides = java.util.WeakHashMap<View, Map<String, String>>()
+
+    /**
+     * [EN] Makes `tint` / `darkTint` (the item's `animationTint` / `animationDarkTint`) replace the same options of `view`'s
+     *      source; a null or blank value replaces nothing, both null removes the override. The players and the Rive view read
+     *      `effectiveOptions`, so a later `setTintColor` / night-mode change keeps the override.
+     * [CN] 让 `tint` / `darkTint`（条目的 `animationTint` / `animationDarkTint`）替换 `view` 来源中的同名选项；null 或空白不替换任何选项，
+     *      两者都为 null 时移除覆盖。播放器与 Rive 视图读取 `effectiveOptions`，因此之后的 `setTintColor` / 夜间模式变化仍保留该覆盖。
+     */
+    fun setOverride(view: View, tint: String?, darkTint: String?) {
+        val values = LinkedHashMap<String, String>()
+        tint?.trim()?.takeIf { it.isNotEmpty() }?.let { values[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionTint] = it }
+        darkTint?.trim()?.takeIf { it.isNotEmpty() }?.let { values[CYLTabBarItemAnimationKeys.CYLTabBarAnimationOptionDarkTint] = it }
+        if (values.isEmpty()) overrides.remove(view) else overrides[view] = values
+    }
+
+    /**
+     * [EN] `options` of the source with the override of `view` on top; `options` itself when there is none.
+     * [CN] 来源的 `options`，加上 `view` 的覆盖；没有覆盖时就是 `options`。
+     */
+    fun effectiveOptions(view: View?, options: Map<String, String>): Map<String, String> {
+        val override = view?.let { overrides[it] } ?: return options
+        return options + override
+    }
+
+    /**
+     * [EN] Draws `color` on an animation view: on the layer of `view`, or on the inner view of a Rive view (which draws its own tint).
+     * [CN] 在动画视图上绘制 `color`：绘制在 `view` 的图层上，Rive 视图则绘制在其内部视图上（它自己绘制着色）。
+     */
+    fun applyToAnimationView(view: View, color: Int?) {
+        if (view is CYLRiveTabBarItemAnimationView) view.drawTint(color) else apply(view, color)
+    }
+
     /**
      * [EN] The `tint` option, trimmed; null when it is missing or empty. [CN] 去除空白后的 `tint` 选项；缺失或为空时为 null。
      */
@@ -96,8 +131,10 @@ object CYLTabBarItemAnimationTint {
  */
 internal class CYLTabBarItemAnimationTintingPlayer(
     val player: CYLTabBarItemAnimationPlayer,
-    private val options: Map<String, String>,
+    private val sourceOptions: Map<String, String>,
 ) : CYLTabBarItemAnimationPlayer by player {
+    // [EN] The source's options with the item's `animationTint` / `animationDarkTint` on top. [CN] 来源的选项，加上条目的 `animationTint` / `animationDarkTint`。
+    private val options: Map<String, String> get() = CYLTabBarItemAnimationTint.effectiveOptions(animationView, sourceOptions)
     override var tintColor: Int?
         get() = player.tintColor
         set(value) {

@@ -1,6 +1,7 @@
 package com.cyl.animateditem
 
 import android.content.Context
+import android.content.res.Configuration
 import com.chenyilong.cyldeallocblockexecutor.AnimationEvents
 import com.chenyilong.cyldeallocblockexecutor.LifecycleCenter
 import com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry
@@ -727,6 +728,62 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             iconView.clearColorFilter()
             appliesIconColor = false
         }
+        refreshAnimationTint()
+    }
+
+    // MARK: - Animation tint 动画着色
+
+    /**
+     * [EN] How the animation is drawn in the item's icon color, the same names and values as the `tint` option of the
+     *      animation source (`CYLTabBarAnimationOptionTint`) and iOS `animationTint`. "title": drawn like a template image in
+     *      `effectiveIconColor` (the selected icon color while selected). "#RRGGBB" / "#AARRGGBB": that color on the UNSELECTED
+     *      item, the selected item takes its icon color. Set, it replaces the option of the source URL; null (default) leaves the
+     *      file's own colors and the URL's option as they are. Works before and after the file loads, for every engine
+     *      (`CYLTabBarItemAnimationTint`).
+     * [CN] 动画如何以条目的图标颜色绘制，名称与取值同动画来源的 `tint` 选项（`CYLTabBarAnimationOptionTint`）及 iOS 的 `animationTint`。
+     *      "title"：像模板图片一样以 `effectiveIconColor` 绘制（选中时为选中图标颜色）。"#RRGGBB" / "#AARRGGBB"：该颜色只用于未选中的条目，
+     *      选中的条目使用其图标颜色。设置后替换来源 URL 中的选项；null（默认）保持文件自身颜色与 URL 中的选项不变。文件加载前后设置都有效，
+     *      适用于所有引擎（`CYLTabBarItemAnimationTint`）。
+     */
+    var animationTint: String? = null
+        set(value) { if (field != value) { field = value; refreshAnimationTint() } }
+
+    /**
+     * [EN] The night-mode color of a fixed `animationTint` (the `darkTint` option); not needed for "title". Re-applied when the
+     *      configuration changes. null (default) keeps the URL's option.
+     * [CN] 固定 `animationTint` 的夜间模式颜色（`darkTint` 选项）；"title" 不需要。配置变化时重新应用。null（默认）保留 URL 中的选项。
+     */
+    var animationDarkTint: String? = null
+        set(value) { if (field != value) { field = value; refreshAnimationTint() } }
+
+    private var animationTintOverrides = false
+
+    /**
+     * [EN] Draws the animation's tint for the current state (selection, icon color, night mode): the options of the source
+     *      with `animationTint` / `animationDarkTint` on top, resolved by `CYLTabBarItemAnimationTint`. Does nothing for an item
+     *      that never set them. A subclass that makes the animation view itself (the tab button) calls it after setting `animationView`.
+     * [CN] 按当前状态（选中、图标颜色、夜间模式）绘制动画着色：来源的选项加上 `animationTint` / `animationDarkTint`，由
+     *      `CYLTabBarItemAnimationTint` 解析。从未设置它们的条目不做任何事。自己创建动画视图的子类（Tab 按钮）在设置 `animationView` 后调用。
+     */
+    fun refreshAnimationTint(configuration: Configuration = resources.configuration) {
+        val view = animationView ?: return
+        val overrides = !animationTint.isNullOrBlank() || !animationDarkTint.isNullOrBlank()
+        if (!overrides && !animationTintOverrides) return
+        animationTintOverrides = overrides
+        CYLTabBarItemAnimationTint.setOverride(view, animationTint, animationDarkTint)
+        val source = CYLTabBarItemAnimationFactory.optionsOf(view)
+            ?: animationURL?.takeIf { it.isNotBlank() }?.let { CYLTabBarAnimationFileAndOptions(it).second }.orEmpty()
+        val options = CYLTabBarItemAnimationTint.effectiveOptions(view, source)
+        val iconColor = effectiveIconColor
+        // [EN] Without an icon color the title-dependent tints are left to the host (the tab bar passes its title color). [CN] 没有图标颜色时，依赖标题颜色的着色交给宿主（TabBar 传入其标题颜色）。
+        val tint = CYLTabBarItemAnimationTint.tintOption(options)
+        if (tint != null && iconColor == null && (tint == CYLTabBarItemAnimationTint.TINT_TITLE || isSelected)) return
+        CYLTabBarItemAnimationTint.applyToAnimationView(view, CYLTabBarItemAnimationTint.resolvedTintColor(options, iconColor, configuration, isSelected))
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        refreshAnimationTint(newConfig)
     }
 
     override fun setEnabled(enabled: Boolean) {
@@ -791,6 +848,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
                     if (animationSpeed > 0f) player.animationSpeed = animationSpeed
                     player.progress = animationRestingProgress
                 }
+                refreshAnimationTint()
                 if (drivesAnimationPlayback && isSelected) playAnimation()
             } ?: run {
                 CYLAnimationEngines.warnMissingEngine(context, null, url)
@@ -975,6 +1033,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     override fun cyl_animationViewDidLoad(animationView: View) {
         if (animationView !== this.animationView) return
+        refreshAnimationTint()
         updateIcon()
         requestLayout()
         if (drivesAnimationPlayback && isSelected) playAnimation()

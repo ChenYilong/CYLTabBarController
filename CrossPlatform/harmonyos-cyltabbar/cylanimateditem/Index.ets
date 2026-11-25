@@ -34,7 +34,10 @@ export { CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItem
 export { CYLAnimatedItemGIF, CYLAnimatedItemGIFPlayer, CYLAnimatedItemGIFView } from './src/main/ets/CYLAnimatedItemGIF';
 export { CYL_GIF_DEFAULT_DELAY_MS, CYL_GIF_MIN_DELAY_MS, cylGIFDelays, cylGIFDuration, cylGIFFrameIndex } from './src/main/ets/CYLAnimatedItemGIFTiming';
 export { CYLAnimatedItemSVGA, CYLAnimatedItemSVGAPlayer, CYLAnimatedItemSVGAView } from './src/main/ets/CYLAnimatedItemSVGA';
-export { CYLAnimatedItemRGBA, cylAnimatedItemParseHexColor, cylAnimatedItemARGBInteger } from './src/main/ets/CYLAnimatedItemColors';
+export {
+  CYLAnimatedItemRGBA, cylAnimatedItemParseHexColor, cylAnimatedItemARGBInteger, CYL_ANIMATED_ITEM_TINT_TITLE, cylAnimatedItemTintArkColor,
+  CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint
+} from './src/main/ets/CYLAnimatedItemColors';
 export {
   CYLSVGALayout, CYLSVGATransform, CYLSVGAColor, CYLSVGAStyle, CYLSVGARect, CYLSVGAEllipse, CYLSVGAShape, CYLSVGAFrame,
   CYLSVGASprite, CYLSVGAMovie, cylLoadSVGAMovie, cylDecodeSVGAMovie
