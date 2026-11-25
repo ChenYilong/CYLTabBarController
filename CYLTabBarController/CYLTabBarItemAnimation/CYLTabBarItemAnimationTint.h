@@ -6,7 +6,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationColorCount.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimationColorCount.h>
+#else
 #import "CYLTabBarItemAnimationColorCount.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 

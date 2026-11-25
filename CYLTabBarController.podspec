@@ -152,7 +152,7 @@ Pod::Spec.new do |s|
     #      Swift/UIControl+CYLTabBarItemAnimationPlayer.swift 与 PAG 工具函数 Swift/CYLPAGTabBarItemAttributes.swift），只有引入动画子库时才编译
     #      （`CYL_ANIMATION_ENGINE_AVAILABLE`、`CYL_PAG_AVAILABLE`）。
     'CYLTabBarController/CYLTabBarItemAnimation/{GIF,Lottie,PAG,Rive,SVGA,Swift}/**/*',
-    'CYLTabBarController/CYLTabBarItemAnimation/{CYLTabBarItemAnimator,CYLTabBarItemAnimationPlayer,CYLTabBarItemAnimatorRegistry,CYLTabBarItemAnimationFactory,CYLTabBarItemAnimationTint,CYLTabBarItemAnimationPlayableView,CYLTabBarItemViewAnimator}.{h,m}',
+    'CYLTabBarController/CYLTabBarItemAnimation/{CYLTabBarItemAnimator,CYLTabBarItemAnimationPlayer,CYLTabBarItemAnimatorRegistry,CYLTabBarItemAnimationFactory,CYLTabBarItemAnimationTint,CYLTabBarItemAnimationColorCount,CYLTabBarItemAnimationPlayableView,CYLTabBarItemViewAnimator}.{h,m}',
     'CYLTabBarController/CYLAnimatedItem/**/*', # the CYLAnimatedItem subspec above (the engine files are in CYLTabBarItemAnimation/)
     'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}',
     'CYLTabBarController/RiveSwift/**/*', # the Rive subspec below (Swift bridge)

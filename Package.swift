@@ -55,6 +55,7 @@ let package = Package(
                 "CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.m",
                 "CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.m",
                 "CYLTabBarItemAnimation/CYLTabBarItemAnimationTint.m",
+                "CYLTabBarItemAnimation/CYLTabBarItemAnimationColorCount.m",
                 "CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.m",
             ],
             publicHeadersPath: "CYLAnimatedItem/include",
