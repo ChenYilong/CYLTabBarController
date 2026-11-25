@@ -20,6 +20,8 @@ const CYL_PROJECT = path.resolve(__dirname, '..');
 const CYL_CLI = require('../scripts/cyl_devtools_cli').cylDevtoolsCli();
 // [EN] State changes reach the pages on the next turn of the app's event loop. [CN] 状态变化在 App 事件循环的下一轮到达页面。
 const CYL_SETTLE_MS = 800;
+// [EN] A slower settle for the tests that wait for a page switch on a loaded machine (test 15). [CN] 在负载高的机器上等待页面切换的测试（第 15 项）使用更长的等待。
+const CYL_SETTLE_MS_SLOW = 2500;
 
 let miniProgram;
 
@@ -876,7 +878,7 @@ test('the Home rows act with the Objective-C values (docs/ObjC-Example-Parity it
 
 test('the arrows, the touchable area, the replaced tab and the gesture timings (docs/ObjC-Example-Parity items 27, 30, 35, 37)', async () => {
   await miniProgram.reLaunch('/pages/home/index');
-  await cylSleep(CYL_SETTLE_MS * 2);
+  await cylSleep(CYL_SETTLE_MS_SLOW);
   await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
   await cylClearDecoration();
   const row = async (id) => {
@@ -914,7 +916,7 @@ test('the arrows, the touchable area, the replaced tab and the gesture timings (
   // [CN] 第 27 项：同城（首页右侧）变为「替换页 B」并显示粉色页面；再点恢复。
   await cylTapElement('.cyl-home-row[data-id="replaceNeighbors"]');
   assert.equal((await row('replaceNeighbors')).accessory, 'check');
-  await cylTapElement('#cyl-arrow-next', CYL_SETTLE_MS * 2);
+  await cylTapElement('#cyl-arrow-next', CYL_SETTLE_MS_SLOW);
   let current = await cylCurrentPage();
   assert.equal(current.route, 'pages/web/index');
   assert.match(current.data.replaced.title, /Replaced page B|替换页 B|替換頁 B/);
