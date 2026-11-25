@@ -37,6 +37,29 @@ class CYLLiquidGlassTest {
 
     @Test
     @Config(sdk = [34])
+    fun itemGlassBackdropSourceReachesTheGlassLayerAndNullKeepsTheWindowRoot() {
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        val item = CYLAnimatedItemView(context)
+        item.itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.LiquidGlass
+        item.layout(0, 0, 200, 80)
+        val glass = item.itemLiquidGlassView as CYLLiquidGlassView
+        assertEquals("default: the window root", null, glass.backdropSource)
+        val plate = android.view.View(context)
+        item.itemGlassBackdropSource = plate
+        assertEquals("the plate reaches the glass layer", plate, glass.backdropSource)
+        item.itemGlassBackdropSource = null
+        assertEquals("null keeps today's behavior (the window root)", null, glass.backdropSource)
+        // A glass layer made later takes the source too.
+        val late = CYLAnimatedItemView(context)
+        late.itemGlassBackdropSource = plate
+        late.itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.LiquidGlass
+        late.layout(0, 0, 200, 80)
+        assertEquals(plate, (late.itemLiquidGlassView as CYLLiquidGlassView).backdropSource)
+    }
+
+    @Test
+    @Config(sdk = [34])
     fun aTintAlphaOfOneKeepsTheColorAsItIs() {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val renderer = CYLAnimatedItemBackgroundRenderer(android.widget.FrameLayout(context))

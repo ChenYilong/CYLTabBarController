@@ -66,7 +66,7 @@ internal class CYLAnimatedItemBackgroundRenderer(private val host: ViewGroup) {
             ?.let { Color.argb((Color.alpha(it) * (tintAlpha ?: GLASS_TINT_ALPHA)).roundToInt(), Color.red(it), Color.green(it), Color.blue(it)) }
             ?: defaultGlassTint(host.resources)
 
-    fun apply(style: CYLAnimatedItemBackgroundStyle, color: Int?, cornerRadius: Float?, borderWidth: Float, borderColor: Int?, tintAlpha: Float? = null) {
+    fun apply(style: CYLAnimatedItemBackgroundStyle, color: Int?, cornerRadius: Float?, borderWidth: Float, borderColor: Int?, tintAlpha: Float? = null, backdropSource: View? = null) {
         val density = host.resources.displayMetrics.density
         val resolved = resolvedStyle(style)
         val height = host.height
@@ -83,6 +83,7 @@ internal class CYLAnimatedItemBackgroundRenderer(private val host: ViewGroup) {
         if (resolved == CYLAnimatedItemBackgroundStyle.LiquidGlass) {
             val glass = layer ?: CYLLiquidGlassView(host.context).also { layer = it }
             glass.glassTintColor = glassTint(color, tintAlpha)
+            glass.backdropSource = backdropSource
             glass.cornerRadius = radius
             if (glass.parent == null) host.addView(glass, 0)
             glass.visibility = View.VISIBLE

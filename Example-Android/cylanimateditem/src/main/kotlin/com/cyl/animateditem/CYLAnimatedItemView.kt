@@ -1572,6 +1572,16 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         set(value) { if (field != value) { field = value; itemBackgroundDidChange() } }
 
     /**
+     * [EN] The view a Liquid Glass background blurs and refracts: null (the default) is the root of the window's views. The source must be a view BEHIND this
+     *      item and NOT an ancestor of it (a sibling plate, e.g. the gradient behind a list): a glass inside its own source cannot sample it and draws only
+     *      its tint and rim. Applied to the glass layer, also when the layer is created later. Not used by the flat style.
+     * [CN] 液态玻璃背景所模糊、折射的视图：null（默认）为窗口视图的根。源必须是位于该条目后面、且不是其祖先的视图（同级的背板，例如列表后面的渐变）：
+     *      位于自己的源之内的玻璃不能采样它，只绘制着色与边缘。应用到玻璃层，层稍后创建时也会应用。扁平样式不使用。
+     */
+    var itemGlassBackdropSource: View? = null
+        set(value) { if (field !== value) { field = value; itemBackgroundDidChange() } }
+
+    /**
      * [EN] The background really drawn: `itemBackgroundStyle`, or `Flat` where `isLiquidGlassActive()` is false.
      * [CN] 实际绘制的背景：`itemBackgroundStyle`，`isLiquidGlassActive()` 为 false 时为 `Flat`。
      */
@@ -1596,7 +1606,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     /** [EN] Applies the background, radius and border for the current size ([CYLAnimatedItemBackgroundRenderer]). [CN] 按当前尺寸应用背景、圆角与边框。 */
     private fun applyItemBackground() {
         if (!usesItemBackground) return
-        itemBackgroundRenderer.apply(itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha)
+        itemBackgroundRenderer.apply(itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha, itemGlassBackdropSource)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
