@@ -60,7 +60,7 @@ object DemoTagList {
         CYLTagListViewScrollEnabled to false,
         CYLTagListViewLongPressAction to "callout",
         CYLTagListViewDefaultVisibleRows to VISIBLE_ROWS,
-        CYLTagListViewFoldControl to mapOf(CYLMenuFoldControlKeyPosition to "headerTrailing", CYLMenuFoldControlKeyContent to "iconAndTitle"),
+        CYLTagListViewFoldControl to mapOf(CYLMenuFoldControlKeyPosition to "tail", CYLMenuFoldControlKeyContent to "icon"),
         // [EN] Liquid Glass tags (docs/instructions/examples.md). [CN] 液态玻璃样式的 Tag（docs/instructions/examples.md）。
         // [EN] The list sits on the page's own background: its default white would hide the (dark mode) header texts. [CN] 列表位于页面自己的背景之上：默认的白色会遮住（深色模式下的）标题文字。
         CYLTagListViewStyle to mapOf(CYLMenuStyleTitleMaxLines to TITLE_MAX_LINES, CYLMenuStyleBackgroundStyle to "liquidGlass", CYLMenuStyleBackgroundColor to "#00000000"),

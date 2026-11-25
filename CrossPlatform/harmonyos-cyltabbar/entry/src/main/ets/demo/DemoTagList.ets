@@ -58,8 +58,8 @@ export function demoTagListConfiguration(sections: DemoSection[]): CYLConfigurat
   configuration[CYLTagListKey.longPressAction] = 'callout';
   configuration[CYLTagListKey.defaultVisibleRows] = DEMO_TAG_VISIBLE_ROWS;
   const foldControl: CYLConfiguration = {};
-  foldControl[CYLMenuFoldControlKey.position] = 'headerTrailing';
-  foldControl[CYLMenuFoldControlKey.content] = 'iconAndTitle';
+  foldControl[CYLMenuFoldControlKey.position] = 'tail';
+  foldControl[CYLMenuFoldControlKey.content] = 'icon';
   configuration[CYLTagListKey.foldControl] = foldControl;
   const style: CYLConfiguration = {};
   style[CYLMenuStyleKey.titleMaxLines] = DEMO_TAG_TITLE_MAX_LINES;
