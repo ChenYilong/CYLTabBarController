@@ -14,19 +14,34 @@ import CollectionViewClassifyMenu
       "Demo lists that need sections use a ClassifyMenu tag list"): one tag per row (its main title and icon; the subtitle is the
       long-press callout), a titled header per section, tags as wide as their title, titles that wrap up to 3 lines, a More / Less
       icon as the last tag after 3 rows of tags, the library's Liquid Glass tag style and a clear list background, so the page's grouped
-      background shows. A tap does what tapping the old row did. The badge sample rows stay rows of the table, because a badge is drawn
-      over a row's icon and a tag has no place for it. The twin of HarmonyOS `demoTagText`, Android `DemoTagList.tagText` and the mini
+      background shows. A tap does what tapping the old row did. The badge samples are tags too: a round badge image before the title
+      (`CYLTag.badgeText` / `badgeColor` / `badgeAccessibilityLabel`, drawn by `CYLTagDataSource.menuImageForItem(at:)`). The twin of HarmonyOS `demoTagText`, Android `DemoTagList.tagText` and the mini
       program `cylTagText`.
  [CN] 演示 section（`UIViewController (CYLDemoSections)`）以 CollectionViewClassifyMenu 的 TagList 显示：每行一个 Tag（主标题与图标；
       副标题为长按浮层），每个分组有标题，Tag 宽度随标题自适应，标题最多换行 3 行，超过 3 行 Tag 后最后一个 Tag 是 More / Less 图标，
-      使用库的液态玻璃 Tag 样式与透明的列表背景，让页面的分组背景显示出来。点击 Tag 与点击原行效果相同。角标样例行仍是表格的行，
-      因为角标画在行图标上，Tag 没有对应位置。对应 HarmonyOS 的 `demoTagText`、Android 的 `DemoTagList.tagText` 与小程序的 `cylTagText`。
+      使用库的液态玻璃 Tag 样式与透明的列表背景，让页面的分组背景显示出来。点击 Tag 与点击原行效果相同。角标样例也是 Tag：
+      标题前的圆形角标图片（`CYLTag.badgeText` / `badgeColor` / `badgeAccessibilityLabel`，由 `CYLTagDataSource.menuImageForItem(at:)` 绘制）。对应 HarmonyOS 的 `demoTagText`、Android 的 `DemoTagList.tagText` 与小程序的 `cylTagText`。
  */
 @objc(CYLDemoTagList)
 final class CYLDemoTagList: NSObject, CYLMenuDelegate {
 
     @objc static let titleMaxLines = 3
     @objc static let visibleRows = 3
+
+    /**
+     [EN] The badge of each badge sample, in the order of the core's samples (`UITableViewCell.cylBadgeTitle(forRow:)`; the rows repeat after the last one): the
+          text the old row's badge showed ("" is the red dot), and true when the old row had custom colors (purple). Every other badge is red.
+     [CN] 每个角标样例的角标，顺序与核心的样例相同（`UITableViewCell.cylBadgeTitle(forRow:)`；超出最后一个后循环）：旧行角标显示的文字（"" 为红点），
+          以及旧行是否使用自定义颜色（紫色）。其余角标为红色。
+     */
+    private static let badgeSamples: [(text: String, purple: Bool)] = [
+        ("3", false), ("3", false), ("3", false), ("", false), ("3", false), ("new", false), ("3", false),
+        ("3", false), ("3", false), ("3", false), ("", false), ("3", false),
+        ("3", false), ("3", false), ("3", false), ("3", false), ("3", false), ("3", false),
+        ("", false), ("8", false), ("99+", false), ("9+", false), ("new", false), ("NEW", false), ("hot", false),
+        ("5", true), ("5", false), ("5", false), ("5", false), ("", false), ("5", false), ("new", false),
+        ("5", false), ("5", false), ("5", false),
+    ]
 
     private static let brackets = try! NSRegularExpression(pattern: "\\s*[（(]([^）)]*)[）)]")
 
@@ -96,11 +111,11 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
             }
             sections.append([CYLTagSectionKey.title: host.cyl_demoTitle(forSection: section) ?? "", CYLTagSectionKey.items: items])
         }
-        // [EN] The badge samples are tags too (docs/instructions/examples.md); a tag draws no badge, so the sample's title and its page are what shows. [CN] 角标样例也是 Tag（docs/instructions/examples.md）；Tag 不画角标，所以只显示样例的标题与页面。
+        // [EN] The badge samples are tags too (docs/instructions/examples.md): the sample's title, its page and a badge image before the title. [CN] 角标样例也是 Tag（docs/instructions/examples.md）：样例的标题、页面，以及标题前的角标图片。
         if let badgeCell, badgeRowCount > 0 {
             counts.append(badgeRowCount)
             sections.append([CYLTagSectionKey.title: cylDemoLocalizedString("角标"),
-                             CYLTagSectionKey.items: (0..<badgeRowCount).map { Self.item(from: badgeCell($0), identifier: "badge-\($0)") }])
+                             CYLTagSectionKey.items: (0..<badgeRowCount).map { Self.badgeItem(from: badgeCell($0), row: $0) }])
         }
         let newSignature = sections.map { section in
             let items = (section[CYLTagSectionKey.items] as? [[String: Any]]) ?? []
@@ -128,6 +143,30 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
         return item
     }
 
+    /// [EN] A badge sample's tag: like `item(from:)` but without the row's icon; the badge (`CYLTag.badgeText`, `badgeColor`, `badgeAccessibilityLabel`) is the image before the title. [CN] 角标样例的 Tag：与 `item(from:)` 相同但不用行图标；角标（`CYLTag.badgeText`、`badgeColor`、`badgeAccessibilityLabel`）是标题前的图片。
+    private static func badgeItem(from cell: UITableViewCell, row: Int) -> [String: Any] {
+        var result = item(from: cell, identifier: "badge-\(row)")
+        result.removeValue(forKey: CYLTagItemKey.image)
+        let sample = badgeSamples[row % badgeSamples.count]
+        let tag = CYLTag(title: result[CYLTagItemKey.title] as? String ?? "")
+        tag.badgeText = sample.text
+        tag.badgeColor = sample.purple ? .systemPurple : .systemRed
+        tag.badgeAccessibilityLabel = cylBadgeAccessibilityDescriptionEntryPoint(sample.text as NSString) as String?
+        let source = CYLTagDataSource(tags: [tag])
+        source.baseStyle = CYLMenuStyle(configuration: styleConfiguration)
+        if let image = source.menuImageForItem(at: IndexPath(item: 0, section: 0)) { result[CYLTagItemKey.image] = image }
+        return result
+    }
+
+    private static let styleConfiguration: [String: Any] = [
+        CYLMenuStyleKey.titleMaxLines: titleMaxLines, CYLMenuStyleKey.backgroundStyle: "liquidGlass",
+        CYLMenuStyleKey.backgroundColor: "#00000000",
+        // [EN] Each section is a Liquid Glass card (pin bbe56951 or newer). [CN] 每个分组是一张液态玻璃卡片（pin bbe56951 或更新）。
+        CYLMenuStyleKey.sectionStyle: "insetGrouped",
+        // [EN] No side inset: the cards line up with the table's own rounded sections (the cell is already inset). [CN] 左右无边距：卡片与表格自己的圆角分组对齐（cell 本身已有边距）。
+        CYLMenuStyleKey.sectionInsets: "{10, 0, 10, 0}", CYLMenuStyleKey.sectionBackgroundStyle: "liquidGlass",
+    ]
+
     /// [EN] The tag list configuration of `sections`. [CN] `sections` 的 TagList 配置。
     static func configuration(sections: [[String: Any]]) -> [String: Any] {
         [
@@ -138,12 +177,7 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
             CYLTagListKey.defaultVisibleRows: visibleRows,
             CYLTagListKey.foldControl: [CYLMenuFoldControlKey.position: "tail", CYLMenuFoldControlKey.content: "icon"],
             // [EN] Liquid Glass tags; a clear list background so the page's grouped background shows (the default is a fixed white, and the header texts follow dark mode). [CN] 液态玻璃 Tag；列表背景透明，显示页面的分组背景（默认是固定白色，而标题文字会随深色模式变化）。
-            CYLTagListKey.style: [CYLMenuStyleKey.titleMaxLines: titleMaxLines, CYLMenuStyleKey.backgroundStyle: "liquidGlass",
-                                  CYLMenuStyleKey.backgroundColor: "#00000000",
-                                  // [EN] Each section is a Liquid Glass card (pin bbe56951 or newer). [CN] 每个分组是一张液态玻璃卡片（pin bbe56951 或更新）。
-                                  CYLMenuStyleKey.sectionStyle: "insetGrouped",
-                                  // [EN] No side inset: the cards line up with the table's own rounded sections (the cell is already inset). [CN] 左右无边距：卡片与表格自己的圆角分组对齐（cell 本身已有边距）。
-                                  CYLMenuStyleKey.sectionInsets: "{10, 0, 10, 0}", CYLMenuStyleKey.sectionBackgroundStyle: "liquidGlass"],
+            CYLTagListKey.style: styleConfiguration,
             CYLTagListKey.sections: sections,
         ]
     }
