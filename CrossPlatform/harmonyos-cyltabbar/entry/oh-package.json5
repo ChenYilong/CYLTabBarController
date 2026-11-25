@@ -7,6 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "cyltabbar": "file:../cyltabbar",
+    "@cyl/classifymenu": "file:../cylclassifymenu",
     "cylanimateditem": "file:../cylanimateditem",
     "cylanimateditem_rive": "file:../cylanimateditem_rive"
   }

@@ -52,6 +52,10 @@
       "srcPath": "./cyltabbar"
     },
     {
+      "name": "classifymenu",
+      "srcPath": "./cylclassifymenu"
+    },
+    {
       "name": "cylanimateditem",
       "srcPath": "./cylanimateditem"
     },
