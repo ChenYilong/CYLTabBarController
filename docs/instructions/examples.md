@@ -54,6 +54,13 @@ A demo that shows another setup on purpose (no plus button, a plus button withou
     showing only the icon (a chevron, turned when expanded): `foldControl` position `tail`, content `icon`, on every platform. Never a header button and
     never a title on it. It is set in the same code that builds the tag list's configuration (HarmonyOS `demo/DemoTagList.ets`, Android `demo/DemoTagList.kt`,
     mini program `utils/cyl_demo_tags.js`).
+  - Badge samples are tags too: the badge section of an example (the "Badges" / "角标" rows) is organized like every other section: a section with
+    its main title, the badge samples as tags with the short main title, and the long press callout for the rest (the subtitle). No badge section keeps its
+    own list rows, on any platform (HarmonyOS `Index.ets` `cylTagSections`, Android `DemoList.reload`, mini program `pages/home/index.js`).
+  - Liquid background plate and a gradient page: the tag list's background plate is the Liquid Glass plate (`backgroundStyle` `liquidGlass`, with `backgroundColor`
+    transparent so the page shows through), and the main page behind it has a GRADIENT background (light and dark variants), so the glass has colors to
+    bend and blur: the liquid see-through effect is part of what the example tests. If the glass shows no see-through effect over the gradient on a
+    platform, do not draw it in the example: report it to the CollectionViewClassifyMenu repository so its core code is fixed, and re-pin.
   - Liquid Glass style: every tag list in an example uses the library's Liquid Glass tag style (`backgroundStyle` `liquidGlass`: a glass background
     behind each tag, with the library's own border, corner radius and content inset), never the flat style, on every platform. It is set in the code that
     builds the tag list's configuration (HarmonyOS `demo/DemoTagList.ets`, Android `demo/DemoTagList.kt`, mini program `utils/cyl_demo_tags.js`), together with

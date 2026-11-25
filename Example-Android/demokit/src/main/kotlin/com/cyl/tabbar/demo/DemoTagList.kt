@@ -50,9 +50,6 @@ object DemoTagList {
         return stripped to (listOfNotNull(subtitle?.takeIf { it.isNotEmpty() }) + notes).joinToString(" · ")
     }
 
-    /** [EN] A section whose rows carry badge samples stays a list section. [CN] 含角标样例行的分组仍是列表分组。 */
-    fun isBadgeSection(section: DemoSection) = section.rows.any { it.badgeRow >= 0 }
-
     /** [EN] The tag list configuration of `sections` (the order of the sections and rows is kept). [CN] `sections` 的 TagList 配置（保持分组与行的顺序）。 */
     fun configuration(sections: List<DemoSection>, subtitleOf: (DemoRow) -> String?): Map<String, Any?> = mapOf(
         // [EN] `none`: a tap selects nothing but still reports the item, so the host runs the row's action. [CN] `none`：点击不选中，仍回调条目，由宿主执行该行的动作。

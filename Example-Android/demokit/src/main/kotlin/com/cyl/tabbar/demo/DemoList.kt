@@ -109,7 +109,15 @@ class DemoListFragment : Fragment() {
         list.setOnScrollListener(ScrollBridge())
         listView = list
         reload()
-        return FrameLayout(context).apply { addView(list) }
+        // [EN] The page background is a gradient, so the Liquid Glass tags and the bar have colors to bend and blur (docs/instructions/examples.md). The list is transparent.
+        // [CN] 页面背景为渐变色，液态玻璃的 Tag 与 TabBar 才有可折射、可模糊的颜色（docs/instructions/examples.md）。列表本身透明。
+        val dark = (context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        val colors = if (dark) intArrayOf(Color.parseColor("#5B2A3C"), Color.parseColor("#1F4A63"), Color.parseColor("#3B2D5C"))
+                     else intArrayOf(Color.parseColor("#FFB199"), Color.parseColor("#7EC8E3"), Color.parseColor("#C3AED6"))
+        return FrameLayout(context).apply {
+            background = android.graphics.drawable.GradientDrawable(android.graphics.drawable.GradientDrawable.Orientation.TL_BR, colors)
+            addView(list)
+        }
     }
 
     override fun onDestroyView() {
@@ -126,9 +134,9 @@ class DemoListFragment : Fragment() {
     /** [EN] Reads the sections again (rows show the current state). [CN] 重新读取各 section（行显示当前状态）。 */
     fun reload() {
         val all = DemoCatalog.sections(this)
-        val (badgeSections, tagSections) = all.partition(DemoTagList::isBadgeSection)
-        sections = badgeSections
-        tagList?.update(tagSections) { it.subtitle?.invoke(this) }
+        // [EN] Every section, the badge samples too, is part of the tag list (docs/instructions/examples.md). [CN] 所有分组（含角标样例）都在 TagList 中。
+        sections = emptyList()
+        tagList?.update(all) { it.subtitle?.invoke(this) }
         adapter.notifyDataSetChanged()
     }
 

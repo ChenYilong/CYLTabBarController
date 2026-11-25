@@ -1081,17 +1081,13 @@ struct Index {
     ];
   }
 
-  /** [EN] The sections shown as tags: every section but the badge samples. [CN] 以 Tag 显示的分组：除角标样例外的所有分组。 */
+  /** [EN] The sections shown as tags: every section, the badge samples too (docs/instructions/examples.md). [CN] 以 Tag 显示的分组：所有分组，含角标样例。 */
   private cylTagSections(page: string): DemoSection[] {
-    return this.sections(page).filter((section: DemoSection) => !this.cylIsBadgeSection(section));
+    return this.sections(page);
   }
 
   private cylBadgeSections(page: string): DemoSection[] {
-    return this.sections(page).filter((section: DemoSection) => this.cylIsBadgeSection(section));
-  }
-
-  private cylIsBadgeSection(section: DemoSection): boolean {
-    return section.title === CYLLocalizedString('角标');
+    return [];
   }
 
   // MARK: - Pages 页面
