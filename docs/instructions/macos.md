@@ -73,3 +73,12 @@ The root `Podfile` is the reference: it already has the top lines and the hook.
    - The sample configuration files are in `Example-Shared/Configurations/`, bundled as a folder reference.
    - Test helpers shared by several test files go into one file (Android: `CYLTestSupport.kt`; scripts:
      `scripts/configuration-tests/confined_paths.py`).
+
+## Simulator run rules (added 2026-11-25)
+
+- **Read this before every simulator run**; the root `AGENTS.md` and `instructions.md` point here.
+- **After a simulator test or screenshot run ends, immediately kill the app and the simulator processes; start them again only when needed. Never leave an app running or a simulator booted after the task is done.**
+- Stop the app with `xcrun simctl terminate <UDID> <bundle id>` and the simulator with `xcrun simctl shutdown <UDID>`, by the UDID of a simulator you booted yourself. Never `simctl shutdown all`: simulators are shared with other sessions. Kill only the Simulator.app, `xcodebuild` and `xcrun` processes you started; leave other sessions' processes alone.
+- Do it as the last step of the run, after the screenshots are saved and checked, also when the run failed or was cancelled (use a trap or a final step). Boot again only when the next run needs it.
+- A task is not done while an app it launched is still running or a simulator it booted is still up; say in the report that they were stopped.
+- The matching skill text is in `cyl-verify`, "Running the simulator".

@@ -170,6 +170,7 @@ configuration manifest. Taps with axe are often swallowed under load: prefer the
   run the one-time `scripts/free-ram.sh --install` (a sudoers rule that allows only `/usr/sbin/purge`). Never type,
   store or ask for a password to work around that; continue without the purge and mention the hint.
 - It quits no app or simulator, and does nothing outside macOS.
+- **Stop what you started (added 2026-11-25).** After a simulator test or screenshot run ends, immediately kill the app and the simulator processes; start them again only when needed. Never leave an app running or a simulator booted after the task is done. Terminate the app (`xcrun simctl terminate <UDID> <bundle id>`) and shut down the simulator you booted (`xcrun simctl shutdown <UDID>`, by UDID, never `shutdown all`) as the last step of the run, also after a failure. Full text: `docs/instructions/macos.md`, "Simulator run rules".
 
 ### CYLTableViewPlaceHolder in every example
 

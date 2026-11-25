@@ -108,6 +108,7 @@ appears in the task). Instruction files (this file, `instructions.md`, `docs/ins
 
 - Xcode projects keep the Objective-C example's format (`objectVersion = 46`); Podfile top lines and `post_install` hook; app icon and launch screen from the ObjC example; no copied sources.
 - Clean before every build (new derived data folder); run `scripts/free-ram.sh` before the simulator; details in `cyl-verify` and `cyl-xcode-compat`.
+- **Before you run a simulator you must read the simulator run rules** ([docs/instructions/macos.md](docs/instructions/macos.md#simulator-run-rules-added-2026-11-25), or the `cyl-verify` skill, "Running the simulator"), or this text: After a simulator test or screenshot run ends, immediately kill the app and the simulator processes; start them again only when needed. Never leave an app running or a simulator booted after the task is done.
 - Full text: [docs/instructions/macos.md](docs/instructions/macos.md).
 
 ## Windows and HarmonyOS (tag: `windows-harmonyos`)
