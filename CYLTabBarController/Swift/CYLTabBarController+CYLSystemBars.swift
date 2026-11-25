@@ -53,11 +53,33 @@ private func cylIsImplementedOutsideSystemFrameworks(_ cls: AnyClass, _ selector
  */
 extension CYLTabBarController {
 
-    /// [EN] The child that decides the status bar (and its hidden state, update animation, home indicator): the selected one,
-    ///      else the last tab. [CN] 决定状态栏（及其隐藏、更新动画、Home 指示条）的子控制器：选中的控制器，否则为最后一个 Tab。
+    /**
+     FIX: status bar style at launch
+     [EN] The tab on screen: the selected view controller; before the first selection `selectedViewController` is nil and
+          `selectedIndex` is -1 (classic and Liquid Glass) while the first tab is shown, so the tab at `selectedIndex` if that
+          index is valid, else the first tab. Never the last tab.
+     [CN] 屏幕上显示的 Tab：选中的控制器；首次选中之前 `selectedViewController` 为 nil、`selectedIndex` 为 -1（经典样式与液态玻璃），
+          而此时显示的是第一个 Tab，因此取 `selectedIndex` 对应的 Tab（下标有效时），否则取第一个 Tab。绝不取最后一个 Tab。
+     */
+    @objc(cyl_displayedViewController)
+    func cylDisplayedViewController() -> UIViewController? {
+        if let selectedViewController {
+            return selectedViewController
+        }
+        let tabs = viewControllers ?? []
+        return tabs.indices.contains(selectedIndex) ? tabs[selectedIndex] : tabs.first
+    }
+
+    /**
+     FIX: status bar style at launch
+     [EN] The child that decides the status bar (and its hidden state, update animation, home indicator): the tab on screen
+          (`cylDisplayedViewController()`), so at launch the first tab decides, not the last one.
+     [CN] 决定状态栏（及其隐藏、更新动画、Home 指示条）的子控制器：屏幕上显示的 Tab（`cylDisplayedViewController()`），因此启动时由第一个 Tab
+          决定，而不是最后一个。
+     */
     @objc(cyl_childViewControllerForStatusBarStyle)
     func cylChildViewControllerForStatusBarStyle() -> UIViewController? {
-        selectedViewController ?? viewControllers?.last
+        cylDisplayedViewController()
     }
 
     /**
@@ -89,7 +111,7 @@ extension CYLTabBarController {
     func cylSelectedChildOverridesVerticalBarBehavior() -> Bool {
         let behavior = NSSelectorFromString("preferredVerticalBarBehavior")
         let childGetter = NSSelectorFromString("childViewControllerForPreferredVerticalBarBehavior")
-        var viewController = selectedViewController
+        var viewController = cylDisplayedViewController()
         var depth = 0
         while let current = viewController, depth < 16 {
             depth += 1

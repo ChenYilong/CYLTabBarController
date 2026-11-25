@@ -458,6 +458,7 @@ docs/
 │   ├── ios-rive-tab-badges-over-tinted-icons.png
 │   ├── ios-rive-tint-template.png
 │   ├── ios-rive-title-tint-light-dark.png
+│   ├── ios-status-bar-first-tab-launch.png
 │   ├── ios-swift-base-view-controllers.png
 │   ├── ios-swift-example-screens.png
 │   ├── ios-swift-flat-design-main-tab-bar-controller.png

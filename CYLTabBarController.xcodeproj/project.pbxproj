@@ -225,6 +225,7 @@
 		9AC0FFEE2C3064BD00000302 /* CYLAnimationEventBridgeLazyInstallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC0FFEE2C3064BD00000301 /* CYLAnimationEventBridgeLazyInstallTests.swift */; };
 		9AC0FFEE2C3064BD00000402 /* CYLRiveInputPassTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC0FFEE2C3064BD00000401 /* CYLRiveInputPassTests.swift */; };
 		9AC0FFEE2C3064BD00000502 /* CYLTabBarControllerDeallocTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC0FFEE2C3064BD00000501 /* CYLTabBarControllerDeallocTests.swift */; };
+		9AC0FFEE2C3064BD00000512 /* CYLSystemBarsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC0FFEE2C3064BD00000511 /* CYLSystemBarsTests.swift */; };
 		9AC0FFEE2C3064BD00000602 /* CYLRiveInputPass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AC0FFEE2C3064BD00000601 /* CYLRiveInputPass.swift */; };
 		9AD7F5B022B7D4B6004BF0A0 /* gray_tabbar_me_animation.json in Resources */ = {isa = PBXBuildFile; fileRef = 9AD7F5AD22B7D4B6004BF0A0 /* gray_tabbar_me_animation.json */; };
 		9AD7F5B122B7D4B6004BF0A0 /* gray_tabbar_home_animation.json in Resources */ = {isa = PBXBuildFile; fileRef = 9AD7F5AE22B7D4B6004BF0A0 /* gray_tabbar_home_animation.json */; };
@@ -680,6 +681,7 @@
 		9AC0FFEE2C3064BD00000301 /* CYLAnimationEventBridgeLazyInstallTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLAnimationEventBridgeLazyInstallTests.swift; sourceTree = "<group>"; };
 		9AC0FFEE2C3064BD00000401 /* CYLRiveInputPassTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLRiveInputPassTests.swift; sourceTree = "<group>"; };
 		9AC0FFEE2C3064BD00000501 /* CYLTabBarControllerDeallocTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLTabBarControllerDeallocTests.swift; sourceTree = "<group>"; };
+		9AC0FFEE2C3064BD00000511 /* CYLSystemBarsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLSystemBarsTests.swift; sourceTree = "<group>"; };
 		9AC0FFEE2C3064BD00000601 /* CYLRiveInputPass.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Swift/CYLRiveInputPass.swift; sourceTree = "<group>"; };
 		9AD7F5AD22B7D4B6004BF0A0 /* gray_tabbar_me_animation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = gray_tabbar_me_animation.json; sourceTree = "<group>"; };
 		9AD7F5AE22B7D4B6004BF0A0 /* gray_tabbar_home_animation.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = gray_tabbar_home_animation.json; sourceTree = "<group>"; };
@@ -1377,6 +1379,7 @@
 				B7C0DE5A11A2233D4001FC01 /* CYLFlatDesignDelegateTests.swift */,
 				9AC0FFEE2C3064BD00000101 /* CYLLayoutBlockTests.swift */,
 				9AC0FFEE2C3064BD00000501 /* CYLTabBarControllerDeallocTests.swift */,
+				9AC0FFEE2C3064BD00000511 /* CYLSystemBarsTests.swift */,
 				9AC0FFEE2C3064BD00000401 /* CYLRiveInputPassTests.swift */,
 				9AC0FFEE2C3064BD00000201 /* CYLAnimationEventBridgeTests.swift */,
 				9AC0FFEE2C3064BD00000301 /* CYLAnimationEventBridgeLazyInstallTests.swift */,
@@ -2340,6 +2343,7 @@
 				B7C0DE5A11A2233D4001FC02 /* CYLFlatDesignDelegateTests.swift in Sources */,
 				9AC0FFEE2C3064BD00000102 /* CYLLayoutBlockTests.swift in Sources */,
 				9AC0FFEE2C3064BD00000502 /* CYLTabBarControllerDeallocTests.swift in Sources */,
+				9AC0FFEE2C3064BD00000512 /* CYLSystemBarsTests.swift in Sources */,
 				9AC0FFEE2C3064BD00000402 /* CYLRiveInputPassTests.swift in Sources */,
 				9AC0FFEE2C3064BD00000202 /* CYLAnimationEventBridgeTests.swift in Sources */,
 				9AC0FFEE2C3064BD00000302 /* CYLAnimationEventBridgeLazyInstallTests.swift in Sources */,

@@ -534,7 +534,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
 
     open override var childForStatusBarStyle: UIViewController? { cylChildViewControllerForStatusBarStyle() }
     open override var childForStatusBarHidden: UIViewController? { childForStatusBarStyle }
-    open override var childForScreenEdgesDeferringSystemGestures: UIViewController? { selectedViewController }
+    open override var childForScreenEdgesDeferringSystemGestures: UIViewController? { cylDisplayedViewController() }
     open override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
         childForStatusBarStyle?.preferredStatusBarUpdateAnimation ?? super.preferredStatusBarUpdateAnimation
     }
@@ -545,7 +545,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
         if let presented = cylPresentedViewControllerForOrientation() {
             return presented.shouldAutorotate
         }
-        var controller = selectedViewController
+        var controller = cylDisplayedViewController()
         if let navigationController = controller as? UINavigationController {
             controller = navigationController.topViewController
         }

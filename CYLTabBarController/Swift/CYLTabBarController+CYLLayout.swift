@@ -247,10 +247,10 @@ extension CYLTabBarController {
         if let presented = cylPresentedViewControllerForOrientation() {
             return presented.supportedInterfaceOrientations
         }
-        if tabBarStyleType != .flatDesign, let navigationController = selectedViewController as? UINavigationController {
+        if tabBarStyleType != .flatDesign, let navigationController = cylDisplayedViewController() as? UINavigationController {
             return navigationController.topViewController?.supportedInterfaceOrientations ?? []
         }
-        return selectedViewController?.supportedInterfaceOrientations ?? []
+        return cylDisplayedViewController()?.supportedInterfaceOrientations ?? []
     }
 
     /// [EN] The observers removed in `-dealloc`, whatever the style is now (it can change after an observation started).
