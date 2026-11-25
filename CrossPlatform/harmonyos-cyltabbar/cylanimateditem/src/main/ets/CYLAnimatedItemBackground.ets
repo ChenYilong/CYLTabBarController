@@ -1,4 +1,4 @@
-import { CYLLiquidGlass, CYLLiquidGlassSurface } from './CYLLiquidGlass';
+import { CYLLiquidGlass } from './CYLLiquidGlass';
 import { cylAnimatedItemGlassTintColor } from './CYLAnimatedItemColors';
 
 /**
@@ -62,19 +62,6 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
 
   /** [EN] The share of the color's alpha that tints the glass, -1 for the default 0.75. [CN] 用于给玻璃着色的颜色透明度比例，-1 为默认的 0.75。 */
   tintAlpha: number;
-
-  /** [EN] The role of the surface (`CYLLiquidGlassSurface.item` by default): it decides the edge light of a drawn glass. [CN] 表面的角色（默认 `CYLLiquidGlassSurface.item`）：决定所绘玻璃的边缘光。 */
-  surface: CYLLiquidGlassSurface = CYLLiquidGlassSurface.item;
-
-  /**
-   * [EN] The modifier of a plate: a large glass behind other items (a tag list's section card), with the lit rim and the sheen of `CYLLiquidGlassSurface.plate`.
-   * [CN] 平板的 modifier：位于其他条目之后的大块玻璃（标签列表的分组卡片），带 `CYLLiquidGlassSurface.plate` 的方向性细边与高光。
-   */
-  static plate(style: CYLAnimatedItemBackgroundStyle, color: ResourceColor, cornerRadius: number = -1): CYLAnimatedItemBackgroundModifier {
-    const modifier: CYLAnimatedItemBackgroundModifier = new CYLAnimatedItemBackgroundModifier(style, color, cornerRadius);
-    modifier.surface = CYLLiquidGlassSurface.plate;
-    return modifier;
-  }
 
   constructor(style: CYLAnimatedItemBackgroundStyle, color: ResourceColor, cornerRadius: number = -1, borderWidth: number = 0,
     borderColor: ResourceColor = Color.Transparent, tintAlpha: number = -1) {
@@ -148,9 +135,9 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
     //      细边（1 vp，浅色页面上为深色、深色页面上为浅色），使标签或分组卡片的边缘在纯色或渐变页面上可见。
     const rim: boolean = glass && this.borderWidth <= 0;
     instance.borderWidth(rim ? CYLLiquidGlass.RIM_WIDTH : this.borderWidth);
-    instance.borderColor(rim ? CYLLiquidGlass.rimEdgeColors(this.surface, CYLLiquidGlass.isDark()) : this.borderColor);
-    // [EN] Only a plate has a sheen; an item is the flat translucent glass of Android with the uniform rim. [CN] 只有平板有高光；条目与 Android 相同，是扁平的半透明玻璃，加均匀的细边。
-    const sheen: Array<[ResourceColor, number]> = CYLLiquidGlass.sheenColors(this.surface, CYLLiquidGlass.isDark());
+    instance.borderColor(rim ? CYLLiquidGlass.rimEdgeColors(CYLLiquidGlass.isDark()) : this.borderColor);
+    // [EN] Every glass has the sheen and the lit rim of CYLLiquidGlass (the tab bar capsule uses the same values). [CN] 所有玻璃都有 CYLLiquidGlass 的高光与方向性细边（TabBar 胶囊使用相同的数值）。
+    const sheen: Array<[ResourceColor, number]> = CYLLiquidGlass.sheenColors(CYLLiquidGlass.isDark());
     if (glass && sheen.length > 0) {
       instance.linearGradient({ direction: GradientDirection.Bottom, colors: sheen });
     }

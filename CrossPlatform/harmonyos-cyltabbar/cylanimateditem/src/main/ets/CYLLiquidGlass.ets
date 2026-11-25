@@ -7,17 +7,6 @@
  *      因此玻璃是带着色的模糊）。TabBar（`cyltabbar`）依赖本模块并用相同的数值绘制自己的胶囊；本模块不了解 TabBar。ArkUI struct 没有静态成员，
  *      所以规则是这个导出的类（iOS 与 Android 为 `CYLAnimatedItemView.isLiquidGlassActive()`）。
  */
-/**
- * [EN] The role of a glass surface, which decides its edge light: `item` is a small glass (a tag, a `CYLAnimatedItemView`) with Android's hairline rim and
- *      no sheen; `plate` is a large one (a section card behind tags, the tab bar capsule) with the lit rim and the sheen.
- * [CN] 玻璃表面的角色，决定其边缘光：`item` 是小块玻璃（标签、`CYLAnimatedItemView`），带 Android 的细边、没有高光；`plate` 是大块玻璃（标签后的分组卡片、
- *      TabBar 胶囊），带方向性细边与高光。
- */
-export enum CYLLiquidGlassSurface {
-  item = 0,
-  plate = 1
-}
-
 export class CYLLiquidGlass {
   /**
    * [EN] The blur radius of the glass imitation, vp. [CN] 玻璃仿制的模糊半径，单位 vp。
@@ -55,36 +44,25 @@ export class CYLLiquidGlass {
   }
 
   /**
-   * [EN] The rim per edge of a surface. `item` (a tag, an item): Android's non-sampled rim, uniform (black 16% on a light page, white 22% on a dark one).
-   *      `plate` (a section card, the tab bar capsule): lit from the top left as Android's `CYLGlassHighlight` (45 degrees), the top and left edges the
-   *      bright highlight, the bottom and right edges a dim line (dark on light glass, where a white rim alone would wash out; faint white on dark glass).
-   * [CN] 表面各边的细边。`item`（标签、条目）：Android 非采样时的细边，四边均匀（浅色页面上为黑色 16%，深色页面上为白色 22%）。`plate`（分组卡片、TabBar 胶囊）：
-   *      光从左上来，与 Android `CYLGlassHighlight`（45 度）相同，上边与左边是明亮的高光，下边与右边是暗淡的线（浅色玻璃上为深色，因为白色细边单独画
-   *      在浅色玻璃上会淡掉；深色玻璃上为微弱的白色）。
+   * [EN] The rim per edge of every glass (a tag, a section card behind tags, an item, the tab bar capsule): lit from the top left as Android's
+   *      `CYLGlassHighlight` (45 degrees), the top and left edges the bright highlight, the bottom and right edges a dim line (dark on light glass,
+   *      where a white rim alone would wash out; faint white on dark glass). One definition: no host keeps its own.
+   * [CN] 所有玻璃（标签、标签后的分组卡片、条目、TabBar 胶囊）各边的细边：光从左上来，与 Android `CYLGlassHighlight`（45 度）相同，上边与左边是明亮的高光，
+   *      下边与右边是暗淡的线（浅色玻璃上为深色，因为白色细边单独画在浅色玻璃上会淡掉；深色玻璃上为微弱的白色）。只有这一份定义：宿主不保留自己的。
    */
-  static rimEdgeColors(surface: CYLLiquidGlassSurface, dark: boolean): EdgeColors {
-    let colors: EdgeColors;
-    if (surface === CYLLiquidGlassSurface.plate) {
-      colors = dark ?
-        { top: '#8CFFFFFF', right: '#24FFFFFF', bottom: '#24FFFFFF', left: '#8CFFFFFF' } :
-        { top: '#E6FFFFFF', right: '#2E000000', bottom: '#2E000000', left: '#E6FFFFFF' };
-    } else {
-      const edge: string = dark ? '#38FFFFFF' : '#29000000';
-      colors = { top: edge, right: edge, bottom: edge, left: edge };
-    }
+  static rimEdgeColors(dark: boolean): EdgeColors {
+    const colors: EdgeColors = dark ?
+      { top: '#8CFFFFFF', right: '#24FFFFFF', bottom: '#24FFFFFF', left: '#8CFFFFFF' } :
+      { top: '#E6FFFFFF', right: '#2E000000', bottom: '#2E000000', left: '#E6FFFFFF' };
     return colors;
   }
 
   /**
-   * [EN] The sheen of a surface over the glass tint, top to bottom; empty for none. `item`: none (Android draws none where the glass is not sampled).
-   *      `plate`: a specular band at the top fading down and a faint glow at the bottom (the light of the tab bar capsule).
-   * [CN] 表面在玻璃着色之上的高光，自上而下；空数组表示没有。`item`：没有（Android 在未采样的玻璃上也不画）。`plate`：顶部向下渐隐的高光带与底部微弱的反光
-   *      （TabBar 胶囊的光）。
+   * [EN] The sheen of every glass over its tint, top to bottom: a specular band at the top fading down and a faint glow at the bottom (the light of
+   *      the tab bar capsule).
+   * [CN] 所有玻璃在着色之上的高光，自上而下：顶部向下渐隐的高光带与底部微弱的反光（TabBar 胶囊的光）。
    */
-  static sheenColors(surface: CYLLiquidGlassSurface, dark: boolean): Array<[ResourceColor, number]> {
-    if (surface !== CYLLiquidGlassSurface.plate) {
-      return [];
-    }
+  static sheenColors(dark: boolean): Array<[ResourceColor, number]> {
     return dark ?
       [['#2EFFFFFF', 0], ['#0AFFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#12FFFFFF', 1]] :
       [['#66FFFFFF', 0], ['#14FFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#1FFFFFFF', 1]];

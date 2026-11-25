@@ -10,7 +10,7 @@ import { CYLSVGAView } from './svga/CYLSVGAView';
 import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint } from './CYLRiveTabBarItemAnimator';
 import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines, CYLAnimatedItemSVGA, cylSetPausesWhileUserScrolls,
   CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint, cylAnimatedItemEffectiveRenderingMode,
-  CYL_RENDERING_MODE_AUTOMATIC, CYL_RENDERING_MODE_ORIGINAL, CYLLiquidGlass, CYLLiquidGlassSurface } from 'cylanimateditem';
+  CYL_RENDERING_MODE_AUTOMATIC, CYL_RENDERING_MODE_ORIGINAL, CYLLiquidGlass } from 'cylanimateditem';
 import { CYLAnimatedItemLottie } from 'cylanimateditem_lottie';
 // TODO: replace the file: dependency (cyltabbar/oh-package.json5, a vendored copy) with the ohpm package after the library is published (owner's OK).
 import { LifecycleController } from 'cyldeallocblockexecutor';
@@ -834,13 +834,13 @@ export struct CYLTabBarController {
       .width('100%')
       .height('100%')
       .borderRadius(this.cylGlassRowHeight() / 2)
-      // [EN] The light is `cylanimateditem`'s (CYLLiquidGlass, the plate surface), the same as a tag list's section card. [CN] 光来自 `cylanimateditem`（CYLLiquidGlass 的平板表面），与标签列表的分组卡片相同。
+      // [EN] The light is `cylanimateditem`'s (CYLLiquidGlass), the same as every tag and section card. [CN] 光来自 `cylanimateditem`（CYLLiquidGlass 的平板表面），与标签列表的分组卡片相同。
       .linearGradient({
         direction: GradientDirection.Bottom,
-        colors: CYLLiquidGlass.sheenColors(CYLLiquidGlassSurface.plate, this.colorMode === 'dark'),
+        colors: CYLLiquidGlass.sheenColors(this.colorMode === 'dark'),
       })
       // [EN] The glass rim, under the tabs. [CN] 玻璃亮边，位于 Tab 之下。
-      .border({ width: CYLLiquidGlass.RIM_WIDTH, color: CYLLiquidGlass.rimEdgeColors(CYLLiquidGlassSurface.plate, this.colorMode === 'dark') })
+      .border({ width: CYLLiquidGlass.RIM_WIDTH, color: CYLLiquidGlass.rimEdgeColors(this.colorMode === 'dark') })
       .position({ x: 0, y: 0 })
       .hitTestBehavior(HitTestMode.None)
   }

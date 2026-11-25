@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@ohos/hypium';
-import { CYLLiquidGlass, CYLLiquidGlassSurface, CYLAnimatedItemBackgroundModifier, CYLAnimatedItemBackgroundStyle } from 'cylanimateditem';
+import { CYLLiquidGlass, CYLAnimatedItemBackgroundModifier } from 'cylanimateditem';
 
 /**
  * [EN] The light of the Liquid Glass of cylanimateditem (the hairline rim and the sheen, Android `CYLGlassHighlight`): the rim is lit from the
@@ -10,44 +10,29 @@ import { CYLLiquidGlass, CYLLiquidGlassSurface, CYLAnimatedItemBackgroundModifie
  */
 export default function cylGlassHighlightTest() {
   describe('CYLGlassHighlight', () => {
-    it('an item has the uniform Android rim and no sheen, in light and dark', 0, () => {
-      const light: EdgeColors = CYLLiquidGlass.rimEdgeColors(CYLLiquidGlassSurface.item, false);
-      expect(light.top).assertEqual('#29000000');
-      expect(light.left).assertEqual(light.bottom);
-      expect(light.right).assertEqual(light.top);
-      const dark: EdgeColors = CYLLiquidGlass.rimEdgeColors(CYLLiquidGlassSurface.item, true);
-      expect(dark.top).assertEqual('#38FFFFFF');
-      expect(dark.bottom).assertEqual(dark.top);
-      expect(CYLLiquidGlass.sheenColors(CYLLiquidGlassSurface.item, false).length).assertEqual(0);
-      expect(CYLLiquidGlass.sheenColors(CYLLiquidGlassSurface.item, true).length).assertEqual(0);
-    });
-
-    it('a plate is lit from the top left in light and dark', 0, () => {
-      const light: EdgeColors = CYLLiquidGlass.rimEdgeColors(CYLLiquidGlassSurface.plate, false);
+    it('the rim is lit from the top left in light and dark', 0, () => {
+      const light: EdgeColors = CYLLiquidGlass.rimEdgeColors(false);
       expect(light.top).assertEqual(light.left);
       expect(light.bottom).assertEqual(light.right);
       expect(light.top).assertEqual('#E6FFFFFF');
       expect(light.bottom).assertEqual('#2E000000');
-      const dark: EdgeColors = CYLLiquidGlass.rimEdgeColors(CYLLiquidGlassSurface.plate, true);
+      const dark: EdgeColors = CYLLiquidGlass.rimEdgeColors(true);
+      expect(dark.top).assertEqual(dark.left);
+      expect(dark.bottom).assertEqual(dark.right);
       expect(dark.top).assertEqual('#8CFFFFFF');
       expect(dark.bottom).assertEqual('#24FFFFFF');
     });
 
-    it('a plate has the sheen: bright at the top, clear in the middle, in both modes', 0, () => {
+    it('the sheen is bright at the top and clear in the middle, in both modes', 0, () => {
       [false, true].forEach((dark: boolean) => {
-        const stops: Array<[ResourceColor, number]> = CYLLiquidGlass.sheenColors(CYLLiquidGlassSurface.plate, dark);
+        const stops: Array<[ResourceColor, number]> = CYLLiquidGlass.sheenColors(dark);
         expect(stops.length).assertEqual(4);
         expect(stops[0][1]).assertEqual(0);
         expect(stops[stops.length - 1][1]).assertEqual(1);
         expect(stops[2][0]).assertEqual('#00FFFFFF');
       });
-      expect(CYLLiquidGlass.sheenColors(CYLLiquidGlassSurface.plate, false)[0][0]).assertEqual('#66FFFFFF');
-      expect(CYLLiquidGlass.sheenColors(CYLLiquidGlassSurface.plate, true)[0][0]).assertEqual('#2EFFFFFF');
-    });
-
-    it('the plate factory sets the surface, a modifier is an item by default', 0, () => {
-      expect(new CYLAnimatedItemBackgroundModifier(CYLAnimatedItemBackgroundStyle.liquidGlass, '').surface).assertEqual(CYLLiquidGlassSurface.item);
-      expect(CYLAnimatedItemBackgroundModifier.plate(CYLAnimatedItemBackgroundStyle.liquidGlass, '').surface).assertEqual(CYLLiquidGlassSurface.plate);
+      expect(CYLLiquidGlass.sheenColors(false)[0][0]).assertEqual('#66FFFFFF');
+      expect(CYLLiquidGlass.sheenColors(true)[0][0]).assertEqual('#2EFFFFFF');
     });
 
     it('the default glass tint follows the mode: frosted light, white 14 percent in dark', 0, () => {
