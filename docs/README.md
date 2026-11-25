@@ -237,6 +237,7 @@ docs/
 │   ├── android-rive-menu-loop-pause-fix.png
 │   ├── android-rive-menu-settles-then-rests.png
 │   ├── android-rive-rest-same-frame-every-launch.png
+│   ├── android-rive-tab-tint-dark-light-93eca81f.png
 │   ├── android-rn-image-end-rule.png
 │   ├── animated-icons-demo-controls-request-android.jpg
 │   ├── animated-item-android-demo-interaction.png
