@@ -17,8 +17,11 @@ import { CYLAnimatedItemSource } from './CYLAnimatedItemSource';
 import {
   CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint, cylAnimatedItemEffective,
   CYLAnimatedItemDividerInput, CYLAnimatedItemDividerResult, cylAnimatedItemDividerColor, CYL_ANIMATED_ITEM_DIVIDER_LENGTH,
-  CYL_ANIMATED_ITEM_DIVIDER_ALPHA
+  CYL_ANIMATED_ITEM_DIVIDER_ALPHA, cylAnimatedItemEffectiveRenderingMode, CYL_RENDERING_MODE_AUTOMATIC,
+  CYLAnimatedItemStateColorInput, cylAnimatedItemStateColorSource, cylAnimatedItemBuiltInColor, CYLAnimatedItemBuiltInColor
 } from './CYLAnimatedItemColors';
+import { CYL_COLOR_COUNT_UNKNOWN, CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE } from './CYLAnimatedItemColorCount';
+import { cylAnimatedItemDetectColorKind } from './CYLAnimatedItemColorCountLoader';
 import {
   CYLAnimatedItemMissingReporter, CYLAnimatedItemResourceMissingCallback, cylAnimatedItemResourceOf, CYL_RESOURCE_DECODE_FAILED,
   CYL_RESOURCE_ENGINE_LIBRARY_MISSING
@@ -528,6 +531,42 @@ export struct CYLAnimatedItemView {
    */
   @Prop @Watch('cylTintDidChange') selectedIconColor: ResourceColor = '';
   /**
+   * [EN] The icon color while the item is disabled (`isItemEnabled` false); '' = not set: the built-in disabled color (the iOS UIButton
+   *      disabled look, as there is no SDK color for it). [CN] 条目不可用（`isItemEnabled` 为 false）时的图标颜色；'' 表示未设置：内置的禁用色
+   *      （iOS UIButton 的禁用外观，SDK 没有对应颜色）。
+   */
+  @Prop @Watch('cylTintDidChange') disabledIconColor: ResourceColor = '';
+  /**
+   * [EN] The title color while selected; '' = not set: the built-in selected color (`sys.color.interactive_active`). `titleColor` ('' by
+   *      default, the built-in label color `sys.color.font_primary`) is the normal one. Precedence of every color: the item's explicit value,
+   *      then the stack's explicit one (`stackIconColor` ... below), then the built-in, evaluated at draw time with the app's color mode.
+   * [CN] 选中时的标题颜色；'' 表示未设置：内置选中色（`sys.color.interactive_active`）。`titleColor`（默认 ''，内置标签色 `sys.color.font_primary`）为普通状态的颜色。
+   *      所有颜色的优先级：条目显式值，其次堆叠的显式值（下面的 `stackIconColor` 等），最后是内置色，在绘制时按 App 的颜色模式求值。
+   */
+  @Prop @Watch('cylTintDidChange') selectedTitleColor: ResourceColor = '';
+  /**
+   * [EN] The animation rendering mode: 'automatic' (the default and "not set"), 'alwaysTemplate', 'alwaysOriginal'. It applies only while no
+   *      animation tint is set: automatic tints a file detected as ONE color with the effective icon color (multi-color and undetectable files,
+   *      and PAG / SVGA / Rive, keep their colors), alwaysTemplate always tints, alwaysOriginal never. Precedence: this property when not
+   *      automatic, then the `renderingMode=` option of `animationUrl`, then the stack's.
+   * [CN] 动画渲染模式：'automatic'（默认，即「未设置」）、'alwaysTemplate'、'alwaysOriginal'。仅在未设置动画着色时生效：automatic 用生效的图标颜色给检测为单色的文件着色
+   *      （多色、无法检测的文件以及 PAG / SVGA / Rive 保持原色），alwaysTemplate 始终着色，alwaysOriginal 从不着色。优先级：本属性（不是 automatic 时），
+   *      其次 `animationUrl` 的 `renderingMode=` 选项，最后是堆叠的。
+   */
+  @Prop @Watch('cylTintDidChange') animationRenderingMode: string = CYL_RENDERING_MODE_AUTOMATIC;
+  /**
+   * [EN] The stack's explicit colors (`CYLAnimatedItemStackView` fills them; a standalone item leaves them ''): used when the item's own is not set.
+   * [CN] 堆叠的显式颜色（由 `CYLAnimatedItemStackView` 填写；独立使用的条目保持 ''）：条目自己的未设置时使用。
+   */
+  @Prop @Watch('cylTintDidChange') stackIconColor: ResourceColor = '';
+  @Prop @Watch('cylTintDidChange') stackSelectedIconColor: ResourceColor = '';
+  @Prop @Watch('cylTintDidChange') stackDisabledIconColor: ResourceColor = '';
+  @Prop @Watch('cylTintDidChange') stackTitleColor: ResourceColor = '';
+  @Prop @Watch('cylTintDidChange') stackSelectedTitleColor: ResourceColor = '';
+  @Prop @Watch('cylTintDidChange') stackAnimationRenderingMode: string = CYL_RENDERING_MODE_AUTOMATIC;
+  /** [EN] The detection of the animation file (one color or not), filled asynchronously. [CN] 动画文件的检测结果（是否单色），异步填写。 */
+  @State cylColorKind: string = CYL_COLOR_COUNT_UNKNOWN;
+  /**
    * [EN] The background: `flat` (default) fills the view with `itemBackgroundColor`; `liquidGlass` draws Liquid Glass (a blur
    *      with the tint `itemBackgroundColor`) clipped to `itemCornerRadius`; where `CYLLiquidGlass.isActive()` is false the style
    *      is ignored and the view stays flat. Setting any `item…` background property makes the view draw its background, corner
@@ -635,7 +674,7 @@ export struct CYLAnimatedItemView {
    */
   @Prop titleLines: number = 1;
   @Prop titleFontSize: number = 14;
-  @Prop titleColor: ResourceColor = '#333333';
+  @Prop @Watch('cylTintDidChange') titleColor: ResourceColor = '';
   @Prop accessoryImage: ResourceStr = '';
   @Prop accessoryText: string = '';
   @Prop accessoryAccessibilityText: string = '';
@@ -936,6 +975,7 @@ export struct CYLAnimatedItemView {
     this.animationFailed = false;
     this.cylShowsImageAfterEnd = false;
     this.cylUpdateContext();
+    this.cylDetectColorKind();
     if (this.animationUrl.length > 0 && !CYLAnimatedItemEngines.canPlay(this.animationUrl)) {
       CYLAnimatedItemEngines.warnMissingEngine(this.animationUrl);
       // [EN] A known type without its engine (or its library for this device); a file of no known type cannot be decoded.
@@ -1050,11 +1090,11 @@ export struct CYLAnimatedItemView {
     if (this.animationTintColor !== '') {
       return this.animationTintColor;
     }
-    const tint: string = cylAnimatedItemEffective(this.animationTint, this.stackAnimationTint);
-    const darkTint: string = cylAnimatedItemEffective(this.animationDarkTint, this.stackAnimationDarkTint);
-    if (tint === '' && darkTint === '' && this.animationUrl === '') {
+    if (this.animationUrl === '') {
       return '';
     }
+    const tint: string = cylAnimatedItemEffective(this.animationTint, this.stackAnimationTint);
+    const darkTint: string = cylAnimatedItemEffective(this.animationDarkTint, this.stackAnimationDarkTint);
     if (this.cylTintSource === undefined || this.cylTintSource.url !== this.animationUrl) {
       this.cylTintSource = CYLAnimatedItemSource.parse(this.animationUrl);
     }
@@ -1065,13 +1105,114 @@ export struct CYLAnimatedItemView {
     input.optionDarkTint = this.cylTintSource.option('darkTint') ?? '';
     input.selected = this.isItemSelected;
     input.dark = this.cylColorMode === 'dark';
-    input.hasIconColor = this.iconColor !== '';
-    input.hasSelectedIconColor = this.selectedIconColor !== '';
+    // [EN] Only an EXPLICIT selected icon color (the item's or the stack's) lets a fixed tint yield on a selected item. [CN] 只有显式的选中图标颜色（条目或堆叠的）才让固定着色在选中条目上让位。
+    input.hasSelectedIconColor = this.selectedIconColor !== '' || this.stackSelectedIconColor !== '';
+    input.renderingMode = cylAnimatedItemEffectiveRenderingMode(this.animationRenderingMode, this.cylTintSource.option('renderingMode') ?? '',
+      this.stackAnimationRenderingMode);
+    input.colorKind = this.cylColorKind;
     const result: CYLAnimatedItemTintResult = cylAnimatedItemResolveTint(input);
     if (result.kind === 'icon') {
-      return this.cylCurrentIconColor();
+      return this.cylEffectiveIconColor();
     }
     return result.kind === 'fixed' ? result.color : '';
+  }
+
+  /**
+   * [EN] Detects whether the animation file is one color (Lottie JSON, GIF first frame; cached per file) and re-resolves the tint when known.
+   * [CN] 检测动画文件是否单色（Lottie JSON、GIF 首帧；按文件缓存），得到结果后重新解析着色。
+   */
+  private cylDetectColorKind(): void {
+    const source: CYLAnimatedItemSource = CYLAnimatedItemSource.parse(this.animationUrl);
+    const key: string = source.inlineJSON !== undefined ? source.inlineJSON : source.path;
+    const cached: string | undefined = key === '' ? CYL_COLOR_COUNT_UNKNOWN : CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE.get(key);
+    if (cached !== undefined) {
+      this.cylColorKind = cached;
+      this.cylTintDidChange();
+      return;
+    }
+    this.cylColorKind = CYL_COLOR_COUNT_UNKNOWN;
+    const url: string = this.animationUrl;
+    cylAnimatedItemDetectColorKind(source, this.getUIContext().getHostContext()).then((kind: string) => {
+      CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE.set(key, kind);
+      if (url === this.animationUrl) {
+        this.cylColorKind = kind;
+        this.cylTintDidChange();
+      }
+    });
+  }
+
+  /** [EN] The state input of the color resolution (strings: only "set or not" matters here). [CN] 颜色解析的状态输入（字符串：这里只关心「是否设置」）。 */
+  private cylStateInput(item: ResourceColor[], stack: ResourceColor[]): CYLAnimatedItemStateColorInput {
+    const input = new CYLAnimatedItemStateColorInput();
+    const text = (color: ResourceColor): string => color === '' ? '' : 'set';
+    input.item.normal = text(item[0]);
+    input.item.selected = text(item[1]);
+    input.item.disabled = text(item[2]);
+    input.stack.normal = text(stack[0]);
+    input.stack.selected = text(stack[1]);
+    input.stack.disabled = text(stack[2]);
+    input.selected = this.isItemSelected;
+    input.enabled = this.isItemEnabled;
+    input.dark = this.cylColorMode === 'dark';
+    return input;
+  }
+
+  /** [EN] A built-in color as a resource color (the `sys.color` resource, else the constant). [CN] 内置颜色，作为资源颜色（`sys.color` 资源，否则为常量）。 */
+  private cylBuiltInColor(role: string): ResourceColor {
+    const builtIn: CYLAnimatedItemBuiltInColor = cylAnimatedItemBuiltInColor(role, this.cylColorMode === 'dark');
+    if (builtIn.resource === 'font_primary') {
+      return $r('sys.color.font_primary');
+    }
+    if (builtIn.resource === 'interactive_active') {
+      return $r('sys.color.interactive_active');
+    }
+    if (builtIn.resource === 'font_secondary') {
+      return $r('sys.color.font_secondary');
+    }
+    return builtIn.color;
+  }
+
+  /** [EN] The role of the current state. [CN] 当前状态的角色。 */
+  private cylStateRole(): string {
+    return !this.isItemEnabled ? 'disabled' : (this.isItemSelected ? 'selected' : 'normal');
+  }
+
+  /**
+   * [EN] The EXPLICIT icon color of the current state (the item's, else the stack's; '' when neither set): what tints a static image.
+   * [CN] 当前状态的显式图标颜色（条目的，否则堆叠的；都未设置时为 ''）：用于静态图片着色。
+   */
+  cylExplicitIconColor(): ResourceColor {
+    const input = this.cylStateInput([this.iconColor, this.selectedIconColor, this.disabledIconColor],
+      [this.stackIconColor, this.stackSelectedIconColor, this.stackDisabledIconColor]);
+    const source: string = cylAnimatedItemStateColorSource(input);
+    if (source === 'item') {
+      return !this.isItemEnabled ? this.disabledIconColor : (this.isItemSelected ? this.selectedIconColor : this.iconColor);
+    }
+    if (source === 'stack') {
+      return !this.isItemEnabled ? this.stackDisabledIconColor : (this.isItemSelected ? this.stackSelectedIconColor : this.stackIconColor);
+    }
+    return '';
+  }
+
+  /**
+   * [EN] The EFFECTIVE icon color of the current state: explicit, else the built-in of the state. [CN] 当前状态生效的图标颜色：显式，否则为该状态的内置色。
+   */
+  cylEffectiveIconColor(): ResourceColor {
+    const explicit: ResourceColor = this.cylExplicitIconColor();
+    return explicit !== '' ? explicit : this.cylBuiltInColor(this.cylStateRole());
+  }
+
+  /** [EN] The title color of the current state (item, stack, built-in). [CN] 当前状态的标题颜色（条目、堆叠、内置）。 */
+  cylEffectiveTitleColor(): ResourceColor {
+    const input = this.cylStateInput([this.titleColor, this.selectedTitleColor, ''], [this.stackTitleColor, this.stackSelectedTitleColor, '']);
+    const source: string = cylAnimatedItemStateColorSource(input);
+    if (source === 'item') {
+      return this.isItemEnabled && this.isItemSelected ? this.selectedTitleColor : this.titleColor;
+    }
+    if (source === 'stack') {
+      return this.isItemEnabled && this.isItemSelected ? this.stackSelectedTitleColor : this.stackTitleColor;
+    }
+    return this.cylBuiltInColor(this.cylStateRole());
   }
 
   /** [EN] The divider's color and opacity (`cylAnimatedItemDividerColor`). [CN] 分隔线的颜色与透明度。 */
@@ -1079,24 +1220,29 @@ export struct CYLAnimatedItemView {
     const input = new CYLAnimatedItemDividerInput();
     input.dividerColor = this.cylInternalDividerColor;
     input.dark = this.cylColorMode === 'dark';
-    const icon: ResourceColor = this.iconColor;
+    // [EN] The EXPLICIT normal icon color (item, else stack; no built-in): the divider derives from it at alpha 0.6, else it is the built-in
+    //      divider color. [CN] 显式的普通图标颜色（条目，否则堆叠；不含内置色）：分隔线以透明度 0.6 由它推导，否则使用内置分隔色。
+    const icon: ResourceColor = this.iconColor !== '' ? this.iconColor : this.stackIconColor;
     if (typeof icon === 'string') {
       input.iconColor = icon;
     }
     const result: CYLAnimatedItemDividerResult = cylAnimatedItemDividerColor(input);
     if (typeof icon !== 'string' && input.dividerColor.trim() === '') {
-      // [EN] A resource / number icon color has no text to convert: draw it as it is at alpha 0.3. [CN] 资源 / 数值图标颜色无文本可转换：原样以透明度 0.3 绘制。
+      // [EN] A resource / number icon color has no text to convert: draw it as it is at alpha 0.6. [CN] 资源 / 数值图标颜色无文本可转换：原样以透明度 0.6 绘制。
       result.source = 'icon';
       result.opacity = CYL_ANIMATED_ITEM_DIVIDER_ALPHA;
     }
     return result;
   }
 
-  /** [EN] The line's fill: the text color, or a non-text icon color. [CN] 线的填充：文本颜色，或非文本的图标颜色。 */
+  /** [EN] The line's fill: the text color, a non-text icon color, or the built-in `sys.color.font_secondary`. [CN] 线的填充：文本颜色、非文本图标颜色，或内置的 `sys.color.font_secondary`。 */
   private cylDividerFill(): ResourceColor {
     const style: CYLAnimatedItemDividerResult = this.cylDividerStyle();
-    if (style.source === 'icon' && typeof this.iconColor !== 'string') {
-      return this.iconColor;
+    if (style.source === 'icon' && typeof (this.iconColor !== '' ? this.iconColor : this.stackIconColor) !== 'string') {
+      return this.iconColor !== '' ? this.iconColor : this.stackIconColor;
+    }
+    if (style.source === 'builtin') {
+      return this.cylBuiltInColor('divider');
     }
     return style.color;
   }
@@ -1108,14 +1254,6 @@ export struct CYLAnimatedItemView {
       .height(this.cylInternalDividerVertical ? this.cylInternalDividerLength : 1)
       .backgroundColor(this.cylDividerFill())
       .opacity(this.cylDividerStyle().opacity)
-  }
-
-  /**
-   * [EN] The icon color of the current state: `selectedIconColor` when selected and set, else `iconColor`.
-   * [CN] 当前状态的图标颜色：选中且设置了 `selectedIconColor` 时为它，否则为 `iconColor`。
-   */
-  cylCurrentIconColor(): ResourceColor {
-    return this.isItemSelected && this.selectedIconColor !== '' ? this.selectedIconColor : this.iconColor;
   }
 
   /** [EN] A tint input changed: the engine state follows (the layer itself reads the properties). [CN] 着色输入变化：引擎状态随之更新（着色层本身直接读取属性）。 */
@@ -1215,7 +1353,7 @@ export struct CYLAnimatedItemView {
         //      因此用 SymbolGlyph 按 `iconColor` 绘制（没有时为主题主色）。
         SymbolGlyph(this.cylFallbackImage() as Resource)
           .fontSize(this.iconSize)
-          .fontColor([this.cylCurrentIconColor() === '' ? $r('sys.color.font_primary') : this.cylCurrentIconColor()])
+          .fontColor([this.cylEffectiveIconColor()])
           .width(this.iconSize)
           .height(this.iconSize)
           .opacity(this.cylAnimationShows() ? 0 : 1)
@@ -1224,8 +1362,8 @@ export struct CYLAnimatedItemView {
         Image(this.cylFallbackImage())
           .width(this.iconSize)
           .height(this.iconSize)
-          .fillColor(this.cylCurrentIconColor() === '' ? undefined : this.cylCurrentIconColor())
-          .colorFilter(new ColorFilter(cylIconColorFilter(this.cylCurrentIconColor())))
+          .fillColor(this.cylExplicitIconColor() === '' ? undefined : this.cylExplicitIconColor())
+          .colorFilter(new ColorFilter(cylIconColorFilter(this.cylExplicitIconColor())))
           .objectFit(ImageFit.Contain)
           .opacity(this.cylAnimationShows() ? 0 : 1)
           .accessibilityLevel('no')
@@ -1285,7 +1423,7 @@ export struct CYLAnimatedItemView {
         if (!this.cylIsEmpty(this.accessoryImage)) {
           Image(this.accessoryImage).width(18).height(18).objectFit(ImageFit.Contain)
         } else {
-          Text(this.accessoryText).fontSize(this.titleFontSize).fontColor(this.titleColor)
+          Text(this.accessoryText).fontSize(this.titleFontSize).fontColor(this.cylEffectiveTitleColor())
         }
       }
       .constraintSize({ minWidth: 44, minHeight: 44 })
@@ -1311,7 +1449,7 @@ export struct CYLAnimatedItemView {
     if (this.cylTitleText().length > 0) {
       Text(this.cylTitleText())
         .fontSize(this.titleFontSize)
-        .fontColor(this.cylIsRunning() ? this.countdownRunningTitleColor : this.titleColor)
+        .fontColor(this.cylIsRunning() ? this.countdownRunningTitleColor : this.cylEffectiveTitleColor())
         .constraintSize({ minWidth: this.cylCountdownMinWidth() })
         .maxLines(this.titleLines > 0 ? Math.floor(this.titleLines) : CYL_UNLIMITED_LINES)
         .textOverflow({ overflow: this.titleLines > 0 ? TextOverflow.Ellipsis : TextOverflow.None })

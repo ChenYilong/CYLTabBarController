@@ -50,18 +50,18 @@ class CYLAnimatedItemStackTintTest {
 
     private val alpha = (CYLAnimatedItemDividerAlpha * 255f).let { Math.round(it) }
     private fun withAlpha(color: Int) = Color.argb(alpha, Color.red(color), Color.green(color), Color.blue(color))
-    private val separatorDay = 0x1F000000
-    private val separatorNight = 0x1FFFFFFF
+    private fun builtInDivider(night: Boolean) = CYLAnimatedItemBuiltInColors.divider(context, Configuration(context.resources.configuration).apply {
+        uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or (if (night) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO)
+    })
 
     private data class DividerRow(val dividerColor: Int?, val iconColor: Int?, val night: Boolean, val expected: Int)
 
     private fun dividerTable(): List<DividerRow> = buildList {
         for (night in listOf(false, true)) {
-            val separator = if (night) separatorNight else separatorDay
             add(DividerRow(Color.GREEN, Color.RED, night, Color.GREEN))   // dividerColor wins, used as is
             add(DividerRow(Color.GREEN, null, night, Color.GREEN))
-            add(DividerRow(null, Color.RED, night, withAlpha(Color.RED))) // the stack's icon color at 0.3
-            add(DividerRow(null, null, night, separator))                 // separator fallback
+            add(DividerRow(null, Color.RED, night, withAlpha(Color.RED))) // the stack's explicit icon color at 0.6
+            add(DividerRow(null, null, night, builtInDivider(night)))     // built-in secondary text color
         }
     }
 
@@ -86,16 +86,16 @@ class CYLAnimatedItemStackTintTest {
     fun dividerColorReresolvesWhenColorsChange() {
         val stack = CYLAnimatedItemStackView(context)
         stack.append(sized(10))
-        assertEquals(separatorDay, colorOf(stack, Configuration()))
+        assertEquals(builtInDivider(false), colorOf(stack, Configuration()))
         stack.iconColor = Color.RED
         assertEquals(withAlpha(Color.RED), colorOf(stack))
         stack.dividerColor = Color.GREEN
         assertEquals(Color.GREEN, colorOf(stack))
         stack.dividerColor = null
         stack.iconColor = null
-        assertEquals(separatorDay, colorOf(stack))
+        assertEquals(builtInDivider(false), colorOf(stack))
         night(stack, true)
-        assertEquals(separatorNight, colorOf(stack))
+        assertEquals(builtInDivider(true), colorOf(stack))
         val later = sized(10)                                  // a divider made later gets the same defaults
         stack.iconColor = Color.BLUE
         stack.append(later)
@@ -303,6 +303,7 @@ class CYLAnimatedItemStackTintTest {
         val stack = CYLAnimatedItemStackView(context)
         stack.iconColor = Color.RED
         stack.selectedIconColor = Color.BLUE
+        stack.animationRenderingMode = CYLAnimationRenderingMode.AlwaysOriginal  // the one-color test GIF would be tinted by `Automatic`
         val inheriting = item()
         stack.append(inheriting)
         assertNull(applied(inheriting))                               // nothing set
@@ -366,13 +367,12 @@ class CYLAnimatedItemStackTintTest {
         stack.titleColor = Color.MAGENTA
         val inheriting = item(load = false)
         val own = item(load = false).apply { titleColor = Color.YELLOW }
-        val before = inheriting.titleView.currentTextColor
         stack.append(inheriting)
         stack.append(own)
         assertEquals(Color.MAGENTA, inheriting.titleView.currentTextColor)
         assertEquals(Color.YELLOW, own.titleView.currentTextColor)
         stack.titleColor = null
-        assertEquals(before, inheriting.titleView.currentTextColor)
+        assertEquals("cleared: the built-in normal color", CYLAnimatedItemBuiltInColors.normal(context), inheriting.titleView.currentTextColor)
         assertEquals(Color.YELLOW, own.titleView.currentTextColor)
     }
 

@@ -9,15 +9,15 @@ const { cylAnimatedItemDividerColor, cylAnimatedItemDividerStyle, cylAnimatedIte
 const { cylStackModel, cylStackAppendDivider, cylStackSetDivider, cylStackRemoveDivider, cylStackHasDivider } = require('../src/cyl-animated-item-stack/cyl_animated_item_stack_model')
 
 const color = (p) => cylAnimatedItemDividerColor({ ...p, cylDividerColor: p.dividerColor, iconTint: p.iconColor })
-const SEP_LIGHT = 'rgba(60,60,67,0.29)'
-const SEP_DARK = 'rgba(84,84,88,0.65)'
+const SEP_LIGHT = 'rgba(60,60,67,0.6)'
+const SEP_DARK = 'rgba(235,235,245,0.6)'
 
 // [EN] Each row: [dividerColor, stack iconColor, userInterfaceStyle, expected]. [CN] 每行：[dividerColor, 堆叠 iconColor, userInterfaceStyle, 期望值]。
-test('divider color table: dividerColor, icon color at alpha 0.3, separator; light and dark', () => {
+test('divider color table: dividerColor, icon color at alpha 0.6, secondaryLabel; light and dark', () => {
   const rows = [
     ['#FF0000', '#00FF00', 'light', '#FF0000'], ['#FF0000', '#00FF00', 'dark', '#FF0000'], ['#FF000080', '', 'dark', '#FF000080'], [' red ', '', 'light', 'red'],
-    ['', '#00FF00', 'light', 'rgba(0,255,0,0.3)'], ['', '#00FF00', 'dark', 'rgba(0,255,0,0.3)'], ['', '#0F08', 'light', 'rgba(0,255,0,0.3)'], ['', '#11223344', 'light', 'rgba(17,34,51,0.3)'],
-    ['', 'rgb(1, 2, 3)', 'dark', 'rgba(1,2,3,0.3)'], ['', 'rgba(1,2,3,0.9)', 'light', 'rgba(1,2,3,0.3)'],
+    ['', '#00FF00', 'light', 'rgba(0,255,0,0.6)'], ['', '#00FF00', 'dark', 'rgba(0,255,0,0.6)'], ['', '#0F08', 'light', 'rgba(0,255,0,0.6)'], ['', '#11223344', 'light', 'rgba(17,34,51,0.6)'],
+    ['', 'rgb(1, 2, 3)', 'dark', 'rgba(1,2,3,0.6)'], ['', 'rgba(1,2,3,0.9)', 'light', 'rgba(1,2,3,0.6)'],
     ['', '', 'light', SEP_LIGHT], ['', '', 'dark', SEP_DARK], [null, undefined, 'light', SEP_LIGHT], ['  ', 'blue', 'dark', SEP_DARK], ['', 'nonsense', 'light', SEP_LIGHT],
   ]
   rows.forEach(([dividerColor, iconColor, userInterfaceStyle, expected]) => assert.equal(color({ dividerColor, iconColor, userInterfaceStyle }), expected, JSON.stringify([dividerColor, iconColor, userInterfaceStyle])))
@@ -25,8 +25,8 @@ test('divider color table: dividerColor, icon color at alpha 0.3, separator; lig
   assert.equal(color({ systemTheme: 'dark' }), SEP_DARK)
   assert.equal(color({ systemTheme: 'light' }), SEP_LIGHT)
   assert.equal(color({ userInterfaceStyle: 'light', systemTheme: 'dark' }), SEP_LIGHT, 'forced style wins')
-  assert.equal(withAlpha('#abc', 0.3), 'rgba(170,187,204,0.3)')
-  assert.equal(withAlpha('', 0.3), '')
+  assert.equal(withAlpha('#abc', 0.6), 'rgba(170,187,204,0.6)')
+  assert.equal(withAlpha('', 0.6), '')
 })
 
 const dividersOf = (m) => m.items.map((i) => i.dividerBefore)
@@ -53,10 +53,10 @@ test('the internal divider mode: no icon, title, animation or badge, hidden from
   assert.equal(m.title, '')
   assert.equal(m.hasAccessory, false)
   assert.equal(m.ariaHidden, true)
-  assert.match(m.dividerStyle, /rgba\(60,60,67,0\.29\)/)
-  assert.match(model({ ...props, systemTheme: 'dark' }).dividerStyle, /rgba\(84,84,88,0\.65\)/)
-  assert.match(model({ ...props, userInterfaceStyle: 'dark' }).dividerStyle, /rgba\(84,84,88,0\.65\)/)
-  assert.match(model({ ...props, iconTint: '#FF0000' }).dividerStyle, /rgba\(255,0,0,0\.3\)/)
+  assert.match(m.dividerStyle, /rgba\(60,60,67,0\.6\)/)
+  assert.match(model({ ...props, systemTheme: 'dark' }).dividerStyle, /rgba\(235,235,245,0\.6\)/)
+  assert.match(model({ ...props, userInterfaceStyle: 'dark' }).dividerStyle, /rgba\(235,235,245,0\.6\)/)
+  assert.match(model({ ...props, iconTint: '#FF0000' }).dividerStyle, /rgba\(255,0,0,0\.6\)/)
   assert.match(model({ ...props, cylDividerColor: '#123456', systemTheme: 'dark' }).dividerStyle, /background-color: #123456;/)
   assert.equal(model({ title: 'T' }).isDivider, undefined, 'a normal item is unchanged')
 })
@@ -153,11 +153,11 @@ test('append, remove, reorder and hide update the dividers by themselves; the it
 
 test('the color follows the stack through the divider item: derived from iconColor, explicit, light / dark', () => {
   const style = (p, extra) => cylAnimatedItemDividerStyle({ ...extra, cylDividerColor: cylStackModel({ items: four, ...p }).divider.color, iconTint: cylStackModel({ items: four, ...p }).divider.iconTint, userInterfaceStyle: cylStackModel({ items: four, ...p }).divider.userInterfaceStyle })
-  assert.match(style({ iconColor: '#FF0000' }), /rgba\(255,0,0,0\.3\)/)
+  assert.match(style({ iconColor: '#FF0000' }), /rgba\(255,0,0,0\.6\)/)
   assert.match(style({ iconColor: '#FF0000', dividerColor: '#123456' }), /background-color: #123456;/)
-  assert.match(style({}), /rgba\(60,60,67,0\.29\)/)
-  assert.match(style({}, { systemTheme: 'dark' }), /rgba\(84,84,88,0\.65\)/)
-  assert.match(style({ userInterfaceStyle: 'dark' }), /rgba\(84,84,88,0\.65\)/)
+  assert.match(style({}), /rgba\(60,60,67,0\.6\)/)
+  assert.match(style({}, { systemTheme: 'dark' }), /rgba\(235,235,245,0\.6\)/)
+  assert.match(style({ userInterfaceStyle: 'dark' }), /rgba\(235,235,245,0\.6\)/)
 })
 
 test('inheritance: the item value wins when set, blank inherits', () => {

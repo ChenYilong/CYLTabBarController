@@ -327,6 +327,8 @@ final class CYLAnimatedItemTintTableTests: XCTestCase {
         var normal: UIColor?
         var selectedColor: UIColor?
         var expected: UIColor?
+        /// The expected color is a built-in of the item (v2): the label color unselected, the item's tintColor selected.
+        var builtIn = false
     }
 
     private let normal = UIColor(red: 0.1, green: 0.2, blue: 0.3, alpha: 1)
@@ -383,6 +385,11 @@ final class CYLAnimatedItemTintTableTests: XCTestCase {
         return item
     }
 
+    /// The built-in icon color of the item's current state, resolved with its own traits.
+    private func builtInColor(_ item: CYLAnimatedItemView) -> UIColor {
+        (item.isSelected ? (item.tintColor ?? .systemBlue) : UIColor.label).resolvedColor(with: item.traitCollection)
+    }
+
     /// The color of the last call that reached the view; `.some(nil)` is a removal.
     private func last(_ factory: CYLRecordingViewFactory) -> UIColor?? {
         factory.view.stateCalls.last.map { $0.0 }
@@ -395,12 +402,12 @@ final class CYLAnimatedItemTintTableTests: XCTestCase {
             Row(name: "invalid text is unset", tint: "banana", normal: normal, expected: nil),
             Row(name: "invalid hex (5 digits) is unset", tint: "#12345", normal: normal, expected: nil),
             Row(name: "title unselected: the normal color", tint: "title", normal: normal, expected: normal),
-            Row(name: "title unselected, no normal color: no tint", tint: "title", selectedColor: selectedColor, expected: nil),
+            Row(name: "title unselected, no normal color: the built-in label color", tint: "title", selectedColor: selectedColor, builtIn: true),
             Row(name: "title selected: the selected color", tint: "title", selected: true, normal: normal, selectedColor: selectedColor, expected: selectedColor),
             Row(name: "title selected, only the selected color", tint: "title", selected: true, selectedColor: selectedColor, expected: selectedColor),
-            Row(name: "title selected, only the normal color (a)", tint: "title", selected: true, normal: normal, expected: normal),
-            Row(name: "title selected, no icon color at all: no tint (b)", tint: "title", selected: true, expected: nil),
-            Row(name: "title unselected, no icon color at all: no tint (b)", tint: "title", expected: nil),
+            Row(name: "title selected, only the normal color: the built-in tint color (v2, no fallback to normal)", tint: "title", selected: true, normal: normal, builtIn: true),
+            Row(name: "title selected, no icon color at all: the built-in tint color", tint: "title", selected: true, builtIn: true),
+            Row(name: "title unselected, no icon color at all: the built-in label color", tint: "title", builtIn: true),
             Row(name: "title in dark mode follows the colors", tint: "title", dark: true, normal: normal, expected: normal),
             Row(name: "fixed unselected", tint: "#00FF00", normal: normal, expected: fixed),
             Row(name: "fixed unselected, no icon colors", tint: "#00FF00", expected: fixed),
@@ -433,7 +440,7 @@ final class CYLAnimatedItemTintTableTests: XCTestCase {
                 XCTFail("\(row.name): nothing reached the view")
                 continue
             }
-            assertColor(got, row.expected, "\(row.name) (set before load)")
+            assertColor(got, row.builtIn ? builtInColor(early) : row.expected, "\(row.name) (set before load)")
 
             let after = CYLRecordingViewFactory()
             let late = makeItem(after, dark: row.dark)
@@ -446,7 +453,7 @@ final class CYLAnimatedItemTintTableTests: XCTestCase {
                 XCTFail("\(row.name): nothing reached the view (set after load)")
                 continue
             }
-            assertColor(gotLate, row.expected, "\(row.name) (set after load)")
+            assertColor(gotLate, row.builtIn ? builtInColor(late) : row.expected, "\(row.name) (set after load)")
         }
     }
 
@@ -467,28 +474,27 @@ final class CYLAnimatedItemTintTableTests: XCTestCase {
         XCTAssertNil(last(factory) ?? nil, "an invalid text is unset")
     }
 
-    /// (b) "title" with no icon color at all removes a previous tint.
-    func testTitleWithoutAnyIconColorRemovesAPreviousTint() {
+    /// v2: "title" with no explicit icon color takes the built-in color (it never goes without one).
+    func testTitleWithoutAnyExplicitIconColorTakesTheBuiltInColor() {
         let factory = CYLRecordingViewFactory()
         let item = makeItem(factory)
         item.animationURL = file
         item.animationTint = "title"
         item.itemAppearance = appearance(normal: normal, selected: nil)
-        assertColor(last(factory) ?? nil, normal, "tinted")
+        assertColor(last(factory) ?? nil, normal, "explicit")
         item.itemAppearance = appearance(normal: nil, selected: nil)
-        guard let removed = last(factory) else { return XCTFail("nothing reached the view") }
-        XCTAssertNil(removed, "no icon color: the file's own colors")
+        assertColor(last(factory) ?? nil, builtInColor(item), "no explicit color: the built-in label color")
     }
 
-    /// (a) A selected item falls back to the normal icon color when its own state has none; selecting and deselecting follows.
-    func testSelectionFollowsTheTableWithTheNormalColorAsFallback() {
+    /// v2: selected without an explicit selected color is the inherited tint (not the normal color); explicit colors win; deselecting follows.
+    func testSelectionFollowsTheTableWithTheBuiltInTintAsFallback() {
         let factory = CYLRecordingViewFactory()
         let item = makeItem(factory)
         item.itemAppearance = appearance(normal: normal, selected: nil)
         item.animationURL = file
         item.animationTint = "title"
         item.isSelected = true
-        assertColor(last(factory) ?? nil, normal, "selected, normal fallback")
+        assertColor(last(factory) ?? nil, builtInColor(item), "selected, no explicit selected color: the built-in tint")
         item.itemAppearance = appearance(normal: normal, selected: selectedColor)
         assertColor(last(factory) ?? nil, selectedColor, "selected color")
         item.isSelected = false

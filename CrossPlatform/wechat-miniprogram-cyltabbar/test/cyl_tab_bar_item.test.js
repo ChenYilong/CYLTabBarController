@@ -104,8 +104,8 @@ test('animation tint: the item hands the options and its title colors over, cyl-
   assert.equal(resolved({ animationTint: 'title', selected: true }), '#007AFF');
   assert.equal(resolved({ animationTint: 'title', selected: true, standardAppearance }), '#FF3B30');
   assert.equal(resolved({ animationTint: 'Title', selected: true, standardAppearance }), '', '"title" is case-sensitive, as on every platform');
-  assert.equal(resolved({ animationTint: 'title', selected: true, titleTextAttributes: { normal: { color: '#8E8E93' } } }), '#8E8E93', 'no selected title color: the normal one');
-  assert.equal(resolved({ animationTint: 'title', titleTextAttributes: undefined }), '', 'no title color at all: no tint');
+  assert.equal(resolved({ animationTint: 'title', selected: true, titleTextAttributes: { normal: { color: '#8E8E93' } } }), 'rgb(0,136,255)', 'no selected title color: the built-in selected color');
+  assert.equal(resolved({ animationTint: 'title', titleTextAttributes: undefined }), 'rgb(0,0,0)', 'no title color at all: the built-in label color');
   // a fixed tint on the unselected tab; the selected tab takes the title's selected color
   assert.equal(resolved({ animationTint: '#34C759' }), '#34C759');
   assert.equal(resolved({ animationTint: '#34C759', selected: true }), '#007AFF');

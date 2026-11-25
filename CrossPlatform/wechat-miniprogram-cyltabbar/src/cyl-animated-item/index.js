@@ -16,9 +16,12 @@
  *      `accessibility-label`（否则为标题），带选中与禁用状态。
  */
 const {
-  cylAnimatedItemBackground, cylAnimatedItemMissingReason, cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemResource, cylAnimatedItemRestingProgress,
+  cylAnimatedItemBackground, cylAnimatedItemMissingReason, cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemRenderingMode, cylAnimatedItemResource, cylAnimatedItemRestingProgress,
 } = require('./cyl_animated_item_model')
 const { cylGIFImageInfo } = require('./cyl_gif_image')
+const { cylGIFColorKind } = require('./cyl_one_color_detector')
+// [EN] The one-color detection of a GIF animation, cached per URL. [CN] GIF 动画的单色检测结果，按 URL 缓存。
+const cylGIFColorKindCache = {}
 const { CYLAnimatedItemPlayer } = require('./cyl_animated_item_player')
 const { CYLAnimatedItemCountdown, CYL_COUNTDOWN_TICK_INTERVAL } = require('./cyl_animated_item_countdown')
 const { LifecycleController } = require('../cyl-dealloc-block-executor/index')
@@ -210,6 +213,23 @@ Component({
     cylDividerVertical: { type: Boolean, value: true },
     animationSelectedIconTint: { type: String, value: '' },
     /**
+     * [EN] The rendering mode of the animation when `animationTint` is NOT set (also the URL option `renderingMode=`): 'automatic' (default, also '')
+     *      tints with the effective icon color only a file detected as ONE color (here only a GIF; Rive, Lottie, PAG and SVGA are undetectable, and
+     *      Lottie, PAG and SVGA cannot be recolored in a mini program at all); 'alwaysTemplate' tints (Rive and GIF) with the effective icon
+     *      color; 'alwaysOriginal' never tints. An explicit `animationTint` always wins.
+     * [CN] 未设置 `animationTint` 时动画的渲染模式（也可用 URL 选项 `renderingMode=`）：'automatic'（默认，也可为 ''）仅当文件被检测为「单色」时用有效图标
+     *      颜色着色（这里只有 GIF；Rive、Lottie、PAG、SVGA 无法检测，而 Lottie、PAG、SVGA 在小程序里根本无法改色）；'alwaysTemplate' 用有效图标颜色给
+     *      Rive 与 GIF 着色；'alwaysOriginal' 从不着色。显式的 `animationTint` 始终优先。
+     */
+    animationRenderingMode: { type: String, value: '' },
+    /**
+     * [EN] The built-in SELECTED color (icon, title, rendering-mode tint) when no explicit selected color exists: the host's default selected color (the
+     *      stack passes its own, the tab bar its default); '' (default) is systemBlue 0,136,255 (dark 0,145,255). The normal built-in is label.
+     * [CN] 没有显式选中颜色时的内置「选中」颜色（图标、标题、渲染模式着色）：宿主的默认选中色（堆叠传入自己的，TabBar 传入其默认值）；'' （默认）为
+     *      systemBlue 0,136,255（深色 0,145,255）。普通状态的内置色为 label。
+     */
+    builtInSelectedColor: { type: String, value: '' },
+    /**
      * [EN] The title's color (any CSS color); '' keeps the inherited color.
      * [CN] 标题颜色（任意 CSS 颜色）；'' 时沿用继承的颜色。
      */
@@ -290,6 +310,7 @@ Component({
     gifImageReady: false,
     gifImagePlaying: false,
     animationEnded: false,
+    animationColorKind: '',
     hostRestingProgress: 0,
     lottieData: null,
     m: {},
@@ -327,7 +348,7 @@ Component({
       // [EN] A file of no known type has no engine to report anything: it cannot be decoded. [CN] 不属于任何已知类型的文件没有引擎可以报告：无法解码。
       if (animationUrl && this.data.m && !this.data.m.animationType) this.cyl_reportResourceMissing('decode failed')
     },
-    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, selectedIconTint, animationTint, animationDarkTint, animationIconTint, animationSelectedIconTint, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing, cylInternalDivider, cylDividerColor, cylDividerLength, cylDividerVertical': function () {
+    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, selectedIconTint, animationTint, animationDarkTint, animationIconTint, animationSelectedIconTint, animationRenderingMode, builtInSelectedColor, animationColorKind, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing, cylInternalDivider, cylDividerColor, cylDividerLength, cylDividerVertical': function () {
       this.cyl_update()
     },
     'itemStyle, countdownIdleTitle, countdownRunningTitleFormat, countdownFinishedTitle, countdownImage, countdownRunningTitleColor, countdownDuration': function (itemStyle) {
@@ -489,8 +510,44 @@ Component({
     cyl_update() {
       const m = cylAnimatedItemModel({ ...this.data })
       this.setData({ m })
+      this.cyl_detectColorKind(m)
       if ((m.gifImage || '') !== (this.cylGIFImageSource || '')) this.cyl_loadGIFImage(m.gifImage || '')
       else if (m.gifImage && this.cylGIFImageInfo && (m.iconTint || '') !== (this.cylGIFImageTint || '')) this.cyl_drawGIFImageStill()
+    },
+
+    /**
+     * [EN] One-color detection of a GIF ANIMATION (the only type this mini program tints without an explicit color; cached per URL): needed only
+     *      with no explicit tint and a rendering mode that is not alwaysOriginal. Sets `animationColorKind` ('one' | 'multi' | 'unknown').
+     * [CN] GIF「动画」的单色检测（本小程序在没有显式颜色时唯一会着色的类型；按 URL 缓存）：仅在没有显式着色且渲染模式不是 alwaysOriginal 时需要。设置 `animationColorKind`。
+     */
+    cyl_detectColorKind(m) {
+      const url = m.animationType === 'gif' ? m.animationPath : ''
+      const wanted = url && cylAnimatedItemRenderingMode(this.data.animationRenderingMode, url) === 'automatic' && !String(this.data.animationTint || '').trim()
+      const kind = wanted ? cylGIFColorKindCache[url] : ''
+      if (kind !== undefined) {
+        if ((this.data.animationColorKind || '') !== (kind || '')) this.setData({ animationColorKind: kind || '' }, () => this.cyl_update())
+        return
+      }
+      if (this.cylColorKindURL === url || typeof wx === 'undefined') return
+      this.cylColorKindURL = url
+      this.cyl_readBytes(url, (buffer) => {
+        const info = buffer ? cylGIFImageInfo(new Uint8Array(buffer)) : null
+        cylGIFColorKindCache[url] = info ? cylGIFColorKind(info.frame, false) : 'unknown'
+        this.cyl_detectColorKind(this.data.m || m)
+      })
+    },
+
+    /** [EN] Reads a package or local file, or an http(s) URL, as an ArrayBuffer (null on failure). [CN] 以 ArrayBuffer 读取代码包或本地文件或 http(s) 地址（失败为 null）。 */
+    cyl_readBytes(path, done) {
+      if (/^https?:\/\//.test(path)) {
+        wx.request({ url: path, responseType: 'arraybuffer', success: (result) => done(result.statusCode >= 200 && result.statusCode < 300 ? result.data : null), fail: () => done(null) })
+        return
+      }
+      const fs = wx.getFileSystemManager()
+      fs.readFile({ filePath: path, success: (result) => done(result.data), fail: () => {
+        if (path.startsWith('/')) fs.readFile({ filePath: path.slice(1), success: (result) => done(result.data), fail: () => done(null) })
+        else done(null)
+      } })
     },
 
     /**

@@ -73,7 +73,7 @@ export struct CYLAnimatedItemStackView {
   @Prop itemBorderColor: ResourceColor = '';
   /** [EN] The share of the color's alpha that tints a Liquid Glass: -1 (the default) is 0.75, 1 the color as it is. [CN] 颜色透明度中用于给液态玻璃着色的比例：-1（默认）为 0.75，1 为原色。 */
   @Prop itemGlassTintAlpha: number = -1;
-  @Prop titleColor: ResourceColor = '#333333';
+  @Prop titleColor: ResourceColor = '';
   /** [EN] The title font size of every item. [CN] 所有条目的标题字号。 */
   @Prop titleFontSize: number = 16;
   @BuilderParam animationBuilder: (context: CYLAnimatedItemAnimationContext) => void = this.cylNoAnimation;
@@ -132,11 +132,23 @@ export struct CYLAnimatedItemStackView {
       axis: CYLAnimatedItemAxis.Vertical,
       iconSize: item.iconSize,
       titleLines: item.titleLines,
-      titleColor: this.titleColor,
+      titleColor: item.titleColor,
+      selectedTitleColor: item.selectedTitleColor,
+      stackTitleColor: this.titleColor !== '' ? this.titleColor : this.model.titleColor,
+      stackSelectedTitleColor: this.model.selectedTitleColor,
       titleFontSize: this.titleFontSize,
       itemId: item.id,
       isItemEnabled: item.enabled,
-      iconColor: this.model.iconColorOf(item),
+      // [EN] The item's OWN explicit colors and the stack's explicit ones go separately: the item resolves item > stack > built-in with its own
+      //      state and color mode. [CN] 条目自己的显式颜色与堆叠的显式颜色分开传入：条目按自己的状态与颜色模式解析 条目 > 堆叠 > 内置。
+      iconColor: item.iconColor,
+      selectedIconColor: item.selectedIconColor,
+      disabledIconColor: item.disabledIconColor,
+      stackIconColor: this.model.iconColor,
+      stackSelectedIconColor: this.model.selectedIconColor,
+      stackDisabledIconColor: this.model.disabledIconColor,
+      animationRenderingMode: item.animationRenderingMode,
+      stackAnimationRenderingMode: this.model.animationRenderingMode,
       animationTint: item.animationTint,
       animationDarkTint: item.animationDarkTint,
       stackAnimationTint: this.model.animationTint,
@@ -158,7 +170,7 @@ export struct CYLAnimatedItemStackView {
               cylInternalDividerColor: this.model.dividerColor,
               cylInternalDividerLength: this.model.dividerLength,
               cylInternalDividerVertical: this.model.isHorizontal,
-              iconColor: this.model.iconColor,
+              stackIconColor: this.model.iconColor,
               stackAnimationTint: this.model.animationTint,
               stackAnimationDarkTint: this.model.animationDarkTint,
               isBare: true,

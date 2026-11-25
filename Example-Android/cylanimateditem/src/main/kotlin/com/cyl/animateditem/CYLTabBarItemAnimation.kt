@@ -646,6 +646,22 @@ object CYLTabBarItemAnimationFiles {
     } catch (error: java.io.IOException) { null } catch (error: SecurityException) { null }
 
     /**
+     * [EN] The cache file `localFile` copies a non-local `url` (asset, stream, remote) to. [CN] `localFile` 复制非本地 `url`（asset、流、远程）所到的缓存文件。
+     */
+    private fun cacheFile(context: Context, url: String): File =
+        File(context.applicationContext.cacheDir, "cyl-animation-" + Integer.toHexString(url.hashCode()) + "." + CYLTabBarAnimationFileExtension(url).ifEmpty { "bin" })
+
+    /**
+     * [EN] The bytes of `url` when they are available without waiting: a local file or asset, or a remote file already in the download
+     *      cache; null otherwise (a download not finished). Reads on the calling thread; never the network.
+     * [CN] 无需等待即可得到的 `url` 字节：本地文件或 asset，或已在下载缓存中的远程文件；否则为 null（下载未完成）。在调用线程读取；从不访问网络。
+     */
+    fun readBytes(context: Context, url: String): ByteArray? {
+        if (isRemote(url)) return cacheFile(context, url).takeIf { it.isFile && it.length() > 0 }?.readBytes()
+        return openLocal(context.applicationContext, url)?.use { it.readBytes() }?.takeIf { it.isNotEmpty() }
+    }
+
+    /**
      * [EN] A local file of `url` (copied to the cache when it is an asset, a stream or remote), delivered on the main thread. [CN] `url` 的本地文件（asset、流或远程文件会复制到缓存），在主线程回调。
      */
     fun localFile(context: Context, url: String, completion: (File?) -> Unit) {
@@ -654,8 +670,7 @@ object CYLTabBarItemAnimationFiles {
         if (url.startsWith("file:") && !url.startsWith(ANDROID_ASSET_PREFIX)) return completion(Uri.parse(url).path?.let { File(it) }?.takeIf { it.exists() })
         val appContext = context.applicationContext
         executor.execute {
-            val name = "cyl-animation-" + Integer.toHexString(url.hashCode()) + "." + CYLTabBarAnimationFileExtension(url).ifEmpty { "bin" }
-            val target = File(appContext.cacheDir, name)
+            val target = cacheFile(appContext, url)
             val file = try {
                 if (!target.exists() || target.length() == 0L) {
                     val input = if (isRemote(url)) java.net.URI(url).toURL().openStream() else openLocal(appContext, url)

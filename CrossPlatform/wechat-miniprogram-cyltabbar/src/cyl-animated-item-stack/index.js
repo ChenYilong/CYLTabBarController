@@ -41,6 +41,16 @@ Component({
     /** [EN] The dark-mode color of a fixed `animationTint`, for items without their own. [CN] 固定 `animationTint` 的深色模式颜色，供没有自己值的条目使用。 */
     animationDarkTint: { type: String, value: '' },
     /**
+     * [EN] The animation rendering mode of items without their own: 'automatic' (default, also ''), 'alwaysTemplate', 'alwaysOriginal' (see cyl-animated-item
+     *      `animationRenderingMode`; applies only while `animationTint` is unset).
+     * [CN] 没有自己渲染模式的条目的动画渲染模式：'automatic'（默认，也可为 ''）、'alwaysTemplate'、'alwaysOriginal'（见 cyl-animated-item 的 `animationRenderingMode`；仅在未设置 `animationTint` 时生效）。
+     */
+    animationRenderingMode: { type: String, value: '' },
+    /** [EN] The title color of items without their own; '' = the built-in (label, the selected color while selected). [CN] 没有自己标题颜色的条目的标题颜色；'' 为内置（label，选中时为选中色）。 */
+    titleColor: { type: String, value: '' },
+    /** [EN] The built-in selected color the stack hands its items (the host's default selected color, e.g. the mini tab bar's); '' = systemBlue 0,136,255 | 0,145,255. [CN] 堆叠传给条目的内置选中颜色（宿主的默认选中色，例如小程序 TabBar 的）；'' 为 systemBlue。 */
+    defaultSelectedColor: { type: String, value: '' },
+    /**
      * [EN] true: a built-in divider between every two visible items (an item's `dividerAfter` true / false overrides its own gap). Never before the first or after the
      *      last visible item; hidden items leave none. The dividers are the stack's, not items: a user never writes one.
      * [CN] true：每两个可见条目之间有一条内置分割线（条目的 `dividerAfter` 为 true / false 时覆盖其所在的间隙）。绝不出现在第一个可见条目之前或最后一个可见条目之后；
@@ -50,7 +60,7 @@ Component({
     /** [EN] The space before / after a divider without its own value (px); -1 (default) = not set: before falls back to `spacing`, after to the next item's spacingBefore, then `spacing`. A gap with a divider is before + 1 + after. [CN] 没有自己值的分割线之前 / 之后的间距（px）；-1（默认）表示未设置：before 回退到 `spacing`，after 回退到下一个条目的 spacingBefore，再到 `spacing`。有分割线的间隙为 before + 1 + after。 */
     dividerSpacingBefore: { type: Number, value: -1 },
     dividerSpacingAfter: { type: Number, value: -1 },
-    /** [EN] The divider color; '' (default) derives it: `iconColor` at alpha 0.3, else the separator color (light / dark by `userInterfaceStyle`). [CN] 分割线颜色；'' （默认）时推导：`iconColor` 的 0.3 透明度，否则为分隔线颜色（按 `userInterfaceStyle` 区分浅色 / 深色）。 */
+    /** [EN] The divider color; '' (default) derives it: the explicit `iconColor` at alpha 0.6, else secondaryLabel (60,60,67 at 0.6 | 235,235,245 at 0.6; light / dark by `userInterfaceStyle`). [CN] 分割线颜色；'' （默认）时推导：显式 `iconColor` 的 0.6 透明度，否则为 secondaryLabel（按 `userInterfaceStyle` 区分浅色 / 深色）。 */
     dividerColor: { type: String, value: '' },
     /** [EN] The divider's length in px (20); it is 1 px thick. [CN] 分割线长度，单位 px（20）；粗 1 px。 */
     dividerLength: { type: Number, value: 20 },
@@ -63,7 +73,7 @@ Component({
   },
   data: { m: cylStackModel({}) },
   observers: {
-    'items, contentMargin, itemContentHorizontalInset, backgroundAction, axis, spacing, iconColor, selectedIconColor, animationTint, animationDarkTint, dividerColor, dividerLength, dividerSpacingBefore, dividerSpacingAfter, showsDividers, hugsContent, userInterfaceStyle'() {
+    'items, contentMargin, itemContentHorizontalInset, backgroundAction, axis, spacing, iconColor, selectedIconColor, animationTint, animationDarkTint, animationRenderingMode, titleColor, defaultSelectedColor, dividerColor, dividerLength, dividerSpacingBefore, dividerSpacingAfter, showsDividers, hugsContent, userInterfaceStyle'() {
       this.setData({ m: cylStackModel({ ...this.data }) })
     },
   },

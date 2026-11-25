@@ -85,7 +85,7 @@ function cylStackModel(p) {
       animationUrl: String(item.animationUrl || ''),
       iconSize: cylStackLength(item.iconSize, 24),
       titleLines: item.titleLines === undefined ? 0 : cylStackLength(item.titleLines, 0),
-      titleColor: String(item.titleColor || ''),
+      titleColor: cylAnimatedItemInherited(item.titleColor, p.titleColor),
       titleFontSize: cylStackLength(item.titleFontSize, 0),
       titleFontWeight: item.titleFontWeight === undefined ? '' : item.titleFontWeight,
       iconTint: iconColor,
@@ -93,6 +93,9 @@ function cylStackModel(p) {
       loop: Boolean(item.loop),
       visible,
       animationTint: cylAnimatedItemInherited(item.animationTint, p.animationTint),
+      // [EN] Inherited rendering mode and the built-in selected color the stack hands every item (tint spec v2). [CN] 堆叠传给每个条目的继承渲染模式与内置选中颜色。
+      animationRenderingMode: cylAnimatedItemInherited(item.animationRenderingMode, p.animationRenderingMode),
+      builtInSelectedColor: String(p.defaultSelectedColor || '').trim(),
       animationDarkTint: cylAnimatedItemInherited(item.animationDarkTint, p.animationDarkTint),
       animationIconTint: normalColor,
       animationSelectedIconTint: String(item.selectedIconColor || '') || stackSelectedIconColor,
@@ -127,6 +130,7 @@ function cylStackModel(p) {
     iconTint: stackIconColor,
     animationTint: cylAnimatedItemInherited('', p.animationTint),
     animationDarkTint: cylAnimatedItemInherited('', p.animationDarkTint),
+    builtInSelectedColor: String(p.defaultSelectedColor || '').trim(),
     userInterfaceStyle: String(p.userInterfaceStyle || 'system'),
   }
   const before = horizontal ? 'margin-left' : 'margin-top'

@@ -10,7 +10,7 @@ import com.cyl.animateditem.CYLSize
 /**
  * An animation played by CYLTabBarController's engine through a `CYLAnimatedItemView` (the cross-platform engine API:
  * `docs/Animated-Item.md`, "Engine API across platforms"). Props `source`, `playing`, `selected`, `animationSpeed`,
- * `animationLoops`, `animationRestartToken`, `drivesAnimationPlayback` (default true), `showsImageWhenAnimationEnds`, `image`, `iconSize`, `tintColor`, `itemBackgroundStyle`,
+ * `animationLoops`, `animationRestartToken`, `drivesAnimationPlayback` (default true), `showsImageWhenAnimationEnds`, `image`, `iconSize`, `tintColor`, `animationTint`, `animationDarkTint`, `animationRenderingMode`, `itemBackgroundStyle`,
  * `itemBackgroundColor`, `itemCornerRadius`, `itemBorderWidth`, `itemBorderColor`; commands
  * `play`, `stopAtProgress`, `restart`; events `onAnimationLoaded`, `onAnimationFailed`, `onAnimationEnd`, `onResourceMissing`. No engine logic here.
  * 由 CYLTabBarController 引擎通过 `CYLAnimatedItemView` 播放的动画（跨端引擎 API，见 `docs/Animated-Item.md`）。
@@ -84,8 +84,17 @@ class CyltabbarAnimationView(context: Context) : FrameLayout(context) {
   /** `iconSize` in dp; 0 or less fills the view. */
   fun applyIconSize(value: Float) { iconSize = value.takeIf { it > 0f }; fitIcon() }
 
-  /** `tintColor` as an ARGB int; null clears it. */
+  /** `tintColor` as an ARGB int; null (unset) resets the item to its built-in default color, nothing is forced. */
   fun applyTintColor(value: Int?) { item.iconColor = value }
+
+  /** `animationTint` ("title", "#RRGGBB", "#RRGGBBAA"); null or empty is not set (null). */
+  fun applyAnimationTint(value: String?) { item.animationTint = value?.takeIf { it.isNotEmpty() } }
+
+  /** `animationDarkTint`; null or empty is not set (null). */
+  fun applyAnimationDarkTint(value: String?) { item.animationDarkTint = value?.takeIf { it.isNotEmpty() } }
+
+  /** `animationRenderingMode` raw value: "automatic", "alwaysTemplate" or "alwaysOriginal"; null is "automatic". */
+  fun applyAnimationRenderingMode(value: String?) { item.animationRenderingMode = value?.takeIf { it.isNotEmpty() } ?: "automatic" }
 
   /** `itemBackgroundStyle`: "liquidGlass" or anything else (null, "flat") for flat. */
   fun applyItemBackgroundStyle(value: String?) {

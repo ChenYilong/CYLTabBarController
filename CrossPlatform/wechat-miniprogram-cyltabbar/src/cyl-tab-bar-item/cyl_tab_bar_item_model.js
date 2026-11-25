@@ -189,6 +189,7 @@ function cylItemModel(p) {
     //      resolver (cylAnimatedItemAnimationTint). [CN] Tab 配置的着色选项与标题颜色原样交给 cyl-animated-item：只有该组件做解析。
     animationTint: String(p.animationTint === undefined || p.animationTint === null ? '' : p.animationTint).trim(),
     animationDarkTint: String(p.animationDarkTint === undefined || p.animationDarkTint === null ? '' : p.animationDarkTint).trim(),
+    animationRenderingMode: String(p.animationRenderingMode || ''),
     animationIconTint: cylStateTitleColor(p, false),
     animationSelectedIconTint: cylStateTitleColor(p, true),
     iconWidth: iconBox.width,

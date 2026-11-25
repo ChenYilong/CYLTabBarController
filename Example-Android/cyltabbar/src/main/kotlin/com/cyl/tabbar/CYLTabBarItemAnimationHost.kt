@@ -83,7 +83,7 @@ private fun View.cyl_insertAnimationView(state: CYLTabAnimationState) {
     host.addView(view, FrameLayout.LayoutParams(width, height, Gravity.CENTER))
     state.view = view
     state.loadedURL = url
-    (this as? CYLTabBarItemButton)?.cyl_setTabBarItemAnimationView(view)
+    (this as? CYLTabBarItemButton)?.cyl_setTabBarItemAnimationView(view, state.url)
     val player = CYLTabBarItemAnimationFactory.playerForView(view)
     if (state.speed > 0 && state.speed.isFinite()) player?.animationSpeed = state.speed
     if (state.loops) player?.loops = true

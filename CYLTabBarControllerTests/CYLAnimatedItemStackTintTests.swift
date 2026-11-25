@@ -306,10 +306,10 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
             Case(name: "fixed color", color: .red, icon: iconColor, dark: false),
             Case(name: "dynamic, light", color: dynamic, dark: false),
             Case(name: "dynamic, dark", color: dynamic, dark: true),
-            Case(name: "icon color at 0.3, light", icon: iconColor, dark: false),
-            Case(name: "icon color at 0.3, dark", icon: iconColor, dark: true),
-            Case(name: "separator, light", dark: false),
-            Case(name: "separator, dark", dark: true),
+            Case(name: "icon color at 0.6, light", icon: iconColor, dark: false),
+            Case(name: "icon color at 0.6, dark", icon: iconColor, dark: true),
+            Case(name: "secondaryLabel, light", dark: false),
+            Case(name: "secondaryLabel, dark", dark: true),
         ]
         for c in cases {
             let (stack, _) = row(["A", "B"], dark: c.dark)
@@ -323,7 +323,7 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
             } else if let icon = c.icon {
                 expected = icon.withAlphaComponent(CYLAnimatedItemDividerAlpha)
             } else {
-                expected = UIColor.separator.resolvedColor(with: style)
+                expected = UIColor.secondaryLabel.resolvedColor(with: style)
             }
             assertColor(line(of: stack.dividerViews[0])?.backgroundColor, expected, c.name)
         }
@@ -343,9 +343,9 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
         assertColor(line(of: stack.dividerViews[0])?.backgroundColor, .green, "light again")
         stack.dividerColor = nil
         stack.itemAppearance = appearance(normal: iconColor)
-        assertColor(line(of: stack.dividerViews[0])?.backgroundColor, iconColor.withAlphaComponent(0.3), "icon color change re-resolves")
+        assertColor(line(of: stack.dividerViews[0])?.backgroundColor, iconColor.withAlphaComponent(CYLAnimatedItemDividerAlpha), "icon color change re-resolves")
         stack.itemAppearance = nil
-        assertColor(line(of: stack.dividerViews[0])?.backgroundColor, UIColor.separator.resolvedColor(with: stack.traitCollection), "separator again")
+        assertColor(line(of: stack.dividerViews[0])?.backgroundColor, UIColor.secondaryLabel.resolvedColor(with: stack.traitCollection), "secondaryLabel again")
     }
 
     // MARK: - Stack: tint inheritance 堆叠视图着色继承
@@ -422,7 +422,8 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
 
     // MARK: - Host subclasses 宿主子类
 
-    func testASubclassIconColorKeepsWinningOverTheStackAppearance() {
+    /// v2 precedence: an explicit stack value wins over the subclass built-in (the subclass wins over the component built-ins only).
+    func testAnExplicitStackAppearanceWinsOverASubclassIconColor() {
         let stack = CYLAnimatedItemStackView(frame: CGRect(x: 0, y: 0, width: 300, height: 100))
         window().addSubview(stack)
         let factory = StackRecordingFactory()
@@ -432,17 +433,22 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
         item.animationURL = file
         item.animationTint = "title"
         item.applyIconTintColor(.orange)
+        assertColor(item.imageView.tintColor, .orange, "subclass color beats the built-in label color")
         stack.itemAppearance = appearance(normal: .red, selected: .blue)
         stack.dispatchesItemTaps = false
         stack.append(item, action: nil, spacingBefore: 0)
         XCTAssertTrue(item is OrangeTagItem && stack.itemViews.first === item, "a subclass is accepted")
         XCTAssertTrue(item.isItemAppearanceInherited)
-        assertColor(item.imageView.tintColor, .orange, "appended")
-        assertColor(lastTint(factory) ?? nil, .orange, "the animation tint takes the subclass color too")
+        assertColor(item.imageView.tintColor, .red, "appended: the stack's explicit normal color wins")
+        assertColor(lastTint(factory) ?? nil, .red, "the animation tint takes the effective color")
         stack.itemAppearance = appearance(normal: .green, selected: .green)
-        assertColor(item.imageView.tintColor, .orange, "stack appearance changed")
+        assertColor(item.imageView.tintColor, .green, "stack appearance changed")
         item.isSelected = true
-        assertColor(item.imageView.tintColor, .orange, "selected")
+        assertColor(item.imageView.tintColor, .green, "selected: the stack's selected color")
+        stack.itemAppearance = appearance(normal: .green, selected: nil)
+        assertColor(item.imageView.tintColor, .orange, "stack has no selected color: the subclass color is next")
+        stack.itemAppearance = nil
+        assertColor(item.imageView.tintColor, .orange, "no explicit value at all: the subclass color")
         XCTAssertEqual(stack.itemViews.count, 1)
     }
 

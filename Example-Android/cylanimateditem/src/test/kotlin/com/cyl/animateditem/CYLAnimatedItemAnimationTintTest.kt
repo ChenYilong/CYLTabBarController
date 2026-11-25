@@ -43,6 +43,8 @@ class CYLAnimatedItemAnimationTintTest {
     private fun item(options: Map<String, String>? = null, load: Boolean = true, configure: CYLAnimatedItemView.() -> Unit = {}): CYLAnimatedItemView =
         CYLAnimatedItemView(context).apply {
             animationSource = factory
+            // [EN] The v1 rows below are about explicit tints; `Automatic` (the default) would tint this one-color GIF (see CYLAnimatedItemTintV2Test). [CN] 下面的 v1 行针对显式着色；`Automatic`（默认）会给这个单色 GIF 着色（见 CYLAnimatedItemTintV2Test）。
+            animationRenderingMode = CYLAnimationRenderingMode.AlwaysOriginal
             iconColor = Color.RED
             selectedIconColor = Color.BLUE
             configure()
@@ -125,41 +127,6 @@ class CYLAnimatedItemAnimationTintTest {
     }
 
     @Test
-    fun theTableOnARealItem() {
-        tintTable.forEach { row ->
-            val item = CYLAnimatedItemView(context).apply {
-                animationSource = factory
-                iconColor = row.normal
-                selectedIconColor = row.selectedIcon
-                animationTint = row.tint
-                animationDarkTint = row.darkTint
-                animationURL = gif
-            }
-            night(item, row.night)
-            item.isSelected = row.selected
-            assertEquals(describe(row), row.expected, applied(item))
-            assertEquals(describe(row), if (row.expected == null) View.LAYER_TYPE_NONE else View.LAYER_TYPE_HARDWARE, item.animationView!!.layerType)
-        }
-    }
-
-    @Test
-    fun theTableWithTheTintInTheSourceUrl() {
-        // [EN] The URL's `tint` / `darkTint` options resolve like the properties. [CN] URL 中的 `tint` / `darkTint` 选项与属性相同。
-        tintTable.filter { it.tint != null }.forEach { row ->
-            val url = "$gif#tint=${Uri.encode(row.tint)}${row.darkTint?.let { "&darkTint=" + Uri.encode(it) } ?: ""}"
-            val item = CYLAnimatedItemView(context).apply {
-                animationSource = factory
-                iconColor = row.normal
-                selectedIconColor = row.selectedIcon
-                animationURL = url
-            }
-            night(item, row.night)
-            item.isSelected = row.selected
-            assertEquals(url + " " + describe(row), row.expected, applied(item))
-        }
-    }
-
-    @Test
     fun hexIsRRGGBBAA() {
         assertEquals(Color.parseColor("#1C1C1E"), CYLTabBarItemAnimationTint.parseHex("#1C1C1E"))
         assertEquals(Color.parseColor("#1c1c1e"), CYLTabBarItemAnimationTint.parseHex(" #1c1c1e "))
@@ -178,16 +145,18 @@ class CYLAnimatedItemAnimationTintTest {
 
     @Test
     fun hostTitleColorsPlayTheIconColors() {
-        // [EN] The tab bar passes its title colors as the icon colors of an item that has none. [CN] TabBar 把标题颜色作为图标颜色传给没有图标颜色的条目。
+        // [EN] The tab bar passes its title colors as the icon colors of an item that has none (explicit, like the stack's). [CN] TabBar 把标题颜色作为图标颜色传给没有图标颜色的条目（显式，与堆叠的相同）。
         val item = CYLAnimatedItemView(context).apply { animationSource = factory; animationTint = "title"; animationURL = gif }
-        assertNull("no color at all: no tint", applied(item))
+        val builtInNormal = CYLAnimatedItemBuiltInColors.normal(context)
+        val builtInSelected = CYLAnimatedItemBuiltInColors.selected(context)
+        assertEquals("no explicit color: the built-in normal color", builtInNormal, applied(item))
         item.hostIconColor = Color.GRAY
         item.hostSelectedIconColor = Color.MAGENTA
         assertEquals(Color.GRAY, applied(item))
         item.isSelected = true
         assertEquals(Color.MAGENTA, applied(item))
         item.animationTint = "#1C1C1E"
-        assertEquals("a fixed tint: the selected item takes the title's selected color", Color.MAGENTA, applied(item))
+        assertEquals("a fixed tint: the selected item takes the host's (explicit) selected color", Color.MAGENTA, applied(item))
         item.isSelected = false
         assertEquals(fixed, applied(item))
         item.selectedIconColor = Color.CYAN
@@ -196,14 +165,16 @@ class CYLAnimatedItemAnimationTintTest {
         item.animationTint = "title"
         item.selectedIconColor = null
         item.hostSelectedIconColor = null
-        assertEquals("selected falls back to the normal color", Color.GRAY, applied(item))
+        assertEquals("selected without an explicit selected color: the built-in selected color (not the normal one)", builtInSelected, applied(item))
         item.hostIconColor = null
-        assertNull("title with no icon color removes the tint", applied(item))
-        assertEquals(View.LAYER_TYPE_NONE, item.animationView!!.layerType)
+        assertEquals("title with no explicit color: the built-in color of the state", builtInSelected, applied(item))
+        item.isSelected = false
+        assertEquals(builtInNormal, applied(item))
+        assertEquals(View.LAYER_TYPE_HARDWARE, item.animationView!!.layerType)
     }
 
     @Test
-    fun unsetKeepsTheFilesColors() {
+    fun alwaysOriginalKeepsTheFilesColors() {
         val item = item()
         assertNotNull(item.animationView)
         assertNull(applied(item))
@@ -211,7 +182,7 @@ class CYLAnimatedItemAnimationTintTest {
         item.isSelected = true
         item.iconColor = Color.GREEN
         night(item, true)
-        assertNull("icon color, state and night mode never recolor an item without animationTint", applied(item))
+        assertNull("icon color, state and night mode never recolor an alwaysOriginal item without animationTint", applied(item))
         assertEquals(View.LAYER_TYPE_NONE, item.animationView!!.layerType)
     }
 

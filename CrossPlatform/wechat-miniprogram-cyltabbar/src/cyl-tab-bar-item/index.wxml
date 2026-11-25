@@ -28,6 +28,7 @@
       icon-tint="{{m.normalStillTint}}"
       animation-tint="{{m.animationTint}}"
       animation-dark-tint="{{m.animationDarkTint}}"
+      animation-rendering-mode="{{m.animationRenderingMode}}"
       animation-icon-tint="{{m.animationIconTint}}"
       animation-selected-icon-tint="{{m.animationSelectedIconTint}}"
       user-interface-style="{{isDark ? 'dark' : 'light'}}"

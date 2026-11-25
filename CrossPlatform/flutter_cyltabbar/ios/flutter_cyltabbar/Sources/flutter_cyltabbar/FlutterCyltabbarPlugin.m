@@ -370,10 +370,12 @@ static UIColor *CYLFlutterColor(id value) {
     // [EN] The token at creation is not a restart. [CN] 创建时的 token 不算重播。
     _restartToken = [arguments[@"animationRestartToken"] isKindOfClass:[NSNumber class]] ? [arguments[@"animationRestartToken"] integerValue] : 0;
     _iconSide = [arguments[@"iconSize"] isKindOfClass:[NSNumber class]] ? [arguments[@"iconSize"] doubleValue] : 0;
+    // [EN] tintColor is optional: nil leaves the built-in default. [CN] tintColor 可选：nil 保持内置默认。
     UIColor *tint = CYLFlutterColor(arguments[@"tintColor"]);
     if (tint) {
         [_item applyIconTintColor:tint];
     }
+    [self applyAnimationTint:arguments[@"animationTint"] dark:arguments[@"animationDarkTint"] mode:arguments[@"animationRenderingMode"]];
     [self applyItemBackgroundStyle:arguments[@"itemBackgroundStyle"]];
     _item.itemBackgroundColor = CYLFlutterColor(arguments[@"itemBackgroundColor"]);
     [self applyItemCornerRadius:arguments[@"itemCornerRadius"]];
@@ -390,6 +392,33 @@ static UIColor *CYLFlutterColor(id value) {
     if ([arguments[@"playing"] boolValue]) {
         _playing = YES;
         [_item playAnimation];
+    }
+}
+
+/// [EN] Tint spec v2: `animationTint` / `animationDarkTint` (nil or empty resets to unset) and `animationRenderingMode`
+///      ("automatic" | "alwaysTemplate" | "alwaysOriginal"; anything else is automatic).
+/// [CN] 着色规范 v2：`animationTint` / `animationDarkTint`（nil 或空串重置为未设置）与 `animationRenderingMode`。
+- (void)applyAnimationTint:(id)tint dark:(id)dark mode:(id)mode {
+    [self applyAnimationTint:tint];
+    [self applyAnimationDarkTint:dark];
+    [self applyAnimationRenderingMode:mode];
+}
+
+- (void)applyAnimationTint:(id)tint {
+    _item.animationTint = [tint isKindOfClass:[NSString class]] && [(NSString *)tint length] > 0 ? tint : nil;
+}
+
+- (void)applyAnimationDarkTint:(id)dark {
+    _item.animationDarkTint = [dark isKindOfClass:[NSString class]] && [(NSString *)dark length] > 0 ? dark : nil;
+}
+
+- (void)applyAnimationRenderingMode:(id)mode {
+    if ([mode isEqual:@"alwaysTemplate"]) {
+        _item.animationRenderingMode = CYLAnimatedItemRenderingModeAlwaysTemplate;
+    } else if ([mode isEqual:@"alwaysOriginal"]) {
+        _item.animationRenderingMode = CYLAnimatedItemRenderingModeAlwaysOriginal;
+    } else {
+        _item.animationRenderingMode = CYLAnimatedItemRenderingModeAutomatic;
     }
 }
 
@@ -518,6 +547,12 @@ static UIColor *CYLFlutterColor(id value) {
         [self fitIcon];
     } else if ([method isEqualToString:@"setTintColor"]) {
         [_item applyIconTintColor:CYLFlutterColor(argument)];
+    } else if ([method isEqualToString:@"setAnimationTint"]) {
+        [self applyAnimationTint:argument];
+    } else if ([method isEqualToString:@"setAnimationDarkTint"]) {
+        [self applyAnimationDarkTint:argument];
+    } else if ([method isEqualToString:@"setAnimationRenderingMode"]) {
+        [self applyAnimationRenderingMode:argument];
     } else if ([method isEqualToString:@"setItemBackgroundStyle"]) {
         [self applyItemBackgroundStyle:argument];
     } else if ([method isEqualToString:@"setItemBackgroundColor"]) {

@@ -57,6 +57,14 @@ export type CYLAnimationViewHandle = {
   restart: () => void;
 };
 
+/**
+ * [EN] `automatic` (default): tint with the effective icon color only when the file is one-color; `alwaysTemplate`: always tint;
+ *      `alwaysOriginal`: never tint. Applies while `animationTint` is unset. Same values as the URL option `renderingMode=`.
+ * [CN] `automatic`（默认）：仅单色文件用有效图标颜色着色；`alwaysTemplate`：总是着色；`alwaysOriginal`：从不着色。`animationTint`
+ *      未设置时生效。取值与 URL 选项 `renderingMode=` 相同。
+ */
+export type CYLAnimationRenderingMode = 'automatic' | 'alwaysTemplate' | 'alwaysOriginal';
+
 export type CYLAnimationViewProps = ViewProps & {
   /**
    * A file name in the app (iOS main bundle, Android assets), a path or a URL: `.riv`, `.json` (Lottie), `.pag`, `.gif`, `.svga`.
@@ -83,8 +91,17 @@ export type CYLAnimationViewProps = ViewProps & {
   image?: string;
   /** The icon's side in points; unset fills the view. */
   iconSize?: number;
-  /** Tints the icon and an animation that takes a tint. */
+  /**
+   * The icon color, optional. Unset (undefined): the built-in default (label-like when normal, the inherited tint when selected);
+   * no color is forced on the native view, and going from set to undefined resets it.
+   */
   tintColor?: ColorValue;
+  /** "title" or a fixed "#RRGGBB" / "#RRGGBBAA" for the animation; unset (undefined or empty) is not set. */
+  animationTint?: string;
+  /** The Dark Mode color of a fixed `animationTint`; unset (undefined or empty) is not set. */
+  animationDarkTint?: string;
+  /** Applies while `animationTint` is unset; default `automatic`. */
+  animationRenderingMode?: CYLAnimationRenderingMode;
   /**
    * The background: `flat` (default) fills with `itemBackgroundColor`; `liquidGlass` draws Liquid Glass tinted with it, where the
    * platform draws Liquid Glass (iOS 26 and later, Android 12 and later with the glass available); elsewhere the view stays flat.
@@ -138,6 +155,9 @@ export function CYLAnimationView({
   onAnimationFailed,
   onAnimationEnd,
   onResourceMissing,
+  animationTint,
+  animationDarkTint,
+  animationRenderingMode,
   ref,
   ...rest
 }: CYLAnimationViewProps) {
@@ -157,6 +177,9 @@ export function CYLAnimationView({
       ref={native}
       source={animationURLWithOptions(file, options)}
       playing={playing ?? false}
+      animationTint={animationTint ? animationTint : undefined}
+      animationDarkTint={animationDarkTint ? animationDarkTint : undefined}
+      animationRenderingMode={animationRenderingMode ?? 'automatic'}
       onAnimationLoaded={onAnimationLoaded ? () => onAnimationLoaded() : undefined}
       onAnimationFailed={onAnimationFailed ? () => onAnimationFailed() : undefined}
       onAnimationEnd={onAnimationEnd ? () => onAnimationEnd() : undefined}

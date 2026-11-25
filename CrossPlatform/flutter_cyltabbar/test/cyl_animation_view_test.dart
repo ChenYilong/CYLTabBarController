@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_cyltabbar/flutter_cyltabbar.dart';
+import 'package:flutter/painting.dart' show Color;
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  tintTests();
   test('the file URL carries its options sorted by name, percent-encoded, empty values left out', () {
     expect(animationURLWithOptions('icons.riv'), 'icons.riv');
     expect(
@@ -78,5 +80,76 @@ void main() {
     expect(view.onResourceMissing, isNull);
     void callback(String resource, String reason) {}
     expect(CYLAnimationView(file: 'a.riv', onResourceMissing: callback).onResourceMissing, same(callback));
+  });
+}
+
+void tintTests() {
+  group('tint spec v2', () {
+    test('defaults: nothing forced, rendering mode automatic', () {
+      const view = CYLAnimationView(file: 'a.json');
+      expect(view.tintColor, isNull);
+      expect(view.animationTint, isNull);
+      expect(view.animationDarkTint, isNull);
+      expect(view.animationRenderingMode, CYLAnimationRenderingMode.automatic);
+      expect(CYLAnimationRenderingMode.values.map((m) => m.name), ['automatic', 'alwaysTemplate', 'alwaysOriginal']);
+    });
+
+    test('creation params carry the tint keys, null when unset', () {
+      final params = cylAnimationCreationParams(const CYLAnimationView(file: 'a.json'));
+      for (final key in ['tintColor', 'animationTint', 'animationDarkTint']) {
+        expect(params.containsKey(key), isTrue, reason: key);
+        expect(params[key], isNull, reason: key);
+      }
+      expect(params['animationRenderingMode'], 'automatic');
+      expect(params['source'], 'a.json');
+    });
+
+    test('creation params map the values', () {
+      final params = cylAnimationCreationParams(const CYLAnimationView(
+        file: 'a.json',
+        tintColor: Color(0xFF112233),
+        animationTint: 'title',
+        animationDarkTint: '#FFFFFF',
+        animationRenderingMode: CYLAnimationRenderingMode.alwaysTemplate,
+      ));
+      expect(params['tintColor'], 0xFF112233);
+      expect(params['animationTint'], 'title');
+      expect(params['animationDarkTint'], '#FFFFFF');
+      expect(params['animationRenderingMode'], 'alwaysTemplate');
+      expect(params['source'], 'a.json#renderingMode=alwaysTemplate');
+    });
+
+    test('renderingMode URL option: written when not automatic, an option in options wins', () {
+      String source(CYLAnimationView v) => cylAnimationCreationParams(v)['source'] as String;
+      expect(source(const CYLAnimationView(file: 'a.json', animationRenderingMode: CYLAnimationRenderingMode.alwaysOriginal)),
+          'a.json#renderingMode=alwaysOriginal');
+      expect(
+          source(const CYLAnimationView(
+              file: 'a.json', options: {'renderingMode': 'alwaysTemplate'}, animationRenderingMode: CYLAnimationRenderingMode.alwaysOriginal)),
+          'a.json#renderingMode=alwaysTemplate');
+    });
+
+    test('updates: a changed value is sent, set to null is sent as null (reset)', () {
+      const none = CYLAnimationView(file: 'a.json');
+      const set = CYLAnimationView(
+        file: 'a.json',
+        tintColor: Color(0xFF112233),
+        animationTint: '#FF0000',
+        animationDarkTint: '#00FF00',
+        animationRenderingMode: CYLAnimationRenderingMode.alwaysTemplate,
+      );
+      expect(cylAnimationTintUpdates(none, none), isEmpty);
+      final up = {for (final u in cylAnimationTintUpdates(none, set)) u.key: u.value};
+      expect(up, {
+        'setTintColor': 0xFF112233,
+        'setAnimationTint': '#FF0000',
+        'setAnimationDarkTint': '#00FF00',
+        'setAnimationRenderingMode': 'alwaysTemplate',
+      });
+      final down = cylAnimationTintUpdates(set, none);
+      expect(down.map((u) => u.key), ['setTintColor', 'setAnimationTint', 'setAnimationDarkTint', 'setAnimationRenderingMode']);
+      expect(down.map((u) => u.value), [null, null, null, 'automatic']);
+      expect(down.first.value, isNull);
+    });
   });
 }

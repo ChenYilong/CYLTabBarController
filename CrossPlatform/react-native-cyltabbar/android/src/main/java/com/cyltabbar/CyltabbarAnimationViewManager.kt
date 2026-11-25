@@ -83,6 +83,21 @@ class CyltabbarAnimationViewManager : SimpleViewManager<CyltabbarAnimationView>(
     view?.applyTintColor(value)
   }
 
+  @ReactProp(name = "animationTint")
+  override fun setAnimationTint(view: CyltabbarAnimationView?, value: String?) {
+    view?.applyAnimationTint(value)
+  }
+
+  @ReactProp(name = "animationDarkTint")
+  override fun setAnimationDarkTint(view: CyltabbarAnimationView?, value: String?) {
+    view?.applyAnimationDarkTint(value)
+  }
+
+  @ReactProp(name = "animationRenderingMode")
+  override fun setAnimationRenderingMode(view: CyltabbarAnimationView?, value: String?) {
+    view?.applyAnimationRenderingMode(value)
+  }
+
   @ReactProp(name = "itemBackgroundStyle")
   override fun setItemBackgroundStyle(view: CyltabbarAnimationView?, value: String?) {
     view?.applyItemBackgroundStyle(value)
