@@ -42,6 +42,17 @@ public enum CYLAnimatedItemContrast {
     /** [EN] The share of an explicit tint's alpha that tints the glass when the tint alpha is nil (`itemGlassTintAlpha`). [CN] 着色透明度为 nil 时，显式着色透明度中用于玻璃着色的占比（`itemGlassTintAlpha`）。 */
     public static let defaultTintShare: CGFloat = 0.75
 
+    /**
+     [EN] How bright iOS actually renders dark Liquid Glass over a black page, as a white share (sRGB 0.26, luminance about 0.055; measured on iOS 27.2 as
+          Y 66 on a tag over a section board). The rule judges a color against `max(model, this floor)` (`renderedGlassReferenceLuminance`): the shared
+          model (`glassReferenceLuminance`, frosted white 0.14) alone gave only about 2.9:1 on the real glass. The algorithm is the shared one; this
+          value is per platform, each platform measures its own.
+     [CN] iOS 在黑色页面上实际渲染的深色液态玻璃亮度，以白色占比表示（sRGB 0.26，亮度约 0.055；iOS 27.2 上实测，分组底板上的标签 Y 为 66）。规则以
+          `max(模型值, 此下限)`（`renderedGlassReferenceLuminance`）作为对照：只用共享模型（`glassReferenceLuminance`，磨砂白 0.14）时在真实玻璃上只有约 2.9:1。
+          算法是共享的；此值因平台而异，各平台自己测量。
+     */
+    public static let renderedDarkGlassWhiteShare: CGFloat = 0.26
+
     /** [EN] The lightness rise per step (HSL, 0...1). [CN] 每步亮度增量（HSL，0...1）。 */
     public static let lightnessStep: CGFloat = 0.005
 
@@ -82,6 +93,15 @@ public enum CYLAnimatedItemContrast {
     }
 
     /**
+     [EN] The reference the item judges against: the shared model, never below the rendered glass of this platform (`renderedDarkGlassWhiteShare`).
+     [CN] 条目所对照的亮度：共享模型值，且不低于本平台实际渲染的玻璃（`renderedDarkGlassWhiteShare`）。
+     */
+    public static func renderedGlassReferenceLuminance(glassTint: UIColor?, tintAlpha: CGFloat?) -> CGFloat {
+        max(glassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha),
+            relativeLuminance(red: renderedDarkGlassWhiteShare, green: renderedDarkGlassWhiteShare, blue: renderedDarkGlassWhiteShare))
+    }
+
+    /**
      [EN] Whether `color` is static: the same color resolved with the light and the dark traits.
      [CN] `color` 是否为静态颜色：用浅色与深色 trait 解析得到相同颜色。
      */
@@ -106,7 +126,7 @@ public enum CYLAnimatedItemContrast {
         guard isStatic(color) else { return color }
         var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
         guard color.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else { return color }
-        let reference = glassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha)
+        let reference = renderedGlassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha)
         let hsl = hslFromRGB(red: min(max(red, 0), 1), green: min(max(green, 0), 1), blue: min(max(blue, 0), 1))
         func passes(_ lightness: CGFloat) -> Bool {
             let rgb = rgbFromHSL(hue: hsl.hue, saturation: hsl.saturation, lightness: lightness)

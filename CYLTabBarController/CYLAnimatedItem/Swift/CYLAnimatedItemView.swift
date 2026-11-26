@@ -1329,6 +1329,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         accessibilityTraits = .button
         accessibilityIdentifier = "CYLAnimatedItemView"
         refreshIconColor()
+        // [EN] A detached item gets its built-in title too (it was applied only once the item reached a window). [CN] 未加入窗口的条目也获得内置标题颜色（以前只在条目进入窗口后才应用）。
+        refreshTitleColor()
     }
 
     // MARK: - Icon 图标
