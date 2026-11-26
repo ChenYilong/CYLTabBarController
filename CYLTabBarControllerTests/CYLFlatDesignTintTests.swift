@@ -374,6 +374,28 @@ final class CYLFlatDesignTintTests: XCTestCase {
         XCTAssertTrue(tintOverlays(in: controller.view).isEmpty, "automatic removes it again")
     }
 
+    func testAPerTabIconColorTintsTheAnimationOnTheSystemTabBar() throws {
+        // [EN] B35: classic and Liquid Glass read the tab's own appearance (CYLTabBarItemIconColor / SelectedIconColor) before the bar's. [CN] B35：经典与液态玻璃先读 Tab 自己的外观，再读 TabBar 的。
+        let urls = [try withFragment(try multiColorGIF(), ["renderingMode": "alwaysTemplate"]),
+                    try withFragment(try multiColorGIF(), ["renderingMode": "alwaysTemplate"])]
+        let attributes: [[AnyHashable: Any]] = [
+            [cylTabBarItemTitle: "S0", cylTabBarItemImage: icon(), cylTabBarAnimationURL: urls[0], cylTabBarItemSelectedIconColor: UIColor.red],
+            [cylTabBarItemTitle: "S1", cylTabBarItemImage: icon(), cylTabBarAnimationURL: urls[1], cylTabBarItemIconColor: UIColor.green],
+        ]
+        let controller = CYLTabBarController(viewControllers: [UIViewController(), UIViewController()],
+                                             tabBarItemsAttributes: attributes, styleType: .default, context: UUID().uuidString)
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
+        window.overrideUserInterfaceStyle = .light
+        window.rootViewController = controller
+        window.isHidden = false
+        windows.append(window)
+        settle(controller.view)
+        let colors = tintOverlays(in: controller.view).compactMap { $0.backgroundColor.map { UIColor(cgColor: $0) } }
+        let rgb = colors.compactMap { rgba($0, controller.view) }.map { $0.prefix(3).map { ($0 * 255).rounded() } }
+        XCTAssertTrue(rgb.contains([255, 0, 0]), "selected tab: its own selected icon color, got \(rgb)")
+        XCTAssertTrue(rgb.contains([0, 255, 0]), "unselected tab: its own icon color, got \(rgb)")
+    }
+
     func testARemoteURLsQueryIsNotReadAsOptions() throws {
         var components = URLComponents()
         components.scheme = "https"
