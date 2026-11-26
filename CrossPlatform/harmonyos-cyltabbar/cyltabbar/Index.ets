@@ -92,3 +92,4 @@ export {
   CYLTabButtonFumeAnimation, CYLTabButtonPressAnimation, CYLTabButtonBlockAnimation, CYLTabButtonFlipAnimation,
   CYLTabButtonFrameAnimation
 } from './src/main/ets/CYLTabButtonAnimation';
+export { CYLLiquidGlassCapsuleEdge } from './src/main/ets/CYLLiquidGlass';

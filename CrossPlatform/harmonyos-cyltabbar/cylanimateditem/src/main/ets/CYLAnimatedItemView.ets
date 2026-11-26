@@ -1,6 +1,7 @@
 import { CYLAnimatedItemTypeRegistry } from './CYLAnimatedItemTypes';
 import { CYLLiquidGlass } from './CYLLiquidGlass';
 import { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier } from './CYLAnimatedItemBackground';
+import { CYLAnimatedItemContrast } from './CYLAnimatedItemContrast';
 import { LifecycleCenter, LifecycleController } from 'cyldeallocblockexecutor';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
 import {
@@ -631,9 +632,9 @@ export struct CYLAnimatedItemView {
   /**
    * [EN] The dark-mode color of a fixed `animationTint` ("#RRGGBB" / "#RRGGBBAA"; Rive's `darkTint` option); not needed for "title". A set
    *      value overrides the `darkTint` option of the source. The mode is the app's (`cyl_colorMode` in AppStorage, set by cyltabbar's
-   *      `cyl_updateColorMode`; light when unset).
+   *      `cyl_updateColorMode`; the system dark / light mode when unset).
    * [CN] 固定 `animationTint` 在深色模式下的颜色（"#RRGGBB" / "#RRGGBBAA"；Rive 的 `darkTint` 选项）；"title" 不需要。设置后覆盖来源的
-   *      `darkTint` 选项。模式取自 App（AppStorage 中的 `cyl_colorMode`，由 cyltabbar 的 `cyl_updateColorMode` 设置；未设置时为浅色）。
+   *      `darkTint` 选项。模式取自 App（AppStorage 中的 `cyl_colorMode`，由 cyltabbar 的 `cyl_updateColorMode` 设置；未设置时跟随系统深浅色）。
    */
   @Prop @Watch('cylTintDidChange') animationDarkTint: string = '';
   /** [EN] The app's color mode ('dark' / 'light'), the key cyltabbar's `CYLColorModeStorageKey` names. [CN] App 的颜色模式。 */
@@ -660,7 +661,8 @@ export struct CYLAnimatedItemView {
   @Prop cylInternalDividerColor: string = '';
   @Prop cylInternalDividerLength: number = CYL_ANIMATED_ITEM_DIVIDER_LENGTH;
   @Prop cylInternalDividerVertical: boolean = false;
-  @StorageProp('cyl_colorMode') @Watch('cylTintDidChange') private cylColorMode: string = 'light';
+  @StorageProp('cyl_colorMode') @Watch('cylTintDidChange') private cylExplicitColorMode: string = '';
+  @StorageProp('colorMode') @Watch('cylTintDidChange') private cylSystemColorMode: number = ColorMode.LIGHT;
   private cylTintSource: CYLAnimatedItemSource | undefined = undefined;
   /**
    * [EN] The gap in vp between the icon and the title, and between an inline accessory and the rest (iOS `spacing`,
@@ -785,7 +787,16 @@ export struct CYLAnimatedItemView {
   private cylStopScrollObserver: (() => void) | undefined = undefined;
 
 
+  /**
+   * [EN] The resolved dark / light decision (the explicit `cyl_colorMode` wins, else the system mode): the one reader of the two stored values.
+   * [CN] 解析后的深浅色（明确的 `cyl_colorMode` 优先，否则取系统模式）：两个存储值的唯一读取处。
+   */
+  private cylIsDark(): boolean {
+    return CYLLiquidGlass.resolveDark(this.cylExplicitColorMode, this.cylSystemColorMode);
+  }
+
   aboutToAppear(): void {
+    CYLLiquidGlass.trackSystemColorMode();
     this.cylLifecycle = new LifecycleController<CYLAnimatedItemView>(this);
     this.cylLifecycle.registry.addDeallocCallback<CYLAnimatedItemView>((owner: CYLAnimatedItemView) => owner.cylTeardown(), { key: 'cyl.animatedItem.teardown' });
     this.cylLifecycle.aboutToAppear();
@@ -1088,7 +1099,7 @@ export struct CYLAnimatedItemView {
    */
   cylAnimationTint(): ResourceColor {
     if (this.animationTintColor !== '') {
-      return this.animationTintColor;
+      return this.cylGlassAdapted(this.animationTintColor, CYLAnimatedItemContrast.minimumIconContrast);
     }
     if (this.animationUrl === '') {
       return '';
@@ -1104,7 +1115,7 @@ export struct CYLAnimatedItemView {
     input.optionTint = this.cylTintSource.option('tint') ?? '';
     input.optionDarkTint = this.cylTintSource.option('darkTint') ?? '';
     input.selected = this.isItemSelected;
-    input.dark = this.cylColorMode === 'dark';
+    input.dark = this.cylIsDark();
     // [EN] Only an EXPLICIT selected icon color (the item's or the stack's) lets a fixed tint yield on a selected item. [CN] 只有显式的选中图标颜色（条目或堆叠的）才让固定着色在选中条目上让位。
     input.hasSelectedIconColor = this.selectedIconColor !== '' || this.stackSelectedIconColor !== '';
     input.renderingMode = cylAnimatedItemEffectiveRenderingMode(this.animationRenderingMode, this.cylTintSource.option('renderingMode') ?? '',
@@ -1114,7 +1125,7 @@ export struct CYLAnimatedItemView {
     if (result.kind === 'icon') {
       return this.cylEffectiveIconColor();
     }
-    return result.kind === 'fixed' ? result.color : '';
+    return result.kind === 'fixed' ? this.cylGlassAdapted(result.color, CYLAnimatedItemContrast.minimumIconContrast) : '';
   }
 
   /**
@@ -1153,13 +1164,13 @@ export struct CYLAnimatedItemView {
     input.stack.disabled = text(stack[2]);
     input.selected = this.isItemSelected;
     input.enabled = this.isItemEnabled;
-    input.dark = this.cylColorMode === 'dark';
+    input.dark = this.cylIsDark();
     return input;
   }
 
   /** [EN] A built-in color as a resource color (the `sys.color` resource, else the constant). [CN] 内置颜色，作为资源颜色（`sys.color` 资源，否则为常量）。 */
   private cylBuiltInColor(role: string): ResourceColor {
-    const builtIn: CYLAnimatedItemBuiltInColor = cylAnimatedItemBuiltInColor(role, this.cylColorMode === 'dark');
+    const builtIn: CYLAnimatedItemBuiltInColor = cylAnimatedItemBuiltInColor(role, this.cylIsDark());
     if (builtIn.resource === 'font_primary') {
       return $r('sys.color.font_primary');
     }
@@ -1186,10 +1197,12 @@ export struct CYLAnimatedItemView {
       [this.stackIconColor, this.stackSelectedIconColor, this.stackDisabledIconColor]);
     const source: string = cylAnimatedItemStateColorSource(input);
     if (source === 'item') {
-      return !this.isItemEnabled ? this.disabledIconColor : (this.isItemSelected ? this.selectedIconColor : this.iconColor);
+      return this.cylGlassAdapted(!this.isItemEnabled ? this.disabledIconColor : (this.isItemSelected ? this.selectedIconColor : this.iconColor),
+        CYLAnimatedItemContrast.minimumIconContrast);
     }
     if (source === 'stack') {
-      return !this.isItemEnabled ? this.stackDisabledIconColor : (this.isItemSelected ? this.stackSelectedIconColor : this.stackIconColor);
+      return this.cylGlassAdapted(!this.isItemEnabled ? this.stackDisabledIconColor : (this.isItemSelected ? this.stackSelectedIconColor : this.stackIconColor),
+        CYLAnimatedItemContrast.minimumIconContrast);
     }
     return '';
   }
@@ -1202,15 +1215,30 @@ export struct CYLAnimatedItemView {
     return explicit !== '' ? explicit : this.cylBuiltInColor(this.cylStateRole());
   }
 
+  /**
+   * [EN] An EXPLICIT title / icon / tint color on the drawn DARK Liquid Glass: lightened until it has `minimum` contrast with the glass
+   *      (`CYLAnimatedItemContrast.adjustedColor`); as it is on flat, light mode or when no glass is drawn. [CN] 绘制的深色液态玻璃上的显式标题 / 图标 / 着色颜色：
+   *      提亮到与玻璃的对比度达到 `minimum`；扁平、浅色模式或未绘制玻璃时保持原样。
+   */
+  private cylGlassAdapted(color: ResourceColor, minimum: number): ResourceColor {
+    if (!this.cylIsDark() || !this.cylItemGlassDrawn()) {
+      return color;
+    }
+    return CYLAnimatedItemContrast.adjustedColor(color, this.itemBackgroundColor !== '' ? this.itemBackgroundColor : undefined,
+      this.itemGlassTintAlpha, minimum);
+  }
+
   /** [EN] The title color of the current state (item, stack, built-in). [CN] 当前状态的标题颜色（条目、堆叠、内置）。 */
   cylEffectiveTitleColor(): ResourceColor {
     const input = this.cylStateInput([this.titleColor, this.selectedTitleColor, ''], [this.stackTitleColor, this.stackSelectedTitleColor, '']);
     const source: string = cylAnimatedItemStateColorSource(input);
     if (source === 'item') {
-      return this.isItemEnabled && this.isItemSelected ? this.selectedTitleColor : this.titleColor;
+      return this.cylGlassAdapted(this.isItemEnabled && this.isItemSelected ? this.selectedTitleColor : this.titleColor,
+        CYLAnimatedItemContrast.minimumTextContrast);
     }
     if (source === 'stack') {
-      return this.isItemEnabled && this.isItemSelected ? this.stackSelectedTitleColor : this.stackTitleColor;
+      return this.cylGlassAdapted(this.isItemEnabled && this.isItemSelected ? this.stackSelectedTitleColor : this.stackTitleColor,
+        CYLAnimatedItemContrast.minimumTextContrast);
     }
     return this.cylBuiltInColor(this.cylStateRole());
   }
@@ -1219,7 +1247,7 @@ export struct CYLAnimatedItemView {
   private cylDividerStyle(): CYLAnimatedItemDividerResult {
     const input = new CYLAnimatedItemDividerInput();
     input.dividerColor = this.cylInternalDividerColor;
-    input.dark = this.cylColorMode === 'dark';
+    input.dark = this.cylIsDark();
     // [EN] The EXPLICIT normal icon color (item, else stack; no built-in): the divider derives from it at alpha 0.6, else it is the built-in
     //      divider color. [CN] 显式的普通图标颜色（条目，否则堆叠；不含内置色）：分隔线以透明度 0.6 由它推导，否则使用内置分隔色。
     const icon: ResourceColor = this.iconColor !== '' ? this.iconColor : this.stackIconColor;

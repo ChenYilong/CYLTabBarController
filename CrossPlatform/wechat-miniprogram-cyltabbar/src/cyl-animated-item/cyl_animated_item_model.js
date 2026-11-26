@@ -1,5 +1,6 @@
 const { cylIsGIFImagePath } = require('./cyl_gif_image')
 const { cylCountdownText } = require('./cyl_animated_item_countdown')
+const { cylAnimatedItemContrastLift, CYL_ICON_MINIMUM_CONTRAST, CYL_TITLE_MINIMUM_CONTRAST } = require('./cyl_animated_item_contrast')
 /**
  * [EN] The render model of cyl-animated-item, the mini program counterpart of iOS `CYLAnimatedItemView` (the
  *      CYLAnimatedItem pod) and Android `com.cyl.animateditem.CYLAnimatedItemView`. Pure functions without any wx API,
@@ -316,11 +317,12 @@ function cylAnimatedItemTitleLines(value) {
  *      点击时既不创建节点也不改变 `src`（任何一帧都不会出现空白或上一张图片）。每个图层有自己的着色（普通图层用 `iconTint`，
  *      选中图层用 `selectedIconTint`；未设置 `selectedIconTint` 时用 `iconTint`）。其他条目的 `layered` 为 false。
  */
-function cylAnimatedItemStillLayers(p, fallbackImage, fallbackHidden) {
+function cylAnimatedItemStillLayers(p, fallbackImage, fallbackHidden, adapt) {
   const normal = p.image || ''
   const selected = p.selectedImage || ''
-  const tintNormal = p.iconTint || ''
-  const tintSelected = p.selectedIconTint === null || p.selectedIconTint === undefined ? tintNormal : p.selectedIconTint
+  const adaptTint = adapt || ((c) => c)
+  const tintNormal = adaptTint(p.iconTint || '')
+  const tintSelected = p.selectedIconTint === null || p.selectedIconTint === undefined ? tintNormal : adaptTint(p.selectedIconTint)
   const layered = !!normal && !!selected && normal !== selected && !!fallbackImage && !cylIsGIFImagePath(normal) && !cylIsGIFImagePath(selected)
   return {
     layered,
@@ -393,7 +395,7 @@ function cylAnimatedItemBuiltInColor(name, isDark) {
  */
 function cylAnimatedItemEffectiveIconColor(p) {
   const explicit = cylAnimatedItemTintColor(p.selected ? p.selectedIconTint : p.iconTint)
-  if (explicit) return explicit
+  if (explicit) return p.adaptColor ? p.adaptColor(explicit) : explicit
   if (p.enabled === false) return cylAnimatedItemBuiltInColor('disabled', p.isDark)
   if (p.selected) return cylAnimatedItemTintColor(p.builtInSelectedColor) || cylAnimatedItemBuiltInColor('selected', p.isDark)
   return cylAnimatedItemBuiltInColor('label', p.isDark)
@@ -447,8 +449,9 @@ function cylAnimatedItemAnimationTint(input) {
     if (mode === 'alwaysTemplate' || (mode === 'automatic' && p.animationColorKind === 'one')) return cylAnimatedItemEffectiveIconColor(p)
     return ''
   }
-  if (p.selected && selectedColor) return selectedColor
-  return (p.isDark && cylAnimatedItemTintHex(darkOption)) || fixed
+  const adaptTint = p.adaptColor || ((c) => c)
+  if (p.selected && selectedColor) return adaptTint(selectedColor)
+  return adaptTint((p.isDark && cylAnimatedItemTintHex(darkOption)) || fixed)
 }
 
 /**
@@ -550,9 +553,20 @@ function cylAnimatedItemRestingFrame(p) {
  * [EN] The title color: the explicit one (the dark variant while dark), else the built-in one.
  * [CN] 标题颜色：显式颜色（深色时用深色变体），否则为内置颜色。
  */
-function cylAnimatedItemTitleColor(p, dark) {
+function cylAnimatedItemTitleColor(p, dark, adapt) {
   const explicitTitleColor = dark && p.titleDarkColor ? p.titleDarkColor : p.titleColor
-  return explicitTitleColor || cylAnimatedItemEffectiveIconColor({ selected: p.selected, enabled: p.enabled, isDark: dark, builtInSelectedColor: p.builtInSelectedColor })
+  if (explicitTitleColor) return adapt ? adapt(explicitTitleColor) : explicitTitleColor
+  return cylAnimatedItemEffectiveIconColor({ selected: p.selected, enabled: p.enabled, isDark: dark, builtInSelectedColor: p.builtInSelectedColor })
+}
+
+/**
+ * [EN] The color adapter of an item: lifts an explicit color (minimum contrast `minimum`) only when its Liquid Glass is really drawn
+ *      (`itemBackgroundStyle` 'liquidGlass' and `cylAnimatedItemLiquidGlassIsActive()`) and the item is dark; else null (colors unchanged).
+ * [CN] 条目的颜色适配器：仅当液态玻璃真正绘制且条目为深色时，提亮显式颜色（最低对比度 `minimum`）；否则为 null（颜色不变）。
+ */
+function cylAnimatedItemGlassContrastAdapter(p, minimum) {
+  if (p.itemBackgroundStyle !== 'liquidGlass' || !cylAnimatedItemLiquidGlassIsActive() || !cylAnimatedItemIsDark(p)) return null
+  return (color) => cylAnimatedItemContrastLift(color, minimum, p.itemBackgroundColor, Number(p.itemGlassTintAlpha))
 }
 
 function cylAnimatedItemModel(input) {
@@ -567,9 +581,12 @@ function cylAnimatedItemModel(input) {
   const animationType = cylAnimatedItemResolvedType(p, animationPath, hasAnimationData)
   const hasSource = !!animationPath || hasAnimationData
   const { usesEngine, gifShows, ended, animationShows } = cylAnimatedItemAnimationState(p, animationType, hasSource)
+  // [EN] Dark Liquid Glass drawn: explicit title / icon colors without enough contrast are lifted (cyl_animated_item_contrast.js). [CN] 绘制深色液态玻璃时：对比度不足的显式标题 / 图标颜色会被提亮。
+  const adaptIcon = cylAnimatedItemGlassContrastAdapter(p, CYL_ICON_MINIMUM_CONTRAST)
+  const adaptTitle = cylAnimatedItemGlassContrastAdapter(p, CYL_TITLE_MINIMUM_CONTRAST)
   const fallbackImage = cylAnimatedItemFallbackImage(p, hasSource, animationShows)
   const fallbackHidden = (animationShows && !gifShows) || cylGIFImageStillShows(p, hasSource, fallbackImage)
-  const layers = cylAnimatedItemStillLayers(p, fallbackImage, fallbackHidden)
+  const layers = cylAnimatedItemStillLayers(p, fallbackImage, fallbackHidden, adaptIcon)
   const iconSize = cylAnimatedItemDimension(p.iconSize, 24)
   const iconWidth = cylAnimatedItemDimension(p.iconWidth, iconSize)
   const iconHeight = cylAnimatedItemDimension(p.iconHeight, iconSize)
@@ -584,7 +601,7 @@ function cylAnimatedItemModel(input) {
   const dark = cylAnimatedItemIsDark(p)
   // [EN] Built-in title color (tint spec v2): no explicit color (own / dark variant) means label, or the selected color while selected (the disabled look while disabled).
   //      [CN] 内置标题颜色（着色规范 v2）：没有显式颜色（自己的 / 深色变体）时为 label，选中时为选中色（禁用时为禁用外观）。
-  const titleColor = cylAnimatedItemTitleColor(p, dark)
+  const titleColor = cylAnimatedItemTitleColor(p, dark, adaptTitle)
   const countdownWidth = cylAnimatedItemCountdownTitleWidth(p)
   const titleStyle = cylAnimatedItemTitleStyle(p, titleColor, titleLines) + (countdownWidth > 0 ? `min-width: ${countdownWidth}px; text-align: center;` : '')
   const titleLinesClass = cylAnimatedItemTitleLinesClass(titleLines)
@@ -624,6 +641,7 @@ function cylAnimatedItemModel(input) {
       enabled: p.enabled,
       selected: p.selected,
       isDark: dark,
+      adaptColor: adaptIcon,
       // [EN] The icon colors the tint follows: `animationIconTint` / `animationSelectedIconTint` when set (a tab bar item passes its
       //      title colors), else `iconTint` / `selectedIconTint`. [CN] 着色所跟随的图标颜色：设置了 `animationIconTint` /
       //      `animationSelectedIconTint` 时用它们（TabBar 项传入标题颜色），否则用 `iconTint` / `selectedIconTint`。

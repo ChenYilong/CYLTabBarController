@@ -126,3 +126,23 @@ export class CYLLiquidGlassContainerModifier implements AttributeModifier<Column
     }
   }
 }
+
+/**
+ * [EN] The edge light of the glass capsule: the rim and the sheen are `cylanimateditem`'s (`CYLLiquidGlass`), the one definition that tags and section cards
+ *      use too; the capsule keeps no copy of them. The bar tint, the shadow and the geometry stay the capsule's.
+ * [CN] 玻璃胶囊的边缘光：细边与高光来自 `cylanimateditem`（`CYLLiquidGlass`），标签与分组卡片使用的同一份定义；胶囊不保留它们的副本。TabBar 着色、
+ *      阴影与几何尺寸仍属于胶囊。
+ */
+export class CYLLiquidGlassCapsuleEdge {
+  static rim(dark: boolean): EdgeColors {
+    return CYLLiquidGlass.rimEdgeColors(dark);
+  }
+
+  static sheen(dark: boolean): Array<[ResourceColor, number]> {
+    return CYLLiquidGlass.sheenColors(dark);
+  }
+
+  static rimWidth(): number {
+    return CYLLiquidGlass.RIM_WIDTH;
+  }
+}

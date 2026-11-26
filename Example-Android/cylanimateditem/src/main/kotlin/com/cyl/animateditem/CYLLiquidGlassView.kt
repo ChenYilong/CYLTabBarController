@@ -9,15 +9,17 @@ import android.view.View
 
 /**
  * [EN] A Liquid Glass background for any view (the same names as iOS `CYLLiquidGlassView`): what is behind it (the pages,
- *      `backdropSource`) is blurred and refracted inside a rounded rectangle, tinted with `glassTintColor` and edged with the
- *      glass highlight. Where `CYLLiquidGlass.isActive()` is false, or the canvas is not hardware accelerated, it draws nothing
+ *      `backdropSource`) is blurred and refracted inside a rounded rectangle, tinted with `glassTintColor`, lit by the sheen
+ *      (a top-to-bottom gradient over the tint) and edged with the uniform 1 dp rim (or the explicit `borderColor`/`borderWidth`),
+ *      the same values as HarmonyOS (`CYLGlassEdge.rimColor`, `sheenColors`). Where `CYLLiquidGlass.isActive()` is false, or the canvas is not hardware accelerated, it draws nothing
  *      (`isGlassDrawn` is false), so the caller keeps its flat background. It takes no touches and is hidden from accessibility.
  *      While a glass view draws the pages, other glass views in them draw nothing (no glass inside glass). A glass view that sits
  *      inside its own `backdropSource` (e.g. a list cell, with the default source, the window's root) cannot sample it: drawing
  *      the source would draw the cells that are recording right now (`IllegalStateException`: "Recording currently in progress"),
  *      so it draws only the tint.
  * [CN] 任意视图的液态玻璃背景（与 iOS `CYLLiquidGlassView` 同名）：它后面的内容（页面，`backdropSource`）在圆角矩形内被模糊与折射，
- *      以 `glassTintColor` 着色并加上玻璃高光边缘。`CYLLiquidGlass.isActive()` 为 false 或画布未硬件加速时不绘制（`isGlassDrawn` 为
+ *      以 `glassTintColor` 着色，其上加自上而下渐变的高光，并以统一的 1 dp 细边（或显式的 `borderColor`/`borderWidth`）为边缘，
+ *      数值与鸿蒙相同（`CYLGlassEdge.rimColor`、`sheenColors`）。`CYLLiquidGlass.isActive()` 为 false 或画布未硬件加速时不绘制（`isGlassDrawn` 为
  *      false），调用方保持其扁平背景。不接收触摸，对辅助功能隐藏。某个玻璃视图绘制页面时，页面中的其他玻璃视图不绘制（玻璃里不嵌玻璃）。
  *      位于自己的 `backdropSource` 之内的玻璃视图（例如列表单元格，默认源为窗口根视图）不能采样它：绘制源会绘制正在录制的单元格
  *      （`IllegalStateException`："Recording currently in progress"），所以只绘制着色。
@@ -25,9 +27,7 @@ import android.view.View
 internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
 
     private val backdrop = CYLGlassBackdrop()
-    private val highlight = CYLGlassHighlight()
     private val tintPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val rimPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     private val rect = RectF()
     private val here = IntArray(2)
     private val there = IntArray(2)
@@ -37,6 +37,27 @@ internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, at
      * [CN] 玻璃的着色，例如标签的背景色（ARGB 颜色）；`null` 表示不着色。
      */
     var glassTintColor: Int? = null
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    /**
+     * [EN] The width of an explicit border, in px; 0 (the default) for none (the uniform rim is drawn then).
+     * [CN] 显式边框的宽度，单位像素；0（默认）表示没有（此时绘制统一细边）。
+     */
+    var borderWidth: Float = 0f
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    /**
+     * [EN] The colour of an explicit border (ARGB); `null` or fully transparent for none. With a width above 0 it replaces the rim as the
+     *      edge, and the sheen is still drawn under it.
+     * [CN] 显式边框的颜色（ARGB）；`null` 或完全透明表示没有。宽度大于 0 时它取代细边作为边缘，高光仍绘制在它之下。
+     */
+    var borderColor: Int? = null
         set(value) {
             field = value
             invalidate()
@@ -122,19 +143,13 @@ internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, at
             tintPaint.color = it
             canvas.drawRoundRect(rect, radius, radius, tintPaint)
         }
-        if (drawn) {
-            highlight.draw(canvas, rect, radius, density, 1f)
-        } else {
-            // [EN] No sampled glass (a glass inside its own source, e.g. a tag in a list): the tint alone is almost invisible on a plain page,
-            //      so a hairline rim keeps the shape visible, as the glass edge does on iOS. [CN] 没有采样的玻璃（位于自己的源之内，例如列表中的标签）：
-            //      在纯色页面上只有着色几乎看不见，所以用一圈细边保持形状可见，与 iOS 的玻璃边缘相同。
-            val night = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
-                android.content.res.Configuration.UI_MODE_NIGHT_YES
-            rimPaint.strokeWidth = density
-            rimPaint.color = if (night) android.graphics.Color.argb(56, 255, 255, 255) else android.graphics.Color.argb(41, 0, 0, 0)
-            val inset = density / 2f
-            canvas.drawRoundRect(inset, inset, rect.width() - inset, rect.height() - inset, radius, radius, rimPaint)
-        }
+        val dark = CYLGlassEdge.isDark(resources)
+        // [EN] The sheen over the tint, top to bottom, for sampled and non-sampled glass alike. [CN] 着色之上的高光，自上而下，采样与非采样玻璃相同。
+        CYLGlassEdge.drawSheen(canvas, rect, radius, dark)
+        // [EN] The edge: the explicit border (its colour and width) when set, else the uniform rim. [CN] 边缘：设置了显式边框时用它的颜色与宽度，否则为统一细边。
+        val border = borderColor
+        val explicit = borderWidth > 0f && border != null && android.graphics.Color.alpha(border) != 0
+        CYLGlassEdge.drawRim(canvas, rect, radius, density, dark, 1f, if (explicit) border else null, if (explicit) borderWidth else null)
     }
 
     /**

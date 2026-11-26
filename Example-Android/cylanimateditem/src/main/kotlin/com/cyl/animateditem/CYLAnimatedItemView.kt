@@ -770,7 +770,12 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         }
 
     private fun applyTitleColor(configuration: Configuration = resources.configuration) {
-        val color = resolvedTitleColor(configuration)
+        val color = resolvedTitleColor(configuration)?.let { resolved ->
+            // [EN] Only an EXPLICIT colour is adapted, and only on dark drawn glass. [CN] 只调整显式颜色，且仅在深色玻璃确实绘制时。
+            if ((titleColor ?: stackTitleColor) != null && glassContrastApplies(configuration)) {
+                CYLAnimatedItemContrast.adjustedTitle(resolved, itemBackgroundColor, itemGlassTintAlpha)
+            } else resolved
+        }
         if (color != null) {
             if (!appliesTitleColor) defaultTitleColor = titleView.currentTextColor
             titleView.setTextColor(color)
@@ -814,8 +819,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         return if (isSelected) CYLAnimatedItemBuiltInColors.selected(context, configuration) else CYLAnimatedItemBuiltInColors.normal(context, configuration)
     }
 
-    private fun applyIconColor() {
-        val color = effectiveIconColor
+    private fun applyIconColor(configuration: Configuration = resources.configuration) {
+        val color = effectiveIconColor?.let { adaptedIconColor(it, configuration) }
         if (color != null) {
             iconView.setColorFilter(color, PorterDuff.Mode.SRC_IN)
             appliesIconColor = true
@@ -824,9 +829,22 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             iconView.clearColorFilter()
             appliesIconColor = false
         }
-        refreshAnimationTint()
+        refreshAnimationTint(configuration)
         invalidate()
     }
+
+    /**
+     * [EN] True when the dark-glass contrast rule applies: Liquid Glass is really drawn (the glass layer is on) and `configuration` is night.
+     * [CN] 深色玻璃对比度规则适用：液态玻璃确实绘制（玻璃层在显示）且 `configuration` 为夜间模式。
+     */
+    private fun glassContrastApplies(configuration: Configuration): Boolean =
+        usesItemBackground && itemBackgroundStyle == CYLAnimatedItemBackgroundStyle.LiquidGlass && isLiquidGlassActive() &&
+            itemBackgroundRenderer.glassView != null &&
+            (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
+    /** [EN] An explicit icon colour, adapted to the dark glass when the rule applies. [CN] 规则适用时，把显式图标颜色调整到适合深色玻璃。 */
+    private fun adaptedIconColor(color: Int, configuration: Configuration): Int =
+        if (glassContrastApplies(configuration)) CYLAnimatedItemContrast.adjustedIcon(color, itemBackgroundColor, itemGlassTintAlpha) else color
 
     // MARK: - Divider mode 分隔线模式
 
@@ -963,17 +981,24 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val kind = if (!tintIsSet && mode == CYLAnimationRenderingMode.Automatic) {
             CYLAnimationColorCount.kindOfSource(context, animationURL?.takeIf { it.isNotBlank() } ?: (view.cyl_getTag(CYLTabBarItemAnimationFailure.RESOURCE_TAG) as? String))
         } else CYLAnimationColorCount.Kind.Undetectable
-        val color = CYLTabBarItemAnimationTint.resolveItem(
+        val resolvedIcon = resolvedIconColor(configuration)
+        var color = CYLTabBarItemAnimationTint.resolveItem(
             tint, CYLTabBarItemAnimationTint.darkTintOption(options), mode, kind, isSelected, night,
-            CYLTabBarItemAnimationTint.IconColors(resolvedIconColor(configuration), explicitSelectedIconColor),
+            CYLTabBarItemAnimationTint.IconColors(resolvedIcon, explicitSelectedIconColor),
         )
+        // [EN] Dark drawn glass: an explicit tint (fixed, or the explicit icon colour) is adapted; the built-in icon colour is not.
+        // [CN] 深色玻璃确实绘制时：显式着色（固定色或显式图标颜色）会被调整；内置图标颜色不调整。
+        if (color != null && glassContrastApplies(configuration) && !(color == resolvedIcon && (if (isSelected) explicitSelectedIconColor else explicitIconColor) == null)) {
+            color = CYLAnimatedItemContrast.adjustedIcon(color, itemBackgroundColor, itemGlassTintAlpha)
+        }
         CYLTabBarItemAnimationTint.applyToAnimationView(view, color)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        applyItemBackground()
         applyTitleColor(newConfig)
-        refreshAnimationTint(newConfig)
+        applyIconColor(newConfig)
         invalidate()
     }
 
@@ -1619,7 +1644,15 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     private fun applyItemBackground() {
         if (!usesItemBackground) return
         itemBackgroundRenderer.apply(itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha, itemGlassBackdropSource)
+        // [EN] The glass state (drawn or not, its tint) decides the contrast adaptation: re-apply the colours when it changes. [CN] 玻璃状态（是否绘制、着色）决定对比度调整：变化时重新应用颜色。
+        val key = if (glassContrastApplies(resources.configuration)) listOf(itemBackgroundColor, itemGlassTintAlpha) else null
+        if (key != glassContrastKey) {
+            glassContrastKey = key
+            applyTitleColor()
+            applyIconColor()
+        }
     }
+    private var glassContrastKey: List<Any?>? = null
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)

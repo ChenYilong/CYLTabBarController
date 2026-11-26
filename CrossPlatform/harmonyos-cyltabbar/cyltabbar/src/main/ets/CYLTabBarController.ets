@@ -1,6 +1,6 @@
 import { CYLTabBarStyleType, cyl_tabBarStyleModifier } from './CYLFlatDesignTabBar';
 import { CYLTabBarDefaultHeight } from './CYLConstants';
-import { CYLLiquidGlassTokens, CYLLiquidGlassCapsuleModifier, CYLLiquidGlassContainerModifier } from './CYLLiquidGlass';
+import { CYLLiquidGlassTokens, CYLLiquidGlassCapsuleModifier, CYLLiquidGlassContainerModifier, CYLLiquidGlassCapsuleEdge } from './CYLLiquidGlass';
 import { curves, window, KeyboardAvoidMode } from '@kit.ArkUI';
 import { CYLTabBarItemAttributes, CYLTitleOffset } from './CYLTabBarItem';
 import { CYLPlusButton, cyl_liquidGlassContentDy } from './CYLPlusButton';
@@ -837,10 +837,10 @@ export struct CYLTabBarController {
       // [EN] The light is `cylanimateditem`'s (CYLLiquidGlass), the same as every tag and section card. [CN] 光来自 `cylanimateditem`（CYLLiquidGlass 的平板表面），与标签列表的分组卡片相同。
       .linearGradient({
         direction: GradientDirection.Bottom,
-        colors: CYLLiquidGlass.sheenColors(this.colorMode === 'dark'),
+        colors: CYLLiquidGlassCapsuleEdge.sheen(this.colorMode === 'dark'),
       })
       // [EN] The glass rim, under the tabs. [CN] 玻璃亮边，位于 Tab 之下。
-      .border({ width: CYLLiquidGlass.RIM_WIDTH, color: CYLLiquidGlass.rimEdgeColors(this.colorMode === 'dark') })
+      .border({ width: CYLLiquidGlassCapsuleEdge.rimWidth(), color: CYLLiquidGlassCapsuleEdge.rim(this.colorMode === 'dark') })
       .position({ x: 0, y: 0 })
       .hitTestBehavior(HitTestMode.None)
   }
