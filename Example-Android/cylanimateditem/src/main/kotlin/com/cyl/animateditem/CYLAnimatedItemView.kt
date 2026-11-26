@@ -394,7 +394,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         set(value) { field = value; animationPlayer?.loops = value }
 
     override var animationRestingProgress: Float = 0f
-        set(value) { field = value.coerceIn(0f, 1f); if (!playing) animationPlayer?.progress = field }
+        set(value) {
+            field = value.coerceIn(0f, 1f)
+            if (playing) return
+            // [EN] A selected item that opted in rests on the last frame: a list re-applying the (unselected) resting progress on every
+            //      bind must not put it back on the first one. [CN] 已选择启用的选中条目停在最后一帧：列表每次绑定都重设（未选中的）静止进度，不能把它放回第一帧。
+            if (isSelected && showsLastFrameWhenSelected && animationPlayer != null) showAnimationLastFrame() else animationPlayer?.progress = field
+        }
 
     override val isAnimationReady: Boolean get() = animationView != null
 

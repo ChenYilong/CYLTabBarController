@@ -133,4 +133,31 @@ class CYLAnimatedItemLastFrameTest {
         assertEquals(true, log.contains("play"))
         assertEquals(false, log.contains("last"))
     }
+
+    /** The ClassifyMenu list binds every cell: selected, loaded, then `animationRestingProgress = 0` again (the data source's default). */
+    @Test
+    fun restingProgressReappliedWhileSelectedKeepsTheLastFrame() {
+        val item = item(drives = false, option = true)
+        item.animationURL = "home.fake"
+        item.isSelected = true
+        item.load()
+        item.animationRestingProgress = 0f
+        val progress = log.filter { it == "last" || it.startsWith("progress") }
+        assertEquals("the last frame is the final write, not progress=0.0", "last", progress.last())
+    }
+
+    @Test
+    fun restingProgressStillAppliesWhenNotSelectedOrWithoutTheOption() {
+        val item = item(drives = false, option = true)
+        item.animationURL = "home.fake"
+        log.clear()
+        item.animationRestingProgress = 0.25f
+        assertEquals(listOf("progress=0.25"), log)
+        val plain = item(drives = false, option = false)
+        plain.animationURL = "home.fake"
+        plain.isSelected = true
+        log.clear()
+        plain.animationRestingProgress = 0.5f
+        assertEquals(listOf("progress=0.5"), log)
+    }
 }
