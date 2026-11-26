@@ -16,7 +16,7 @@
  *      `accessibility-label`（否则为标题），带选中与禁用状态。
  */
 const {
-  cylAnimatedItemBackground, cylAnimatedItemIsDark, cylAnimatedItemMissingReason, cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemRenderingMode, cylAnimatedItemResource, cylAnimatedItemRestingProgress,
+  cylAnimatedItemAdaptedColor, cylAnimatedItemBackground, cylAnimatedItemDrawsLiquidGlass, cylAnimatedItemIsAnimationEngineAvailable, cylAnimatedItemIsDark, cylAnimatedItemTintColor, cylAnimatedItemMissingReason, cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemRenderingMode, cylAnimatedItemResource, cylAnimatedItemRestingProgress,
 } = require('./cyl_animated_item_model')
 const { cylGIFImageInfo } = require('./cyl_gif_image')
 const { cylGIFColorKind } = require('./cyl_one_color_detector')
@@ -230,6 +230,61 @@ Component({
      */
     builtInSelectedColor: { type: String, value: '' },
     /**
+     * [EN] SUBCLASS-EXPLICIT colors per state (the iOS `setSubclassTitleColor(_:for:)` / `setSubclassIconColor(_:for:)` channel; '' = none): a host built on this item
+     *      (a cyl-tag-list tag) hands its per-state colors here WITHOUT touching the integrator's own `titleColor` / `iconTint` or the stack-inherited ones. They count as
+     *      EXPLICIT (adapted on drawn dark glass: title 4.5, icon and animation tint 3) and are never written into the public properties. A missing selected value falls
+     *      back to the normal one. Precedence (one function for the title, one for the icon, see `cylAnimatedItemResolvedTitleColor` / `cylAnimatedItemResolvedIconColor`): own
+     *      `titleColor` / `iconTint` > subclass-explicit of the state > stack-inherited > subclass built-in > component built-in. A static image is tinted by the explicit levels only (tint spec v2).
+     * [CN] 按状态的「子类显式」颜色（iOS 的 `setSubclassTitleColor(_:for:)` / `setSubclassIconColor(_:for:)` 通道；'' 为无）：基于本条目的宿主（cyl-tag-list 的标签）把每个状态的颜色
+     *      交到这里，「不触碰」集成方自己的 `titleColor` / `iconTint` 与堆叠继承的颜色。它们算「显式」颜色（在绘制的深色玻璃上适配：标题 4.5，图标与动画着色 3），且绝不写入公开属性。
+     *      缺少选中值时回退到常态值。优先级（标题一个函数、图标一个函数，见 `cylAnimatedItemResolvedTitleColor` / `cylAnimatedItemResolvedIconColor`）：自己的 `titleColor` / `iconTint` >
+     *      该状态的子类显式 > 堆叠继承 > 子类内置 > 组件内置。静态图片只由显式层着色（着色规范 v2）。
+     */
+    subclassTitleColor: { type: String, value: '' },
+    subclassSelectedTitleColor: { type: String, value: '' },
+    subclassDisabledTitleColor: { type: String, value: '' },
+    subclassIconColor: { type: String, value: '' },
+    subclassSelectedIconColor: { type: String, value: '' },
+    subclassDisabledIconColor: { type: String, value: '' },
+    /**
+     * [EN] SUBCLASS BUILT-IN colors per state (the twin of iOS `applyTitleTintColor(_:)` / `applyIconTintColor(_:)`; '' = none): the host's effective color of each state when it
+     *      has no explicit one. Adapted on drawn dark glass like the explicit levels (normal and selected; NOT the disabled look), as the iOS doc says (the message that said
+     *      "not adapted" is superseded). They tint no static image (built-in), but are the icon color of `animationTint: 'title'` and the rendering modes.
+     * [CN] 按状态的「子类内置」颜色（iOS `applyTitleTintColor(_:)` / `applyIconTintColor(_:)` 的对应；'' 为无）：宿主在没有显式颜色时各状态的有效颜色。与显式层一样在绘制的深色玻璃上适配
+     *      （常态与选中；「不」含禁用外观），依据 iOS 文档（说「不适配」的消息已被取代）。它们不给静态图片着色（内置），但是 `animationTint: 'title'` 与渲染模式所用的图标颜色。
+     */
+    builtInTitleColor: { type: String, value: '' },
+    builtInSelectedTitleColor: { type: String, value: '' },
+    builtInDisabledTitleColor: { type: String, value: '' },
+    builtInIconColor: { type: String, value: '' },
+    builtInSelectedIconColor: { type: String, value: '' },
+    builtInDisabledIconColor: { type: String, value: '' },
+    // [EN] INTERNAL: the stack-inherited level for a host that passes the stack's colors apart from the item's own (cyl-animated-item-stack still merges them into `titleColor` / `iconTint`, i.e. the own level). [CN] 内部使用：供把堆叠的颜色与条目自己的分开传入的宿主使用的「堆叠继承」层（cyl-animated-item-stack 仍把它们合并进 `titleColor` / `iconTint`，即自己的层）。
+    inheritedTitleColor: { type: String, value: '' },
+    inheritedIconTint: { type: String, value: '' },
+    inheritedSelectedIconTint: { type: String, value: '' },
+    /**
+     * [EN] The background color while the item is pressed and enabled (iOS `itemHighlightedBackgroundColor`); '' (default) = none. A finger down / up (or a cancelled touch) toggles it.
+     * [CN] 条目被按下且可用时的背景色（iOS 的 `itemHighlightedBackgroundColor`）；'' （默认）为无。手指按下 / 抬起（或触摸取消）时切换。
+     */
+    itemHighlightedBackgroundColor: { type: String, value: '' },
+    /**
+     * [EN] The alpha (0...1) of the animation (engine, GIF) while the item is disabled (iOS `itemDisabledAnimationAlpha`); -1 (default) = not set = 1. The static image is not changed.
+     * [CN] 条目禁用时动画（引擎、GIF）的透明度（0...1，iOS 的 `itemDisabledAnimationAlpha`）；-1（默认）为未设置，即 1。静态图片不变。
+     */
+    itemDisabledAnimationAlpha: { type: Number, value: -1 },
+    /**
+     * [EN] A selected HOST-DRIVEN item (`drivesAnimationPlayback` false) rests on the last frame (iOS `showsLastFrameWhenSelected`); default off. With the default rules a selected item
+     *      always rests on its last frame already.
+     * [CN] 被选中的「宿主驱动」条目（`drivesAnimationPlayback` 为 false）停在最后一帧（iOS 的 `showsLastFrameWhenSelected`）；默认关闭。默认规则下选中的条目本来就停在最后一帧。
+     */
+    showsLastFrameWhenSelected: { type: Boolean, value: false },
+    /**
+     * [EN] Disabled wins the image (iOS `disabledWinsImage`): `selectedImage` shows only when selected AND enabled; default off.
+     * [CN] 禁用优先于图片（iOS 的 `disabledWinsImage`）：`selectedImage` 仅在选中且可用时显示；默认关闭。
+     */
+    disabledWinsImage: { type: Boolean, value: false },
+    /**
      * [EN] The title's color (any CSS color); '' keeps the inherited color.
      * [CN] 标题颜色（任意 CSS 颜色）；'' 时沿用继承的颜色。
      */
@@ -304,6 +359,10 @@ Component({
   data: {
     itemBackgroundCss: '',
     itemGlassDrawn: false,
+    // [EN] The same rule as `itemGlassDrawn` under the iOS names (`drawsLiquidGlass` / `drawsFlatBackground`), for the template or a host to read. [CN] 与 `itemGlassDrawn` 同一规则，使用 iOS 的名称（`drawsLiquidGlass` / `drawsFlatBackground`），供模板或宿主读取。
+    itemDrawsLiquidGlass: false,
+    itemDrawsFlatBackground: true,
+    itemPressed: false,
     animationLoaded: false,
     animationFailed: false,
     gifPlaying: false,
@@ -320,8 +379,10 @@ Component({
   },
 
   observers: {
-    'itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha, itemContentHorizontalInset, userInterfaceStyle': function () {
+    'itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha, itemContentHorizontalInset, userInterfaceStyle, itemHighlightedBackgroundColor, enabled': function () {
       this.cyl_refreshBackground()
+      // [EN] The colors are judged against the glass: a changed glass changes them. [CN] 颜色是对照玻璃判断的：玻璃变化，颜色也变化。
+      this.cyl_update()
     },
     'animationUrl, animationData, animationType': function (animationUrl, animationData, animationType) {
       // [EN] A host re-renders and sets the same file (or the same Lottie data object) again: keep the loaded / failed
@@ -350,6 +411,10 @@ Component({
     'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, selectedIconTint, animationTint, animationDarkTint, animationIconTint, animationSelectedIconTint, animationRenderingMode, builtInSelectedColor, animationColorKind, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing, cylInternalDivider, cylDividerColor, cylDividerLength, cylDividerVertical': function () {
       this.cyl_update()
     },
+    // [EN] The subclass, inherited and built-in color levels and the options that change the model. [CN] 子类、继承与内置颜色层级，以及改变模型的选项。
+    'subclassTitleColor, subclassSelectedTitleColor, subclassDisabledTitleColor, subclassIconColor, subclassSelectedIconColor, subclassDisabledIconColor, builtInTitleColor, builtInSelectedTitleColor, builtInDisabledTitleColor, builtInIconColor, builtInSelectedIconColor, builtInDisabledIconColor, inheritedTitleColor, inheritedIconTint, inheritedSelectedIconTint, itemDisabledAnimationAlpha, disabledWinsImage': function () {
+      this.cyl_update()
+    },
     'itemStyle, countdownIdleTitle, countdownRunningTitleFormat, countdownFinishedTitle, countdownImage, countdownRunningTitleColor, countdownDuration': function (itemStyle) {
       if (itemStyle !== 'countdown' && this.cylCountdown && this.data.countdownState !== 'idle') this.resetCountdown()
       this.cyl_update()
@@ -372,7 +437,7 @@ Component({
       if (last === undefined || !this.data.drivesAnimationPlayback) return
       if (Number(token) > Number(last) || Number(aliasToken) > Number(lastAlias)) this.restartAnimation()
     },
-    'selected, restingProgress': function () {
+    'selected, restingProgress, showsLastFrameWhenSelected': function () {
       // [EN] Host-driven: the host rests and plays through the player; only the drawing follows `selected`. [CN] 宿主驱动：宿主通过播放器静止与播放；只有绘制随 `selected` 变化。
       if (!this.data.drivesAnimationPlayback) {
         this.cyl_update()
@@ -444,16 +509,50 @@ Component({
 
   methods: {
     /**
-     * [EN] Builds the background (flat or drawn Liquid Glass) for the current inputs and mode: the default frosted tint of dark mode is white at 0.14, of
-     *      light mode (225, 222, 220) at 0.5. Called by the observer and again when the system theme changes (`userInterfaceStyle` `system`).
-     * [CN] 按当前输入与模式构建背景（扁平或绘制的液态玻璃）：深色模式的默认磨砂着色是透明度 0.14 的白色，浅色模式是透明度 0.5 的 (225, 222, 220)。由 observer 调用，
+     * [EN] Builds the background (flat or drawn Liquid Glass) for the current inputs and mode: the default frosted tint of dark mode is white at 0.04, of
+     *      light mode (225, 222, 220) at 0.10. Called by the observer and again when the system theme changes (`userInterfaceStyle` `system`).
+     * [CN] 按当前输入与模式构建背景（扁平或绘制的液态玻璃）：深色模式的默认磨砂着色是透明度 0.04 的白色，浅色模式是透明度 0.10 的 (225, 222, 220)。由 observer 调用，
      *      系统主题变化时（`userInterfaceStyle` 为 `system`）再次调用。
      */
     cyl_refreshBackground() {
       const d = this.data
       const dark = cylAnimatedItemIsDark({ userInterfaceStyle: d.userInterfaceStyle, systemTheme: d.systemTheme })
       const background = cylAnimatedItemBackground(d.itemBackgroundStyle, d.itemBackgroundColor, d.itemCornerRadius, d.itemBorderWidth, d.itemBorderColor, dark, d.itemGlassTintAlpha, d.itemContentHorizontalInset)
-      this.setData({ itemBackgroundCss: background.css, itemGlassDrawn: background.glass })
+      const drawsLiquidGlass = cylAnimatedItemDrawsLiquidGlass(d)
+      // [EN] The pressed background (`itemHighlightedBackgroundColor`, while pressed and enabled) replaces the tint. [CN] 按下背景（`itemHighlightedBackgroundColor`，按下且可用时）取代着色。
+      const highlight = d.itemPressed && d.enabled !== false ? cylAnimatedItemTintColor(d.itemHighlightedBackgroundColor) : ''
+      this.setData({
+        itemBackgroundCss: background.css + (highlight ? `background-color:${highlight};` : ''),
+        itemGlassDrawn: background.glass,
+        itemDrawsLiquidGlass: drawsLiquidGlass,
+        itemDrawsFlatBackground: !drawsLiquidGlass,
+      })
+    },
+
+    /**
+     * [EN] The item's own dark-glass rule as a public function (iOS `adaptedOnGlass(_:kind:)`): `color` as it must be drawn for this item's glass state, theme, background
+     *      colour and tint alpha; `kind` 'icon' (minimum 3) or 'title' (minimum 4.5, 'text' too). Unchanged unless dark Liquid Glass is drawn.
+     * [CN] 条目自己的深色玻璃规则，公开为函数（iOS 的 `adaptedOnGlass(_:kind:)`）：`color` 对本条目的玻璃状态、主题、背景色与着色透明度实际应绘制的颜色；
+     *      `kind` 为 'icon'（最低 3）或 'title'（最低 4.5，'text' 亦可）。除非绘制深色液态玻璃，否则原样返回。
+     */
+    adaptedOnGlass(color, kind) {
+      return cylAnimatedItemAdaptedColor(color, kind, this.data)
+    },
+
+    /** [EN] Whether the engine of `type` (default: this item's type) can draw (iOS `isAnimationEngineAvailable`). [CN] `type`（默认为本条目的类型）的引擎是否可绘制（iOS 的 `isAnimationEngineAvailable`）。 */
+    cyl_isAnimationEngineAvailable(type) {
+      return cylAnimatedItemIsAnimationEngineAvailable(type || this.data.m?.animationType, cylWarnedTypes)
+    },
+
+    /** [EN] Pressed look on / off for `itemHighlightedBackgroundColor`. [CN] `itemHighlightedBackgroundColor` 的按下外观开 / 关。 */
+    cyl_setPressed(pressed) {
+      if (!this.data.itemHighlightedBackgroundColor || !!this.data.itemPressed === pressed) return
+      this.setData({ itemPressed: pressed })
+      this.cyl_refreshBackground()
+    },
+
+    cyl_onTouchCancel() {
+      this.cyl_setPressed(false)
     },
 
     /**
@@ -1005,6 +1104,7 @@ Component({
     },
 
     cyl_onTouchStart(event) {
+      if (this.data.enabled) this.cyl_setPressed(true)
       if (!this.data.dragEnabled || this.data.embedded) return
       const touch = event.touches[0]
       this.cylDragStart = { x: touch.clientX, y: touch.clientY }
@@ -1018,6 +1118,7 @@ Component({
     },
 
     cyl_onTouchEnd(event) {
+      this.cyl_setPressed(false)
       if (!this.data.dragEnabled || !this.cylDragStart) return
       const touch = event.changedTouches[0]
       this.triggerEvent('dragend', { dx: touch.clientX - this.cylDragStart.x, dy: touch.clientY - this.cylDragStart.y })

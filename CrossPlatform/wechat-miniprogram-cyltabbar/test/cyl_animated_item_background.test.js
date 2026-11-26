@@ -43,8 +43,20 @@ test('liquidGlass: backdrop-filter over the tint where the rule is active, flat 
 
 test('a radius below zero is square and the glass has a default tint', () => {
   assert.match(cylAnimatedItemBackground('flat', '#fff', 0, 0, '', false).css, /border-radius:0px;/)
-  assert.match(cylAnimatedItemBackground('liquidGlass', '', 8, 0, '', false).css, /background-color:rgba\(225,222,220,0.5\);/)
-  assert.match(cylAnimatedItemBackground('liquidGlass', '', 8, 0, '', true).css, /background-color:rgba\(255,255,255,0.14\);/)
+  assert.match(cylAnimatedItemBackground('liquidGlass', '', 8, 0, '', false).css, /background-color:rgba\(225,222,220,0.10\);/)
+  assert.match(cylAnimatedItemBackground('liquidGlass', '', 8, 0, '', true).css, /background-color:rgba\(255,255,255,0.04\);/)
+})
+
+test('the default glass tint constants: 0.10 frosted light, 0.04 white dark, applied with their own alpha; an explicit colour keeps x0.75', () => {
+  const m = require('../src/cyl-animated-item/cyl_animated_item_model')
+  assert.equal(m.cylAnimatedItemDefaultGlassTintAlphaLight, 0.10)
+  assert.equal(m.cylAnimatedItemDefaultGlassTintAlphaDark, 0.04)
+  assert.equal(m.cylAnimatedItemDefaultGlassTintLight, 'rgba(225,222,220,0.10)')
+  assert.equal(m.cylAnimatedItemDefaultGlassTintDark, 'rgba(255,255,255,0.04)')
+  assert.match(cylAnimatedItemBackground('liquidGlass', '', 8, 0, '', false).css, /background-color:rgba\(225,222,220,0.10\);/)
+  assert.match(cylAnimatedItemBackground('liquidGlass', '', 8, 0, '', true).css, /background-color:rgba\(255,255,255,0.04\);/)
+  assert.equal(m.cylAnimatedItemGlassTint('#000000', undefined), 'rgba(0,0,0,0.75)')
+  assert.match(cylAnimatedItemBackground('liquidGlass', '#000000', 8, 0, '', true).css, /background-color:rgba\(0,0,0,0.75\);/)
 })
 
 test('an unset radius (-1) is a capsule for the drawn glass and square for flat; a set radius wins', () => {
@@ -75,9 +87,9 @@ test('a fully transparent color means no color: the glass gets the default frost
   assert.equal(cylAnimatedItemGlassTint('#00FF0000'), '')
   cylAnimatedItemLiquidGlassSetActiveOverride(true)
   for (const clear of ['transparent', 'rgba(0,0,0,0)', '']) {
-    assert.match(cylAnimatedItemBackground('liquidGlass', clear, -1, 0, '', false).css, /background-color:rgba\(225,222,220,0.5\);backdrop-filter/, `"${clear}": the default tint`)
+    assert.match(cylAnimatedItemBackground('liquidGlass', clear, -1, 0, '', false).css, /background-color:rgba\(225,222,220,0.10\);backdrop-filter/, `"${clear}": the default tint`)
   }
-  assert.match(cylAnimatedItemBackground('liquidGlass', 'transparent', -1, 0, '', true).css, /background-color:rgba\(255,255,255,0.14\);/)
+  assert.match(cylAnimatedItemBackground('liquidGlass', 'transparent', -1, 0, '', true).css, /background-color:rgba\(255,255,255,0.04\);/)
 })
 
 test('itemContentHorizontalInset: unset is the glass constant on drawn glass and 0 on flat; an explicit value wins (the partner of the unset radius)', () => {

@@ -8,6 +8,7 @@ const {
   CYL_TITLE_MINIMUM_CONTRAST,
   cylAnimatedItemContrastLift,
   cylAnimatedItemGlassReferenceLuminance,
+  cylAnimatedItemRenderedGlassReferenceLuminance,
 } = require('../src/cyl-animated-item/cyl_animated_item_contrast')
 const { cylAnimatedItemModel, cylAnimatedItemLiquidGlassSetActiveOverride, cylAnimatedItemAdaptedColor, CYL_ADAPTED_KIND_ICON, CYL_ADAPTED_KIND_TEXT } = require('../src/cyl-animated-item/cyl_animated_item_model')
 
@@ -21,7 +22,7 @@ const lum = (hex) => {
   return 0.2126 * ch(Math.floor(n / 65536)) + 0.7152 * ch(Math.floor(n / 256) % 256) + 0.0722 * ch(n % 256)
 }
 const contrast = (hex, glass, alpha) => {
-  const a = lum(hex); const b = cylAnimatedItemGlassReferenceLuminance(glass, alpha)
+  const a = lum(hex); const b = cylAnimatedItemRenderedGlassReferenceLuminance(glass, alpha)
   return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
 }
 const hsl = (hex) => {

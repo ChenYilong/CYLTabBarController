@@ -1,6 +1,6 @@
 const { cylIsGIFImagePath } = require('./cyl_gif_image')
 const { cylCountdownText } = require('./cyl_animated_item_countdown')
-const { cylAnimatedItemContrastLift, CYL_ICON_MINIMUM_CONTRAST, CYL_TITLE_MINIMUM_CONTRAST, CYL_ADAPTED_KIND_ICON, CYL_ADAPTED_KIND_TEXT } = require('./cyl_animated_item_contrast')
+const { cylAnimatedItemContrastLift, CYL_ICON_MINIMUM_CONTRAST, CYL_TITLE_MINIMUM_CONTRAST, CYL_ADAPTED_KIND_ICON, CYL_ADAPTED_KIND_TEXT, CYL_ADAPTED_KIND_TITLE } = require('./cyl_animated_item_contrast')
 /**
  * [EN] The render model of cyl-animated-item, the mini program counterpart of iOS `CYLAnimatedItemView` (the
  *      CYLAnimatedItem pod) and Android `com.cyl.animateditem.CYLAnimatedItemView`. Pure functions without any wx API,
@@ -132,6 +132,8 @@ function cylAnimatedItemRestingProgress(p) {
   // [EN] Host-driven (`drivesAnimationPlayback` false): the progress the host last stopped at, whatever is selected.
   // [CN] 宿主驱动（`drivesAnimationPlayback` 为 false）：宿主上次停下的进度，与选中状态无关。
   if (p.drivesAnimationPlayback === false) {
+    // [EN] `showsLastFrameWhenSelected` (default off): a selected host-driven item rests on the last frame, as the default rules do. [CN] `showsLastFrameWhenSelected`（默认关闭）：被选中的宿主驱动条目停在最后一帧，与默认规则相同。
+    if (p.showsLastFrameWhenSelected && p.selected) return 1
     const hosted = Number(p.hostRestingProgress)
     return Number.isFinite(hosted) ? Math.min(1, Math.max(0, hosted)) : 0
   }
@@ -387,18 +389,79 @@ function cylAnimatedItemBuiltInColor(name, isDark) {
 }
 
 /**
- * [EN] The EFFECTIVE icon color of the current state: the explicit color of the state (`iconTint` normal, `selectedIconTint` selected; the item's, else
- *      the stack's, already merged by the caller), else the built-in (selected: the host's default selected color, else systemBlue; normal: label). A
- *      disabled item (`enabled` false) with no explicit color of its state takes the disabled built-in. '' for a color the canvas cannot use.
- * [CN] 当前状态「有效」的图标颜色：该状态的显式颜色（普通用 `iconTint`，选中用 `selectedIconTint`；条目的，否则堆叠的，由调用者合并），否则内置颜色
- *      （选中：宿主的默认选中色，否则 systemBlue；普通：label）。禁用的条目（`enabled` 为 false）在该状态没有显式颜色时使用禁用内置色。
+ * [EN] The color levels of the icon and the title (iOS `CYLAnimatedItemView`, the precedence note of the tint unification): the state of an item is
+ *      'disabled' (`enabled` false), 'selected' or 'normal'. A color level is the text of a property; '' means the level is absent.
+ * [CN] 图标与标题的颜色层级（iOS `CYLAnimatedItemView`，tint 统一说明中的优先级）：条目状态为 'disabled'（`enabled` 为 false）、'selected' 或 'normal'。
+ *      颜色层级是属性的文本；'' 表示该层不存在。
  */
+function cylAnimatedItemStateName(p) {
+  if (p.enabled === false) return 'disabled'
+  return p.selected ? 'selected' : 'normal'
+}
+
+const CYL_ANIMATED_ITEM_STATE_PART = { normal: '', selected: 'Selected', disabled: 'Disabled' }
+
+/**
+ * [EN] The SUBCLASS-EXPLICIT color of a state (`subclassTitleColor` / `subclassSelectedTitleColor` / `subclassDisabledTitleColor`, and the same three
+ *      for `...IconColor`; '' = none). `part` is 'Title' or 'Icon'. A missing selected value falls back to the normal one. It counts as an EXPLICIT color
+ *      (adapted on drawn dark glass) and is never written into the integrator's `titleColor` / `iconTint`.
+ * [CN] 某状态的「子类显式」颜色（`subclassTitleColor` / `subclassSelectedTitleColor` / `subclassDisabledTitleColor`，图标为同样三个 `...IconColor`；'' 为无）。
+ *      `part` 为 'Title' 或 'Icon'。缺少选中值时回退到常态值。它算「显式」颜色（在绘制的深色玻璃上适配），且绝不写入集成方的 `titleColor` / `iconTint`。
+ */
+function cylAnimatedItemSubclassExplicit(p, part, state) {
+  const read = (name) => String(p[`subclass${CYL_ANIMATED_ITEM_STATE_PART[name]}${part}Color`] ?? '').trim()
+  return state === 'selected' ? read('selected') || read('normal') : read(state)
+}
+
+/**
+ * [EN] The SUBCLASS BUILT-IN color of a state (the twin of iOS `applyTitleTintColor` / `applyIconTintColor`: `builtInTitleColor`,
+ *      `builtInSelectedTitleColor`, `builtInDisabledTitleColor`, and `builtInIconColor`, `builtInSelectedIconColor`, `builtInDisabledIconColor`; a host such as cyl-tag-list sets
+ *      them to its effective color of each state; '' = none). No fallback between states.
+ * [CN] 某状态的「子类内置」颜色（iOS `applyTitleTintColor` / `applyIconTintColor` 的对应：`builtInTitleColor`、`builtInSelectedTitleColor`、
+ *      `builtInDisabledTitleColor` 与 `builtInIconColor`、`builtInSelectedIconColor`、`builtInDisabledIconColor`；cyl-tag-list 等宿主把它们设为各状态的有效颜色；'' 为无）。状态之间不回退。
+ */
+function cylAnimatedItemSubclassBuiltIn(p, part, state) {
+  return String(p[`builtIn${CYL_ANIMATED_ITEM_STATE_PART[state]}${part}Color`] ?? '').trim()
+}
+
+/** [EN] The component built-in color of a state: the disabled look, the host's default selected color (else systemBlue) or label. [CN] 某状态的组件内置颜色：禁用外观、宿主的默认选中色（否则 systemBlue）或 label。 */
+function cylAnimatedItemComponentBuiltIn(p, state, dark) {
+  if (state === 'disabled') return cylAnimatedItemBuiltInColor('disabled', dark)
+  if (state === 'selected') return cylAnimatedItemTintColor(p.builtInSelectedColor) || cylAnimatedItemBuiltInColor('selected', dark)
+  return cylAnimatedItemBuiltInColor('label', dark)
+}
+
+/**
+ * [EN] The EFFECTIVE icon color of the current state, ONE function for every level (precedence, as iOS): the item's own explicit color (`iconTint` normal,
+ *      `selectedIconTint` selected; the item's, else the stack's, already merged by the caller) > subclass-explicit (`subclass...IconColor` of the state, selected
+ *      falls back to normal) > stack-inherited (`inheritedIconTint` / `inheritedSelectedIconTint`, for a host that passes the stack's color apart from its own)
+ *      > subclass built-in (`builtIn...IconColor`) > component built-in (disabled look, the host's default selected color else systemBlue, label). The explicit
+ *      levels AND both built-in levels (normal and selected) go through the glass adapter (`p.adaptColor`, else `cylAnimatedItemAdaptedColor` of `p`: only on drawn dark
+ *      glass, icon minimum 3); the DISABLED built-in look never. '' for a color the canvas cannot use.
+ * [CN] 当前状态「有效」的图标颜色，所有层级用同一个函数（优先级同 iOS）：条目自己的显式颜色（普通 `iconTint`，选中 `selectedIconTint`；条目的，否则堆叠的，由调用者合并）
+ *      > 子类显式（该状态的 `subclass...IconColor`，选中缺失时回退到常态）> 堆叠继承（`inheritedIconTint` / `inheritedSelectedIconTint`，供把堆叠的颜色与自己的分开传入的宿主）
+ *      > 子类内置（`builtIn...IconColor`）> 组件内置（禁用外观、宿主的默认选中色否则 systemBlue、label）。显式层与两个内置层（常态与选中）都经过玻璃适配
+ *      （`p.adaptColor`，否则用 `p` 的 `cylAnimatedItemAdaptedColor`：只在绘制的深色玻璃上，图标最低 3）；「禁用」内置外观从不适配。画布无法使用的颜色为 ''。
+ */
+function cylAnimatedItemResolvedIconColor(p) {
+  const state = cylAnimatedItemStateName(p)
+  const dark = p.isDark === undefined ? cylAnimatedItemIsDark(p) : !!p.isDark
+  const adapt = p.adaptColor || ((color) => cylAnimatedItemAdaptedColor(color, CYL_ADAPTED_KIND_ICON, p))
+  const own = cylAnimatedItemTintColor(p.selected ? p.selectedIconTint : p.iconTint)
+  if (own) return adapt(own)
+  const subclass = cylAnimatedItemTintColor(cylAnimatedItemSubclassExplicit(p, 'Icon', state))
+  if (subclass) return adapt(subclass)
+  const inherited = cylAnimatedItemTintColor(p.selected ? p.inheritedSelectedIconTint || p.inheritedIconTint : p.inheritedIconTint)
+  if (inherited) return adapt(inherited)
+  const builtIn = cylAnimatedItemTintColor(cylAnimatedItemSubclassBuiltIn(p, 'Icon', state))
+  if (builtIn) return state === 'disabled' ? builtIn : adapt(builtIn)
+  const component = cylAnimatedItemComponentBuiltIn(p, state, dark)
+  return state === 'disabled' ? component : adapt(component)
+}
+
+/** [EN] The effective icon color (see `cylAnimatedItemResolvedIconColor`, which this forwards to). [CN] 有效图标颜色（转到 `cylAnimatedItemResolvedIconColor`）。 */
 function cylAnimatedItemEffectiveIconColor(p) {
-  const explicit = cylAnimatedItemTintColor(p.selected ? p.selectedIconTint : p.iconTint)
-  if (explicit) return p.adaptColor ? p.adaptColor(explicit) : explicit
-  if (p.enabled === false) return cylAnimatedItemBuiltInColor('disabled', p.isDark)
-  if (p.selected) return cylAnimatedItemTintColor(p.builtInSelectedColor) || cylAnimatedItemBuiltInColor('selected', p.isDark)
-  return cylAnimatedItemBuiltInColor('label', p.isDark)
+  return cylAnimatedItemResolvedIconColor(p)
 }
 
 /**
@@ -550,42 +613,126 @@ function cylAnimatedItemRestingFrame(p) {
 }
 
 /**
- * [EN] The title color: the explicit one (the dark variant while dark), else the built-in one.
- * [CN] 标题颜色：显式颜色（深色时用深色变体），否则为内置颜色。
+ * [EN] The title color, ONE function for every level (precedence, as iOS): the item's own explicit color (`titleDarkColor` while dark, else `titleColor`) >
+ *      subclass-explicit (`subclassTitleColor` / `subclassSelectedTitleColor` / `subclassDisabledTitleColor`, selected falls back to normal) > stack-inherited
+ *      (`inheritedTitleColor`) > subclass built-in (`builtInTitleColor`, `builtInSelectedTitleColor`, `builtInDisabledTitleColor`) > component built-in (disabled look, the host's default
+ *      selected color else systemBlue, label). The explicit levels AND both built-in levels (normal and selected) are adapted on drawn dark glass (title minimum
+ *      4.5, `cylAnimatedItemAdaptedColor`); the DISABLED built-in look is not. Public properties keep the app's value: nothing is written back.
+ * [CN] 标题颜色，所有层级用同一个函数（优先级同 iOS）：条目自己的显式颜色（深色时 `titleDarkColor`，否则 `titleColor`）> 子类显式（`subclassTitleColor` /
+ *      `subclassSelectedTitleColor` / `subclassDisabledTitleColor`，选中缺失时回退到常态）> 堆叠继承（`inheritedTitleColor`）> 子类内置（`builtInTitleColor`、
+ *      `builtInSelectedTitleColor`、`builtInDisabledTitleColor`）> 组件内置（禁用外观、宿主的默认选中色否则 systemBlue、label）。显式层与两个内置层（常态与选中）在绘制的深色玻璃上适配
+ *      （标题最低 4.5，`cylAnimatedItemAdaptedColor`）；「禁用」内置外观不适配。公开属性保持应用的值：不会写回任何值。
  */
-function cylAnimatedItemTitleColor(p, dark, adapt) {
-  const explicitTitleColor = dark && p.titleDarkColor ? p.titleDarkColor : p.titleColor
-  if (explicitTitleColor) return adapt ? adapt(explicitTitleColor) : explicitTitleColor
-  return cylAnimatedItemEffectiveIconColor({ selected: p.selected, enabled: p.enabled, isDark: dark, builtInSelectedColor: p.builtInSelectedColor })
+function cylAnimatedItemResolvedTitleColor(p) {
+  const state = cylAnimatedItemStateName(p)
+  const dark = cylAnimatedItemIsDark(p)
+  const adapt = (color) => cylAnimatedItemAdaptedColor(color, CYL_ADAPTED_KIND_TITLE, p)
+  const own = dark && p.titleDarkColor ? p.titleDarkColor : p.titleColor
+  if (own) return adapt(own)
+  const subclass = cylAnimatedItemSubclassExplicit(p, 'Title', state)
+  if (subclass) return adapt(subclass)
+  const inherited = String(p.inheritedTitleColor ?? '').trim()
+  if (inherited) return adapt(inherited)
+  const builtIn = cylAnimatedItemSubclassBuiltIn(p, 'Title', state)
+  if (builtIn) return state === 'disabled' ? builtIn : adapt(builtIn)
+  const component = cylAnimatedItemComponentBuiltIn(p, state, dark)
+  return state === 'disabled' ? component : adapt(component)
 }
 
 /**
- * [EN] The color adapter of an item: lifts an explicit color (minimum contrast `minimum`) only when its Liquid Glass is really drawn
- *      (`itemBackgroundStyle` 'liquidGlass' and `cylAnimatedItemLiquidGlassIsActive()`) and the item is dark; else null (colors unchanged).
- * [CN] 条目的颜色适配器：仅当液态玻璃真正绘制且条目为深色时，提亮显式颜色（最低对比度 `minimum`）；否则为 null（颜色不变）。
+ * [EN] Whether the item DRAWS Liquid Glass: the resolved style is 'liquidGlass' AND `cylAnimatedItemLiquidGlassIsActive()` holds (iOS `drawsLiquidGlass`). Of the
+ *      properties only: no layer and no size, which change before layout. The contrast guard uses this one rule (and the component data field `itemDrawsLiquidGlass`).
+ * [CN] 条目是否「绘制」液态玻璃：解析后的样式为 'liquidGlass' 且 `cylAnimatedItemLiquidGlassIsActive()` 成立（iOS 的 `drawsLiquidGlass`）。只依据属性：
+ *      不依据图层或尺寸（它们在布局之前就会变化）。对比度 guard 使用这一条规则（以及组件数据字段 `itemDrawsLiquidGlass`）。
+ */
+function cylAnimatedItemDrawsLiquidGlass(p) {
+  return !!p && p.itemBackgroundStyle === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive()
+}
+
+/** [EN] The opposite of `cylAnimatedItemDrawsLiquidGlass`: glass asked for but not drawn counts as flat (iOS `drawsFlatBackground`). [CN] `cylAnimatedItemDrawsLiquidGlass` 的反面：请求了玻璃但没有绘制算扁平（iOS 的 `drawsFlatBackground`）。 */
+function cylAnimatedItemDrawsFlatBackground(p) {
+  return !cylAnimatedItemDrawsLiquidGlass(p)
+}
+
+/**
+ * [EN] The color adapter of an item: lifts a color (minimum contrast `minimum`) only when its Liquid Glass is really drawn (`cylAnimatedItemDrawsLiquidGlass`)
+ *      and the item is dark; else null (colors unchanged).
+ * [CN] 条目的颜色适配器：仅当液态玻璃真正绘制（`cylAnimatedItemDrawsLiquidGlass`）且条目为深色时，提亮颜色（最低对比度 `minimum`）；否则为 null（颜色不变）。
  */
 function cylAnimatedItemGlassContrastAdapter(p, minimum) {
-  if (p.itemBackgroundStyle !== 'liquidGlass' || !cylAnimatedItemLiquidGlassIsActive() || !cylAnimatedItemIsDark(p)) return null
+  if (!cylAnimatedItemDrawsLiquidGlass(p) || !cylAnimatedItemIsDark(p)) return null
   return (color) => cylAnimatedItemContrastLift(color, minimum, p.itemBackgroundColor, Number(p.itemGlassTintAlpha))
 }
 
 /**
- * [EN] The colour `color` as it must be drawn for the item `p` (the item's properties): unchanged unless the glass adapter applies
- *      (dark item with really drawn Liquid Glass, see `cylAnimatedItemGlassContrastAdapter`), else lifted to the minimum contrast of
- *      `kind` (CYL_ADAPTED_KIND_ICON: 3, CYL_ADAPTED_KIND_TEXT: 4.5). The model uses this single path for the title, the icon tint and
+ * [EN] The colour `color` as it must be drawn for the item `p` (the item's properties, the item-state form of iOS `adaptedOnGlass(_:kind:)`): unchanged unless the
+ *      glass adapter applies (dark item with really drawn Liquid Glass, see `cylAnimatedItemGlassContrastAdapter`), else lifted to the minimum contrast of
+ *      `kind` (CYL_ADAPTED_KIND_ICON: 3, CYL_ADAPTED_KIND_TEXT or CYL_ADAPTED_KIND_TITLE: 4.5) against the RENDERED glass
+ *      (`cylAnimatedItemRenderedGlassReferenceLuminance`). The model uses this single path for the title, the icon tint and
  *      the animation tint. A host that draws its own static icon (e.g. the cyl-tag-list component, which bakes the colour of a
- *      `system:` symbol into an SVG data URI) must call it BEFORE baking the colour, with the same `p` as the item.
- * [CN] 条目 `p`（条目属性）实际应绘制的颜色：除非玻璃适配器生效（深色条目且真正绘制液态玻璃，见 `cylAnimatedItemGlassContrastAdapter`），
- *      否则原样返回；生效时提亮到 `kind` 的最低对比度（CYL_ADAPTED_KIND_ICON：3，CYL_ADAPTED_KIND_TEXT：4.5）。模型的标题、图标着色与
+ *      `system:` symbol into an SVG data URI) must call it BEFORE baking the colour, with the same `p` as the item. The caller decides which colours are
+ *      adapted (explicit and built-in ones, not the disabled look).
+ * [CN] 条目 `p`（条目属性，即 iOS `adaptedOnGlass(_:kind:)` 的条目状态形式）实际应绘制的颜色：除非玻璃适配器生效（深色条目且真正绘制液态玻璃，见
+ *      `cylAnimatedItemGlassContrastAdapter`），否则原样返回；生效时对照「实际渲染」的玻璃（`cylAnimatedItemRenderedGlassReferenceLuminance`）提亮到 `kind` 的最低对比度
+ *      （CYL_ADAPTED_KIND_ICON：3，CYL_ADAPTED_KIND_TEXT 或 CYL_ADAPTED_KIND_TITLE：4.5）。模型的标题、图标着色与
  *      动画着色都走这一条路径。自己绘制静态图标的宿主（如 cyl-tag-list 组件把 `system:` 符号的颜色烘焙进 SVG data URI）必须在烘焙颜色之前
- *      以与条目相同的 `p` 调用它。
- * @param {string} color the explicit colour text
- * @param {string} kind CYL_ADAPTED_KIND_ICON ('icon') or CYL_ADAPTED_KIND_TEXT ('text')
- * @param {object} p the item properties (itemBackgroundStyle, itemBackgroundColor, itemGlassTintAlpha, userInterfaceStyle, ...)
+ *      以与条目相同的 `p` 调用它。哪些颜色要适配（显式与内置颜色，不含禁用外观）由调用者决定。
+ * @param {string} color the colour text
+ * @param {string} kind CYL_ADAPTED_KIND_ICON ('icon'), CYL_ADAPTED_KIND_TEXT ('text') or CYL_ADAPTED_KIND_TITLE ('title')
+ * @param {object} p the item properties (itemBackgroundStyle, itemBackgroundColor, itemGlassTintAlpha, userInterfaceStyle, systemTheme, ...)
  */
 function cylAnimatedItemAdaptedColor(color, kind, p) {
-  const adapter = cylAnimatedItemGlassContrastAdapter(p || {}, kind === CYL_ADAPTED_KIND_TEXT ? CYL_TITLE_MINIMUM_CONTRAST : CYL_ICON_MINIMUM_CONTRAST)
+  const isTitle = kind === CYL_ADAPTED_KIND_TEXT || kind === CYL_ADAPTED_KIND_TITLE
+  const adapter = cylAnimatedItemGlassContrastAdapter(p || {}, isTitle ? CYL_TITLE_MINIMUM_CONTRAST : CYL_ICON_MINIMUM_CONTRAST)
   return adapter ? adapter(color) : color
+}
+
+/**
+ * [EN] Static helper (iOS `resolvedContentHorizontalInset(_:style:)`): the content inset an item gets for an explicit value (0 or more; -1 = not set) and a background
+ *      style: the explicit value, else the Liquid Glass default while that glass is drawn, else 0. Forwards to `cylAnimatedItemBackgroundInset`.
+ * [CN] 静态辅助（iOS 的 `resolvedContentHorizontalInset(_:style:)`）：显式值（0 及以上；-1 为未设置）与背景样式对应的内容内边距：显式值，否则绘制液态玻璃时为玻璃默认值，否则为 0。
+ *      转到 `cylAnimatedItemBackgroundInset`。
+ */
+function cylAnimatedItemResolvedContentHorizontalInset(explicit, style) {
+  return cylAnimatedItemBackgroundInset(Number(explicit) >= 0 ? Number(explicit) : -1, style === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive())
+}
+
+/**
+ * [EN] Static helper (iOS `isAnimationEngineAvailable`): whether the engine of an animation `type` can draw. GIF is drawn by `<image>`, always; Lottie, PAG, Rive and
+ *      SVGA are engine components the APP names with `generic:`: a mini program cannot probe that in a pure function, so the item learns a missing engine from its first
+ *      `error` (`failedTypes`: the types whose engine failed, the item's `cylWarnedTypes`). Unknown type: false.
+ * [CN] 静态辅助（iOS 的 `isAnimationEngineAvailable`）：动画 `type` 的引擎是否可绘制。GIF 由 `<image>` 绘制，始终可用；Lottie、PAG、Rive、SVGA 是 App 用 `generic:` 指定的引擎组件：
+ *      小程序无法在纯函数里探测，所以条目从第一次 `error` 得知引擎缺失（`failedTypes`：引擎失败过的类型，即条目的 `cylWarnedTypes`）。未知类型：false。
+ */
+function cylAnimatedItemIsAnimationEngineAvailable(type, failedTypes) {
+  if (!CYL_ANIMATED_ITEM_TYPES.some((entry) => entry.type === type)) return false
+  if (type === 'gif') return true
+  return !(Array.isArray(failedTypes) && failedTypes.includes(type))
+}
+
+/**
+ * [EN] The EXPLICIT static-image tints of an item (own > subclass-explicit > stack-inherited, per level selected falling back to normal): `{ iconTint, selectedIconTint }`
+ *      as `cylAnimatedItemStillLayers` reads them. Built-in colors are not part of it.
+ * [CN] 条目的「显式」静态图片着色（自己的 > 子类显式 > 堆叠继承，每层选中缺失时回退到常态）：`cylAnimatedItemStillLayers` 读取的 `{ iconTint, selectedIconTint }`。内置颜色不在其中。
+ */
+function cylAnimatedItemExplicitStillTints(p) {
+  const has = cylAnimatedItemHasValue
+  const levels = [
+    [p.iconTint, p.selectedIconTint],
+    [cylAnimatedItemSubclassExplicit(p, 'Icon', 'normal'), cylAnimatedItemSubclassExplicit(p, 'Icon', 'selected')],
+    [p.inheritedIconTint, p.inheritedSelectedIconTint],
+  ]
+  const normal = levels.map((level) => level[0]).find(has) || ''
+  // [EN] The own selected tint (even '') stays as it was; else the first level with a color gives its selected one (its normal one when it has none). [CN] 自己的选中着色（即使是 ''）保持原样；否则取第一个有颜色的层级的选中值（没有时用它的常态值）。
+  if (p.selectedIconTint !== null && p.selectedIconTint !== undefined) return { iconTint: normal, selectedIconTint: p.selectedIconTint }
+  const first = levels.find((level) => has(level[0]) || has(level[1]))
+  return { iconTint: normal, selectedIconTint: first ? (has(first[1]) ? first[1] : first[0]) : null }
+}
+
+/** [EN] The opacity style of the animation while disabled (`itemDisabledAnimationAlpha` 0...1), else ''. [CN] 禁用时动画的透明度样式（`itemDisabledAnimationAlpha` 0...1），否则为 ''。 */
+function cylAnimatedItemDisabledAnimationStyle(p) {
+  const alpha = Number(p.itemDisabledAnimationAlpha)
+  return p.enabled === false && p.itemDisabledAnimationAlpha !== null && p.itemDisabledAnimationAlpha !== undefined && alpha >= 0 && alpha <= 1 ? `opacity: ${alpha};` : ''
 }
 
 function cylAnimatedItemModel(input) {
@@ -602,10 +749,15 @@ function cylAnimatedItemModel(input) {
   const { usesEngine, gifShows, ended, animationShows } = cylAnimatedItemAnimationState(p, animationType, hasSource)
   // [EN] Dark Liquid Glass drawn: explicit title / icon colors without enough contrast are lifted (cyl_animated_item_contrast.js). [CN] 绘制深色液态玻璃时：对比度不足的显式标题 / 图标颜色会被提亮。
   const adaptIcon = (color) => cylAnimatedItemAdaptedColor(color, CYL_ADAPTED_KIND_ICON, p)
-  const adaptTitle = (color) => cylAnimatedItemAdaptedColor(color, CYL_ADAPTED_KIND_TEXT, p)
-  const fallbackImage = cylAnimatedItemFallbackImage(p, hasSource, animationShows)
+  // [EN] `disabledWinsImage` (default off): a disabled item shows its normal image and tint even while selected (`selectedImage` only when selected AND enabled). The static
+  //      image tints are the EXPLICIT levels only (own > subclass-explicit > stack-inherited; tint spec v2: a built-in color never tints a static image).
+  //      [CN] `disabledWinsImage`（默认关闭）：禁用的条目即使被选中也显示普通图片与着色（`selectedImage` 仅在选中且可用时）。静态图片着色只取「显式」层
+  //      （自己的 > 子类显式 > 堆叠继承；着色规范 v2：内置颜色从不给静态图片着色）。
+  const imageP = { ...p, ...cylAnimatedItemExplicitStillTints(p) }
+  if (p.disabledWinsImage && p.enabled === false) imageP.selected = false
+  const fallbackImage = cylAnimatedItemFallbackImage(imageP, hasSource, animationShows)
   const fallbackHidden = (animationShows && !gifShows) || cylGIFImageStillShows(p, hasSource, fallbackImage)
-  const layers = cylAnimatedItemStillLayers(p, fallbackImage, fallbackHidden, adaptIcon)
+  const layers = cylAnimatedItemStillLayers(imageP, fallbackImage, fallbackHidden, adaptIcon)
   const iconSize = cylAnimatedItemDimension(p.iconSize, 24)
   const iconWidth = cylAnimatedItemDimension(p.iconWidth, iconSize)
   const iconHeight = cylAnimatedItemDimension(p.iconHeight, iconSize)
@@ -620,7 +772,7 @@ function cylAnimatedItemModel(input) {
   const dark = cylAnimatedItemIsDark(p)
   // [EN] Built-in title color (tint spec v2): no explicit color (own / dark variant) means label, or the selected color while selected (the disabled look while disabled).
   //      [CN] 内置标题颜色（着色规范 v2）：没有显式颜色（自己的 / 深色变体）时为 label，选中时为选中色（禁用时为禁用外观）。
-  const titleColor = cylAnimatedItemTitleColor(p, dark, adaptTitle)
+  const titleColor = cylAnimatedItemResolvedTitleColor(p)
   const countdownWidth = cylAnimatedItemCountdownTitleWidth(p)
   const titleStyle = cylAnimatedItemTitleStyle(p, titleColor, titleLines) + (countdownWidth > 0 ? `min-width: ${countdownWidth}px; text-align: center;` : '')
   const titleLinesClass = cylAnimatedItemTitleLinesClass(titleLines)
@@ -644,6 +796,8 @@ function cylAnimatedItemModel(input) {
     gifImageStill: cylGIFImageStillShows(p, hasSource, fallbackImage),
     showsIcon: !!(fallbackImage || usesEngine || gifShows),
     iconStyle: `width: ${iconWidth}px; height: ${iconHeight}px;`,
+    // [EN] `itemDisabledAnimationAlpha` (0...1; -1 = not set = 1): the alpha of the animation (engine, GIF) while disabled. [CN] `itemDisabledAnimationAlpha`（0...1；-1 为未设置，即 1）：禁用时动画（引擎、GIF）的透明度。
+    animationStyle: cylAnimatedItemDisabledAnimationStyle(p),
     // [EN] A tint applies to the static image only; an animation keeps its own colors. [CN] 着色只作用于静态图片。
     iconTint: layers.currentTint,
     still: layers,
@@ -661,6 +815,15 @@ function cylAnimatedItemModel(input) {
       selected: p.selected,
       isDark: dark,
       adaptColor: adaptIcon,
+      // [EN] The subclass, stack-inherited and built-in levels reach the one icon resolution (cylAnimatedItemResolvedIconColor). [CN] 子类、堆叠继承与内置层级都进入同一个图标解析（cylAnimatedItemResolvedIconColor）。
+      subclassIconColor: p.subclassIconColor,
+      subclassSelectedIconColor: p.subclassSelectedIconColor,
+      subclassDisabledIconColor: p.subclassDisabledIconColor,
+      inheritedIconTint: p.inheritedIconTint,
+      inheritedSelectedIconTint: p.inheritedSelectedIconTint,
+      builtInIconColor: p.builtInIconColor,
+      builtInSelectedIconColor: p.builtInSelectedIconColor,
+      builtInDisabledIconColor: p.builtInDisabledIconColor,
       // [EN] The icon colors the tint follows: `animationIconTint` / `animationSelectedIconTint` when set (a tab bar item passes its
       //      title colors), else `iconTint` / `selectedIconTint`. [CN] 着色所跟随的图标颜色：设置了 `animationIconTint` /
       //      `animationSelectedIconTint` 时用它们（TabBar 项传入标题颜色），否则用 `iconTint` / `selectedIconTint`。
@@ -797,11 +960,35 @@ function cylAnimatedItemGlassFilter() {
 }
 
 /**
+ * [EN] The alpha of the default glass tint in light mode (frosted 225, 222, 220); same value as iOS `defaultGlassTintAlphaLight`.
+ * [CN] 浅色模式默认玻璃着色（磨砂色 225, 222, 220）的透明度；与 iOS `defaultGlassTintAlphaLight` 同值。
+ */
+const cylAnimatedItemDefaultGlassTintAlphaLight = 0.10
+
+/**
+ * [EN] The alpha of the default glass tint in dark mode (white); same value as iOS `defaultGlassTintAlphaDark`.
+ * [CN] 深色模式默认玻璃着色（白色）的透明度；与 iOS `defaultGlassTintAlphaDark` 同值。
+ */
+const cylAnimatedItemDefaultGlassTintAlphaDark = 0.04
+
+/**
+ * [EN] The default glass tint in light mode as a CSS color: `rgba(225,222,220,0.10)`, applied with its own alpha (not multiplied by the 0.75 share of an explicit color).
+ * [CN] 浅色模式默认玻璃着色（CSS 颜色）：`rgba(225,222,220,0.10)`，以其自身透明度使用（不乘以显式颜色的 0.75 份额）。
+ */
+const cylAnimatedItemDefaultGlassTintLight = `rgba(225,222,220,${cylAnimatedItemDefaultGlassTintAlphaLight.toFixed(2)})`
+
+/**
+ * [EN] The default glass tint in dark mode as a CSS color: `rgba(255,255,255,0.04)`.
+ * [CN] 深色模式默认玻璃着色（CSS 颜色）：`rgba(255,255,255,0.04)`。
+ */
+const cylAnimatedItemDefaultGlassTintDark = `rgba(255,255,255,${cylAnimatedItemDefaultGlassTintAlphaDark.toFixed(2)})`
+
+/**
  * [EN] The style text of the drawn glass: the tint (the default frosted tint without a usable color), blur and highlight.
  * [CN] 绘制的玻璃的样式文本：着色（没有可用颜色时为默认的磨砂着色）、模糊与高光。
  */
 function cylAnimatedItemGlassCss(color, tintAlpha, isDark) {
-  const tint = (color ? cylAnimatedItemGlassTint(color, tintAlpha) : '') || (isDark ? 'rgba(255,255,255,0.14)' : 'rgba(225,222,220,0.5)')
+  const tint = (color ? cylAnimatedItemGlassTint(color, tintAlpha) : '') || (isDark ? cylAnimatedItemDefaultGlassTintDark : cylAnimatedItemDefaultGlassTintLight)
   const filter = cylAnimatedItemGlassFilter()
   let css = `background-color:${tint};backdrop-filter:${filter};-webkit-backdrop-filter:${filter};`
   css += `box-shadow:inset 0 1px 0 rgba(255,255,255,${isDark ? 0.18 : 0.6});overflow:hidden;`
@@ -860,12 +1047,26 @@ function cylAnimatedItemResource(animationUrl) {
 }
 
 module.exports = {
+  cylAnimatedItemDefaultGlassTintAlphaLight,
+  cylAnimatedItemDefaultGlassTintAlphaDark,
+  cylAnimatedItemDefaultGlassTintLight,
+  cylAnimatedItemDefaultGlassTintDark,
   cylAnimatedItemGlassSaturation,
   cylAnimatedItemGlassBrightness,
   cylAnimatedItemGlassFilter,
   cylAnimatedItemAdaptedColor,
+  cylAnimatedItemResolvedTitleColor,
+  cylAnimatedItemResolvedIconColor,
+  cylAnimatedItemDrawsLiquidGlass,
+  cylAnimatedItemDrawsFlatBackground,
+  cylAnimatedItemResolvedContentHorizontalInset,
+  cylAnimatedItemIsAnimationEngineAvailable,
+  cylAnimatedItemSubclassExplicit,
+  cylAnimatedItemSubclassBuiltIn,
+  cylAnimatedItemStateName,
   CYL_ADAPTED_KIND_ICON,
   CYL_ADAPTED_KIND_TEXT,
+  CYL_ADAPTED_KIND_TITLE,
   cylAnimatedItemSourceOption,
   cylAnimatedItemMissingReason,
   cylAnimatedItemResource,
