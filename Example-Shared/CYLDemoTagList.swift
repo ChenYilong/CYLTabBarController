@@ -43,21 +43,6 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
     @objc static let titleMaxLines = 3
     @objc static let visibleRows = 3
 
-    /**
-     [EN] The badge of each badge sample, in the order of the core's samples (`UITableViewCell.cylBadgeTitle(forRow:)`; the rows repeat after the last one): the
-          text the old row's badge showed ("" is the red dot: an empty, non-nil `CYLTag.badgeText` draws the 8 pt dot since ClassifyMenu 00b40e8d), and true when the old row had custom colors (purple). Every other badge is red.
-     [CN] 每个角标样例的角标，顺序与核心的样例相同（`UITableViewCell.cylBadgeTitle(forRow:)`；超出最后一个后循环）：旧行角标显示的文字（"" 为红点），
-          以及旧行是否使用自定义颜色（紫色）。其余角标为红色。
-     */
-    private static let badgeSamples: [(text: String, purple: Bool)] = [
-        ("3", false), ("3", false), ("3", false), ("", false), ("3", false), ("new", false), ("3", false),
-        ("3", false), ("3", false), ("3", false), ("", false), ("3", false),
-        ("3", false), ("3", false), ("3", false), ("3", false), ("3", false), ("3", false),
-        ("", false), ("8", false), ("99+", false), ("9+", false), ("new", false), ("NEW", false), ("hot", false),
-        ("5", true), ("5", false), ("5", false), ("5", false), ("", false), ("5", false), ("new", false),
-        ("5", false), ("5", false), ("5", false),
-    ]
-
     private static let brackets = try? NSRegularExpression(pattern: "\\s*[（(]([^）)]*)[）)]")
 
     /**
@@ -113,6 +98,8 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
         list.cell.list.menuDelegate = list
         // [EN] A skin picked from the menu or the sheet changes the rows' subtitles. [CN] 从菜单或弹出列表选择皮肤会改变各行的副标题。
         host.view.cyl_themeDidChangeBlock = { [weak list] in list?.reload() }
+        // [EN] The badge images are drawn once per appearance: draw them again in light / dark. [CN] 角标图片按外观绘制一次：浅色 / 深色切换时重新绘制。
+        list.cell.colorAppearanceDidChange = { [weak list] in list?.reload() }
         list.reload()
         return list
     }
@@ -131,18 +118,19 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
             }
             sections.append([CYLTagSectionKey.title: source.demoTitle(forSection: section) ?? "", CYLTagSectionKey.items: items])
         }
+        let traits = tableView?.traitCollection ?? UITraitCollection(userInterfaceStyle: .light)
         // [EN] The badge samples are tags too (docs/instructions/examples.md): the sample's title, its page and a badge image before the title. [CN] 角标样例也是 Tag（docs/instructions/examples.md）：样例的标题、页面，以及标题前的角标图片。
         if let badgeCell, badgeRowCount > 0 {
             counts.append(badgeRowCount)
             sections.append([CYLTagSectionKey.title: cylDemoLocalizedString("角标"),
-                             CYLTagSectionKey.items: (0..<badgeRowCount).map { Self.badgeItem(from: badgeCell($0), row: $0, cleared: clearedBadgeRows.contains($0)) }])
+                             CYLTagSectionKey.items: (0..<badgeRowCount).map { Self.badgeItem(from: badgeCell($0), row: $0, cleared: clearedBadgeRows.contains($0), traits: traits) }])
         }
         let newSignature = sections.map { section in
             let items = (section[CYLTagSectionKey.items] as? [[String: Any]]) ?? []
             return ((section[CYLTagSectionKey.title] as? String) ?? "") + "|" + items.map {
                 "\($0[CYLTagItemKey.title] ?? "")-\($0[CYLTagItemKey.subtitle] ?? "")"
             }.joined(separator: "|")
-        }.joined(separator: "||") + "|cleared:" + clearedBadgeRows.sorted().map(String.init).joined(separator: ",")
+        }.joined(separator: "||") + "|cleared:" + clearedBadgeRows.sorted().map(String.init).joined(separator: ",") + "|style:\(traits.userInterfaceStyle.rawValue)"
         guard newSignature != signature else { return }
         let expanded = (0..<sectionCount).filter { signature != nil && cell.list.isSectionExpanded($0) }
         signature = newSignature
@@ -163,20 +151,37 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
         return item
     }
 
-    /// [EN] A badge sample's tag: like `item(from:)` but without the row's icon; the badge (`CYLTag.badgeText`, `badgeColor`, `badgeAccessibilityLabel`) is the image before the title, none once `cleared`. [CN] 角标样例的 Tag：与 `item(from:)` 相同但不用行图标；角标（`CYLTag.badgeText`、`badgeColor`、`badgeAccessibilityLabel`）是标题前的图片，`cleared` 后没有。
-    private static func badgeItem(from cell: UITableViewCell, row: Int, cleared: Bool) -> [String: Any] {
+    /**
+     [EN] A badge sample's tag: the old row's icon with the library's own badge on it (`cylShowBadge(forRow:)`: the sample's text, colors, border,
+          font and offset), drawn into one image in the table's appearance; the icon alone, same size, once `cleared`. A badge animation shows its resting frame.
+     [CN] 角标样例的 Tag：旧行的图标，以及库自己的角标（`cylShowBadge(forRow:)`：样例的文字、颜色、描边、字体与偏移），按表格的外观绘制为一张图片；
+          `cleared` 后只有图标（尺寸不变）。角标动画显示其静止帧。
+     */
+    private static func badgeItem(from cell: UITableViewCell, row: Int, cleared: Bool, traits: UITraitCollection) -> [String: Any] {
+        cell.overrideUserInterfaceStyle = traits.userInterfaceStyle
+        cell.cylShowBadge(forRow: row)
         var result = item(from: cell, identifier: "badge-\(row)")
-        result.removeValue(forKey: CYLTagItemKey.image)
-        if cleared { return result }
-        let sample = badgeSamples[row % badgeSamples.count]
-        let tag = CYLTag(title: result[CYLTagItemKey.title] as? String ?? "")
-        tag.badgeText = sample.text
-        tag.badgeColor = sample.purple ? .systemPurple : .systemRed
-        tag.badgeAccessibilityLabel = cylBadgeAccessibilityDescriptionEntryPoint(sample.text as NSString) as String?
-        let source = CYLTagDataSource(tags: [tag])
-        source.baseStyle = CYLMenuStyle(configuration: styleConfiguration)
-        if let image = source.menuImageForItem(at: IndexPath(item: 0, section: 0)) { result[CYLTagItemKey.image] = image }
+        guard let iconView = cell.imageView, let image = iconWithBadge(iconView, traits: traits, hidingBadge: cleared) else { return result }
+        result[CYLTagItemKey.image] = image
+        // [EN] At its own size, as on the old row: the default tag icon size would shrink the badge until it cannot be read. [CN] 按自身尺寸显示，与旧行相同：默认的 Tag 图标尺寸会把角标缩小到无法辨认。
+        result[CYLTagItemKey.style] = [CYLMenuStyleKey.imageSize: NSValue(cgSize: image.size)]
         return result
+    }
+
+    /// [EN] `iconView` and its badge (which sits partly outside the icon) as one image; `hidingBadge`: the icon alone in the same frame. [CN] `iconView` 及其角标（部分位于图标之外）合成的一张图片；`hidingBadge`：在相同范围内只画图标。
+    private static func iconWithBadge(_ iconView: UIImageView, traits: UITraitCollection, hidingBadge: Bool) -> UIImage? {
+        iconView.superview?.layoutIfNeeded()
+        guard let badge = iconView.cyl_badge, !badge.isHidden, !iconView.bounds.isEmpty else { return nil }
+        let rect = iconView.bounds.union(badge.convert(badge.bounds, to: iconView)).integral
+        let format = UIGraphicsImageRendererFormat(for: traits)
+        format.opaque = false
+        badge.isHidden = hidingBadge
+        let image = UIGraphicsImageRenderer(bounds: rect, format: format).image { context in
+            traits.performAsCurrent { iconView.layer.render(in: context.cgContext) }
+        }
+        badge.isHidden = false
+        if !hidingBadge { image.accessibilityLabel = cylBadgeAccessibilityDescriptionEntryPoint(badge.text as NSString?) as String? }
+        return image
     }
 
     private static let styleConfiguration: [String: Any] = [
@@ -230,6 +235,7 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
 final class CYLDemoTagListCell: UITableViewCell {
     let list = CYLTagListView(frame: .zero)
     weak var tableView: UITableView?
+    var colorAppearanceDidChange: (() -> Void)?
     private var heightConstraint: NSLayoutConstraint!
 
     init() {
@@ -265,6 +271,11 @@ final class CYLDemoTagListCell: UITableViewCell {
         heightConstraint.constant = height
         // [EN] The table measures its rows again (after this layout pass). [CN] 表格重新测量各行（在本次布局之后）。
         DispatchQueue.main.async { [weak tableView] in tableView?.performBatchUpdates(nil) }
+    }
+
+    override func traitCollectionDidChange(_ previous: UITraitCollection?) {
+        super.traitCollectionDidChange(previous)
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previous) { colorAppearanceDidChange?() }
     }
 }
 
