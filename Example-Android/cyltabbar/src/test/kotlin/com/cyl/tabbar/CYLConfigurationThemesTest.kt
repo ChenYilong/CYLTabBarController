@@ -108,7 +108,38 @@ class CYLConfigurationThemesTest {
         assertNull("a name no skin gives leaves the key out", item(controller, "home")[CYLConstants.CYLTabBarItemTitleColor])
     }
 
+    /**
+     * [EN] An activity recreated after a light / dark switch (no `configChanges`) builds a new controller in the same process with the shared manager: the skin of the
+     *      NEW mode is chosen, both ways (reported by the CYLTableViewPlaceHolder session on 973c255a: the bar kept the first mode's skin).
+     * [CN] 切换浅色 / 深色后重建的 Activity（未声明 `configChanges`）在同一进程中用共享的管理器构建新的控制器：两个方向都选用「新」模式的皮肤
+     *      （CYLTableViewPlaceHolder 会话在 973c255a 上报告：TabBar 保留了第一次模式的皮肤）。
+     */
     @Test
+    fun aRecreatedControllerFollowsTheNewMode() = withActivity { activity ->
+        val name = UUID.randomUUID().toString()
+        val extra = mapOf(CYLConstants.CYLTabBarControllerDarkThemeIdentifier to "dark")
+        fun switchTo(night: Boolean) {
+            val configuration = android.content.res.Configuration(activity.resources.configuration).apply {
+                uiMode = (uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK.inv()) or
+                    (if (night) android.content.res.Configuration.UI_MODE_NIGHT_YES else android.content.res.Configuration.UI_MODE_NIGHT_NO)
+            }
+            @Suppress("DEPRECATION")
+            activity.resources.updateConfiguration(configuration, activity.resources.displayMetrics)
+        }
+        switchTo(false)
+        CYLTabBarController(activity, configuration(name, skins, extra))
+        val manager = CYLThemeManagerCenter.themeManagerWithName(name)
+        assertEquals("light", manager.currentThemeIdentifier)
+        switchTo(true)
+        val darkController = CYLTabBarController(activity, configuration(name, skins, extra))
+        assertEquals("dark", manager.currentThemeIdentifier)
+        assertEquals("Home (dark)", item(darkController, "home")[CYLConstants.CYLTabBarItemTitle])
+        switchTo(false)
+        CYLTabBarController(activity, configuration(name, skins, extra))
+        assertEquals("and back to light", "light", manager.currentThemeIdentifier)
+    }
+
+    @Test
     fun aDarkSkinIsUsedInDarkMode() = withActivity("night") { activity ->
         val name = UUID.randomUUID().toString()
         val controller = CYLTabBarController(activity, configuration(name, skins, mapOf(CYLConstants.CYLTabBarControllerDarkThemeIdentifier to "dark")))

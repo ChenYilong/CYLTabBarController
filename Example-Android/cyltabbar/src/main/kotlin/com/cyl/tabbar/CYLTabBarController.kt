@@ -608,9 +608,15 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         if (current == null) manager.currentThemeIdentifier = info.initial
         val keepsChoice = current != null && current != info.base && current != info.dark
         val dark = info.dark
-        if (dark != null && manager.identifierForTrait == null && !keepsChoice) {
-            val base = info.base
-            manager.identifierForTrait = { isDark -> if (isDark) dark else base }
+        if (dark != null && !keepsChoice) {
+            if (manager.identifierForTrait == null) {
+                val base = info.base
+                manager.identifierForTrait = { isDark -> if (isDark) dark else base }
+            }
+            // [EN] Also when the shared manager already follows the mode: an activity recreated after a light / dark switch (no `configChanges`) gets a new
+            //      controller in the same process, which must pick the skin of the NEW mode (reported by the CYLTableViewPlaceHolder session, 2026-11-27).
+            // [CN] 共享的管理器已在跟随模式时也要更新：切换浅色 / 深色后重建的 Activity（未声明 `configChanges`）在同一进程中得到新的控制器，必须选用「新」模式的皮肤
+            //      （CYLTableViewPlaceHolder 会话报告，2026-11-27）。
             manager.updateThemeForTraitCollection(activity.resources.configuration)
         }
     }

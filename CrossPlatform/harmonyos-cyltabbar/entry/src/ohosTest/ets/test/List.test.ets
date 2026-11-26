@@ -7,6 +7,7 @@ import cylGlassHighlightTest from './CYLGlassHighlight.test';
 import cylAnimatedItemContrastTest from './CYLAnimatedItemContrast.test';
 import cylAnimatedItemColorResolverTest from './CYLAnimatedItemColorResolver.test';
 import cylIconRenderingModeTest from './CYLIconRenderingMode.test';
+import cylAnimatedItemFlatContrastTest from './CYLAnimatedItemFlatContrast.test';
 
 export default function testsuite() {
   cylAnimatedItemFallbackTest();
@@ -18,4 +19,5 @@ export default function testsuite() {
   cylAnimatedItemContrastTest();
   cylAnimatedItemColorResolverTest();
   cylIconRenderingModeTest();
+  cylAnimatedItemFlatContrastTest();
 }

@@ -132,18 +132,40 @@ function byteOf(x) {
  * @param {number} [tintAlpha] the tint alpha of the glass (missing or negative: 0.75)
  */
 function cylAnimatedItemContrastLift(color, minimumContrast, glassColor, tintAlpha) {
+  return cylAnimatedItemContrastLiftToReference(color, minimumContrast, cylAnimatedItemRenderedGlassReferenceLuminance(glassColor, tintAlpha))
+}
+
+/**
+ * [EN] The reference of a FLAT item that draws a fill (iOS `flatReferenceLuminance(fill:traits:)`): the fill over black by its alpha; null for an unparseable or clear
+ *      fill (such an item is not adapted). No floor (the floor is glass-only).
+ * [CN] 绘制填充的扁平条目的参考亮度（iOS 的 `flatReferenceLuminance(fill:traits:)`）：填充按其透明度叠在黑色上；无法解析或透明的填充为 null（这样的条目不调整）。没有下限（下限仅用于玻璃）。
+ * @param {string} fill the fill color text
+ */
+function cylAnimatedItemFlatReferenceLuminance(fill) {
+  const c = parseColor(fill)
+  if (!c || !(c.a > 0)) return null
+  return relativeLuminance(c.r / RGB_MAX * c.a, c.g / RGB_MAX * c.a, c.b / RGB_MAX * c.a)
+}
+
+/**
+ * [EN] `color` lifted until it has `minimumContrast` against `reference` (a luminance); itself when it already passes or cannot be parsed. When even white cannot pass
+ *      (a light reference), whichever of the original and the lifted color has more contrast: a lift never makes it worse.
+ * [CN] 提亮 `color` 直到对 `reference`（亮度）达到 `minimumContrast`；已满足或无法解析时原样返回。连白色也不能满足时（参考较亮），取原色与提亮色中对比度更高者：提亮绝不会更差。
+ */
+function cylAnimatedItemContrastLiftToReference(color, minimumContrast, reference) {
   const c = parseColor(color)
   if (!c) return color
-  const reference = cylAnimatedItemRenderedGlassReferenceLuminance(glassColor, tintAlpha)
   const hsl = hslFromRgb(c.r / RGB_MAX, c.g / RGB_MAX, c.b / RGB_MAX)
   // The ratio of the color as drawn (whole bytes), so the result keeps the ratio it was judged by.
   const ratioAt = (lightness) => {
     const rgb = rgbFromHsl(hsl.hue, hsl.saturation, lightness)
     return contrastRatio(relativeLuminance(byteOf(rgb.red) / RGB_MAX, byteOf(rgb.green) / RGB_MAX, byteOf(rgb.blue) / RGB_MAX), reference)
   }
-  if (contrastRatio(relativeLuminance(c.r / RGB_MAX, c.g / RGB_MAX, c.b / RGB_MAX), reference) >= minimumContrast) return color
+  const original = contrastRatio(relativeLuminance(c.r / RGB_MAX, c.g / RGB_MAX, c.b / RGB_MAX), reference)
+  if (original >= minimumContrast) return color
   let lightness = hsl.lightness
   while (lightness < 1 && ratioAt(lightness) < minimumContrast) lightness = Math.min(1, lightness + LIGHTNESS_STEP)
+  if (ratioAt(lightness) < minimumContrast && original >= ratioAt(lightness)) return color
   const rgb = rgbFromHsl(hsl.hue, hsl.saturation, lightness)
   const [r, g, b] = [byteOf(rgb.red), byteOf(rgb.green), byteOf(rgb.blue)]
   if (c.hex) return `#${[r, g, b].map((x) => x.toString(16).padStart(2, '0')).join('').toUpperCase()}${c.alphaText}`
@@ -162,4 +184,6 @@ module.exports = {
   CYL_DEFAULT_GLASS_TINT_SHARE,
   cylAnimatedItemGlassReferenceLuminance,
   cylAnimatedItemContrastLift,
+  cylAnimatedItemContrastLiftToReference,
+  cylAnimatedItemFlatReferenceLuminance,
 }

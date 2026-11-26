@@ -79,7 +79,22 @@ class CYLTabIconTintTest {
         assertFull(0xFFFF3B30.toInt(), controller.tabBar.tabBarButtonArray[0].iconView.colorFilter, 153)
         val unset = controller(activity, 153, mapOf(CYLConstants.CYLTabBarItemSelectedIconColor to "#FF3B30"))
         assertFull(0xFFFF3B30.toInt(), unset.tabBar.tabBarButtonArray[0].iconView.colorFilter, 153)
-        assertNull("the unset mode leaves the unselected icon untinted", unset.tabBar.tabBarButtonArray[1].iconView.colorFilter)
+        // [EN] Owner decision D2 (2026-11-27): in FlatDesign the unset mode tints an unselected icon without an icon color with `unselectedTintColor`. [CN] 负责人决定 D2：扁平样式下未设置模式时，没有图标颜色的未选中图标以 `unselectedTintColor` 着色。
+        assertFull(unselectedTint, unset.tabBar.tabBarButtonArray[1].iconView.colorFilter, 153)
+    }
+
+    @Test
+    fun flatUnsetModeTintsOnlyTheUnselectedIconWithoutAColor() = withActivity { activity ->
+        val unset = controller(activity, 255, emptyMap())
+        val buttons = unset.tabBar.tabBarButtonArray
+        assertNull("the selected icon keeps its own colors", buttons[0].iconView.colorFilter)
+        assertEquals(PorterDuffColorFilter(unselectedTint, PorterDuff.Mode.SRC_IN), buttons[1].iconView.colorFilter)
+        buttons[1].performClick()
+        idle()
+        assertNull(buttons[1].iconView.colorFilter)
+        assertEquals(PorterDuffColorFilter(unselectedTint, PorterDuff.Mode.SRC_IN), buttons[0].iconView.colorFilter)
+        val iconColor = controller(activity, 255, mapOf(CYLConstants.CYLTabBarItemIconColor to "#007AFF"))
+        assertEquals("an icon color wins", PorterDuffColorFilter(0xFF007AFF.toInt(), PorterDuff.Mode.SRC_IN), iconColor.tabBar.tabBarButtonArray[1].iconView.colorFilter)
     }
 
     @Test

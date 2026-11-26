@@ -1,4 +1,4 @@
-import { CYLTabBarStyleType, cyl_tabBarStyleModifier } from './CYLFlatDesignTabBar';
+import { CYLTabBarStyleType, cyl_tabBarStyleModifier, CYLFlatDesignDarkBackgroundColor } from './CYLFlatDesignTabBar';
 import { CYLTabBarDefaultHeight } from './CYLConstants';
 import { CYLLiquidGlassTokens, CYLLiquidGlassCapsuleModifier, CYLLiquidGlassContainerModifier, CYLLiquidGlassCapsuleEdge } from './CYLLiquidGlass';
 import { curves, window, KeyboardAvoidMode } from '@kit.ArkUI';
@@ -362,8 +362,12 @@ export struct CYLTabBarController {
    */
   @Prop iconRenderingMode: string | undefined = undefined;
   plusButtonTitleSelectedColor?: ResourceColor;
-  /** [EN] cyl_tabBarBackgroundColor / CYLTabBarBackgroundColor. [CN] TabBar 背景色。 */
-  @Prop tabBarBackgroundColor: ResourceColor = '#F8F8F8';
+  /**
+   * [EN] cyl_tabBarBackgroundColor / CYLTabBarBackgroundColor of the classic bar. '' (default) = unset: '#F8F8F8' light, '#1C1C1E' dark, following the color
+   *      mode (owner decision D3, 2026-11-27; `cylTabBarBackgroundColor`); any other value is used as it is.
+   * [CN] 经典 TabBar 的背景色。''（默认）表示未设置：浅色 '#F8F8F8'、深色 '#1C1C1E'，跟随颜色模式（负责人决定 D3，2026-11-27；`cylTabBarBackgroundColor`）；其他值按原样使用。
+   */
+  @Prop tabBarBackgroundColor: ResourceColor = '';
   /** [EN] cyl_tabBarShadowColor / CYLTabBarShadowColor: the line on top of the bar; transparent hides it. [CN] TabBar 顶部分割线颜色；透明即隐藏。 */
   @Prop tabBarShadowColor: ResourceColor = '#1F000000';
   /**
@@ -1624,7 +1628,10 @@ export struct CYLTabBarController {
     const selected = this.selectedIndex === index;
     const explicit = selected ? (item.selectedIconColor ?? this.selectedIconColor) : (item.iconColor ?? this.iconColor);
     const fallback = selected ? this.cylTabSelectedIconColor(index) : this.cylTabNormalIconColor(index);
-    return cylStaticIconTintColor(item.iconRenderingMode ?? this.iconRenderingMode, explicit, fallback);
+    // [EN] FlatDesign (owner decision D2, 2026-11-27): an unselected icon without an icon color takes the unselected tint, as iOS flat and Android.
+    // [CN] 扁平样式（负责人决定 D2，2026-11-27）：没有图标颜色的未选中图标取未选中着色，与 iOS 扁平样式、Android 一致。
+    const flatUnselected: boolean = !selected && this.tabBarStyleType === CYLTabBarStyleType.FlatDesign;
+    return cylStaticIconTintColor(item.iconRenderingMode ?? this.iconRenderingMode, explicit, fallback, flatUnselected);
   }
 
   /**
@@ -2128,7 +2135,7 @@ export struct CYLTabBarController {
         // [CN] 液态玻璃：CYLLiquidGlass.ets 的玻璃胶囊（模糊、barTintColor 或浅色玻璃着色、阴影、描边）。
         .attributeModifier(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass
           ? new CYLLiquidGlassCapsuleModifier(this.barTintColor, this.cylGlassRowHeight(), 3, this.colorMode === 'dark')
-          : cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor, this.tabBarHeight, this.barBackgroundImage))
+          : cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor, this.tabBarHeight, this.barBackgroundImage, this.colorMode === 'dark'))
         .padding({ left: this.itemEdgeInsets.left, right: this.itemEdgeInsets.right })
         .expandSafeArea(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? [] : [SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         .id('cyl-tab-bar')
@@ -2147,7 +2154,8 @@ export struct CYLTabBarController {
         // [EN] The bar color continues under the gesture bar (classic and FlatDesign); clear around the Liquid Glass capsule.
         // [CN] 经典与扁平样式的 TabBar 颜色延伸到手势条下方；液态玻璃胶囊四周透明。
         .backgroundColor(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? Color.Transparent
-          : (this.tabBarStyleType === CYLTabBarStyleType.FlatDesign ? (this.barTintColor ?? '#F9F9F9') : this.tabBarBackgroundColor))
+          : (this.tabBarStyleType === CYLTabBarStyleType.FlatDesign ? (this.barTintColor ?? (this.colorMode === 'dark' ? CYLFlatDesignDarkBackgroundColor : '#F9F9F9'))
+            : cylTabBarBackgroundColor(this.tabBarBackgroundColor, this.colorMode === 'dark')))
         .expandSafeArea(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? [] : [SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         // [EN] Issue list #31: out of the layout while a resizing keyboard is up, so it never moves above the keyboard.
         // [CN] 问题清单 #31：缩小页面的键盘弹出时退出布局，因此不会移到键盘上方。
@@ -2178,16 +2186,29 @@ export function cylIconRenderingMode(mode: string | undefined): string {
 
 /**
  * [EN] The tint of a static tab icon for its state: 'original' none (''), 'template' the explicit icon color, else `fallback` (the bar's
- *      selected / unselected title color), 'automatic' the explicit icon color only ('' without one: the image keeps its colors).
+ *      selected / unselected title color), 'automatic' the explicit icon color only ('' without one: the image keeps its colors), except with
+ *      `fallsBackWhenUnset` (an unselected FlatDesign icon, owner decision D2): then `fallback` too.
  * [CN] 静态 Tab 图标在其状态下的着色：'original' 无（''），'template' 为显式图标颜色，否则用 `fallback`（TabBar 的选中 / 未选中标题色），
  *      'automatic' 只用显式图标颜色（没有则为 ''：图片保持原色）。
  */
-export function cylStaticIconTintColor(mode: string | undefined, explicit: ResourceColor | undefined, fallback: ResourceColor): ResourceColor {
+/**
+ * [EN] The classic bar's background: `color` when set (not ''), else '#F8F8F8' light / '#1C1C1E' dark (owner decision D3, 2026-11-27, as Android).
+ * [CN] 经典 TabBar 的背景：设置了（不是 ''）时为 `color`，否则浅色 '#F8F8F8' / 深色 '#1C1C1E'（负责人决定 D3，2026-11-27，与 Android 一致）。
+ */
+export function cylTabBarBackgroundColor(color: ResourceColor, dark: boolean): ResourceColor {
+  if (color !== '') {
+    return color;
+  }
+  return dark ? CYLFlatDesignDarkBackgroundColor : '#F8F8F8';
+}
+
+export function cylStaticIconTintColor(mode: string | undefined, explicit: ResourceColor | undefined, fallback: ResourceColor,
+  fallsBackWhenUnset: boolean = false): ResourceColor {
   const resolved = cylIconRenderingMode(mode);
   if (resolved === 'original') {
     return '';
   }
-  return explicit ?? (resolved === 'template' ? fallback : '');
+  return explicit ?? (resolved === 'template' || fallsBackWhenUnset ? fallback : '');
 }
 
 /**

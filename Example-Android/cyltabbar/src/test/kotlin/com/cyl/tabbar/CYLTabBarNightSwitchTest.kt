@@ -57,6 +57,22 @@ class CYLTabBarNightSwitchTest {
         assertEquals("and the light one again", light, unselectedTitle(controller))
     }
 
+    /** [EN] Owner decision D3 (2026-11-27): an unset classic background follows dark mode; a set one is kept. [CN] 负责人决定 D3：未设置的经典背景跟随深色模式；设置的保持不变。 */
+    @Test
+    fun anUnsetClassicBackgroundFollowsALiveSwitch() = withActivity { activity ->
+        val controller = show(activity, CYLEnums.CYLTabBarStyleType.Default)
+        fun background() = (controller.tabBar.background as android.graphics.drawable.ColorDrawable).color
+        assertEquals(CYLClassicTabBarStyle.LIGHT_DEFAULT_BACKGROUND, background())
+        switchTo(activity, controller, night = true)
+        assertEquals(CYLClassicTabBarStyle.DARK_DEFAULT_BACKGROUND, background())
+        switchTo(activity, controller, night = false)
+        assertEquals(CYLClassicTabBarStyle.LIGHT_DEFAULT_BACKGROUND, background())
+        controller.cyl_tabBarBackgroundColor = 0xFF336699.toInt()
+        controller.tabBar.styleRenderer.applyBackgroundColor(controller.tabBar, controller.cyl_tabBarBackgroundColor)
+        switchTo(activity, controller, night = true)
+        assertEquals("a set color is kept", 0xFF336699.toInt(), background())
+    }
+
     @Test
     fun theTitleColorsFollowALiveSwitchOfTheFlatBar() = withActivity { activity ->
         val controller = show(activity, CYLEnums.CYLTabBarStyleType.FlatDesign)

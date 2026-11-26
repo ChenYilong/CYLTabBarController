@@ -85,6 +85,17 @@ class CYLAnimatedItemFlatContrastTest {
     }
 
     @Test
+    fun aLightFillNeverTurnsAMidGreyTitleWhite() {
+        // [EN] On a light fill a lift only lowers contrast: the original (about 3.3:1) is kept, never white (1:1). [CN] 浅色填充上提亮只会降低对比度：保留原色（约 3.3:1），绝不变白（1:1）。
+        val white = Color.WHITE
+        val midGrey = 0xFF8E8E93.toInt()
+        val item = flatItem(white)
+        item.titleColor = midGrey
+        assertEquals(midGrey, item.titleView.currentTextColor)
+        assertEquals(midGrey, CYLAnimatedItemContrast.adjusted(midGrey, CYLAnimatedItemContrast.flatReferenceLuminance(white), CYLAnimatedItemContrast.TITLE_MINIMUM_CONTRAST))
+    }
+
+    @Test
     fun flatWithoutAFillOrWithAClearFillIsNotAdapted() {
         val none = flatItem(null)
         assertNull(none.flatFill)

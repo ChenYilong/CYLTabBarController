@@ -148,9 +148,19 @@ internal object CYLClassicTabBarStyle : CYLTabBarStyleRenderer {
         tabBar.cyl_setShadowVisible(true)
     }
 
+    /**
+     * [EN] An unset background follows dark mode (owner decision D3, 2026-11-27): `#F9F9F9` light, `#1C1C1E` dark (the FlatDesign dark fill); re-resolved on a live
+     *      light / dark switch (`CYLTabBar.onConfigurationChanged`). A set `cyl_tabBarBackgroundColor` is used as it is.
+     * [CN] 未设置的背景跟随深色模式（负责人决定 D3，2026-11-27）：浅色 `#F9F9F9`，深色 `#1C1C1E`（扁平样式的深色填充）；运行中切换浅色 / 深色时重新解析
+     *      （`CYLTabBar.onConfigurationChanged`）。设置了 `cyl_tabBarBackgroundColor` 时按原样使用。
+     */
     override fun applyBackgroundColor(tabBar: CYLTabBar, color: Int?) {
-        tabBar.background = ColorDrawable(color ?: 0xFFF9F9F9.toInt())
+        tabBar.background = ColorDrawable(color ?: if (tabBar.isInDarkMode()) DARK_DEFAULT_BACKGROUND else LIGHT_DEFAULT_BACKGROUND)
     }
+
+    /** [EN] The unset backgrounds. [CN] 未设置时的背景。 */
+    const val LIGHT_DEFAULT_BACKGROUND: Int = 0xFFF9F9F9.toInt()
+    const val DARK_DEFAULT_BACKGROUND: Int = 0xFF1C1C1E.toInt()
 
     override fun itemSpacing(tabBar: CYLTabBar): Int = tabBar.cyl_itemSpacing
 

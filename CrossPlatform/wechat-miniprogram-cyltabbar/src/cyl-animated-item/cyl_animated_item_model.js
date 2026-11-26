@@ -1,6 +1,6 @@
 const { cylIsGIFImagePath } = require('./cyl_gif_image')
 const { cylCountdownText } = require('./cyl_animated_item_countdown')
-const { cylAnimatedItemContrastLift, CYL_ICON_MINIMUM_CONTRAST, CYL_TITLE_MINIMUM_CONTRAST, CYL_ADAPTED_KIND_ICON, CYL_ADAPTED_KIND_TEXT, CYL_ADAPTED_KIND_TITLE } = require('./cyl_animated_item_contrast')
+const { cylAnimatedItemContrastLift, cylAnimatedItemContrastLiftToReference, cylAnimatedItemFlatReferenceLuminance, CYL_ICON_MINIMUM_CONTRAST, CYL_TITLE_MINIMUM_CONTRAST, CYL_ADAPTED_KIND_ICON, CYL_ADAPTED_KIND_TEXT, CYL_ADAPTED_KIND_TITLE } = require('./cyl_animated_item_contrast')
 /**
  * [EN] The render model of cyl-animated-item, the mini program counterpart of iOS `CYLAnimatedItemView` (the
  *      CYLAnimatedItem pod) and Android `com.cyl.animateditem.CYLAnimatedItemView`. Pure functions without any wx API,
@@ -514,7 +514,9 @@ function cylAnimatedItemAnimationTint(input) {
   }
   const adaptTint = p.adaptColor || ((c) => c)
   if (p.selected && selectedColor) return adaptTint(selectedColor)
-  return adaptTint((p.isDark && cylAnimatedItemTintHex(darkOption)) || fixed)
+  // [EN] A fixed tint is adapted on drawn glass only, not on a flat fill. [CN] 固定着色只在绘制玻璃时调整，不在扁平填充上调整。
+  const adaptFixed = p.adaptFixedTint || adaptTint
+  return adaptFixed((p.isDark && cylAnimatedItemTintHex(darkOption)) || fixed)
 }
 
 /**
@@ -660,8 +662,30 @@ function cylAnimatedItemDrawsFlatBackground(p) {
  * [CN] 条目的颜色适配器：仅当液态玻璃真正绘制（`cylAnimatedItemDrawsLiquidGlass`）且条目为深色时，提亮颜色（最低对比度 `minimum`）；否则为 null（颜色不变）。
  */
 function cylAnimatedItemGlassContrastAdapter(p, minimum) {
-  if (!cylAnimatedItemDrawsLiquidGlass(p) || !cylAnimatedItemIsDark(p)) return null
-  return (color) => cylAnimatedItemContrastLift(color, minimum, p.itemBackgroundColor, Number(p.itemGlassTintAlpha))
+  if (!cylAnimatedItemIsDark(p)) return null
+  if (cylAnimatedItemDrawsLiquidGlass(p)) return (color) => cylAnimatedItemContrastLift(color, minimum, p.itemBackgroundColor, Number(p.itemGlassTintAlpha))
+  // [EN] Flat with a fill (since 2026-11-27, iOS and Android): judged against the fill over black; flat without a fill is not adapted.
+  // [CN] 有填充的扁平背景（2026-11-27 起，与 iOS、Android 一致）：对照叠在黑色上的填充；没有填充的扁平背景不调整。
+  const reference = cylAnimatedItemFlatReferenceLuminance(cylAnimatedItemFlatFill(p))
+  if (reference === null) return null
+  return (color) => cylAnimatedItemContrastLiftToReference(color, minimum, reference)
+}
+
+/**
+ * [EN] The fill a FLAT item draws now ('' for none, and while glass is drawn): the pressed color while pressed and enabled, the countdown's built-in fill (#F2F2F7),
+ *      else `itemBackgroundColor`. [CN] 扁平条目当前绘制的填充（没有或绘制玻璃时为 ''）：按下且可用时为按下颜色，其次倒计时的内置填充（#F2F2F7），再次 `itemBackgroundColor`。
+ */
+function cylAnimatedItemFlatFill(p) {
+  if (!p || cylAnimatedItemDrawsLiquidGlass(p)) return ''
+  if (p.itemPressed && p.enabled !== false && p.itemHighlightedBackgroundColor) return p.itemHighlightedBackgroundColor
+  if (p.itemStyle === 'countdown') return '#F2F2F7'
+  return p.itemBackgroundColor || ''
+}
+
+/** [EN] A fixed animation tint is adapted on drawn dark glass only. [CN] 固定的动画着色只在绘制的深色玻璃上调整。 */
+function cylAnimatedItemGlassOnlyAdaptedColor(color, kind, p) {
+  if (!p || !cylAnimatedItemDrawsLiquidGlass(p)) return color
+  return cylAnimatedItemAdaptedColor(color, kind, p)
 }
 
 /**
@@ -815,6 +839,7 @@ function cylAnimatedItemModel(input) {
       selected: p.selected,
       isDark: dark,
       adaptColor: adaptIcon,
+      adaptFixedTint: (color) => cylAnimatedItemGlassOnlyAdaptedColor(color, CYL_ADAPTED_KIND_ICON, p),
       // [EN] The subclass, stack-inherited and built-in levels reach the one icon resolution (cylAnimatedItemResolvedIconColor). [CN] 子类、堆叠继承与内置层级都进入同一个图标解析（cylAnimatedItemResolvedIconColor）。
       subclassIconColor: p.subclassIconColor,
       subclassSelectedIconColor: p.subclassSelectedIconColor,
@@ -1055,6 +1080,7 @@ module.exports = {
   cylAnimatedItemGlassBrightness,
   cylAnimatedItemGlassFilter,
   cylAnimatedItemAdaptedColor,
+  cylAnimatedItemFlatFill,
   cylAnimatedItemResolvedTitleColor,
   cylAnimatedItemResolvedIconColor,
   cylAnimatedItemDrawsLiquidGlass,

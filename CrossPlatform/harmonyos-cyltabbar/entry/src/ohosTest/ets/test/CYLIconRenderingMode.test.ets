@@ -1,5 +1,6 @@
 import { describe, it, expect } from '@ohos/hypium';
-import { cylIconRenderingMode, cylStaticIconTintColor, cylIconFillColorOf, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor } from 'cyltabbar';
+import { cylIconRenderingMode, cylStaticIconTintColor, cylIconFillColorOf, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor, cylTabBarBackgroundColor,
+  CYLFlatDesignDarkBackgroundColor } from 'cyltabbar';
 
 /**
  * [EN] The tint of a static tab icon (docs/Tab-Item-Colors.md, #787): a template icon takes the bar's selected / unselected tint without
@@ -37,6 +38,19 @@ export default function cylIconRenderingModeTest() {
       expect(cylStaticIconTintColor('automatic', undefined, CYLFlatDesignTintColor)).assertEqual('');
       expect(cylStaticIconTintColor(undefined, undefined, CYLFlatDesignTintColor)).assertEqual('');
       expect(cylStaticIconTintColor(undefined, '#FF2D55', CYLFlatDesignTintColor)).assertEqual('#FF2D55');
+    });
+
+    it('FlatDesign unselected (D2): an unset mode without an icon color takes the unselected tint; original and an explicit color still win', 0, () => {
+      expect(cylStaticIconTintColor(undefined, undefined, CYLFlatDesignUnselectedColor, true)).assertEqual(CYLFlatDesignUnselectedColor);
+      expect(cylStaticIconTintColor('automatic', undefined, CYLFlatDesignUnselectedColor, true)).assertEqual(CYLFlatDesignUnselectedColor);
+      expect(cylStaticIconTintColor('original', undefined, CYLFlatDesignUnselectedColor, true)).assertEqual('');
+      expect(cylStaticIconTintColor(undefined, '#FF2D55', CYLFlatDesignUnselectedColor, true)).assertEqual('#FF2D55');
+    });
+
+    it('classic bar background (D3): unset follows the color mode, a set color is kept', 0, () => {
+      expect(cylTabBarBackgroundColor('', false)).assertEqual('#F8F8F8');
+      expect(cylTabBarBackgroundColor('', true)).assertEqual(CYLFlatDesignDarkBackgroundColor);
+      expect(cylTabBarBackgroundColor('#336699', true)).assertEqual('#336699');
     });
 
     it('fill color: the tint for a tinted icon (SVG fill art), none for an untinted one', 0, () => {

@@ -191,18 +191,69 @@ export class CYLAnimatedItemContrast {
    */
   static adjustedColor(color: ResourceColor, glassTint: ResourceColor | undefined, tintAlpha: number | undefined,
     minimumContrast: number): ResourceColor {
+    return CYLAnimatedItemContrast.adjustedToReference(color, CYLAnimatedItemContrast.renderedGlassReferenceLuminance(glassTint, tintAlpha),
+      minimumContrast);
+  }
+
+  /**
+   * [EN] The reference of a FLAT item that draws a fill (iOS `flatReferenceLuminance(fill:traits:)`, Android `flatReferenceLuminance`): the fill over black by its
+   *      alpha; undefined for a fill that is not a static colour (a resource) or is clear (alpha 0): such an item is not adapted. No floor (the floor is glass-only).
+   * [CN] 绘制填充的扁平条目的参考亮度（对应 iOS `flatReferenceLuminance(fill:traits:)`、Android `flatReferenceLuminance`）：填充按其透明度叠在黑色上；填充不是静态颜色（资源）
+   *      或透明（alpha 0）时为 undefined：这样的条目不调整。没有下限（下限仅用于玻璃）。
+   */
+  static flatReferenceLuminance(fill: ResourceColor | undefined): number | undefined {
+    const rgba: CYLAnimatedItemContrastRGBA | undefined = CYLAnimatedItemContrast.components(fill);
+    if (rgba === undefined || rgba.alpha <= 0) {
+      return undefined;
+    }
+    return CYLAnimatedItemContrast.relativeLuminance(rgba.red * rgba.alpha, rgba.green * rgba.alpha, rgba.blue * rgba.alpha);
+  }
+
+  /**
+   * [EN] THE contrast rule of an item (iOS `adaptedForContrast(_:kind:)`) with its state as plain inputs: `color` itself unless `dark` AND (the glass is drawn OR
+   *      `flatFill` is a static, non-clear fill); then lifted to the contrast of `kind` against the rendered glass or the fill over black. Lift-only: light text on a
+   *      light fill is kept (never turned whiter), flat without a fill is not adapted.
+   * [CN] 条目的对比度规则（对应 iOS `adaptedForContrast(_:kind:)`），状态作为普通输入：除非 `dark` 且（绘制玻璃或 `flatFill` 是静态、非透明的填充），否则原值返回；
+   *      适用时按 `kind` 对照实际渲染的玻璃或叠在黑色上的填充提亮。只提亮：浅色填充上的浅色文字保持不变（绝不变得更白），没有填充的扁平背景不调整。
+   */
+  static adaptedForContrastState(color: ResourceColor, kind: string, drawsGlass: boolean, dark: boolean, glassTint: ResourceColor | undefined,
+    tintAlpha: number | undefined, flatFill: ResourceColor | undefined): ResourceColor {
+    if (!dark) {
+      return color;
+    }
+    if (drawsGlass) {
+      return CYLAnimatedItemContrast.adaptedOnGlassState(color, kind, true, true, glassTint, tintAlpha);
+    }
+    const reference: number | undefined = CYLAnimatedItemContrast.flatReferenceLuminance(flatFill);
+    if (reference === undefined) {
+      return color;
+    }
+    const minimum: number = kind === CYLAnimatedItemContrastKindIcon ? CYLAnimatedItemContrast.minimumIconContrast :
+    CYLAnimatedItemContrast.minimumTextContrast;
+    return CYLAnimatedItemContrast.adjustedToReference(color, reference, minimum);
+  }
+
+  /**
+   * [EN] `color` lifted against a reference luminance: itself when not static or already passing; else the lowest passing lightness (steps of 0.005, at most white).
+   *      When even white cannot pass (a light reference), whichever of the original and the lifted colour has more contrast: a lift never makes it worse.
+   * [CN] 对照参考亮度提亮 `color`：非静态或已满足时原值返回；否则取满足要求的最低亮度（步长 0.005，最高为白色）。连白色也不能满足时（参考较亮），取原色与提亮色中对比度更高者：提亮绝不会更差。
+   */
+  static adjustedToReference(color: ResourceColor, reference: number, minimumContrast: number): ResourceColor {
     const rgba: CYLAnimatedItemContrastRGBA | undefined = CYLAnimatedItemContrast.components(color);
     if (rgba === undefined) {
       return color;
     }
-    const reference: number = CYLAnimatedItemContrast.renderedGlassReferenceLuminance(glassTint, tintAlpha);
     const hsl: CYLAnimatedItemContrastHSL = CYLAnimatedItemContrast.hslFromRGB(rgba.red, rgba.green, rgba.blue);
-    if (CYLAnimatedItemContrast.ratio(hsl, hsl.lightness, reference) >= minimumContrast) {
+    const original: number = CYLAnimatedItemContrast.ratio(hsl, hsl.lightness, reference);
+    if (original >= minimumContrast) {
       return color;
     }
     let lightness: number = hsl.lightness;
     while (lightness < 1 && CYLAnimatedItemContrast.ratio(hsl, lightness, reference) < minimumContrast) {
       lightness = Math.min(1, lightness + CYLAnimatedItemContrast.lightnessStep);
+    }
+    if (CYLAnimatedItemContrast.ratio(hsl, lightness, reference) < minimumContrast && original >= CYLAnimatedItemContrast.ratio(hsl, lightness, reference)) {
+      return color;
     }
     const lifted: CYLAnimatedItemContrastRGBA = CYLAnimatedItemContrast.rgbFromHSL(hsl.hue, hsl.saturation, lightness);
     const alphaByte: number = Math.round(rgba.alpha * BYTE_MAX);

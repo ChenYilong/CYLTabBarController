@@ -549,6 +549,8 @@ Component({
       if (!this.data.itemHighlightedBackgroundColor || !!this.data.itemPressed === pressed) return
       this.setData({ itemPressed: pressed })
       this.cyl_refreshBackground()
+      // [EN] The pressed color is the flat fill the colors are judged against. [CN] 按下颜色是颜色所对照的扁平填充。
+      this.cyl_update()
     },
 
     cyl_onTouchCancel() {

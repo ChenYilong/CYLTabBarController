@@ -156,7 +156,7 @@ struct ConfigurationDemo {
           iconColor: this.result.iconColor,
           selectedIconColor: this.result.selectedIconColor,
           iconRenderingMode: this.result.iconRenderingMode,
-          tabBarBackgroundColor: this.result.backgroundColor ?? '#F8F8F8',
+          tabBarBackgroundColor: this.result.backgroundColor ?? '',
           titlePositionAdjustment: this.result.titlePositionAdjustment,
           tabBarItemAnimationLoops: this.loops,
           pageBuilder: (index: number, identifier: string) => {

@@ -49,10 +49,13 @@ export const CYLFlatDesignUnselectedColor: ResourceColor = '#8E8E93';
 export class CYLFlatDesignTabBarModifier implements AttributeModifier<RowAttribute> {
   barTintColor: ResourceColor | undefined;
   backgroundImage: ResourceStr | undefined;
+  /** [EN] The color mode is dark (owner decision D3): the near-opaque background is dark too. [CN] 颜色模式为深色（负责人决定 D3）：接近不透明的背景也为深色。 */
+  dark: boolean;
 
-  constructor(barTintColor: ResourceColor | undefined, backgroundImage?: ResourceStr) {
+  constructor(barTintColor: ResourceColor | undefined, backgroundImage?: ResourceStr, dark: boolean = false) {
     this.barTintColor = barTintColor;
     this.backgroundImage = backgroundImage;
+    this.dark = dark;
   }
 
   applyNormalAttribute(instance: RowAttribute): void {
@@ -78,8 +81,10 @@ export class CYLFlatDesignTabBarModifier implements AttributeModifier<RowAttribu
       instance.backgroundColor(this.barTintColor);
       return;
     }
-    instance.backgroundBlurStyle(BlurStyle.COMPONENT_THICK);
-    instance.backgroundColor('#BFF9F9F9');
+    // [EN] Dark mode (D3): a dark material and the dark fill over it (Android `0xB31C1C1E`), not the light one that read as mid-gray (#949494).
+    // [CN] 深色模式（D3）：深色材质与其上的深色填充（Android `0xB31C1C1E`），而不是显示为中灰（#949494）的浅色填充。
+    instance.backgroundBlurStyle(BlurStyle.COMPONENT_THICK, { colorMode: this.dark ? ThemeColorMode.DARK : ThemeColorMode.LIGHT });
+    instance.backgroundColor(this.dark ? '#B31C1C1E' : '#BFF9F9F9');
   }
 }
 
@@ -140,12 +145,15 @@ export class CYLDefaultTabBarModifier implements AttributeModifier<RowAttribute>
  * [CN] `style` 对应的 TabBar modifier；`barTintColor` 为 App 设置的 TabBar 颜色，未设置时使用样式自己的颜色。
  */
 export function cyl_tabBarStyleModifier(style: CYLTabBarStyleType, barTintColor?: ResourceColor,
-  height: number = 49, backgroundImage?: ResourceStr): AttributeModifier<RowAttribute> {
+  height: number = 49, backgroundImage?: ResourceStr, dark: boolean = false): AttributeModifier<RowAttribute> {
   if (style === CYLTabBarStyleType.LiquidGlass) {
     return new CYLLiquidGlassTabBarModifier(barTintColor, height);
   }
-  return style === CYLTabBarStyleType.FlatDesign ? new CYLFlatDesignTabBarModifier(barTintColor, backgroundImage) : new CYLDefaultTabBarModifier();
+  return style === CYLTabBarStyleType.FlatDesign ? new CYLFlatDesignTabBarModifier(barTintColor, backgroundImage, dark) : new CYLDefaultTabBarModifier();
 }
+
+/** [EN] The dark background of an unset classic or FlatDesign bar (owner decision D3; Android's dark default). [CN] 未设置的经典或扁平 TabBar 的深色背景（负责人决定 D3；Android 的深色默认值）。 */
+export const CYLFlatDesignDarkBackgroundColor: string = '#1C1C1E';
 
 /**
  * [EN] `CYLFlatDesignTabBarItem`: on HarmonyOS a tab item is its attributes, the same type for every style (Android

@@ -106,7 +106,14 @@ internal object CYLAnimatedItemContrast {
         while (hsl[2] < 1f && !passes()) hsl[2] = minOf(1f, hsl[2] + LIGHTNESS_STEP)
         val rgb = rgbFromHSL(hsl[0], hsl[1], hsl[2])
         fun channel(value: Float) = Math.round(value * CHANNEL_MAX.toFloat()).coerceIn(0, 255)
-        return (alphaOf(color) shl 24) or (channel(rgb[0]) shl 16) or (channel(rgb[1]) shl 8) or channel(rgb[2])
+        val lifted = (alphaOf(color) shl 24) or (channel(rgb[0]) shl 16) or (channel(rgb[1]) shl 8) or channel(rgb[2])
+        // [EN] Lifting cannot reach the target (a light reference: a light flat fill): keep whichever of the two has more contrast, so a lift never makes it worse.
+        // [CN] 提亮无法达到目标（参考较亮：浅色扁平填充）：保留两者中对比度更高的一个，提亮绝不会更差。
+        if (!passes()) {
+            fun contrastOf(c: Int) = contrastRatio(relativeLuminance(redOf(c) / CHANNEL_MAX, greenOf(c) / CHANNEL_MAX, blueOf(c) / CHANNEL_MAX), glassLuminance)
+            if (contrastOf(color) >= contrastOf(lifted)) return color
+        }
+        return lifted
     }
 
     /** [EN] Title text (4.5) on the glass. [CN] 玻璃上的标题文字（4.5）。 */

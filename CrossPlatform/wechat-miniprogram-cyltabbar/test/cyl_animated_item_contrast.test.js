@@ -62,7 +62,10 @@ test('an explicit glass tint is the reference (colour x alpha x tintAlpha)', () 
   assert.ok(cylAnimatedItemGlassReferenceLuminance(tint, 1) > cylAnimatedItemGlassReferenceLuminance(tint, -1))
   assert.equal(cylAnimatedItemGlassReferenceLuminance('', undefined), cylAnimatedItemGlassReferenceLuminance('#00000000', 0.5))
   const lifted = cylAnimatedItemContrastLift('#808080', 4.5, tint, 1)
-  assert.ok(contrast(lifted, tint, 1) >= 4.5 - TOLERANCE || lifted === '#FFFFFF')
+  // [EN] On a light reference no lift can pass and white would be 1:1: the colour with more contrast (the original) is kept (2026-11-27 guard, all platforms).
+  // [CN] 参考较亮时任何提亮都无法满足，白色只有 1:1：保留对比度更高的颜色（原色）（2026-11-27 的保护规则，各平台相同）。
+  assert.equal(lifted, '#808080')
+  assert.ok(contrast(lifted, tint, 1) > contrast('#FFFFFF', tint, 1))
 })
 
 test('unparseable colours are returned as they are; the function is deterministic', () => {

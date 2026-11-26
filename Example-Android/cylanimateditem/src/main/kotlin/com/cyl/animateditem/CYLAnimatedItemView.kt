@@ -94,6 +94,48 @@ enum class CYLAnimatedItemTitleState { Normal, Selected, Disabled }
  */
 enum class CYLAnimatedItemColorKind { Icon, Title }
 
+/**
+ * [EN] Where a resolved colour of a [CYLAnimatedItemColorRole] came from (high to low), iOS `CYLAnimatedItemColorLevel`: `Explicit` (the item's own colour, the
+ *      subclass-explicit colour, the stack's), `SubclassBuiltIn` (`applyBuiltInColor`), `ComponentBuiltIn` (the role's own built-in), `None`.
+ * [CN] [CYLAnimatedItemColorRole] 解析出的颜色来自哪一层（由高到低），对应 iOS `CYLAnimatedItemColorLevel`：`Explicit`（条目自己的颜色、子类显式颜色、堆叠的颜色）、
+ *      `SubclassBuiltIn`（`applyBuiltInColor`）、`ComponentBuiltIn`（角色自己的内置值）、`None`。
+ */
+enum class CYLAnimatedItemColorLevel { None, Explicit, SubclassBuiltIn, ComponentBuiltIn }
+
+/**
+ * [EN] The result of the item's ONE colour resolver for a role in the current state (iOS `CYLAnimatedItemResolvedColor`): the colour, already adapted by the contrast
+ *      rule where it applies (never for the disabled look of a built-in level), and its level.
+ * [CN] 条目唯一的颜色解析器对某角色在当前状态下的结果（对应 iOS `CYLAnimatedItemResolvedColor`）：颜色（规则适用时已按对比度调整，内置层的禁用外观除外）及其层级。
+ */
+data class CYLAnimatedItemResolvedColor(val color: Int?, val level: CYLAnimatedItemColorLevel)
+
+/**
+ * [EN] A DECLARED colour role of a [CYLAnimatedItemView] (iOS `CYLAnimatedItemColorRole`): one element whose colour the item resolves and writes. The item's own roles are
+ *      [title] and [icon] (the animation tint follows the icon); a subclass declares its own elements (a delete-indicator label, a cross, editing icons) with
+ *      `register(role)` and nothing else. One mechanism for every role: precedence subclass-explicit (`setSubclassColor`) > subclass built-in (`applyBuiltInColor`) >
+ *      `componentBuiltIn`, (title and icon: own colour > subclass-explicit > stack > subclass built-in > component built-in, as before), then ONE contrast step by `kind`
+ *      (icon 3:1, title 4.5:1; `adaptedForContrast`), re-applied on every change of state, configuration, colours and background. `apply` takes the ITEM as a parameter
+ *      and must not capture it. Registering the same `id` again replaces the role.
+ * [CN] [CYLAnimatedItemView] 声明的一个颜色角色（对应 iOS `CYLAnimatedItemColorRole`）：条目解析并写入颜色的一个元素。条目自己的角色是 [title] 与 [icon]（动画着色跟随图标）；
+ *      子类用 `register(role)` 声明自己的元素（删除指示标签、叉号、编辑图标），无需其他处理。所有角色共用同一机制：优先级 子类显式（`setSubclassColor`）> 子类内置
+ *      （`applyBuiltInColor`）> `componentBuiltIn`（标题与图标：自己的颜色 > 子类显式 > 堆叠 > 子类内置 > 组件内置，与以前相同），然后按 `kind` 做唯一的一次对比度调整
+ *      （图标 3:1，标题 4.5:1；`adaptedForContrast`），状态、配置、颜色与背景每次变化时重新应用。`apply` 以条目为参数，不得捕获它。用相同 `id` 再次注册会替换该角色。
+ */
+class CYLAnimatedItemColorRole(
+    val id: String,
+    val kind: CYLAnimatedItemColorKind,
+    val componentBuiltIn: ((CYLAnimatedItemView, CYLAnimatedItemTitleState) -> Int?)? = null,
+    val apply: (CYLAnimatedItemView, CYLAnimatedItemResolvedColor) -> Unit,
+) {
+    companion object {
+        /** [EN] The title text (4.5:1). [CN] 标题文字（4.5:1）。 */
+        @JvmField val title = CYLAnimatedItemColorRole("title", CYLAnimatedItemColorKind.Title) { item, _ -> item.refreshColors() }
+
+        /** [EN] The icon and the animation tint (3:1). [CN] 图标与动画着色（3:1）。 */
+        @JvmField val icon = CYLAnimatedItemColorRole("icon", CYLAnimatedItemColorKind.Icon) { item, _ -> item.refreshColors() }
+    }
+}
+
 open class CYLAnimatedItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -845,6 +887,125 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         applyIconColor()
     }
 
+    // MARK: - Colour roles 颜色角色
+
+    /** [EN] The roles a subclass registered (title and icon are always there and not stored). Created on first use. [CN] 子类注册的角色（标题与图标始终存在，不存储）。首次使用时创建。 */
+    private var registeredRoles: LinkedHashMap<String, CYLAnimatedItemColorRole>? = null
+    private var subclassRoleColors: HashMap<String, Array<Int?>>? = null
+    private var subclassRoleBuiltIns: HashMap<String, Int>? = null
+
+    private fun isItemRole(role: CYLAnimatedItemColorRole) = role.id == CYLAnimatedItemColorRole.title.id || role.id == CYLAnimatedItemColorRole.icon.id
+
+    /**
+     * [EN] Declares a colour role (iOS `register(_:)`): from now on the item resolves it with the one precedence chain and contrast step and applies it on every change.
+     *      Applied once right away. The item's own `title` and `icon` roles are always registered (registering them does nothing).
+     * [CN] 声明一个颜色角色（对应 iOS `register(_:)`）：此后条目按唯一的优先级链与对比度调整解析它，并在每次变化时应用。注册时立即应用一次。条目自己的 `title` 与 `icon`
+     *      角色始终已注册（再注册不起作用）。
+     */
+    protected fun register(role: CYLAnimatedItemColorRole) {
+        if (isItemRole(role)) return
+        (registeredRoles ?: LinkedHashMap<String, CYLAnimatedItemColorRole>().also { registeredRoles = it })[role.id] = role
+        role.apply(this, resolvedColor(role))
+    }
+
+    /**
+     * [EN] The subclass-explicit colour of `role` for `state` (iOS `setSubclassColor(_:for:role:)`): counts as explicit (adapted by the contrast rule); a missing selected
+     *      colour falls back to the normal one; null clears the state. For `title` / `icon` it is [setSubclassTitleColor] / [setSubclassIconColor].
+     * [CN] `role` 在 `state` 下的子类显式颜色（对应 iOS `setSubclassColor(_:for:role:)`）：视为显式颜色（按对比度规则调整）；缺少选中颜色时回退到普通颜色；null 清除该状态。
+     *      对 `title` / `icon` 即 [setSubclassTitleColor] / [setSubclassIconColor]。
+     */
+    protected fun setSubclassColor(color: Int?, state: CYLAnimatedItemTitleState, role: CYLAnimatedItemColorRole) {
+        when (role.id) {
+            CYLAnimatedItemColorRole.title.id -> setSubclassTitleColor(color, state)
+            CYLAnimatedItemColorRole.icon.id -> setSubclassIconColor(color, state)
+            else -> {
+                val colors = subclassRoleColors ?: HashMap<String, Array<Int?>>().also { subclassRoleColors = it }
+                colors.getOrPut(role.id) { arrayOfNulls(CYLAnimatedItemTitleState.values().size) }[state.ordinal] = color
+                applyRole(role.id)
+            }
+        }
+    }
+
+    /**
+     * [EN] The subclass built-in colour of `role` (iOS `applyBuiltInColor(_:role:)`): below every explicit colour, above the role's `componentBuiltIn`; adapted except while
+     *      disabled. null removes it. For `title` / `icon` it is [applyTitleTintColor] / [applyIconTintColor].
+     * [CN] `role` 的子类内置颜色（对应 iOS `applyBuiltInColor(_:role:)`）：低于所有显式颜色，高于角色的 `componentBuiltIn`；禁用时之外都会调整。null 移除。
+     *      对 `title` / `icon` 即 [applyTitleTintColor] / [applyIconTintColor]。
+     */
+    protected fun applyBuiltInColor(color: Int?, role: CYLAnimatedItemColorRole) {
+        when (role.id) {
+            CYLAnimatedItemColorRole.title.id -> applyTitleTintColor(color)
+            CYLAnimatedItemColorRole.icon.id -> applyIconTintColor(color)
+            else -> {
+                val builtIns = subclassRoleBuiltIns ?: HashMap<String, Int>().also { subclassRoleBuiltIns = it }
+                if (color == null) builtIns.remove(role.id) else builtIns[role.id] = color
+                applyRole(role.id)
+            }
+        }
+    }
+
+    private fun currentState() = when {
+        !isEnabled -> CYLAnimatedItemTitleState.Disabled
+        isSelected -> CYLAnimatedItemTitleState.Selected
+        else -> CYLAnimatedItemTitleState.Normal
+    }
+
+    /**
+     * [EN] THE resolver of a role in the current state (iOS `resolvedColor(_:state:)`), adapted by the contrast rule except the disabled look of a built-in level. For
+     *      `title` it is the colour the title shows; for `icon` the effective icon colour (built-ins included, as `resolvedIconColor`), which tints the animation; the
+     *      static image takes only explicit colours (tint spec v2).
+     * [CN] 角色在当前状态下的唯一解析器（对应 iOS `resolvedColor(_:state:)`），按对比度规则调整（内置层的禁用外观除外）。对 `title` 是标题显示的颜色；对 `icon` 是有效图标颜色
+     *      （含内置值，同 `resolvedIconColor`），用于动画着色；静态图片只使用显式颜色（着色规范 v2）。
+     */
+    fun resolvedColor(role: CYLAnimatedItemColorRole): CYLAnimatedItemResolvedColor {
+        val configuration = resources.configuration
+        val (color, level, builtInOfSubclass) = when (role.id) {
+            CYLAnimatedItemColorRole.title.id -> titleResolution(configuration).let { Triple(it?.first, it?.second, subclassBuiltInTitle) }
+            CYLAnimatedItemColorRole.icon.id -> iconResolution(configuration).let { Triple(it?.first, it?.second, subclassBuiltInIcon) }
+            else -> roleResolution(role).let { Triple(it?.first, it?.second, subclassRoleBuiltIns?.get(role.id)) }
+        }
+        if (color == null || level == null) return CYLAnimatedItemResolvedColor(null, CYLAnimatedItemColorLevel.None)
+        val publicLevel = when {
+            level == ColorLevel.Explicit -> CYLAnimatedItemColorLevel.Explicit
+            builtInOfSubclass != null && color == builtInOfSubclass -> CYLAnimatedItemColorLevel.SubclassBuiltIn
+            else -> CYLAnimatedItemColorLevel.ComponentBuiltIn
+        }
+        val shown = if (level == ColorLevel.DisabledBuiltIn) color else contrastAdapted(color, role.kind, configuration)
+        return CYLAnimatedItemResolvedColor(shown, publicLevel)
+    }
+
+    /** [EN] The precedence chain of a subclass role. [CN] 子类角色的优先级链。 */
+    private fun roleResolution(role: CYLAnimatedItemColorRole): Pair<Int, ColorLevel>? {
+        subclassRoleColors?.get(role.id)?.let { colors ->
+            (if (isSelected) subclassColor(colors, true) ?: subclassColor(colors, false) else subclassColor(colors, false))?.let { return it to ColorLevel.Explicit }
+        }
+        val builtInLevel = if (!isEnabled) ColorLevel.DisabledBuiltIn else ColorLevel.BuiltIn
+        subclassRoleBuiltIns?.get(role.id)?.let { return it to builtInLevel }
+        return role.componentBuiltIn?.invoke(this, currentState())?.let { it to builtInLevel }
+    }
+
+    private fun applyRole(id: String) {
+        val role = registeredRoles?.get(id) ?: return
+        role.apply(this, resolvedColor(role))
+    }
+
+    /** [EN] Applies every registered subclass role. [CN] 应用所有已注册的子类角色。 */
+    private fun applyRegisteredRoles() {
+        val roles = registeredRoles ?: return
+        for (role in roles.values.toList()) role.apply(this, resolvedColor(role))
+    }
+
+    /**
+     * [EN] ONE refresh of every role (iOS `refreshColors()`): the title, the icon (and the animation tint), then the registered roles. The item calls it itself on every
+     *      change of state, configuration, colours and background; a subclass calls it after changing what its `componentBuiltIn` reads.
+     * [CN] 所有角色的唯一刷新（对应 iOS `refreshColors()`）：标题、图标（及动画着色），然后是已注册的角色。条目在状态、配置、颜色与背景每次变化时自己调用；子类在改变其
+     *      `componentBuiltIn` 读取的内容后调用。
+     */
+    fun refreshColors() {
+        applyTitleColor()
+        applyIconColor()
+    }
+
     private fun subclassColor(colors: Array<Int?>, forSelected: Boolean): Int? {
         if (!isEnabled) colors[CYLAnimatedItemTitleState.Disabled.ordinal]?.let { return it }
         return colors[(if (forSelected) CYLAnimatedItemTitleState.Selected else CYLAnimatedItemTitleState.Normal).ordinal]
@@ -889,6 +1050,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             defaultTitleColor?.let { titleView.setTextColor(it) }
             appliesTitleColor = false
         }
+        // [EN] Every path that re-applies the title (state, configuration, background, contrast) re-applies the registered roles too. [CN] 每条重新应用标题的路径（状态、配置、背景、对比度）也重新应用已注册的角色。
+        applyRegisteredRoles()
     }
 
     /**

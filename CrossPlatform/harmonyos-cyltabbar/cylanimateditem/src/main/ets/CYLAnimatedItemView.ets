@@ -30,6 +30,8 @@ import {
 
 /** [EN] `maxLines` for a title without a line limit (`titleLines` 0). [CN] 标题不限行数（`titleLines` 为 0）时的 `maxLines`。 */
 const CYL_UNLIMITED_LINES: number = 1000;
+/** [EN] The built-in fill of the countdown style (the original SMSCodeButton look). [CN] 倒计时样式的内置填充（最初 SMSCodeButton 的外观）。 */
+const CYL_COUNTDOWN_FILL: string = '#F2F2F7';
 
 /**
  * [EN] Icon beside the title (default) or above it. [CN] 图标在标题旁（默认）或上方。
@@ -901,8 +903,43 @@ export struct CYLAnimatedItemView {
    *      4.5:1（`CYLAnimatedItemContrastKindText`）或 3:1（`CYLAnimatedItemContrastKindIcon`），使用条目自己的背景色、着色透明度与解析后的模式。
    */
   adaptedOnGlass(color: ResourceColor, kind: string): ResourceColor {
-    return CYLAnimatedItemContrast.adaptedOnGlassState(color, kind, this.drawsLiquidGlass(), this.cylIsDark(),
+    return this.adaptedForContrast(color, kind);
+  }
+
+  /**
+   * [EN] The contrast rule of this item (iOS `adaptedForContrast(_:kind:)`, Android `adaptedForContrast`): `color` itself unless the mode is dark AND the item draws glass
+   *      or a static flat fill (`cylFlatFill`: the pressed colour, the countdown fill, else `itemBackgroundColor`); then lifted to 4.5:1 / 3:1 against it. Limits: lift-only
+   *      (light text on a light fill is kept), flat without a fill and a resource fill are not adapted, the floor 0.40 is glass-only. `adaptedOnGlass` forwards here.
+   * [CN] 本条目的对比度规则（对应 iOS `adaptedForContrast(_:kind:)`、Android `adaptedForContrast`）：除非为深色模式且条目绘制玻璃或静态的扁平填充（`cylFlatFill`：按下颜色、
+   *      倒计时填充，否则 `itemBackgroundColor`），否则原值返回；适用时对照它提亮到 4.5:1 / 3:1。限制：只提亮（浅色填充上的浅色文字保持不变），没有填充或资源填充的扁平背景不调整，
+   *      下限 0.40 仅用于玻璃。`adaptedOnGlass` 转发到这里。
+   */
+  adaptedForContrast(color: ResourceColor, kind: string): ResourceColor {
+    return CYLAnimatedItemContrast.adaptedForContrastState(color, kind, this.drawsLiquidGlass(), this.cylIsDark(),
+      this.itemBackgroundColor !== '' ? this.itemBackgroundColor : undefined, this.itemGlassTintAlpha, this.cylFlatFill());
+  }
+
+  /** [EN] A fixed animation tint is adapted on drawn glass only. [CN] 固定的动画着色只在绘制玻璃时调整。 */
+  private cylAdaptedOnGlassOnly(color: ResourceColor): ResourceColor {
+    return CYLAnimatedItemContrast.adaptedOnGlassState(color, CYLAnimatedItemContrastKindIcon, this.drawsLiquidGlass(), this.cylIsDark(),
       this.itemBackgroundColor !== '' ? this.itemBackgroundColor : undefined, this.itemGlassTintAlpha);
+  }
+
+  /**
+   * [EN] The fill a flat item draws now, undefined while glass is drawn or with none: the pressed colour while pressed and enabled, the countdown's built-in fill, else
+   *      `itemBackgroundColor`. [CN] 扁平条目当前绘制的填充；绘制玻璃或没有填充时为 undefined：按下且可用时为按下颜色，其次倒计时的内置填充，再次 `itemBackgroundColor`。
+   */
+  cylFlatFill(): ResourceColor | undefined {
+    if (this.drawsLiquidGlass()) {
+      return undefined;
+    }
+    if (this.cylPressed && this.cylEnabled() && CYLAnimatedItemColorResolver.isSet(this.itemHighlightedBackgroundColor)) {
+      return this.itemHighlightedBackgroundColor as ResourceColor;
+    }
+    if (this.cylIsCountdown()) {
+      return CYL_COUNTDOWN_FILL;
+    }
+    return this.itemBackgroundColor !== '' ? this.itemBackgroundColor : undefined;
   }
 
   aboutToAppear(): void {
@@ -1209,7 +1246,7 @@ export struct CYLAnimatedItemView {
    */
   cylAnimationTint(): ResourceColor {
     if (this.animationTintColor !== '') {
-      return this.adaptedOnGlass(this.animationTintColor, CYLAnimatedItemContrastKindIcon);
+      return this.cylAdaptedOnGlassOnly(this.animationTintColor);
     }
     if (this.animationUrl === '') {
       return '';
@@ -1236,7 +1273,7 @@ export struct CYLAnimatedItemView {
     if (result.kind === 'icon') {
       return this.cylEffectiveIconColor();
     }
-    return result.kind === 'fixed' ? this.adaptedOnGlass(result.color, CYLAnimatedItemContrastKindIcon) : '';
+    return result.kind === 'fixed' ? this.cylAdaptedOnGlassOnly(result.color) : '';
   }
 
   /**
@@ -1307,6 +1344,7 @@ export struct CYLAnimatedItemView {
     input.drawsGlass = this.drawsLiquidGlass();
     input.glassTint = this.itemBackgroundColor !== '' ? this.itemBackgroundColor : undefined;
     input.tintAlpha = this.itemGlassTintAlpha;
+    input.flatFill = this.cylFlatFill();
     return input;
   }
 
@@ -1679,7 +1717,7 @@ export struct CYLAnimatedItemView {
     .backgroundEffect(this.cylItemGlassDrawn() ?
       { radius: CYLLiquidGlass.BLUR_RADIUS, saturation: CYLLiquidGlass.BLUR_SATURATION, brightness: CYLLiquidGlass.LIGHT_BRIGHTNESS } :
       { radius: 0 })
-    .backgroundColor(this.cylIsCountdown() ? '#F2F2F7' : this.cylItemBackgroundColor())
+    .backgroundColor(this.cylIsCountdown() ? CYL_COUNTDOWN_FILL : this.cylItemBackgroundColor())
     .borderRadius(this.cylIsCountdown() ? 6 : this.cylItemCornerRadius())
     .borderWidth(this.cylIsCountdown() ? 0.5 : this.itemBorderWidth)
     .borderColor(this.cylIsRunning() ? '#C7C7CC' : (this.cylUsesItemBackground() && this.itemBorderColor !== '' ?

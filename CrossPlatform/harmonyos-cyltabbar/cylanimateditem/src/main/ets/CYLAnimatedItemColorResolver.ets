@@ -32,14 +32,19 @@ export class CYLAnimatedItemColorInput {
   glassTint: ResourceColor | undefined = undefined;
   /** [EN] The item's `itemGlassTintAlpha` (-1 = default). [CN] 条目的 `itemGlassTintAlpha`（-1 为默认）。 */
   tintAlpha: number | undefined = undefined;
+  /**
+   * [EN] The fill a FLAT item draws now (the pressed colour, the countdown fill, else the item's background colour), undefined for none; ignored while glass is drawn.
+   * [CN] 扁平条目当前绘制的填充（按下颜色、倒计时填充，否则条目背景色），没有时为 undefined；绘制玻璃时忽略。
+   */
+  flatFill: ResourceColor | undefined = undefined;
 }
 
 /**
  * [EN] The ONE resolution of every title and icon colour of an item (iOS `CYLAnimatedItemView.resolvedBuiltInColor` and the explicit levels),
  *      static and pure so a hypium test can pin it. Precedence: the item's own colour of the state > the subclass-explicit colour (a missing selected
  *      value falls back to the normal one) > the stack-inherited colour > the subclass built-in colour (normal / selected; a missing selected one
- *      falls back to the normal one) > the component built-in colour of the state. Every level is adapted on the DRAWN dark Liquid Glass (title 4.5:1,
- *      icon and animation tint 3:1) except the disabled look of the built-in levels; dynamic colours (a resource) are never adapted, the component
+ *      falls back to the normal one) > the component built-in colour of the state. Every level is adapted on the DRAWN dark Liquid Glass, or in dark mode on a
+ *      static flat fill (`flatFill`, since 2026-11-27) (title 4.5:1, icon and animation tint 3:1) except the disabled look of the built-in levels; dynamic colours (a resource) are never adapted, the component
  *      built-in is judged by its constant of the mode and keeps its `sys.color` resource when that already passes. The integrator's own props are
  *      never written.
  * [CN] 条目所有标题与图标颜色的唯一解析（iOS `CYLAnimatedItemView.resolvedBuiltInColor` 与显式各层），静态且纯逻辑，hypium 测试可以固定它。优先级：条目自己该状态的颜色 >
@@ -87,7 +92,8 @@ export class CYLAnimatedItemColorResolver {
   }
 
   private static adapt(color: ResourceColor, input: CYLAnimatedItemColorInput): ResourceColor {
-    return CYLAnimatedItemContrast.adaptedOnGlassState(color, input.kind, input.drawsGlass, input.dark, input.glassTint, input.tintAlpha);
+    return CYLAnimatedItemContrast.adaptedForContrastState(color, input.kind, input.drawsGlass, input.dark, input.glassTint, input.tintAlpha,
+      input.flatFill);
   }
 
   /**

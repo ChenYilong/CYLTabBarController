@@ -121,6 +121,7 @@ NSDictionary *live = @{
 | 经典 / 液态玻璃 · Classic / Liquid Glass | 标题与图标颜色写入该 Tab 自己的 `UITabBarItem.standardAppearance`（iOS 15+ 还有 `scrollEdgeAppearance`）：TabBar appearance 的副本，TabBar 的 appearance 改变时自动重建；与 `CYLTabBarItemTitlePositionAdjustment` 共用同一个副本，二者可同时使用。你在 item 上设置的 appearance 会作为基础保留。 | Title and icon colors go into the tab's own `UITabBarItem.standardAppearance` (and `scrollEdgeAppearance` on iOS 15+): a copy of the tab bar's appearance, rebuilt when that one changes, shared with `CYLTabBarItemTitlePositionAdjustment`, so both work together. An appearance you installed on the item is kept as the base. |
 | 经典 · Classic | 选中背景色直接填充选中的 Tab 按钮，切换时移动。 | The selected background fills the selected tab button and moves with the selection. |
 | 扁平样式 · FlatDesign | 标题颜色写入扁平 item 的标题属性，选中背景色写入其 `selectedBackgroundColor`。 | Title colors go to the flat item's title attributes, the background to its `selectedBackgroundColor`. |
+| 扁平样式 · FlatDesign（Android，D2） | 未设置渲染模式时，没有图标颜色的未选中静态图标取 TabBar 的 `unselectedTintColor`（负责人决定 D2，2026-11-27，与 iOS 扁平样式一致）；选中图标保持自身颜色；`original` 从不着色。鸿蒙同日实现（`cylStaticIconTintColor` 的 `fallsBackWhenUnset`，hypium 通过）。小程序：TODO。 | With no rendering mode set, an unselected static icon without an icon color takes the bar's `unselectedTintColor` (owner decision D2, 2026-11-27, as iOS flat); the selected icon keeps its own colors; `original` never tints. HarmonyOS done the same day (`cylStaticIconTintColor`'s `fallsBackWhenUnset`, hypium passes). Mini program: TODO. |
 
 ## 限制 / Limits
 

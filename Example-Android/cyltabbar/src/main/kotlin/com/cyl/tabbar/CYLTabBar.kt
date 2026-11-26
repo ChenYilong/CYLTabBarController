@@ -411,8 +411,10 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
 
     /**
      * [EN] The icon's tint, or null to draw it as it is. FIX: issue #787 — "original" never tints; "template" always tints,
-     *      with the bar's tint colors when no icon color is set.
+     *      with the bar's tint colors when no icon color is set. FlatDesign (owner decision D2, 2026-11-27): with no mode set, an UNSELECTED icon without an
+     *      icon color takes `unselectedTintColor` (as iOS flat); the selected one keeps its own colors.
      * [CN] 图标的着色；null 表示按原图绘制。FIX: issue #787——"original" 从不着色；"template" 总是着色，没有图标颜色时使用 TabBar 的着色。
+     *      扁平样式（负责人决定 D2，2026-11-27）：未设置模式时，没有图标颜色的未选中图标取 `unselectedTintColor`（与 iOS 扁平样式相同）；选中图标保持自身颜色。
      */
     private fun iconColor(selected: Boolean, tabBar: CYLTabBar): Int? {
         val controller = tabBar.tabBarController
@@ -420,7 +422,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         return when (item.cyl_iconRenderingMode) {
             CYLTabBarConfiguration.ICON_RENDERING_ORIGINAL -> null
             CYLTabBarConfiguration.ICON_RENDERING_TEMPLATE -> color ?: if (selected) tabBar.selectedTintColor else tabBar.unselectedTintColor
-            else -> color
+            else -> color ?: if (!selected && tabBar.styleRenderer is CYLFlatDesignTabBarStyle) tabBar.unselectedTintColor else null
         }
     }
 
