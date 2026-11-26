@@ -26,9 +26,9 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *so
 
 /*!
  * [EN] The same with the tab bar's default rendering mode (`-[CYLTabBarController tabBarItemAnimationRenderingMode]`), used only where the URL has
- *      neither a `tint` nor a `renderingMode` option; automatic means no default (the tab flow keeps the file's own colors).
+ *      neither a `tint` nor a `renderingMode` option; automatic (the default) tints only a file detected as one-color (Lottie JSON, GIF); other files keep their own colors.
  * [CN] 同上，并带 TabBar 的默认渲染模式（`-[CYLTabBarController tabBarItemAnimationRenderingMode]`），只在 URL 既没有 `tint` 也没有 `renderingMode`
- *      选项时使用；automatic 表示没有默认值（Tab 流程保持文件自己的颜色）。
+ *      选项时使用；automatic（默认）只给检测为单色的文件（Lottie JSON、GIF）着色，其他文件保持自己的颜色。
  */
 FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationPrepareTabTint(UIView *view, NSURL *sourceURL, id<CYLTabBarItemAnimationPlayer> _Nullable player,
                                                             NSInteger defaultRenderingMode);

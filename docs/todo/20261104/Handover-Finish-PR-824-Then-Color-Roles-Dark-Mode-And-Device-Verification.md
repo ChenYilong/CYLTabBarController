@@ -275,7 +275,7 @@ Superseded, every patch already applied (owner decides on deletion): `feat/harmo
 3. Per-tab `onResourceMissing` on iOS UIKit tab buttons.
 4. Plus-button title default: since `a59ecb55` a titled plus button aligns with the tab titles by default (ordered by the owner).
 5. The 1.4.0 release (the Android pin moves with it), what to do with #823 versus #824, and the badge / TableViewPlaceHolder corner radius rule.
-6. Tint: in the new code, tab animations with no setting keep the file's own colours; `docs/Tint-Special.md` says the default `automatic` tints one-colour files. Keep the code, or add one-colour detection as a bar-wide value (needs a fourth value or changes today's look).
+6. **DECIDED 2026-11-27 (owner): the document wins.** With nothing set, tab animations are `automatic` (only one-colour files are tinted) and the SwiftManager-FlatDesign opt-in is reverted; implemented by the Mac session. Original question: tint: in the new code, tab animations with no setting keep the file's own colours; `docs/Tint-Special.md` says the default `automatic` tints one-colour files. Keep the code, or add one-colour detection as a bar-wide value (needs a fourth value or changes today's look).
 7. Tint: an app that sets only a normal-state title colour now gets it on the selected title too (as the Objective-C button did; the deleted yellow used to hide this), while the icon is the bar tint. Keep, or skip the normal colour for the selected state.
 8. Visible changes to accept: flat apps without a selected title colour go from yellow to their tint; an item's own title colour now beats the bar appearance (the font still comes from the appearance); in the ObjC Example unselected titles turn from red to grey after a tab tap.
 

@@ -416,22 +416,24 @@ BOOL CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id<CYLTab
 
 BOOL CYLTabBarItemAnimationPrepareTabTint(UIView *view, NSURL *sourceURL, id<CYLTabBarItemAnimationPlayer> player, NSInteger defaultRenderingMode) {
     NSMutableDictionary<NSString *, NSString *> *options = [CYLTabBarItemAnimationTintOptionsFromURL(sourceURL) mutableCopy];
-    // [EN] Tab bars keep today's look: without a tint option the tab flow's rendering mode is alwaysOriginal (the file's own colors), unless the URL
-    //      asks for `renderingMode=alwaysTemplate` (tinted like "title") or `renderingMode=automatic` (like "title" for a ONE-color file).
-    // [CN] TabBar 保持现有外观：没有着色选项时，Tab 流程的渲染模式为 alwaysOriginal（文件自己的颜色），除非 URL 要求 `renderingMode=alwaysTemplate`
-    //      （等同 "title" 着色）或 `renderingMode=automatic`（单色文件等同 "title"）。
+    // [EN] Without a tint option the tab flow's rendering mode is the URL's `renderingMode`, else the bar's default, else `automatic`: a ONE-color
+    //      file (Lottie JSON, GIF) is tinted like "title", every other file (multi-color, Rive, PAG, SVGA) keeps its own colors (docs/Tint-Special.md).
+    // [CN] 没有着色选项时，Tab 流程的渲染模式依次取 URL 的 `renderingMode`、TabBar 默认值、`automatic`：单色文件（Lottie JSON、GIF）按 "title" 着色，
+    //      其他文件（多色、Rive、PAG、SVGA）保持自己的颜色（docs/Tint-Special.md）。
     CYLTabBarItemAnimationRenderingMode mode = CYLTabBarItemAnimationRenderingModeAlwaysOriginal;
     BOOL followsTitle = NO;
     if (!CYLTabBarItemAnimationTintIsSet(options[@"tint"])) {
-        // [EN] The tab's own `renderingMode` option, else the bar's default, else the file's own colors. [CN] 先取 Tab 自己的 `renderingMode` 选项，再取 TabBar 默认值，最后保持文件自己的颜色。
-        CYLTabBarItemAnimationRenderingMode fallback = defaultRenderingMode == CYLTabBarItemAnimationRenderingModeAlwaysTemplate
-            ? CYLTabBarItemAnimationRenderingModeAlwaysTemplate : CYLTabBarItemAnimationRenderingModeAlwaysOriginal;
+        CYLTabBarItemAnimationRenderingMode fallback = (defaultRenderingMode == CYLTabBarItemAnimationRenderingModeAlwaysTemplate
+                                                        || defaultRenderingMode == CYLTabBarItemAnimationRenderingModeAlwaysOriginal)
+            ? (CYLTabBarItemAnimationRenderingMode)defaultRenderingMode : CYLTabBarItemAnimationRenderingModeAutomatic;
         mode = CYLTabBarItemAnimationRenderingModeFromString(options[@"renderingMode"], fallback);
-        if (mode == CYLTabBarItemAnimationRenderingModeAlwaysTemplate
-            || (mode == CYLTabBarItemAnimationRenderingModeAutomatic && CYLTabBarItemAnimationColorKindOfURL(sourceURL) == CYLTabBarItemAnimationColorKindOneColor)) {
+        if (mode == CYLTabBarItemAnimationRenderingModeAutomatic) {
+            // [EN] Decided here, once: an item showing this view has no URL to detect the file with. [CN] 在此一次判定：显示该视图的条目没有可用于检测文件的 URL。
+            mode = CYLTabBarItemAnimationColorKindOfURL(sourceURL) == CYLTabBarItemAnimationColorKindOneColor
+                ? CYLTabBarItemAnimationRenderingModeAlwaysTemplate : CYLTabBarItemAnimationRenderingModeAlwaysOriginal;
+        }
+        if (mode == CYLTabBarItemAnimationRenderingModeAlwaysTemplate) {
             options[@"tint"] = @"title";
-            // [EN] Stored as template: an item showing this view has no URL to detect the file with. [CN] 记录为模板：显示该视图的条目没有可用于检测文件的 URL。
-            mode = CYLTabBarItemAnimationRenderingModeAlwaysTemplate;
             followsTitle = YES;
         }
     }
