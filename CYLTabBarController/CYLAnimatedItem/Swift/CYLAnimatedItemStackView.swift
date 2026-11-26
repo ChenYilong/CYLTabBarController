@@ -201,6 +201,15 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
           Resolved inside the item against the item's own traits, with the truth table of `CYLAnimatedItemView.animationTint`. nil by default.
      [CN] 每个条目的默认 `animationTint`（"title" 或 "#RRGGBB" / "#RRGGBBAA"），包括之后追加的条目；条目自己的 `animationTint` 已设置（非空）时优先，
           条目上为 nil 则继承。改回 nil 时从没有自己设置的条目上移除。由条目用自己的 trait、按 `CYLAnimatedItemView.animationTint` 的真值表解析。默认 nil。
+          [EN] Limits: the animation view is tinted only when `animationTint` is set or the rendering mode (automatic / alwaysTemplate / alwaysOriginal) asks; tab flows keep the
+               file's own colors by default. `renderingMode=automatic` is the UNIFIED policy for every engine: a ONE-color file is tinted like "title", a multi-color file keeps its
+               colors. One-color detection works for Lottie (fl/st colors within +-2/255) and GIF (first frame, 4-bit buckets, 98%); PAG, SVGA and Rive are UNDETECTABLE and are
+               treated as multi-color (kept as they are). An explicit `tint=title` forces the template look on ANY engine, even a multi-color one (do not use it as a per-engine fix).
+               One-color artwork whose color is not the icon color follows the item's effective icon color. A fixed `animationTint` is adapted (3:1) on drawn dark glass only, not on flat.
+          [CN] 限制：只有设置了 `animationTint` 或渲染模式（automatic / alwaysTemplate / alwaysOriginal）要求时，动画视图才会着色；Tab 流程默认保持文件自己的颜色。
+               `renderingMode=automatic` 是对所有引擎统一的策略：单色文件按 "title" 着色，多色文件保持原色。单色检测对 Lottie（fl/st 颜色在 +-2/255 内）与 GIF（首帧、4 位分桶、98%）有效；
+               PAG、SVGA、Rive 无法检测，视为多色（保持原样）。显式 `tint=title` 会对任何引擎强制模板外观，即使是多色文件（不要把它当作按引擎的修补手段）。
+               颜色不是图标颜色的单色素材跟随条目的有效图标颜色。固定的 `animationTint` 只在深色玻璃确实绘制时按 3:1 调整，扁平不调整。
      */
     public var animationTint: String? {
         didSet { if oldValue != animationTint { entries.forEach { applyInheritedValues(to: $0.view) } } }
@@ -219,6 +228,15 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
           non-automatic value wins. Applies only where the tint is unset. automatic by default.
      [CN] 每个条目的默认 `animationRenderingMode`（automatic、alwaysTemplate、alwaysOriginal），包括之后追加的条目；条目自己的非 automatic 值优先。
           只在着色未设置时生效。默认 automatic。
+          [EN] Limits: the animation view is tinted only when `animationTint` is set or the rendering mode (automatic / alwaysTemplate / alwaysOriginal) asks; tab flows keep the
+               file's own colors by default. `renderingMode=automatic` is the UNIFIED policy for every engine: a ONE-color file is tinted like "title", a multi-color file keeps its
+               colors. One-color detection works for Lottie (fl/st colors within +-2/255) and GIF (first frame, 4-bit buckets, 98%); PAG, SVGA and Rive are UNDETECTABLE and are
+               treated as multi-color (kept as they are). An explicit `tint=title` forces the template look on ANY engine, even a multi-color one (do not use it as a per-engine fix).
+               One-color artwork whose color is not the icon color follows the item's effective icon color. A fixed `animationTint` is adapted (3:1) on drawn dark glass only, not on flat.
+          [CN] 限制：只有设置了 `animationTint` 或渲染模式（automatic / alwaysTemplate / alwaysOriginal）要求时，动画视图才会着色；Tab 流程默认保持文件自己的颜色。
+               `renderingMode=automatic` 是对所有引擎统一的策略：单色文件按 "title" 着色，多色文件保持原色。单色检测对 Lottie（fl/st 颜色在 +-2/255 内）与 GIF（首帧、4 位分桶、98%）有效；
+               PAG、SVGA、Rive 无法检测，视为多色（保持原样）。显式 `tint=title` 会对任何引擎强制模板外观，即使是多色文件（不要把它当作按引擎的修补手段）。
+               颜色不是图标颜色的单色素材跟随条目的有效图标颜色。固定的 `animationTint` 只在深色玻璃确实绘制时按 3:1 调整，扁平不调整。
      */
     public var animationRenderingMode: CYLAnimatedItemRenderingMode = .automatic {
         didSet { if oldValue != animationRenderingMode { entries.forEach { applyInheritedValues(to: $0.view) } } }

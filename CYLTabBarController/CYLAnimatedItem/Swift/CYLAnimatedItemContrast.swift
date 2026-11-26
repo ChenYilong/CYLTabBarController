@@ -50,6 +50,8 @@ public enum CYLAnimatedItemContrast {
      [CN] iOS 在黑色页面上实际渲染的深色液态玻璃亮度，以白色占比表示（sRGB 0.28，亮度约 0.063：iOS 27.2 上实测 0.26、亮度约 0.055，分组底板上的标签 Y 为 66，再加约 0.02 的余量，用于字形抗锯齿边缘与玻璃的波动，Y 66 到 68）。规则以
           `max(模型值, 此下限)`（`renderedGlassReferenceLuminance`）作为对照：只用共享模型（`glassReferenceLuminance`，磨砂白 0.14）时在真实玻璃上只有约 2.9:1。
           算法是共享的；此值因平台而异，各平台自己测量。
+          [EN] Limits: the floor is per platform (each platform measures its own) and glass-only: flat fills are judged against the fill itself, flat without a fill is not adapted.
+          [CN] 限制：下限因平台而异（各平台自己测量），且仅用于玻璃：纯色填充对照填充本身，没有填充的纯色背景不调整。
      */
     public static let renderedDarkGlassWhiteShare: CGFloat = 0.28
 
@@ -95,6 +97,8 @@ public enum CYLAnimatedItemContrast {
     /**
      [EN] The reference the item judges against: the shared model, never below the rendered glass of this platform (`renderedDarkGlassWhiteShare`).
      [CN] 条目所对照的亮度：共享模型值，且不低于本平台实际渲染的玻璃（`renderedDarkGlassWhiteShare`）。
+          [EN] Limits: the floor is per platform (each platform measures its own) and glass-only: flat fills are judged against the fill itself, flat without a fill is not adapted.
+          [CN] 限制：下限因平台而异（各平台自己测量），且仅用于玻璃：纯色填充对照填充本身，没有填充的纯色背景不调整。
      */
     public static func renderedGlassReferenceLuminance(glassTint: UIColor?, tintAlpha: CGFloat?) -> CGFloat {
         max(glassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha),
