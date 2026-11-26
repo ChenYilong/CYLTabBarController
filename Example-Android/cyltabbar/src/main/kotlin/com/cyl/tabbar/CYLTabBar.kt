@@ -145,15 +145,11 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
      */
     internal fun cyl_setTabBarItemAnimationView(view: View?, url: String? = null) {
         animationView = view
-        // [EN] Tab bars keep today's look: a tab URL with no usable `tint` and no `renderingMode` is never tinted (alwaysOriginal), so a one-color
-        //      tab icon without a tint option does not take the title color on its own. [CN] TabBar 保持现有外观：没有可用 `tint` 也没有 `renderingMode` 的
-        //      Tab URL 从不着色（alwaysOriginal），所以没有 tint 选项的单色 Tab 图标不会自行取标题颜色。
-        if (url != null) {
-            val options = com.cyl.animateditem.CYLTabBarAnimationFileAndOptions(url).second
-            val unset = !com.cyl.animateditem.CYLTabBarItemAnimationTint.isValidTint(com.cyl.animateditem.CYLTabBarItemAnimationTint.tintOption(options)) &&
-                com.cyl.animateditem.CYLTabBarItemAnimationTint.renderingModeOption(options) == null
-            animationRenderingMode = if (unset) com.cyl.animateditem.CYLAnimationRenderingMode.AlwaysOriginal else null
-        }
+        // [EN] Owner decision (2026-11-27, as iOS `465f857f`): a tab URL with no `tint` and no `renderingMode` uses the component's `automatic`: a ONE-colour
+        //      Lottie JSON / GIF follows the tab's title color, every other file keeps its colors. (It was `alwaysOriginal` before.)
+        // [CN] 负责人决定（2026-11-27，与 iOS `465f857f` 一致）：没有 `tint` 也没有 `renderingMode` 的 Tab URL 使用组件的 `automatic`：「单色」Lottie JSON / GIF
+        //      跟随 Tab 的标题颜色，其他文件保持自身颜色。（之前为 `alwaysOriginal`。）
+        if (url != null) animationRenderingMode = null
         refreshAnimationTint()
     }
 

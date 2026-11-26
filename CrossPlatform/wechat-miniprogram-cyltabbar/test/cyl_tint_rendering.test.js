@@ -165,7 +165,7 @@ test('stack: rendering mode and built-in selected color are inherited; the item 
   assert.equal(m.cylAnimatedItemModel({ title: 'a', animationUrl: 'a.riv', animationRenderingMode: 'alwaysTemplate', selected: true, animationIconTint: tinted.animationIconTint, animationSelectedIconTint: tinted.animationSelectedIconTint }).animationTint, 'rgb(0,136,255)')
 })
 
-test('tab URL option renderingMode= is read; tab bars pass alwaysOriginal without a tint option (today\'s look)', () => {
+test('tab URL option renderingMode= is read; tab bars pass no mode without options (the item\'s automatic, owner decision 2026-11-27)', () => {
   const env = { animationBasePath: '', isDark: false }
   const lottie = (extra) => reader.cylRive({ CYLTabBarAnimationFilePath: '/a/b.riv', ...extra }, env)
   assert.equal(lottie({}).renderingMode, '')
@@ -175,7 +175,7 @@ test('tab URL option renderingMode= is read; tab bars pass alwaysOriginal withou
   assert.equal(lottie({ CYLTabBarAnimationOptions: { renderingMode: 'bogus' } }).renderingMode, '')
   // the tab bar's rule, read from the source (cylAnimationProperties is not exported)
   const source = fs.readFileSync(path.join(__dirname, '../src/cyl-tab-bar/index.js'), 'utf8')
-  assert.match(source, /animationRenderingMode: lottie\.renderingMode \|\| \(lottie\.tint \? '' : 'alwaysOriginal'\)/)
+  assert.match(source, /animationRenderingMode: lottie\.renderingMode \|\| '',/)
   assert.match(source, /animationTint: '', animationDarkTint: '', animationRenderingMode: ''/)
   assert.match(fs.readFileSync(path.join(__dirname, '../src/cyl-tab-bar/index.wxml'), 'utf8'), /animation-rendering-mode="\{\{item\.item\.animationRenderingMode\}\}"/)
   assert.match(fs.readFileSync(path.join(__dirname, '../src/cyl-tab-bar-item/index.wxml'), 'utf8'), /animation-rendering-mode="\{\{m\.animationRenderingMode\}\}"/)
@@ -221,8 +221,8 @@ const RUNTIME_TABS = [
   { CYLTabBarItemIdentifier: 'c', CYLTabBarItemTitle: 'C', CYLTabBarItemImage: 'c.png', CYLTabBarItemSelectedImage: 'c-s.png', CYLTabBarItemPageIdentifier: 'c', CYLTabBarAnimationFilePath: '/x/c.riv#renderingMode=alwaysTemplate' },
 ]
 
-test('the rendered tab bar: no tint option = alwaysOriginal; tint=title keeps the tint (no mode); renderingMode= is passed on', () => {
+test('the rendered tab bar: no option = no mode (automatic); tint=title keeps the tint (no mode); renderingMode= is passed on', () => {
   const bar = runtime()({ configuration: { CYLTabBarControllerTabBarItemsAttributes: RUNTIME_TABS } })
   const modes = bar.data.cylSlots.map((slot) => [slot.item.animationRenderingMode, slot.item.animationTint])
-  assert.deepEqual(modes, [['alwaysOriginal', ''], ['', 'title'], ['alwaysTemplate', '']])
+  assert.deepEqual(modes, [['', ''], ['', 'title'], ['alwaysTemplate', '']])
 })

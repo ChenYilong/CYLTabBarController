@@ -10,7 +10,7 @@ import { CYLSVGAView } from './svga/CYLSVGAView';
 import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint } from './CYLRiveTabBarItemAnimator';
 import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines, CYLAnimatedItemSVGA, cylSetPausesWhileUserScrolls,
   CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint, cylAnimatedItemEffectiveRenderingMode,
-  CYL_RENDERING_MODE_AUTOMATIC, CYL_RENDERING_MODE_ORIGINAL, CYLLiquidGlass } from 'cylanimateditem';
+  CYL_RENDERING_MODE_AUTOMATIC, CYLLiquidGlass } from 'cylanimateditem';
 import { CYLAnimatedItemLottie } from 'cylanimateditem_lottie';
 // TODO: replace the file: dependency (cyltabbar/oh-package.json5, a vendored copy) with the ohpm package after the library is published (owner's OK).
 import { LifecycleController } from 'cyldeallocblockexecutor';
@@ -1535,16 +1535,14 @@ export struct CYLTabBarController {
   }
 
   /**
-   * [EN] The `animationRenderingMode` a tab gives its animated item (tint spec v2, section 6): the tab bar keeps its look, so a tab URL with no
-   *      `tint` option is 'alwaysOriginal' (a single-color tab icon without a tint option is not recolored); with a `tint` option, or with a
-   *      `renderingMode=` option of its own, it is 'automatic' (the option then decides, as for every animation).
-   * [CN] Tab 交给其动效条目的 `animationRenderingMode`（着色规范 v2 第 6 节）：Tab 栏保持原有外观，因此没有 `tint` 选项的 Tab URL 为 'alwaysOriginal'（没有着色选项的
-   *      单色 Tab 图标不会改色）；有 `tint` 选项或自带 `renderingMode=` 选项时为 'automatic'（由该选项决定，与其他动画相同）。
+   * [EN] The `animationRenderingMode` a tab gives its animated item (tint spec v2, section 6, changed by the owner on 2026-11-27 as iOS and Android):
+   *      always 'automatic': a tab URL with no `tint` and no `renderingMode` option tints a ONE-colour Lottie / GIF with the tab color and keeps every
+   *      other file's colors; a `tint` or `renderingMode=` option of the URL decides as for every animation. (It was 'alwaysOriginal' without options.)
+   * [CN] Tab 交给其动效条目的 `animationRenderingMode`（着色规范 v2 第 6 节，负责人于 2026-11-27 修改，与 iOS、Android 一致）：始终为 'automatic'：没有 `tint`
+   *      也没有 `renderingMode` 选项的 Tab URL 以 Tab 颜色给「单色」Lottie / GIF 着色，其他文件保持自身颜色；URL 的 `tint` 或 `renderingMode=` 选项与其他动画一样决定。
+   *      （之前没有选项时为 'alwaysOriginal'。）
    */
   cylTabRenderingMode(path: string | undefined): string {
-    if (this.cylTabTintOption(path, CYLTabBarAnimationOptionTint) === '' && this.cylTabTintOption(path, 'renderingMode') === '') {
-      return CYL_RENDERING_MODE_ORIGINAL;
-    }
     return CYL_RENDERING_MODE_AUTOMATIC;
   }
 
@@ -1598,7 +1596,7 @@ export struct CYLTabBarController {
     input.selected = this.selectedIndex === index;
     input.dark = this.colorMode === 'dark';
     input.hasSelectedIconColor = true;
-    // [EN] No tint option: alwaysOriginal (the tab flow keeps its look). [CN] 没有着色选项：alwaysOriginal（Tab 流程保持原有外观）。
+    // [EN] No option: automatic (owner decision 2026-11-27). [CN] 没有选项：automatic（负责人决定，2026-11-27）。
     input.renderingMode = cylAnimatedItemEffectiveRenderingMode(this.cylTabRenderingMode(path), this.cylTabTintOption(path, 'renderingMode'), '');
     const result: CYLAnimatedItemTintResult = cylAnimatedItemResolveTint(input);
     if (result.kind === 'icon') {
