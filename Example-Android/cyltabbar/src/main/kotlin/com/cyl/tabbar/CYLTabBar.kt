@@ -8,7 +8,6 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.view.GestureDetector
 import android.view.Gravity
@@ -384,7 +383,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
             titleLabel.typeface = font.typeface ?: if (font.bold) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
         }
         val iconColor = iconColor(selected, tabBar)
-        if (iconColor != null) iconView.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN) else iconView.clearColorFilter()
+        if (iconColor != null) iconView.colorFilter = CYLTabIconTint.filter(iconView.drawable, iconColor) else iconView.clearColorFilter()
         val background = if (selected) item.cyl_selectedBackgroundColor else item.cyl_backgroundColor
         setBackgroundColor(background ?: Color.TRANSPARENT)
         contentDescription = item.accessibilityLabel ?: titleLabel.text
@@ -434,7 +433,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         titleLabel.setTextColor(CYLTabBarIndicator.blend(titleColor(false, tabBar), titleColor(true, tabBar), fraction))
         val normal = iconColor(false, tabBar)
         val selected = iconColor(true, tabBar)
-        if (normal != null && selected != null) iconView.setColorFilter(CYLTabBarIndicator.blend(normal, selected, fraction), PorterDuff.Mode.SRC_IN)
+        if (normal != null && selected != null) iconView.colorFilter = CYLTabIconTint.filter(iconView.drawable, CYLTabBarIndicator.blend(normal, selected, fraction))
     }
 
     /**
@@ -695,6 +694,10 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
             if (cyl_moreButton == null) {
                 val item = CYLTabBarItem(mapOf(CYLConstants.CYLTabBarItemTitle to CYLLocalization.string(context, R.string.cyl_more))).apply {
                     image = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.cyl_tab_more)
+                    // [EN] The library's own glyph is monochrome: a template icon, so it takes the bar's selected / unselected tint like the
+                    //      icons of the tabs (with no mode it stayed black in both states). [CN] 库自带的图标是单色的：作为模板图标，与各 Tab 的图标一样
+                    //      使用 TabBar 的选中 / 未选中着色（没有渲染方式时两种状态都是黑色）。
+                    cyl_iconRenderingMode = CYLTabBarConfiguration.ICON_RENDERING_TEMPLATE
                 }
                 val more = CYLTabBarItemButton(context, item, -1)
                 more.onTap = { controller.cyl_moreButtonTapped(more) }

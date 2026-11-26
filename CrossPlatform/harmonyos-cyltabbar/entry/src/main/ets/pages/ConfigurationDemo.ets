@@ -155,6 +155,7 @@ struct ConfigurationDemo {
           unselectedColor: this.result.unselectedColor ?? '#808080',
           iconColor: this.result.iconColor,
           selectedIconColor: this.result.selectedIconColor,
+          iconRenderingMode: this.result.iconRenderingMode,
           tabBarBackgroundColor: this.result.backgroundColor ?? '#F8F8F8',
           titlePositionAdjustment: this.result.titlePositionAdjustment,
           tabBarItemAnimationLoops: this.loops,

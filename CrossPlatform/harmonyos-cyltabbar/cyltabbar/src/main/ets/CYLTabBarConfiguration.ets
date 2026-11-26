@@ -50,6 +50,8 @@ export interface CYLTabBarConfigurationResult {
    * [CN] 选中图标的颜色：`CYLTabBarItemSelectedIconColor`，否则为 `CYLTabBarControllerSelectedIconColor`。
    */
   selectedIconColor?: string;
+  /** [EN] `CYLTabBarControllerIconRenderingMode` (also copied into each tab without its own). [CN] 整个 TabBar 的图标渲染方式（也写入未单独设置的 Tab）。 */
+  iconRenderingMode?: string;
   backgroundColor?: string;
   themeIdentifier?: string;
   plusButton?: CYLConfiguredPlusButton;
@@ -371,6 +373,7 @@ export class CYLTabBarConfiguration {
           titlePositionAdjustment: CYLTabBarConfiguration.offsetValue(item['CYLTabBarItemTitlePositionAdjustment']),
           iconColor: CYLTabBarConfiguration.colorValue(item['CYLTabBarItemIconColor']),
           selectedIconColor: CYLTabBarConfiguration.colorValue(item['CYLTabBarItemSelectedIconColor']),
+          iconRenderingMode: CYLTabBarConfiguration.stringValue(item['CYLTabBarItemIconRenderingMode']),
         };
         items.push(configured);
       });
@@ -389,7 +392,10 @@ export class CYLTabBarConfiguration {
     // [CN] 图标颜色：先用 Tab 自己的，再用主题的。
     const iconColor = pick('CYLTabBarItemIconColor') ?? pick('CYLTabBarControllerIconColor');
     const selectedIconColor = pick('CYLTabBarItemSelectedIconColor') ?? pick('CYLTabBarControllerSelectedIconColor');
+    const iconRenderingMode = CYLTabBarConfiguration.stringValue(theme?.['CYLTabBarControllerIconRenderingMode'])
+      ?? CYLTabBarConfiguration.stringValue(configuration['CYLTabBarControllerIconRenderingMode']);
     items.forEach((item: CYLConfiguredTabBarItem) => {
+      item.iconRenderingMode = item.iconRenderingMode ?? iconRenderingMode;
       item.iconColor = item.iconColor ?? iconColor;
       item.selectedIconColor = item.selectedIconColor ?? selectedIconColor;
     });
@@ -403,6 +409,7 @@ export class CYLTabBarConfiguration {
       unselectedColor: pick('CYLTabBarItemTitleColor'),
       iconColor: iconColor,
       selectedIconColor: selectedIconColor,
+      iconRenderingMode: iconRenderingMode,
       backgroundColor: pick('CYLTabBarBackgroundColor'),
       themeIdentifier: typeof themeIdentifier === 'string' ? themeIdentifier : undefined,
       plusButton: CYLTabBarConfiguration.plusButtonWithConfiguration(configuration),

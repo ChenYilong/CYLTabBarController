@@ -394,7 +394,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         set(value) { field = value; animationPlayer?.loops = value }
 
     override var animationRestingProgress: Float = 0f
-        set(value) { field = value.coerceIn(0f, 1f); if (!playing) animationPlayer?.progress = field }
+        set(value) {
+            field = value.coerceIn(0f, 1f)
+            if (playing) return
+            // [EN] A selected item that opted in rests on the last frame: a list re-applying the (unselected) resting progress on every
+            //      bind must not put it back on the first one. [CN] 已选择启用的选中条目停在最后一帧：列表每次绑定都重设（未选中的）静止进度，不能把它放回第一帧。
+            if (isSelected && showsLastFrameWhenSelected && animationPlayer != null) showAnimationLastFrame() else animationPlayer?.progress = field
+        }
 
     override val isAnimationReady: Boolean get() = animationView != null
 
@@ -709,8 +715,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val changed = selected != isSelected
         super.setSelected(selected)
         if (changed) { updateIcon(); applyIconColor(); applyTitleColor(); onItemStateChanged(); updateAccessibility() }
-        if (changed && drivesAnimationPlayback && animationView != null) {
-            if (selected) { if (showsLastFrameWhenSelected) showAnimationLastFrame() else restartAnimation() } else stopAnimation()
+        if (changed && animationView != null) {
+            if (drivesAnimationPlayback) {
+                if (selected) { if (showsLastFrameWhenSelected) showAnimationLastFrame() else restartAnimation() } else stopAnimation()
+            } else if (selected && showsLastFrameWhenSelected) {
+                // [EN] A host-driven item that opted in still rests on the last frame when selected. [CN] 已选择启用的宿主驱动条目，选中时仍停在最后一帧。
+                showAnimationLastFrame()
+            }
         }
     }
 
@@ -1205,7 +1216,9 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             player.progress = animationRestingProgress
         }
         refreshAnimationTint()
-        if (drivesAnimationPlayback && isSelected) playAnimation()
+        if (isSelected) {
+            if (showsLastFrameWhenSelected) showAnimationLastFrame() else if (drivesAnimationPlayback) playAnimation()
+        }
     }
 
     private fun reportMissingEngine(url: String) {
@@ -1397,7 +1410,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         refreshAnimationTint()
         updateIcon()
         requestLayout()
-        if (drivesAnimationPlayback && isSelected) { if (showsLastFrameWhenSelected) showAnimationLastFrame() else playAnimation() }
+        if (isSelected) { if (showsLastFrameWhenSelected) showAnimationLastFrame() else if (drivesAnimationPlayback) playAnimation() }
         onAnimationLoaded?.invoke()
     }
 
@@ -1694,15 +1707,21 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         set(value) { if (field != value) { field = value; applyDisabledAnimationAlpha() } }
 
     /**
-     * [EN] true: a selected item shows the LAST frame of its animation instead of playing it (an item that drives its own playback). Default false.
-     *      iOS `showsLastFrameWhenSelected`.
-     * [CN] 为 true 时，选中的条目显示动画的最后一帧而不是播放（自行驱动播放的条目）。默认 false。对应 iOS `showsLastFrameWhenSelected`。
+     * [EN] true: a selected item shows the LAST frame of its animation instead of playing it. A self-driven item (`drivesAnimationPlayback`)
+     *      shows it instead of playing; a host-driven item shows it too when it becomes selected and again whenever its animation view is
+     *      made or has loaded (a frame set before the animation file has loaded is lost, so it is applied again then). A host-driven item
+     *      without this option gets nothing automatic. Default false. iOS `showsLastFrameWhenSelected`.
+     * [CN] 为 true 时，选中的条目显示动画的最后一帧而不是播放。自行驱动播放（`drivesAnimationPlayback`）的条目显示最后一帧而不播放；宿主驱动的条目
+     *      在被选中时同样显示最后一帧，并在其动画视图创建或加载完成时再次应用（动画文件加载完成之前设置的帧会丢失，所以此时重新应用）。
+     *      没有此选项的宿主驱动条目不会有任何自动行为。默认 false。对应 iOS `showsLastFrameWhenSelected`。
      */
     var showsLastFrameWhenSelected: Boolean = false
         set(value) {
             if (field == value) return
             field = value
-            if (drivesAnimationPlayback && isSelected && animationView != null) { if (value) showAnimationLastFrame() else restartAnimation() }
+            if (isSelected && animationView != null) {
+                if (drivesAnimationPlayback) { if (value) showAnimationLastFrame() else restartAnimation() } else if (value) showAnimationLastFrame()
+            }
         }
 
     /**
