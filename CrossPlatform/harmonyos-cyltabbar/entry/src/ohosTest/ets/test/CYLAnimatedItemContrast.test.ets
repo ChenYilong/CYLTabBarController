@@ -5,7 +5,7 @@ import { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemContrast, CYLAnimatedIte
 const DARK_TEXT: string = '#FF3C3C43';
 const TEAL: string = '#FF30B0C7';
 const DARK_TEAL: string = '#FF004040';
-const BRIGHT: string = '#FF99E6FF';
+const BRIGHT: string = '#FFEAF6FF';
 const WHITE: string = '#FFFFFFFF';
 const TINT: string = '#CC3399FF';
 const PASSING: number = 4.49;
@@ -38,7 +38,14 @@ function icon(color: ResourceColor): ResourceColor {
   return CYLAnimatedItemContrast.adjustedColor(color, undefined, undefined, CYLAnimatedItemContrast.minimumIconContrast);
 }
 
-const MID_GRAY: string = '#FF888888';
+const MID_GRAY: string = '#FFC8C8C8';
+
+/** [EN] The contrast against the rendered glass (the reference the lift judges against: max(model, measured floor)). [CN] 对照实际渲染玻璃的对比度（提亮所对照的参考：max(模型, 实测下限)）。 */
+function renderedContrastOf(color: ResourceColor): number {
+  const c: CYLAnimatedItemContrastRGBA = rgbaOf(color);
+  return CYLAnimatedItemContrast.contrastRatio(CYLAnimatedItemContrast.relativeLuminance(c.red, c.green, c.blue),
+    CYLAnimatedItemContrast.renderedGlassReferenceLuminance(undefined, undefined));
+}
 
 /** [EN] `adaptedOnGlass` with the app color mode set to `mode` for the call (the AppStorage value is restored). [CN] 把应用颜色模式设为 `mode` 后调用 `adaptedOnGlass`（AppStorage 的值随后还原）。 */
 function onGlass(color: ResourceColor, kind: string, mode: string,
@@ -156,12 +163,12 @@ export default function cylAnimatedItemContrastTest() {
     });
 
     it('adaptedOnGlass picks 3 for an icon and 4.5 for a text', 0, () => {
-      expect(contrastOf(MID_GRAY) >= CYLAnimatedItemContrast.minimumIconContrast).assertTrue();
-      expect(contrastOf(MID_GRAY) < CYLAnimatedItemContrast.minimumTextContrast).assertTrue();
+      expect(renderedContrastOf(MID_GRAY) >= CYLAnimatedItemContrast.minimumIconContrast).assertTrue();
+      expect(renderedContrastOf(MID_GRAY) < CYLAnimatedItemContrast.minimumTextContrast).assertTrue();
       expect(onGlass(MID_GRAY, CYLAnimatedItemContrastKindIcon, 'dark')).assertEqual(MID_GRAY);
       const lifted: ResourceColor = onGlass(MID_GRAY, CYLAnimatedItemContrastKindText, 'dark');
       expect(lifted === MID_GRAY).assertFalse();
-      expect(contrastOf(lifted) >= PASSING).assertTrue();
+      expect(renderedContrastOf(lifted) >= PASSING).assertTrue();
     });
 
     it('adaptedOnGlass returns a resource, an unset and a Color constant colour as they are', 0, () => {

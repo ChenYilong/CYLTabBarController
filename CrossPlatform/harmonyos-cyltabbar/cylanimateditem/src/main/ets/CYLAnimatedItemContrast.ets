@@ -77,6 +77,17 @@ export class CYLAnimatedItemContrast {
   static readonly defaultGlassTintShare: number = 0.75;
   /** [EN] The lightness step. [CN] 亮度步长。 */
   static readonly lightnessStep: number = 0.005;
+  /**
+   * [EN] The white share (0...1, the Y/255 of the rendered glass interior) that the glass reference never goes below: the dark Liquid Glass this
+   *      platform really renders over a dark plate is brighter than the model (white 0.14 over black). MEASURED on the HarmonyOS 6 x86_64
+   *      emulator (Mate 70 Pro), CYLAnimatedItemView with liquidGlass and no tint over the demo's dark plate gradient, `cylColorMode dark`:
+   *      Rec.601 Y of the sRGB bytes in the middle band of the glass (away from glyphs and the top sheen band), median of 12 tags (Y 96.0, i.e. 0.376), then a
+   *      margin of 0.02 (0.396, set to 0.4). Never copied from another platform. The model (`glassReferenceLuminance`) is unchanged.
+   * [CN] 玻璃参考亮度的白色占比下限（0...1，即实际渲染的玻璃内部的 Y/255）：本平台在深色背板上真正渲染的深色液态玻璃比模型（黑底上 0.14 的白）更亮。
+   *      在 HarmonyOS 6 x86_64 模拟器（Mate 70 Pro）上实测：未设置着色的 liquidGlass CYLAnimatedItemView 位于示例的深色背板渐变之上，`cylColorMode dark`：
+   *      取玻璃中间带（避开字形与顶部高光带）sRGB 字节的 Rec.601 Y，多个标签的中位数，再加 0.02 余量。不照搬其他平台。模型（`glassReferenceLuminance`）不变。
+   */
+  static readonly renderedDarkGlassWhiteShare: number = 0.4;
 
   /** [EN] The WCAG relative luminance of sRGB components 0...1. [CN] sRGB 分量（0...1）的 WCAG 相对亮度。 */
   static relativeLuminance(red: number, green: number, blue: number): number {
@@ -132,6 +143,17 @@ export class CYLAnimatedItemContrast {
   }
 
   /**
+   * [EN] The reference the lift judges against: `max(model, floor)`, the model being `glassReferenceLuminance` and the floor the luminance of
+   *      `renderedDarkGlassWhiteShare` as a gray. The lift never judges against a glass darker than the one this platform really renders.
+   * [CN] 提亮所对照的参考亮度：`max(模型, 下限)`，模型为 `glassReferenceLuminance`，下限为灰色 `renderedDarkGlassWhiteShare` 的亮度。提亮从不对照比本平台实际渲染更暗的玻璃。
+   */
+  static renderedGlassReferenceLuminance(glassTint: ResourceColor | undefined, tintAlpha: number | undefined): number {
+    const share: number = CYLAnimatedItemContrast.renderedDarkGlassWhiteShare;
+    return Math.max(CYLAnimatedItemContrast.glassReferenceLuminance(glassTint, tintAlpha),
+      CYLAnimatedItemContrast.relativeLuminance(share, share, share));
+  }
+
+  /**
    * [EN] The colour to draw on the item's background: `color` itself (the same value) unless the glass is drawn for `style`
    *      (`CYLAnimatedItemBackgroundModifier.isGlassDrawn`) AND the mode is dark (`CYLLiquidGlass.isDark()`); then `adjustedColor` with the
    *      contrast of `kind`: `CYLAnimatedItemContrastKindIcon` = `minimumIconContrast` (3), `CYLAnimatedItemContrastKindText` (or any other
@@ -141,7 +163,18 @@ export class CYLAnimatedItemContrast {
    */
   static adaptedOnGlass(color: ResourceColor, kind: string, style: CYLAnimatedItemBackgroundStyle, glassTint: ResourceColor | undefined,
     tintAlpha: number | undefined): ResourceColor {
-    if (!CYLAnimatedItemBackgroundModifier.isGlassDrawn(style) || !CYLLiquidGlass.isDark()) {
+    return CYLAnimatedItemContrast.adaptedOnGlassState(color, kind, CYLAnimatedItemBackgroundModifier.isGlassDrawn(style), CYLLiquidGlass.isDark(),
+      glassTint, tintAlpha);
+  }
+
+  /**
+   * [EN] The same rule with the item's state as plain inputs (what `CYLAnimatedItemView.adaptedOnGlass` calls): `drawsGlass` (the item's
+   *      `drawsLiquidGlass`) and `dark` (the item's resolved colour mode); nothing global is read.
+   * [CN] 同一规则，条目状态作为普通输入（`CYLAnimatedItemView.adaptedOnGlass` 所调用）：`drawsGlass`（条目的 `drawsLiquidGlass`）与 `dark`（条目解析后的颜色模式）；不读取任何全局状态。
+   */
+  static adaptedOnGlassState(color: ResourceColor, kind: string, drawsGlass: boolean, dark: boolean, glassTint: ResourceColor | undefined,
+    tintAlpha: number | undefined): ResourceColor {
+    if (!drawsGlass || !dark) {
       return color;
     }
     const minimum: number = kind === CYLAnimatedItemContrastKindIcon ? CYLAnimatedItemContrast.minimumIconContrast :
@@ -162,7 +195,7 @@ export class CYLAnimatedItemContrast {
     if (rgba === undefined) {
       return color;
     }
-    const reference: number = CYLAnimatedItemContrast.glassReferenceLuminance(glassTint, tintAlpha);
+    const reference: number = CYLAnimatedItemContrast.renderedGlassReferenceLuminance(glassTint, tintAlpha);
     const hsl: CYLAnimatedItemContrastHSL = CYLAnimatedItemContrast.hslFromRGB(rgba.red, rgba.green, rgba.blue);
     if (CYLAnimatedItemContrast.ratio(hsl, hsl.lightness, reference) >= minimumContrast) {
       return color;

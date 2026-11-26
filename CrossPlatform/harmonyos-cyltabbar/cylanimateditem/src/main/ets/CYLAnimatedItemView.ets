@@ -1,7 +1,8 @@
 import { CYLAnimatedItemTypeRegistry } from './CYLAnimatedItemTypes';
 import { CYLLiquidGlass } from './CYLLiquidGlass';
 import { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier } from './CYLAnimatedItemBackground';
-import { CYLAnimatedItemContrast, CYLAnimatedItemContrastKindIcon, CYLAnimatedItemContrastKindText } from './CYLAnimatedItemContrast';
+import { CYLAnimatedItemContrast, CYLAnimatedItemContrastKindIcon } from './CYLAnimatedItemContrast';
+import { CYLAnimatedItemColorInput, CYLAnimatedItemColorResolver } from './CYLAnimatedItemColorResolver';
 import { LifecycleCenter, LifecycleController } from 'cyldeallocblockexecutor';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
 import {
@@ -18,8 +19,7 @@ import { CYLAnimatedItemSource } from './CYLAnimatedItemSource';
 import {
   CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint, cylAnimatedItemEffective,
   CYLAnimatedItemDividerInput, CYLAnimatedItemDividerResult, cylAnimatedItemDividerColor, CYL_ANIMATED_ITEM_DIVIDER_LENGTH,
-  CYL_ANIMATED_ITEM_DIVIDER_ALPHA, cylAnimatedItemEffectiveRenderingMode, CYL_RENDERING_MODE_AUTOMATIC,
-  CYLAnimatedItemStateColorInput, cylAnimatedItemStateColorSource, cylAnimatedItemBuiltInColor, CYLAnimatedItemBuiltInColor
+  CYL_ANIMATED_ITEM_DIVIDER_ALPHA, cylAnimatedItemEffectiveRenderingMode, CYL_RENDERING_MODE_AUTOMATIC
 } from './CYLAnimatedItemColors';
 import { CYL_COLOR_COUNT_UNKNOWN, CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE } from './CYLAnimatedItemColorCount';
 import { cylAnimatedItemDetectColorKind } from './CYLAnimatedItemColorCountLoader';
@@ -434,6 +434,33 @@ export function cylIconColorFilter(color: ResourceColor): number[] {
  *      显示规则与 iOS、Android 相同：已注册的引擎能播放时显示动画；否则在加载期间与失败之后显示静态图片（`image` / `selectedImage`）；只有没有静态图片时
  *      才显示占位图。它是一个无障碍元素：文本为 `itemTitle`（或 `itemAccessibilityText`），描述为 `itemDescription` 加上选中状态。
  */
+/**
+ * [EN] Static helpers of the item as an exported class (an ArkUI struct has no static members; iOS `CYLAnimatedItemView.resolvedContentHorizontalInset` /
+ *      `isAnimationEngineAvailable`): forwarders to what exists, so a host keeps no copy of the rules.
+ * [CN] 条目的静态辅助函数，放在导出类上（ArkUI struct 没有静态成员；对应 iOS 的 `CYLAnimatedItemView.resolvedContentHorizontalInset` / `isAnimationEngineAvailable`）：
+ *      转发到已有的实现，宿主不必保留规则的副本。
+ */
+export class CYLAnimatedItemStatics {
+  /**
+   * [EN] The content inset (vp) an item with `style` really applies for the explicit `itemContentHorizontalInset` (-1 = not set): the set value, else
+   *      `CYLAnimatedItemLiquidGlassContentInset` for the drawn glass and 0 for flat (`CYLAnimatedItemBackgroundModifier.resolvedContentInset`).
+   * [CN] 样式为 `style` 的条目对显式 `itemContentHorizontalInset`（-1 表示未设置）实际应用的内容间距（vp）：设置的值，否则绘制玻璃时为
+   *      `CYLAnimatedItemLiquidGlassContentInset`，扁平时为 0（`CYLAnimatedItemBackgroundModifier.resolvedContentInset`）。
+   */
+  static resolvedContentHorizontalInset(explicit: number, style: CYLAnimatedItemBackgroundStyle): number {
+    return CYLAnimatedItemBackgroundModifier.resolvedContentInset(style, explicit);
+  }
+
+  /**
+   * [EN] Whether any animation engine is registered (`CYLAnimatedItemEngines.registeredTypes()` is not empty): false means every animation file shows
+   *      its still image or the placeholder.
+   * [CN] 是否注册了任何动画引擎（`CYLAnimatedItemEngines.registeredTypes()` 非空）：false 表示所有动画文件都显示静态图片或占位图。
+   */
+  static isAnimationEngineAvailable(): boolean {
+    return CYLAnimatedItemEngines.registeredTypes().length > 0;
+  }
+}
+
 let cylPausesWhileScrolling: boolean = false;
 let cylScrollObserverNumber: number = 0;
 
@@ -647,6 +674,57 @@ export struct CYLAnimatedItemView {
   @Prop @Watch('cylTintDidChange') stackAnimationTint: string = '';
   @Prop @Watch('cylTintDidChange') stackAnimationDarkTint: string = '';
   /**
+   * [EN] The SUBCLASS-EXPLICIT colours (iOS `setSubclassTitleColor(_:for:)` / `setSubclassIconColor(_:for:)`; an ArkUI struct cannot be subclassed, so a
+   *      wrapper hands them in here): per state, undefined = not set. They count as explicit (adapted on drawn dark glass: title 4.5:1, icon and animation
+   *      tint 3:1) and are NEVER written into the integrator's own `titleColor` / `iconColor` ... A missing selected value falls back to the normal one;
+   *      the disabled one has no fallback. Precedence: own > subclass-explicit > stack > subclass built-in > component built-in.
+   * [CN] 子类显式颜色（iOS `setSubclassTitleColor(_:for:)` / `setSubclassIconColor(_:for:)`；ArkUI struct 不能被继承，所以由包装组件传入）：按状态，undefined 表示未设置。
+   *      视为显式颜色（深色绘制玻璃上适配：标题 4.5:1，图标与动画着色 3:1），从不写入集成方自己的 `titleColor` / `iconColor` 等。缺少选中值时回退到普通值；
+   *      禁用值没有回退。优先级：自己的 > 子类显式 > 堆叠 > 子类内置 > 组件内置。
+   */
+  @Prop @Watch('cylTintDidChange') subclassTitleColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') subclassSelectedTitleColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') subclassDisabledTitleColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') subclassIconColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') subclassSelectedIconColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') subclassDisabledIconColor: ResourceColor | undefined = undefined;
+  /**
+   * [EN] The SUBCLASS BUILT-IN level (iOS `applyTitleTintColor` / `applyIconTintColor`): the colour a subclass wants when nobody set an explicit one, normal
+   *      and selected (a missing selected one falls back to the normal one); undefined = not set (the component built-in applies). Adapted on drawn dark
+   *      glass like the explicit levels, but not for the disabled look (a disabled item uses the component's disabled colour).
+   * [CN] 子类内置层（iOS `applyTitleTintColor` / `applyIconTintColor`）：没有人设置显式颜色时子类想要的颜色，普通与选中（缺少选中值时回退到普通值）；undefined 表示未设置
+   *      （使用组件内置）。与显式层一样在深色绘制玻璃上适配，但禁用外观除外（禁用的条目使用组件的禁用颜色）。
+   */
+  @Prop @Watch('cylTintDidChange') builtInTitleColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') builtInSelectedTitleColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') builtInIconColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') builtInSelectedIconColor: ResourceColor | undefined = undefined;
+  /**
+   * [EN] The background while the item is pressed and enabled (iOS `itemHighlightedBackgroundColor`); undefined (default) = no pressed look. A flat item
+   *      draws it as the fill, a drawn Liquid Glass as its tint.
+   * [CN] 条目被按下且可用时的背景（iOS `itemHighlightedBackgroundColor`）；undefined（默认）表示没有按下外观。扁平条目作为填充色，绘制的液态玻璃作为着色。
+   */
+  @Prop itemHighlightedBackgroundColor: ResourceColor | undefined = undefined;
+  /**
+   * [EN] The alpha of the animation while the item is disabled (iOS `itemDisabledAnimationAlpha`); undefined (default) = 1.
+   * [CN] 条目禁用时动画的透明度（iOS `itemDisabledAnimationAlpha`）；undefined（默认）表示 1。
+   */
+  @Prop itemDisabledAnimationAlpha: number | undefined = undefined;
+  /**
+   * [EN] true: a selected item shows the last frame of its animation instead of playing it (iOS `showsLastFrameWhenSelected`); an explicit restart still plays.
+   *      Off by default. The default engine view applies it (a custom `animationBuilder` reads `CYLAnimatedItemAnimationContext.selected` itself).
+   * [CN] true：选中的条目显示动画的最后一帧而不是播放（iOS `showsLastFrameWhenSelected`）；显式重播仍会播放。默认关闭。默认引擎视图应用它
+   *      （自定义 `animationBuilder` 自己读取 `CYLAnimatedItemAnimationContext.selected`）。
+   */
+  @Prop @Watch('cylPlaybackDidChange') showsLastFrameWhenSelected: boolean = false;
+  /**
+   * [EN] true: `selectedImage` shows only while the item is selected AND enabled (iOS `disabledWinsImage`); off by default (selected wins).
+   * [CN] true：只有条目选中且可用时才显示 `selectedImage`（iOS `disabledWinsImage`）；默认关闭（选中优先）。
+   */
+  @Prop disabledWinsImage: boolean = false;
+  /** [EN] The item is being pressed (only tracked with `itemHighlightedBackgroundColor`). [CN] 条目正被按下（仅在设置了 `itemHighlightedBackgroundColor` 时跟踪）。 */
+  @State private cylPressed: boolean = false;
+  /**
    * [EN] INTERNAL, not API (a host never sets these; `CYLAnimatedItemStackView` does for the dividers it owns): `cylInternalDivider` makes this
    *      item view a divider: no icon, title, animation or badge, ONE line 1 vp thick and `cylInternalDividerLength` long (vertical when
    *      `cylInternalDividerVertical`), centered; no taps, hidden from the screen reader. The color goes through the same pipeline as
@@ -788,11 +866,43 @@ export struct CYLAnimatedItemView {
 
 
   /**
-   * [EN] The resolved dark / light decision (the explicit `cyl_colorMode` wins, else the system mode): the one reader of the two stored values.
-   * [CN] 解析后的深浅色（明确的 `cyl_colorMode` 优先，否则取系统模式）：两个存储值的唯一读取处。
+   * [EN] The resolved dark / light decision (the explicit `cyl_colorMode` wins, else the system mode): the one reader of the two stored values. The system
+   *      mode is read from AppStorage as well (after `CYLLiquidGlass.trackSystemColorMode()`), so an item built before its `@StorageProp` synced, as a detached
+   *      or just-built one, already has the right mode at its first render and needs no later update; the `@StorageProp` reads keep the view reactive.
+   * [CN] 解析后的深浅色（明确的 `cyl_colorMode` 优先，否则取系统模式）：两个存储值的唯一读取处。系统模式同时直接从 AppStorage 读取（在 `CYLLiquidGlass.trackSystemColorMode()` 之后），
+   *      因此在 `@StorageProp` 同步之前构建的条目（未加入窗口或刚构建的）在首次渲染时就有正确的模式，无需后续更新；`@StorageProp` 的读取使视图保持响应式。
    */
   private cylIsDark(): boolean {
-    return CYLLiquidGlass.resolveDark(this.cylExplicitColorMode, this.cylSystemColorMode);
+    CYLLiquidGlass.trackSystemColorMode();
+    const live: number | undefined = AppStorage.get<number>('colorMode');
+    return CYLLiquidGlass.resolveDark(this.cylExplicitColorMode, live !== undefined ? live : this.cylSystemColorMode);
+  }
+
+  /**
+   * [EN] Whether the Liquid Glass is really drawn: the resolved style is Liquid Glass AND `CYLLiquidGlass.isActive()` (iOS `drawsLiquidGlass`; a method, because an ArkUI struct cannot have accessors: a getter compiles to undefined). Glass that is
+   *      requested but not drawn counts as flat. Not based on a layer or the view's size, which change before layout.
+   * [CN] 液态玻璃是否真正绘制：解析后的样式为液态玻璃且 `CYLLiquidGlass.isActive()`（iOS `drawsLiquidGlass`）。要求了玻璃但没有绘制算作扁平。
+   *      不依赖图层或视图尺寸，它们在布局之前就会变化。
+   */
+  drawsLiquidGlass(): boolean {
+    return CYLAnimatedItemBackgroundModifier.isGlassDrawn(this.itemBackgroundStyle);
+  }
+
+  /** [EN] The opposite of `drawsLiquidGlass` (iOS `drawsFlatBackground`). [CN] `drawsLiquidGlass` 的反面（iOS `drawsFlatBackground`）。 */
+  drawsFlatBackground(): boolean {
+    return !this.drawsLiquidGlass();
+  }
+
+  /**
+   * [EN] The dark-glass rule of this item as a public function (iOS `adaptedOnGlass(_:kind:)`): `color` itself unless the glass is drawn
+   *      (`drawsLiquidGlass`) and the mode is dark; then lifted to 4.5:1 (`CYLAnimatedItemContrastKindText`) or 3:1 (`CYLAnimatedItemContrastKindIcon`) against the
+   *      rendered glass, with the item's own background colour, tint alpha and resolved mode.
+   * [CN] 本条目的深色玻璃规则，公开为函数（iOS `adaptedOnGlass(_:kind:)`）：除非绘制了玻璃（`drawsLiquidGlass`）且为深色模式，否则原值返回；否则对照实际渲染的玻璃提亮到
+   *      4.5:1（`CYLAnimatedItemContrastKindText`）或 3:1（`CYLAnimatedItemContrastKindIcon`），使用条目自己的背景色、着色透明度与解析后的模式。
+   */
+  adaptedOnGlass(color: ResourceColor, kind: string): ResourceColor {
+    return CYLAnimatedItemContrast.adaptedOnGlassState(color, kind, this.drawsLiquidGlass(), this.cylIsDark(),
+      this.itemBackgroundColor !== '' ? this.itemBackgroundColor : undefined, this.itemGlassTintAlpha);
   }
 
   aboutToAppear(): void {
@@ -1099,7 +1209,7 @@ export struct CYLAnimatedItemView {
    */
   cylAnimationTint(): ResourceColor {
     if (this.animationTintColor !== '') {
-      return this.cylGlassAdapted(this.animationTintColor, CYLAnimatedItemContrast.minimumIconContrast);
+      return this.adaptedOnGlass(this.animationTintColor, CYLAnimatedItemContrastKindIcon);
     }
     if (this.animationUrl === '') {
       return '';
@@ -1117,7 +1227,8 @@ export struct CYLAnimatedItemView {
     input.selected = this.isItemSelected;
     input.dark = this.cylIsDark();
     // [EN] Only an EXPLICIT selected icon color (the item's or the stack's) lets a fixed tint yield on a selected item. [CN] 只有显式的选中图标颜色（条目或堆叠的）才让固定着色在选中条目上让位。
-    input.hasSelectedIconColor = this.selectedIconColor !== '' || this.stackSelectedIconColor !== '';
+    input.hasSelectedIconColor = CYLAnimatedItemColorResolver.isSet(this.selectedIconColor) || CYLAnimatedItemColorResolver.isSet(this.stackSelectedIconColor) ||
+      CYLAnimatedItemColorResolver.isSet(this.subclassSelectedIconColor);
     input.renderingMode = cylAnimatedItemEffectiveRenderingMode(this.animationRenderingMode, this.cylTintSource.option('renderingMode') ?? '',
       this.stackAnimationRenderingMode);
     input.colorKind = this.cylColorKind;
@@ -1125,7 +1236,7 @@ export struct CYLAnimatedItemView {
     if (result.kind === 'icon') {
       return this.cylEffectiveIconColor();
     }
-    return result.kind === 'fixed' ? this.cylGlassAdapted(result.color, CYLAnimatedItemContrast.minimumIconContrast) : '';
+    return result.kind === 'fixed' ? this.adaptedOnGlass(result.color, CYLAnimatedItemContrastKindIcon) : '';
   }
 
   /**
@@ -1152,93 +1263,73 @@ export struct CYLAnimatedItemView {
     });
   }
 
-  /** [EN] The state input of the color resolution (strings: only "set or not" matters here). [CN] 颜色解析的状态输入（字符串：这里只关心「是否设置」）。 */
-  private cylStateInput(item: ResourceColor[], stack: ResourceColor[]): CYLAnimatedItemStateColorInput {
-    const input = new CYLAnimatedItemStateColorInput();
-    const text = (color: ResourceColor): string => color === '' ? '' : 'set';
-    input.item.normal = text(item[0]);
-    input.item.selected = text(item[1]);
-    input.item.disabled = text(item[2]);
-    input.stack.normal = text(stack[0]);
-    input.stack.selected = text(stack[1]);
-    input.stack.disabled = text(stack[2]);
+  /** [EN] A built-in color as a resource color (the `sys.color` resource, else the constant). [CN] 内置颜色，作为资源颜色（`sys.color` 资源，否则为常量）。 */
+  private cylBuiltInColor(role: string): ResourceColor {
+    return CYLAnimatedItemColorResolver.builtInColor(role, this.cylIsDark());
+  }
+
+  /**
+   * [EN] The plain input of the ONE colour resolution (`CYLAnimatedItemColorResolver`) for a title (`icon` false) or an icon: the item's own, the
+   *      subclass-explicit, the stack's and the subclass built-in levels, the state and the glass state. Read in `build`, so a just-built item has its
+   *      colours at its first render.
+   * [CN] 唯一的颜色解析（`CYLAnimatedItemColorResolver`）的普通输入，用于标题（`icon` 为 false）或图标：条目自己的、子类显式、堆叠的与子类内置各层，状态与玻璃状态。
+   *      在 `build` 中读取，因此刚构建的条目在首次渲染时就有颜色。
+   */
+  private cylColorInput(icon: boolean): CYLAnimatedItemColorInput {
+    const input = new CYLAnimatedItemColorInput();
+    const value = (color: ResourceColor | undefined): ResourceColor => color === undefined ? '' : color;
+    if (icon) {
+      input.own.normal = this.iconColor;
+      input.own.selected = this.selectedIconColor;
+      input.own.disabled = this.disabledIconColor;
+      input.stack.normal = this.stackIconColor;
+      input.stack.selected = this.stackSelectedIconColor;
+      input.stack.disabled = this.stackDisabledIconColor;
+      input.subclassExplicit.normal = value(this.subclassIconColor);
+      input.subclassExplicit.selected = value(this.subclassSelectedIconColor);
+      input.subclassExplicit.disabled = value(this.subclassDisabledIconColor);
+      input.subclassBuiltIn.normal = value(this.builtInIconColor);
+      input.subclassBuiltIn.selected = value(this.builtInSelectedIconColor);
+    } else {
+      input.own.normal = this.titleColor;
+      input.own.selected = this.selectedTitleColor;
+      input.stack.normal = this.stackTitleColor;
+      input.stack.selected = this.stackSelectedTitleColor;
+      input.subclassExplicit.normal = value(this.subclassTitleColor);
+      input.subclassExplicit.selected = value(this.subclassSelectedTitleColor);
+      input.subclassExplicit.disabled = value(this.subclassDisabledTitleColor);
+      input.subclassBuiltIn.normal = value(this.builtInTitleColor);
+      input.subclassBuiltIn.selected = value(this.builtInSelectedTitleColor);
+    }
     input.selected = this.isItemSelected;
     input.enabled = this.isItemEnabled;
     input.dark = this.cylIsDark();
+    input.drawsGlass = this.drawsLiquidGlass();
+    input.glassTint = this.itemBackgroundColor !== '' ? this.itemBackgroundColor : undefined;
+    input.tintAlpha = this.itemGlassTintAlpha;
     return input;
   }
 
-  /** [EN] A built-in color as a resource color (the `sys.color` resource, else the constant). [CN] 内置颜色，作为资源颜色（`sys.color` 资源，否则为常量）。 */
-  private cylBuiltInColor(role: string): ResourceColor {
-    const builtIn: CYLAnimatedItemBuiltInColor = cylAnimatedItemBuiltInColor(role, this.cylIsDark());
-    if (builtIn.resource === 'font_primary') {
-      return $r('sys.color.font_primary');
-    }
-    if (builtIn.resource === 'interactive_active') {
-      return $r('sys.color.interactive_active');
-    }
-    if (builtIn.resource === 'font_secondary') {
-      return $r('sys.color.font_secondary');
-    }
-    return builtIn.color;
-  }
-
-  /** [EN] The role of the current state. [CN] 当前状态的角色。 */
-  private cylStateRole(): string {
-    return !this.isItemEnabled ? 'disabled' : (this.isItemSelected ? 'selected' : 'normal');
-  }
-
   /**
-   * [EN] The EXPLICIT icon color of the current state (the item's, else the stack's; '' when neither set): what tints a static image.
-   * [CN] 当前状态的显式图标颜色（条目的，否则堆叠的；都未设置时为 ''）：用于静态图片着色。
+   * [EN] The EXPLICIT icon color of the current state (own, subclass-explicit, then stack; '' when none set), adapted on drawn dark glass: what tints a
+   *      static image. [CN] 当前状态的显式图标颜色（自己的、子类显式、堆叠；都未设置时为 ''），在深色绘制玻璃上已适配：用于静态图片着色。
    */
   cylExplicitIconColor(): ResourceColor {
-    const input = this.cylStateInput([this.iconColor, this.selectedIconColor, this.disabledIconColor],
-      [this.stackIconColor, this.stackSelectedIconColor, this.stackDisabledIconColor]);
-    const source: string = cylAnimatedItemStateColorSource(input);
-    if (source === 'item') {
-      return this.cylGlassAdapted(!this.isItemEnabled ? this.disabledIconColor : (this.isItemSelected ? this.selectedIconColor : this.iconColor),
-        CYLAnimatedItemContrast.minimumIconContrast);
-    }
-    if (source === 'stack') {
-      return this.cylGlassAdapted(!this.isItemEnabled ? this.stackDisabledIconColor : (this.isItemSelected ? this.stackSelectedIconColor : this.stackIconColor),
-        CYLAnimatedItemContrast.minimumIconContrast);
-    }
-    return '';
+    const input: CYLAnimatedItemColorInput = this.cylColorInput(true);
+    input.kind = CYLAnimatedItemContrastKindIcon;
+    return CYLAnimatedItemColorResolver.explicitColor(input);
   }
 
   /**
-   * [EN] The EFFECTIVE icon color of the current state: explicit, else the built-in of the state. [CN] 当前状态生效的图标颜色：显式，否则为该状态的内置色。
+   * [EN] The EFFECTIVE icon color of the current state: the ONE resolution (`CYLAnimatedItemColorResolver.resolvedIconColor`). [CN] 当前状态生效的图标颜色：唯一的解析。
    */
   cylEffectiveIconColor(): ResourceColor {
-    const explicit: ResourceColor = this.cylExplicitIconColor();
-    return explicit !== '' ? explicit : this.cylBuiltInColor(this.cylStateRole());
+    return CYLAnimatedItemColorResolver.resolvedIconColor(this.cylColorInput(true));
   }
 
-  /**
-   * [EN] An EXPLICIT title / icon / tint color on the drawn DARK Liquid Glass: lightened until it has `minimum` contrast with the glass
-   *      (`CYLAnimatedItemContrast.adjustedColor`); as it is on flat, light mode or when no glass is drawn. [CN] 绘制的深色液态玻璃上的显式标题 / 图标 / 着色颜色：
-   *      提亮到与玻璃的对比度达到 `minimum`；扁平、浅色模式或未绘制玻璃时保持原样。
-   */
-  private cylGlassAdapted(color: ResourceColor, minimum: number): ResourceColor {
-    const kind: string = minimum === CYLAnimatedItemContrast.minimumIconContrast ? CYLAnimatedItemContrastKindIcon : CYLAnimatedItemContrastKindText;
-    return CYLAnimatedItemContrast.adaptedOnGlass(color, kind, this.itemBackgroundStyle,
-      this.itemBackgroundColor !== '' ? this.itemBackgroundColor : undefined, this.itemGlassTintAlpha);
-  }
-
-  /** [EN] The title color of the current state (item, stack, built-in). [CN] 当前状态的标题颜色（条目、堆叠、内置）。 */
+  /** [EN] The title color of the current state: the ONE resolution (`CYLAnimatedItemColorResolver.resolvedTitleColor`). [CN] 当前状态的标题颜色：唯一的解析。 */
   cylEffectiveTitleColor(): ResourceColor {
-    const input = this.cylStateInput([this.titleColor, this.selectedTitleColor, ''], [this.stackTitleColor, this.stackSelectedTitleColor, '']);
-    const source: string = cylAnimatedItemStateColorSource(input);
-    if (source === 'item') {
-      return this.cylGlassAdapted(this.isItemEnabled && this.isItemSelected ? this.selectedTitleColor : this.titleColor,
-        CYLAnimatedItemContrast.minimumTextContrast);
-    }
-    if (source === 'stack') {
-      return this.cylGlassAdapted(this.isItemEnabled && this.isItemSelected ? this.stackSelectedTitleColor : this.stackTitleColor,
-        CYLAnimatedItemContrast.minimumTextContrast);
-    }
-    return this.cylBuiltInColor(this.cylStateRole());
+    return CYLAnimatedItemColorResolver.resolvedTitleColor(this.cylColorInput(false));
   }
 
   /** [EN] The divider's color and opacity (`cylAnimatedItemDividerColor`). [CN] 分隔线的颜色与透明度。 */
@@ -1306,6 +1397,7 @@ export struct CYLAnimatedItemView {
     state.onFailed = context.onFailed;
     state.onEnded = context.onEnded;
     state.onPlayer = (player: CYLAnimatedItemPlayer | undefined) => this.onAnimationPlayer?.(player);
+    state.showsLastFrameWhenSelected = this.showsLastFrameWhenSelected;
     // [EN] Last, so the engine view reads the playback above when it reacts. [CN] 最后设置，使引擎视图响应时读到上面的播放设置。
     state.selected = context.selected;
     state.restartToken = context.restartToken;
@@ -1338,7 +1430,7 @@ export struct CYLAnimatedItemView {
     if (this.cylIsRunning() && !this.cylIsEmpty(this.countdownImage)) {
       return this.countdownImage;
     }
-    if (this.isItemSelected && !this.cylIsEmpty(this.selectedImage)) {
+    if (this.isItemSelected && (!this.disabledWinsImage || this.isItemEnabled) && !this.cylIsEmpty(this.selectedImage)) {
       return this.selectedImage;
     }
     return this.image;
@@ -1432,7 +1524,7 @@ export struct CYLAnimatedItemView {
         // [EN] An offscreen group, so the tint only meets the animation, never what is behind the item.
         // [CN] 离屏组，使着色只与动画合成，不影响条目背后的内容。
         .blendMode(this.cylAnimationTint() !== '' ? BlendMode.SRC_OVER : BlendMode.NONE, BlendApplyType.OFFSCREEN)
-        .opacity(this.animationLoaded && !this.cylShowsImageAfterEnd ? 1 : 0)
+        .opacity(this.animationLoaded && !this.cylShowsImageAfterEnd ? this.cylAnimationAlpha() : 0)
         .accessibilityLevel('no')
       }
       if (this.accessoryPlacement === CYLAnimatedItemAccessoryPlacement.TopTrailing) {
@@ -1526,7 +1618,25 @@ export struct CYLAnimatedItemView {
    * [EN] Whether the Liquid Glass is drawn: the style asks for it and `CYLLiquidGlass.isActive()`. [CN] 是否绘制液态玻璃：样式要求且 `CYLLiquidGlass.isActive()`。
    */
   private cylItemGlassDrawn(): boolean {
-    return CYLAnimatedItemBackgroundModifier.isGlassDrawn(this.itemBackgroundStyle);
+    return this.drawsLiquidGlass();
+  }
+
+  /** [EN] A touch: tracks the pressed look (only with `itemHighlightedBackgroundColor`). [CN] 触摸：跟踪按下外观（仅在设置了 `itemHighlightedBackgroundColor` 时）。 */
+  private cylTouchChanged(type: TouchType): void {
+    if (!CYLAnimatedItemColorResolver.isSet(this.itemHighlightedBackgroundColor)) {
+      return;
+    }
+    if (type === TouchType.Down) {
+      this.cylPressed = true;
+    } else if (type === TouchType.Up || type === TouchType.Cancel) {
+      this.cylPressed = false;
+    }
+  }
+
+  /** [EN] The animation's alpha: `itemDisabledAnimationAlpha` while disabled, else 1. [CN] 动画的透明度：禁用时为 `itemDisabledAnimationAlpha`，否则为 1。 */
+  private cylAnimationAlpha(): number {
+    const alpha: number | undefined = this.itemDisabledAnimationAlpha;
+    return !this.isItemEnabled && alpha !== undefined ? Math.min(1, Math.max(0, alpha)) : 1;
   }
 
   /**
@@ -1542,6 +1652,10 @@ export struct CYLAnimatedItemView {
    * [EN] The background color: the tint over the glass blur, else the solid fill, '' meaning transparent. [CN] 背景色：玻璃模糊之上的着色，否则为纯色填充；'' 表示透明。
    */
   private cylItemBackgroundColor(): ResourceColor {
+    if (this.cylPressed && this.cylEnabled() && CYLAnimatedItemColorResolver.isSet(this.itemHighlightedBackgroundColor)) {
+      const pressed: ResourceColor = this.itemHighlightedBackgroundColor as ResourceColor;
+      return this.cylItemGlassDrawn() ? CYLAnimatedItemBackgroundModifier.glassTint(pressed, this.itemGlassTintAlpha) : pressed;
+    }
     // [EN] The glass tint is translucent (and a default frosted tint when none is set): the shared rule of the modifier. [CN] 玻璃着色是半透明的（未设置时为默认磨砂着色）：与修饰器共用同一规则。
     if (this.cylItemGlassDrawn()) {
       return CYLAnimatedItemBackgroundModifier.glassTint(this.itemBackgroundColor !== '' ? this.itemBackgroundColor : Color.Transparent, this.itemGlassTintAlpha);
@@ -1601,6 +1715,9 @@ export struct CYLAnimatedItemView {
     })
     .onClick(() => {
       this.cylHandleTap();
+    })
+    .onTouch((event: TouchEvent) => {
+      this.cylTouchChanged(event.type);
     })
     .gesture(
       LongPressGesture()

@@ -247,6 +247,11 @@ export interface CYLAnimatedItemPlayback {
   speed: number;
   loops: boolean;
   restartToken: number;
+  /**
+   * [EN] true: a selected item rests on the last frame (progress 1) instead of playing (iOS showsLastFrameWhenSelected); a restart still plays. Absent = false.
+   * [CN] true：选中的条目停在最后一帧（进度 1）而不是播放（iOS showsLastFrameWhenSelected）；重播仍会播放。缺省为 false。
+   */
+  showsLastFrameWhenSelected?: boolean;
 }
 
 /**
@@ -263,7 +268,7 @@ export class CYLAnimatedItemPlaybackDriver {
     player.speed = playback.speed;
     player.loops = playback.loops;
     if (playback.selected) {
-      player.play();
+      CYLAnimatedItemPlaybackDriver.playSelected(player, playback);
     } else {
       player.stopAtProgress(0);
     }
@@ -292,10 +297,21 @@ export class CYLAnimatedItemPlaybackDriver {
       player.play();
     } else if (playback.selected !== last.selected) {
       if (playback.selected) {
-        player.play();
+        CYLAnimatedItemPlaybackDriver.playSelected(player, playback);
       } else {
         player.stopAtProgress(0);
       }
+    } else if (playback.selected && (playback.showsLastFrameWhenSelected === true) !== (last.showsLastFrameWhenSelected === true)) {
+      CYLAnimatedItemPlaybackDriver.playSelected(player, playback);
+    }
+  }
+
+  /** [EN] A selected item plays, or rests on the last frame. [CN] 选中的条目播放，或停在最后一帧。 */
+  private static playSelected(player: CYLAnimatedItemPlayer, playback: CYLAnimatedItemPlayback): void {
+    if (playback.showsLastFrameWhenSelected === true) {
+      player.stopAtProgress(1);
+    } else {
+      player.play();
     }
   }
 
@@ -306,7 +322,8 @@ export class CYLAnimatedItemPlaybackDriver {
 
   private static copy(playback: CYLAnimatedItemPlayback): CYLAnimatedItemPlayback {
     return {
-      selected: playback.selected, speed: playback.speed, loops: playback.loops, restartToken: playback.restartToken
+      selected: playback.selected, speed: playback.speed, loops: playback.loops, restartToken: playback.restartToken,
+      showsLastFrameWhenSelected: playback.showsLastFrameWhenSelected
     };
   }
 }

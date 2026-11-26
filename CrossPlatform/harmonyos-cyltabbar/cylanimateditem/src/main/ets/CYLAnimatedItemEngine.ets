@@ -31,6 +31,8 @@ export class CYLAnimatedItemEngineState implements CYLAnimatedItemEngineHost {
   selected: boolean = false;
   speed: number = 1;
   loops: boolean = false;
+  /** [EN] A selected item rests on the last frame (`showsLastFrameWhenSelected`). [CN] 选中的条目停在最后一帧。 */
+  showsLastFrameWhenSelected: boolean = false;
   /** [EN] Grows on every restart: the engine plays from progress 0. [CN] 每次重播时增长：引擎从进度 0 播放。 */
   restartToken: number = 0;
   /**
@@ -72,7 +74,8 @@ export class CYLAnimatedItemEngineState implements CYLAnimatedItemEngineHost {
 
   /** [EN] The playback as the driver reads it. [CN] 驱动读取的播放设置。 */
   playback(): CYLAnimatedItemPlayback {
-    return { selected: this.selected, speed: this.speed, loops: this.loops, restartToken: this.restartToken };
+    return { selected: this.selected, speed: this.speed, loops: this.loops, restartToken: this.restartToken,
+      showsLastFrameWhenSelected: this.showsLastFrameWhenSelected };
   }
 }
 

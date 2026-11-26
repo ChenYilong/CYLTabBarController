@@ -54,12 +54,19 @@ export default function cylGlassHighlightTest() {
       expect(CYLLiquidGlassCapsuleEdge.rimWidth()).assertEqual(CYLLiquidGlass.RIM_WIDTH);
     });
 
-    it('the default glass tint follows the mode: frosted light, white 14 percent in dark', 0, () => {
+    it('the default glass tint alphas are 0.10 light and 0.04 dark, the colours carry them', 0, () => {
+      expect(CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT_ALPHA_LIGHT).assertEqual(0.10);
+      expect(CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT_ALPHA_DARK).assertEqual(0.04);
+      expect(CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT).assertEqual('#1AE1DEDC');
+      expect(CYLAnimatedItemBackgroundModifier.DEFAULT_GLASS_TINT_DARK).assertEqual('#0AFFFFFF');
+    });
+
+    it('the default glass tint follows the mode: frosted 10 percent light, white 4 percent in dark', 0, () => {
       const before: string | undefined = AppStorage.get<string>('cyl_colorMode');
       AppStorage.setOrCreate('cyl_colorMode', 'dark');
-      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#24FFFFFF');
+      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#0AFFFFFF');
       AppStorage.setOrCreate('cyl_colorMode', 'light');
-      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#80E1DEDC');
+      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#1AE1DEDC');
       AppStorage.setOrCreate('cyl_colorMode', before ?? 'light');
     });
 
@@ -79,18 +86,18 @@ export default function cylGlassHighlightTest() {
       AppStorage.delete('cyl_colorMode');
       AppStorage.setOrCreate('colorMode', ColorMode.DARK);
       expect(CYLLiquidGlass.isDark()).assertTrue();
-      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#24FFFFFF');
+      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#0AFFFFFF');
       AppStorage.setOrCreate('colorMode', ColorMode.LIGHT);
       expect(CYLLiquidGlass.isDark()).assertFalse();
-      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#80E1DEDC');
+      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#1AE1DEDC');
       AppStorage.setOrCreate('cyl_colorMode', 'light');
       AppStorage.setOrCreate('colorMode', ColorMode.DARK);
       expect(CYLLiquidGlass.isDark()).assertFalse();
-      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#80E1DEDC');
+      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#1AE1DEDC');
       AppStorage.setOrCreate('cyl_colorMode', 'dark');
       AppStorage.setOrCreate('colorMode', ColorMode.LIGHT);
       expect(CYLLiquidGlass.isDark()).assertTrue();
-      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#24FFFFFF');
+      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#0AFFFFFF');
       if (key === undefined) {
         AppStorage.delete('cyl_colorMode');
       } else {

@@ -38,10 +38,13 @@ export enum CYLAnimatedItemBackgroundStyle {
  *      `cornerRadius` 为 -1 表示未设置：绘制玻璃时为胶囊，扁平时为直角；0 及以上的值用于自定义。
  */
 export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<CommonAttribute> {
-  /** [EN] The tint of a glass with no color (225, 222, 220 at alpha 0.5). [CN] 未设置颜色时玻璃的着色（225, 222, 220，透明度 0.5）。 */
-  static readonly DEFAULT_GLASS_TINT: string = '#80E1DEDC';
-  /** [EN] The tint of a glass with no color in a dark app: white at alpha 36/255 (Android `defaultGlassTint`), so the glass stays dark and translucent. [CN] 深色应用中未设置颜色时玻璃的着色：白色，透明度 36/255（Android `defaultGlassTint`），使玻璃保持深色半透明。 */
-  static readonly DEFAULT_GLASS_TINT_DARK: string = '#24FFFFFF';
+  /** [EN] The default (unset) glass tint in a light app: (225, 222, 220) at alpha 0.10, handed with the item's own alpha (not the 0.75 share of an explicit color), as iOS `defaultGlassTint`. [CN] 浅色应用中未设置颜色时玻璃的默认着色：(225, 222, 220)，透明度 0.10，按条目自己的透明度交出（不乘显式颜色的 0.75），与 iOS `defaultGlassTint` 相同。 */
+  static readonly DEFAULT_GLASS_TINT: string = '#1AE1DEDC';
+  /** [EN] The default (unset) glass tint in a dark app: white at alpha 0.04, as iOS. [CN] 深色应用中未设置颜色时玻璃的默认着色：白色，透明度 0.04，与 iOS 相同。 */
+  static readonly DEFAULT_GLASS_TINT_DARK: string = '#0AFFFFFF';
+  /** [EN] The alpha of the default glass tint, light and dark (iOS `defaultGlassTintAlphaLight` / `defaultGlassTintAlphaDark`). [CN] 默认玻璃着色的透明度，浅色与深色（iOS `defaultGlassTintAlphaLight` / `defaultGlassTintAlphaDark`）。 */
+  static readonly DEFAULT_GLASS_TINT_ALPHA_LIGHT: number = 0.10;
+  static readonly DEFAULT_GLASS_TINT_ALPHA_DARK: number = 0.04;
 
   /**
    * [EN] The default tint of the app's color mode (`CYLLiquidGlass.isDark()`). [CN] 应用颜色模式（`CYLLiquidGlass.isDark()`）对应的默认着色。

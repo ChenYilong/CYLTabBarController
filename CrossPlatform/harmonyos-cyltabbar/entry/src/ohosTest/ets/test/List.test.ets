@@ -5,6 +5,7 @@ import cylTabBarHeightTest from './CYLTabBarHeight.test';
 import demoTeardownTest from './DemoTeardown.test';
 import cylGlassHighlightTest from './CYLGlassHighlight.test';
 import cylAnimatedItemContrastTest from './CYLAnimatedItemContrast.test';
+import cylAnimatedItemColorResolverTest from './CYLAnimatedItemColorResolver.test';
 
 export default function testsuite() {
   cylAnimatedItemFallbackTest();
@@ -14,4 +15,5 @@ export default function testsuite() {
   demoTeardownTest();
   cylGlassHighlightTest();
   cylAnimatedItemContrastTest();
+  cylAnimatedItemColorResolverTest();
 }

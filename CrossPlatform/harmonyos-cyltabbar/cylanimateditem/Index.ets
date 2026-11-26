@@ -7,9 +7,10 @@
  */
 export {
   CYLAnimatedItemView, CYLAnimatedItemStyle, CYLAnimatedItemAxis, CYLAnimatedItemAccessoryPlacement, CYLAnimatedItemAnimationContext, CYLAnimatedItemController,
-  CYLAnimatedItemEngines, cylAnimatedItemTypeOf, cylIconColorFilter, cylSetPausesWhileUserScrolls, cylPausesWhileUserScrolls
+  CYLAnimatedItemEngines, CYLAnimatedItemStatics, cylAnimatedItemTypeOf, cylIconColorFilter, cylSetPausesWhileUserScrolls, cylPausesWhileUserScrolls
 } from './src/main/ets/CYLAnimatedItemView';
 export { CYLAnimatedItemStackView } from './src/main/ets/CYLAnimatedItemStackView';
+export { CYLAnimatedItemColorResolver, CYLAnimatedItemColorInput, CYLAnimatedItemColorStates } from './src/main/ets/CYLAnimatedItemColorResolver';
 export { CYLLiquidGlass } from './src/main/ets/CYLLiquidGlass';
 export { CYLAnimatedItemContrast, CYLAnimatedItemContrastRGBA, CYLAnimatedItemContrastHSL, CYLAnimatedItemContrastKindIcon,
   CYLAnimatedItemContrastKindText } from './src/main/ets/CYLAnimatedItemContrast';
