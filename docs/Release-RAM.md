@@ -143,6 +143,19 @@ Studio, Chrome, bionic, opencode, MiniMax Code, TextExpander; `-Extra name` adds
 that is not named in `-KeepEmulator`) and `brightness` (the built-in display through WMI, `-Brightness 1` is the percent;
 external monitors have no WMI brightness, lower them with their buttons).
 
-Status: the Windows script was written on a Mac and **not run yet**. A Windows session runs `.\release-ram.ps1 -DryRun`
-first and reports what it prints; the process names of the HarmonyOS emulator, bionic and MiniMax Code are guesses to
-check there.
+Status: the Windows script was written on a Mac; a Windows session ran `.\release-ram.ps1 -DryRun` (never without `-DryRun`)
+in PowerShell 7.6 and in Windows PowerShell 5.1: it parses and every step prints sensible lines. What the dry run found and what changed:
+
+- The HarmonyOS emulator (`DevEco Studio\tools\emulator\Emulator.exe`) and the Android SDK launcher (`C:\Android\Sdk\emulator\emulator.exe`) have the
+  same process name, `Emulator`, because process names are matched without regard to case: the first version would also have quit the Android
+  emulator launcher (and `-KeepEmulator` could not protect it). `Stop-Named` now takes a `-PathPattern`; the HarmonyOS emulator is the
+  `Emulator` / `emulator-crash-service` processes whose path matches `Huawei|DevEco`.
+- WeChat DevTools runs as `微信开发者工具.exe` (process name `微信开发者工具`), added to the names.
+  The script itself must stay ASCII: Windows PowerShell 5.1 reads a UTF-8 file without BOM as ANSI and failed to parse the Chinese name
+  ("Unexpected token"), so the name is built from its code points (`$WeChatName`); PowerShell 7 did not care.
+- `adb` was not on the PATH of that PC (`ANDROID_HOME` was `C:\Android\Sdk`): the script now falls back to `platform-tools\adb.exe` of `ANDROID_HOME` or
+  `ANDROID_SDK_ROOT`; before, the emulators step was skipped.
+- The Gradle step found 3 `java` processes (GradleDaemon or gradle-launcher); that PC has no WMI brightness (a desktop with external
+  monitors), the step prints the "lower external monitors by hand" line.
+- Not running on that PC when checked (names unverified): DevEco Studio, Obsidian, Android Studio, Chrome, bionic, opencode, MiniMax Code,
+  TextExpander, watchman. The script ends with `exit 0` (it left no exit code before).

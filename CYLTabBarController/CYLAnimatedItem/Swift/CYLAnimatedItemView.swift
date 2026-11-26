@@ -1708,15 +1708,25 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
 
     /// [EN] The EFFECTIVE icon color of the current state: explicit, else subclass, else built-in (resolved with this item's traits). [CN] 当前状态的有效图标颜色：显式值，否则子类，否则内置（用本条目的 trait 解析）。
-    ///      On drawn dark glass the EXPLICIT color is adapted (`CYLAnimatedItemContrast`, 3:1, static colors only); the subclass and built-in levels are not.
-    ///      [CN] 深色玻璃确实绘制时调整显式颜色（`CYLAnimatedItemContrast`，3:1，仅静态颜色）；子类层与内置层不调整。
+    ///      On drawn dark glass the EXPLICIT color is adapted (`CYLAnimatedItemContrast`, 3:1, static colors only); the subclass and built-in levels go through `resolvedBuiltInColor` (resolved with the item's traits, and adapted too except the disabled look).
+    ///      [CN] 深色玻璃确实绘制时调整显式颜色（`CYLAnimatedItemContrast`，3:1，仅静态颜色）；子类层与内置层走 `resolvedBuiltInColor`（用条目的 trait 解析，除禁用外观外同样适配）。
     private func effectiveIconColor() -> UIColor {
         let state = currentIconState
         if let explicit = explicitIconColor(state) {
             return glassAdapted(explicit, minimumContrast: CYLAnimatedItemContrast.iconMinimumContrast).resolvedColor(with: traitCollection)
         }
-        let color = hostIconColor ?? builtInIconColor(state)
-        return color.resolvedColor(with: traitCollection)
+        return resolvedBuiltInColor(hostIconColor ?? builtInIconColor(state), state: state, minimumContrast: CYLAnimatedItemContrast.iconMinimumContrast)
+    }
+
+    /// [EN] The ONE resolution of a built-in color (the component's or a subclass's, title and icon, every state): resolved with THIS item's traits into a
+    ///      plain color, so normal and selected go the same way, and, except for the disabled look, adapted to drawn dark glass like an explicit color
+    ///      (`glassAdapted`; static colors only, so the default dark `UIColor.label` passes unchanged).
+    /// [CN] 内置颜色（组件的或子类的，标题与图标，所有状态）的唯一解析：用本条目自己的 trait 解析为普通颜色，普通与选中走同一条路径，
+    ///      并且除禁用外观外，与显式颜色一样适配深色玻璃（`glassAdapted`；仅静态颜色，因此深色默认 `UIColor.label` 保持不变）。
+    private func resolvedBuiltInColor(_ color: UIColor, state: IconState, minimumContrast: CGFloat) -> UIColor {
+        let resolved = color.resolvedColor(with: traitCollection)
+        guard state != .disabled else { return resolved }
+        return glassAdapted(resolved, minimumContrast: minimumContrast)
     }
 
     /// [EN] The icon and the animation take the effective icon color; called on every change of state, appearance, tint and traits. [CN] 图标与动画使用有效图标颜色；状态、外观、tint 与 trait 每次变化时调用。
@@ -1799,8 +1809,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         if itemStyle == .countdown && countdownState == .running { return }
         // [EN] The subclass built-in title color (`applyTitleTintColor`): not adapted. [CN] 子类内置标题颜色（`applyTitleTintColor`）：不调整。
         if let host = hostTitleColor {
-            titleLabel.textColor = host
-            appliedTitleColor = host
+            let shown = resolvedBuiltInColor(host, state: currentIconState, minimumContrast: CYLAnimatedItemContrast.titleMinimumContrast)
+            titleLabel.textColor = shown
+            appliedTitleColor = shown
             refreshOutlineForTitleColor()
             return
         }
@@ -1825,8 +1836,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
 
     private func setBuiltInTitleColor() {
-        let color = builtInIconColor(currentIconState)
-        let applied = currentIconState == .normal ? color : color.resolvedColor(with: traitCollection)
+        let applied = resolvedBuiltInColor(builtInIconColor(currentIconState), state: currentIconState,
+                                           minimumContrast: CYLAnimatedItemContrast.titleMinimumContrast)
         titleLabel.textColor = applied
         appliedTitleColor = applied
     }

@@ -36,9 +36,12 @@ if (-not $DryRun -and -not $Yes) {
   if ($answer -ne 'yes') { Say 'cancelled'; exit 1 }
 }
 
-# Stops every process with one of the names. The names are process names without .exe (see Get-Process).
-function Stop-Named([string]$Label, [string[]]$Names) {
+# Stops every process with one of the names. The names are process names without .exe (see Get-Process) and are matched
+# without regard to case, so `Emulator` (HarmonyOS, DevEco Studio) is also `emulator` (the Android SDK): `-PathPattern` keeps only the
+# processes whose executable path matches the regular expression (checked on a Windows PC: both have the process name Emulator).
+function Stop-Named([string]$Label, [string[]]$Names, [string]$PathPattern = '') {
   $found = @(Get-Process -Name $Names -ErrorAction SilentlyContinue)
+  if ($PathPattern -ne '') { $found = @($found | Where-Object { $_.Path -and $_.Path -match $PathPattern }) }
   if ($found.Count -eq 0) { Say "apps: $Label is not running"; return }
   Say "apps: quitting $Label ($($found.Count) process(es))"
   if ($DryRun) { return }
@@ -47,13 +50,17 @@ function Stop-Named([string]$Label, [string[]]$Names) {
     [void]$process.CloseMainWindow()
   }
   Start-Sleep -Seconds 4
-  Get-Process -Name $Names -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+  foreach ($process in $found) { Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue }
 }
 
+# The process name of WeChat DevTools is its Chinese product name; spelled with code points so that this file stays ASCII
+# (Windows PowerShell 5.1 reads a UTF-8 file without BOM as ANSI and cannot parse the characters).
+$WeChatName = -join ([char[]](0x5FAE,0x4FE1,0x5F00,0x53D1,0x8005,0x5DE5,0x5177))
+
 function Step-Apps {
-  Stop-Named 'WeChat DevTools' @('wechatdevtools', 'wechatwebdevtools')
+  Stop-Named 'WeChat DevTools' @($WeChatName, 'wechatdevtools', 'wechatwebdevtools')
   Stop-Named 'DevEco Studio' @('devecostudio64', 'devecostudio')
-  Stop-Named 'HarmonyOS emulator' @('Emulator', 'HarmonyOSEmulator', 'hmos_emulator')
+  Stop-Named 'HarmonyOS emulator' @('Emulator', 'emulator-crash-service', 'HarmonyOSEmulator', 'hmos_emulator') 'Huawei|DevEco'
   Stop-Named 'Obsidian' @('Obsidian')
   Stop-Named 'Android Studio' @('studio64', 'studio')
   Stop-Named 'Google Chrome' @('chrome')
@@ -85,13 +92,19 @@ function Step-Explorer {
 # Android emulators that are not kept: adb emu kill by serial. An emulator is "inactive" when no session debugs on it,
 # which a script cannot know: name the ones to keep with -KeepEmulator.
 function Step-Emulators {
-  $adb = Get-Command adb -ErrorAction SilentlyContinue
-  if (-not $adb) { Say 'emulators: adb is not on the PATH, skipped'; return }
-  $serials = @(& adb devices | Select-String '^(emulator-\d+)\s+device' | ForEach-Object { $_.Matches[0].Groups[1].Value })
+  # adb: the PATH first, else platform-tools of ANDROID_HOME or ANDROID_SDK_ROOT (on the checked PC adb was not on the PATH, ANDROID_HOME was C:\Android\Sdk).
+  $adb = (Get-Command adb -ErrorAction SilentlyContinue).Source
+  if (-not $adb) {
+    foreach ($root in @($env:ANDROID_HOME, $env:ANDROID_SDK_ROOT)) {
+      if ($root -and (Test-Path (Join-Path $root 'platform-tools\adb.exe'))) { $adb = Join-Path $root 'platform-tools\adb.exe'; break }
+    }
+  }
+  if (-not $adb) { Say 'emulators: adb is not on the PATH and ANDROID_HOME has no platform-tools, skipped'; return }
+  $serials = @(& $adb devices | Select-String '^(emulator-\d+)\s+device' | ForEach-Object { $_.Matches[0].Groups[1].Value })
   foreach ($serial in $serials) {
     if ($KeepEmulator -contains $serial) { Say "emulators: keeping $serial"; continue }
     Say "emulators: adb emu kill $serial"
-    if (-not $DryRun) { & adb -s $serial emu kill | Out-Null }
+    if (-not $DryRun) { & $adb -s $serial emu kill | Out-Null }
   }
   if ($serials.Count -eq 0) { Say 'emulators: no running Android emulator' }
 }
@@ -121,3 +134,4 @@ foreach ($step in @('apps', 'watchman', 'gradle', 'explorer', 'emulators', 'brig
 }
 
 Say 'done. If you run AI sessions, tell every Windows and macOS session: the simulators and emulators were restarted, restart debugging if you were waiting (docs/Release-RAM.md).'
+exit 0
