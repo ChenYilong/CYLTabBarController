@@ -314,6 +314,19 @@ final class CYLFlatDesignTintTests: XCTestCase {
         assertColor(try animationTint(bar.buttons[0]), .blue, in: bar.buttons[0], "also on a view the URL asked nothing of")
     }
 
+    func testAPerTabRenderingModeOnTheFlatButtonBeatsTheBarDefault() throws {
+        let bar = try makeBar(animations: [try multiColorGIF(), try multiColorGIF()])
+        bar.buttons[1].animationRenderingMode = .alwaysTemplate
+        settle(bar.controller.view)
+        assertColor(try animationTint(bar.buttons[1]), .systemGray, in: bar.buttons[1], "alwaysTemplate on the button tints a URL without options")
+        XCTAssertNil(try animationTint(bar.buttons[0]), "the other tab keeps the file's own colors")
+        bar.controller.tabBarItemAnimationRenderingMode = .alwaysTemplate
+        bar.buttons[0].animationRenderingMode = .alwaysOriginal
+        settle(bar.controller.view)
+        XCTAssertNil(try animationTint(bar.buttons[0]), "alwaysOriginal on the button beats the bar's alwaysTemplate")
+        assertColor(try animationTint(bar.buttons[1]), .systemGray, in: bar.buttons[1], "still tinted")
+    }
+
     func testTheTabFlowUsesTheBarDefaultOnlyWhereTheURLSetsNothing() throws {
         let plain = UIView()
         _ = CYLTabBarItemAnimationPrepareTabTint(plain, try multiColorGIF(), nil, CYLAnimatedItemRenderingMode.alwaysTemplate.rawValue)

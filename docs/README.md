@@ -442,6 +442,7 @@ docs/
 │   ├── ios-27.2-iphone-18-pro-objc-example-flat-selected-icon-tint-dark-9d2b9e7b-2026-11-26-2122.png
 │   ├── ios-27.2-iphone-18-pro-objc-example-flat-selected-icon-tint-light-9d2b9e7b-2026-11-26-2122.png
 │   ├── ios-27.2-iphone-18-pro-objc-example-flat-tint-unchanged-lottie-9d2b9e7b-2026-11-26-2240.png
+│   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-b34-theme-by-tab-973c255a-2026-11-27.png
 │   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-dark-to-light-bar-stays-dark-9d2b9e7b-2026-11-26-2240.png
 │   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-flat-selected-icon-tint-dark-9d2b9e7b-2026-11-26-2122.png
 │   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-flat-selected-icon-tint-light-9d2b9e7b-2026-11-26-2122.png
