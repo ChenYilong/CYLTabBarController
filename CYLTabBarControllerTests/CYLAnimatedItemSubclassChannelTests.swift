@@ -192,7 +192,7 @@ final class CYLAnimatedItemSubclassChannelTests: XCTestCase {
         assertSame(item.titleLabel.textColor, .white, "normal: the dark label color, unchanged by the rule", dark: true)
         item.isSelected = true
         item.layoutIfNeeded()
-        assertSame(item.titleLabel.textColor, item.tintColor.resolvedColor(with: item.traitCollection), "selected: the inherited tint resolved like normal", dark: true)
+        assertSame(item.titleLabel.textColor, item.adaptedOnGlass(item.tintColor.resolvedColor(with: item.traitCollection), kind: .title), "selected: the inherited tint resolved like normal, then adapted on drawn dark glass like every built-in", dark: true)
         // Both are plain colors resolved with the item's traits (the same function), not dynamic ones.
         XCTAssertFalse(item.titleLabel.textColor.isEqual(UIColor.label), "a resolved color, not the dynamic label")
     }
