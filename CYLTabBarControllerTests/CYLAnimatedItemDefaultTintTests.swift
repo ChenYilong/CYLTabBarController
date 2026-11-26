@@ -478,11 +478,11 @@ final class CYLAnimatedItemDefaultTintTests: XCTestCase {
 
     // MARK: Tab flow 标签流程
 
-    func testTheTabFlowKeepsTheFilesOwnColorsWithoutATintOption() throws {
+    func testTheTabFlowTintsAOneColorFileWithoutATintOption() throws {
+        // [EN] Owner decision 2026-11-27: with nothing set the tab flow is automatic (docs/Tint-Special.md, tier 4). [CN] 所有者 2026-11-27 决定：未设置时 Tab 流程为 automatic。
         let plain = UIView()
-        _ = CYLTabBarItemAnimationPrepareTint(plain, try fixture("camera-one-color"), nil)
-        XCTAssertEqual(CYLTabBarItemAnimationTabFlowRenderingMode(plain), .alwaysOriginal, "a one-color tab icon is not recolored without #tint")
-        XCTAssertFalse(plain.responds(to: NSSelectorFromString("cyl_applyAnimationViewTintColor:")), "no tint method: nothing recolors it")
+        XCTAssertTrue(CYLTabBarItemAnimationPrepareTint(plain, try fixture("camera-one-color"), nil), "a one-color tab icon is tinted like title")
+        XCTAssertEqual(CYLTabBarItemAnimationTabFlowRenderingMode(plain), .alwaysTemplate)
 
         let template = UIView()
         var components = URLComponents(url: try fixture("camera-one-color"), resolvingAgainstBaseURL: false)!
@@ -496,9 +496,10 @@ final class CYLAnimatedItemDefaultTintTests: XCTestCase {
 
         XCTAssertEqual(CYLTabBarItemAnimationTabFlowRenderingMode(UIView()), .automatic, "a view the tab flow did not prepare")
 
-        // The item (FlatDesign tab) that shows the tab flow's view: automatic takes the tab flow's alwaysOriginal.
+        // The item (FlatDesign tab) that shows the tab flow's view: automatic takes the tab flow's alwaysOriginal (asked by the URL).
         let flowView = DefaultTintRecordingView()
-        _ = CYLTabBarItemAnimationPrepareTint(flowView, try fixture("camera-one-color"), nil)
+        components.fragment = "renderingMode=alwaysOriginal"
+        _ = CYLTabBarItemAnimationPrepareTint(flowView, components.url!, nil)
         let item = GivenViewItem(frame: CGRect(x: 0, y: 0, width: 80, height: 49))
         window().addSubview(item)
         item.given = flowView

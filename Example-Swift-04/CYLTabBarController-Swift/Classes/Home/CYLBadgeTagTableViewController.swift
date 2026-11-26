@@ -51,9 +51,9 @@ final class CYLBadgeTagTableViewController: CYLBadgeHelperTableViewController, C
     override func viewDidLoad() {
         super.viewDidLoad()
         // [EN] The badge samples are tags too: a scratch cell supplies each one's title and subtitle. A tap does what tapping the old row did: the
-        //      library's handler (the old row's index path was in section 1), then a simulated memory warning (a tag draws its badge, there is none to clear).
+        //      library's handler (the old row's index path was in section 1), then a simulated memory warning; the tag list clears the tag's badge first, as the old row's tap cleared its badge.
         // [CN] 角标样例也是 Tag：用临时 cell 提供标题与副标题。点击效果与点击原行相同：调用库的回调（原行的 indexPath 在第 1 组），然后模拟内存警告
-        //      （Tag 自己绘制角标，没有可清除的角标）。
+        //      ；TagList 会先清除该 Tag 的角标，与点击原行清除其角标相同。
         demoTagList = CYLDemoTagList.install(on: tableView, host: self, source: self, badgeRowCount: UITableViewCell.cylBadgeStyleCount(), badgeCell: { [weak self] row in
             let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
             cell.textLabel?.text = UITableViewCell.cylBadgeTitle(forRow: row)

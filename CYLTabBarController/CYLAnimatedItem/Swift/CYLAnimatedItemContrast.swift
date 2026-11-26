@@ -134,9 +134,10 @@ public enum CYLAnimatedItemContrast {
 
     /**
      [EN] `color` itself when it is dynamic or already has `minimumContrast` against the glass (`glassReferenceLuminance`), else the same hue,
-          saturation and alpha with the lowest lightness (`lightnessStep` steps, at most white) that passes; channels rounded to 1/255.
+          saturation and alpha with the lowest lightness (`lightnessStep` steps, at most white) that passes; channels rounded to 1/255. When even white fails (a light
+          reference), the one of `color` and the lifted color with more contrast.
      [CN] 颜色为动态颜色或与玻璃（`glassReferenceLuminance`）已达到 `minimumContrast` 时返回原颜色；否则返回色相、饱和度、透明度不变且亮度最低
-          （每步 `lightnessStep`，最高为白色）的通过颜色；分量取整到 1/255。
+          （每步 `lightnessStep`，最高为白色）的通过颜色；分量取整到 1/255。白色也不通过时（浅色参考），返回原颜色与提亮颜色中对比度较高者。
      */
     public static func adjusted(_ color: UIColor, glassTint: UIColor?, tintAlpha: CGFloat?, minimumContrast: CGFloat) -> UIColor {
         adjusted(color, referenceLuminance: renderedGlassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha), minimumContrast: minimumContrast)
@@ -148,15 +149,18 @@ public enum CYLAnimatedItemContrast {
         var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
         guard color.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else { return color }
         let hsl = hslFromRGB(red: min(max(red, 0), 1), green: min(max(green, 0), 1), blue: min(max(blue, 0), 1))
-        func passes(_ lightness: CGFloat) -> Bool {
+        func contrast(_ lightness: CGFloat) -> CGFloat {
             let rgb = rgbFromHSL(hue: hsl.hue, saturation: hsl.saturation, lightness: lightness)
-            return contrastRatio(relativeLuminance(red: rgb.red, green: rgb.green, blue: rgb.blue), reference) >= minimumContrast
+            return contrastRatio(relativeLuminance(red: rgb.red, green: rgb.green, blue: rgb.blue), reference)
         }
+        func passes(_ lightness: CGFloat) -> Bool { contrast(lightness) >= minimumContrast }
         guard !passes(hsl.lightness) else { return color }
         var lightness = hsl.lightness
         while lightness < 1, !passes(lightness) {
             lightness = min(1, lightness + lightnessStep)
         }
+        // [EN] Lifting can only help on a dark reference; on a light one (a light flat fill) it lowers contrast: keep whichever is higher. [CN] 提亮只对深色参考有帮助；浅色参考（浅色扁平填充）上会降低对比度：取二者中对比度较高者。
+        if !passes(lightness), contrast(hsl.lightness) >= contrast(lightness) { return color }
         let rgb = rgbFromHSL(hue: hsl.hue, saturation: hsl.saturation, lightness: lightness)
         func channel(_ value: CGFloat) -> CGFloat { min(max((value * channelMax).rounded(), 0), channelMax) / channelMax }
         return UIColor(red: channel(rgb.red), green: channel(rgb.green), blue: channel(rgb.blue), alpha: alpha)

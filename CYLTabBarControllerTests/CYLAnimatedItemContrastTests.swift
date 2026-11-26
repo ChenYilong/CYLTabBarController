@@ -139,4 +139,16 @@ final class CYLAnimatedItemContrastTests: XCTestCase {
         XCTAssertTrue(CYLAnimatedItemContrast.adjustedIcon(label, glassTint: nil, tintAlpha: nil) === label)
         XCTAssertTrue(CYLAnimatedItemContrast.isStatic(grey))
     }
+
+    func testALightFillNeverTurnsAMidGreyTitleWhite() {
+        // [EN] Same case as Android aLightFillNeverTurnsAMidGreyTitleWhite: #8E8E93 on a white flat fill (~3.3:1) fails 4.5; lifting only lowers it. [CN] 与 Android 用例相同。
+        let midGrey = UIColor(red: 0x8E / 255, green: 0x8E / 255, blue: 0x93 / 255, alpha: 1)
+        let result = CYLAnimatedItemContrast.adjusted(midGrey, referenceLuminance: 1, minimumContrast: CYLAnimatedItemContrast.titleMinimumContrast)
+        XCTAssertTrue(result === midGrey, "the original has more contrast than any lifted colour")
+        // [EN] A dark reference is unchanged: the colour is still lifted until it passes. [CN] 深色参考不变：仍提亮直到通过。
+        let lifted = CYLAnimatedItemContrast.adjusted(grey, referenceLuminance: 0, minimumContrast: CYLAnimatedItemContrast.titleMinimumContrast)
+        XCTAssertGreaterThan(luminance(lifted), luminance(grey), "lifted")
+        // [EN] 0.01 below the floor is allowed: channels are rounded to 1/255 after the check (4.498 here, existing behaviour). [CN] 允许低于下限 0.01：分量在判断后取整到 1/255（此处 4.498，现有行为）。
+        XCTAssertGreaterThanOrEqual(CYLAnimatedItemContrast.contrastRatio(luminance(lifted), 0), CYLAnimatedItemContrast.titleMinimumContrast - 0.01)
+    }
 }

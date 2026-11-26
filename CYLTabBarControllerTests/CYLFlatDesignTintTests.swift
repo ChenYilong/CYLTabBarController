@@ -233,10 +233,12 @@ final class CYLFlatDesignTintTests: XCTestCase {
 
     // MARK: Animation tint 动画着色
 
-    func testWithoutOptionsATabAnimationKeepsItsOwnColors() throws {
+    func testWithoutOptionsAutomaticTintsOnlyTheOneColorTabAnimation() throws {
         let bar = try makeBar(animations: [try oneColorGIF(), try multiColorGIF()])
-        XCTAssertNil(try animationTint(bar.buttons[0]), "one-color: untouched without an option")
-        XCTAssertNil(try animationTint(bar.buttons[1]), "multi-color: untouched")
+        assertColor(try animationTint(bar.buttons[0]), bar.buttons[0].tintColor, in: bar.buttons[0], "one-color: tinted by the default automatic")
+        XCTAssertNil(try animationTint(bar.buttons[1]), "multi-color: keeps its own colors")
+        let swapped = try makeBar(animations: [try multiColorGIF(), try oneColorGIF()])
+        assertColor(try animationTint(swapped.buttons[1]), .systemGray, in: swapped.buttons[1], "one-color, unselected: the unselected icon color")
     }
 
     func testTintTitleIsHonoredInBothURLForms() throws {
@@ -333,7 +335,13 @@ final class CYLFlatDesignTintTests: XCTestCase {
         XCTAssertEqual(CYLTabBarItemAnimationTabFlowRenderingMode(plain), .alwaysTemplate)
         let unset = UIView()
         _ = CYLTabBarItemAnimationPrepareTabTint(unset, try oneColorGIF(), nil, CYLAnimatedItemRenderingMode.automatic.rawValue)
-        XCTAssertEqual(CYLTabBarItemAnimationTabFlowRenderingMode(unset), .alwaysOriginal, "automatic default: as before")
+        XCTAssertEqual(CYLTabBarItemAnimationTabFlowRenderingMode(unset), .alwaysTemplate, "automatic default: a one-color file is tinted")
+        let multi = UIView()
+        _ = CYLTabBarItemAnimationPrepareTabTint(multi, try multiColorGIF(), nil, CYLAnimatedItemRenderingMode.automatic.rawValue)
+        XCTAssertEqual(CYLTabBarItemAnimationTabFlowRenderingMode(multi), .alwaysOriginal, "automatic default: a multi-color file keeps its colors")
+        let barOriginal = UIView()
+        _ = CYLTabBarItemAnimationPrepareTabTint(barOriginal, try oneColorGIF(), nil, CYLAnimatedItemRenderingMode.alwaysOriginal.rawValue)
+        XCTAssertEqual(CYLTabBarItemAnimationTabFlowRenderingMode(barOriginal), .alwaysOriginal, "the bar's alwaysOriginal beats one-color detection")
         let own = UIView()
         _ = CYLTabBarItemAnimationPrepareTabTint(own, try withFragment(try multiColorGIF(), ["renderingMode": "alwaysOriginal"]), nil,
                                                  CYLAnimatedItemRenderingMode.alwaysTemplate.rawValue)
@@ -364,6 +372,28 @@ final class CYLFlatDesignTintTests: XCTestCase {
         controller.tabBarItemAnimationRenderingMode = .automatic
         settle(controller.view)
         XCTAssertTrue(tintOverlays(in: controller.view).isEmpty, "automatic removes it again")
+    }
+
+    func testAPerTabIconColorTintsTheAnimationOnTheSystemTabBar() throws {
+        // [EN] B35: classic and Liquid Glass read the tab's own appearance (CYLTabBarItemIconColor / SelectedIconColor) before the bar's. [CN] B35：经典与液态玻璃先读 Tab 自己的外观，再读 TabBar 的。
+        let urls = [try withFragment(try multiColorGIF(), ["renderingMode": "alwaysTemplate"]),
+                    try withFragment(try multiColorGIF(), ["renderingMode": "alwaysTemplate"])]
+        let attributes: [[AnyHashable: Any]] = [
+            [cylTabBarItemTitle: "S0", cylTabBarItemImage: icon(), cylTabBarAnimationURL: urls[0], cylTabBarItemSelectedIconColor: UIColor.red],
+            [cylTabBarItemTitle: "S1", cylTabBarItemImage: icon(), cylTabBarAnimationURL: urls[1], cylTabBarItemIconColor: UIColor.green],
+        ]
+        let controller = CYLTabBarController(viewControllers: [UIViewController(), UIViewController()],
+                                             tabBarItemsAttributes: attributes, styleType: .default, context: UUID().uuidString)
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
+        window.overrideUserInterfaceStyle = .light
+        window.rootViewController = controller
+        window.isHidden = false
+        windows.append(window)
+        settle(controller.view)
+        let colors = tintOverlays(in: controller.view).compactMap { $0.backgroundColor.map { UIColor(cgColor: $0) } }
+        let rgb = colors.compactMap { rgba($0, controller.view) }.map { $0.prefix(3).map { ($0 * 255).rounded() } }
+        XCTAssertTrue(rgb.contains([255, 0, 0]), "selected tab: its own selected icon color, got \(rgb)")
+        XCTAssertTrue(rgb.contains([0, 255, 0]), "unselected tab: its own icon color, got \(rgb)")
     }
 
     func testARemoteURLsQueryIsNotReadAsOptions() throws {
