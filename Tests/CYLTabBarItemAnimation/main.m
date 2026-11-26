@@ -408,10 +408,16 @@ int main(void) {
         NSError *parseError = [NSError errorWithDomain:@"CYLTest" code:7 userInfo:nil];
         CYLTabBarItemAnimationReportFailure(failingView, parseError);
         [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+        // [EN] Every engine this process made hears the notification (each observes it); the one that finds the tab button reports it for the button,
+        //      another one that cannot reaches the view itself. Every report names the file and the error; at least one is for the tab button.
+        // [CN] 本进程创建的每个引擎都会收到该通知（各自都在观察）；找到 Tab 按钮的引擎为按钮报告，找不到的引擎则为视图本身报告。每次报告都带有文件与错误；至少有一次是为 Tab 按钮。
         BOOL allForTheTab = engineCalls.count >= 1;
+        BOOL oneForTheButton = NO;
         for (NSArray *call in engineCalls) {
-            allForTheTab = allForTheTab && [call[0] isEqual:@"failure"] && [call[1] isEqual:lightFile] && call[2] == parseError && call[3] == failingTab;
+            allForTheTab = allForTheTab && [call[0] isEqual:@"failure"] && [call[1] isEqual:lightFile] && call[2] == parseError;
+            oneForTheButton = oneForTheButton || call[3] == failingTab;
         }
+        allForTheTab = allForTheTab && oneForTheButton;
         CHECK(allForTheTab, "a late failure reports the file the view was made for, with its error, for its tab button");
 
         printf("\n# Dark Mode through the injected style source (#442)\n");

@@ -501,8 +501,8 @@ function cylAnimatedItemInherited(own, inherited) {
 
 /**
  * [EN] The built-in divider (an INTERNAL mode of this item, switched on only by cyl-animated-item-stack; not API): the line is 1 px thick, `cylDividerLength` px long
- *      (default 20), and the alpha of the explicit-icon-color derivation is 0.6 (iOS `CYLAnimatedItemDividerAlpha`). [CN] 内置分割线（本条目的内部模式，只由
- *      cyl-animated-item-stack 开启；不是 API）：线粗 1 px，长 `cylDividerLength` px（默认 20），显式图标颜色推导的透明度为 0.6（iOS `CYLAnimatedItemDividerAlpha`）。
+ *      (default 20), and the alpha of the explicit-icon-color derivation is 0.6 (iOS `cylAnimatedItemDividerAlpha`). [CN] 内置分割线（本条目的内部模式，只由
+ *      cyl-animated-item-stack 开启；不是 API）：线粗 1 px，长 `cylDividerLength` px（默认 20），显式图标颜色推导的透明度为 0.6（iOS `cylAnimatedItemDividerAlpha`）。
  */
 const CYL_ANIMATED_ITEM_DIVIDER_THICKNESS = 1
 const CYL_ANIMATED_ITEM_DIVIDER_LENGTH = 20

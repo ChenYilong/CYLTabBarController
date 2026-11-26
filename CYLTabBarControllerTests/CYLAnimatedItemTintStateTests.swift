@@ -111,7 +111,7 @@ final class CYLAnimatedItemBackgroundTests: XCTestCase {
     func testTheCapsuleConstantIsHalfTheHeightAndFollowsTheSize() {
         let item = makeItem()
         item.itemBackgroundColor = .systemBlue
-        item.itemCornerRadius = CYLAnimatedItemCornerRadiusCapsule
+        item.itemCornerRadius = cylAnimatedItemCornerRadiusCapsule
         item.layoutIfNeeded()
         XCTAssertEqual(item.layer.cornerRadius, 28, accuracy: 0.01)
         item.frame.size.height = 40
@@ -223,7 +223,7 @@ final class CYLAnimatedItemBackgroundTests: XCTestCase {
         XCTAssertEqual(stack.layer.cornerRadius, 40, accuracy: 0.01, "glass, unset: a capsule")
         stack.itemCornerRadius = 12
         XCTAssertEqual(stack.layer.cornerRadius, 12)
-        stack.itemCornerRadius = CYLAnimatedItemCornerRadiusCapsule
+        stack.itemCornerRadius = cylAnimatedItemCornerRadiusCapsule
         XCTAssertEqual(stack.layer.cornerRadius, 40, accuracy: 0.01)
         XCTAssertNotNil(stack.itemLiquidGlassView)
     }
@@ -237,8 +237,8 @@ final class CYLAnimatedItemBackgroundTests: XCTestCase {
         CYLAnimatedItemView.liquidGlassActiveOverride = true
         let glass = makeItem()
         glass.itemBackgroundStyle = .liquidGlass
-        XCTAssertEqual(CYLAnimatedItemLiquidGlassContentInset, 14)
-        XCTAssertEqual(glass.resolvedItemContentHorizontalInset, CYLAnimatedItemLiquidGlassContentInset)
+        XCTAssertEqual(cylAnimatedItemLiquidGlassContentInset, 14)
+        XCTAssertEqual(glass.resolvedItemContentHorizontalInset, cylAnimatedItemLiquidGlassContentInset)
         XCTAssertNil(glass.itemContentHorizontalInsetNumber, "unset stays unset for the bridges")
     }
 
@@ -270,7 +270,7 @@ final class CYLAnimatedItemBackgroundTests: XCTestCase {
         CYLAnimatedItemView.liquidGlassActiveOverride = true
         let glass = makeItem()
         glass.itemBackgroundStyle = .liquidGlass
-        XCTAssertEqual(glass.intrinsicContentSize.width, flatWidth + 2 * CYLAnimatedItemLiquidGlassContentInset, accuracy: 1)
+        XCTAssertEqual(glass.intrinsicContentSize.width, flatWidth + 2 * cylAnimatedItemLiquidGlassContentInset, accuracy: 1)
         glass.itemContentHorizontalInset = 20
         XCTAssertEqual(glass.intrinsicContentSize.width, flatWidth + 40, accuracy: 1, "the setter changes the size")
     }
@@ -290,7 +290,7 @@ final class CYLAnimatedItemBackgroundTests: XCTestCase {
         CYLAnimatedItemView.liquidGlassActiveOverride = true
         let glass = CYLAnimatedItemStackView(frame: CGRect(x: 0, y: 0, width: 300, height: 200))
         glass.itemBackgroundStyle = .liquidGlass
-        XCTAssertEqual(margins(glass).leading, flatMargins.leading + CYLAnimatedItemLiquidGlassContentInset, "the margins follow the style")
+        XCTAssertEqual(margins(glass).leading, flatMargins.leading + cylAnimatedItemLiquidGlassContentInset, "the margins follow the style")
         XCTAssertEqual(margins(glass).top, flatMargins.top, "top and bottom unchanged")
         glass.itemContentHorizontalInset = 0
         XCTAssertEqual(margins(glass).leading, flatMargins.leading)
@@ -350,7 +350,10 @@ final class CYLAnimatedItemTintTableTests: XCTestCase {
 
     private func components(_ color: UIColor?) -> [CGFloat]? {
         guard let color else { return nil }
-        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
         color.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light)).getRed(&r, green: &g, blue: &b, alpha: &a)
         return [r, g, b, a]
     }

@@ -20,6 +20,8 @@ xcrun clang -fobjc-arc -fmodules -Wall -Wextra -Wno-unused-parameter -DDEBUG=1 \
     "$animation/CYLTabBarItemAnimatorRegistry.m" \
     "$animation/CYLTabBarItemAnimationFactory.m" \
     "$animation/CYLTabBarItemAnimationEngine.m" \
+    "$animation/CYLTabBarItemAnimationTint.m" \
+    "$animation/CYLTabBarItemAnimationColorCount.m" \
     "$animation/CYLTabBarItemViewAnimator.m" \
     "$animation/CYLTabBarItemAnimationPlayer.m" \
     "$root/CYLTabBarController/CYLUtils/CYLAnimationKeys.m" \

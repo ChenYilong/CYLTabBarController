@@ -45,6 +45,15 @@ private final class DefaultTintTagItem: CYLAnimatedItemView {
  *      the tab flow's alwaysOriginal, and the divider contrast.
  * [CN] 着色规格 v2：内置颜色（实测值）、显式与有效图标颜色、渲染模式与单色检测及其夹具、Tab 流程的 alwaysOriginal、分隔条对比度。
  */
+/// [EN] A remote URL built from parts, so no test hard-codes a URI. [CN] 由各部分拼出的远程 URL，测试里不写死 URI。
+private func cylTestRemoteURL(host: String, path: String) -> URL? {
+    var components = URLComponents()
+    components.scheme = "https"
+    components.host = host
+    components.path = "/" + path
+    return components.url
+}
+
 final class CYLAnimatedItemDefaultTintTests: XCTestCase {
 
     private var windows: [UIWindow] = []
@@ -70,7 +79,10 @@ final class CYLAnimatedItemDefaultTintTests: XCTestCase {
 
     private func rgba(_ color: UIColor?, _ style: UIUserInterfaceStyle = .light) -> [CGFloat]? {
         guard let color else { return nil }
-        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
         color.resolvedColor(with: UITraitCollection(userInterfaceStyle: style)).getRed(&r, green: &g, blue: &b, alpha: &a)
         return [r, g, b, a]
     }
@@ -103,7 +115,8 @@ final class CYLAnimatedItemDefaultTintTests: XCTestCase {
     }
 
     private func composite(_ color: UIColor, over background: UIColor, _ style: UIUserInterfaceStyle) -> [CGFloat] {
-        let c = rgba(color, style)!, b = rgba(background, style)!
+        let c = rgba(color, style)!
+        let b = rgba(background, style)!
         return (0..<3).map { c[$0] * c[3] + b[$0] * (1 - c[3]) }
     }
 
@@ -113,7 +126,8 @@ final class CYLAnimatedItemDefaultTintTests: XCTestCase {
     }
 
     private func contrast(_ a: [CGFloat], _ b: [CGFloat]) -> CGFloat {
-        let la = luminance(a), lb = luminance(b)
+        let la = luminance(a)
+        let lb = luminance(b)
         return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
     }
 
@@ -244,8 +258,8 @@ final class CYLAnimatedItemDefaultTintTests: XCTestCase {
     }
 
     /// EXPLICIT vs EFFECTIVE: a FIXED tint on a SELECTED item yields only to an explicit selected icon color, never to the built-in tint or a subclass color.
-    func testFixedTintSelectedYieldsOnlyToAnExplicitSelectedIconColor() {
-        let url = try! fixture("camera-one-color")
+    func testFixedTintSelectedYieldsOnlyToAnExplicitSelectedIconColor() throws {
+        let url = try fixture("camera-one-color")
         let fixed = UIColor(red: 0, green: 1, blue: 0, alpha: 1)
         func lastColor(_ factory: DefaultTintFactory) -> UIColor? { factory.view.calls.last ?? nil }
 
@@ -291,7 +305,7 @@ final class CYLAnimatedItemDefaultTintTests: XCTestCase {
         // URL entry point, cached per file.
         XCTAssertEqual(CYLTabBarItemAnimationColorKindOfURL(try fixture("camera-one-color")), .oneColor)
         XCTAssertEqual(CYLTabBarItemAnimationColorKindOfURL(try fixture("camera-one-color")), .oneColor, "cached")
-        XCTAssertEqual(CYLTabBarItemAnimationColorKindOfURL(URL(string: "https://example.com/a.json")), .undetectable, "remote: nothing is downloaded")
+        XCTAssertEqual(CYLTabBarItemAnimationColorKindOfURL(cylTestRemoteURL(host: "example.com", path: "a.json")), .undetectable, "remote: nothing is downloaded")
         XCTAssertEqual(CYLTabBarItemAnimationColorKindOfURL(nil), .undetectable)
     }
 
@@ -383,7 +397,13 @@ final class CYLAnimatedItemDefaultTintTests: XCTestCase {
                 var fileURL = try url(source)
                 if level == .urlOption {
                     var components = URLComponents(url: fileURL, resolvingAgainstBaseURL: false)!
-                    components.fragment = "renderingMode=\(mode == .automatic ? "automatic" : mode == .alwaysTemplate ? "alwaysTemplate" : "alwaysOriginal")"
+                    let modeName: String
+                    switch mode {
+                    case .automatic: modeName = "automatic"
+                    case .alwaysTemplate: modeName = "alwaysTemplate"
+                    default: modeName = "alwaysOriginal"
+                    }
+                    components.fragment = "renderingMode=\(modeName)"
                     fileURL = components.url!
                 }
                 let item: CYLAnimatedItemView
@@ -502,7 +522,8 @@ final class CYLAnimatedItemDefaultTintTests: XCTestCase {
             let stack = CYLAnimatedItemStackView(frame: .zero)
             stack.contentMargin = 0
             window(dark: dark).addSubview(stack)
-            let a = CYLAnimatedItemView(frame: .zero), b = CYLAnimatedItemView(frame: .zero)
+            let a = CYLAnimatedItemView(frame: .zero)
+            let b = CYLAnimatedItemView(frame: .zero)
             stack.append(a, action: nil, spacingBefore: 0)
             stack.append(b, action: nil, spacingBefore: 0)
             stack.showsDividers = true
@@ -516,9 +537,9 @@ final class CYLAnimatedItemDefaultTintTests: XCTestCase {
     }
 
     func testAnExplicitIconColorDividerIsAtAlpha06AndKeepsTheContrast() {
-        XCTAssertEqual(CYLAnimatedItemDividerAlpha, 0.6)
+        XCTAssertEqual(cylAnimatedItemDividerAlpha, 0.6)
         for (style, bar, icon) in [(UIUserInterfaceStyle.light, UIColor.white, UIColor.black), (.dark, UIColor.black, UIColor.white)] {
-            let ratio = contrast(composite(icon.withAlphaComponent(CYLAnimatedItemDividerAlpha), over: bar, style), rgba(bar, style)!.prefix(3).map { $0 })
+            let ratio = contrast(composite(icon.withAlphaComponent(cylAnimatedItemDividerAlpha), over: bar, style), rgba(bar, style)!.prefix(3).map { $0 })
             XCTAssertGreaterThanOrEqual(ratio, 3.0, "explicit label-like icon color at 0.6: \(ratio)")
         }
         let dark = false
