@@ -43,7 +43,7 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
         ("5", false), ("5", false), ("5", false),
     ]
 
-    private static let brackets = try! NSRegularExpression(pattern: "\\s*[（(]([^）)]*)[）)]")
+    private static let brackets = try? NSRegularExpression(pattern: "\\s*[（(]([^）)]*)[）)]")
 
     /**
      [EN] A tag's title is short: what a row's title says in brackets, "(…)" or "（…）", moves behind the row's subtitle (joined by " · ";
@@ -51,6 +51,7 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
      [CN] Tag 的标题要短：行标题中括号「(…)」或「（…）」里的内容追加到行的副标题之后（以 " · " 连接，长按才显示）。只有括号的标题保持不变。
      */
     @objc static func tagText(title: String, subtitle: String?) -> [String] {
+        guard let brackets else { return [title, subtitle ?? ""] }
         let range = NSRange(title.startIndex..., in: title)
         let notes = brackets.matches(in: title, range: range).compactMap { match -> String? in
             guard let note = Range(match.range(at: 1), in: title) else { return nil }
@@ -185,7 +186,7 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
 
     // MARK: - CYLMenuDelegate
 
-    func menu(_ menu: Any, didSelectItemAt indexPath: IndexPath) {
+    func menu(_: Any, didSelectItemAt indexPath: IndexPath) {
         guard let host, indexPath.section < rowCounts.count, indexPath.item < rowCounts[indexPath.section] else { return }
         if indexPath.section == host.cyl_demoSectionCount() {
             didSelectBadgeRow?(indexPath.item)
@@ -196,7 +197,7 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
         DispatchQueue.main.async { [weak self] in self?.reload() }
     }
 
-    func menu(_ menu: Any, didChangeContentHeight height: CGFloat) {
+    func menu(_: Any, didChangeContentHeight _: CGFloat) {
         cell.setNeedsLayout()
     }
 }

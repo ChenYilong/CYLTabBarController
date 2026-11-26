@@ -65,7 +65,14 @@ import UIKit
  [CN] 胶囊的命名常量（1000 点）：传给 `itemCornerRadius`，不要写字面量。视图把它当作恰好半高，随尺寸变化。（任何普通数字都是点数且最大取半高，所以不小于半高的数字
       也是胶囊。）
  */
-public let CYLAnimatedItemCornerRadiusCapsule: CGFloat = 1000
+public let cylAnimatedItemCornerRadiusCapsule: CGFloat = 1000
+
+/**
+ [EN] The old name of `cylAnimatedItemCornerRadiusCapsule`, kept until CollectionViewClassifyMenu (its tag list uses it) moves to the new name; then it goes.
+ [CN] `cylAnimatedItemCornerRadiusCapsule` 的旧名称，保留到 CollectionViewClassifyMenu（其标签列表在用）改用新名称为止，之后删除。
+ */
+@available(*, deprecated, renamed: "cylAnimatedItemCornerRadiusCapsule")
+public let CYLAnimatedItemCornerRadiusCapsule: CGFloat = cylAnimatedItemCornerRadiusCapsule
 
 /**
  [EN] The named constant of the default content inset on Liquid Glass (14 points): the space between the outer border and the content, left and right,
@@ -73,7 +80,7 @@ public let CYLAnimatedItemCornerRadiusCapsule: CGFloat = 1000
  [CN] 液态玻璃上默认内容内缩的命名常量（14 点）：外边框与内容之间左右的距离，在真正绘制液态玻璃且未设置时 `itemContentHorizontalInset` 取此值。
       传它，不要写字面量。
  */
-public let CYLAnimatedItemLiquidGlassContentInset: CGFloat = 14
+public let cylAnimatedItemLiquidGlassContentInset: CGFloat = 14
 
 /**
  [EN] The alpha of a divider's line when it takes an EXPLICIT icon color (item or stack) (0.6; was 0.3). Same value on every platform. Without an
@@ -81,13 +88,13 @@ public let CYLAnimatedItemLiquidGlassContentInset: CGFloat = 14
  [CN] 分隔条的线使用显式图标颜色（条目或堆叠视图）时的透明度（0.6；原为 0.3）。各平台相同。没有显式图标颜色时分隔条为 `UIColor.secondaryLabel`
       （在白色与深色 Bar 上约 3:1）。
  */
-public let CYLAnimatedItemDividerAlpha: CGFloat = 0.6
+public let cylAnimatedItemDividerAlpha: CGFloat = 0.6
 
 /**
  [EN] The default length of a divider's line (20 points), the value of `CYLAnimatedItemStackView.dividerLength`. Same value on every platform.
  [CN] 分隔条线条的默认长度（20 点），即 `CYLAnimatedItemStackView.dividerLength` 的默认值。各平台相同。
  */
-public let CYLAnimatedItemDividerLength: CGFloat = 20
+public let cylAnimatedItemDividerLength: CGFloat = 20
 
 /**
  [EN] How an animation is drawn when `animationTint` is unset (an explicit tint always wins; also the URL option `renderingMode=`): `automatic` (default)
@@ -518,10 +525,10 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         didSet { if oldValue != itemBackgroundColor { itemBackgroundDidChange() } }
     }
     /**
-     [EN] The corner radius, applied as `min(radius, height / 2)`: 0 is square, `CYLAnimatedItemCornerRadiusCapsule` is the named constant of the capsule (exactly half the height, following the size); any other number is points, limited to half the height. nil (the
+     [EN] The corner radius, applied as `min(radius, height / 2)`: 0 is square, `cylAnimatedItemCornerRadiusCapsule` is the named constant of the capsule (exactly half the height, following the size); any other number is points, limited to half the height. nil (the
           default) is not set: the Liquid Glass style is a capsule (half the height), so a host gets a capsule without setting
           anything and customizes it by setting this property; the flat style is square.
-     [CN] 圆角半径，实际取 `min(radius, height / 2)`：0 为直角，`CYLAnimatedItemCornerRadiusCapsule` 是胶囊的命名常量（恰好半高，随尺寸变化），其他数字为点数且最大取半高。nil（默认）表示未设置：液态玻璃样式为胶囊（半高），
+     [CN] 圆角半径，实际取 `min(radius, height / 2)`：0 为直角，`cylAnimatedItemCornerRadiusCapsule` 是胶囊的命名常量（恰好半高，随尺寸变化），其他数字为点数且最大取半高。nil（默认）表示未设置：液态玻璃样式为胶囊（半高），
           宿主无需设置任何属性即可得到胶囊，要自定义时设置此属性即可；扁平样式为直角。
      */
     public var itemCornerRadius: CGFloat? {
@@ -539,10 +546,10 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
     /**
      [EN] The space between the OUTER border and the content, left and right only, on top of `contentInsets`. nil (the default) is not set:
-          `CYLAnimatedItemLiquidGlassContentInset` where Liquid Glass is really drawn (the condition that makes an unset `itemCornerRadius` a
+          `cylAnimatedItemLiquidGlassContentInset` where Liquid Glass is really drawn (the condition that makes an unset `itemCornerRadius` a
           capsule), 0 when flat. Any number wins, including 0 on glass. It changes the size, so the view lays out again.
      [CN] 外边框与内容之间的距离，仅左右，叠加在 `contentInsets` 之上。nil（默认）表示未设置：真正绘制液态玻璃时（与未设置的 `itemCornerRadius`
-          成为胶囊的条件相同）为 `CYLAnimatedItemLiquidGlassContentInset`，扁平时为 0。任何数字都优先，包括液态玻璃上的 0。它改变尺寸，因此视图重新布局。
+          成为胶囊的条件相同）为 `cylAnimatedItemLiquidGlassContentInset`，扁平时为 0。任何数字都优先，包括液态玻璃上的 0。它改变尺寸，因此视图重新布局。
      */
     public var itemContentHorizontalInset: CGFloat? {
         didSet {
@@ -623,9 +630,38 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     private func itemBackgroundDidChange() {
         usesItemBackground = true
         layoutItemBackground()
+        refreshGlassContrastColorsIfNeeded()
         // [EN] The style decides the unset inset, which changes the size. [CN] 样式决定未设置时的内缩，从而改变尺寸。
         invalidateIntrinsicContentSize()
         setNeedsLayout()
+    }
+
+    /**
+     [EN] Whether the dark-glass contrast rule (`CYLAnimatedItemContrast`) applies: Liquid Glass is really drawn (`resolvedItemBackgroundStyle`)
+          and this item's own traits are dark.
+     [CN] 深色玻璃对比度规则（`CYLAnimatedItemContrast`）是否适用：液态玻璃确实绘制（`resolvedItemBackgroundStyle`）且本条目自己的 trait 为深色。
+     */
+    private var glassContrastApplies: Bool {
+        usesItemBackground && resolvedItemBackgroundStyle == .liquidGlass && traitCollection.userInterfaceStyle == .dark
+    }
+
+    /// [EN] The glass state the colors were last adapted to (nil: the rule did not apply). [CN] 颜色上次适配的玻璃状态（nil：规则不适用）。
+    private var glassContrastKey: [AnyHashable?]?
+
+    /// [EN] The glass (drawn or not, its tint) decides the contrast adaptation: the colors are applied again when it changes. [CN] 玻璃（是否绘制、着色）决定对比度调整：变化时重新应用颜色。
+    private func refreshGlassContrastColorsIfNeeded() {
+        let key: [AnyHashable?]? = glassContrastApplies ? [itemBackgroundColor, itemGlassTintAlpha.map { Double($0) }] : nil
+        guard key != glassContrastKey else { return }
+        glassContrastKey = key
+        refreshIconColor()
+        // [EN] Only an explicit title color is adapted; a color someone else set (a subclass) is left alone. [CN] 只调整显式标题颜色；他人（子类）设置的颜色不动。
+        if explicitTitleColor != nil { refreshTitleColor() }
+    }
+
+    /// [EN] An explicit color adapted to the dark glass when the rule applies; `minimumContrast` picks title or icon. [CN] 规则适用时把显式颜色调整到适合深色玻璃；`minimumContrast` 区分标题与图标。
+    private func glassAdapted(_ color: UIColor, minimumContrast: CGFloat) -> UIColor {
+        guard glassContrastApplies else { return color }
+        return CYLAnimatedItemContrast.adjusted(color, glassTint: itemBackgroundColor, tintAlpha: itemGlassTintAlpha, minimumContrast: minimumContrast)
     }
 
     /// [EN] Applies the background, radius and border for the current bounds (`CYLAnimatedItemBackgroundRenderer`). [CN] 按当前 bounds 应用背景、圆角与边框。
@@ -1450,7 +1486,10 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     private enum IconState { case normal, selected, disabled }
 
-    private var currentIconState: IconState { !isEnabled ? .disabled : (isSelected ? .selected : .normal) }
+    private var currentIconState: IconState {
+        if !isEnabled { return .disabled }
+        return isSelected ? .selected : .normal
+    }
 
     /// [EN] EXPLICIT icon color of a state: `itemAppearance` (the item's own, or the stack's given one); no built-ins, no subclass color. [CN] 某状态的显式图标颜色：`itemAppearance`（条目自己的或堆叠视图给的）；不含内置值与子类颜色。
     private func explicitIconColor(_ state: IconState) -> UIColor? {
@@ -1482,9 +1521,14 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
 
     /// [EN] The EFFECTIVE icon color of the current state: explicit, else subclass, else built-in (resolved with this item's traits). [CN] 当前状态的有效图标颜色：显式值，否则子类，否则内置（用本条目的 trait 解析）。
+    ///      On drawn dark glass the EXPLICIT color is adapted (`CYLAnimatedItemContrast`, 3:1, static colors only); the subclass and built-in levels are not.
+    ///      [CN] 深色玻璃确实绘制时调整显式颜色（`CYLAnimatedItemContrast`，3:1，仅静态颜色）；子类层与内置层不调整。
     private func effectiveIconColor() -> UIColor {
         let state = currentIconState
-        let color = explicitIconColor(state) ?? hostIconColor ?? builtInIconColor(state)
+        if let explicit = explicitIconColor(state) {
+            return glassAdapted(explicit, minimumContrast: CYLAnimatedItemContrast.iconMinimumContrast).resolvedColor(with: traitCollection)
+        }
+        let color = hostIconColor ?? builtInIconColor(state)
         return color.resolvedColor(with: traitCollection)
     }
 
@@ -1520,9 +1564,16 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         //      (a subview) still reports the OLD appearance, so a dynamic color resolved by the engine there came out white on white after
         //      a live switch. [CN] 用本条目的 trait 解析并以普通颜色交出：在 `traitCollectionDidChange` 内，动画视图（子视图）仍报告旧的外观，
         //      引擎在那里解析动态颜色会在运行中切换后得到白底白图标。
-        let resolved = CYLTabBarItemAnimationItemTintColor(
+        var resolved = CYLTabBarItemAnimationItemTintColor(
             animationURL, effectiveAnimationTint, effectiveAnimationDarkTint, mode, isSelected, traits.userInterfaceStyle == .dark,
             effective, explicitSelected)?.resolvedColor(with: traits)
+        // [EN] Drawn dark glass: an explicit tint (a fixed `animationTint`, or the explicit icon color, already adapted) is adapted (3:1); the
+        //      subclass and built-in icon colors are not. [CN] 深色玻璃确实绘制时：显式着色（固定 `animationTint`，或已调整的显式图标颜色）按 3:1 调整；
+        //      子类与内置图标颜色不调整。
+        if let tint = resolved, glassContrastApplies,
+           !(tint.isEqual(effective) && explicitIconColor(currentIconState) == nil) {
+            resolved = glassAdapted(tint, minimumContrast: CYLAnimatedItemContrast.iconMinimumContrast)
+        }
         // [EN] A view that resolves its own tint from its URL options (Rive) takes the final color instead, so the properties reach it too.
         // [CN] 自行从 URL 选项解析着色的视图（Rive）改为接收最终颜色，使属性对它也生效。
         let resolvedSelector = NSSelectorFromString("cyl_applyAnimationViewResolvedTintColor:")
@@ -1546,16 +1597,24 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     ///      disabled the system disabled gray) unless someone else set `titleLabel.textColor` (a subclass, the countdown), which then stays.
     /// [CN] 标题颜色：该状态 `titleTextAttributes` 中的显式颜色，否则为内置值（普通 `UIColor.label`，选中 `tintColor`，不可用为系统禁用灰色），
     ///      除非他人（子类、倒计时）设置了 `titleLabel.textColor`，此时保持其值。
+    ///      On drawn dark glass the explicit color is adapted (`CYLAnimatedItemContrast`, 4.5:1, static colors only).
+    ///      [CN] 深色玻璃确实绘制时调整显式颜色（`CYLAnimatedItemContrast`，4.5:1，仅静态颜色）。
     private func refreshTitleColor() {
         guard !cylIsDivider else { return }
-        if let explicit = currentItemStateAppearance?.titleTextAttributes[.foregroundColor] as? UIColor {
-            titleLabel.textColor = explicit
-            appliedTitleColor = explicit
+        if let explicit = explicitTitleColor {
+            let shown = glassAdapted(explicit, minimumContrast: CYLAnimatedItemContrast.titleMinimumContrast)
+            titleLabel.textColor = shown
+            appliedTitleColor = shown
             return
         }
         if itemStyle == .countdown && countdownState == .running { return }
         let current: UIColor? = titleLabel.textColor
         if current == nil || (appliedTitleColor != nil && current!.isEqual(appliedTitleColor)) { setBuiltInTitleColor() }
+    }
+
+    /// [EN] The explicit `titleTextAttributes` color of the current state. [CN] 当前状态 `titleTextAttributes` 中的显式颜色。
+    private var explicitTitleColor: UIColor? {
+        currentItemStateAppearance?.titleTextAttributes[.foregroundColor] as? UIColor
     }
 
     private func setBuiltInTitleColor() {
@@ -1603,10 +1662,10 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     // [EN] INTERNAL, not API: `CYLAnimatedItemStackView` makes one item per divider and puts it in this mode. The item shows no icon, title, animation or
     //      badge and draws one line (1 pixel, `cylDividerLength` long) centered in its bounds, across the stack's axis; no taps, hidden from VoiceOver;
     //      size 1 point by the length (swapped when horizontal), without insets. The line's color: `cylDividerColor`, else the normal-state icon color
-    //      (`itemAppearance`, handed down by the stack) at alpha `CYLAnimatedItemDividerAlpha` (0.6), else `UIColor.secondaryLabel`, resolved with THIS item's traits.
+    //      (`itemAppearance`, handed down by the stack) at alpha `cylAnimatedItemDividerAlpha` (0.6), else `UIColor.secondaryLabel`, resolved with THIS item's traits.
     // [CN] 内部接口，不是 API：`CYLAnimatedItemStackView` 为每条分隔条创建一个条目并置于此模式。条目不显示图标、标题、动画与角标，只在边界中央画一条线
     //      （1 像素，长 `cylDividerLength`），垂直于堆叠方向；不接收点击，对 VoiceOver 隐藏；尺寸为 1 点乘长度（横线时对调），不含内缩。线的颜色：
-    //      `cylDividerColor`，否则普通状态图标颜色（`itemAppearance`，由堆叠视图传下来）加 `CYLAnimatedItemDividerAlpha`（0.6）透明度，否则 `UIColor.secondaryLabel`，
+    //      `cylDividerColor`，否则普通状态图标颜色（`itemAppearance`，由堆叠视图传下来）加 `cylAnimatedItemDividerAlpha`（0.6）透明度，否则 `UIColor.secondaryLabel`，
     //      用本条目的 trait 解析。
     var cylIsDivider = false {
         didSet {
@@ -1626,7 +1685,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         }
     }
     var cylDividerIsVertical = true { didSet { if oldValue != cylDividerIsVertical { contentDidChange() } } }
-    var cylDividerLength = CYLAnimatedItemDividerLength { didSet { if oldValue != cylDividerLength { contentDidChange() } } }
+    var cylDividerLength = cylAnimatedItemDividerLength { didSet { if oldValue != cylDividerLength { contentDidChange() } } }
     var cylDividerColor: UIColor? { didSet { if oldValue != cylDividerColor { updateDividerLine() } } }
 
     private lazy var dividerLine: UIView = {
@@ -1645,7 +1704,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         if let color = cylDividerColor {
             dividerLine.backgroundColor = color.resolvedColor(with: traits)
         } else if let icon = itemAppearance?.normal.iconColor {
-            dividerLine.backgroundColor = icon.resolvedColor(with: traits).withAlphaComponent(CYLAnimatedItemDividerAlpha)
+            dividerLine.backgroundColor = icon.resolvedColor(with: traits).withAlphaComponent(cylAnimatedItemDividerAlpha)
         } else {
             dividerLine.backgroundColor = UIColor.secondaryLabel.resolvedColor(with: traits)
         }

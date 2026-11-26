@@ -151,13 +151,35 @@ private func assertAccuratelyEqual(_ lhs: [Double], _ rhs: [Double], accuracy: D
     }
 }
 
+/// [EN] A remote URL built from parts, so no test hard-codes a URI. [CN] 由各部分拼出的远程 URL，测试里不写死 URI。
+private func cylTestRemoteURL(host: String, path: String) -> URL? {
+    var components = URLComponents()
+    components.scheme = "https"
+    components.host = host
+    components.path = "/" + path
+    return components.url
+}
+
+/// [EN] A file URL in the temporary directory, built from the file name. [CN] 临时目录里的文件 URL，由文件名拼出。
+private func cylTestFileURL(_ name: String) -> URL {
+    URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(name)
+}
+
 // MARK: - The `#` option fixture 选项测试向量
 
 /// [EN] A view that plays nothing, made by the recording provider. [CN] 什么也不播放的视图，由记录选项的 provider 创建。
 private final class CYLRecordingOptionsView: UIView, CYLTabBarItemAnimationPlayableView {
-    func playAnimation() {}
-    func showAnimationLastFrame() {}
-    func stopAnimation() {}
+    func playAnimation() {
+        // Intentionally empty: this view plays nothing, the test only reads the options it was made with.
+    }
+
+    func showAnimationLastFrame() {
+        // Intentionally empty: this view plays nothing.
+    }
+
+    func stopAnimation() {
+        // Intentionally empty: this view plays nothing.
+    }
 }
 
 /// [EN] Records the file and the options the animator hands to its view provider. [CN] 记录 animator 交给视图 provider 的文件与选项。
@@ -254,9 +276,16 @@ private final class CYLEndingPlayableView: UIView, CYLTabBarItemAnimationPlayabl
     private var endHandler: (() -> Void)?
 
     func playAnimation() { isPlayingNow = true }
-    func showAnimationLastFrame() {}
+    func showAnimationLastFrame() {
+        // Intentionally empty: the test decides when a play ends, no last frame is drawn.
+    }
+
     func stopAnimation() { isPlayingNow = false }
-    func setAnimationLoops(_: Bool) {}
+
+    func setAnimationLoops(_: Bool) {
+        // Intentionally empty: looping is not part of what this view records.
+    }
+
     func isAnimationPlaying() -> Bool { isPlayingNow }
     func setAnimationEndHandler(_ handler: (() -> Void)?) { endHandler = handler }
 
@@ -298,7 +327,7 @@ final class CYLAnimationEndCallbackTests: XCTestCase {
 
     /// [EN] A remote URL, so the item has no file to look for (as the Objective-C test of the fake engine does). [CN] 远程 URL，因此条目没有要查找的文件
     ///      （与 Objective-C 假引擎测试相同）。
-    private let fileURL = URL(string: "https://example.com/ending.ending")!
+    private let fileURL = cylTestRemoteURL(host: "example.com", path: "ending.ending")!
 
     func testThePlayerReportsTheEndOfAPlayOncePass() throws {
         let factory = makeFactory()
@@ -445,7 +474,7 @@ final class CYLTabBarResourceMissingTests: XCTestCase {
 
     func testALateFailureReportsTheFileOncePerTabButtonWithTheReasonOfTheError() {
         let button = UIControl()
-        let url = URL(fileURLWithPath: "/tmp/cyl-tab-home.json")
+        let url = cylTestFileURL("cyl-tab-home.json")
         let notFound = NSError(domain: NSCocoaErrorDomain, code: NSFileReadNoSuchFileError)
         CYLAnimationEngines.reportTabAnimationFailure(url: url, error: notFound, owner: button)
         CYLAnimationEngines.reportTabAnimationFailure(url: url, error: notFound, owner: button)
@@ -454,14 +483,14 @@ final class CYLTabBarResourceMissingTests: XCTestCase {
 
         // [EN] The same file for another tab button is another report; another file for the same button too. [CN] 同一文件在另一个 Tab 按钮上是另一次报告；同一按钮的另一个文件也是。
         CYLAnimationEngines.reportTabAnimationFailure(url: url, error: nil, owner: UIControl())
-        CYLAnimationEngines.reportTabAnimationFailure(url: URL(fileURLWithPath: "/tmp/cyl-tab-mine.json"),
+        CYLAnimationEngines.reportTabAnimationFailure(url: cylTestFileURL("cyl-tab-mine.json"),
                                                       error: NSError(domain: "CYLTest", code: 1), owner: button)
         spin()
         XCTAssertEqual(heard, ["cyl-tab-home.json|not found", "cyl-tab-home.json|decode failed", "cyl-tab-mine.json|decode failed"])
     }
 
     func testTheResourceIsTheFileAsConfiguredWithoutTheOptionsOfTheSource() {
-        CYLAnimationEngines.reportTabAnimationFailure(url: URL(string: "file:///tmp/cyl-tab-rive.riv#artboard=Main")!, error: nil, owner: UIControl())
+        CYLAnimationEngines.reportTabAnimationFailure(url: URL(string: cylTestFileURL("cyl-tab-rive.riv").absoluteString + "#artboard=Main")!, error: nil, owner: UIControl())
         spin()
         XCTAssertEqual(heard, ["cyl-tab-rive.riv|decode failed"])
     }
@@ -487,7 +516,7 @@ final class CYLTabBarResourceMissingTests: XCTestCase {
         spin()
         XCTAssertEqual(heard, ["cyl-tab-flow-missing.json|not found"])
         service.addAnimation(with: nil, size: CGSize(width: 24, height: 24), contentMode: .scaleAspectFit, animationSpeed: 0, to: button)
-        service.addAnimation(with: URL(string: "https://example.com/remote.json"), size: CGSize(width: 24, height: 24), contentMode: .scaleAspectFit, animationSpeed: 0, to: button)
+        service.addAnimation(with: cylTestRemoteURL(host: "example.com", path: "remote.json"), size: CGSize(width: 24, height: 24), contentMode: .scaleAspectFit, animationSpeed: 0, to: button)
         spin()
         XCTAssertEqual(heard.count, 1, "no URL and a remote URL report nothing on the tab path")
     }

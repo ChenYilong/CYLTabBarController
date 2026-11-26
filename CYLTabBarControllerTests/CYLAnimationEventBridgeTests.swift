@@ -19,7 +19,9 @@ private final class CYLScriptedPanRecognizer: UIPanGestureRecognizer {
     var scripted: UIGestureRecognizer.State = .possible
     override var state: UIGestureRecognizer.State {
         get { scripted }
-        set {}
+        set {
+            // Intentionally empty: the recognizer state is scripted by the test, UIKit may not change it.
+        }
     }
 }
 

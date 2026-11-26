@@ -92,7 +92,7 @@ final class CYLLiquidGlassView: UIVisualEffectView {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) {
+    required init?(coder _: NSCoder) {
         fatalError("init(coder:) is not supported")
     }
 
@@ -118,10 +118,10 @@ final class CYLLiquidGlassView: UIVisualEffectView {
 /**
  * [EN] The one implementation of the background of an animated item (the flat color or Liquid Glass, the corner radius, the border),
  *      shared by `CYLAnimatedItemView` and `CYLAnimatedItemStackView`: both only keep the `item…` properties and call `apply`.
- *      `CYLAnimatedItemCornerRadiusCapsule` is the capsule (half the height, following the size); any other value is points limited
+ *      `cylAnimatedItemCornerRadiusCapsule` is the capsule (half the height, following the size); any other value is points limited
  *      to half the height; unset is a capsule for Liquid Glass and square for flat.
  * [CN] 动效条目背景（纯色或液态玻璃、圆角、边框）的唯一实现，由 `CYLAnimatedItemView` 与 `CYLAnimatedItemStackView` 共用：二者只保存 `item…`
- *      属性并调用 `apply`。`CYLAnimatedItemCornerRadiusCapsule` 为胶囊（半高，随尺寸变化）；其他值为点数，最大取半高；未设置时液态玻璃为胶囊、扁平为直角。
+ *      属性并调用 `apply`。`cylAnimatedItemCornerRadiusCapsule` 为胶囊（半高，随尺寸变化）；其他值为点数，最大取半高；未设置时液态玻璃为胶囊、扁平为直角。
  */
 final class CYLAnimatedItemBackgroundRenderer {
 
@@ -170,7 +170,7 @@ final class CYLAnimatedItemBackgroundRenderer {
      * [CN] 实际使用的内容内缩：已设置时为 `explicit`（包括 0），否则真正绘制液态玻璃时为玻璃常量，扁平时为 0。
      */
     static func resolvedContentHorizontalInset(_ explicit: CGFloat?, style: CYLAnimatedItemBackgroundStyle) -> CGFloat {
-        explicit ?? (resolvedStyle(style) == .liquidGlass ? CYLAnimatedItemLiquidGlassContentInset : 0)
+        explicit ?? (resolvedStyle(style) == .liquidGlass ? cylAnimatedItemLiquidGlassContentInset : 0)
     }
 
     func apply(on host: UIView, style: CYLAnimatedItemBackgroundStyle, color: UIColor?, cornerRadius: CGFloat?,
@@ -179,7 +179,7 @@ final class CYLAnimatedItemBackgroundRenderer {
         let height = host.bounds.height
         let radius: CGFloat
         if let requested = cornerRadius {
-            radius = requested == CYLAnimatedItemCornerRadiusCapsule ? height / 2 : min(max(requested, 0), height / 2)
+            radius = requested == cylAnimatedItemCornerRadiusCapsule ? height / 2 : min(max(requested, 0), height / 2)
         } else {
             radius = resolved == .liquidGlass ? height / 2 : 0
         }

@@ -71,7 +71,10 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
 
     private func components(_ color: UIColor?) -> [CGFloat]? {
         guard let color else { return nil }
-        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
         color.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light)).getRed(&r, green: &g, blue: &b, alpha: &a)
         return [r, g, b, a]
     }
@@ -130,7 +133,7 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
         let (stack, items) = row(["A", "B"])
         let divider = stack.dividerViews[0]
         let scale = stack.traitCollection.displayScale > 0 ? stack.traitCollection.displayScale : 2
-        XCTAssertEqual(CYLAnimatedItemDividerLength, 20)
+        XCTAssertEqual(cylAnimatedItemDividerLength, 20)
         XCTAssertEqual(stack.dividerLength, 20)
         XCTAssertEqual(divider.frame.size, CGSize(width: 1, height: 20), "1 x dividerLength in a horizontal row")
         XCTAssertEqual(line(of: divider)?.frame.width ?? 0, 1 / scale, accuracy: 0.001, "one pixel")
@@ -141,7 +144,8 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
         XCTAssertFalse(divider.isUserInteractionEnabled)
         XCTAssertTrue(divider.accessibilityElementsHidden)
         XCTAssertFalse(divider.isAccessibilityElement)
-        let widthA = items[0].frame.width, widthB = items[1].frame.width
+        let widthA = items[0].frame.width
+        let widthB = items[1].frame.width
         XCTAssertEqual(stack.intrinsicContentSize.width, widthA + widthB + 6 + 1 + 6, accuracy: 1)
         stack.dividerLength = 8
         stack.layoutIfNeeded()
@@ -159,7 +163,8 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
         stack.appendDivider(spacingBefore: 8, spacingAfter: 8)
         XCTAssertEqual(stack.dividerViews.count, 0)
         XCTAssertEqual(stack.stackView.arrangedSubviews.count, 0)
-        let camera = tag("Camera"), search = tag("Search")
+        let camera = tag("Camera")
+        let search = tag("Search")
         stack.append(camera, action: nil, spacingBefore: 0)
         stack.appendDivider(spacingBefore: 8, spacingAfter: 8)
         XCTAssertTrue(stack.hasDivider(after: camera))
@@ -174,9 +179,12 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
             let name: String
             var spacing: CGFloat = 12
             var nextBefore: CGFloat = 5
-            var ownBefore: CGFloat?, ownAfter: CGFloat?
-            var stackBefore: CGFloat?, stackAfter: CGFloat?
-            var before: CGFloat, after: CGFloat
+            var ownBefore: CGFloat?
+            var ownAfter: CGFloat?
+            var stackBefore: CGFloat?
+            var stackAfter: CGFloat?
+            var before: CGFloat
+            var after: CGFloat
         }
         let cases = [
             Case(name: "worked example: 12 spacing, divider(8,8) = 17", nextBefore: 12, ownBefore: 8, ownAfter: 8, before: 8, after: 8),
@@ -194,7 +202,8 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
             stack.dividerSpacingBefore = c.stackBefore
             stack.dividerSpacingAfter = c.stackAfter
             window().addSubview(stack)
-            let a = tag("A"), b = tag("B")
+            let a = tag("A")
+            let b = tag("B")
             stack.append(a, action: nil, spacingBefore: 0)
             stack.appendDivider(spacingBefore: c.ownBefore, spacingAfter: c.ownAfter)
             stack.append(b, action: nil, spacingBefore: c.nextBefore)
@@ -321,7 +330,7 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
             if let color = c.color {
                 expected = color.resolvedColor(with: style)
             } else if let icon = c.icon {
-                expected = icon.withAlphaComponent(CYLAnimatedItemDividerAlpha)
+                expected = icon.withAlphaComponent(cylAnimatedItemDividerAlpha)
             } else {
                 expected = UIColor.secondaryLabel.resolvedColor(with: style)
             }
@@ -343,7 +352,7 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
         assertColor(line(of: stack.dividerViews[0])?.backgroundColor, .green, "light again")
         stack.dividerColor = nil
         stack.itemAppearance = appearance(normal: iconColor)
-        assertColor(line(of: stack.dividerViews[0])?.backgroundColor, iconColor.withAlphaComponent(CYLAnimatedItemDividerAlpha), "icon color change re-resolves")
+        assertColor(line(of: stack.dividerViews[0])?.backgroundColor, iconColor.withAlphaComponent(cylAnimatedItemDividerAlpha), "icon color change re-resolves")
         stack.itemAppearance = nil
         assertColor(line(of: stack.dividerViews[0])?.backgroundColor, UIColor.secondaryLabel.resolvedColor(with: stack.traitCollection), "secondaryLabel again")
     }
@@ -364,7 +373,9 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
         let stack = CYLAnimatedItemStackView(frame: CGRect(x: 0, y: 0, width: 300, height: 100))
         window().addSubview(stack)
         stack.itemAppearance = appearance(normal: iconColor)
-        let fInherit = StackRecordingFactory(), fOwn = StackRecordingFactory(), fLater = StackRecordingFactory()
+        let fInherit = StackRecordingFactory()
+        let fOwn = StackRecordingFactory()
+        let fLater = StackRecordingFactory()
         let inherit = makeTintItem(fInherit)
         let own = makeTintItem(fOwn)
         own.animationTint = "#FF0000"
@@ -494,7 +505,8 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
         stack.axis = .horizontal
         stack.contentMargin = 0
         stack.spacing = 6
-        let a = tag("A"), b = tag("A much longer title")
+        let a = tag("A")
+        let b = tag("A much longer title")
         stack.append(a, action: nil, spacingBefore: 0)
         stack.append(b, action: nil, spacingBefore: 10)
         let sizeA = a.sizeThatFits(CGSize(width: 1000, height: 1000))
@@ -518,7 +530,9 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
         let stack = CYLAnimatedItemStackView(frame: .zero)
         stack.axis = .horizontal
         stack.contentMargin = 0
-        let a = tag("A"), b = tag("B"), c = tag("C")
+        let a = tag("A")
+        let b = tag("B")
+        let c = tag("C")
         stack.append(a, action: nil, spacingBefore: 0)
         stack.append(b, action: nil, spacingBefore: 12)
         stack.append(c, action: nil, spacingBefore: 12)
@@ -543,7 +557,9 @@ final class CYLAnimatedItemStackTintTests: XCTestCase {
         let stack = CYLAnimatedItemStackView(frame: CGRect(x: 0, y: 0, width: 300, height: 60))
         stack.axis = .horizontal
         stack.contentMargin = 0
-        let a = tag("A"), b = tag("B"), c = tag("C")
+        let a = tag("A")
+        let b = tag("B")
+        let c = tag("C")
         stack.append(a, action: "a", spacingBefore: 0)
         stack.append(b, action: "b", spacingBefore: 8)
         stack.append(c, action: "c", spacingBefore: 8)

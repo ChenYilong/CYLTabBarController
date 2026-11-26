@@ -55,9 +55,9 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     }
 
     /**
-     [EN] The corner radius: 0 is square, `CYLAnimatedItemCornerRadiusCapsule` a capsule, any other value points limited to half the height;
+     [EN] The corner radius: 0 is square, `cylAnimatedItemCornerRadiusCapsule` a capsule, any other value points limited to half the height;
           nil (the default) is a capsule for Liquid Glass and square for flat, as `CYLAnimatedItemView.itemCornerRadius`.
-     [CN] 圆角半径：0 为直角，`CYLAnimatedItemCornerRadiusCapsule` 为胶囊，其他值为点数且最大取半高；nil（默认）时液态玻璃为胶囊、扁平为直角，
+     [CN] 圆角半径：0 为直角，`cylAnimatedItemCornerRadiusCapsule` 为胶囊，其他值为点数且最大取半高；nil（默认）时液态玻璃为胶囊、扁平为直角，
           与 `CYLAnimatedItemView.itemCornerRadius` 相同。
      */
     public var itemCornerRadius: CGFloat? {
@@ -66,9 +66,9 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
 
     /**
      [EN] The space between the OUTER border and the items, left and right only, added to `contentMargin` (top and bottom unchanged). nil (the default):
-          `CYLAnimatedItemLiquidGlassContentInset` where Liquid Glass is really drawn, 0 when flat; any number wins, including 0 on glass.
+          `cylAnimatedItemLiquidGlassContentInset` where Liquid Glass is really drawn, 0 when flat; any number wins, including 0 on glass.
           Same rules as `CYLAnimatedItemView.itemContentHorizontalInset`.
-     [CN] 外边框与条目之间的距离，仅左右，加在 `contentMargin` 上（上下不变）。nil（默认）：真正绘制液态玻璃时为 `CYLAnimatedItemLiquidGlassContentInset`，
+     [CN] 外边框与条目之间的距离，仅左右，加在 `contentMargin` 上（上下不变）。nil（默认）：真正绘制液态玻璃时为 `cylAnimatedItemLiquidGlassContentInset`，
           扁平时为 0；任何数字都优先，包括液态玻璃上的 0。规则与 `CYLAnimatedItemView.itemContentHorizontalInset` 相同。
      */
     public var itemContentHorizontalInset: CGFloat? {
@@ -226,21 +226,21 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
 
     /**
      [EN] The color of the dividers, resolved by each divider with its own traits (a dynamic color follows light and dark; a fixed one is used as it
-          is). nil (default): the EXPLICIT normal-state icon color of `itemAppearance` at alpha `CYLAnimatedItemDividerAlpha` (0.6), else `UIColor.secondaryLabel`
+          is). nil (default): the EXPLICIT normal-state icon color of `itemAppearance` at alpha `cylAnimatedItemDividerAlpha` (0.6), else `UIColor.secondaryLabel`
           (about 3:1 on light and dark bars; re-resolved on every appearance change).
      [CN] 分隔条的颜色，由每条分隔条用自己的 trait 解析（动态颜色跟随浅色与深色；固定颜色原样使用）。nil（默认）：`itemAppearance` 普通状态的图标颜色
-          加 `CYLAnimatedItemDividerAlpha`（0.6）透明度，否则 `UIColor.secondaryLabel`（浅色与深色 Bar 上约 3:1；每次外观变化时重新解析）。
+          加 `cylAnimatedItemDividerAlpha`（0.6）透明度，否则 `UIColor.secondaryLabel`（浅色与深色 Bar 上约 3:1；每次外观变化时重新解析）。
      */
     public var dividerColor: UIColor? {
         didSet { if oldValue != dividerColor { updateDividerLook() } }
     }
 
     /**
-     [EN] The length of the dividers' line, `CYLAnimatedItemDividerLength` (20) by default; the line is 1 pixel thick and centered in a slot of
+     [EN] The length of the dividers' line, `cylAnimatedItemDividerLength` (20) by default; the line is 1 pixel thick and centered in a slot of
           1 point by this length (swapped in a vertical stack).
-     [CN] 分隔条线的长度，默认 `CYLAnimatedItemDividerLength`（20）；线厚 1 像素，居中于 1 点乘该长度的槽中（竖向堆叠时对调）。
+     [CN] 分隔条线的长度，默认 `cylAnimatedItemDividerLength`（20）；线厚 1 像素，居中于 1 点乘该长度的槽中（竖向堆叠时对调）。
      */
-    public var dividerLength: CGFloat = CYLAnimatedItemDividerLength {
+    public var dividerLength: CGFloat = cylAnimatedItemDividerLength {
         didSet {
             dividerLength = max(0, dividerLength)
             if oldValue != dividerLength {
