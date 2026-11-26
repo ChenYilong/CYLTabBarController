@@ -890,14 +890,25 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
           适用时按 `kind`（图标 3:1，标题 4.5:1）对照它提亮：绘制的玻璃（`itemBackgroundColor`、`itemGlassTintAlpha`；未设置时为默认着色）或叠在黑色上的纯色填充。
           没有填充的纯色背景原样返回（条目无法知道其后是什么）。动态颜色原样返回。条目自己对每个显式颜色都应用该规则；是 `adaptedOnGlass` 的中性名称。
           [EN] Limits: the rule only RAISES lightness: light mode is never adapted and there is no darkening rule, so LIGHT text on a mid-luminance fill (for example white on a
-               selected orange fill, 2.89:1) is NOT fixed (white is the cap). Dynamic colors and the disabled look are never adapted (only static colors: light and dark
-               resolutions equal). Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
+               selected orange fill, 2.89:1) is NOT fixed (white is the cap). EXPLICIT dynamic colors and the disabled look are never adapted (only static colors: light and dark
+               resolutions equal); a dynamic BUILT-IN color becomes static (resolved with the item's traits) and is then adapted. Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
                flat with a fill = that fill over black; flat WITHOUT a fill (tab bar items, tags without a background) is NOT adapted: the item cannot know what is behind it
                (a flat item on a light-coloured page in dark mode is not detected). The floor 0.28 is per platform and glass-only.
           [CN] 限制：规则只会提亮：浅色模式从不调整，也没有压暗规则，所以中等亮度填充上的浅色文字（例如选中的橙色填充上的白色，2.89:1）不会被修复（白色是上限）。
-               动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
+               显式的动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）；动态的内置颜色会先变为静态（按条目的 trait 解析）再被调整。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
                有填充的纯色背景 = 该填充叠在黑色上；没有填充的纯色背景（Tab 栏条目、没有背景的标签）不调整：条目无法知道其后是什么（深色模式下放在浅色页面上的纯色条目检测不到）。
                下限 0.28 因平台而异，且仅用于玻璃。
+               [EN] Half-alpha fills: a fill is judged over black, and a lift-only rule cannot exceed white's contrast: on a white 0.5-alpha fill (0.5 grey, luminance 0.214) the cap is
+                    1.05 / (0.214 + 0.05) = 3.98:1, so the title is lifted as far as white goes, not to 4.5:1.
+               [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
+                    the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
+                    badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+               [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
+                    因此标题只提亮到白色为止，达不到 4.5:1。
+               [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
+                    `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
      */
     public func adaptedForContrast(_ color: UIColor, kind: CYLAnimatedItemGlassColorKind) -> UIColor {
         contrastAdapted(color, kind: kind)
@@ -907,14 +918,25 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      [EN] The former name of `adaptedForContrast(_:kind:)`, kept (not deprecated) because the other platforms port it under this name; it forwards.
      [CN] `adaptedForContrast(_:kind:)` 的旧名称，保留（不标记弃用），因为其他平台以此名称移植；它直接转发。
           [EN] Limits: the rule only RAISES lightness: light mode is never adapted and there is no darkening rule, so LIGHT text on a mid-luminance fill (for example white on a
-               selected orange fill, 2.89:1) is NOT fixed (white is the cap). Dynamic colors and the disabled look are never adapted (only static colors: light and dark
-               resolutions equal). Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
+               selected orange fill, 2.89:1) is NOT fixed (white is the cap). EXPLICIT dynamic colors and the disabled look are never adapted (only static colors: light and dark
+               resolutions equal); a dynamic BUILT-IN color becomes static (resolved with the item's traits) and is then adapted. Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
                flat with a fill = that fill over black; flat WITHOUT a fill (tab bar items, tags without a background) is NOT adapted: the item cannot know what is behind it
                (a flat item on a light-coloured page in dark mode is not detected). The floor 0.28 is per platform and glass-only.
           [CN] 限制：规则只会提亮：浅色模式从不调整，也没有压暗规则，所以中等亮度填充上的浅色文字（例如选中的橙色填充上的白色，2.89:1）不会被修复（白色是上限）。
-               动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
+               显式的动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）；动态的内置颜色会先变为静态（按条目的 trait 解析）再被调整。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
                有填充的纯色背景 = 该填充叠在黑色上；没有填充的纯色背景（Tab 栏条目、没有背景的标签）不调整：条目无法知道其后是什么（深色模式下放在浅色页面上的纯色条目检测不到）。
                下限 0.28 因平台而异，且仅用于玻璃。
+               [EN] Half-alpha fills: a fill is judged over black, and a lift-only rule cannot exceed white's contrast: on a white 0.5-alpha fill (0.5 grey, luminance 0.214) the cap is
+                    1.05 / (0.214 + 0.05) = 3.98:1, so the title is lifted as far as white goes, not to 4.5:1.
+               [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
+                    the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
+                    badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+               [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
+                    因此标题只提亮到白色为止，达不到 4.5:1。
+               [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
+                    `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
      */
     public func adaptedOnGlass(_ color: UIColor, kind: CYLAnimatedItemGlassColorKind) -> UIColor {
         adaptedForContrast(color, kind: kind)
@@ -1766,14 +1788,25 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
           否则为本颜色，再否则为组件内置值（普通 `UIColor.label`，选中为视图的 `tintColor`，不可用为系统禁用灰色）。nil 表示忘记子类颜色。
           为 `imageView` 与动画视图（通过 selector 调用 `-cyl_applyAnimationViewTintColor:`）着色。
           [EN] Limits: the rule only RAISES lightness: light mode is never adapted and there is no darkening rule, so LIGHT text on a mid-luminance fill (for example white on a
-               selected orange fill, 2.89:1) is NOT fixed (white is the cap). Dynamic colors and the disabled look are never adapted (only static colors: light and dark
-               resolutions equal). Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
+               selected orange fill, 2.89:1) is NOT fixed (white is the cap). EXPLICIT dynamic colors and the disabled look are never adapted (only static colors: light and dark
+               resolutions equal); a dynamic BUILT-IN color becomes static (resolved with the item's traits) and is then adapted. Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
                flat with a fill = that fill over black; flat WITHOUT a fill (tab bar items, tags without a background) is NOT adapted: the item cannot know what is behind it
                (a flat item on a light-coloured page in dark mode is not detected). The floor 0.28 is per platform and glass-only.
           [CN] 限制：规则只会提亮：浅色模式从不调整，也没有压暗规则，所以中等亮度填充上的浅色文字（例如选中的橙色填充上的白色，2.89:1）不会被修复（白色是上限）。
-               动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
+               显式的动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）；动态的内置颜色会先变为静态（按条目的 trait 解析）再被调整。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
                有填充的纯色背景 = 该填充叠在黑色上；没有填充的纯色背景（Tab 栏条目、没有背景的标签）不调整：条目无法知道其后是什么（深色模式下放在浅色页面上的纯色条目检测不到）。
                下限 0.28 因平台而异，且仅用于玻璃。
+               [EN] Half-alpha fills: a fill is judged over black, and a lift-only rule cannot exceed white's contrast: on a white 0.5-alpha fill (0.5 grey, luminance 0.214) the cap is
+                    1.05 / (0.214 + 0.05) = 3.98:1, so the title is lifted as far as white goes, not to 4.5:1.
+               [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
+                    the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
+                    badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+               [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
+                    因此标题只提亮到白色为止，达不到 4.5:1。
+               [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
+                    `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
      */
     @objc(applyIconTintColor:)
     open func applyIconTintColor(_ color: UIColor?) {
@@ -1787,14 +1820,25 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      [CN] 子类内置标题颜色，`applyIconTintColor(_:)` 的标题版本：先保存，然后在没有显式值的地方标题使用它（条目自己的、子类显式的以及堆叠视图
           `itemAppearance` 的标题颜色优先于它；它优先于组件内置值与手动设置的 `titleLabel.textColor`）。与所有内置颜色一样用条目的 trait 解析，并在深色玻璃确实绘制时调整（禁用外观除外）。nil 表示忘记。
           [EN] Limits: the rule only RAISES lightness: light mode is never adapted and there is no darkening rule, so LIGHT text on a mid-luminance fill (for example white on a
-               selected orange fill, 2.89:1) is NOT fixed (white is the cap). Dynamic colors and the disabled look are never adapted (only static colors: light and dark
-               resolutions equal). Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
+               selected orange fill, 2.89:1) is NOT fixed (white is the cap). EXPLICIT dynamic colors and the disabled look are never adapted (only static colors: light and dark
+               resolutions equal); a dynamic BUILT-IN color becomes static (resolved with the item's traits) and is then adapted. Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
                flat with a fill = that fill over black; flat WITHOUT a fill (tab bar items, tags without a background) is NOT adapted: the item cannot know what is behind it
                (a flat item on a light-coloured page in dark mode is not detected). The floor 0.28 is per platform and glass-only.
           [CN] 限制：规则只会提亮：浅色模式从不调整，也没有压暗规则，所以中等亮度填充上的浅色文字（例如选中的橙色填充上的白色，2.89:1）不会被修复（白色是上限）。
-               动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
+               显式的动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）；动态的内置颜色会先变为静态（按条目的 trait 解析）再被调整。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
                有填充的纯色背景 = 该填充叠在黑色上；没有填充的纯色背景（Tab 栏条目、没有背景的标签）不调整：条目无法知道其后是什么（深色模式下放在浅色页面上的纯色条目检测不到）。
                下限 0.28 因平台而异，且仅用于玻璃。
+               [EN] Half-alpha fills: a fill is judged over black, and a lift-only rule cannot exceed white's contrast: on a white 0.5-alpha fill (0.5 grey, luminance 0.214) the cap is
+                    1.05 / (0.214 + 0.05) = 3.98:1, so the title is lifted as far as white goes, not to 4.5:1.
+               [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
+                    the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
+                    badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+               [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
+                    因此标题只提亮到白色为止，达不到 4.5:1。
+               [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
+                    `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
      */
     open func applyTitleTintColor(_ color: UIColor?) {
         // [EN] The title ignores a repeated color (it would overwrite a label color set by hand). [CN] 标题忽略重复的颜色（否则会覆盖手动设置的标签颜色）。
@@ -1813,14 +1857,25 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
           （`isItemAppearanceInherited` 为 true）> 子类内置（`applyTitleTintColor`）> 组件内置。它视为显式值：深色玻璃确实绘制时按 4.5:1 调整
           （`CYLAnimatedItemContrast`）。从不改动 `itemAppearance` 或 `isItemAppearanceInherited`，因此堆叠视图的继承（字体、图标颜色）保持有效。
           [EN] Limits: the rule only RAISES lightness: light mode is never adapted and there is no darkening rule, so LIGHT text on a mid-luminance fill (for example white on a
-               selected orange fill, 2.89:1) is NOT fixed (white is the cap). Dynamic colors and the disabled look are never adapted (only static colors: light and dark
-               resolutions equal). Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
+               selected orange fill, 2.89:1) is NOT fixed (white is the cap). EXPLICIT dynamic colors and the disabled look are never adapted (only static colors: light and dark
+               resolutions equal); a dynamic BUILT-IN color becomes static (resolved with the item's traits) and is then adapted. Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
                flat with a fill = that fill over black; flat WITHOUT a fill (tab bar items, tags without a background) is NOT adapted: the item cannot know what is behind it
                (a flat item on a light-coloured page in dark mode is not detected). The floor 0.28 is per platform and glass-only.
           [CN] 限制：规则只会提亮：浅色模式从不调整，也没有压暗规则，所以中等亮度填充上的浅色文字（例如选中的橙色填充上的白色，2.89:1）不会被修复（白色是上限）。
-               动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
+               显式的动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）；动态的内置颜色会先变为静态（按条目的 trait 解析）再被调整。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
                有填充的纯色背景 = 该填充叠在黑色上；没有填充的纯色背景（Tab 栏条目、没有背景的标签）不调整：条目无法知道其后是什么（深色模式下放在浅色页面上的纯色条目检测不到）。
                下限 0.28 因平台而异，且仅用于玻璃。
+               [EN] Half-alpha fills: a fill is judged over black, and a lift-only rule cannot exceed white's contrast: on a white 0.5-alpha fill (0.5 grey, luminance 0.214) the cap is
+                    1.05 / (0.214 + 0.05) = 3.98:1, so the title is lifted as far as white goes, not to 4.5:1.
+               [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
+                    the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
+                    badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+               [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
+                    因此标题只提亮到白色为止，达不到 4.5:1。
+               [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
+                    `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
      */
     open func setSubclassTitleColor(_ color: UIColor?, for state: UIControl.State) {
         setSubclassColor(color, for: state, role: .title)
@@ -1831,14 +1886,25 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
           animation tint are adapted at 3:1.
      [CN] 某状态的子类显式图标颜色（nil 清除）；优先级与调整同 `setSubclassTitleColor(_:for:)`，图标与动画着色按 3:1 调整。
           [EN] Limits: the rule only RAISES lightness: light mode is never adapted and there is no darkening rule, so LIGHT text on a mid-luminance fill (for example white on a
-               selected orange fill, 2.89:1) is NOT fixed (white is the cap). Dynamic colors and the disabled look are never adapted (only static colors: light and dark
-               resolutions equal). Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
+               selected orange fill, 2.89:1) is NOT fixed (white is the cap). EXPLICIT dynamic colors and the disabled look are never adapted (only static colors: light and dark
+               resolutions equal); a dynamic BUILT-IN color becomes static (resolved with the item's traits) and is then adapted. Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
                flat with a fill = that fill over black; flat WITHOUT a fill (tab bar items, tags without a background) is NOT adapted: the item cannot know what is behind it
                (a flat item on a light-coloured page in dark mode is not detected). The floor 0.28 is per platform and glass-only.
           [CN] 限制：规则只会提亮：浅色模式从不调整，也没有压暗规则，所以中等亮度填充上的浅色文字（例如选中的橙色填充上的白色，2.89:1）不会被修复（白色是上限）。
-               动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
+               显式的动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）；动态的内置颜色会先变为静态（按条目的 trait 解析）再被调整。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
                有填充的纯色背景 = 该填充叠在黑色上；没有填充的纯色背景（Tab 栏条目、没有背景的标签）不调整：条目无法知道其后是什么（深色模式下放在浅色页面上的纯色条目检测不到）。
                下限 0.28 因平台而异，且仅用于玻璃。
+               [EN] Half-alpha fills: a fill is judged over black, and a lift-only rule cannot exceed white's contrast: on a white 0.5-alpha fill (0.5 grey, luminance 0.214) the cap is
+                    1.05 / (0.214 + 0.05) = 3.98:1, so the title is lifted as far as white goes, not to 4.5:1.
+               [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
+                    the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
+                    badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+               [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
+                    因此标题只提亮到白色为止，达不到 4.5:1。
+               [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
+                    `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
      */
     open func setSubclassIconColor(_ color: UIColor?, for state: UIControl.State) {
         setSubclassColor(color, for: state, role: .icon)
@@ -1853,15 +1919,26 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      [CN] 声明一个颜色角色（`CYLAnimatedItemColorRole`）：此后条目按唯一的优先级链与唯一的深色玻璃调整解析颜色，并在每次变化（状态、外观、tint、trait、玻璃）时
           交给 `role.apply`。再次注册相同 id 会替换该角色。标题、图标与动画着色由条目自己注册；子类在此注册自己的标签、叉号或图标，不需要其他任何处理。
           [EN] Limits: the rule only RAISES lightness: light mode is never adapted and there is no darkening rule, so LIGHT text on a mid-luminance fill (for example white on a
-               selected orange fill, 2.89:1) is NOT fixed (white is the cap). Dynamic colors and the disabled look are never adapted (only static colors: light and dark
-               resolutions equal). Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
+               selected orange fill, 2.89:1) is NOT fixed (white is the cap). EXPLICIT dynamic colors and the disabled look are never adapted (only static colors: light and dark
+               resolutions equal); a dynamic BUILT-IN color becomes static (resolved with the item's traits) and is then adapted. Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
                flat with a fill = that fill over black; flat WITHOUT a fill (tab bar items, tags without a background) is NOT adapted: the item cannot know what is behind it
                (a flat item on a light-coloured page in dark mode is not detected). The floor 0.28 is per platform and glass-only.
           [EN] Used by ClassifyMenu tags for the delete-indicator label, the cross and the editing icons (rename, delete); their tag defaults are not adapted.
           [CN] 限制：规则只会提亮：浅色模式从不调整，也没有压暗规则，所以中等亮度填充上的浅色文字（例如选中的橙色填充上的白色，2.89:1）不会被修复（白色是上限）。
-               动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
+               显式的动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）；动态的内置颜色会先变为静态（按条目的 trait 解析）再被调整。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
                有填充的纯色背景 = 该填充叠在黑色上；没有填充的纯色背景（Tab 栏条目、没有背景的标签）不调整：条目无法知道其后是什么（深色模式下放在浅色页面上的纯色条目检测不到）。
                下限 0.28 因平台而异，且仅用于玻璃。
+               [EN] Half-alpha fills: a fill is judged over black, and a lift-only rule cannot exceed white's contrast: on a white 0.5-alpha fill (0.5 grey, luminance 0.214) the cap is
+                    1.05 / (0.214 + 0.05) = 3.98:1, so the title is lifted as far as white goes, not to 4.5:1.
+               [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
+                    the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
+                    badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+               [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
+                    因此标题只提亮到白色为止，达不到 4.5:1。
+               [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
+                    `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
           [CN] ClassifyMenu 的标签用它注册删除指示器标签、叉号与编辑图标（重命名、删除）；标签默认值不调整。
      */
     public func register(_ role: CYLAnimatedItemColorRole) {
@@ -1879,14 +1956,25 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      [CN] 某角色在某状态下的子类显式颜色（nil 清除）：`setSubclassTitleColor(_:for:)` 与 `setSubclassIconColor(_:for:)` 的通用形式，
           优先级（条目自己的 `itemAppearance` > 本通道 > 堆叠视图继承的 `itemAppearance` > 内置）与调整（`role.kind`）相同。
           [EN] Limits: the rule only RAISES lightness: light mode is never adapted and there is no darkening rule, so LIGHT text on a mid-luminance fill (for example white on a
-               selected orange fill, 2.89:1) is NOT fixed (white is the cap). Dynamic colors and the disabled look are never adapted (only static colors: light and dark
-               resolutions equal). Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
+               selected orange fill, 2.89:1) is NOT fixed (white is the cap). EXPLICIT dynamic colors and the disabled look are never adapted (only static colors: light and dark
+               resolutions equal); a dynamic BUILT-IN color becomes static (resolved with the item's traits) and is then adapted. Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
                flat with a fill = that fill over black; flat WITHOUT a fill (tab bar items, tags without a background) is NOT adapted: the item cannot know what is behind it
                (a flat item on a light-coloured page in dark mode is not detected). The floor 0.28 is per platform and glass-only.
           [CN] 限制：规则只会提亮：浅色模式从不调整，也没有压暗规则，所以中等亮度填充上的浅色文字（例如选中的橙色填充上的白色，2.89:1）不会被修复（白色是上限）。
-               动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
+               显式的动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）；动态的内置颜色会先变为静态（按条目的 trait 解析）再被调整。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
                有填充的纯色背景 = 该填充叠在黑色上；没有填充的纯色背景（Tab 栏条目、没有背景的标签）不调整：条目无法知道其后是什么（深色模式下放在浅色页面上的纯色条目检测不到）。
                下限 0.28 因平台而异，且仅用于玻璃。
+               [EN] Half-alpha fills: a fill is judged over black, and a lift-only rule cannot exceed white's contrast: on a white 0.5-alpha fill (0.5 grey, luminance 0.214) the cap is
+                    1.05 / (0.214 + 0.05) = 3.98:1, so the title is lifted as far as white goes, not to 4.5:1.
+               [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
+                    the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
+                    badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+               [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
+                    因此标题只提亮到白色为止，达不到 4.5:1。
+               [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
+                    `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
      */
     open func setSubclassColor(_ color: UIColor?, for state: UIControl.State, role: CYLAnimatedItemColorRole) {
         if subclassColors[role.id]?[state.rawValue] == color { return }
@@ -1900,14 +1988,25 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      [CN] 某角色的子类内置颜色（`applyIconTintColor(_:)` 与 `applyTitleTintColor(_:)` 的通用形式）：在没有显式值的地方使用；优先于角色的 `componentBuiltIn`。
           用条目的 trait 解析，`role.adaptsBuiltIn` 时在深色玻璃确实绘制时调整（禁用外观除外）。nil 表示忘记。
           [EN] Limits: the rule only RAISES lightness: light mode is never adapted and there is no darkening rule, so LIGHT text on a mid-luminance fill (for example white on a
-               selected orange fill, 2.89:1) is NOT fixed (white is the cap). Dynamic colors and the disabled look are never adapted (only static colors: light and dark
-               resolutions equal). Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
+               selected orange fill, 2.89:1) is NOT fixed (white is the cap). EXPLICIT dynamic colors and the disabled look are never adapted (only static colors: light and dark
+               resolutions equal); a dynamic BUILT-IN color becomes static (resolved with the item's traits) and is then adapted. Reference: drawn glass = max(the shared model, frosted white 0.14, the per-platform rendered floor 0.28 measured on iOS 27.2 plus a margin);
                flat with a fill = that fill over black; flat WITHOUT a fill (tab bar items, tags without a background) is NOT adapted: the item cannot know what is behind it
                (a flat item on a light-coloured page in dark mode is not detected). The floor 0.28 is per platform and glass-only.
           [CN] 限制：规则只会提亮：浅色模式从不调整，也没有压暗规则，所以中等亮度填充上的浅色文字（例如选中的橙色填充上的白色，2.89:1）不会被修复（白色是上限）。
-               动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
+               显式的动态颜色与禁用外观从不调整（只调整静态颜色：浅色与深色解析结果相同）；动态的内置颜色会先变为静态（按条目的 trait 解析）再被调整。对照：绘制的玻璃 = max(共享模型磨砂白 0.14，各平台实测渲染下限 0.28，iOS 27.2 实测再加余量)；
                有填充的纯色背景 = 该填充叠在黑色上；没有填充的纯色背景（Tab 栏条目、没有背景的标签）不调整：条目无法知道其后是什么（深色模式下放在浅色页面上的纯色条目检测不到）。
                下限 0.28 因平台而异，且仅用于玻璃。
+               [EN] Half-alpha fills: a fill is judged over black, and a lift-only rule cannot exceed white's contrast: on a white 0.5-alpha fill (0.5 grey, luminance 0.214) the cap is
+                    1.05 / (0.214 + 0.05) = 3.98:1, so the title is lifted as far as white goes, not to 4.5:1.
+               [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
+                    the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
+                    badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+               [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
+                    因此标题只提亮到白色为止，达不到 4.5:1。
+               [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
+                    `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
      */
     open func applyBuiltInColor(_ color: UIColor?, role: CYLAnimatedItemColorRole) {
         subclassBuiltInColors[role.id] = color
