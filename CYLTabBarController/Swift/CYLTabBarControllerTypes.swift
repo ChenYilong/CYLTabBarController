@@ -160,7 +160,8 @@ public protocol CYLPlusButtonSubclassing {
      *        changes.
      *      - The plus button and the tab items are in different view hierarchies, so the item title's center is converted
      *        into the plus button's coordinate space. Only the plus button title's centerY moves.
-     *      - Not implemented, or NO: the title stays where the plus button lays it out, as before.
+     *      - Not implemented: the core's default, YES for a plus button with a title that is not part of its background image
+     *        (nothing to implement). NO: the title stays where the plus button lays it out, as before.
      *      - A plus button drawn with a background image only, its title on that picture: better not implemented. The title
      *        would leave the middle of the picture for the tab titles' line and take their font and colors. Such a button is
      *        placed by `+multiplierOfTabBarHeight:` and `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` in every style
@@ -171,7 +172,7 @@ public protocol CYLPlusButtonSubclassing {
      *      - 以第一个标题可见且有文字的 TabBarItem 为参照：没有标题或标题隐藏的 item 会被跳过。没有这样的 item，或 PlusButton 没有可见
      *        标题时，不做任何调整。
      *      - PlusButton 与 TabBarItem 不在同一视图层级，因此会把 item 标题的中心点转换到 PlusButton 的坐标系。只调整 PlusButton 标题的 centerY。
-     *      - 未实现或返回 NO：标题保持 PlusButton 自身布局的位置，与旧版本一致。
+     *      - 未实现：核心的默认值，有标题且标题不是背景图的一部分时为 YES（无需实现）；返回 NO：标题保持 PlusButton 自身布局的位置，与旧版本一致。
      *      - 只用背景图片绘制、标题画在图上的 PlusButton：建议不实现。否则标题会离开图片中心、移到 Tab 标题所在的线上，并使用其字体和颜色。
      *        这种按钮在所有样式下都按 `+multiplierOfTabBarHeight:` 与 `+constantOfPlusButtonCenterYOffsetForTabBarHeight:` 放置
      *        （见 docs/PlusButton-Background-Image-Liquid-Glass.md）。

@@ -570,3 +570,31 @@ final class CYLPlusButtonTitleColorTests: XCTestCase {
         XCTAssertTrue(try shownTitleColor(button).isEqual(UIColor.systemOrange), "the aligned selected color")
     }
 }
+
+/**
+ [EN] The core's default for `+alignsTitleWithTabBarItemTitles` (not implemented by the app's plus button): YES for a plus button with a
+      title that is not part of its background image, NO without a title.
+ [CN] `+alignsTitleWithTabBarItemTitles` 的核心默认值（App 的 PlusButton 未实现时）：有标题且标题不是背景图的一部分时为 YES，没有标题时为 NO。
+ */
+final class CYLPlusButtonDefaultAlignsTitleTests: XCTestCase {
+
+    func testAPlusButtonWithATitleAlignsItByDefault() {
+        let button = CYLTestPlusButton()
+        button.setTitle("Plus", for: .normal)
+        XCTAssertTrue(button.cylAlignsTitleWithTabBarItemTitles(), "no app code: the title lines up with the tab titles")
+    }
+
+    func testAPlusButtonWithoutATitleDoesNotAlign() {
+        XCTAssertFalse(CYLTestPlusButton().cylAlignsTitleWithTabBarItemTitles())
+    }
+
+    func testATitleOnItsBackgroundImageIsLeftAlone() {
+        let button = CYLTestPlusButton()
+        button.setTitle("Plus", for: .normal)
+        UIGraphicsBeginImageContext(CGSize(width: 10, height: 10))
+        let picture = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        button.setBackgroundImage(picture, for: .normal)
+        XCTAssertFalse(button.cylAlignsTitleWithTabBarItemTitles(), "the title is part of the picture")
+    }
+}
