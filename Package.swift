@@ -47,7 +47,8 @@ let package = Package(
             name: "CYLAnimatedItem",
             dependencies: ["CYLAnimatedItemSwift"],
             path: "CYLTabBarController",
-            exclude: ["CYLAnimatedItem/Resources", "CYLAnimatedItem/Swift"],
+            // [EN] The module map is read from `publicHeadersPath`; as a source file it only warns "no rule to process file". [CN] module map 从 `publicHeadersPath` 读取；作为源文件只会产生 "no rule to process file" 警告。
+            exclude: ["CYLAnimatedItem/Resources", "CYLAnimatedItem/Swift", "CYLAnimatedItem/include/module.modulemap"],
             sources: [
                 "CYLAnimatedItem",
                 "CYLUtils/CYLAnimationKeys.m",

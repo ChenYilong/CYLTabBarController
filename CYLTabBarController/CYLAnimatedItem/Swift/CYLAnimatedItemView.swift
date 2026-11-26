@@ -903,12 +903,12 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
                     the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
                     badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
-                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `secondaryLabel` (3:1 in light and dark, not adapted; ClassifyMenu 09bc2413).
                [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
                     因此标题只提亮到白色为止，达不到 4.5:1。
                [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
                     `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
-                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `secondaryLabel`（浅色与深色均为 3:1，不调整；ClassifyMenu 09bc2413）。
      */
     public func adaptedForContrast(_ color: UIColor, kind: CYLAnimatedItemGlassColorKind) -> UIColor {
         contrastAdapted(color, kind: kind)
@@ -931,12 +931,12 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
                     the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
                     badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
-                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `secondaryLabel` (3:1 in light and dark, not adapted; ClassifyMenu 09bc2413).
                [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
                     因此标题只提亮到白色为止，达不到 4.5:1。
                [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
                     `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
-                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `secondaryLabel`（浅色与深色均为 3:1，不调整；ClassifyMenu 09bc2413）。
      */
     public func adaptedOnGlass(_ color: UIColor, kind: CYLAnimatedItemGlassColorKind) -> UIColor {
         adaptedForContrast(color, kind: kind)
@@ -1808,12 +1808,12 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
                     the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
                     badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
-                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `secondaryLabel` (3:1 in light and dark, not adapted; ClassifyMenu 09bc2413).
                [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
                     因此标题只提亮到白色为止，达不到 4.5:1。
                [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
                     `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
-                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `secondaryLabel`（浅色与深色均为 3:1，不调整；ClassifyMenu 09bc2413）。
      */
     @objc(applyIconTintColor:)
     open func applyIconTintColor(_ color: UIColor?) {
@@ -1840,12 +1840,12 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
                     the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
                     badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
-                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `secondaryLabel` (3:1 in light and dark, not adapted; ClassifyMenu 09bc2413).
                [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
                     因此标题只提亮到白色为止，达不到 4.5:1。
                [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
                     `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
-                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `secondaryLabel`（浅色与深色均为 3:1，不调整；ClassifyMenu 09bc2413）。
      */
     open func applyTitleTintColor(_ color: UIColor?) {
         // [EN] The title ignores a repeated color (it would overwrite a label color set by hand). [CN] 标题忽略重复的颜色（否则会覆盖手动设置的标签颜色）。
@@ -1877,12 +1877,12 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
                     the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
                     badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
-                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `secondaryLabel` (3:1 in light and dark, not adapted; ClassifyMenu 09bc2413).
                [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
                     因此标题只提亮到白色为止，达不到 4.5:1。
                [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
                     `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
-                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `secondaryLabel`（浅色与深色均为 3:1，不调整；ClassifyMenu 09bc2413）。
      */
     open func setSubclassTitleColor(_ color: UIColor?, for state: UIControl.State) {
         setSubclassColor(color, for: state, role: .title)
@@ -1906,12 +1906,12 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
                     the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
                     badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
-                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `secondaryLabel` (3:1 in light and dark, not adapted; ClassifyMenu 09bc2413).
                [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
                     因此标题只提亮到白色为止，达不到 4.5:1。
                [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
                     `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
-                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `secondaryLabel`（浅色与深色均为 3:1，不调整；ClassifyMenu 09bc2413）。
      */
     open func setSubclassIconColor(_ color: UIColor?, for state: UIControl.State) {
         setSubclassColor(color, for: state, role: .icon)
@@ -1940,12 +1940,12 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
                     the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
                     badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
-                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `secondaryLabel` (3:1 in light and dark, not adapted; ClassifyMenu 09bc2413).
                [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
                     因此标题只提亮到白色为止，达不到 4.5:1。
                [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
                     `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
-                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `secondaryLabel`（浅色与深色均为 3:1，不调整；ClassifyMenu 09bc2413）。
           [CN] ClassifyMenu 的标签用它注册删除指示器标签、叉号与编辑图标（重命名、删除）；标签默认值不调整。
      */
     public func register(_ role: CYLAnimatedItemColorRole) {
@@ -1976,12 +1976,12 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
                     the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
                     badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
-                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `secondaryLabel` (3:1 in light and dark, not adapted; ClassifyMenu 09bc2413).
                [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
                     因此标题只提亮到白色为止，达不到 4.5:1。
                [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
                     `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
-                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `secondaryLabel`（浅色与深色均为 3:1，不调整；ClassifyMenu 09bc2413）。
      */
     open func setSubclassColor(_ color: UIColor?, for state: UIControl.State, role: CYLAnimatedItemColorRole) {
         if subclassColors[role.id]?[state.rawValue] == color { return }
@@ -2008,12 +2008,12 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
                [EN] Not covered (by design): multicolor / palette SF Symbols and `alwaysOriginal` / original images ignore `tintColor` (the role color is written, UIKit does not apply it);
                     the badge dot and capsule images are `alwaysOriginal` bitmaps and are not adapted; a fixed `animationTint` is adapted on glass only; the FlatDesign tab bar button and
                     badge view have no contrast rule. The ClassifyMenu header More / Clear buttons, header title / icon and the fold chevron are judged by the style's own `CYLTintContrast`
-                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `tertiaryLabel` (not adapted).
+                    (the opaque band / list background), not by the glass rule; the created-cell plus icon is a dynamic `secondaryLabel` (3:1 in light and dark, not adapted; ClassifyMenu 09bc2413).
                [CN] 半透明填充：填充按叠在黑色上判断，仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（0.5 灰，亮度 0.214）的上限是 1.05 / (0.214 + 0.05) = 3.98:1，
                     因此标题只提亮到白色为止，达不到 4.5:1。
                [CN] 不覆盖（设计如此）：多色 / 调色板 SF Symbol 与 `alwaysOriginal` / 原始图片忽略 `tintColor`（角色颜色已写入，UIKit 不应用）；角标圆点与胶囊图片是
                     `alwaysOriginal` 位图，不调整；固定的 `animationTint` 只在玻璃上调整；FlatDesign 的 Tab 栏按钮与角标视图没有对比度规则。ClassifyMenu 的头部「更多 / 清除」按钮、
-                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `tertiaryLabel`（不调整）。
+                    头部标题 / 图标与折叠箭头按样式自己的 `CYLTintContrast`（不透明的带状 / 列表背景）判断，而不是玻璃规则；创建的单元格加号图标是动态的 `secondaryLabel`（浅色与深色均为 3:1，不调整；ClassifyMenu 09bc2413）。
      */
     open func applyBuiltInColor(_ color: UIColor?, role: CYLAnimatedItemColorRole) {
         subclassBuiltInColors[role.id] = color

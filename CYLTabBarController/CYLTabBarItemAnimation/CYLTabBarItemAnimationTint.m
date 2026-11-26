@@ -25,16 +25,15 @@
 /*
  * [EN] The `tint` / `darkTint` options (`CYLTabBarAnimationOptionTint`, `CYLTabBarAnimationOptionDarkTint`) for the
  *      libraries that do not read them in their own view (Lottie, PAG, SVGA, GIF; Rive does), each through its official
- *      means when it has one: GIF frames become template images drawn in the view's `tintColor` (UIKit); Lottie 4.x takes
+ *      means when it has one: Lottie 4.x takes
  *      a `ColorValueProvider` on the keypath "**.Color" (its player's `-applyColors:traitCollection:`); a library without
- *      a tint API (PAG, SVGA, Lottie 2.x) gets a layer of that color composited "sourceAtop" over its view, so only the
+ *      a tint API (PAG, SVGA, GIF, Lottie 2.x) gets a layer of that color composited "sourceAtop" over its view, so only the
  *      icon's pixels take it. "title" follows the color the tab bar (or CYLAnimatedItemView's `iconColor`) passes to
  *      `-cyl_applyAnimationViewTintColor:`; "#RRGGBB(AA)" is fixed, with `darkTint` in Dark Mode. The method is added to the
  *      view's class at run time when it lacks one, so no library header is imported; it does nothing on a view without
  *      these options.
- * [CN] 为不在自身视图中读取 `tint` / `darkTint` 选项的动画库（Lottie、PAG、SVGA、GIF；Rive 自己读取）提供着色，有官方方式时使用官方方式：GIF 帧变为
- *      模板图片，以视图的 `tintColor` 绘制（UIKit）；Lottie 4.x 在 keypath "**.Color" 上使用 `ColorValueProvider`（其播放器的
- *      `-applyColors:traitCollection:`）；没有着色 API 的动画库（PAG、SVGA、Lottie 2.x）在视图上方叠加一层该颜色并以 "sourceAtop" 合成，只有图标的像素
+ * [CN] 为不在自身视图中读取 `tint` / `darkTint` 选项的动画库（Lottie、PAG、SVGA、GIF；Rive 自己读取）提供着色，有官方方式时使用官方方式：Lottie 4.x 在 keypath "**.Color" 上使用 `ColorValueProvider`（其播放器的
+ *      `-applyColors:traitCollection:`）；没有着色 API 的动画库（PAG、SVGA、GIF、Lottie 2.x）在视图上方叠加一层该颜色并以 "sourceAtop" 合成，只有图标的像素
  *      取该颜色。"title" 跟随 TabBar（或 CYLAnimatedItemView 的 `iconColor`）传给 `-cyl_applyAnimationViewTintColor:` 的颜色；"#RRGGBB(AA)" 为固定颜色，
  *      深色模式下使用 `darkTint`。视图类没有该方法时在运行时添加，因此不导入任何动画库的头文件；没有这些选项的视图不做任何事。
  */
@@ -43,7 +42,6 @@ static const void *CYLTabBarItemAnimationTintOptionsKey = &CYLTabBarItemAnimatio
 static const void *CYLTabBarItemAnimationTintFinalKey = &CYLTabBarItemAnimationTintFinalKey;
 static const void *CYLTabBarItemAnimationTintPlayerKey = &CYLTabBarItemAnimationTintPlayerKey;
 static const void *CYLTabBarItemAnimationTintOverlayKey = &CYLTabBarItemAnimationTintOverlayKey;
-static const void *CYLTabBarItemAnimationTintOriginalFramesKey = &CYLTabBarItemAnimationTintOriginalFramesKey;
 
 /// [EN] The options in a URL's fragment ("name=value&…", percent-encoded). [CN] URL fragment 中的选项（「名称=值&…」，百分号编码）。
 static NSDictionary<NSString *, NSString *> *CYLTabBarItemAnimationTintOptionsFromURL(NSURL *URL) {
@@ -257,28 +255,6 @@ static const void *CYLTabBarItemAnimationTintOverlaySizerKey = &CYLTabBarItemAni
 
 static void CYLTabBarItemAnimationApplyTint(UIView *view, UIColor *color) {
     UIColor *resolved = [color resolvedColorWithTraitCollection:view.traitCollection];
-    // [EN] A view with a KVC-readable `frames` array of template-able images in the view's tint color (UIKit's own tint). NOTE: the shipped GIF view does NOT take this branch:
-    //      its `frames` is a `private var` (not `@objc`), so `respondsToSelector:` is NO, and it plays by a keyframe animation of the layer's `contents` (CGImages, which
-    //      ignore the rendering mode). The GIF therefore takes the overlay path below, exactly like PAG and SVGA (engine-uniform, one policy); do not "fix" this branch
-    //      for GIF, it would change the GIF colors.
-    // [CN] 带有可 KVC 读取的 `frames` 图片数组的视图：模板帧以视图 tint 颜色绘制（UIKit 自身的着色）。注意：现有的 GIF 视图不会进入此分支：
-    //      其 `frames` 是 `private var`（非 `@objc`），`respondsToSelector:` 为 NO，且它通过 layer `contents` 的关键帧动画播放（CGImage，忽略渲染模式）。
-    //      因此 GIF 与 PAG、SVGA 一样走下面的叠加层路径（各引擎统一，一个策略）；不要为 GIF「修复」此分支，否则会改变 GIF 的颜色。
-    if ([view isKindOfClass:[UIImageView class]] && [view respondsToSelector:NSSelectorFromString(@"frames")]) {
-        UIImageView *imageView = (UIImageView *)view;
-        NSArray<UIImage *> *original = objc_getAssociatedObject(view, CYLTabBarItemAnimationTintOriginalFramesKey) ?: [view valueForKey:@"frames"];
-        objc_setAssociatedObject(view, CYLTabBarItemAnimationTintOriginalFramesKey, original, OBJC_ASSOCIATION_COPY_NONATOMIC);
-        UIImageRenderingMode mode = resolved ? UIImageRenderingModeAlwaysTemplate : UIImageRenderingModeAutomatic;
-        NSMutableArray<UIImage *> *frames = [NSMutableArray arrayWithCapacity:original.count];
-        for (UIImage *frame in original) {
-            [frames addObject:[frame imageWithRenderingMode:mode]];
-        }
-        NSUInteger shown = imageView.image ? [[view valueForKey:@"frames"] indexOfObjectIdenticalTo:imageView.image] : NSNotFound;
-        [view setValue:frames forKey:@"frames"];
-        imageView.image = (shown != NSNotFound && shown < frames.count) ? frames[shown] : frames.firstObject;
-        imageView.tintColor = resolved;
-        return;
-    }
     // [EN] Lottie 4.x: a color value provider on every color. [CN] Lottie 4.x：作用于所有颜色的 color value provider。
     id<CYLTabBarItemAnimationPlayer> player = objc_getAssociatedObject(view, CYLTabBarItemAnimationTintPlayerKey);
     // [EN] A CYL playable view (SVGA, GIF) has a generic player that answers `-applyColors:…` for any view: colors work only
