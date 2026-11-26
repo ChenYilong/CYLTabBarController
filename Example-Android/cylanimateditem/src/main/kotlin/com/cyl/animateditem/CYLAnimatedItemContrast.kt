@@ -6,11 +6,11 @@ package com.cyl.animateditem
  *      is judged over black: the default frosted tint (dark mode) is white at alpha 0.14, an explicit tint is its colour times its alpha times
  *      the tint alpha. HSL lightness rises in 0.005 steps and never goes above white. Dark glass only: light glass is NOT adapted (there is
  *      no symmetric darkening rule). Pure and deterministic; the item calls it only where glass is really drawn, in night mode, for a colour the
- *      app set (built-in colours and flat items are untouched).
+ *      app set and for the built-in normal colour of an unselected, enabled item (selected and disabled built-ins and flat items are untouched).
  * [CN] 条目的深色玻璃对比度规则（与 ClassifyMenu 的 `CYLIconContrast` 相同）：显式的标题或图标颜色在深色液态玻璃上过暗时，保持色相、饱和度与
  *      透明度，提高亮度直到与玻璃的对比度达到最小值。玻璃以黑色为底判断：夜间默认磨砂着色为白色 0.14 透明度，显式着色为其颜色乘以透明度再乘以
  *      着色透明度。HSL 亮度每步 0.005 上升，不超过白色。只处理深色玻璃：浅色玻璃不调整（没有对称的加深规则）。纯函数、确定性；条目只在
- *      玻璃确实绘制、夜间模式、颜色由应用设置时调用（内置颜色与扁平条目不受影响）。
+ *      玻璃确实绘制、夜间模式，颜色由应用设置，或为未选中且可用条目的内置普通颜色时调用（选中、禁用的内置颜色与扁平条目不受影响）。
  */
 internal object CYLAnimatedItemContrast {
 

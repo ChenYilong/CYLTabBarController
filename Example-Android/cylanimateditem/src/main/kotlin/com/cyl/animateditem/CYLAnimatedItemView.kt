@@ -592,6 +592,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        // [EN] An item nothing was set on has not applied its built-in title colour yet (no state change ran): do it once, else the TextView default (a dark theme text colour) stays. [CN] 什么都没设置的条目尚未应用内置标题颜色（没有状态变化发生）：应用一次，否则保留 TextView 默认色（深色主题文字色）。
+        if (!appliesTitleColor && usesBuiltInColors) applyTitleColor()
         itemBackgroundRenderer.layoutGlass(r - l, b - t)
         if (isDividerMode) return
         val inset = contentInsetPx()
@@ -769,10 +771,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             else -> CYLAnimatedItemBuiltInColors.normal(context, configuration)
         }
 
+    /** [EN] True while the colours in effect are the built-in NORMAL ones: unselected, not showing the disabled look, built-ins on. [CN] 当前生效的是内置普通色：未选中、未显示禁用外观、启用内置色。 */
+    private fun usesBuiltInNormal() = usesBuiltInColors && !isSelected && !showsDisabledColor()
+
     private fun applyTitleColor(configuration: Configuration = resources.configuration) {
         val color = resolvedTitleColor(configuration)?.let { resolved ->
-            // [EN] Only an EXPLICIT colour is adapted, and only on dark drawn glass. [CN] 只调整显式颜色，且仅在深色玻璃确实绘制时。
-            if ((titleColor ?: stackTitleColor) != null && glassContrastApplies(configuration)) {
+            // [EN] An EXPLICIT colour or the built-in NORMAL one (unselected, not disabled) is adapted, only on dark drawn glass. [CN] 显式颜色与内置普通色（未选中、未禁用）才调整，且仅在深色玻璃确实绘制时。
+            if (((titleColor ?: stackTitleColor) != null || usesBuiltInNormal()) && glassContrastApplies(configuration)) {
                 CYLAnimatedItemContrast.adjustedTitle(resolved, itemBackgroundColor, itemGlassTintAlpha)
             } else resolved
         }
@@ -986,9 +991,10 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             tint, CYLTabBarItemAnimationTint.darkTintOption(options), mode, kind, isSelected, night,
             CYLTabBarItemAnimationTint.IconColors(resolvedIcon, explicitSelectedIconColor),
         )
-        // [EN] Dark drawn glass: an explicit tint (fixed, or the explicit icon colour) is adapted; the built-in icon colour is not.
-        // [CN] 深色玻璃确实绘制时：显式着色（固定色或显式图标颜色）会被调整；内置图标颜色不调整。
-        if (color != null && glassContrastApplies(configuration) && !(color == resolvedIcon && (if (isSelected) explicitSelectedIconColor else explicitIconColor) == null)) {
+        // [EN] Dark drawn glass: an explicit tint (fixed, or the explicit icon colour) and the built-in NORMAL icon colour are adapted; the built-in selected / disabled ones are not.
+        // [CN] 深色玻璃确实绘制时：显式着色（固定色或显式图标颜色）与内置普通图标颜色会被调整；内置选中 / 禁用颜色不调整。
+        val builtInIcon = color == resolvedIcon && (if (isSelected) explicitSelectedIconColor else explicitIconColor) == null
+        if (color != null && glassContrastApplies(configuration) && (!builtInIcon || usesBuiltInNormal())) {
             color = CYLAnimatedItemContrast.adjustedIcon(color, itemBackgroundColor, itemGlassTintAlpha)
         }
         CYLTabBarItemAnimationTint.applyToAnimationView(view, color)
@@ -1611,9 +1617,12 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      *      item and NOT an ancestor of it (a sibling plate, e.g. the gradient behind a list): a glass inside its own source cannot sample it and draws only
      *      its tint and rim. Applied to the glass layer, also when the layer is created later, and re-applied to the shown glass when set. Below API 31
      *      (no glass is drawn) the property is kept but has no effect and the item draws its flat color. Not used by the flat style.
+     *      Besides the source, the glass samples, automatically, the Liquid Glass items BEHIND it that cover it (an earlier sibling of it or of one of its
+     *      ancestors, e.g. the section card a tag sits on), drawn over the source: so a tag looks lighter than its card, as on HarmonyOS. Nothing to set.
      * [CN] 液态玻璃背景所模糊、折射的视图：null（默认）为窗口视图的根。源必须是位于该条目后面、且不是其祖先的视图（同级的背板，例如列表后面的渐变）：
      *      位于自己的源之内的玻璃不能采样它，只绘制着色与边缘。应用到玻璃层，层稍后创建时也会应用，设置时重新应用到正在显示的玻璃。API 31 以下
-     *      （不绘制玻璃）属性被保留但不起作用，条目绘制其扁平颜色。扁平样式不使用。
+     *      （不绘制玻璃）属性被保留但不起作用，条目绘制其扁平颜色。扁平样式不使用。除源之外，玻璃还会自动采样位于它后面并覆盖它的液态玻璃条目
+     *      （它自己或其某个祖先的前面的同级，例如标签所在的分区卡片），绘制在源之上：因此标签比所在的卡片更亮，与鸿蒙一致。无需设置。
      */
     var itemGlassBackdropSource: View? = null
         set(value) { if (field !== value) { field = value; if (usesItemBackground) itemBackgroundDidChange() } }

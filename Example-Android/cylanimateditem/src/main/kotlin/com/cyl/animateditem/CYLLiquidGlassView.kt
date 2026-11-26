@@ -13,7 +13,9 @@ import android.view.View
  *      (a top-to-bottom gradient over the tint) and edged with the uniform 1 dp rim (or the explicit `borderColor`/`borderWidth`),
  *      the same values as HarmonyOS (`CYLGlassEdge.rimColor`, `sheenColors`). Where `CYLLiquidGlass.isActive()` is false, or the canvas is not hardware accelerated, it draws nothing
  *      (`isGlassDrawn` is false), so the caller keeps its flat background. It takes no touches and is hidden from accessibility.
- *      While a glass view draws the pages, other glass views in them draw nothing (no glass inside glass). A glass view that sits
+ *      While a glass view draws the pages, other glass views in them draw nothing (no glass inside glass), with one exception: after the
+ *      pages it also draws the glass views BEHIND it that cover it ([glassViewsBehind]: the section card a tag sits on), so a tag is lighter
+ *      than its card as on HarmonyOS; such a card samples only the pages it is given (depth 2 draws nothing). A glass view that sits
  *      inside its own `backdropSource` (e.g. a list cell, with the default source, the window's root) cannot sample it: drawing
  *      the source would draw the cells that are recording right now (`IllegalStateException`: "Recording currently in progress"),
  *      so it draws only the tint.
@@ -21,7 +23,8 @@ import android.view.View
  *      以 `glassTintColor` 着色，其上加自上而下渐变的高光，并以统一的 1 dp 细边（或显式的 `borderColor`/`borderWidth`）为边缘，
  *      数值与鸿蒙相同（`CYLGlassEdge.rimColor`、`sheenColors`）。`CYLLiquidGlass.isActive()` 为 false 或画布未硬件加速时不绘制（`isGlassDrawn` 为
  *      false），调用方保持其扁平背景。不接收触摸，对辅助功能隐藏。某个玻璃视图绘制页面时，页面中的其他玻璃视图不绘制（玻璃里不嵌玻璃）。
- *      位于自己的 `backdropSource` 之内的玻璃视图（例如列表单元格，默认源为窗口根视图）不能采样它：绘制源会绘制正在录制的单元格
+ *      例外：在页面之后，它还会绘制位于其后面并覆盖它的玻璃视图（[glassViewsBehind]：标签所在的分区卡片），因此标签比卡片更亮（与鸿蒙一致）；
+ *      这样的卡片只采样交给它的页面（第 2 层什么也不绘制）。位于自己的 `backdropSource` 之内的玻璃视图（例如列表单元格，默认源为窗口根视图）不能采样它：绘制源会绘制正在录制的单元格
  *      （`IllegalStateException`："Recording currently in progress"），所以只绘制着色。
  */
 internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
@@ -105,7 +108,9 @@ internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, at
     }
 
     override fun onDraw(canvas: Canvas) {
-        if (!isGlassDrawn || drawingGlass) return
+        // [EN] Depth 0 (a glass on screen) and depth 1 (a card redrawn inside the pass of a glass on top of it, its glass child included) draw normally; depth 2 and above draw nothing.
+        // [CN] 第 0 层（屏幕上的玻璃）与第 1 层（在其上方玻璃的录制过程中重绘的卡片，包括其玻璃子视图）正常绘制；第 2 层及以上什么也不绘制。
+        if (!isGlassDrawn || drawDepth >= 2) return
         val source = backdropSource ?: rootView
         if (source.width <= 0 || source.height <= 0) return
         rect.set(0f, 0f, width.toFloat(), height.toFloat())
@@ -127,11 +132,15 @@ internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, at
         // [CN] 位于自己的源之内：绘制源会重绘本视图正在录制的祖先，所以只绘制着色。
         var drawn = false
         if (sampled) {
-            drawingGlass = true
+            val nested = drawDepth == 1
+            // [EN] Only a glass on screen (depth 0) looks for the glass behind it; the cards it draws are recorded with the plate in ONE pass (one blur, one saturation/brightness).
+            // [CN] 只有屏幕上的玻璃（第 0 层）才寻找其后面的玻璃；它绘制的卡片与背板在同一次录制中完成（一次模糊、一次饱和度/亮度）。
+            val behind = if (nested) emptyList<View>() else glassViewsBehind(this).filter { it !== source && !isInside(it) && !it.hasAncestor(source) }
+            drawDepth++
             try {
-                drawn = backdrop.draw(canvas, source, (here[0] - there[0]).toFloat(), (here[1] - there[1]).toFloat(), rect, radius, effects)
+                drawn = backdrop.draw(canvas, source, (here[0] - there[0]).toFloat(), (here[1] - there[1]).toFloat(), rect, radius, effects, behind, nested)
             } finally {
-                drawingGlass = false
+                drawDepth--
             }
         }
         // [EN] Without sampled glass (a tag in a list) a clear tint would draw nothing: the default frosted tint fills the shape then, so the tag is visible.
@@ -155,6 +164,15 @@ internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, at
         CYLGlassEdge.drawRim(canvas, rect, radius, density, dark, 1f, if (explicit) border else null, if (explicit) borderWidth else null)
     }
 
+    private fun View.hasAncestor(source: View): Boolean {
+        var ancestor = parent
+        while (ancestor != null) {
+            if (ancestor === source) return true
+            ancestor = ancestor.parent
+        }
+        return false
+    }
+
     /**
      * [EN] Whether this view is `source` or one of its descendants: then `source` is in a drawing pass while this view draws.
      * [CN] 本视图是否为 `source` 或其后代：此时本视图绘制时 `source` 正处于绘制过程中。
@@ -169,8 +187,8 @@ internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, at
         return false
     }
 
-    private companion object {
-        /** Set while a glass view draws the pages, so the glass views among them draw nothing. */
-        var drawingGlass = false
+    internal companion object {
+        /** How many glass passes are running (the UI thread only): 1 inside the pass of a glass on screen, 2 inside a card's own glass pass; at 2 glass views draw nothing (see onDraw). */
+        internal var drawDepth = 0
     }
 }

@@ -219,14 +219,19 @@ class CYLGlassBackdrop {
      * [EN] `source` is drawn so that its point (`sourceX`, `sourceY`) lands on `rect.left`, `rect.top`.
      * [CN] 绘制 `source` 时，其坐标（`sourceX`, `sourceY`）对齐 `rect.left`、`rect.top`。
      */
-    fun draw(canvas: Canvas, source: View, sourceX: Float, sourceY: Float, rect: RectF, radius: Float, effects: CYLGlassEffects): Boolean {
+    fun draw(
+        canvas: Canvas, source: View, sourceX: Float, sourceY: Float, rect: RectF, radius: Float, effects: CYLGlassEffects,
+        above: List<View> = emptyList(), nested: Boolean = false,
+    ): Boolean {
         if (!CYLLiquidGlassSupport.rendersBlur || !canvas.isHardwareAccelerated || source.width <= 0 || rect.width() <= 0f) return false
         // [EN] A glass inside the captured page (a Liquid Glass tag in a list: the source is the root view that contains it, and every
         //      other glass tag) would capture the page again while the page is being captured: that nesting recurses without end. While a
         //      capture is under way every glass view anywhere skips its backdrop (returns false: the caller draws its translucent tint).
         // [CN] 被录制页面里的玻璃（列表中的液态玻璃标签：来源是包含它的根视图，还有其他所有玻璃标签）会在录制页面的过程中再次录制页面，这种嵌套会无限递归。
         //      录制期间，任何位置的玻璃视图都跳过背景（返回 false：由调用方绘制半透明着色）。
-        return captureOnce { drawSampled(canvas, source, sourceX, sourceY, rect, radius, effects) } ?: false
+        //      `nested` lets this capture run inside exactly one other capture (a section board drawn behind a tag, see CYLLiquidGlassView); `above` are more
+        //      views (section cards behind a tag, back to front) drawn over the source into the SAME recording, each at its own window offset, so the effects run once. [CN] `nested` 允许本次录制在另一个录制之内恰好嵌套一层（绘制在标签后面的分区面板）；`above` 是在同一录制中、在源之上再绘制的其他视图（标签后面的分区卡片，由后到前），各自按其窗口偏移，因此效果只运行一次。
+        return captureOnce(nested) { drawSampled(canvas, source, sourceX, sourceY, rect, radius, effects, above) } ?: false
     }
 
     /**
@@ -234,9 +239,9 @@ class CYLGlassBackdrop {
      *      record), a warning is logged once, and false is returned (the caller draws its tint). [CN] 对 "Recording currently in progress" 的最后手段：用 `endRecording` 关闭我们的两个节点（下一帧才能录制），只记录一次警告，返回 false（调用方绘制着色）。
      */
     @RequiresApi(Build.VERSION_CODES.S)
-    private fun drawSampled(canvas: Canvas, source: View, sourceX: Float, sourceY: Float, rect: RectF, radius: Float, effects: CYLGlassEffects): Boolean {
+    private fun drawSampled(canvas: Canvas, source: View, sourceX: Float, sourceY: Float, rect: RectF, radius: Float, effects: CYLGlassEffects, above: List<View>): Boolean {
         return try {
-            drawEffects(canvas, source, sourceX, sourceY, rect, radius, effects)
+            drawEffects(canvas, source, sourceX, sourceY, rect, radius, effects, above)
             true
         } catch (e: IllegalStateException) {
             endRecordingQuietly(sourceNode)
@@ -259,27 +264,28 @@ class CYLGlassBackdrop {
     }
 
     internal companion object {
-        /** True while any glass is recording its backdrop (the UI thread only). */
-        private var capturing = false
+        /** How many glass backdrops are recording now, nested (the UI thread only). */
+        private var capturing = 0
 
         /**
          * [EN] Runs `block` unless a capture is already under way (then null): the flag is reset in a `finally`, so an exception while recording
          *      cannot leave every glass view on its fallback for good. [CN] 除非已有录制在进行（此时返回 null），否则运行 `block`：标志在 `finally` 中复位，
          *      因此录制中的异常不会让所有玻璃视图永久停在降级绘制上。
          */
-        fun <T> captureOnce(block: () -> T): T? {
-            if (capturing) return null
-            capturing = true
+        fun <T> captureOnce(nested: Boolean = false, block: () -> T): T? {
+            // [EN] A nested capture (one level only) may start inside the first; nothing deeper. [CN] 嵌套录制（仅一层）可以在第一个之内开始；更深的不行。
+            if (capturing > 0 && !(nested && capturing == 1)) return null
+            capturing++
             try {
                 return block()
             } finally {
-                capturing = false
+                capturing--
             }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
-    private fun drawEffects(canvas: Canvas, source: View, sourceX: Float, sourceY: Float, rect: RectF, radius: Float, effects: CYLGlassEffects) {
+    private fun drawEffects(canvas: Canvas, source: View, sourceX: Float, sourceY: Float, rect: RectF, radius: Float, effects: CYLGlassEffects, above: List<View>) {
         val pages = (sourceNode as? RenderNode) ?: RenderNode("CYLGlassBackdropPages").also { sourceNode = it }
         pages.setPosition(0, 0, source.width, source.height)
         val recording = pages.beginRecording(source.width, source.height)
@@ -288,6 +294,21 @@ class CYLGlassBackdrop {
         // [CN] 先绘制窗口背景：页面在没有内容的地方通常是透明的（白色来自窗口），没有它，玻璃在这些地方是透明的，清晰的页面会透出来。
         recording.drawColor(windowBackgroundColor(source))
         source.draw(recording)
+        if (above.isNotEmpty()) {
+            val sourceAt = IntArray(2)
+            val at = IntArray(2)
+            source.getLocationInWindow(sourceAt)
+            for (layer in above) {
+                layer.getLocationInWindow(at)
+                val save = recording.save()
+                recording.translate((at[0] - sourceAt[0]).toFloat(), (at[1] - sourceAt[1]).toFloat())
+                try {
+                    layer.draw(recording)
+                } finally {
+                    recording.restoreToCount(save)
+                }
+            }
+        }
         pages.endRecording()
 
         val width = kotlin.math.ceil(rect.width()).toInt()
