@@ -761,7 +761,15 @@ extension CYLPlusButton {
 
     @objc(cyl_alignsTitleWithTabBarItemTitles)
     func cylAlignsTitleWithTabBarItemTitles() -> Bool {
-        cylClass.alignsTitleWithTabBarItemTitles?() ?? false
+        if let aligns = cylClass.alignsTitleWithTabBarItemTitles?() {
+            return aligns
+        }
+        // [EN] Not implemented: the core's default. A plus button with a title (and not one whose title is part of its background image) lines
+        //      its title up with the tab titles, so no app has to implement the method; implementing it can still return NO.
+        // [CN] 未实现：核心的默认值。有标题的 PlusButton（标题不是背景图的一部分）使其标题与 Tab 标题对齐，App 无需实现该方法；
+        //      实现后仍可返回 NO。
+        let title = title(for: .normal) ?? configuration?.title ?? ""
+        return !title.isEmpty && !cylDrawsTitleOverBackgroundImage()
     }
 
     @objc(cyl_plusButtonSetNeedsTitleAlignment)
