@@ -8,7 +8,6 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.view.GestureDetector
 import android.view.Gravity
@@ -384,7 +383,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
             titleLabel.typeface = font.typeface ?: if (font.bold) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
         }
         val iconColor = iconColor(selected, tabBar)
-        if (iconColor != null) iconView.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN) else iconView.clearColorFilter()
+        if (iconColor != null) iconView.colorFilter = CYLTabIconTint.filter(iconView.drawable, iconColor) else iconView.clearColorFilter()
         val background = if (selected) item.cyl_selectedBackgroundColor else item.cyl_backgroundColor
         setBackgroundColor(background ?: Color.TRANSPARENT)
         contentDescription = item.accessibilityLabel ?: titleLabel.text
@@ -434,7 +433,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         titleLabel.setTextColor(CYLTabBarIndicator.blend(titleColor(false, tabBar), titleColor(true, tabBar), fraction))
         val normal = iconColor(false, tabBar)
         val selected = iconColor(true, tabBar)
-        if (normal != null && selected != null) iconView.setColorFilter(CYLTabBarIndicator.blend(normal, selected, fraction), PorterDuff.Mode.SRC_IN)
+        if (normal != null && selected != null) iconView.colorFilter = CYLTabIconTint.filter(iconView.drawable, CYLTabBarIndicator.blend(normal, selected, fraction))
     }
 
     /**
