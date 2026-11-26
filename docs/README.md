@@ -423,6 +423,7 @@ docs/
 │   ├── inset-grouped-sections-demo-ios.png
 │   ├── ios-27.2-iphone-18-pro-example-rive-fixed-tint-glass-vs-flat-dark-9d2b9e7b-2026-11-26-2158.png
 │   ├── ios-27.2-iphone-18-pro-example-rive-fixed-tint-glass-vs-flat-light-9d2b9e7b-2026-11-26-2158.png
+│   ├── ios-27.2-iphone-18-pro-example-rive-flat-vs-glass-tint-9d2b9e7b-2026-11-26-2240.png
 │   ├── ios-27.2-iphone-18-pro-example-rive-tabs-flat-design-dark-9d2b9e7b-2026-11-26-2158.png
 │   ├── ios-27.2-iphone-18-pro-example-rive-tabs-flat-design-light-9d2b9e7b-2026-11-26-2158.png
 │   ├── ios-27.2-iphone-18-pro-example-rive-tabs-liquid-glass-dark-9d2b9e7b-2026-11-26-2158.png
@@ -437,10 +438,14 @@ docs/
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-tag-title-contrast-dark-light-dfbe9190-2026-11-26-1652.png
 │   ├── ios-27.2-iphone-18-pro-gallery-flat-selected-icon-tint-dark-9d2b9e7b-2026-11-26-2122.png
 │   ├── ios-27.2-iphone-18-pro-gallery-flat-selected-icon-tint-light-9d2b9e7b-2026-11-26-2122.png
+│   ├── ios-27.2-iphone-18-pro-gallery-flat-tint-unified-9d2b9e7b-2026-11-26-2240.png
 │   ├── ios-27.2-iphone-18-pro-objc-example-flat-selected-icon-tint-dark-9d2b9e7b-2026-11-26-2122.png
 │   ├── ios-27.2-iphone-18-pro-objc-example-flat-selected-icon-tint-light-9d2b9e7b-2026-11-26-2122.png
+│   ├── ios-27.2-iphone-18-pro-objc-example-flat-tint-unchanged-lottie-9d2b9e7b-2026-11-26-2240.png
+│   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-dark-to-light-bar-stays-dark-9d2b9e7b-2026-11-26-2240.png
 │   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-flat-selected-icon-tint-dark-9d2b9e7b-2026-11-26-2122.png
 │   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-flat-selected-icon-tint-light-9d2b9e7b-2026-11-26-2122.png
+│   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-tint-optin-9d2b9e7b-2026-11-26-2240.png
 │   ├── ios-animated-item-engine-api.png
 │   ├── ios-badge-breathe-not-under-icon.png
 │   ├── ios-badges-follow-swapped-animation-skin.png
@@ -807,7 +812,6 @@ docs/
 ├── instructions.md
 └── todo/
     └── 20261104/
-        ├── 04/
         └── Handover-Finish-PR-824-Then-Color-Roles-Dark-Mode-And-Device-Verification.md
 ```
 

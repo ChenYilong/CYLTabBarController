@@ -224,6 +224,9 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         _ = cyl_tabBar
         tabBarHeight = 60
         tabBarItemAnimationSpeed = 1.5 // Issue #428: tab icon animations at 1.5x (no effect without an animation subspec) Tab 图标动画 1.5 倍速
+        // [EN] Opt-in: the tab Lottie icons are tinted with the tab's icon color, so they follow the selected title color (docs/Animated-Item.md, tab bar tint priority).
+        // [CN] 主动开启：Tab 的 Lottie 图标用 Tab 的图标颜色着色，因此跟随选中标题颜色（docs/Animated-Item.md，TabBar 着色优先级）。
+        tabBarItemAnimationRenderingMode = .alwaysTemplate
         buildArchitecture()
     }
     

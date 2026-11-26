@@ -171,6 +171,31 @@ static void CYLTabBarItemAnimationReportTabNotMade(NSURL *URL, id owner) {
 
 #pragma mark - Helpers
 
+/// [EN] The bar's default rendering mode, asked of the tab button `owner` is in (by selector: the engine does not know the tab bar); automatic without one.
+/// [CN] TabBar 的默认渲染模式，向 `owner` 所在的 Tab 按钮询问（通过 selector：引擎不依赖 TabBar）；没有时为 automatic。
+static NSInteger CYLTabBarItemAnimationDefaultRenderingModeOfOwner(id owner) {
+    UIView *view = [owner isKindOfClass:[UIView class]] ? owner : nil;
+    while (view && ![view isKindOfClass:[UIControl class]]) {
+        view = view.superview;
+    }
+    SEL selector = NSSelectorFromString(@"cyl_tabBarItemAnimationDefaultRenderingMode");
+    if (![view respondsToSelector:selector]) {
+        return CYLTabBarItemAnimationRenderingModeAutomatic;
+    }
+    return ((NSInteger (*)(id, SEL))[view methodForSelector:selector])(view, selector);
+}
+
+- (void)refreshAnimationTintInControl:(UIControl *)control {
+    UIView *animationView = [self animationViewInControl:control];
+    NSURL *sourceURL = animationView ? objc_getAssociatedObject(animationView, CYLTabBarItemAnimationSourceURLKey) : nil;
+    if (!sourceURL) {
+        return;
+    }
+    CYLTabBarItemAnimationResetTint(animationView);
+    CYLTabBarItemAnimationPrepareTabTint(animationView, sourceURL, [self.factory playerForView:animationView],
+                                         CYLTabBarItemAnimationDefaultRenderingModeOfOwner(control));
+}
+
 /*!
  * [EN] An animation view playing `shownURL`, the version of `sourceURL` (the light animation the tab was given) for the
  *      current style. Both URLs are kept on the view, so it can be swapped when the style changes (#442). `owner` (the tab button) is
@@ -186,7 +211,8 @@ static void CYLTabBarItemAnimationReportTabNotMade(NSURL *URL, id owner) {
     if (animationView) {
         objc_setAssociatedObject(animationView, CYLTabBarItemAnimationSourceURLKey, sourceURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         objc_setAssociatedObject(animationView, CYLTabBarItemAnimationShownURLKey, shownURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        CYLTabBarItemAnimationPrepareTint(animationView, sourceURL, [self.factory playerForView:animationView]);
+        CYLTabBarItemAnimationPrepareTabTint(animationView, sourceURL, [self.factory playerForView:animationView],
+                                             CYLTabBarItemAnimationDefaultRenderingModeOfOwner(owner));
     } else {
         // [EN] No library made a view for the file: its resource is missing (or its engine is not in the build). [CN] 没有动画库为该文件创建视图：资源缺失（或其引擎未参与构建）。
         CYLTabBarItemAnimationReportTabNotMade(shownURL, owner);

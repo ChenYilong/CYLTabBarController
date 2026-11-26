@@ -113,14 +113,20 @@ public struct CYLAnimationSource: Equatable {
 
 /**
  [EN] The options in `url`'s fragment ("name=value&…", percent-encoded), as `CYLTabBarAnimationURLWithOptions()` writes them and
-      with the shared rules of `CYLAnimationSource`; an option without a value is left out, as it is never written.
+      with the shared rules of `CYLAnimationSource`; an option without a value is left out, as it is never written. A FILE URL's query
+      is read too (the `file?name=value` form; a fragment option of the same name wins; write "#" as "%23" there). A remote URL's
+      query belongs to its server and is not read.
  [CN] `url` 的 fragment 中的选项（「名称=值&…」，百分号编码），与 `CYLTabBarAnimationURLWithOptions()` 的写法对应，并采用
-      `CYLAnimationSource` 的共同规则；没有值的选项被省略（从不会写入这样的选项）。
+      `CYLAnimationSource` 的共同规则；没有值的选项被省略（从不会写入这样的选项）。文件 URL 的 query 也会读取（`file?名称=值` 写法；同名选项以
+      fragment 为准；query 中的 "#" 需写作 "%23"）。远程 URL 的 query 属于其服务器，不读取。
  */
 @_cdecl("CYLTabBarAnimationOptionsFromURL")
 public func cylTabBarAnimationOptionsFromURLEntryPoint(_ url: NSURL?) -> NSDictionary {
-    guard let url = url as URL?, let fragment = URLComponents(url: url, resolvingAgainstBaseURL: true)?.percentEncodedFragment else {
+    guard let url = url as URL?, let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
         return [:]
     }
-    return cylAnimationOptions(inText: fragment).filter { !$0.value.isEmpty } as NSDictionary
+    let query = url.isFileURL ? components.percentEncodedQuery : nil
+    var options = cylAnimationOptions(inText: query ?? "")
+    options.merge(cylAnimationOptions(inText: components.percentEncodedFragment ?? "")) { _, fragment in fragment }
+    return options.filter { !$0.value.isEmpty } as NSDictionary
 }

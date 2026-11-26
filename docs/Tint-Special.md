@@ -22,6 +22,7 @@
 
 | 中文 | English |
 |:---|:---|
+| [交接状态：未完成即提交（先读这里）](#cn交接状态未完成即提交先读这里) | [Handover status: committed unfinished (read this first)](#enhandover-status-committed-unfinished-read-this-first) |
 | [背景](#cn背景) | [Context](#encontext) |
 | [实测结果](#cn实测结果) | [Findings](#enfindings) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [截图](#cn截图) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Screenshots](#enscreenshots) |
@@ -37,6 +38,20 @@
 | [待办](#cn待办) | [TODO](#entodo) |
 
 <!-- navigation:end -->
+
+## [CN]交接状态：未完成即提交（先读这里）
+## [EN]Handover status: committed unfinished (read this first)
+
+| 中文 | English |
+|:---|:---|
+| **为什么没做完就提交：** 所有者今天（2026-11-26）离职，这批代码只存在于本机 `/tmp` 的工作目录里，不提交接手人就拿不到。提交时：实现与一轮验证已跑过，但**没有经过负责人代码评审**，下表的缺口和待决定事项未处理。 | **Why it was committed unfinished:** the owner leaves today (2026-11-26) and this code existed only in a local `/tmp` worktree, so the next developer could not get it otherwise. At commit time the implementation and one verification batch had run, but **the lead had not reviewed the code**, and the gaps and decisions below are open. |
+| **从这里接着做（按顺序）：** | **Where to continue (in this order):** |
+| 1. 评审本次提交的 diff（入口：`CYLFlatDesignTabBarButton.swift` 的解析器、`CYLTabBarItemAnimationTint.m` 的 `CYLTabBarItemAnimationPrepareTabTint`、新接口 `CYLTabBarController.tabBarItemAnimationRenderingMode`）。 | 1. Review the diff (start at the resolver in `CYLFlatDesignTabBarButton.swift`, `CYLTabBarItemAnimationPrepareTabTint` in `CYLTabBarItemAnimationTint.m`, and the new API `CYLTabBarController.tabBarItemAnimationRenderingMode`). |
+| 2. 请所有者决定：(a) 未设置时代码让 Tab 动画保留原色，本文第 4 层写的是“单色自动着色”；(b) 只设了普通状态标题颜色的 App，选中标题也用它，而图标是栏 tint；(c) 接受可见变化（黄色变 tint；item 标题颜色压过栏 appearance；ObjC 示例点击后未选中标题由红变灰）。 | 2. Get owner decisions: (a) with nothing set the code keeps a tab animation's own colours, while tier 4 of this document says one-colour files are tinted; (b) an app that sets only a normal-state title colour gets it on the selected title too, while the icon is the bar tint; (c) accept the visible changes (yellow becomes the tint; an item's title colour beats the bar appearance; in the ObjC Example unselected titles turn from red to grey after a tab tap). |
+| 3. 修已有缺陷（改动前就存在）：SwiftManager-FlatDesign 深色启动、点一个 Tab、切浅色，整个扁平栏保持深色直到下次点击。 | 3. Fix an existing bug (also present without this change): in SwiftManager-FlatDesign, launch in dark, tap a tab, switch to light: the whole flat bar stays dark until the next tap. |
+| 4. 经典与玻璃路径的不一致（只读代码得出，未改）：动画 tint 读不到按 Tab 的图标颜色（`cylTemplateTintColor` 只读栏的 `standardAppearance`）；标题优先级与扁平不同；`tint=title` 跟随图标颜色链。 | 4. Classic and glass path mismatches (code reading only, unchanged): animation tints do not see per-tab icon colours (`cylTemplateTintColor` reads only the bar's `standardAppearance`); the title order differs from flat; `tint=title` follows the icon colour chain. |
+| 5. 补测未运行的情况：Rive 配 `alwaysTemplate` 或栏级默认；扁平栏的 PAG、SVGA、多色 Rive；玻璃上栏级默认的像素检查；扁平按钮上设 `animationRenderingMode` 没有单独测试；URL query 形式没有跨平台公共用例。 | 5. Test what was not run: Rive with `alwaysTemplate` or the bar default; PAG, SVGA and a multi-colour Rive on flat; a pixel check of the bar default on glass; no own test for `animationRenderingMode` set on a flat button; no shared cross-platform fixture for the URL query form. |
+| 6. 为新接口补文档行（README、`cyl-api-map` 技能、各平台接口对照表），并让 Android、HarmonyOS、小程序、RN、Flutter 按同一优先级表对齐。 | 6. Add the new API to the docs (README, the `cyl-api-map` skill, the platform API maps) and bring Android, HarmonyOS, the mini program, React Native and Flutter to the same priority table. |
 
 ## [CN]背景
 ## [EN]Context

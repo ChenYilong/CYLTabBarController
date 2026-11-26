@@ -47,8 +47,11 @@ extension CYLTabBarController {
         while let view = views.popLast() {
             if view is UIControl, view.responds(to: selector) {
                 _ = view.perform(selector)
+                // [EN] A swapped-in view gets its tint from the button's next layout (FlatDesign). [CN] 换入的视图在按钮下一次布局时获得着色（扁平样式）。
+                view.setNeedsLayout()
             }
             views.append(contentsOf: view.subviews)
         }
+        cylSetNeedsApplyTabBarItemAnimationTintColors()
     }
 }

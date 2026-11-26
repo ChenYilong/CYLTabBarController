@@ -263,7 +263,7 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
     /// [EN] The tint for the current title color and state. [CN] 当前标题颜色与状态下的着色。
     private var currentTintColor: UIColor? {
         if hasResolvedTint { return resolvedTintColor }
-        return configuration.tintColor(titleColor: titleTintColor, selected: tintSelected)
+        return configuration.tintColor(titleColor: titleTintColor, selected: tintSelected) ?? (rendersAsTemplate ? titleTintColor : nil)
     }
 
     /// [EN] Set once a `CYLAnimatedItemView` hands over its final color: it already applied `animationTint` / `animationDarkTint`, the URL
@@ -279,6 +279,20 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
         resolvedTintColor = color
         if isLoaded {
             tintOverlay.apply(color, in: self)
+        }
+    }
+
+    /// [EN] `renderingMode=alwaysTemplate` (the URL option or the tab bar's default) without a `tint`: the title color. [CN] 没有 `tint` 时的 `renderingMode=alwaysTemplate`（URL 选项或 TabBar 默认值）：使用标题颜色。
+    private var rendersAsTemplate = false
+
+    /// [EN] `cyl_setAnimationViewTintFollowsTitle:`, from the tab flow. [CN] 由 Tab 流程调用。
+    @objc(cyl_setAnimationViewTintFollowsTitle:)
+    func setAnimationTintFollowsTitle(_ follows: Bool) {
+        guard rendersAsTemplate != follows else { return }
+        rendersAsTemplate = follows
+        if hasResolvedTint { return }
+        if isLoaded {
+            tintOverlay.apply(currentTintColor, in: self)
         }
     }
 

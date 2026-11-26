@@ -25,6 +25,21 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id<CYLTabBarItemAnimationPlayer> _Nullable player);
 
 /*!
+ * [EN] The same with the tab bar's default rendering mode (`-[CYLTabBarController tabBarItemAnimationRenderingMode]`), used only where the URL has
+ *      neither a `tint` nor a `renderingMode` option; automatic means no default (the tab flow keeps the file's own colors).
+ * [CN] 同上，并带 TabBar 的默认渲染模式（`-[CYLTabBarController tabBarItemAnimationRenderingMode]`），只在 URL 既没有 `tint` 也没有 `renderingMode`
+ *      选项时使用；automatic 表示没有默认值（Tab 流程保持文件自己的颜色）。
+ */
+FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationPrepareTabTint(UIView *view, NSURL *sourceURL, id<CYLTabBarItemAnimationPlayer> _Nullable player,
+                                                            NSInteger defaultRenderingMode);
+
+/*!
+ * [EN] Removes the tint of an animation view and forgets its tint options, so it can be prepared again (the bar's default changed).
+ * [CN] 移除动画视图的着色并忘记其着色选项，以便重新准备（TabBar 默认值变化时）。
+ */
+FOUNDATION_EXTERN void CYLTabBarItemAnimationResetTint(UIView *view);
+
+/*!
  * [EN] The tint of the animation view of a `CYLAnimatedItemView`: `tint` ("title" or "#RRGGBB(AA)") and `darkTint`, overriding the source URL's
  *      options of the same names (Rive's interface); prepared again each time, so setting or clearing it after the file loaded works. With
  *      neither the view is tinted by the tint properties (the rendering mode decides). Returns whether the view takes a tint now.

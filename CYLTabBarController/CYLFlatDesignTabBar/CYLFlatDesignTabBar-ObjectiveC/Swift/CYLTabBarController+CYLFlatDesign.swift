@@ -899,7 +899,6 @@ extension CYLTabBarController {
         cylRememberItemImageInsets(item, imageInsets)
         item.cylFlatDesignSetTabBarController(self)
         item.childViewController = viewController
-        item.setTitleTextAttributes([.foregroundColor: UIColor.systemYellow], for: .selected)
         viewController.cyl_tabBarItem = item
     }
 }

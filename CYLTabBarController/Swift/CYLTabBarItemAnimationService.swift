@@ -163,6 +163,11 @@ public protocol CYLTabBarItemAnimationService: NSObjectProtocol {
      */
     @objc(refreshAnimationColorsInControl:) optional func refreshAnimationColors(in control: UIControl)
     /**
+     * [EN] Prepares the tint of `control`'s animation again, after the tab bar's default rendering mode changed.
+     * [CN] TabBar 默认渲染模式变化后，重新准备 `control` 动画的着色。
+     */
+    @objc(refreshAnimationTintInControl:) optional func refreshAnimationTint(in control: UIControl)
+    /**
      * [EN] The file extensions this library plays.
      * [CN] 本动画库可播放的文件扩展名。
      */

@@ -22,10 +22,13 @@ static NSDictionary<NSString *, NSString *> *CYLTabBarItemAnimationOptionsFromUR
     return CYLTabBarAnimationOptionsFromURL(URL);
 }
 
-/// [EN] `URL` without its fragment: the animation file itself. [CN] 去掉 fragment 的 `URL`，即动画文件本身。
+/// [EN] `URL` without its options (the fragment, and a file URL's query): the animation file itself. [CN] 去掉选项（fragment，以及文件 URL 的 query）的 `URL`，即动画文件本身。
 static NSURL *CYLTabBarItemAnimationFileURLFromURL(NSURL *URL) {
     NSURLComponents *components = [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:YES];
     components.fragment = nil;
+    if (URL.isFileURL) {
+        components.query = nil;
+    }
     return components.URL ?: URL;
 }
 

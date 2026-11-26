@@ -392,22 +392,52 @@ static BOOL CYLTabBarItemAnimationPrepareTintWithOptions(UIView *view, NSDiction
     return YES;
 }
 
+/// [EN] Tells a view that reads its URL options itself (Rive) to take the title color although the URL has no `tint`. [CN] 让自行读取 URL 选项的视图（Rive）在 URL 没有 `tint` 时也使用标题颜色。
+static void CYLTabBarItemAnimationSetTintFollowsTitle(UIView *view, BOOL follows) {
+    SEL selector = NSSelectorFromString(@"cyl_setAnimationViewTintFollowsTitle:");
+    if ([view respondsToSelector:selector]) {
+        ((void (*)(id, SEL, BOOL))[view methodForSelector:selector])(view, selector, follows);
+    }
+}
+
+void CYLTabBarItemAnimationResetTint(UIView *view) {
+    if (objc_getAssociatedObject(view, CYLTabBarItemAnimationTintOptionsKey)) {
+        CYLTabBarItemAnimationApplyTint(view, nil);
+    }
+    objc_setAssociatedObject(view, CYLTabBarItemAnimationTintOptionsKey, nil, OBJC_ASSOCIATION_COPY_NONATOMIC);
+    objc_setAssociatedObject(view, CYLTabBarItemAnimationTintFinalKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(view, CYLTabBarItemAnimationTabFlowModeKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    CYLTabBarItemAnimationSetTintFollowsTitle(view, NO);
+}
+
 BOOL CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id<CYLTabBarItemAnimationPlayer> player) {
+    return CYLTabBarItemAnimationPrepareTabTint(view, sourceURL, player, CYLTabBarItemAnimationRenderingModeAutomatic);
+}
+
+BOOL CYLTabBarItemAnimationPrepareTabTint(UIView *view, NSURL *sourceURL, id<CYLTabBarItemAnimationPlayer> player, NSInteger defaultRenderingMode) {
     NSMutableDictionary<NSString *, NSString *> *options = [CYLTabBarItemAnimationTintOptionsFromURL(sourceURL) mutableCopy];
     // [EN] Tab bars keep today's look: without a tint option the tab flow's rendering mode is alwaysOriginal (the file's own colors), unless the URL
     //      asks for `renderingMode=alwaysTemplate` (tinted like "title") or `renderingMode=automatic` (like "title" for a ONE-color file).
     // [CN] TabBar 保持现有外观：没有着色选项时，Tab 流程的渲染模式为 alwaysOriginal（文件自己的颜色），除非 URL 要求 `renderingMode=alwaysTemplate`
     //      （等同 "title" 着色）或 `renderingMode=automatic`（单色文件等同 "title"）。
     CYLTabBarItemAnimationRenderingMode mode = CYLTabBarItemAnimationRenderingModeAlwaysOriginal;
+    BOOL followsTitle = NO;
     if (!CYLTabBarItemAnimationTintIsSet(options[@"tint"])) {
-        mode = CYLTabBarItemAnimationRenderingModeFromString(options[@"renderingMode"], CYLTabBarItemAnimationRenderingModeAlwaysOriginal);
+        // [EN] The tab's own `renderingMode` option, else the bar's default, else the file's own colors. [CN] 先取 Tab 自己的 `renderingMode` 选项，再取 TabBar 默认值，最后保持文件自己的颜色。
+        CYLTabBarItemAnimationRenderingMode fallback = defaultRenderingMode == CYLTabBarItemAnimationRenderingModeAlwaysTemplate
+            ? CYLTabBarItemAnimationRenderingModeAlwaysTemplate : CYLTabBarItemAnimationRenderingModeAlwaysOriginal;
+        mode = CYLTabBarItemAnimationRenderingModeFromString(options[@"renderingMode"], fallback);
         if (mode == CYLTabBarItemAnimationRenderingModeAlwaysTemplate
             || (mode == CYLTabBarItemAnimationRenderingModeAutomatic && CYLTabBarItemAnimationColorKindOfURL(sourceURL) == CYLTabBarItemAnimationColorKindOneColor)) {
             options[@"tint"] = @"title";
+            // [EN] Stored as template: an item showing this view has no URL to detect the file with. [CN] 记录为模板：显示该视图的条目没有可用于检测文件的 URL。
+            mode = CYLTabBarItemAnimationRenderingModeAlwaysTemplate;
+            followsTitle = YES;
         }
     }
     if (view) {
         objc_setAssociatedObject(view, CYLTabBarItemAnimationTabFlowModeKey, @(mode), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        CYLTabBarItemAnimationSetTintFollowsTitle(view, followsTitle);
     }
     return CYLTabBarItemAnimationPrepareTintWithOptions(view, options, player);
 }

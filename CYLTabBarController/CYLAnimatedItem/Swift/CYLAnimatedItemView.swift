@@ -1220,7 +1220,14 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     private func reapplyAnimationTint() {
         #if CYL_ANIMATION_ENGINE_AVAILABLE
-        if let view = animationView, let url = animationURL { prepareAnimationTint(view, url: url) }
+        guard let view = animationView else { return }
+        if let url = animationURL {
+            prepareAnimationTint(view, url: url)
+        } else {
+            // [EN] A view the item was given (the FlatDesign tab): its owner prepares it on layout; the new color is pushed. [CN] 条目被给予的视图（扁平样式 Tab）：由其所有者在布局时准备；推送新颜色。
+            setNeedsLayout()
+            refreshColors(only: CYLAnimatedItemColorRole.animationTint.id)
+        }
         #endif
     }
 

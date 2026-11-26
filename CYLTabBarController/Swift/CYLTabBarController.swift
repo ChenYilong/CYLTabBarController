@@ -6,6 +6,13 @@
 //
 
 import UIKit
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
+#if canImport(CYLAnimatedItemViews)
+// [EN] SwiftPM: CYLAnimatedItemRenderingMode is in the views target. [CN] SwiftPM：CYLAnimatedItemRenderingMode 位于 views target。
+import CYLAnimatedItemViews
+#endif
 
 /// [EN] The block run at the end of `-viewDidLayoutSubviews`. [CN] 在 `-viewDidLayoutSubviews` 末尾执行的 block。
 public typealias CYLViewDidLayoutSubViewsBlock = (CYLTabBarController) -> Void
@@ -95,6 +102,23 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
         didSet {
             cylApplyTabBarItemAnimationPlayback()
             cylApplyAnimatedImagesLoops(tabBarItemAnimationLoops)
+        }
+    }
+
+    /**
+     [EN] The bar-wide default rendering mode of the animated tab icons (flat design, Liquid Glass and classic tab bars). It applies only to a tab that
+          sets nothing itself: a per-tab `animationTint` or URL `tint` wins, then the tab's own `renderingMode` (the URL option), then this, then
+          `automatic`. `.alwaysTemplate` tints with the tab's icon color (an opaque tint turns multi-color art into a one-color silhouette);
+          `.alwaysOriginal` never tints; `.automatic` (default) means unset: tab icons keep the files' own colors, as before (one-color detection is
+          asked per tab with the URL option `renderingMode=automatic`). Static images are not affected (`CYLTabBarControllerIconRenderingMode`).
+     [CN] 动画 Tab 图标（扁平样式、液态玻璃与经典 TabBar）的栏级默认渲染模式。只对自身没有任何设置的 Tab 生效：按 Tab 的 `animationTint` 或 URL `tint`
+          优先，其次是 Tab 自己的 `renderingMode`（URL 选项），然后是本属性，最后是 `automatic`。`.alwaysTemplate` 用 Tab 的图标颜色着色（不透明着色会把
+          多色图形变成单色剪影）；`.alwaysOriginal` 从不着色；`.automatic`（默认）表示未设置：Tab 图标与以前一样保持文件自己的颜色（单色检测需按 Tab 用
+          URL 选项 `renderingMode=automatic` 要求）。静态图片不受影响（见 `CYLTabBarControllerIconRenderingMode`）。
+     */
+    @objc open var tabBarItemAnimationRenderingMode: CYLAnimatedItemRenderingMode = .automatic {
+        didSet {
+            if oldValue != tabBarItemAnimationRenderingMode { cylApplyTabBarItemAnimationRenderingMode() }
         }
     }
 
