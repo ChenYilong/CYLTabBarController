@@ -97,6 +97,7 @@
 | [换肤实现评估：与动画组件的集成、差距与改进](Theme-Switching-Evaluation.md) | [Theme switching evaluation: integration with the animation components, gaps and improvements](Theme-Switching-Evaluation.md) |
 | [换肤实现评估：与 QMUI 的差距、架构符合度与改进建议](Theme-Switching-QMUI-Evaluation.md) | [Theme switching evaluation: the gap to QMUI, fit with the original design, and what to improve](Theme-Switching-QMUI-Evaluation.md) |
 | [换肤（主题切换）](Theme-Switching.md) | [Theme switching (skins)](Theme-Switching.md) |
+| [tint专项](Tint-Special.md) | [tint专项](Tint-Special.md) |
 | [原地更新 Tab：标题、图标、网络图标与替换页面](Update-Tab-Bar-Items-In-Place.md) | [Update Tabs in Place: Titles, Icons, Network Icons and Pages](Update-Tab-Bar-Items-In-Place.md) |
 | [CYLTabBarController 使用指南](Usage-Guide.md) | [CYLTabBarController usage guide](Usage-Guide.md) |
 | [CYLTabBarController 历史版本亮点](Version-Highlights.md) | [CYLTabBarController highlights of earlier versions](Version-Highlights.md) |
@@ -205,6 +206,7 @@ docs/
 ├── Theme-Switching-Evaluation.md
 ├── Theme-Switching-QMUI-Evaluation.md
 ├── Theme-Switching.md
+├── Tint-Special.md
 ├── Update-Tab-Bar-Items-In-Place.md
 ├── Usage-Guide.md
 ├── Version-Highlights.md
@@ -419,12 +421,26 @@ docs/
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png
+│   ├── ios-27.2-iphone-18-pro-example-rive-fixed-tint-glass-vs-flat-dark-9d2b9e7b-2026-11-26-2158.png
+│   ├── ios-27.2-iphone-18-pro-example-rive-fixed-tint-glass-vs-flat-light-9d2b9e7b-2026-11-26-2158.png
+│   ├── ios-27.2-iphone-18-pro-example-rive-tabs-flat-design-dark-9d2b9e7b-2026-11-26-2158.png
+│   ├── ios-27.2-iphone-18-pro-example-rive-tabs-flat-design-light-9d2b9e7b-2026-11-26-2158.png
+│   ├── ios-27.2-iphone-18-pro-example-rive-tabs-liquid-glass-dark-9d2b9e7b-2026-11-26-2158.png
+│   ├── ios-27.2-iphone-18-pro-example-rive-tabs-liquid-glass-light-9d2b9e7b-2026-11-26-2158.png
+│   ├── ios-27.2-iphone-18-pro-example-rive-tint-page-dark-9d2b9e7b-2026-11-26-2158.png
+│   ├── ios-27.2-iphone-18-pro-example-rive-tint-page-light-9d2b9e7b-2026-11-26-2158.png
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-badge-samples-fold-light-dark-c738ca8a-2026-11-26-1615.png
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-badge-tag-list-light-dark-c738ca8a-2026-11-26-1542.png
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-plus-title-light-dark-a59ecb55-2026-11-26-1419.png
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-tag-roles-dark-light-4d0e00ae-2026-11-26-1917.png
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-tag-title-colors-dark-light-3ed3ab61-2026-11-26-1629.png
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-tag-title-contrast-dark-light-dfbe9190-2026-11-26-1652.png
+│   ├── ios-27.2-iphone-18-pro-gallery-flat-selected-icon-tint-dark-9d2b9e7b-2026-11-26-2122.png
+│   ├── ios-27.2-iphone-18-pro-gallery-flat-selected-icon-tint-light-9d2b9e7b-2026-11-26-2122.png
+│   ├── ios-27.2-iphone-18-pro-objc-example-flat-selected-icon-tint-dark-9d2b9e7b-2026-11-26-2122.png
+│   ├── ios-27.2-iphone-18-pro-objc-example-flat-selected-icon-tint-light-9d2b9e7b-2026-11-26-2122.png
+│   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-flat-selected-icon-tint-dark-9d2b9e7b-2026-11-26-2122.png
+│   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-flat-selected-icon-tint-light-9d2b9e7b-2026-11-26-2122.png
 │   ├── ios-animated-item-engine-api.png
 │   ├── ios-badge-breathe-not-under-icon.png
 │   ├── ios-badges-follow-swapped-animation-skin.png

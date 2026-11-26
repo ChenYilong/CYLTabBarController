@@ -247,6 +247,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [换肤实现评估：与动画组件的集成、差距与改进](docs/Theme-Switching-Evaluation.md) | [Theme switching evaluation: integration with the animation components, gaps and improvements](docs/Theme-Switching-Evaluation.md) |
 | [换肤实现评估：与 QMUI 的差距、架构符合度与改进建议](docs/Theme-Switching-QMUI-Evaluation.md) | [Theme switching evaluation: the gap to QMUI, fit with the original design, and what to improve](docs/Theme-Switching-QMUI-Evaluation.md) |
 | [换肤（主题切换）](docs/Theme-Switching.md) | [Theme switching (skins)](docs/Theme-Switching.md) |
+| [tint专项](docs/Tint-Special.md) | [tint专项](docs/Tint-Special.md) |
 | [原地更新 Tab：标题、图标、网络图标与替换页面](docs/Update-Tab-Bar-Items-In-Place.md) | [Update Tabs in Place: Titles, Icons, Network Icons and Pages](docs/Update-Tab-Bar-Items-In-Place.md) |
 | [CYLTabBarController 使用指南](docs/Usage-Guide.md) | [CYLTabBarController usage guide](docs/Usage-Guide.md) |
 | [CYLTabBarController 历史版本亮点](docs/Version-Highlights.md) | [CYLTabBarController highlights of earlier versions](docs/Version-Highlights.md) |
