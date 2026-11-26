@@ -257,7 +257,13 @@ static const void *CYLTabBarItemAnimationTintOverlaySizerKey = &CYLTabBarItemAni
 
 static void CYLTabBarItemAnimationApplyTint(UIView *view, UIColor *color) {
     UIColor *resolved = [color resolvedColorWithTraitCollection:view.traitCollection];
-    // [EN] GIF: template frames in the view's tint color (UIKit's own tint). [CN] GIF：以视图 tint 颜色绘制的模板帧（UIKit 自身的着色）。
+    // [EN] A view with a KVC-readable `frames` array of template-able images in the view's tint color (UIKit's own tint). NOTE: the shipped GIF view does NOT take this branch:
+    //      its `frames` is a `private var` (not `@objc`), so `respondsToSelector:` is NO, and it plays by a keyframe animation of the layer's `contents` (CGImages, which
+    //      ignore the rendering mode). The GIF therefore takes the overlay path below, exactly like PAG and SVGA (engine-uniform, one policy); do not "fix" this branch
+    //      for GIF, it would change the GIF colors.
+    // [CN] 带有可 KVC 读取的 `frames` 图片数组的视图：模板帧以视图 tint 颜色绘制（UIKit 自身的着色）。注意：现有的 GIF 视图不会进入此分支：
+    //      其 `frames` 是 `private var`（非 `@objc`），`respondsToSelector:` 为 NO，且它通过 layer `contents` 的关键帧动画播放（CGImage，忽略渲染模式）。
+    //      因此 GIF 与 PAG、SVGA 一样走下面的叠加层路径（各引擎统一，一个策略）；不要为 GIF「修复」此分支，否则会改变 GIF 的颜色。
     if ([view isKindOfClass:[UIImageView class]] && [view respondsToSelector:NSSelectorFromString(@"frames")]) {
         UIImageView *imageView = (UIImageView *)view;
         NSArray<UIImage *> *original = objc_getAssociatedObject(view, CYLTabBarItemAnimationTintOriginalFramesKey) ?: [view valueForKey:@"frames"];

@@ -50,6 +50,8 @@ public enum CYLAnimatedItemContrast {
      [CN] iOS 在黑色页面上实际渲染的深色液态玻璃亮度，以白色占比表示（sRGB 0.28，亮度约 0.063：iOS 27.2 上实测 0.26、亮度约 0.055，分组底板上的标签 Y 为 66，再加约 0.02 的余量，用于字形抗锯齿边缘与玻璃的波动，Y 66 到 68）。规则以
           `max(模型值, 此下限)`（`renderedGlassReferenceLuminance`）作为对照：只用共享模型（`glassReferenceLuminance`，磨砂白 0.14）时在真实玻璃上只有约 2.9:1。
           算法是共享的；此值因平台而异，各平台自己测量。
+          [EN] Limits: the floor is per platform (each platform measures its own) and glass-only: flat fills are judged against the fill itself, flat without a fill is not adapted.
+          [CN] 限制：下限因平台而异（各平台自己测量），且仅用于玻璃：纯色填充对照填充本身，没有填充的纯色背景不调整。
      */
     public static let renderedDarkGlassWhiteShare: CGFloat = 0.28
 
@@ -95,10 +97,24 @@ public enum CYLAnimatedItemContrast {
     /**
      [EN] The reference the item judges against: the shared model, never below the rendered glass of this platform (`renderedDarkGlassWhiteShare`).
      [CN] 条目所对照的亮度：共享模型值，且不低于本平台实际渲染的玻璃（`renderedDarkGlassWhiteShare`）。
+          [EN] Limits: the floor is per platform (each platform measures its own) and glass-only: flat fills are judged against the fill itself, flat without a fill is not adapted.
+          [CN] 限制：下限因平台而异（各平台自己测量），且仅用于玻璃：纯色填充对照填充本身，没有填充的纯色背景不调整。
      */
     public static func renderedGlassReferenceLuminance(glassTint: UIColor?, tintAlpha: CGFloat?) -> CGFloat {
         max(glassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha),
             relativeLuminance(red: renderedDarkGlassWhiteShare, green: renderedDarkGlassWhiteShare, blue: renderedDarkGlassWhiteShare))
+    }
+
+    /**
+     [EN] The luminance a color is judged against on a FLAT background: the fill resolved with `traits`, composited over black by its alpha. nil or a clear fill gives 0
+          (black), but the item does not adapt without a fill (it cannot know what is behind it). The 0.28 rendered-glass floor does not apply.
+     [CN] 纯色背景上颜色所对照的亮度：填充用 `traits` 解析，再按其透明度叠在黑色上。nil 或透明填充得到 0（黑色），但没有填充时条目不做调整（无法知道其后是什么）。
+          渲染玻璃的 0.28 下限不适用。
+     */
+    public static func flatReferenceLuminance(fill: UIColor?, traits: UITraitCollection) -> CGFloat {
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        guard let fill, fill.resolvedColor(with: traits).getRed(&red, green: &green, blue: &blue, alpha: &alpha), alpha > 0 else { return 0 }
+        return relativeLuminance(red: red * alpha, green: green * alpha, blue: blue * alpha)
     }
 
     /**
@@ -123,10 +139,14 @@ public enum CYLAnimatedItemContrast {
           （每步 `lightnessStep`，最高为白色）的通过颜色；分量取整到 1/255。
      */
     public static func adjusted(_ color: UIColor, glassTint: UIColor?, tintAlpha: CGFloat?, minimumContrast: CGFloat) -> UIColor {
+        adjusted(color, referenceLuminance: renderedGlassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha), minimumContrast: minimumContrast)
+    }
+
+    /// [EN] The same against a reference luminance given by the caller. [CN] 同上，对照由调用方给出的参考亮度。
+    public static func adjusted(_ color: UIColor, referenceLuminance reference: CGFloat, minimumContrast: CGFloat) -> UIColor {
         guard isStatic(color) else { return color }
         var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
         guard color.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else { return color }
-        let reference = renderedGlassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha)
         let hsl = hslFromRGB(red: min(max(red, 0), 1), green: min(max(green, 0), 1), blue: min(max(blue, 0), 1))
         func passes(_ lightness: CGFloat) -> Bool {
             let rgb = rgbFromHSL(hue: hsl.hue, saturation: hsl.saturation, lightness: lightness)
