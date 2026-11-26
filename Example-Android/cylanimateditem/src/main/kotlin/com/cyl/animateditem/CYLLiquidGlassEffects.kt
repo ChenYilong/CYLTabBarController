@@ -303,7 +303,15 @@ class CYLGlassBackdrop {
                 val save = recording.save()
                 recording.translate((at[0] - sourceAt[0]).toFloat(), (at[1] - sourceAt[1]).toFloat())
                 try {
-                    layer.draw(recording)
+                    // [EN] A glass board goes into the backdrop WITHOUT its sheen and rim (its tint and fill only): the glass on top adds its own, so the edge is not lit twice.
+                    // [CN] 玻璃看板绘制到背景中时不含高光与细边（只有着色与填充）：上层玻璃自己再加，避免同一条边被照亮两次。
+                    val glass = ((layer as? CYLAnimatedItemView)?.itemLiquidGlassView ?: (layer as? CYLAnimatedItemStackView)?.itemLiquidGlassView) as? CYLLiquidGlassView
+                    if (glass != null) {
+                        recording.translate(glass.left.toFloat(), glass.top.toFloat())
+                        glass.drawForBackdrop(recording)
+                    } else {
+                        layer.draw(recording)
+                    }
                 } finally {
                     recording.restoreToCount(save)
                 }

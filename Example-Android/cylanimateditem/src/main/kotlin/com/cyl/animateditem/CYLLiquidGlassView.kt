@@ -18,14 +18,14 @@ import android.view.View
  *      than its card as on HarmonyOS; such a card samples only the pages it is given (depth 2 draws nothing). A glass view that sits
  *      inside its own `backdropSource` (e.g. a list cell, with the default source, the window's root) cannot sample it: drawing
  *      the source would draw the cells that are recording right now (`IllegalStateException`: "Recording currently in progress"),
- *      so it draws only the tint.
+ *      so it draws only the tint. The board drawn into the backdrop of a tag has no sheen and no rim ([drawForBackdrop]): the tag adds its own.
  * [CN] 任意视图的液态玻璃背景（与 iOS `CYLLiquidGlassView` 同名）：它后面的内容（页面，`backdropSource`）在圆角矩形内被模糊与折射，
  *      以 `glassTintColor` 着色，其上加自上而下渐变的高光，并以统一的 1 dp 细边（或显式的 `borderColor`/`borderWidth`）为边缘，
  *      数值与鸿蒙相同（`CYLGlassEdge.rimColor`、`sheenColors`）。`CYLLiquidGlass.isActive()` 为 false 或画布未硬件加速时不绘制（`isGlassDrawn` 为
  *      false），调用方保持其扁平背景。不接收触摸，对辅助功能隐藏。某个玻璃视图绘制页面时，页面中的其他玻璃视图不绘制（玻璃里不嵌玻璃）。
  *      例外：在页面之后，它还会绘制位于其后面并覆盖它的玻璃视图（[glassViewsBehind]：标签所在的分区卡片），因此标签比卡片更亮（与鸿蒙一致）；
  *      这样的卡片只采样交给它的页面（第 2 层什么也不绘制）。位于自己的 `backdropSource` 之内的玻璃视图（例如列表单元格，默认源为窗口根视图）不能采样它：绘制源会绘制正在录制的单元格
- *      （`IllegalStateException`："Recording currently in progress"），所以只绘制着色。
+ *      （`IllegalStateException`："Recording currently in progress"），所以只绘制着色。绘制到标签背景中的看板没有高光与细边（[drawForBackdrop]）：标签自己再加。
  */
 internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
 
@@ -107,7 +107,18 @@ internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, at
         invalidate()
     }
 
-    override fun onDraw(canvas: Canvas) {
+    override fun onDraw(canvas: Canvas) = drawGlass(canvas, withEdge = true)
+
+    /**
+     * [EN] Draws this glass into the backdrop of a glass in FRONT of it (the tag's pass draws the section board this way): the sampled pages and the tint
+     *      only, WITHOUT the sheen and the rim, so the glass on top does not light the same edge a second time (a double sheen). The on-screen drawing
+     *      of this view ([onDraw]) is unchanged. Same guards as [onDraw] (not drawn, or depth 2 and above: nothing).
+     * [CN] 把本玻璃绘制到其前面玻璃的背景中（标签的录制过程以此方式绘制分区面板）：只有被采样的页面与着色，不含高光与细边，
+     *      这样上层玻璃不会把同一条边再照亮一次（双重高光）。本视图在屏幕上的绘制（[onDraw]）不变。守卫与 [onDraw] 相同（未绘制，或第 2 层及以上：什么也不画）。
+     */
+    internal fun drawForBackdrop(canvas: Canvas) = drawGlass(canvas, withEdge = false)
+
+    private fun drawGlass(canvas: Canvas, withEdge: Boolean) {
         // [EN] Depth 0 (a glass on screen) and depth 1 (a card redrawn inside the pass of a glass on top of it, its glass child included) draw normally; depth 2 and above draw nothing.
         // [CN] 第 0 层（屏幕上的玻璃）与第 1 层（在其上方玻璃的录制过程中重绘的卡片，包括其玻璃子视图）正常绘制；第 2 层及以上什么也不绘制。
         if (!isGlassDrawn || drawDepth >= 2) return
@@ -157,6 +168,7 @@ internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, at
         }
         val dark = CYLGlassEdge.isDark(resources)
         // [EN] The sheen over the tint, top to bottom, for sampled and non-sampled glass alike. [CN] 着色之上的高光，自上而下，采样与非采样玻璃相同。
+        if (!withEdge) return
         CYLGlassEdge.drawSheen(canvas, rect, radius, dark)
         // [EN] The edge: the explicit border (its colour and width) when set, else the uniform rim. [CN] 边缘：设置了显式边框时用它的颜色与宽度，否则为统一细边。
         val border = borderColor
