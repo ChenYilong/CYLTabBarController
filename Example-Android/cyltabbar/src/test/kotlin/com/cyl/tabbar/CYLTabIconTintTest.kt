@@ -97,4 +97,34 @@ class CYLTabIconTintTest {
         assertEquals(255, CYLTabIconTint.maxAlpha(asset(255)))
         assertEquals(0, CYLTabIconTint.maxAlpha(asset(0)))
     }
+
+    /** [EN] A tint filter of this color, plain or alpha-normalised. [CN] 该颜色的着色滤镜，普通或 alpha 归一后的。 */
+    private fun assertTint(color: Int, filter: android.graphics.ColorFilter?, what: String) {
+        if (filter is ColorMatrixColorFilter) {
+            val p = parts(filter)
+            assertEquals(what, color, Color.rgb(p[0].toInt(), p[1].toInt(), p[2].toInt()))
+        } else assertEquals(what, PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN), filter)
+    }
+
+    /**
+     * [EN] The "More" button's own glyph takes the bar's tints: selected while its list shows, unselected otherwise (it stayed black before).
+     * [CN] 「更多」按钮自带的图标使用 TabBar 的着色：其列表显示时为选中色，否则为未选中色（以前一直是黑色）。
+     */
+    @Test
+    fun theMoreIconTakesTheBarTints() = withActivity { activity ->
+        val titles = listOf("A", "B", "C", "D", "E", "F", "G")
+        val tabs = titles.map { mapOf(CYLConstants.CYLTabBarItemTitle to it, CYLConstants.CYLTabBarItemImage to asset(255)) }
+        val controller = CYLTabBarController(activity, titles.map { Page() }, tabs, CYLEnums.CYLTabBarStyleType.FlatDesign, null)
+        activity.setContentView(controller.view)
+        idle()
+        controller.tabBar.selectedTintColor = selectedTint
+        controller.tabBar.unselectedTintColor = unselectedTint
+        idle()
+        val more = controller.tabBar.cyl_moreButton!!
+        assertTint(unselectedTint, more.iconView.colorFilter, "unselected More")
+        more.performClick()
+        idle()
+        assertTrue(controller.cyl_isMoreSelected)
+        assertTint(selectedTint, more.iconView.colorFilter, "selected More")
+    }
 }

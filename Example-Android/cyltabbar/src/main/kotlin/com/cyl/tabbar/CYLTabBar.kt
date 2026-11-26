@@ -694,6 +694,10 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
             if (cyl_moreButton == null) {
                 val item = CYLTabBarItem(mapOf(CYLConstants.CYLTabBarItemTitle to CYLLocalization.string(context, R.string.cyl_more))).apply {
                     image = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.cyl_tab_more)
+                    // [EN] The library's own glyph is monochrome: a template icon, so it takes the bar's selected / unselected tint like the
+                    //      icons of the tabs (with no mode it stayed black in both states). [CN] 库自带的图标是单色的：作为模板图标，与各 Tab 的图标一样
+                    //      使用 TabBar 的选中 / 未选中着色（没有渲染方式时两种状态都是黑色）。
+                    cyl_iconRenderingMode = CYLTabBarConfiguration.ICON_RENDERING_TEMPLATE
                 }
                 val more = CYLTabBarItemButton(context, item, -1)
                 more.onTap = { controller.cyl_moreButtonTapped(more) }
