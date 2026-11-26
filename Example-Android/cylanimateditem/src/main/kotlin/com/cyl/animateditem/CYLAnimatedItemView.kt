@@ -1,6 +1,9 @@
 package com.cyl.animateditem
 
+import android.animation.ValueAnimator
+import android.app.UiModeManager
 import android.content.Context
+import android.os.Build
 import androidx.annotation.RestrictTo
 import android.content.res.Configuration
 import com.chenyilong.cyldeallocblockexecutor.AnimationEvents
@@ -77,6 +80,19 @@ const val CYLAnimatedItemLiquidGlassContentInset: Float = 14f
  *      `CYLAnimatedItemView.isLiquidGlassActive()`：与 TabBar 一样为 Android 12 及以上；其他设备忽略该样式，保持扁平）。与 iOS、鸿蒙同名。
  */
 enum class CYLAnimatedItemBackgroundStyle { Flat, LiquidGlass }
+
+/**
+ * [EN] The state a subclass hands a colour for (`setSubclassTitleColor` / `setSubclassIconColor`): the normal look, the selected look, the disabled
+ *      look. A missing selected colour falls back to the normal one; a missing disabled colour shows the colour of the other state. Same names as iOS.
+ * [CN] 子类为之提供颜色的状态（`setSubclassTitleColor` / `setSubclassIconColor`）：普通、选中、禁用外观。缺少选中颜色时回退到普通颜色；缺少禁用颜色时显示另一状态的颜色。与 iOS 同名。
+ */
+enum class CYLAnimatedItemTitleState { Normal, Selected, Disabled }
+
+/**
+ * [EN] The kind of colour `CYLAnimatedItemView.adaptedOnGlass` adapts: an icon / animation tint (least contrast 3) or title text (4.5).
+ * [CN] `CYLAnimatedItemView.adaptedOnGlass` 所适配的颜色种类：图标 / 动画着色（最小对比度 3）或标题文字（4.5）。
+ */
+enum class CYLAnimatedItemColorKind { Icon, Title }
 
 open class CYLAnimatedItemView @JvmOverloads constructor(
     context: Context,
@@ -284,7 +300,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     override var title: CharSequence?
         get() = titleView.text?.takeIf { it.isNotEmpty() }
-        set(value) { titleView.text = value; updateAccessibility(); requestLayout() }
+        set(value) { titleView.text = value; updateAccessibility(); requestLayout(); applyBuiltInTitleOnce() }
 
     override var image: Drawable? = null
         set(value) { field = value; updateIcon(); requestLayout() }
@@ -522,6 +538,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     init {
         isClickable = true
         isFocusable = true
+        // [EN] The pressed background (`itemHighlightedBackgroundColor`) is drawn in `onDraw`. [CN] 按下背景（`itemHighlightedBackgroundColor`）在 `onDraw` 中绘制。
+        setWillNotDraw(false)
         addView(iconView)
         addView(titleView)
         // [EN] Not `updateAccessibility()`: a subclass's `accessibilityText()` would run before its own properties exist.
@@ -573,6 +591,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        applyBuiltInTitleOnce()
         if (isDividerMode) {
             val vertical = dividerAxis == CYLAnimatedItemAxis.Horizontal
             val thickness = dividerThickness()
@@ -593,7 +612,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         // [EN] An item nothing was set on has not applied its built-in title colour yet (no state change ran): do it once, else the TextView default (a dark theme text colour) stays. [CN] 什么都没设置的条目尚未应用内置标题颜色（没有状态变化发生）：应用一次，否则保留 TextView 默认色（深色主题文字色）。
-        if (!appliesTitleColor && usesBuiltInColors) applyTitleColor()
+        applyBuiltInTitleOnce()
         itemBackgroundRenderer.layoutGlass(r - l, b - t)
         if (isDividerMode) return
         val inset = contentInsetPx()
@@ -690,7 +709,9 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val changed = selected != isSelected
         super.setSelected(selected)
         if (changed) { updateIcon(); applyIconColor(); applyTitleColor(); onItemStateChanged(); updateAccessibility() }
-        if (changed && drivesAnimationPlayback && animationView != null) { if (selected) restartAnimation() else stopAnimation() }
+        if (changed && drivesAnimationPlayback && animationView != null) {
+            if (selected) { if (showsLastFrameWhenSelected) showAnimationLastFrame() else restartAnimation() } else stopAnimation()
+        }
     }
 
     // MARK: - Icon color 图标颜色
@@ -761,25 +782,92 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     private fun showsDisabledColor() = !isEnabled && disabledAlpha >= 1f
 
     /**
-     * [EN] The title color in effect: `titleColor`, else the stack's, else the built-in of the state (selected, disabled, normal); null without
-     *      built-ins. [CN] 生效的标题颜色：`titleColor`，其次堆叠的，再次当前状态的内置值（选中、禁用、普通）；没有内置值时为 null。
+     * [EN] Where a resolved colour comes from: an EXPLICIT one (the app's, the subclass's explicit channel, the stack's, the host's), a BUILT-IN one (the subclass's
+     *      `applyTitleTintColor` / `applyIconTintColor`, else the component's), or the built-in of the DISABLED look. The first two are adapted on drawn dark glass, the last is not.
+     * [CN] 解析出的颜色来自哪里：显式（应用的、子类显式通道的、堆叠的、宿主的）、内置（子类的 `applyTitleTintColor` / `applyIconTintColor`，其次组件的）、禁用外观的内置色。
+     *      前两者在深色玻璃绘制时适配，最后一种不适配。
      */
-    internal fun resolvedTitleColor(configuration: Configuration = resources.configuration): Int? =
-        titleColor ?: stackTitleColor ?: if (!usesBuiltInColors) null else when {
-            showsDisabledColor() -> CYLAnimatedItemBuiltInColors.disabled(context, configuration)
-            isSelected -> CYLAnimatedItemBuiltInColors.selected(context, configuration)
-            else -> CYLAnimatedItemBuiltInColors.normal(context, configuration)
-        }
+    private enum class ColorLevel { Explicit, BuiltIn, DisabledBuiltIn }
 
-    /** [EN] True while the colours in effect are the built-in NORMAL ones: unselected, not showing the disabled look, built-ins on. [CN] 当前生效的是内置普通色：未选中、未显示禁用外观、启用内置色。 */
-    private fun usesBuiltInNormal() = usesBuiltInColors && !isSelected && !showsDisabledColor()
+    private val subclassTitleColors = arrayOfNulls<Int>(CYLAnimatedItemTitleState.values().size)
+    private val subclassIconColors = arrayOfNulls<Int>(CYLAnimatedItemTitleState.values().size)
+    private var subclassBuiltInTitle: Int? = null
+    private var subclassBuiltInIcon: Int? = null
+
+    /**
+     * [EN] Subclass-explicit title colour of `state` (the ClassifyMenu tag's channel): counts as explicit (adapted on drawn dark glass, title 4.5) WITHOUT touching
+     *      `titleColor` or the stack's. Precedence: `titleColor` > this (for the current state) > the stack's > `applyTitleTintColor` > the component's built-in.
+     *      A missing selected colour falls back to the normal one. null clears the state.
+     * [CN] 子类显式标题颜色（ClassifyMenu 标签的通道）：视为显式颜色（深色玻璃绘制时适配，标题 4.5），且不改动 `titleColor` 与堆叠的颜色。优先级：
+     *      `titleColor` > 本通道（当前状态）> 堆叠的 > `applyTitleTintColor` > 组件内置。缺少选中颜色时回退到普通颜色。null 清除该状态。
+     */
+    protected fun setSubclassTitleColor(color: Int?, state: CYLAnimatedItemTitleState) {
+        subclassTitleColors[state.ordinal] = color
+        applyTitleColor()
+    }
+
+    /**
+     * [EN] Subclass-explicit icon colour of `state`; same rules as [setSubclassTitleColor] (icon and animation tint 3). It recolours the static image like `iconColor`.
+     * [CN] 子类显式图标颜色；规则同 [setSubclassTitleColor]（图标与动画着色 3）。与 `iconColor` 一样为静态图片着色。
+     */
+    protected fun setSubclassIconColor(color: Int?, state: CYLAnimatedItemTitleState) {
+        subclassIconColors[state.ordinal] = color
+        applyIconColor()
+    }
+
+    /**
+     * [EN] The built-in title colour of a subclass (below every explicit colour, above the component's built-in): adapted on drawn dark glass like the explicit
+     *      ones, except while the item is disabled. null removes it.
+     * [CN] 子类的内置标题颜色（低于所有显式颜色，高于组件内置色）：深色玻璃绘制时与显式颜色一样适配，禁用时除外。null 移除。
+     */
+    protected fun applyTitleTintColor(color: Int?) {
+        subclassBuiltInTitle = color
+        applyTitleColor()
+    }
+
+    /**
+     * [EN] The built-in icon colour of a subclass (twin of [applyTitleTintColor]); it tints the animation (not the static image, tint spec v2).
+     * [CN] 子类的内置图标颜色（[applyTitleTintColor] 的对应项）；用于动画着色（不用于静态图片，着色规范 v2）。
+     */
+    protected fun applyIconTintColor(color: Int?) {
+        subclassBuiltInIcon = color
+        applyIconColor()
+    }
+
+    private fun subclassColor(colors: Array<Int?>, forSelected: Boolean): Int? {
+        if (!isEnabled) colors[CYLAnimatedItemTitleState.Disabled.ordinal]?.let { return it }
+        return colors[(if (forSelected) CYLAnimatedItemTitleState.Selected else CYLAnimatedItemTitleState.Normal).ordinal]
+    }
+
+    private fun titleResolution(configuration: Configuration): Pair<Int, ColorLevel>? {
+        titleColor?.let { return it to ColorLevel.Explicit }
+        (if (isSelected) subclassColor(subclassTitleColors, true) ?: subclassColor(subclassTitleColors, false) else subclassColor(subclassTitleColors, false))?.let { return it to ColorLevel.Explicit }
+        stackTitleColor?.let { return it to ColorLevel.Explicit }
+        subclassBuiltInTitle?.let { return it to (if (!isEnabled) ColorLevel.DisabledBuiltIn else ColorLevel.BuiltIn) }
+        if (!usesBuiltInColors) return null
+        return when {
+            showsDisabledColor() -> CYLAnimatedItemBuiltInColors.disabled(context, configuration) to ColorLevel.DisabledBuiltIn
+            isSelected -> CYLAnimatedItemBuiltInColors.selected(context, configuration) to ColorLevel.BuiltIn
+            else -> CYLAnimatedItemBuiltInColors.normal(context, configuration) to ColorLevel.BuiltIn
+        }
+    }
+
+    /**
+     * [EN] The title color in effect (NOT adapted to glass): `titleColor`, else the subclass-explicit one, else the stack's, else the subclass built-in, else the
+     *      built-in of the state (selected, disabled, normal); null without any.
+     * [CN] 生效的标题颜色（未按玻璃适配）：`titleColor`，其次子类显式的，再次堆叠的，再次子类内置的，最后当前状态的内置值（选中、禁用、普通）；都没有时为 null。
+     */
+    internal fun resolvedTitleColor(configuration: Configuration = resources.configuration): Int? = titleResolution(configuration)?.first
+
+    /** [EN] Applies the title colour once, for an item nothing was set on (no state change ran). [CN] 为什么都没设置的条目（没有状态变化发生）应用一次标题颜色。 */
+    private fun applyBuiltInTitleOnce() {
+        if (!appliesTitleColor) applyTitleColor()
+    }
 
     private fun applyTitleColor(configuration: Configuration = resources.configuration) {
-        val color = resolvedTitleColor(configuration)?.let { resolved ->
-            // [EN] An EXPLICIT colour or the built-in NORMAL one (unselected, not disabled) is adapted, only on dark drawn glass. [CN] 显式颜色与内置普通色（未选中、未禁用）才调整，且仅在深色玻璃确实绘制时。
-            if (((titleColor ?: stackTitleColor) != null || usesBuiltInNormal()) && glassContrastApplies(configuration)) {
-                CYLAnimatedItemContrast.adjustedTitle(resolved, itemBackgroundColor, itemGlassTintAlpha)
-            } else resolved
+        val color = titleResolution(configuration)?.let { (resolved, level) ->
+            // [EN] Explicit and built-in colours (not the disabled look) are adapted, only on dark drawn glass. [CN] 显式与内置颜色（禁用外观除外）才适配，且仅在深色玻璃确实绘制时。
+            if (level != ColorLevel.DisabledBuiltIn && glassContrastApplies(configuration)) CYLAnimatedItemContrast.adjustedTitle(resolved, itemBackgroundColor, itemGlassTintAlpha) else resolved
         }
         if (color != null) {
             if (!appliesTitleColor) defaultTitleColor = titleView.currentTextColor
@@ -797,16 +885,17 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     val effectiveIconColor: Int?
         get() {
-            if (isSelected) (selectedIconColor ?: stackSelectedIconColor)?.let { return it }
-            return iconColor ?: stackIconColor
+            if (isSelected) (selectedIconColor ?: subclassColor(subclassIconColors, true) ?: stackSelectedIconColor)?.let { return it }
+            return iconColor ?: subclassColor(subclassIconColors, false) ?: stackIconColor
         }
 
     /**
-     * [EN] The EXPLICIT icon colors (item, else stack, else host; NO built-ins) of the normal and the selected state. [CN] 普通与选中状态的显式图标颜色
+     * [EN] The EXPLICIT icon colors (item, else the subclass channel, else stack, else host; NO built-ins) of the normal and the selected state. [CN] 普通与选中状态的显式图标颜色
      *      （条目，其次堆叠，再次宿主；不含内置值）。
      */
-    val explicitIconColor: Int? get() = iconColor ?: stackIconColor ?: hostIconColor
-    val explicitSelectedIconColor: Int? get() = selectedIconColor ?: stackSelectedIconColor ?: hostSelectedIconColor
+    val explicitIconColor: Int? get() = iconColor ?: subclassColor(subclassIconColors, false) ?: stackIconColor ?: hostIconColor
+    val explicitSelectedIconColor: Int?
+        get() = selectedIconColor ?: subclassColor(subclassIconColors, true) ?: (if (iconColor == null) subclassColor(subclassIconColors, false) else null) ?: stackSelectedIconColor ?: hostSelectedIconColor
 
     /**
      * [EN] The EFFECTIVE icon color of the current state for `configuration` (default: the item's own): disabled built-in while it shows the disabled
@@ -817,14 +906,17 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      *      未选中的条目为显式颜色，否则为内置普通色。什么都没设置的选中条目取内置选中色，所以选中会改变颜色。仅当该状态没有颜色且 `usesBuiltInColors` 为 false 时为 null。
      *      静态 `image` 不会被它重新着色（`effectiveIconColor` 仅为显式颜色）。
      */
-    fun resolvedIconColor(configuration: Configuration = resources.configuration): Int? {
-        if (usesBuiltInColors && showsDisabledColor()) return CYLAnimatedItemBuiltInColors.disabled(context, configuration)
-        val explicit = if (isSelected) explicitSelectedIconColor else explicitIconColor
-        if (explicit != null || !usesBuiltInColors) return explicit
-        return if (isSelected) CYLAnimatedItemBuiltInColors.selected(context, configuration) else CYLAnimatedItemBuiltInColors.normal(context, configuration)
+    fun resolvedIconColor(configuration: Configuration = resources.configuration): Int? = iconResolution(configuration)?.first
+
+    private fun iconResolution(configuration: Configuration): Pair<Int, ColorLevel>? {
+        if (usesBuiltInColors && showsDisabledColor()) return CYLAnimatedItemBuiltInColors.disabled(context, configuration) to ColorLevel.DisabledBuiltIn
+        (if (isSelected) explicitSelectedIconColor else explicitIconColor)?.let { return it to ColorLevel.Explicit }
+        subclassBuiltInIcon?.let { return it to (if (!isEnabled) ColorLevel.DisabledBuiltIn else ColorLevel.BuiltIn) }
+        if (!usesBuiltInColors) return null
+        return (if (isSelected) CYLAnimatedItemBuiltInColors.selected(context, configuration) else CYLAnimatedItemBuiltInColors.normal(context, configuration)) to ColorLevel.BuiltIn
     }
 
-    private fun applyIconColor(configuration: Configuration = resources.configuration) {
+        private fun applyIconColor(configuration: Configuration = resources.configuration) {
         val color = effectiveIconColor?.let { adaptedIconColor(it, configuration) }
         if (color != null) {
             iconView.setColorFilter(color, PorterDuff.Mode.SRC_IN)
@@ -839,17 +931,38 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     }
 
     /**
-     * [EN] True when the dark-glass contrast rule applies: Liquid Glass is really drawn (the glass layer is on) and `configuration` is night.
-     * [CN] 深色玻璃对比度规则适用：液态玻璃确实绘制（玻璃层在显示）且 `configuration` 为夜间模式。
+     * [EN] True when Liquid Glass is really drawn: the resolved background style is `LiquidGlass` (asked for AND `isLiquidGlassActive()`). Not based on the glass layer
+     *      or the size (they change before layout): glass asked for but not drawn counts as flat. The one property the contrast rule reads.
+     * [CN] 液态玻璃是否真正绘制：解析后的背景样式为 `LiquidGlass`（已请求且 `isLiquidGlassActive()` 为 true）。不依赖玻璃层或尺寸（它们在布局前就会变化）：
+     *      请求了玻璃但未绘制算扁平。对比度规则读取的唯一属性。
      */
+    val drawsLiquidGlass: Boolean get() = resolvedItemBackgroundStyle == CYLAnimatedItemBackgroundStyle.LiquidGlass
+
+    /** [EN] The opposite of [drawsLiquidGlass]. [CN] [drawsLiquidGlass] 的反面。 */
+    val drawsFlatBackground: Boolean get() = !drawsLiquidGlass
+
+    /**
+     * [EN] The item's own dark-glass rule as a function: `color` lifted to the least contrast of `kind` (icon 3, title 4.5) against the rendered glass when
+     *      [drawsLiquidGlass] and the item is in night mode (its own resources configuration), judged with `itemBackgroundColor` and `itemGlassTintAlpha`; else `color` as it is.
+     * [CN] 条目自己的深色玻璃规则（函数形式）：[drawsLiquidGlass] 且条目处于夜间模式（自己的资源配置）时，把 `color` 提亮到 `kind`（图标 3，标题 4.5）对实际渲染玻璃的最小对比度，
+     *      按 `itemBackgroundColor` 与 `itemGlassTintAlpha` 判断；否则原样返回。
+     */
+    fun adaptedOnGlass(color: Int, kind: CYLAnimatedItemColorKind): Int = adaptedOnGlass(color, kind, resources.configuration)
+
+    private fun adaptedOnGlass(color: Int, kind: CYLAnimatedItemColorKind, configuration: Configuration): Int {
+        if (!glassContrastApplies(configuration)) return color
+        return when (kind) {
+            CYLAnimatedItemColorKind.Icon -> CYLAnimatedItemContrast.adjustedIcon(color, itemBackgroundColor, itemGlassTintAlpha)
+            CYLAnimatedItemColorKind.Title -> CYLAnimatedItemContrast.adjustedTitle(color, itemBackgroundColor, itemGlassTintAlpha)
+        }
+    }
+
+    /** [EN] True when the dark-glass contrast rule applies: [drawsLiquidGlass] and `configuration` is night. [CN] 深色玻璃对比度规则适用：[drawsLiquidGlass] 且 `configuration` 为夜间模式。 */
     private fun glassContrastApplies(configuration: Configuration): Boolean =
-        usesItemBackground && itemBackgroundStyle == CYLAnimatedItemBackgroundStyle.LiquidGlass && isLiquidGlassActive() &&
-            itemBackgroundRenderer.glassView != null &&
-            (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        drawsLiquidGlass && (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 
     /** [EN] An explicit icon colour, adapted to the dark glass when the rule applies. [CN] 规则适用时，把显式图标颜色调整到适合深色玻璃。 */
-    private fun adaptedIconColor(color: Int, configuration: Configuration): Int =
-        if (glassContrastApplies(configuration)) CYLAnimatedItemContrast.adjustedIcon(color, itemBackgroundColor, itemGlassTintAlpha) else color
+    private fun adaptedIconColor(color: Int, configuration: Configuration): Int = adaptedOnGlass(color, CYLAnimatedItemColorKind.Icon, configuration)
 
     // MARK: - Divider mode 分隔线模式
 
@@ -893,7 +1006,11 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     private fun dividerThickness() = max(1, dp(1f).roundToInt())
 
     override fun dispatchDraw(canvas: android.graphics.Canvas) {
-        if (!isDividerMode) { super.dispatchDraw(canvas); return }
+        if (!isDividerMode) {
+            super.dispatchDraw(canvas)
+            if (showsOutlineWhenIncreaseContrast && isIncreaseContrastEnabled(context)) drawOutline(canvas)
+            return
+        }
         val vertical = dividerAxis == CYLAnimatedItemAxis.Horizontal
         val w = if (vertical) dividerThickness().toFloat() else dp(dividerLengthDp)
         val h = if (vertical) dp(dividerLengthDp) else dividerThickness().toFloat()
@@ -969,6 +1086,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     fun refreshAnimationTint(configuration: Configuration = resources.configuration) {
         val view = animationView ?: return
+        applyDisabledAnimationAlpha()
         CYLTabBarItemAnimationTint.setOverride(
             view,
             animationTint?.takeIf { it.isNotBlank() } ?: stackAnimationTint,
@@ -986,17 +1104,16 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val kind = if (!tintIsSet && mode == CYLAnimationRenderingMode.Automatic) {
             CYLAnimationColorCount.kindOfSource(context, animationURL?.takeIf { it.isNotBlank() } ?: (view.cyl_getTag(CYLTabBarItemAnimationFailure.RESOURCE_TAG) as? String))
         } else CYLAnimationColorCount.Kind.Undetectable
-        val resolvedIcon = resolvedIconColor(configuration)
+        val resolution = iconResolution(configuration)
+        val resolvedIcon = resolution?.first
         var color = CYLTabBarItemAnimationTint.resolveItem(
             tint, CYLTabBarItemAnimationTint.darkTintOption(options), mode, kind, isSelected, night,
             CYLTabBarItemAnimationTint.IconColors(resolvedIcon, explicitSelectedIconColor),
         )
-        // [EN] Dark drawn glass: an explicit tint (fixed, or the explicit icon colour) and the built-in NORMAL icon colour are adapted; the built-in selected / disabled ones are not.
-        // [CN] 深色玻璃确实绘制时：显式着色（固定色或显式图标颜色）与内置普通图标颜色会被调整；内置选中 / 禁用颜色不调整。
-        val builtInIcon = color == resolvedIcon && (if (isSelected) explicitSelectedIconColor else explicitIconColor) == null
-        if (color != null && glassContrastApplies(configuration) && (!builtInIcon || usesBuiltInNormal())) {
-            color = CYLAnimatedItemContrast.adjustedIcon(color, itemBackgroundColor, itemGlassTintAlpha)
-        }
+        // [EN] Dark drawn glass: an explicit tint (fixed, or the explicit icon colour) and the built-in icon colours (normal and selected) are adapted; the disabled look is not.
+        // [CN] 深色玻璃确实绘制时：显式着色（固定色或显式图标颜色）与内置图标颜色（普通与选中）会被调整；禁用外观不调整。
+        val disabledLook = color == resolvedIcon && resolution?.second == ColorLevel.DisabledBuiltIn
+        if (color != null && !disabledLook) color = adaptedOnGlass(color, CYLAnimatedItemColorKind.Icon, configuration)
         CYLTabBarItemAnimationTint.applyToAnimationView(view, color)
     }
 
@@ -1011,6 +1128,9 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     override fun setEnabled(enabled: Boolean) {
         super.setEnabled(enabled)
         alpha = if (enabled) 1f else disabledAlpha
+        applyDisabledAnimationAlpha()
+        if (disabledWinsImage) updateIcon()
+        invalidate()
         applyTitleColor()
         refreshAnimationTint()
         onItemStateChanged()
@@ -1036,7 +1156,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         // [EN] The static image given, else the placeholder, until the animation shows (also while it downloads).
         // [CN] 在动画显示之前（包括下载期间）显示传入的静态图片，没有时显示占位图。
         val running = countdown.state == CYLAnimatedItemCountdownState.Running
-        val shown = countdownImage.takeIf { running } ?: selectedImage.takeIf { isSelected } ?: image
+        val shown = countdownImage.takeIf { running } ?: selectedImage.takeIf { isSelected && !(disabledWinsImage && !isEnabled) } ?: image
         iconView.setImageDrawable(shown ?: placeholderIfNeeded())
         iconView.visibility = if (animationShows()) View.INVISIBLE else View.VISIBLE
     }
@@ -1133,6 +1253,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     override fun playAnimation() {
         val player = animationPlayer ?: return
+        if (respectsReduceMotion && isReduceMotionEnabled()) {
+            // [EN] Reduce Motion: the state frame instead of a run (selected: the last frame, else the resting one). [CN] 减弱动态效果：显示状态帧而不是播放（选中：最后一帧，否则静止帧）。
+            if (isSelected) { showAnimationLastFrame() } else {
+                showAnimationAgain(); playing = false; endWatchGeneration++; player.progress = animationRestingProgress
+            }
+            return
+        }
         showAnimationAgain()
         playing = true
         pausedByUser = false
@@ -1270,7 +1397,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         refreshAnimationTint()
         updateIcon()
         requestLayout()
-        if (drivesAnimationPlayback && isSelected) playAnimation()
+        if (drivesAnimationPlayback && isSelected) { if (showsLastFrameWhenSelected) showAnimationLastFrame() else playAnimation() }
         onAnimationLoaded?.invoke()
     }
 
@@ -1548,6 +1675,114 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val pausesWhileScrolling: Boolean get() = scrollObservers != null
     }
 
+    // MARK: Options (defaults off / null) 选项（默认关闭 / null）
+
+    /**
+     * [EN] The pressed background (a solid ARGB colour) drawn while the item is pressed AND enabled, clipped to the item's corner radius, over the glass or the flat colour
+     *      and under the content. null (default): no pressed look. iOS `itemHighlightedBackgroundColor`.
+     * [CN] 条目被按下且可用时绘制的按下背景（ARGB 纯色），按条目圆角裁剪，位于玻璃或扁平颜色之上、内容之下。null（默认）：没有按下外观。对应 iOS `itemHighlightedBackgroundColor`。
+     */
+    var itemHighlightedBackgroundColor: Int? = null
+        set(value) { if (field != value) { field = value; invalidate() } }
+
+    /**
+     * [EN] The animation view's alpha while the item is disabled (0...1); null (default) is 1 (the view's own `disabledAlpha` still applies to the whole item).
+     *      iOS `itemDisabledAnimationAlpha`.
+     * [CN] 条目禁用时动画视图的透明度（0...1）；null（默认）为 1（整个条目仍受视图自己的 `disabledAlpha` 影响）。对应 iOS `itemDisabledAnimationAlpha`。
+     */
+    var itemDisabledAnimationAlpha: Float? = null
+        set(value) { if (field != value) { field = value; applyDisabledAnimationAlpha() } }
+
+    /**
+     * [EN] true: a selected item shows the LAST frame of its animation instead of playing it (an item that drives its own playback). Default false.
+     *      iOS `showsLastFrameWhenSelected`.
+     * [CN] 为 true 时，选中的条目显示动画的最后一帧而不是播放（自行驱动播放的条目）。默认 false。对应 iOS `showsLastFrameWhenSelected`。
+     */
+    var showsLastFrameWhenSelected: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            if (drivesAnimationPlayback && isSelected && animationView != null) { if (value) showAnimationLastFrame() else restartAnimation() }
+        }
+
+    /**
+     * [EN] true: while the system Increase Contrast setting is on, an outline in the title colour is drawn around the item. Needs API 34 or later
+     *      (`UiModeManager.getContrast()`, a public API); below it the setting cannot be read and the option has no effect. Default false.
+     *      iOS `showsOutlineWhenIncreaseContrast`.
+     * [CN] 为 true 时，系统「增强对比度」开启期间，在条目周围绘制标题颜色的轮廓。需要 API 34 及以上（公开 API `UiModeManager.getContrast()`）；更低版本读不到该设置，选项不起作用。
+     *      默认 false。对应 iOS `showsOutlineWhenIncreaseContrast`。
+     */
+    var showsOutlineWhenIncreaseContrast: Boolean = false
+        set(value) { if (field != value) { field = value; invalidate() } }
+
+    /**
+     * [EN] true: `playAnimation` shows the state frame (selected: the last frame, else the resting frame) instead of running while the system animations are off
+     *      (`ValueAnimator.areAnimatorsEnabled()`: Remove animations / animator duration scale 0). Default false. iOS `respectsReduceMotion`.
+     * [CN] 为 true 时，系统动画关闭（`ValueAnimator.areAnimatorsEnabled()`：移除动画 / 动画时长缩放为 0）期间，`playAnimation` 显示状态帧（选中：最后一帧，否则静止帧）而不是播放。
+     *      默认 false。对应 iOS `respectsReduceMotion`。
+     */
+    var respectsReduceMotion: Boolean = false
+
+    /**
+     * [EN] true: `selectedImage` shows only while the item is selected AND enabled (a disabled selected item shows `image`). Default false. iOS `disabledWinsImage`.
+     * [CN] 为 true 时，`selectedImage` 只在条目选中且可用时显示（禁用的选中条目显示 `image`）。默认 false。对应 iOS `disabledWinsImage`。
+     */
+    var disabledWinsImage: Boolean = false
+        set(value) { if (field != value) { field = value; updateIcon() } }
+
+    private fun applyDisabledAnimationAlpha() {
+        animationView?.alpha = if (isEnabled) 1f else (itemDisabledAnimationAlpha ?: 1f).coerceIn(0f, 1f)
+    }
+
+    private val optionPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+
+    /** [EN] The corner radius in px as the background draws it. [CN] 背景绘制所用的圆角半径（px）。 */
+    private fun cornerRadiusPx(): Float {
+        val explicit = itemCornerRadius
+        val half = height / 2f
+        return when {
+            explicit != null -> if (explicit == CYLAnimatedItemCornerRadiusCapsule) half else min(max(explicit, 0f) * resources.displayMetrics.density, half)
+            drawsLiquidGlass -> half
+            else -> 0f
+        }
+    }
+
+    private fun highlightApplies() = itemHighlightedBackgroundColor != null && isPressed && isEnabled && !isDividerMode
+
+    private fun drawHighlight(canvas: android.graphics.Canvas) {
+        val color = itemHighlightedBackgroundColor ?: return
+        optionPaint.style = android.graphics.Paint.Style.FILL
+        optionPaint.color = color
+        val radius = cornerRadiusPx()
+        canvas.drawRoundRect(0f, 0f, width.toFloat(), height.toFloat(), radius, radius, optionPaint)
+    }
+
+    override fun onDraw(canvas: android.graphics.Canvas) {
+        super.onDraw(canvas)
+        // [EN] Under glass the highlight is drawn right after the glass layer (see `drawChild`). [CN] 有玻璃时按下背景紧跟在玻璃层之后绘制（见 `drawChild`）。
+        if (highlightApplies() && itemBackgroundRenderer.glassView == null) drawHighlight(canvas)
+    }
+
+    override fun drawChild(canvas: android.graphics.Canvas, child: View, drawingTime: Long): Boolean {
+        val drawn = super.drawChild(canvas, child, drawingTime)
+        if (child === itemBackgroundRenderer.glassView && highlightApplies()) drawHighlight(canvas)
+        return drawn
+    }
+
+    override fun setPressed(pressed: Boolean) {
+        super.setPressed(pressed)
+        if (itemHighlightedBackgroundColor != null) invalidate()
+    }
+
+    private fun drawOutline(canvas: android.graphics.Canvas) {
+        val stroke = max(1f, 2f * resources.displayMetrics.density)
+        optionPaint.style = android.graphics.Paint.Style.STROKE
+        optionPaint.strokeWidth = stroke
+        optionPaint.color = titleView.currentTextColor
+        val radius = max(0f, cornerRadiusPx() - stroke / 2f)
+        canvas.drawRoundRect(stroke / 2f, stroke / 2f, width - stroke / 2f, height - stroke / 2f, radius, radius, optionPaint)
+    }
+
     // MARK: Background (flat or Liquid Glass), corner radius and border
 
     /**
@@ -1675,6 +1910,77 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
          * [CN] 设备是否绘制液态玻璃，TabBar 也使用这唯一的规则：Android 12 及以上（Android 13+ 完整玻璃含折射，Android 12 只有模糊）；更早的版本为 false。与 iOS、鸿蒙同名。
          */
         @JvmStatic fun isLiquidGlassActive(): Boolean = CYLLiquidGlass.isActive()
+
+        /**
+         * [EN] The alpha of the default glass tint in light mode (225, 222, 220), used when the item's color is unset or clear. Same value as iOS `defaultGlassTintAlphaLight`.
+         * [CN] 浅色模式下默认玻璃着色（225, 222, 220）的透明度，条目颜色未设置或透明时使用。与 iOS `defaultGlassTintAlphaLight` 同值。
+         */
+        const val defaultGlassTintAlphaLight: Float = 0.10f
+
+        /**
+         * [EN] The alpha of the default glass tint in dark mode (white), used when the item's color is unset or clear. Same value as iOS `defaultGlassTintAlphaDark`.
+         * [CN] 深色模式下默认玻璃着色（白色）的透明度，条目颜色未设置或透明时使用。与 iOS `defaultGlassTintAlphaDark` 同值。
+         */
+        const val defaultGlassTintAlphaDark: Float = 0.04f
+
+        /**
+         * [EN] The default glass tint in light mode as an ARGB color: the frosted (225, 222, 220) at [defaultGlassTintAlphaLight] (0x1AE1DEDC).
+         * [CN] 浅色模式默认玻璃着色（ARGB）：磨砂色 (225, 222, 220)，透明度 [defaultGlassTintAlphaLight]（0x1AE1DEDC）。
+         */
+        const val defaultGlassTintLight: Int = 0x1AE1DEDC
+
+        /**
+         * [EN] The default glass tint in dark mode as an ARGB color: white at [defaultGlassTintAlphaDark] (0x0AFFFFFF).
+         * [CN] 深色模式默认玻璃着色（ARGB）：白色，透明度 [defaultGlassTintAlphaDark]（0x0AFFFFFF）。
+         */
+        const val defaultGlassTintDark: Int = 0x0AFFFFFF
+
+        /**
+         * [EN] The content inset in dp `style` resolves to for an `explicit` value (the one rule of `resolvedItemContentHorizontalInset`, usable while a view is still being built):
+         *      the explicit value (never negative), else [CYLAnimatedItemLiquidGlassContentInset] where the glass is drawn, else 0.
+         * [CN] 显式值 `explicit` 在样式 `style` 下解析出的内容间距（dp）（`resolvedItemContentHorizontalInset` 的同一规则，可在视图构建过程中使用）：显式值（不为负），否则玻璃绘制时为
+         *      [CYLAnimatedItemLiquidGlassContentInset]，否则为 0。
+         */
+        @JvmStatic fun resolvedContentHorizontalInset(explicit: Float?, style: CYLAnimatedItemBackgroundStyle?): Float =
+            CYLAnimatedItemBackgroundRenderer.resolvedContentInset(explicit, style)
+
+        /**
+         * [EN] Whether an animation engine library (Lottie, PAG, Rive or SVGA) is in the app; GIF is decoded by the system and not counted. A runtime check
+         *      (`CYLAnimationEngines.isAvailable`). iOS `isAnimationEngineAvailable`.
+         * [CN] App 中是否有动画引擎库（Lottie、PAG、Rive 或 SVGA）；GIF 由系统解码，不计入。运行时检查（`CYLAnimationEngines.isAvailable`）。对应 iOS `isAnimationEngineAvailable`。
+         */
+        @JvmStatic val isAnimationEngineAvailable: Boolean
+            get() = listOf("Lottie", "PAG", "Rive", "SVGA").any { CYLAnimationEngines.isAvailable(it) }
+
+        /**
+         * [EN] For tests: replaces the system check of [isReduceMotionEnabled] (null, the default, asks the system). [CN] 供测试使用：替代 [isReduceMotionEnabled] 对系统的检查（默认 null）。
+         */
+        @JvmStatic var reduceMotionOverride: Boolean? = null
+
+        /**
+         * [EN] For tests: replaces the system check of [isIncreaseContrastEnabled] (null, the default, asks the system). [CN] 供测试使用：替代 [isIncreaseContrastEnabled] 对系统的检查（默认 null）。
+         */
+        @JvmStatic var increaseContrastOverride: Boolean? = null
+
+        /**
+         * [EN] Whether the system animations are off: `!ValueAnimator.areAnimatorsEnabled()` (public, API 26 and later; false below, where it cannot be read).
+         *      The Android counterpart of iOS Reduce Motion.
+         * [CN] 系统动画是否关闭：`!ValueAnimator.areAnimatorsEnabled()`（公开 API，API 26 及以上；更低版本读不到，为 false）。对应 iOS 的「减弱动态效果」。
+         */
+        @JvmStatic fun isReduceMotionEnabled(): Boolean =
+            reduceMotionOverride ?: (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !ValueAnimator.areAnimatorsEnabled())
+
+        /**
+         * [EN] Whether the system contrast setting is above standard: `UiModeManager.getContrast()` > 0 (medium 0.5, high 1.0), public API 34 and later.
+         *      No effect below API 34 (false): the hidden high text contrast flag is deliberately not used. The Android counterpart of iOS Increase Contrast.
+         * [CN] 系统对比度设置是否高于标准：`UiModeManager.getContrast()` > 0（中 0.5，高 1.0），公开 API，API 34 及以上。API 34 以下不起作用（为 false）：刻意不使用隐藏的高对比度文字标志。
+         *      对应 iOS 的「增强对比度」。
+         */
+        @JvmStatic fun isIncreaseContrastEnabled(context: Context): Boolean {
+            increaseContrastOverride?.let { return it }
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return false
+            return (context.getSystemService(Context.UI_MODE_SERVICE) as? UiModeManager)?.contrast?.let { it > 0f } ?: false
+        }
 
         /**
          * [EN] For tests: replaces the device check of `isLiquidGlassActive()` (null, the default, asks the device).

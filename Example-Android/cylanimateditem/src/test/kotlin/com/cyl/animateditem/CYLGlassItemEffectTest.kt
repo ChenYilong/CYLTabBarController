@@ -63,7 +63,7 @@ class CYLGlassItemEffectTest {
         val (item, fills) = itemFirstFill(CYLAnimatedItemBackgroundStyle.LiquidGlass)
         assertTrue("the glass layer exists", item.itemLiquidGlassView != null)
         assertTrue("a fill was drawn", fills.isNotEmpty())
-        assertEquals("white 0.14", 0x24FFFFFF, fills.first())
+        assertEquals("white 0.04", 0x0AFFFFFF, fills.first())
     }
 
     @Test

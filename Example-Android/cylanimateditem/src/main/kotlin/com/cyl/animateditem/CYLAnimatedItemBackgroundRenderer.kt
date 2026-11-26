@@ -23,21 +23,22 @@ internal class CYLAnimatedItemBackgroundRenderer(private val host: ViewGroup) {
         const val GLASS_TINT_ALPHA = 0.75f
 
         /**
-         * [EN] The tint of a glass whose host set no color: a light frosted gray in light mode (225, 222, 220 at alpha 0.5), a faint white in dark mode
-         *      (alpha 0.14), so a Liquid Glass style alone is visible on a plain page (the same values on every platform).
-         * [CN] 宿主未设置颜色时玻璃的着色：浅色模式为淡灰（225, 222, 220，透明度 0.5），深色模式为淡白（透明度 0.14），因此只设置液态玻璃样式在纯色页面上也看得见（各平台数值相同）。
-         */
-        /**
          * The content inset: the explicit value, else [CYLAnimatedItemLiquidGlassContentInset] where the glass is drawn (the unset radius's condition), else 0.
          * Static, so a view can ask while it is still being built (its renderer does not exist yet).
          */
         fun resolvedContentInset(explicit: Float?, style: CYLAnimatedItemBackgroundStyle?): Float =
             explicit?.let { max(it, 0f) } ?: if (style == CYLAnimatedItemBackgroundStyle.LiquidGlass && CYLAnimatedItemView.isLiquidGlassActive()) CYLAnimatedItemLiquidGlassContentInset else 0f
 
+        /**
+         * [EN] The tint of a glass whose host set no color: a light frosted gray in light mode ([CYLAnimatedItemView.defaultGlassTintLight], 225, 222, 220 at alpha 0.10),
+         *      a faint white in dark mode ([CYLAnimatedItemView.defaultGlassTintDark], alpha 0.04). Handed to the glass with its own alpha (not multiplied by [GLASS_TINT_ALPHA]).
+         * [CN] 宿主未设置颜色时玻璃的着色：浅色模式为淡灰（[CYLAnimatedItemView.defaultGlassTintLight]，225, 222, 220，透明度 0.10），深色模式为淡白（[CYLAnimatedItemView.defaultGlassTintDark]，透明度 0.04）。
+         *      以其自身透明度交给玻璃（不再乘以 [GLASS_TINT_ALPHA]）。
+         */
         fun defaultGlassTint(resources: android.content.res.Resources): Int {
             val night = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK ==
                 android.content.res.Configuration.UI_MODE_NIGHT_YES
-            return if (night) Color.argb(36, 255, 255, 255) else Color.argb(128, 225, 222, 220)
+            return if (night) CYLAnimatedItemView.defaultGlassTintDark else CYLAnimatedItemView.defaultGlassTintLight
         }
     }
 

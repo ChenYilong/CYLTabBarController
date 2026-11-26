@@ -28,11 +28,38 @@ class CYLLiquidGlassTest {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
         val renderer = CYLAnimatedItemBackgroundRenderer(android.widget.FrameLayout(context))
         val frosted = renderer.glassTint(null)
-        assertEquals("null: the default frosted tint", android.graphics.Color.argb(128, 225, 222, 220), frosted)
+        assertEquals("null: the default frosted tint", android.graphics.Color.argb(26, 225, 222, 220), frosted)
         assertEquals("Color.TRANSPARENT is no color: the same default tint", frosted, renderer.glassTint(android.graphics.Color.TRANSPARENT))
         assertEquals("also an RGB with alpha 0", frosted, renderer.glassTint(0x00FF0000))
         // A color with a real alpha tints at 75% of it.
         assertEquals(android.graphics.Color.argb(Math.round(0x66 * 0.75f), 255, 136, 0), renderer.glassTint(0x66FF8800))
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun theDefaultGlassTintConstantsAreTenPercentFrostedLightAndFourPercentWhiteDark() {
+        assertEquals(0.10f, CYLAnimatedItemView.defaultGlassTintAlphaLight, 0f)
+        assertEquals(0.04f, CYLAnimatedItemView.defaultGlassTintAlphaDark, 0f)
+        assertEquals(android.graphics.Color.argb(Math.round(0.10f * 255), 225, 222, 220), CYLAnimatedItemView.defaultGlassTintLight)
+        assertEquals(android.graphics.Color.argb(Math.round(0.04f * 255), 255, 255, 255), CYLAnimatedItemView.defaultGlassTintDark)
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun theRendererDefaultTintInLightModeIsTheLightConstantAndAnExplicitColourIsStillThreeQuarters() {
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        val renderer = CYLAnimatedItemBackgroundRenderer(android.widget.FrameLayout(context))
+        assertEquals(CYLAnimatedItemView.defaultGlassTintLight, renderer.glassTint(null))
+        assertEquals("an opaque explicit colour keeps the x0.75 share", android.graphics.Color.argb(191, 10, 20, 30), renderer.glassTint(android.graphics.Color.rgb(10, 20, 30)))
+    }
+
+    @Test
+    @Config(sdk = [34], qualifiers = "night")
+    fun theRendererDefaultTintInNightModeIsTheDarkConstant() {
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        val renderer = CYLAnimatedItemBackgroundRenderer(android.widget.FrameLayout(context))
+        assertEquals(CYLAnimatedItemView.defaultGlassTintDark, renderer.glassTint(null))
+        assertEquals(android.graphics.Color.argb(191, 10, 20, 30), renderer.glassTint(android.graphics.Color.rgb(10, 20, 30)))
     }
 
     @Test

@@ -6,11 +6,11 @@ package com.cyl.animateditem
  *      is judged over black: the default frosted tint (dark mode) is white at alpha 0.14, an explicit tint is its colour times its alpha times
  *      the tint alpha. HSL lightness rises in 0.005 steps and never goes above white. Dark glass only: light glass is NOT adapted (there is
  *      no symmetric darkening rule). Pure and deterministic; the item calls it only where glass is really drawn, in night mode, for a colour the
- *      app set and for the built-in normal colour of an unselected, enabled item (selected and disabled built-ins and flat items are untouched).
+ *      app set and for the built-in colours of an enabled item (normal and selected alike; the disabled look and flat items are untouched).
  * [CN] 条目的深色玻璃对比度规则（与 ClassifyMenu 的 `CYLIconContrast` 相同）：显式的标题或图标颜色在深色液态玻璃上过暗时，保持色相、饱和度与
  *      透明度，提高亮度直到与玻璃的对比度达到最小值。玻璃以黑色为底判断：夜间默认磨砂着色为白色 0.14 透明度，显式着色为其颜色乘以透明度再乘以
  *      着色透明度。HSL 亮度每步 0.005 上升，不超过白色。只处理深色玻璃：浅色玻璃不调整（没有对称的加深规则）。纯函数、确定性；条目只在
- *      玻璃确实绘制、夜间模式，颜色由应用设置，或为未选中且可用条目的内置普通颜色时调用（选中、禁用的内置颜色与扁平条目不受影响）。
+ *      玻璃确实绘制、夜间模式，颜色由应用设置，或为可用条目的内置颜色（普通与选中相同）时调用（禁用外观与扁平条目不受影响）。
  */
 internal object CYLAnimatedItemContrast {
 
@@ -25,6 +25,17 @@ internal object CYLAnimatedItemContrast {
 
     /** [EN] Share of an explicit tint's alpha that tints the glass (the renderer's `GLASS_TINT_ALPHA`). [CN] 显式着色透明度中用于玻璃着色的占比。 */
     const val DEFAULT_TINT_SHARE = 0.75f
+
+    /**
+     * [EN] The white share (Y/255 of the sRGB bytes) of the glass interior the device RENDERS in dark mode, the floor of the reference luminance.
+     *      The model ([FROSTED_WHITE_ALPHA]) is darker than what a real dark glass draws (blur of the page plus the sheen), so a colour lifted only to
+     *      the model stays too dark. MEASURED on Android (API 37 emulator, Configuration-like dark page, glass tags, middle band, median of 5 tags: Y 90.1, share 0.353);
+     *      this constant is that value plus a margin of about 0.02. The iOS value (0.26 measured, 0.28 set) is not reused.
+     * [CN] 设备在深色模式下实际渲染的玻璃内部的白色占比（sRGB 字节的 Y/255），即参考亮度的下限。模型（[FROSTED_WHITE_ALPHA]）比真实深色玻璃
+     *      （页面模糊加高光）更暗，只提亮到模型的颜色仍然过暗。Android 实测（API 37 模拟器，仿 Configuration 页的深色页面与玻璃标签，标签中间带，5 个标签的中位数）：Y 90.1，占比 0.353；
+     *      本常量为实测值 0.353 加约 0.02 的余量（0.37）。不沿用 iOS 的值（实测 0.26，设为 0.28）。
+     */
+    const val renderedDarkGlassWhiteShare = 0.37
 
     /** [EN] Lightness rise per step (0...1). [CN] 每步亮度增量（0...1）。 */
     const val LIGHTNESS_STEP = 0.005f
@@ -62,6 +73,13 @@ internal object CYLAnimatedItemContrast {
     }
 
     /**
+     * [EN] The reference the lift judges against: the model [glassReferenceLuminance], never below the rendered dark glass ([renderedDarkGlassWhiteShare]).
+     * [CN] 提亮所对照的参考亮度：模型 [glassReferenceLuminance]，但不低于实际渲染的深色玻璃（[renderedDarkGlassWhiteShare]）。
+     */
+    fun renderedGlassReferenceLuminance(glassTint: Int?, tintAlpha: Float?): Double =
+        maxOf(glassReferenceLuminance(glassTint, tintAlpha), relativeLuminance(renderedDarkGlassWhiteShare, renderedDarkGlassWhiteShare, renderedDarkGlassWhiteShare))
+
+    /**
      * [EN] `color` itself when it already has `minimumContrast` against a glass of `glassLuminance`, else the same hue, saturation and alpha
      *      with the lowest lightness (0.005 steps, at most white) that passes.
      * [CN] 颜色与亮度为 `glassLuminance` 的玻璃已达到 `minimumContrast` 时返回原颜色，否则返回色相、饱和度、透明度不变且亮度最低
@@ -82,11 +100,11 @@ internal object CYLAnimatedItemContrast {
 
     /** [EN] Title text (4.5) on the glass. [CN] 玻璃上的标题文字（4.5）。 */
     fun adjustedTitle(color: Int, glassTint: Int?, tintAlpha: Float?): Int =
-        adjusted(color, glassReferenceLuminance(glassTint, tintAlpha), TITLE_MINIMUM_CONTRAST)
+        adjusted(color, renderedGlassReferenceLuminance(glassTint, tintAlpha), TITLE_MINIMUM_CONTRAST)
 
     /** [EN] Icon tint (3) on the glass. [CN] 玻璃上的图标着色（3）。 */
     fun adjustedIcon(color: Int, glassTint: Int?, tintAlpha: Float?): Int =
-        adjusted(color, glassReferenceLuminance(glassTint, tintAlpha), ICON_MINIMUM_CONTRAST)
+        adjusted(color, renderedGlassReferenceLuminance(glassTint, tintAlpha), ICON_MINIMUM_CONTRAST)
 
     /** [EN] HSL of an sRGB colour as [hue, saturation, lightness], all 0...1. [CN] sRGB 颜色的 HSL。 */
     fun hslFromRGB(red: Float, green: Float, blue: Float): FloatArray {
