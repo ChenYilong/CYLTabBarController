@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@ohos/hypium';
-import { CYLLiquidGlass, CYLAnimatedItemBackgroundModifier } from 'cylanimateditem';
+import { CYLLiquidGlass, CYLAnimatedItemBackgroundModifier, CYLAnimatedItemBackgroundStyle } from 'cylanimateditem';
 import { CYLLiquidGlassCapsuleEdge } from 'cyltabbar';
 
 /**
@@ -97,6 +97,21 @@ export default function cylGlassHighlightTest() {
         AppStorage.setOrCreate('cyl_colorMode', key);
       }
       AppStorage.setOrCreate('colorMode', system ?? ColorMode.LIGHT);
+    });
+
+    it('the background effect is the Android/web glass values and only a drawn Liquid Glass gets it', 0, () => {
+      expect(CYLLiquidGlass.BLUR_RADIUS).assertEqual(28);
+      expect(CYLLiquidGlass.BLUR_SATURATION).assertEqual(1.6);
+      expect(CYLLiquidGlass.LIGHT_BRIGHTNESS).assertEqual(1.05);
+      const saved: boolean | undefined = CYLLiquidGlass.activeOverride;
+      CYLLiquidGlass.activeOverride = true;
+      expect(CYLLiquidGlass.isActive()).assertTrue();
+      expect(CYLAnimatedItemBackgroundModifier.isGlassDrawn(CYLAnimatedItemBackgroundStyle.liquidGlass)).assertTrue();
+      expect(CYLAnimatedItemBackgroundModifier.isGlassDrawn(CYLAnimatedItemBackgroundStyle.flat)).assertFalse();
+      CYLLiquidGlass.activeOverride = false;
+      expect(CYLAnimatedItemBackgroundModifier.isGlassDrawn(CYLAnimatedItemBackgroundStyle.liquidGlass)).assertFalse();
+      expect(CYLAnimatedItemBackgroundModifier.isGlassDrawn(CYLAnimatedItemBackgroundStyle.flat)).assertFalse();
+      CYLLiquidGlass.activeOverride = saved;
     });
   });
 }

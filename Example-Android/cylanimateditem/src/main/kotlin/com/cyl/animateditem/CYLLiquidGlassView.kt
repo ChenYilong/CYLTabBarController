@@ -115,7 +115,10 @@ internal class CYLLiquidGlassView @JvmOverloads constructor(context: Context, at
         getLocationInWindow(here)
         source.getLocationInWindow(there)
         val effects = CYLGlassEffects(
-            saturation = 1.8f,
+            // [EN] The item glass of HarmonyOS (saturation 1.6, brightness 1.05), only on this sampled path: the view exists only where the glass style is drawn (isGlassDrawn), flat items get no effect.
+            // [CN] 与鸿蒙相同的条目玻璃（饱和度 1.6、亮度 1.05），仅在此采样路径：本视图只在绘制玻璃样式时存在（isGlassDrawn），扁平条目没有该效果。
+            saturation = CYLLiquidGlass.ITEM_SATURATION,
+            brightness = CYLLiquidGlass.ITEM_BRIGHTNESS,
             blurRadius = 8f * density,
             refractionHeight = minOf(10f * density, rect.height() / 2f),
             refractionAmount = 14f * density,

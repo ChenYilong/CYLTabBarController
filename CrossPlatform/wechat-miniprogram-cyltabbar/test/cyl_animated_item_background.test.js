@@ -6,6 +6,8 @@ const assert = require('node:assert/strict')
 const {
   cylAnimatedItemBackground,
   cylAnimatedItemCornerRadiusCapsule,
+  cylAnimatedItemGlassBrightness,
+  cylAnimatedItemGlassSaturation,
   cylAnimatedItemLiquidGlassContentInset,
   cylAnimatedItemLiquidGlassIsActive,
   cylAnimatedItemLiquidGlassSetActiveOverride,
@@ -29,7 +31,7 @@ test('flat: the solid color, the radius and the border', () => {
 test('liquidGlass: backdrop-filter over the tint where the rule is active, flat where it is not', () => {
   const glass = cylAnimatedItemBackground('liquidGlass', 'rgba(255,136,0,0.4)', 12, 0, '', false)
   assert.equal(glass.glass, true)
-  assert.match(glass.css, /backdrop-filter:blur\(16px\) saturate\(180%\)/)
+  assert.match(glass.css, /backdrop-filter:blur\(16px\) saturate\(160%\) brightness\(1.05\)/)
   assert.match(glass.css, /background-color:rgba\(255,136,0,0.3\);/, 'the glass tint is translucent: alpha x 0.75')
   cylAnimatedItemLiquidGlassSetActiveOverride(false)
   assert.equal(cylAnimatedItemLiquidGlassIsActive(), false)
@@ -97,4 +99,14 @@ test('a tint alpha of 1 keeps the color as it is (a selected tag), the default i
   assert.equal(cylAnimatedItemGlassTint('#2AB9A0', -1), 'rgba(42,185,160,0.75)')
   cylAnimatedItemLiquidGlassSetActiveOverride(true)
   assert.match(cylAnimatedItemBackground('liquidGlass', '#2AB9A0', -1, 0, '', false, 1).css, /background-color:rgba\(42,185,160,1\);backdrop-filter/)
+})
+
+test('the drawn glass uses the HarmonyOS saturation and brightness, flat has no filter', () => {
+  assert.equal(cylAnimatedItemGlassSaturation, 1.6)
+  assert.equal(cylAnimatedItemGlassBrightness, 1.05)
+  const glass = cylAnimatedItemBackground('liquidGlass', '#2AB9A0', -1, 0, '', false)
+  assert.match(glass.css, /backdrop-filter:blur\(16px\) saturate\(160%\) brightness\(1.05\);/)
+  assert.match(glass.css, /-webkit-backdrop-filter:blur\(16px\) saturate\(160%\) brightness\(1.05\);/)
+  const flat = cylAnimatedItemBackground('flat', '#2AB9A0', -1, 0, '', false)
+  assert.doesNotMatch(flat.css, /saturate|brightness|backdrop-filter/)
 })

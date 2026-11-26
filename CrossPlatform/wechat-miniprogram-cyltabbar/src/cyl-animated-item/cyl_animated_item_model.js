@@ -681,12 +681,12 @@ function cylAnimatedItemModel(input) {
 /**
  * [EN] The background of cyl-animated-item (`itemBackgroundStyle`, `itemBackgroundColor`, `itemCornerRadius`, `itemBorderWidth`,
  *      `itemBorderColor`, the same names as iOS, Android and HarmonyOS): flat is the solid color; 'liquidGlass' is CSS
- *      `backdrop-filter` (blur 16 px, saturation 180 %, the values of the tab bar's lens) over a translucent tint, a faint top
+ *      `backdrop-filter` (blur 16 px, saturation 160 %, brightness 1.05, the HarmonyOS values; the blur is the tab bar's lens) over a translucent tint, a faint top
  *      highlight and the border, clipped to the radius. `cylAnimatedItemLiquidGlassIsActive()` (the same rule name as
  *      `CYLAnimatedItemView.isLiquidGlassActive()` elsewhere) is always true in a mini program: where the WebView lacks
  *      `backdrop-filter` only the tint stays, as in the tab bar.
  * [CN] cyl-animated-item 的背景（`itemBackgroundStyle`、`itemBackgroundColor`、`itemCornerRadius`、`itemBorderWidth`、`itemBorderColor`，与 iOS、
- *      Android、鸿蒙同名）：扁平为纯色；'liquidGlass' 为 CSS `backdrop-filter`（模糊 16 px、饱和度 180 %，TabBar 透镜的数值）加半透明着色、顶部
+ *      Android、鸿蒙同名）：扁平为纯色；'liquidGlass' 为 CSS `backdrop-filter`（模糊 16 px、饱和度 160 %、亮度 1.05（鸿蒙取值），模糊同 TabBar 透镜的数值）加半透明着色、顶部
  *      淡淡的高光与边框，按圆角裁剪。`cylAnimatedItemLiquidGlassIsActive()`（与其他平台的 `CYLAnimatedItemView.isLiquidGlassActive()` 同一规则）
  *      在小程序中始终为真：WebView 不支持 `backdrop-filter` 时只剩着色，与 TabBar 相同。
  */
@@ -781,13 +781,29 @@ function cylAnimatedItemBackgroundInset(explicitInset, glass) {
   return glass ? cylAnimatedItemLiquidGlassContentInset : 0
 }
 
+// [EN] The saturation and brightness of the drawn glass: the HarmonyOS `backgroundEffect` values (BLUR_SATURATION 1.6, LIGHT_BRIGHTNESS 1.05), so a tag
+//      looks the same on every platform. The blur stays 16 px here, the CSS equivalent of HarmonyOS's radius 28.
+// [CN] 绘制的玻璃的饱和度与亮度：鸿蒙 `backgroundEffect` 的取值（BLUR_SATURATION 1.6、LIGHT_BRIGHTNESS 1.05），使标签在各平台外观一致。
+//      这里的模糊保持 16 px，是鸿蒙半径 28 的 CSS 等价值。
+const cylAnimatedItemGlassSaturation = 1.6
+const cylAnimatedItemGlassBrightness = 1.05
+
+/**
+ * [EN] The `backdrop-filter` text of the drawn glass (only the glass branch uses it; flat has none).
+ * [CN] 绘制的玻璃的 `backdrop-filter` 文本（仅玻璃分支使用，扁平没有）。
+ */
+function cylAnimatedItemGlassFilter() {
+  return `blur(16px) saturate(${Math.round(cylAnimatedItemGlassSaturation * 100)}%) brightness(${cylAnimatedItemGlassBrightness})`
+}
+
 /**
  * [EN] The style text of the drawn glass: the tint (the default frosted tint without a usable color), blur and highlight.
  * [CN] 绘制的玻璃的样式文本：着色（没有可用颜色时为默认的磨砂着色）、模糊与高光。
  */
 function cylAnimatedItemGlassCss(color, tintAlpha, isDark) {
   const tint = (color ? cylAnimatedItemGlassTint(color, tintAlpha) : '') || (isDark ? 'rgba(255,255,255,0.14)' : 'rgba(225,222,220,0.5)')
-  let css = `background-color:${tint};backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);`
+  const filter = cylAnimatedItemGlassFilter()
+  let css = `background-color:${tint};backdrop-filter:${filter};-webkit-backdrop-filter:${filter};`
   css += `box-shadow:inset 0 1px 0 rgba(255,255,255,${isDark ? 0.18 : 0.6});overflow:hidden;`
   return css
 }
@@ -844,6 +860,9 @@ function cylAnimatedItemResource(animationUrl) {
 }
 
 module.exports = {
+  cylAnimatedItemGlassSaturation,
+  cylAnimatedItemGlassBrightness,
+  cylAnimatedItemGlassFilter,
   cylAnimatedItemAdaptedColor,
   CYL_ADAPTED_KIND_ICON,
   CYL_ADAPTED_KIND_TEXT,

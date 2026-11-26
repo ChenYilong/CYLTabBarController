@@ -182,17 +182,20 @@ half4 main(float2 coord) {
     /**
      * [EN] Backdrop's `vibrancy()`: saturation 1.5. [CN] Backdrop 的 `vibrancy()`：饱和度 1.5。
      */
-    fun vibrancyColorFilter(saturation: Float = 1.5f): ColorMatrixColorFilter {
+    fun vibrancyColorFilter(saturation: Float = 1.5f, brightness: Float = 1f): ColorMatrixColorFilter {
         val inverse = 1f - saturation
         val r = 0.213f * inverse
         val g = 0.715f * inverse
         val b = 0.072f * inverse
-        return ColorMatrixColorFilter(ColorMatrix(floatArrayOf(
+        val matrix = ColorMatrix(floatArrayOf(
             r + saturation, g, b, 0f, 0f,
             r, g + saturation, b, 0f, 0f,
             r, g, b + saturation, 0f, 0f,
             0f, 0f, 0f, 1f, 0f,
-        )))
+        ))
+        // [EN] Brightness: a scale of the colour channels, applied after the saturation. [CN] 亮度：颜色通道的缩放，在饱和度之后应用。
+        if (brightness != 1f) matrix.postConcat(ColorMatrix().apply { setScale(brightness, brightness, brightness, 1f) })
+        return ColorMatrixColorFilter(matrix)
     }
 }
 
@@ -321,7 +324,7 @@ class CYLGlassBackdrop {
      */
     @RequiresApi(Build.VERSION_CODES.S)
     private fun effectChain(width: Float, height: Float, radius: Float, effects: CYLGlassEffects): RenderEffect? {
-        var effect: RenderEffect? = if (effects.saturation != 1f) RenderEffect.createColorFilterEffect(CYLLiquidGlassShaders.vibrancyColorFilter(effects.saturation)) else null
+        var effect: RenderEffect? = if (effects.saturation != 1f || effects.brightness != 1f) RenderEffect.createColorFilterEffect(CYLLiquidGlassShaders.vibrancyColorFilter(effects.saturation, effects.brightness)) else null
         if (effects.blurRadius > 0f) {
             val blur = effect?.let { RenderEffect.createBlurEffect(effects.blurRadius, effects.blurRadius, it, Shader.TileMode.CLAMP) }
                 ?: RenderEffect.createBlurEffect(effects.blurRadius, effects.blurRadius, Shader.TileMode.CLAMP)
@@ -362,4 +365,5 @@ data class CYLGlassEffects(
     val refractionHeight: Float = 0f,
     val refractionAmount: Float = 0f,
     val chromaticAberration: Boolean = false,
+    val brightness: Float = 1f,
 )

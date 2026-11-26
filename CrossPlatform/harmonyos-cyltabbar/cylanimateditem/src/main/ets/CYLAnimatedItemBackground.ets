@@ -125,6 +125,7 @@ export class CYLAnimatedItemBackgroundModifier implements AttributeModifier<Comm
 
   applyNormalAttribute(instance: CommonAttribute): void {
     const glass: boolean = CYLAnimatedItemBackgroundModifier.isGlassDrawn(this.style);
+    // [EN] Only a drawn Liquid Glass gets the effect (flat: none). [CN] 只有绘制的液态玻璃才有该效果（扁平：没有）。
     instance.backgroundEffect(glass ?
       { radius: CYLLiquidGlass.BLUR_RADIUS, saturation: CYLLiquidGlass.BLUR_SATURATION, brightness: CYLLiquidGlass.LIGHT_BRIGHTNESS } :
       { radius: 0 });
