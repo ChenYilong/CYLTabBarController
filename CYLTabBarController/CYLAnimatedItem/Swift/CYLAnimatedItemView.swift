@@ -68,13 +68,6 @@ import UIKit
 public let cylAnimatedItemCornerRadiusCapsule: CGFloat = 1000
 
 /**
- [EN] The old name of `cylAnimatedItemCornerRadiusCapsule`, kept until CollectionViewClassifyMenu (its tag list uses it) moves to the new name; then it goes.
- [CN] `cylAnimatedItemCornerRadiusCapsule` 的旧名称，保留到 CollectionViewClassifyMenu（其标签列表在用）改用新名称为止，之后删除。
- */
-@available(*, deprecated, renamed: "cylAnimatedItemCornerRadiusCapsule")
-public let CYLAnimatedItemCornerRadiusCapsule: CGFloat = cylAnimatedItemCornerRadiusCapsule
-
-/**
  [EN] The named constant of the default content inset on Liquid Glass (14 points): the space between the outer border and the content, left and right,
       that `itemContentHorizontalInset` resolves to where Liquid Glass is really drawn and nothing is set. Pass it instead of a literal.
  [CN] 液态玻璃上默认内容内缩的命名常量（14 点）：外边框与内容之间左右的距离，在真正绘制液态玻璃且未设置时 `itemContentHorizontalInset` 取此值。
