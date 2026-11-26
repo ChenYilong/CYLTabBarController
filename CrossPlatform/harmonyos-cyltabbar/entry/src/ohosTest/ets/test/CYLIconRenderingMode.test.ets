@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@ohos/hypium';
-import { cylIconRenderingMode, cylStaticIconTintColor, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor } from 'cyltabbar';
+import { cylIconRenderingMode, cylStaticIconTintColor, cylIconFillColorOf, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor } from 'cyltabbar';
 
 /**
  * [EN] The tint of a static tab icon (docs/Tab-Item-Colors.md, #787): a template icon takes the bar's selected / unselected tint without
@@ -39,5 +39,13 @@ export default function cylIconRenderingModeTest() {
       expect(cylStaticIconTintColor(undefined, '#FF2D55', CYLFlatDesignTintColor)).assertEqual('#FF2D55');
     });
 
+    it('fill color: the tint for a tinted icon (SVG fill art), none for an untinted one', 0, () => {
+      expect(cylIconFillColorOf('#FF2D55')).assertEqual('#FF2D55');
+      expect(cylIconFillColorOf(0xFF9500)).assertEqual(0xFF9500);
+      expect(cylIconFillColorOf('')).assertEqual(undefined);
+      expect(cylIconFillColorOf(cylStaticIconTintColor('original', '#FF2D55', CYLFlatDesignTintColor))).assertEqual(undefined);
+      expect(cylIconFillColorOf(cylStaticIconTintColor('automatic', undefined, CYLFlatDesignTintColor))).assertEqual(undefined);
+      expect(cylIconFillColorOf(cylStaticIconTintColor('template', '#FF2D55', CYLFlatDesignTintColor))).assertEqual('#FF2D55');
+    });
   });
 }
