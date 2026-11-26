@@ -1,5 +1,6 @@
 import { describe, it, expect } from '@ohos/hypium';
-import { CYLAnimatedItemContrast, CYLAnimatedItemContrastRGBA } from 'cylanimateditem';
+import { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemContrast, CYLAnimatedItemContrastKindIcon, CYLAnimatedItemContrastKindText,
+  CYLAnimatedItemContrastRGBA } from 'cylanimateditem';
 
 const DARK_TEXT: string = '#FF3C3C43';
 const TEAL: string = '#FF30B0C7';
@@ -35,6 +36,22 @@ function text(color: ResourceColor): ResourceColor {
 
 function icon(color: ResourceColor): ResourceColor {
   return CYLAnimatedItemContrast.adjustedColor(color, undefined, undefined, CYLAnimatedItemContrast.minimumIconContrast);
+}
+
+const MID_GRAY: string = '#FF888888';
+
+/** [EN] `adaptedOnGlass` with the app color mode set to `mode` for the call (the AppStorage value is restored). [CN] 把应用颜色模式设为 `mode` 后调用 `adaptedOnGlass`（AppStorage 的值随后还原）。 */
+function onGlass(color: ResourceColor, kind: string, mode: string,
+  style: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.liquidGlass): ResourceColor {
+  const before: string | undefined = AppStorage.get<string>('cyl_colorMode');
+  AppStorage.setOrCreate('cyl_colorMode', mode);
+  const result: ResourceColor = CYLAnimatedItemContrast.adaptedOnGlass(color, kind, style, undefined, undefined);
+  if (before === undefined) {
+    AppStorage.delete('cyl_colorMode');
+  } else {
+    AppStorage.setOrCreate('cyl_colorMode', before);
+  }
+  return result;
 }
 
 /**
@@ -116,6 +133,42 @@ export default function cylAnimatedItemContrastTest() {
     it('the pure function gives the same output for the same input', 0, () => {
       expect(text(TEAL)).assertEqual(text(TEAL));
       expect(icon(DARK_TEAL)).assertEqual(icon(DARK_TEAL));
+    });
+
+    it('adaptedOnGlass lifts dark text and an icon on the drawn dark glass', 0, () => {
+      const lifted: ResourceColor = onGlass(DARK_TEXT, CYLAnimatedItemContrastKindText, 'dark');
+      expect(lifted === DARK_TEXT).assertFalse();
+      expect(contrastOf(lifted) >= PASSING).assertTrue();
+      const liftedIcon: ResourceColor = onGlass(DARK_TEAL, CYLAnimatedItemContrastKindIcon, 'dark');
+      expect(liftedIcon === DARK_TEAL).assertFalse();
+      expect(contrastOf(liftedIcon) >= ICON_PASSING).assertTrue();
+      expect(onGlass(DARK_TEXT, CYLAnimatedItemContrastKindText, 'dark')).assertEqual(text(DARK_TEXT));
+    });
+
+    it('adaptedOnGlass leaves the colour alone in light mode', 0, () => {
+      expect(onGlass(DARK_TEXT, CYLAnimatedItemContrastKindText, 'light')).assertEqual(DARK_TEXT);
+      expect(onGlass(DARK_TEAL, CYLAnimatedItemContrastKindIcon, 'light')).assertEqual(DARK_TEAL);
+    });
+
+    it('adaptedOnGlass leaves the colour alone on the flat style even in dark mode', 0, () => {
+      expect(onGlass(DARK_TEXT, CYLAnimatedItemContrastKindText, 'dark', CYLAnimatedItemBackgroundStyle.flat)).assertEqual(DARK_TEXT);
+      expect(onGlass(DARK_TEAL, CYLAnimatedItemContrastKindIcon, 'dark', CYLAnimatedItemBackgroundStyle.flat)).assertEqual(DARK_TEAL);
+    });
+
+    it('adaptedOnGlass picks 3 for an icon and 4.5 for a text', 0, () => {
+      expect(contrastOf(MID_GRAY) >= CYLAnimatedItemContrast.minimumIconContrast).assertTrue();
+      expect(contrastOf(MID_GRAY) < CYLAnimatedItemContrast.minimumTextContrast).assertTrue();
+      expect(onGlass(MID_GRAY, CYLAnimatedItemContrastKindIcon, 'dark')).assertEqual(MID_GRAY);
+      const lifted: ResourceColor = onGlass(MID_GRAY, CYLAnimatedItemContrastKindText, 'dark');
+      expect(lifted === MID_GRAY).assertFalse();
+      expect(contrastOf(lifted) >= PASSING).assertTrue();
+    });
+
+    it('adaptedOnGlass returns a resource, an unset and a Color constant colour as they are', 0, () => {
+      const resource: ResourceColor = $r('sys.color.font_primary');
+      expect(onGlass(resource, CYLAnimatedItemContrastKindText, 'dark') === resource).assertTrue();
+      expect(onGlass('', CYLAnimatedItemContrastKindIcon, 'dark')).assertEqual('');
+      expect(onGlass(1, CYLAnimatedItemContrastKindText, 'dark')).assertEqual(1);
     });
   });
 }

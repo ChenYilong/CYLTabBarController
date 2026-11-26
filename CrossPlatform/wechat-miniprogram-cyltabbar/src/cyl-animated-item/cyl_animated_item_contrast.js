@@ -9,6 +9,9 @@
  */
 const CYL_ICON_MINIMUM_CONTRAST = 3
 const CYL_TITLE_MINIMUM_CONTRAST = 4.5
+// [EN] The kind of an adapted colour: an icon tint / symbol colour (minimum 3) or a text colour (minimum 4.5). [CN] 被适配颜色的种类：图标着色 / 符号颜色（最低 3）或文字颜色（最低 4.5）。
+const CYL_ADAPTED_KIND_ICON = 'icon'
+const CYL_ADAPTED_KIND_TEXT = 'text'
 /** [EN] White share of the default frosted glass in dark mode (over black about #242424). */
 const CYL_FROSTED_GLASS_WHITE_ALPHA = 0.14
 /** [EN] The share of an explicit glass tint's alpha that tints the glass when no tint alpha is given. */
@@ -118,6 +121,8 @@ function cylAnimatedItemContrastLift(color, minimumContrast, glassColor, tintAlp
 module.exports = {
   CYL_ICON_MINIMUM_CONTRAST,
   CYL_TITLE_MINIMUM_CONTRAST,
+  CYL_ADAPTED_KIND_ICON,
+  CYL_ADAPTED_KIND_TEXT,
   CYL_FROSTED_GLASS_WHITE_ALPHA,
   CYL_DEFAULT_GLASS_TINT_SHARE,
   cylAnimatedItemGlassReferenceLuminance,

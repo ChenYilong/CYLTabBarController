@@ -1,6 +1,6 @@
 const { cylIsGIFImagePath } = require('./cyl_gif_image')
 const { cylCountdownText } = require('./cyl_animated_item_countdown')
-const { cylAnimatedItemContrastLift, CYL_ICON_MINIMUM_CONTRAST, CYL_TITLE_MINIMUM_CONTRAST } = require('./cyl_animated_item_contrast')
+const { cylAnimatedItemContrastLift, CYL_ICON_MINIMUM_CONTRAST, CYL_TITLE_MINIMUM_CONTRAST, CYL_ADAPTED_KIND_ICON, CYL_ADAPTED_KIND_TEXT } = require('./cyl_animated_item_contrast')
 /**
  * [EN] The render model of cyl-animated-item, the mini program counterpart of iOS `CYLAnimatedItemView` (the
  *      CYLAnimatedItem pod) and Android `com.cyl.animateditem.CYLAnimatedItemView`. Pure functions without any wx API,
@@ -569,6 +569,25 @@ function cylAnimatedItemGlassContrastAdapter(p, minimum) {
   return (color) => cylAnimatedItemContrastLift(color, minimum, p.itemBackgroundColor, Number(p.itemGlassTintAlpha))
 }
 
+/**
+ * [EN] The colour `color` as it must be drawn for the item `p` (the item's properties): unchanged unless the glass adapter applies
+ *      (dark item with really drawn Liquid Glass, see `cylAnimatedItemGlassContrastAdapter`), else lifted to the minimum contrast of
+ *      `kind` (CYL_ADAPTED_KIND_ICON: 3, CYL_ADAPTED_KIND_TEXT: 4.5). The model uses this single path for the title, the icon tint and
+ *      the animation tint. A host that draws its own static icon (e.g. the cyl-tag-list component, which bakes the colour of a
+ *      `system:` symbol into an SVG data URI) must call it BEFORE baking the colour, with the same `p` as the item.
+ * [CN] 条目 `p`（条目属性）实际应绘制的颜色：除非玻璃适配器生效（深色条目且真正绘制液态玻璃，见 `cylAnimatedItemGlassContrastAdapter`），
+ *      否则原样返回；生效时提亮到 `kind` 的最低对比度（CYL_ADAPTED_KIND_ICON：3，CYL_ADAPTED_KIND_TEXT：4.5）。模型的标题、图标着色与
+ *      动画着色都走这一条路径。自己绘制静态图标的宿主（如 cyl-tag-list 组件把 `system:` 符号的颜色烘焙进 SVG data URI）必须在烘焙颜色之前
+ *      以与条目相同的 `p` 调用它。
+ * @param {string} color the explicit colour text
+ * @param {string} kind CYL_ADAPTED_KIND_ICON ('icon') or CYL_ADAPTED_KIND_TEXT ('text')
+ * @param {object} p the item properties (itemBackgroundStyle, itemBackgroundColor, itemGlassTintAlpha, userInterfaceStyle, ...)
+ */
+function cylAnimatedItemAdaptedColor(color, kind, p) {
+  const adapter = cylAnimatedItemGlassContrastAdapter(p || {}, kind === CYL_ADAPTED_KIND_TEXT ? CYL_TITLE_MINIMUM_CONTRAST : CYL_ICON_MINIMUM_CONTRAST)
+  return adapter ? adapter(color) : color
+}
+
 function cylAnimatedItemModel(input) {
   if (input?.cylInternalDivider) {
     // [EN] The divider mode shows no icon, title, animation or badge, only the line, and no screen reader element. [CN] 分割线模式不显示图标、标题、动画与角标，只有一条线，读屏也不朗读。
@@ -582,8 +601,8 @@ function cylAnimatedItemModel(input) {
   const hasSource = !!animationPath || hasAnimationData
   const { usesEngine, gifShows, ended, animationShows } = cylAnimatedItemAnimationState(p, animationType, hasSource)
   // [EN] Dark Liquid Glass drawn: explicit title / icon colors without enough contrast are lifted (cyl_animated_item_contrast.js). [CN] 绘制深色液态玻璃时：对比度不足的显式标题 / 图标颜色会被提亮。
-  const adaptIcon = cylAnimatedItemGlassContrastAdapter(p, CYL_ICON_MINIMUM_CONTRAST)
-  const adaptTitle = cylAnimatedItemGlassContrastAdapter(p, CYL_TITLE_MINIMUM_CONTRAST)
+  const adaptIcon = (color) => cylAnimatedItemAdaptedColor(color, CYL_ADAPTED_KIND_ICON, p)
+  const adaptTitle = (color) => cylAnimatedItemAdaptedColor(color, CYL_ADAPTED_KIND_TEXT, p)
   const fallbackImage = cylAnimatedItemFallbackImage(p, hasSource, animationShows)
   const fallbackHidden = (animationShows && !gifShows) || cylGIFImageStillShows(p, hasSource, fallbackImage)
   const layers = cylAnimatedItemStillLayers(p, fallbackImage, fallbackHidden, adaptIcon)
@@ -825,6 +844,9 @@ function cylAnimatedItemResource(animationUrl) {
 }
 
 module.exports = {
+  cylAnimatedItemAdaptedColor,
+  CYL_ADAPTED_KIND_ICON,
+  CYL_ADAPTED_KIND_TEXT,
   cylAnimatedItemSourceOption,
   cylAnimatedItemMissingReason,
   cylAnimatedItemResource,

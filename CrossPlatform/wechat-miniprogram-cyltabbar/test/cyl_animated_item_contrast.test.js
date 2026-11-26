@@ -9,7 +9,7 @@ const {
   cylAnimatedItemContrastLift,
   cylAnimatedItemGlassReferenceLuminance,
 } = require('../src/cyl-animated-item/cyl_animated_item_contrast')
-const { cylAnimatedItemModel, cylAnimatedItemLiquidGlassSetActiveOverride } = require('../src/cyl-animated-item/cyl_animated_item_model')
+const { cylAnimatedItemModel, cylAnimatedItemLiquidGlassSetActiveOverride, cylAnimatedItemAdaptedColor, CYL_ADAPTED_KIND_ICON, CYL_ADAPTED_KIND_TEXT } = require('../src/cyl-animated-item/cyl_animated_item_model')
 
 test.afterEach(() => cylAnimatedItemLiquidGlassSetActiveOverride(undefined))
 
@@ -103,4 +103,41 @@ test('unset, flat, light and inactive glass are unchanged', () => {
   const unset = cylAnimatedItemModel({ ...GLASS })
   assert.equal(unset.iconTint, '')
   assert.doesNotMatch(unset.titleStyle, /#3C3C43/i)
+})
+
+test('cylAnimatedItemAdaptedColor lifts text and an icon colour on dark drawn glass', () => {
+  const text = cylAnimatedItemAdaptedColor(DARK_TEXT, CYL_ADAPTED_KIND_TEXT, GLASS)
+  assert.notEqual(text, DARK_TEXT)
+  assert.ok(contrast(text) >= 4.5 - TOLERANCE)
+  const icon = cylAnimatedItemAdaptedColor('#202020', CYL_ADAPTED_KIND_ICON, GLASS)
+  assert.notEqual(icon, '#202020')
+  assert.ok(contrast(icon) >= 3 - TOLERANCE)
+  assert.equal(icon, cylAnimatedItemContrastLift('#202020', CYL_ICON_MINIMUM_CONTRAST))
+  const dark = { ...GLASS, userInterfaceStyle: 'system', systemTheme: 'dark' }
+  assert.notEqual(cylAnimatedItemAdaptedColor('#202020', CYL_ADAPTED_KIND_ICON, dark), '#202020')
+})
+
+test('cylAnimatedItemAdaptedColor leaves light, flat, inactive glass and unparseable colours unchanged', () => {
+  for (const kind of [CYL_ADAPTED_KIND_ICON, CYL_ADAPTED_KIND_TEXT]) {
+    assert.equal(cylAnimatedItemAdaptedColor('#202020', kind, { ...GLASS, userInterfaceStyle: 'light' }), '#202020')
+    assert.equal(cylAnimatedItemAdaptedColor('#202020', kind, { ...GLASS, itemBackgroundStyle: 'flat' }), '#202020')
+    assert.equal(cylAnimatedItemAdaptedColor('#202020', kind, { userInterfaceStyle: 'dark' }), '#202020')
+    for (const c of ['red', 'var(--x)', '#abc', '']) assert.equal(cylAnimatedItemAdaptedColor(c, kind, GLASS), c)
+  }
+  cylAnimatedItemLiquidGlassSetActiveOverride(false)
+  assert.equal(cylAnimatedItemAdaptedColor('#202020', CYL_ADAPTED_KIND_ICON, GLASS), '#202020')
+})
+
+test('cylAnimatedItemAdaptedColor: the kind picks 3 versus 4.5', () => {
+  // A grey that passes 3 but not 4.5 on the default glass (found with the same helpers the tests use).
+  let between = ''
+  for (let v = 0; v < 256 && !between; v++) {
+    const hex = '#' + v.toString(16).padStart(2, '0').repeat(3).toUpperCase()
+    if (contrast(hex) >= 3 + TOLERANCE && contrast(hex) < 4.5 - TOLERANCE) between = hex
+  }
+  assert.ok(between)
+  assert.equal(cylAnimatedItemAdaptedColor(between, CYL_ADAPTED_KIND_ICON, GLASS), between)
+  const text = cylAnimatedItemAdaptedColor(between, CYL_ADAPTED_KIND_TEXT, GLASS)
+  assert.notEqual(text, between)
+  assert.ok(contrast(text) >= 4.5 - TOLERANCE)
 })

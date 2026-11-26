@@ -1,7 +1,7 @@
 import { CYLAnimatedItemTypeRegistry } from './CYLAnimatedItemTypes';
 import { CYLLiquidGlass } from './CYLLiquidGlass';
 import { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier } from './CYLAnimatedItemBackground';
-import { CYLAnimatedItemContrast } from './CYLAnimatedItemContrast';
+import { CYLAnimatedItemContrast, CYLAnimatedItemContrastKindIcon, CYLAnimatedItemContrastKindText } from './CYLAnimatedItemContrast';
 import { LifecycleCenter, LifecycleController } from 'cyldeallocblockexecutor';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
 import {
@@ -1221,11 +1221,9 @@ export struct CYLAnimatedItemView {
    *      提亮到与玻璃的对比度达到 `minimum`；扁平、浅色模式或未绘制玻璃时保持原样。
    */
   private cylGlassAdapted(color: ResourceColor, minimum: number): ResourceColor {
-    if (!this.cylIsDark() || !this.cylItemGlassDrawn()) {
-      return color;
-    }
-    return CYLAnimatedItemContrast.adjustedColor(color, this.itemBackgroundColor !== '' ? this.itemBackgroundColor : undefined,
-      this.itemGlassTintAlpha, minimum);
+    const kind: string = minimum === CYLAnimatedItemContrast.minimumIconContrast ? CYLAnimatedItemContrastKindIcon : CYLAnimatedItemContrastKindText;
+    return CYLAnimatedItemContrast.adaptedOnGlass(color, kind, this.itemBackgroundStyle,
+      this.itemBackgroundColor !== '' ? this.itemBackgroundColor : undefined, this.itemGlassTintAlpha);
   }
 
   /** [EN] The title color of the current state (item, stack, built-in). [CN] 当前状态的标题颜色（条目、堆叠、内置）。 */

@@ -1,3 +1,6 @@
+import { CYLAnimatedItemBackgroundModifier, CYLAnimatedItemBackgroundStyle } from './CYLAnimatedItemBackground';
+import { CYLLiquidGlass } from './CYLLiquidGlass';
+
 /**
  * [EN] The dark Liquid Glass colour adaptation of an item (ClassifyMenu's `CYLIconContrast` rule, moved here so no host has to apply it): an
  *      EXPLICIT, static title or icon colour that does not contrast enough with the dark glass behind it is lightened (HSL lightness raised in
@@ -29,6 +32,11 @@ const LINEAR_GAMMA: number = 2.4;
 const ALPHA_SHIFT: number = 16777216;
 const RED_SHIFT: number = 65536;
 const GREEN_SHIFT: number = 256;
+
+/** [EN] The kind of `CYLAnimatedItemContrast.adaptedOnGlass` for an icon / animation tint (3:1). [CN] `adaptedOnGlass` 的图标 / 动画着色类型（3:1）。 */
+export const CYLAnimatedItemContrastKindIcon: string = 'icon';
+/** [EN] The kind of `CYLAnimatedItemContrast.adaptedOnGlass` for a title text (4.5:1). [CN] `adaptedOnGlass` 的标题文字类型（4.5:1）。 */
+export const CYLAnimatedItemContrastKindText: string = 'text';
 
 /** [EN] sRGB components and alpha, all 0...1. [CN] sRGB 分量与透明度，均为 0...1。 */
 export class CYLAnimatedItemContrastRGBA {
@@ -121,6 +129,24 @@ export class CYLAnimatedItemContrast {
     }
     const share: number = tint.alpha * (tintAlpha === undefined || tintAlpha < 0 ? CYLAnimatedItemContrast.defaultGlassTintShare : tintAlpha);
     return CYLAnimatedItemContrast.relativeLuminance(tint.red * share, tint.green * share, tint.blue * share);
+  }
+
+  /**
+   * [EN] The colour to draw on the item's background: `color` itself (the same value) unless the glass is drawn for `style`
+   *      (`CYLAnimatedItemBackgroundModifier.isGlassDrawn`) AND the mode is dark (`CYLLiquidGlass.isDark()`); then `adjustedColor` with the
+   *      contrast of `kind`: `CYLAnimatedItemContrastKindIcon` = `minimumIconContrast` (3), `CYLAnimatedItemContrastKindText` (or any other
+   *      kind) = `minimumTextContrast` (4.5).
+   * [CN] 条目背景上应绘制的颜色：除非 `style` 绘制了玻璃（`isGlassDrawn`）且为深色模式（`CYLLiquidGlass.isDark()`），否则原值返回；否则按 `kind` 的对比度调用
+   *      `adjustedColor`：`CYLAnimatedItemContrastKindIcon` 为 `minimumIconContrast`（3），`CYLAnimatedItemContrastKindText`（及其他值）为 `minimumTextContrast`（4.5）。
+   */
+  static adaptedOnGlass(color: ResourceColor, kind: string, style: CYLAnimatedItemBackgroundStyle, glassTint: ResourceColor | undefined,
+    tintAlpha: number | undefined): ResourceColor {
+    if (!CYLAnimatedItemBackgroundModifier.isGlassDrawn(style) || !CYLLiquidGlass.isDark()) {
+      return color;
+    }
+    const minimum: number = kind === CYLAnimatedItemContrastKindIcon ? CYLAnimatedItemContrast.minimumIconContrast :
+    CYLAnimatedItemContrast.minimumTextContrast;
+    return CYLAnimatedItemContrast.adjustedColor(color, glassTint, tintAlpha, minimum);
   }
 
   /**

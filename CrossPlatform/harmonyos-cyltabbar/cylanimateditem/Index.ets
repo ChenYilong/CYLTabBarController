@@ -11,7 +11,8 @@ export {
 } from './src/main/ets/CYLAnimatedItemView';
 export { CYLAnimatedItemStackView } from './src/main/ets/CYLAnimatedItemStackView';
 export { CYLLiquidGlass } from './src/main/ets/CYLLiquidGlass';
-export { CYLAnimatedItemContrast, CYLAnimatedItemContrastRGBA, CYLAnimatedItemContrastHSL } from './src/main/ets/CYLAnimatedItemContrast';
+export { CYLAnimatedItemContrast, CYLAnimatedItemContrastRGBA, CYLAnimatedItemContrastHSL, CYLAnimatedItemContrastKindIcon,
+  CYLAnimatedItemContrastKindText } from './src/main/ets/CYLAnimatedItemContrast';
 export { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier, CYLAnimatedItemCornerRadiusCapsule,
   CYLAnimatedItemLiquidGlassContentInset } from './src/main/ets/CYLAnimatedItemBackground';
 export {
