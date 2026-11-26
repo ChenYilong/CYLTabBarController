@@ -21,6 +21,16 @@ function cylStackLength(value, fallback) {
 }
 
 /**
+ * [EN] Whether the divider after an item shows: its own `dividerAfter` (false hides, true or an options object shows), else the stack's `showsDividers`.
+ * [CN] 条目之后的分割线是否显示：条目自己的 `dividerAfter`（false 隐藏，true 或选项对象显示），否则取堆叠的 `showsDividers`。
+ */
+function cylStackDividerShown(own, showsDividers) {
+  if (own === false) return false
+  if (own === true || (own !== null && typeof own === 'object')) return true
+  return (own === undefined || own === null) && Boolean(showsDividers)
+}
+
+/**
  * [EN] An action name, or '' for none. [CN] 动作名称；没有时为 ''。
  */
 function cylStackAction(value) {
@@ -40,7 +50,7 @@ function cylStackModel(p) {
   const margin = cylStackLength(p.contentMargin, CYL_STACK_DEFAULT_SPACING)
   // [EN] `itemContentHorizontalInset` (px, left and right only, on top of the margin): the stack has no glass background here, so only an explicit value (0 or more) counts.
   // [CN] `itemContentHorizontalInset`（px，仅左右，叠加在边距之上）：此处的堆叠没有玻璃背景，所以只有显式值（0 及以上）有效。
-  const sideInset = Number(p.itemContentHorizontalInset) >= 0 ? Number(p.itemContentHorizontalInset) : 0
+  const sideInset = Math.max(0, Number(p.itemContentHorizontalInset) || 0)
   // [EN] iOS `axis` and `spacing`: 'horizontal' lays the items in one row (anything else is vertical); `spacing` is the space
   //      before items without their own `spacingBefore`. [CN] iOS 的 `axis` 与 `spacing`：'horizontal' 排成一行（其他值为竖向）；
   //      `spacing` 是没有自己 `spacingBefore` 的条目之前的间距。
@@ -135,7 +145,11 @@ function cylStackModel(p) {
   }
   const before = horizontal ? 'margin-left' : 'margin-top'
   const after = horizontal ? 'margin-right' : 'margin-bottom'
-  const optional = (value) => (value === undefined || value === null || value === '' || !(Number(value) >= 0) ? undefined : Number(value))
+  const optional = (value) => {
+    if (value === undefined || value === null || value === '') return undefined
+    const number = Number(value)
+    return number >= 0 ? number : undefined
+  }
   const stackBefore = optional(p.dividerSpacingBefore)
   const stackAfter = optional(p.dividerSpacingAfter)
   let owner = null
@@ -145,7 +159,7 @@ function cylStackModel(p) {
     if (!entry.visible) return
     if (owner) {
       const own = list[owner.index].dividerAfter
-      const shown = own === false ? false : own === true || (own !== null && typeof own === 'object') || (own === undefined || own === null ? Boolean(p.showsDividers) : false)
+      const shown = cylStackDividerShown(own, p.showsDividers)
       if (shown) {
         const values = own !== null && typeof own === 'object' ? own : {}
         const gapBefore = optional(values.spacingBefore) ?? stackBefore ?? stackSpacing

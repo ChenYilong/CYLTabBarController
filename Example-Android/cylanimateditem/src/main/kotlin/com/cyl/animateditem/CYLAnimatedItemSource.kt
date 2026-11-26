@@ -39,21 +39,25 @@ data class CYLAnimatedItemSource(
             val file = (if (start < 0) text else text.substring(0, start)).removePrefix("asset:")
             val options = LinkedHashMap<String, String>()
             if (start >= 0) {
-                val pairs = ArrayList<String>()
-                val current = StringBuilder()
-                for (index in start + 1 until text.length) {
-                    val character = text[index]
-                    val splits = character == '&' || ((character == '#' || character == '?') && text[index - 1] != '=')
-                    if (splits) { pairs.add(current.toString()); current.setLength(0) } else current.append(character)
-                }
-                pairs.add(current.toString())
-                for (pair in pairs) {
+                for (pair in splitPairs(text, start)) {
                     val equals = pair.indexOf('=')
                     if (equals <= 0) continue
                     options[decode(pair.substring(0, equals))] = decode(pair.substring(equals + 1))
                 }
             }
             return CYLAnimatedItemSource(file, CYLAnimationEngines.typeOf(null, file), options)
+        }
+
+        private fun splitPairs(text: String, start: Int): List<String> {
+            val pairs = ArrayList<String>()
+            val current = StringBuilder()
+            for (index in start + 1 until text.length) {
+                val character = text[index]
+                val splits = character == '&' || ((character == '#' || character == '?') && text[index - 1] != '=')
+                if (splits) { pairs.add(current.toString()); current.setLength(0) } else current.append(character)
+            }
+            pairs.add(current.toString())
+            return pairs
         }
 
         private fun decode(text: String): String = try {

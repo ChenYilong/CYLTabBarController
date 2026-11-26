@@ -139,6 +139,25 @@ function cylStateIconTint(p, selected) {
 }
 
 /**
+ * [EN] The text of a property: '' when it is undefined or null.
+ * [CN] 属性的文本：undefined 或 null 时为 ''。
+ */
+function cylItemText(value) {
+  return String(value === undefined || value === null ? '' : value);
+}
+
+/**
+ * [EN] The badge's content inset: the default one when the property is not set (undefined, null or '').
+ * [CN] 角标的内边距：属性未设置（undefined、null 或 ''）时为默认值。
+ */
+function cylItemBadgeInset(value) {
+  if (value === undefined || value === null || value === '') {
+    return { top: 1, left: 6, bottom: 1, right: 6 };
+  }
+  return reader.cylInsets(value);
+}
+
+/**
  * [EN] The render model from the component's properties.
  * [CN] 根据组件属性生成渲染模型。
  */
@@ -150,22 +169,20 @@ function cylItemModel(p) {
   const imageOffset = reader.cylOffset(p.imagePositionAdjustment);
   const titleOffset = reader.cylOffset(p.titlePositionAdjustment);
   const badgeOffset = reader.cylOffset(p.badgePositionAdjustment);
-  const badgeInset = p.badgeContentInset === undefined || p.badgeContentInset === null || p.badgeContentInset === ''
-    ? { top: 1, left: 6, bottom: 1, right: 6 }
-    : reader.cylInsets(p.badgeContentInset);
+  const badgeInset = cylItemBadgeInset(p.badgeContentInset);
   const badgeSize = reader.cylSize(p.badgeSize);
   const animationPath = String(p.lottieURL || p.lottieFilePath || p.animationPath || '');
   const animationSize = reader.cylSize(p.lottieSizeValue) || reader.cylSize(p.animationSize);
   const imageSize = reader.cylSize(p.imageSize);
-  const image = selected ? (p.selectedImage || p.image || '') : (p.image || '');
-  const title = String(p.title === undefined || p.title === null ? '' : p.title);
+  const image = (selected && p.selectedImage) || p.image || '';
+  const title = cylItemText(p.title);
   const iconBox = animationSize || imageSize || { width: 28, height: 28 };
   const imageMoveX = imageOffset.horizontal + (imageInsets.left - imageInsets.right) / 2;
   const imageMoveY = imageOffset.vertical + (imageInsets.top - imageInsets.bottom) / 2;
   const iconTint = reader.cylColor(appearance.iconColor) || reader.cylColor(selected ? p.selectedIconTint : p.iconTint);
   const titleAttributes = cylStateAttributes(p.titleTextAttributes, stateKey, selected);
   const badgeAttributes = cylStateAttributes(p.badgeTextAttributes, stateKey, selected);
-  const badgeValue = String(p.badgeValue === undefined || p.badgeValue === null ? '' : p.badgeValue);
+  const badgeValue = cylItemText(p.badgeValue);
   const showsBadge = badgeValue !== '' || Boolean(badgeSize);
   const background = reader.cylColor(selected ? p.selectedBackgroundColor : p.backgroundColor);
   const hasImage = Boolean(image || animationPath);
@@ -187,8 +204,8 @@ function cylItemModel(p) {
     iconTint,
     // [EN] The tab's configured tint options and its title colors go to cyl-animated-item unresolved: the component is the only
     //      resolver (cylAnimatedItemAnimationTint). [CN] Tab 配置的着色选项与标题颜色原样交给 cyl-animated-item：只有该组件做解析。
-    animationTint: String(p.animationTint === undefined || p.animationTint === null ? '' : p.animationTint).trim(),
-    animationDarkTint: String(p.animationDarkTint === undefined || p.animationDarkTint === null ? '' : p.animationDarkTint).trim(),
+    animationTint: cylItemText(p.animationTint).trim(),
+    animationDarkTint: cylItemText(p.animationDarkTint).trim(),
     animationRenderingMode: String(p.animationRenderingMode || ''),
     animationIconTint: cylStateTitleColor(p, false),
     animationSelectedIconTint: cylStateTitleColor(p, true),

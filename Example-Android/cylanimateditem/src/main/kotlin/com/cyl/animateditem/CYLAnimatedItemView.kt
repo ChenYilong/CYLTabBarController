@@ -770,7 +770,12 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         }
 
     private fun applyTitleColor(configuration: Configuration = resources.configuration) {
-        val color = resolvedTitleColor(configuration)
+        val color = resolvedTitleColor(configuration)?.let { resolved ->
+            // [EN] Only an EXPLICIT colour is adapted, and only on dark drawn glass. [CN] 只调整显式颜色，且仅在深色玻璃确实绘制时。
+            if ((titleColor ?: stackTitleColor) != null && glassContrastApplies(configuration)) {
+                CYLAnimatedItemContrast.adjustedTitle(resolved, itemBackgroundColor, itemGlassTintAlpha)
+            } else resolved
+        }
         if (color != null) {
             if (!appliesTitleColor) defaultTitleColor = titleView.currentTextColor
             titleView.setTextColor(color)
@@ -814,8 +819,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         return if (isSelected) CYLAnimatedItemBuiltInColors.selected(context, configuration) else CYLAnimatedItemBuiltInColors.normal(context, configuration)
     }
 
-    private fun applyIconColor() {
-        val color = effectiveIconColor
+    private fun applyIconColor(configuration: Configuration = resources.configuration) {
+        val color = effectiveIconColor?.let { adaptedIconColor(it, configuration) }
         if (color != null) {
             iconView.setColorFilter(color, PorterDuff.Mode.SRC_IN)
             appliesIconColor = true
@@ -824,9 +829,22 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             iconView.clearColorFilter()
             appliesIconColor = false
         }
-        refreshAnimationTint()
+        refreshAnimationTint(configuration)
         invalidate()
     }
+
+    /**
+     * [EN] True when the dark-glass contrast rule applies: Liquid Glass is really drawn (the glass layer is on) and `configuration` is night.
+     * [CN] 深色玻璃对比度规则适用：液态玻璃确实绘制（玻璃层在显示）且 `configuration` 为夜间模式。
+     */
+    private fun glassContrastApplies(configuration: Configuration): Boolean =
+        usesItemBackground && itemBackgroundStyle == CYLAnimatedItemBackgroundStyle.LiquidGlass && isLiquidGlassActive() &&
+            itemBackgroundRenderer.glassView != null &&
+            (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+
+    /** [EN] An explicit icon colour, adapted to the dark glass when the rule applies. [CN] 规则适用时，把显式图标颜色调整到适合深色玻璃。 */
+    private fun adaptedIconColor(color: Int, configuration: Configuration): Int =
+        if (glassContrastApplies(configuration)) CYLAnimatedItemContrast.adjustedIcon(color, itemBackgroundColor, itemGlassTintAlpha) else color
 
     // MARK: - Divider mode 分隔线模式
 
@@ -963,17 +981,24 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val kind = if (!tintIsSet && mode == CYLAnimationRenderingMode.Automatic) {
             CYLAnimationColorCount.kindOfSource(context, animationURL?.takeIf { it.isNotBlank() } ?: (view.cyl_getTag(CYLTabBarItemAnimationFailure.RESOURCE_TAG) as? String))
         } else CYLAnimationColorCount.Kind.Undetectable
-        val color = CYLTabBarItemAnimationTint.resolveItem(
+        val resolvedIcon = resolvedIconColor(configuration)
+        var color = CYLTabBarItemAnimationTint.resolveItem(
             tint, CYLTabBarItemAnimationTint.darkTintOption(options), mode, kind, isSelected, night,
-            resolvedIconColor(configuration), explicitSelectedIconColor,
+            CYLTabBarItemAnimationTint.IconColors(resolvedIcon, explicitSelectedIconColor),
         )
+        // [EN] Dark drawn glass: an explicit tint (fixed, or the explicit icon colour) is adapted; the built-in icon colour is not.
+        // [CN] 深色玻璃确实绘制时：显式着色（固定色或显式图标颜色）会被调整；内置图标颜色不调整。
+        if (color != null && glassContrastApplies(configuration) && !(color == resolvedIcon && (if (isSelected) explicitSelectedIconColor else explicitIconColor) == null)) {
+            color = CYLAnimatedItemContrast.adjustedIcon(color, itemBackgroundColor, itemGlassTintAlpha)
+        }
         CYLTabBarItemAnimationTint.applyToAnimationView(view, color)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        applyItemBackground()
         applyTitleColor(newConfig)
-        refreshAnimationTint(newConfig)
+        applyIconColor(newConfig)
         invalidate()
     }
 
@@ -1027,34 +1052,44 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         if (fileMissing && url != null) {
             resourceMissing(url.substringBefore('#'), if (localFileExists(url)) CYLResourceMissingReason.UNREADABLE else CYLResourceMissingReason.NOT_FOUND)
         }
-        if (!url.isNullOrBlank() && !fileMissing) {
-            val (w, h) = iconSizeDp?.let { it.width to it.height } ?: (24f to 24f)
-            // [EN] No engine, no library or a file it cannot read: no view, the static image stays (an app's own source that
-            //      throws is treated the same way). [CN] 没有引擎、没有动画库或文件无法读取：不创建视图，保留静态图片（App 自己的来源抛出异常时同样处理）。
-            val made = try { animationSource.animationViewWithURL(context, url, CYLSize(w, h), ImageView.ScaleType.FIT_CENTER) } catch (error: RuntimeException) { null }
-            made?.let { view ->
-                view.cyl_hideFromAccessibility()
-                addView(view, indexOfChild(iconView) + 1)
-                animationView = view
-                animationPlayer?.let { player ->
-                    player.loops = animationLoops
-                    if (animationSpeed > 0f) player.animationSpeed = animationSpeed
-                    player.progress = animationRestingProgress
-                }
-                refreshAnimationTint()
-                if (drivesAnimationPlayback && isSelected) playAnimation()
-            } ?: run {
-                CYLAnimationEngines.warnMissingEngine(context, null, url)
-                val type = CYLAnimationEngines.typeOf(null, url)
-                resourceMissing(url.substringBefore('#'), when {
-                    type != null && !CYLAnimationEngines.isAvailable(type) -> CYLResourceMissingReason.ENGINE_LIBRARY_MISSING
-                    type != null -> CYLResourceMissingReason.UNREADABLE
-                    else -> CYLResourceMissingReason.DECODE_FAILED
-                })
-            }
-        }
+        if (!url.isNullOrBlank() && !fileMissing) makeAnimationView(url)
         updateIcon()
         requestLayout()
+    }
+
+    /**
+     * [EN] Creates and attaches the animation view of `url`, or reports why there is none (the static image stays).
+     * [CN] 创建并添加 `url` 的动画视图；无法创建时报告原因（保留静态图片）。
+     */
+    private fun makeAnimationView(url: String) {
+        val (w, h) = iconSizeDp?.let { it.width to it.height } ?: (24f to 24f)
+        // [EN] No engine, no library or a file it cannot read: no view, the static image stays (an app's own source that
+        //      throws is treated the same way). [CN] 没有引擎、没有动画库或文件无法读取：不创建视图，保留静态图片（App 自己的来源抛出异常时同样处理）。
+        val made = try { animationSource.animationViewWithURL(context, url, CYLSize(w, h), ImageView.ScaleType.FIT_CENTER) } catch (error: RuntimeException) { null }
+        if (made == null) {
+            reportMissingEngine(url)
+            return
+        }
+        made.cyl_hideFromAccessibility()
+        addView(made, indexOfChild(iconView) + 1)
+        animationView = made
+        animationPlayer?.let { player ->
+            player.loops = animationLoops
+            if (animationSpeed > 0f) player.animationSpeed = animationSpeed
+            player.progress = animationRestingProgress
+        }
+        refreshAnimationTint()
+        if (drivesAnimationPlayback && isSelected) playAnimation()
+    }
+
+    private fun reportMissingEngine(url: String) {
+        CYLAnimationEngines.warnMissingEngine(context, null, url)
+        val type = CYLAnimationEngines.typeOf(null, url)
+        resourceMissing(url.substringBefore('#'), when {
+            type != null && !CYLAnimationEngines.isAvailable(type) -> CYLResourceMissingReason.ENGINE_LIBRARY_MISSING
+            type != null -> CYLResourceMissingReason.UNREADABLE
+            else -> CYLResourceMissingReason.DECODE_FAILED
+        })
     }
 
     /**
@@ -1609,7 +1644,15 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     private fun applyItemBackground() {
         if (!usesItemBackground) return
         itemBackgroundRenderer.apply(itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha, itemGlassBackdropSource)
+        // [EN] The glass state (drawn or not, its tint) decides the contrast adaptation: re-apply the colours when it changes. [CN] 玻璃状态（是否绘制、着色）决定对比度调整：变化时重新应用颜色。
+        val key = if (glassContrastApplies(resources.configuration)) listOf(itemBackgroundColor, itemGlassTintAlpha) else null
+        if (key != glassContrastKey) {
+            glassContrastKey = key
+            applyTitleColor()
+            applyIconColor()
+        }
     }
+    private var glassContrastKey: List<Any?>? = null
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)

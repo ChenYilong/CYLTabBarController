@@ -630,9 +630,38 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     private func itemBackgroundDidChange() {
         usesItemBackground = true
         layoutItemBackground()
+        refreshGlassContrastColorsIfNeeded()
         // [EN] The style decides the unset inset, which changes the size. [CN] 样式决定未设置时的内缩，从而改变尺寸。
         invalidateIntrinsicContentSize()
         setNeedsLayout()
+    }
+
+    /**
+     [EN] Whether the dark-glass contrast rule (`CYLAnimatedItemContrast`) applies: Liquid Glass is really drawn (`resolvedItemBackgroundStyle`)
+          and this item's own traits are dark.
+     [CN] 深色玻璃对比度规则（`CYLAnimatedItemContrast`）是否适用：液态玻璃确实绘制（`resolvedItemBackgroundStyle`）且本条目自己的 trait 为深色。
+     */
+    private var glassContrastApplies: Bool {
+        usesItemBackground && resolvedItemBackgroundStyle == .liquidGlass && traitCollection.userInterfaceStyle == .dark
+    }
+
+    /// [EN] The glass state the colors were last adapted to (nil: the rule did not apply). [CN] 颜色上次适配的玻璃状态（nil：规则不适用）。
+    private var glassContrastKey: [AnyHashable?]?
+
+    /// [EN] The glass (drawn or not, its tint) decides the contrast adaptation: the colors are applied again when it changes. [CN] 玻璃（是否绘制、着色）决定对比度调整：变化时重新应用颜色。
+    private func refreshGlassContrastColorsIfNeeded() {
+        let key: [AnyHashable?]? = glassContrastApplies ? [itemBackgroundColor, itemGlassTintAlpha.map { Double($0) }] : nil
+        guard key != glassContrastKey else { return }
+        glassContrastKey = key
+        refreshIconColor()
+        // [EN] Only an explicit title color is adapted; a color someone else set (a subclass) is left alone. [CN] 只调整显式标题颜色；他人（子类）设置的颜色不动。
+        if explicitTitleColor != nil { refreshTitleColor() }
+    }
+
+    /// [EN] An explicit color adapted to the dark glass when the rule applies; `minimumContrast` picks title or icon. [CN] 规则适用时把显式颜色调整到适合深色玻璃；`minimumContrast` 区分标题与图标。
+    private func glassAdapted(_ color: UIColor, minimumContrast: CGFloat) -> UIColor {
+        guard glassContrastApplies else { return color }
+        return CYLAnimatedItemContrast.adjusted(color, glassTint: itemBackgroundColor, tintAlpha: itemGlassTintAlpha, minimumContrast: minimumContrast)
     }
 
     /// [EN] Applies the background, radius and border for the current bounds (`CYLAnimatedItemBackgroundRenderer`). [CN] 按当前 bounds 应用背景、圆角与边框。
@@ -1492,9 +1521,14 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
 
     /// [EN] The EFFECTIVE icon color of the current state: explicit, else subclass, else built-in (resolved with this item's traits). [CN] 当前状态的有效图标颜色：显式值，否则子类，否则内置（用本条目的 trait 解析）。
+    ///      On drawn dark glass the EXPLICIT color is adapted (`CYLAnimatedItemContrast`, 3:1, static colors only); the subclass and built-in levels are not.
+    ///      [CN] 深色玻璃确实绘制时调整显式颜色（`CYLAnimatedItemContrast`，3:1，仅静态颜色）；子类层与内置层不调整。
     private func effectiveIconColor() -> UIColor {
         let state = currentIconState
-        let color = explicitIconColor(state) ?? hostIconColor ?? builtInIconColor(state)
+        if let explicit = explicitIconColor(state) {
+            return glassAdapted(explicit, minimumContrast: CYLAnimatedItemContrast.iconMinimumContrast).resolvedColor(with: traitCollection)
+        }
+        let color = hostIconColor ?? builtInIconColor(state)
         return color.resolvedColor(with: traitCollection)
     }
 
@@ -1530,9 +1564,16 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         //      (a subview) still reports the OLD appearance, so a dynamic color resolved by the engine there came out white on white after
         //      a live switch. [CN] 用本条目的 trait 解析并以普通颜色交出：在 `traitCollectionDidChange` 内，动画视图（子视图）仍报告旧的外观，
         //      引擎在那里解析动态颜色会在运行中切换后得到白底白图标。
-        let resolved = CYLTabBarItemAnimationItemTintColor(
+        var resolved = CYLTabBarItemAnimationItemTintColor(
             animationURL, effectiveAnimationTint, effectiveAnimationDarkTint, mode, isSelected, traits.userInterfaceStyle == .dark,
             effective, explicitSelected)?.resolvedColor(with: traits)
+        // [EN] Drawn dark glass: an explicit tint (a fixed `animationTint`, or the explicit icon color, already adapted) is adapted (3:1); the
+        //      subclass and built-in icon colors are not. [CN] 深色玻璃确实绘制时：显式着色（固定 `animationTint`，或已调整的显式图标颜色）按 3:1 调整；
+        //      子类与内置图标颜色不调整。
+        if let tint = resolved, glassContrastApplies,
+           !(tint.isEqual(effective) && explicitIconColor(currentIconState) == nil) {
+            resolved = glassAdapted(tint, minimumContrast: CYLAnimatedItemContrast.iconMinimumContrast)
+        }
         // [EN] A view that resolves its own tint from its URL options (Rive) takes the final color instead, so the properties reach it too.
         // [CN] 自行从 URL 选项解析着色的视图（Rive）改为接收最终颜色，使属性对它也生效。
         let resolvedSelector = NSSelectorFromString("cyl_applyAnimationViewResolvedTintColor:")
@@ -1556,16 +1597,24 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     ///      disabled the system disabled gray) unless someone else set `titleLabel.textColor` (a subclass, the countdown), which then stays.
     /// [CN] 标题颜色：该状态 `titleTextAttributes` 中的显式颜色，否则为内置值（普通 `UIColor.label`，选中 `tintColor`，不可用为系统禁用灰色），
     ///      除非他人（子类、倒计时）设置了 `titleLabel.textColor`，此时保持其值。
+    ///      On drawn dark glass the explicit color is adapted (`CYLAnimatedItemContrast`, 4.5:1, static colors only).
+    ///      [CN] 深色玻璃确实绘制时调整显式颜色（`CYLAnimatedItemContrast`，4.5:1，仅静态颜色）。
     private func refreshTitleColor() {
         guard !cylIsDivider else { return }
-        if let explicit = currentItemStateAppearance?.titleTextAttributes[.foregroundColor] as? UIColor {
-            titleLabel.textColor = explicit
-            appliedTitleColor = explicit
+        if let explicit = explicitTitleColor {
+            let shown = glassAdapted(explicit, minimumContrast: CYLAnimatedItemContrast.titleMinimumContrast)
+            titleLabel.textColor = shown
+            appliedTitleColor = shown
             return
         }
         if itemStyle == .countdown && countdownState == .running { return }
         let current: UIColor? = titleLabel.textColor
         if current == nil || (appliedTitleColor != nil && current!.isEqual(appliedTitleColor)) { setBuiltInTitleColor() }
+    }
+
+    /// [EN] The explicit `titleTextAttributes` color of the current state. [CN] 当前状态 `titleTextAttributes` 中的显式颜色。
+    private var explicitTitleColor: UIColor? {
+        currentItemStateAppearance?.titleTextAttributes[.foregroundColor] as? UIColor
     }
 
     private func setBuiltInTitleColor() {

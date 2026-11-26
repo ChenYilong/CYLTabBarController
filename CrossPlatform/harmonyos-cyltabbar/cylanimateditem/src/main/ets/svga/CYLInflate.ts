@@ -39,7 +39,7 @@ class CYLHuffman {
 }
 
 class CYLBitReader {
-  private data: Uint8Array;
+  private readonly data: Uint8Array;
   position: number;
   private bitBuffer: number = 0;
   private bitCount: number = 0;
@@ -132,10 +132,20 @@ class CYLOutput {
   }
 }
 
+function fixedLiteralLength(symbol: number): number {
+  if (symbol < 144) {
+    return 8;
+  }
+  if (symbol < 256) {
+    return 9;
+  }
+  return symbol < 280 ? 7 : 8;
+}
+
 function fixedCodes(): CYLHuffman[] {
   const lengths = new Uint8Array(288);
   for (let i = 0; i < 288; i++) {
-    lengths[i] = i < 144 ? 8 : i < 256 ? 9 : i < 280 ? 7 : 8;
+    lengths[i] = fixedLiteralLength(i);
   }
   const distances = new Uint8Array(30);
   distances.fill(5);
@@ -180,6 +190,45 @@ function dynamicCodes(reader: CYLBitReader): CYLHuffman[] {
     new CYLHuffman(lengths.subarray(literalCount), distanceCount)];
 }
 
+/** Copies one stored (uncompressed) deflate block to the output. */
+function inflateStoredBlock(reader: CYLBitReader, output: CYLOutput): void {
+  reader.alignToByte();
+  const length = reader.byte() | (reader.byte() << 8);
+  reader.byte();
+  reader.byte();
+  for (let i = 0; i < length; i++) {
+    output.push(reader.byte());
+  }
+}
+
+/** Decodes the literal and length/distance symbols of one Huffman-compressed deflate block until its end symbol. */
+function inflateCompressedBlock(reader: CYLBitReader, output: CYLOutput, codes: CYLHuffman[]): void {
+  for (;;) {
+    const symbol = reader.decode(codes[0]);
+    if (symbol < 256) {
+      output.push(symbol);
+    } else if (symbol === 256) {
+      return;
+    } else {
+      inflateMatch(reader, output, codes, symbol);
+    }
+  }
+}
+
+/** Copies one back-reference (length symbol, then distance) to the output. */
+function inflateMatch(reader: CYLBitReader, output: CYLOutput, codes: CYLHuffman[], symbol: number): void {
+  const index = symbol - 257;
+  if (index >= LENGTH_BASE.length) {
+    throw new Error('CYLSVGA: zlib: bad length symbol');
+  }
+  const length = LENGTH_BASE[index] + reader.bits(LENGTH_EXTRA[index]);
+  const d = reader.decode(codes[1]);
+  if (d >= DIST_BASE.length) {
+    throw new Error('CYLSVGA: zlib: bad distance symbol');
+  }
+  output.copy(DIST_BASE[d] + reader.bits(DIST_EXTRA[d]), length);
+}
+
 /**
  * Inflates a raw deflate stream starting at `offset`.
  */
@@ -191,38 +240,13 @@ export function cylInflateRaw(data: Uint8Array, offset: number = 0): Uint8Array 
     last = reader.bits(1);
     const type = reader.bits(2);
     if (type === 0) {
-      reader.alignToByte();
-      const length = reader.byte() | (reader.byte() << 8);
-      reader.byte();
-      reader.byte();
-      for (let i = 0; i < length; i++) {
-        output.push(reader.byte());
-      }
+      inflateStoredBlock(reader, output);
       continue;
     }
     if (type === 3) {
       throw new Error('CYLSVGA: zlib: bad deflate block');
     }
-    const codes = type === 1 ? fixedCodes() : dynamicCodes(reader);
-    for (;;) {
-      const symbol = reader.decode(codes[0]);
-      if (symbol < 256) {
-        output.push(symbol);
-      } else if (symbol === 256) {
-        break;
-      } else {
-        const index = symbol - 257;
-        if (index >= LENGTH_BASE.length) {
-          throw new Error('CYLSVGA: zlib: bad length symbol');
-        }
-        const length = LENGTH_BASE[index] + reader.bits(LENGTH_EXTRA[index]);
-        const d = reader.decode(codes[1]);
-        if (d >= DIST_BASE.length) {
-          throw new Error('CYLSVGA: zlib: bad distance symbol');
-        }
-        output.copy(DIST_BASE[d] + reader.bits(DIST_EXTRA[d]), length);
-      }
-    }
+    inflateCompressedBlock(reader, output, type === 1 ? fixedCodes() : dynamicCodes(reader));
   }
   return output.buffer.slice(0, output.length);
 }

@@ -84,7 +84,9 @@ class CYLLiquidGlassReentrantDrawTest {
         val canvas = TintCanvas()
         glass.draw(canvas)
         assertEquals("the page is not drawn while it records", 0, page.sampledWhileRecording)
-        assertEquals("the tint fallback", listOf(0x66FF8800), canvas.tints)
+        // [EN] Only the tint is drawn from the page (no sampling); the sheen and the rim follow it. [CN] 页面只绘制着色（不采样）；高光与细边随后绘制。
+        assertEquals("the tint fallback", listOf(0x66FF8800), canvas.tints.take(1))
+        assertEquals("then the sheen and the rim", 3, canvas.tints.size)
     }
 
     @Test
@@ -95,7 +97,7 @@ class CYLLiquidGlassReentrantDrawTest {
         val canvas = TintCanvas()
         glass.draw(canvas)
         assertEquals(0, page.sampledWhileRecording)
-        assertEquals(listOf(0x66FF8800), canvas.tints)
+        assertEquals(listOf(0x66FF8800), canvas.tints.take(1))
     }
 
     @Test
@@ -108,7 +110,7 @@ class CYLLiquidGlassReentrantDrawTest {
         glass.backdropSource = other
         val canvas = TintCanvas()
         glass.draw(canvas)
-        assertEquals("the tint fallback survives the exception", listOf(0x66FF8800), canvas.tints)
+        assertEquals("the tint fallback survives the exception", listOf(0x66FF8800), canvas.tints.take(1))
         assertEquals(0, page.sampledWhileRecording)
     }
 }

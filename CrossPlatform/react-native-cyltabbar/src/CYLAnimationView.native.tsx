@@ -177,8 +177,8 @@ export function CYLAnimationView({
       ref={native}
       source={animationURLWithOptions(file, options)}
       playing={playing ?? false}
-      animationTint={animationTint ? animationTint : undefined}
-      animationDarkTint={animationDarkTint ? animationDarkTint : undefined}
+      animationTint={animationTint || undefined}
+      animationDarkTint={animationDarkTint || undefined}
       animationRenderingMode={animationRenderingMode ?? 'automatic'}
       onAnimationLoaded={onAnimationLoaded ? () => onAnimationLoaded() : undefined}
       onAnimationFailed={onAnimationFailed ? () => onAnimationFailed() : undefined}

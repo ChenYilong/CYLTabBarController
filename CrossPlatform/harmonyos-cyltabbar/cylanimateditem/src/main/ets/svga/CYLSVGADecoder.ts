@@ -121,7 +121,7 @@ function cylUTF8(bytes: Uint8Array): string {
  * [EN] A protobuf reader over bytes. [CN] 读取字节的 protobuf 解析器。
  */
 class CYLProtoReader {
-  bytes: Uint8Array;
+  readonly bytes: Uint8Array;
   position: number = 0;
   private view: DataView;
 
@@ -431,7 +431,7 @@ export function cylDecodeSVGAMovie(bytes: Uint8Array): CYLSVGAMovie {
     }
     return true;
   });
-  if (!(movie.fps > 0)) {
+  if (movie.fps <= 0 || Number.isNaN(movie.fps)) {
     movie.fps = 20;
   }
   return movie;

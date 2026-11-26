@@ -76,14 +76,13 @@ object DemoTeardown {
         arm(controller, "CYLTabBarController")
         remaining = SECONDS
         onTick()
-        val tick = object : Runnable {
-            override fun run() {
-                remaining -= 1
-                if (remaining > 0 && !host.isFinishing) {
-                    onTick()
-                    handler.postDelayed(this, 1000)
-                    return
-                }
+        lateinit var tick: Runnable
+        tick = Runnable {
+            remaining -= 1
+            if (remaining > 0 && !host.isFinishing) {
+                onTick()
+                handler.postDelayed(tick, 1000)
+            } else {
                 remaining = 0
                 host.startActivity(android.content.Intent(host, DemoReleasedActivity::class.java)
                     .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK))

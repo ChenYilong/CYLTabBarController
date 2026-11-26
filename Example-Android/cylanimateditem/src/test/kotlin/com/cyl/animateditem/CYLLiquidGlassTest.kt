@@ -97,7 +97,7 @@ class CYLLiquidGlassTest {
             override fun drawRoundRect(left: Float, top: Float, right: Float, bottom: Float, rx: Float, ry: Float, paint: android.graphics.Paint) { roundRects++ }
         }
         (item.itemLiquidGlassView as CYLLiquidGlassView).draw(canvas)
-        assertEquals("the frosted tint and the hairline rim are drawn", 2, roundRects)
+        assertEquals("the frosted tint, the sheen and the rim are drawn", 3, roundRects)
     }
 
     @Test

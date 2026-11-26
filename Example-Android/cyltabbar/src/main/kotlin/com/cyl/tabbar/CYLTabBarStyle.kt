@@ -2,7 +2,7 @@ package com.cyl.tabbar
 
 import com.cyl.animateditem.CYLGlassBackdrop
 import com.cyl.animateditem.CYLGlassEffects
-import com.cyl.animateditem.CYLGlassHighlight
+import com.cyl.animateditem.CYLGlassEdge
 import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Color
@@ -244,7 +244,6 @@ internal class CYLFlatDesignTabBarStyle : CYLTabBarStyleRenderer {
 internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
     private val panelBackdrop = CYLGlassBackdrop()
     private val bubbleBackdrop = CYLGlassBackdrop()
-    private val highlight = CYLGlassHighlight()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val panel = RectF()
@@ -441,10 +440,15 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
     }
 
     override fun drawAboveItems(tabBar: CYLTabBar, canvas: Canvas) {
-        // [EN] Backdrop's default `Highlight` on the dock: the 0.5 dp rim. [CN] 胶囊上 Backdrop 默认的 `Highlight`：0.5 dp 的边缘高光。
-        if (!panelShape.isEmpty) highlight.draw(canvas, panelShape, panelShape.height() / 2f, tabBar.resources.displayMetrics.density, 1f)
+        // [EN] The shared glass edge (the same sheen and rim as tags and boards) on the dock and, while pressed, the bubble's rim. [CN] 共用的玻璃边缘（与标签、看板相同的高光与细边）：胶囊上绘制，按下时气泡绘制细边。
+        val density = tabBar.resources.displayMetrics.density
+        val dark = CYLGlassEdge.isDark(tabBar.resources)
+        if (!panelShape.isEmpty) {
+            CYLGlassEdge.drawSheen(canvas, panelShape, panelShape.height() / 2f, dark)
+            CYLGlassEdge.drawRim(canvas, panelShape, panelShape.height() / 2f, density, dark)
+        }
         val press = pressProgress.value
-        if (press > 0.01f && !bubble.isEmpty) highlight.draw(canvas, bubble, bubble.height() / 2f, tabBar.resources.displayMetrics.density, press)
+        if (press > 0.01f && !bubble.isEmpty) CYLGlassEdge.drawRim(canvas, bubble, bubble.height() / 2f, density, dark, press)
     }
 
     // MARK: - Pressing and dragging the bubble (DampedDragAnimation) 按下与拖动气泡

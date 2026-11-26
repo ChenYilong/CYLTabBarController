@@ -180,29 +180,6 @@ half4 main(float2 coord) {
 }"""
 
     /**
-     * [EN] The rim light: brighter where the edge faces `angle`. [CN] 边缘高光：边缘朝向 `angle` 的位置更亮。
-     */
-    const val HIGHLIGHT = """
-uniform float2 size;
-uniform float4 cornerRadii;
-layout(color) uniform half4 color;
-uniform float angle;
-uniform float falloff;
-$ROUNDED_RECT_SDF
-
-half4 main(float2 coord) {
-    float2 halfSize = size * 0.5;
-    float2 centeredCoord = coord - halfSize;
-    float radius = radiusAt(coord, cornerRadii);
-    float gradRadius = min(radius * 1.5, min(halfSize.x, halfSize.y));
-    float2 grad = gradSdRoundedRect(centeredCoord, halfSize, gradRadius);
-    float2 normal = float2(cos(angle), sin(angle));
-    float d = dot(grad, normal);
-    float intensity = pow(abs(d), falloff);
-    return color * intensity;
-}"""
-
-    /**
      * [EN] Backdrop's `vibrancy()`: saturation 1.5. [CN] Backdrop 的 `vibrancy()`：饱和度 1.5。
      */
     fun vibrancyColorFilter(saturation: Float = 1.5f): ColorMatrixColorFilter {
@@ -386,41 +363,3 @@ data class CYLGlassEffects(
     val refractionAmount: Float = 0f,
     val chromaticAberration: Boolean = false,
 )
-
-/**
- * [EN] Backdrop's `Highlight.Default`: a thin rim, brighter at 45°, added (PLUS) over the glass. Android 13+; nothing
- *      before.
- * [CN] Backdrop 的 `Highlight.Default`：细边缘，45° 方向更亮，以 PLUS 叠加在玻璃上。需要 Android 13+，更早的版本不绘制。
- */
-class CYLGlassHighlight {
-    private var shader: Any? = null
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
-    private val path = Path()
-
-    fun draw(canvas: Canvas, rect: RectF, radius: Float, density: Float, alpha: Float) {
-        if (!CYLLiquidGlassSupport.rendersRefraction || alpha <= 0f || rect.width() <= 0f) return
-        drawRim(canvas, rect, radius, density, alpha)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private fun drawRim(canvas: Canvas, rect: RectF, radius: Float, density: Float, alpha: Float) {
-        val rim = (shader as? RuntimeShader) ?: RuntimeShader(CYLLiquidGlassShaders.HIGHLIGHT).also { shader = it }
-        val corner = radius.coerceAtMost(minOf(rect.width(), rect.height()) / 2f)
-        rim.setFloatUniform("size", rect.width(), rect.height())
-        rim.setFloatUniform("cornerRadii", corner, corner, corner, corner)
-        rim.setColorUniform("color", android.graphics.Color.WHITE)
-        rim.setFloatUniform("angle", (45f * PI / 180f).toFloat())
-        rim.setFloatUniform("falloff", 1f)
-        paint.shader = rim
-        paint.alpha = (alpha * 0.5f * 255).toInt().coerceIn(0, 255)
-        paint.strokeWidth = 0.5f * density * 2f
-        paint.blendMode = BlendMode.PLUS
-        path.rewind()
-        path.addRoundRect(rect, radius, radius, Path.Direction.CW)
-        canvas.save()
-        canvas.clipPath(path)
-        canvas.translate(rect.left, rect.top)
-        canvas.drawRoundRect(0f, 0f, rect.width(), rect.height(), radius, radius, paint)
-        canvas.restore()
-    }
-}

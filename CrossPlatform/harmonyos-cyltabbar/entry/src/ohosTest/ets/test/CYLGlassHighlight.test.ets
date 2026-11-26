@@ -1,5 +1,6 @@
 import { describe, it, expect } from '@ohos/hypium';
 import { CYLLiquidGlass, CYLAnimatedItemBackgroundModifier } from 'cylanimateditem';
+import { CYLLiquidGlassCapsuleEdge } from 'cyltabbar';
 
 /**
  * [EN] The one liquid glass config of cylanimateditem (the hairline rim and the sheen), shared by tags, cards and the tab bar capsule: the rim is the
@@ -34,6 +35,25 @@ export default function cylGlassHighlightTest() {
       expect(CYLLiquidGlass.sheenColors(true)[0][0]).assertEqual('#2EFFFFFF');
     });
 
+    it('the tab bar capsule reads the same rim and sheen as a tag, in light and dark', 0, () => {
+      [false, true].forEach((dark: boolean) => {
+        const tag: EdgeColors = CYLLiquidGlass.rimEdgeColors(dark);
+        const capsule: EdgeColors = CYLLiquidGlassCapsuleEdge.rim(dark);
+        expect(capsule.top).assertEqual(tag.top);
+        expect(capsule.right).assertEqual(tag.right);
+        expect(capsule.bottom).assertEqual(tag.bottom);
+        expect(capsule.left).assertEqual(tag.left);
+        const tagSheen: Array<[ResourceColor, number]> = CYLLiquidGlass.sheenColors(dark);
+        const capsuleSheen: Array<[ResourceColor, number]> = CYLLiquidGlassCapsuleEdge.sheen(dark);
+        expect(capsuleSheen.length).assertEqual(tagSheen.length);
+        capsuleSheen.forEach((stop: [ResourceColor, number], index: number) => {
+          expect(stop[0]).assertEqual(tagSheen[index][0]);
+          expect(stop[1]).assertEqual(tagSheen[index][1]);
+        });
+      });
+      expect(CYLLiquidGlassCapsuleEdge.rimWidth()).assertEqual(CYLLiquidGlass.RIM_WIDTH);
+    });
+
     it('the default glass tint follows the mode: frosted light, white 14 percent in dark', 0, () => {
       const before: string | undefined = AppStorage.get<string>('cyl_colorMode');
       AppStorage.setOrCreate('cyl_colorMode', 'dark');
@@ -50,6 +70,33 @@ export default function cylGlassHighlightTest() {
       AppStorage.setOrCreate('cyl_colorMode', 'light');
       expect(CYLLiquidGlass.isDark()).assertFalse();
       AppStorage.setOrCreate('cyl_colorMode', before ?? 'light');
+    });
+
+    it('with cyl_colorMode unset the system dark / light mode decides; an explicit key wins', 0, () => {
+      const key: string | undefined = AppStorage.get<string>('cyl_colorMode');
+      const system: number | undefined = AppStorage.get<number>('colorMode');
+      CYLLiquidGlass.trackSystemColorMode();
+      AppStorage.delete('cyl_colorMode');
+      AppStorage.setOrCreate('colorMode', ColorMode.DARK);
+      expect(CYLLiquidGlass.isDark()).assertTrue();
+      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#24FFFFFF');
+      AppStorage.setOrCreate('colorMode', ColorMode.LIGHT);
+      expect(CYLLiquidGlass.isDark()).assertFalse();
+      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#80E1DEDC');
+      AppStorage.setOrCreate('cyl_colorMode', 'light');
+      AppStorage.setOrCreate('colorMode', ColorMode.DARK);
+      expect(CYLLiquidGlass.isDark()).assertFalse();
+      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#80E1DEDC');
+      AppStorage.setOrCreate('cyl_colorMode', 'dark');
+      AppStorage.setOrCreate('colorMode', ColorMode.LIGHT);
+      expect(CYLLiquidGlass.isDark()).assertTrue();
+      expect(CYLAnimatedItemBackgroundModifier.defaultGlassTint()).assertEqual('#24FFFFFF');
+      if (key === undefined) {
+        AppStorage.delete('cyl_colorMode');
+      } else {
+        AppStorage.setOrCreate('cyl_colorMode', key);
+      }
+      AppStorage.setOrCreate('colorMode', system ?? ColorMode.LIGHT);
     });
   });
 }

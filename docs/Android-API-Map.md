@@ -17,7 +17,7 @@
 | 中文 | English |
 |:---|:---|
 | iOS 库的每个公开符号（公开头文件中的类、协议、方法、属性、常量、枚举、函数）及其 Android 版本（`Example-Android/cyltabbar`，Kotlin 与 Java）。状态：done 行为相同；partial 部分行为（见说明）；planned 尚未移植；n/a 仅 iOS（UIKit、扁平样式、液态玻璃、Core Animation 等），不计入完成率。 | Every public symbol of the iOS library (classes, protocols, methods, properties, constants, enums and functions of the public headers) with its Android version (`Example-Android/cyltabbar`, Kotlin and Java). Status: done, the same behavior; partial, part of it (see the note); planned, not ported yet; n/a, iOS only (UIKit, FlatDesign, Liquid Glass, Core Animation...), left out of the score. |
-| **迁移完成率：99 / 100**（done + 0.5 × partial，共 1076 个计入的符号；done 1062、partial 6、planned 8、n/a 387）。 | **Migration score: 99 / 100** (done + 0.5 × partial over 1076 counted symbols; done 1062, partial 6, planned 8, n/a 387). |
+| **迁移完成率：98 / 100**（done + 0.5 × partial，共 1091 个计入的符号；done 1062、partial 6、planned 23、n/a 387）。 | **Migration score: 98 / 100** (done + 0.5 × partial over 1091 counted symbols; done 1062, partial 6, planned 23, n/a 387). |
 
 ## 目录 / Contents
 
@@ -52,9 +52,11 @@
 | [`CYLTabBarController.h`](#cyltabbarcontrollerh) | [`CYLTabBarController.h`](#cyltabbarcontrollerh) |
 | [`CYLTabBarControllerTypedefs.h`](#cyltabbarcontrollertypedefsh) | [`CYLTabBarControllerTypedefs.h`](#cyltabbarcontrollertypedefsh) |
 | [`CYLTabBarHostView.h`](#cyltabbarhostviewh) | [`CYLTabBarHostView.h`](#cyltabbarhostviewh) |
+| [`CYLTabBarItemAnimation/CYLTabBarItemAnimationColorCount.h`](#cyltabbaritemanimationcyltabbaritemanimationcolorcounth) | [`CYLTabBarItemAnimation/CYLTabBarItemAnimationColorCount.h`](#cyltabbaritemanimationcyltabbaritemanimationcolorcounth) |
 | [`CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.h`](#cyltabbaritemanimationcyltabbaritemanimationfactoryh) | [`CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.h`](#cyltabbaritemanimationcyltabbaritemanimationfactoryh) |
 | [`CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h`](#cyltabbaritemanimationcyltabbaritemanimationplayableviewh) | [`CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h`](#cyltabbaritemanimationcyltabbaritemanimationplayableviewh) |
 | [`CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayer.h`](#cyltabbaritemanimationcyltabbaritemanimationplayerh) | [`CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayer.h`](#cyltabbaritemanimationcyltabbaritemanimationplayerh) |
+| [`CYLTabBarItemAnimation/CYLTabBarItemAnimationTint.h`](#cyltabbaritemanimationcyltabbaritemanimationtinth) | [`CYLTabBarItemAnimation/CYLTabBarItemAnimationTint.h`](#cyltabbaritemanimationcyltabbaritemanimationtinth) |
 | [`CYLTabBarItemAnimation/CYLTabBarItemAnimator.h`](#cyltabbaritemanimationcyltabbaritemanimatorh) | [`CYLTabBarItemAnimation/CYLTabBarItemAnimator.h`](#cyltabbaritemanimationcyltabbaritemanimatorh) |
 | [`CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.h`](#cyltabbaritemanimationcyltabbaritemanimatorregistryh) | [`CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.h`](#cyltabbaritemanimationcyltabbaritemanimatorregistryh) |
 | [`CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.h`](#cyltabbaritemanimationcyltabbaritemviewanimatorh) | [`CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.h`](#cyltabbaritemanimationcyltabbaritemviewanimatorh) |
@@ -86,7 +88,6 @@
 | [`CYLUtils/UIView+CYLUtils.h`](#cylutilsuiviewcylutilsh) | [`CYLUtils/UIView+CYLUtils.h`](#cylutilsuiviewcylutilsh) |
 | [`CYLUtils/UIViewController+CYLUtils.h`](#cylutilsuiviewcontrollercylutilsh) | [`CYLUtils/UIViewController+CYLUtils.h`](#cylutilsuiviewcontrollercylutilsh) |
 | [`NSObject+CYLTabBarControllerExtention.h`](#nsobjectcyltabbarcontrollerextentionh) | [`NSObject+CYLTabBarControllerExtention.h`](#nsobjectcyltabbarcontrollerextentionh) |
-| [`Package/ObjC/include/CYLTabBarItemAnimationEngine.h`](#packageobjcincludecyltabbaritemanimationengineh) | [`Package/ObjC/include/CYLTabBarItemAnimationEngine.h`](#packageobjcincludecyltabbaritemanimationengineh) |
 | [`UIColor+CYLTabBarControllerExtention.h`](#uicolorcyltabbarcontrollerextentionh) | [`UIColor+CYLTabBarControllerExtention.h`](#uicolorcyltabbarcontrollerextentionh) |
 | [`UIControl+CYLTabBarControllerExtention.h`](#uicontrolcyltabbarcontrollerextentionh) | [`UIControl+CYLTabBarControllerExtention.h`](#uicontrolcyltabbarcontrollerextentionh) |
 | [`UIImage+CYLTabBarControllerExtention.h`](#uiimagecyltabbarcontrollerextentionh) | [`UIImage+CYLTabBarControllerExtention.h`](#uiimagecyltabbarcontrollerextentionh) |
@@ -987,6 +988,14 @@
 | `CYLTabBarHostView` `touchableRectsDidChange` | `CYLTabBarHostView.touchableRectsDidChange` | done |  |
 | `CYLTabBarHostView` `tabBarController` | `CYLTabBarHostView.tabBarController` | done |  |
 
+## `CYLTabBarItemAnimation/CYLTabBarItemAnimationColorCount.h`
+
+| iOS API | Android API | 状态 Status | 说明 / Note |
+|:---|:---|:---|:---|
+| `CYLTabBarItemAnimationColorKind` | — | planned |  |
+| `CYLTabBarItemAnimationColorKindOfData()` | — | planned |  |
+| `CYLTabBarItemAnimationColorKindOfURL()` | — | planned |  |
+
 ## `CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.h`
 
 | iOS API | Android API | 状态 Status | 说明 / Note |
@@ -1043,6 +1052,29 @@
 | `CYLTabBarItemAnimationBasePlayer` `+new` | `CYLTabBarItemAnimationBasePlayer (constructor)` | done | unavailable on iOS too: use the designated constructor |
 | `CYLTabBarItemAnimationBasePlayer` `animationView` | `CYLTabBarItemAnimationBasePlayer.animationView` | done |  |
 | `CYLTabBarItemAnimationPlayer` `loops` | `CYLTabBarItemAnimationPlayer.loops` | done | Lottie (repeat count) and PAG; the other libraries ignore it |
+| `CYLTabBarItemAnimationPlayer` `supportsSpeed` | — | planned |  |
+| `CYLTabBarItemAnimationPlayer` `supportsLoops` | — | planned |  |
+| `CYLTabBarItemAnimationPlayer` `supportsProgress` | — | planned |  |
+| `CYLTabBarItemAnimationPlayer` `supportsColors` | — | planned |  |
+| `CYLTabBarItemAnimationPlayer` `playing` | — | planned |  |
+| `CYLTabBarItemAnimationPlayer` `speed` | — | planned |  |
+| `CYLTabBarItemAnimationPlayer` `onEnded` | — | planned |  |
+| `CYLTabBarItemAnimationPlayer` `-applyColors:` | — | planned |  |
+| `CYLTabBarItemAnimationBasePlayer` `onEnded` | — | planned |  |
+| `CYLTabBarItemAnimationBasePlayer` `-notifyPlaybackEnded` | — | planned |  |
+
+## `CYLTabBarItemAnimation/CYLTabBarItemAnimationTint.h`
+
+| iOS API | Android API | 状态 Status | 说明 / Note |
+|:---|:---|:---|:---|
+| `CYLTabBarItemAnimationPrepareTint()` | — | planned |  |
+| `CYLTabBarItemAnimationPrepareItemTint()` | — | planned |  |
+| `CYLTabBarItemAnimationRenderingMode` | — | planned |  |
+| `CYLTabBarItemAnimationRenderingModeFromString()` | — | planned |  |
+| `CYLTabBarItemAnimationTabFlowRenderingMode()` | — | planned |  |
+| `CYLTabBarItemAnimationResolveTint()` | — | planned |  |
+| `CYLTabBarItemAnimationResolveTintWithRenderingMode()` | — | planned |  |
+| `CYLTabBarItemAnimationItemTintColor()` | — | planned |  |
 
 ## `CYLTabBarItemAnimation/CYLTabBarItemAnimator.h`
 
@@ -1336,6 +1368,7 @@
 
 | iOS API | Android API | 状态 Status | 说明 / Note |
 |:---|:---|:---|:---|
+| `CYLTabBarAnimationOptionsFromURL()` | — | planned |  |
 | `CYLTabBarAnimationOptionRiveNumberInput` | `CYLConstants.CYLTabBarAnimationOptionRiveNumberInput` | done | played when libpag / rive-android is in the app |
 | `CYLTabBarAnimationOptionRiveNumberValues` | `CYLConstants.CYLTabBarAnimationOptionRiveNumberValues` | done | played when libpag / rive-android is in the app |
 | `CYLTabBarAnimationOptionTint` | `CYLConstants.CYLTabBarAnimationOptionTint` | done |  |
@@ -1552,18 +1585,6 @@
 | `NSObject(CYLTabBarControllerExtention)` `-cyl_removeObserver:forKeyPath:` | — | n/a | UIKit view / control / color / image / navigation helpers |
 | `NSObject(CYLTabBarControllerExtention)` `-cyl_removeObserver:forKeyPath:context:` | — | n/a | UIKit view / control / color / image / navigation helpers |
 | `CYLCatchException()` | — | n/a | Catches an Objective-C exception for Swift callers (Swift cannot catch NSException); Kotlin has try / catch |
-
-## `Package/ObjC/include/CYLTabBarItemAnimationEngine.h`
-
-| iOS API | Android API | 状态 Status | 说明 / Note |
-|:---|:---|:---|:---|
-| `CYLTabBarItemAnimationEngine` | — | planned |  |
-| `CYLTabBarItemAnimationEngine` `registry` | — | planned |  |
-| `CYLTabBarItemAnimationEngine` `factory` | — | planned |  |
-| `CYLTabBarItemAnimationEngine` `styleSource` | — | planned |  |
-| `CYLTabBarItemAnimationEngine` `host` | — | planned |  |
-| `CYLTabBarItemAnimationEngine` `-initWithRegistry:factory:styleSource:host:` | — | planned |  |
-| `CYLTabBarItemAnimationEngine` `-init` | — | planned |  |
 
 ## `UIColor+CYLTabBarControllerExtention.h`
 
@@ -1970,7 +1991,7 @@
 | `CYLAnimatedItemView.showsImageWhenAnimationEnds` | `CYLAnimatedItemView.showsImageWhenAnimationEnds` | done | 只播放一次的动画结束时显示静态图片代替最后一帧，默认 false / A play-once animation that ends shows the still image instead of the last frame, default false |
 | `CYLAnimatedItemView.isShowingImageAfterAnimationEnd` | `CYLAnimatedItemView.isShowingImageAfterAnimationEnd` | done | 静态图片当前是否替换了已结束的动画（只读）/ Whether the still image replaces the ended animation now (read only) |
 | `CYLAnimatedItemView.onAnimationEnd` | `CYLAnimatedItemView.animationEndListener` | done | 只播放一次的一遍播放结束时调用，停止与循环时不调用（鸿蒙 `onAnimationEnd`，小程序 `animationcomplete`）/ Called when a play-once pass ends, not on a stop or a loop (HarmonyOS `onAnimationEnd`, mini program `animationcomplete`) |
-| `CYLAnimatedItemView.drivesAnimationPlayback` | `CYLAnimatedItemView.drivesAnimationPlayback` | match | 默认值相同：iOS、鸿蒙与 Android 均为 true（2026-11-24 起；TabBar 的 `CYLTabBarItemButton` 显式设为 false，因为 TabBar 自己播放）；false 时不应用默认播放规则，宿主通过播放器播放 / The default is the same: true on iOS, HarmonyOS and Android (since 2026-11-24; the tab bar's `CYLTabBarItemButton` sets false, the tab bar plays its icons itself); false applies no default playback rule and the host plays through the player |
+| `CYLAnimatedItemView.drivesAnimationPlayback` | `CYLAnimatedItemView.drivesAnimationPlayback` | partial | 默认值不同：iOS 与鸿蒙为 true，Android 为 false（待负责人决定，未改）；false 时不应用默认播放规则，宿主通过播放器播放 / The defaults differ: true on iOS and HarmonyOS, false on Android (owner question, not changed); false applies no default playback rule and the host plays through the player |
 | `CYLAnimatedItemView.animationRestartToken` | `CYLAnimatedItemView.animationRestartToken` | done | 每次重播加一；iOS 只读，Android 可写，值变化即重播（鸿蒙 `animationRestartToken`，小程序 `restartToken`）/ Grows on every restart; read only on iOS, settable on Android where a changed value restarts (HarmonyOS `animationRestartToken`, mini program `restartToken`) |
 | `CYLAnimatedItemView.animationPlayer.play()` | `CYLAnimatedItemView.animatedItemPlayer.play()` | done | 从当前进度播放 / Plays from the current progress |
 | `CYLAnimatedItemView.animationPlayer.progress (stop, then set)` | `CYLAnimatedItemView.animatedItemPlayer.stopAtProgress(progress)` | partial | iOS 没有单独的 `stopAtProgress`：先 `stop()`，播放器支持时再设置 `progress` / iOS has no single `stopAtProgress`: `stop()`, then set `progress` where the player supports it |

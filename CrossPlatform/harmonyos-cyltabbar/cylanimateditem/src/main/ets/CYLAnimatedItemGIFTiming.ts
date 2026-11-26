@@ -73,7 +73,7 @@ export function cylGIFUsableFrameCount(decoded: number, hasTrailer: boolean): nu
 export function cylGIFCacheFileName(url: string, byteLength: number): string {
   let hash = 5381;
   for (let i = 0; i < url.length; i++) {
-    hash = ((hash * 33) ^ url.charCodeAt(i)) >>> 0;
+    hash = ((hash * 33) ^ (url.codePointAt(i) ?? 0)) >>> 0;
   }
   return 'cyl-gif-' + hash.toString(16) + '-' + byteLength + '.gif';
 }

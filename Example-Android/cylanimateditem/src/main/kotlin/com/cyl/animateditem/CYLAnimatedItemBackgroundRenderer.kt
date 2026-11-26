@@ -78,13 +78,18 @@ internal class CYLAnimatedItemBackgroundRenderer(private val host: ViewGroup) {
             0f
         }
         box.cornerRadius = radius
-        box.setStroke((borderWidth * density).roundToInt(), borderColor ?: Color.TRANSPARENT)
+        val borderPx = (borderWidth * density).roundToInt()
         var glassDrawn = false
         if (resolved == CYLAnimatedItemBackgroundStyle.LiquidGlass) {
             val glass = layer ?: CYLLiquidGlassView(host.context).also { layer = it }
             glass.glassTintColor = glassTint(color, tintAlpha)
             glass.backdropSource = backdropSource
             glass.cornerRadius = radius
+            // [EN] The explicit border is drawn by the glass layer (over the tint and sheen), not by the box under it. [CN] 显式边框由玻璃层绘制（在着色与高光之上），而不是它下面的 box。
+            glass.borderWidth = borderPx.toFloat()
+            glass.borderColor = borderColor
+            // [EN] The glass layer fills the host: with padding, a FrameLayout's clipToPadding would clip the rim and sheen to the padded rect (most visible on a small capsule). [CN] 玻璃层铺满宿主：有 padding 时 clipToPadding 会把细边与高光裁到内边距矩形内（小胶囊上最明显）。
+            host.clipToPadding = false
             if (glass.parent == null) host.addView(glass, 0)
             glass.visibility = View.VISIBLE
             glass.layout(0, 0, host.width, host.height)
@@ -92,6 +97,7 @@ internal class CYLAnimatedItemBackgroundRenderer(private val host: ViewGroup) {
             glassDrawn = glass.isGlassDrawn
         }
         if (!glassDrawn) layer?.let { if (it.parent != null) host.removeView(it) }
+        box.setStroke(if (glassDrawn) 0 else borderPx, if (glassDrawn) Color.TRANSPARENT else (borderColor ?: Color.TRANSPARENT))
         box.setColor(if (glassDrawn) Color.TRANSPARENT else (color ?: Color.TRANSPARENT))
         if (host.background !== box) host.background = box
     }

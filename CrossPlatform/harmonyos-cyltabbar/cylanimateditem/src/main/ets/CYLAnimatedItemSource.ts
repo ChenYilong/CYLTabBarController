@@ -56,7 +56,12 @@ export function cylAnimatedItemFileAndOptions(url: string): [string, Map<string,
   const options: Map<string, string> = new Map<string, string>();
   const query = url.indexOf('?');
   const hash = url.indexOf('#');
-  const at = query < 0 ? hash : (hash < 0 ? query : Math.min(query, hash));
+  let at = query;
+  if (query < 0) {
+    at = hash;
+  } else if (hash >= 0) {
+    at = Math.min(query, hash);
+  }
   if (at < 0) {
     return [url, options];
   }

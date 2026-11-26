@@ -17,7 +17,7 @@ export function cylAnimatedItemParseHexColor(text: string): CYLAnimatedItemRGBA 
   if (!/^([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(hex)) {
     return undefined;
   }
-  const value = (index: number): number => parseInt(hex.substring(index, index + 2), 16);
+  const value = (index: number): number => Number.parseInt(hex.substring(index, index + 2), 16);
   const color = new CYLAnimatedItemRGBA();
   const offset = hex.length === 8 ? 2 : 0;
   color.alpha = hex.length === 8 ? value(0) : 255;
@@ -33,7 +33,8 @@ export function cylAnimatedItemParseHexColor(text: string): CYLAnimatedItemRGBA 
  */
 export function cylAnimatedItemARGBInteger(color: CYLAnimatedItemRGBA): number {
   const byte = (component: number): number => Math.max(0, Math.min(255, Math.round(component)));
-  return (byte(color.alpha) * 0x1000000 + byte(color.red) * 0x10000 + byte(color.green) * 0x100 + byte(color.blue)) | 0;
+  const unsigned = byte(color.alpha) * 0x1000000 + byte(color.red) * 0x10000 + byte(color.green) * 0x100 + byte(color.blue);
+  return unsigned > 0x7FFFFFFF ? unsigned - 0x100000000 : unsigned;
 }
 
 /**
@@ -52,9 +53,9 @@ export function cylAnimatedItemGlassTintColor(color: string | number, tintAlpha:
   } else if (color.trim().toLowerCase() === 'transparent') {
     return defaultTint;
   } else {
-    const hex: RegExpMatchArray | null = color.match(/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/);
+    const hex: RegExpExecArray | null = /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.exec(color);
     if (hex !== null) {
-      argb = hex[1].length === 6 ? (0xFF000000 + parseInt(hex[1], 16)) : parseInt(hex[1], 16);
+      argb = hex[1].length === 6 ? (0xFF000000 + Number.parseInt(hex[1], 16)) : Number.parseInt(hex[1], 16);
     }
   }
   if (argb < 0) {
@@ -287,6 +288,14 @@ export class CYLAnimatedItemStateColorInput {
   dark: boolean = false;
 }
 
+/** [EN] The color of the current state in the given colors: disabled, else selected, else normal. [CN] 给定颜色中当前状态的颜色：禁用，否则选中，否则普通。 */
+function cylAnimatedItemPickStateColor(input: CYLAnimatedItemStateColorInput, colors: CYLAnimatedItemStateColors): string {
+  if (!input.enabled) {
+    return colors.disabled;
+  }
+  return input.selected ? colors.selected : colors.normal;
+}
+
 /**
  * [EN] Where the EXPLICIT color of the current state comes from: 'item' (the item's value of the state is set), else 'stack', else 'builtIn'
  *      (neither set). A disabled item uses the disabled property, a selected one the selected property, else the normal one; each property on
@@ -296,8 +305,7 @@ export class CYLAnimatedItemStateColorInput {
  *      normal；各属性互相独立（宿主只设置了普通颜色的选中条目没有显式选中色：使用内置选中色）。视图据此选取自己的 `ResourceColor`（资源颜色没有文本）。纯逻辑。
  */
 export function cylAnimatedItemStateColorSource(input: CYLAnimatedItemStateColorInput): string {
-  const pick = (colors: CYLAnimatedItemStateColors): string =>
-    !input.enabled ? colors.disabled : (input.selected ? colors.selected : colors.normal);
+  const pick = (colors: CYLAnimatedItemStateColors): string => cylAnimatedItemPickStateColor(input, colors);
   if (pick(input.item).trim() !== '') {
     return 'item';
   }
@@ -306,10 +314,14 @@ export function cylAnimatedItemStateColorSource(input: CYLAnimatedItemStateColor
 
 /** [EN] The EXPLICIT color of the current state as text: the item's, else the stack's, else ''. [CN] 当前状态的显式颜色（文本）：条目的，否则堆叠的，否则 ''。 */
 export function cylAnimatedItemExplicitStateColor(input: CYLAnimatedItemStateColorInput): string {
-  const pick = (colors: CYLAnimatedItemStateColors): string =>
-    !input.enabled ? colors.disabled : (input.selected ? colors.selected : colors.normal);
   const source = cylAnimatedItemStateColorSource(input);
-  return source === 'item' ? pick(input.item) : (source === 'stack' ? pick(input.stack) : '');
+  if (source === 'item') {
+    return cylAnimatedItemPickStateColor(input, input.item);
+  }
+  if (source === 'stack') {
+    return cylAnimatedItemPickStateColor(input, input.stack);
+  }
+  return '';
 }
 
 /**
@@ -325,7 +337,13 @@ export class CYLAnimatedItemStateColorResult {
 export function cylAnimatedItemResolveStateColor(input: CYLAnimatedItemStateColorInput): CYLAnimatedItemStateColorResult {
   const result = new CYLAnimatedItemStateColorResult();
   result.explicit = cylAnimatedItemExplicitStateColor(input);
-  result.builtIn = cylAnimatedItemBuiltInColor(!input.enabled ? 'disabled' : (input.selected ? 'selected' : 'normal'), input.dark);
+  let state = 'normal';
+  if (!input.enabled) {
+    state = 'disabled';
+  } else if (input.selected) {
+    state = 'selected';
+  }
+  result.builtIn = cylAnimatedItemBuiltInColor(state, input.dark);
   return result;
 }
 

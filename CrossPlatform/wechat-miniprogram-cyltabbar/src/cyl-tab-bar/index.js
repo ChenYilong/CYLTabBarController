@@ -510,15 +510,7 @@ Component({
       // [CN] TabBar 的首次渲染跟随刚被点击的 Tab，并把它保存为自己的选中项。选中项以 key（实质是位置）保存；`selectedIndex` 与
       //      `selectedIdentifier` 自上次渲染以来变化时，在这里转换。
       const slotKeys = cylSlotKeys(model);
-      const indexSet = this.data.selectedIndex;
-      let requested = recent;
-      if (!requested && indexSet >= 0 && indexSet !== this.cylIndexMirror && slotKeys[indexSet]) {
-        requested = slotKeys[indexSet];
-      }
-      if (!requested && this.data.selectedIdentifier !== this.cylIdentifierMirror) {
-        requested = cylKeyOfIdentifier(model, this.data.selectedIdentifier);
-      }
-      requested = requested || this.cylSelectedKey;
+      const requested = this.cyl_requestedKey(model, recent, slotKeys);
       // [EN] A bar rendered before its configuration arrives (the example's custom-tab-bar passes {} first) has no tabs to
       //      choose from: it keeps the requested key, so the render with the real configuration still draws the tapped
       //      tab, not the first one for a frame.
@@ -562,6 +554,23 @@ Component({
         cylAnimationStyle: `animation-duration: ${model.animationDuration}ms;`,
         cylAnimationDuration: model.animationDuration,
       }, () => this.cyl_syncLottie(selected));
+    },
+
+    /**
+     * [EN] The key a render asks for: the tab just tapped, else the changed `selectedIndex`, else the changed
+     *      `selectedIdentifier`, else the current selection.
+     * [CN] 渲染所请求的 key：刚被点击的 Tab，否则是变化了的 `selectedIndex`，再否则是变化了的 `selectedIdentifier`，最后是当前选中项。
+     */
+    cyl_requestedKey(model, recent, slotKeys) {
+      const indexSet = this.data.selectedIndex;
+      let requested = recent;
+      if (!requested && indexSet >= 0 && indexSet !== this.cylIndexMirror && slotKeys[indexSet]) {
+        requested = slotKeys[indexSet];
+      }
+      if (!requested && this.data.selectedIdentifier !== this.cylIdentifierMirror) {
+        requested = cylKeyOfIdentifier(model, this.data.selectedIdentifier);
+      }
+      return requested || this.cylSelectedKey;
     },
 
     /**

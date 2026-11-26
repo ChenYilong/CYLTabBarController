@@ -34,13 +34,42 @@ export class CYLLiquidGlass {
    */
   static readonly RIM_WIDTH: number = 1;
   /**
-   * [EN] Whether the app's color mode is dark (AppStorage `cyl_colorMode`, set by cyltabbar's `cyl_updateColorMode`; light when unset). The rule
-   *      of the rim and the sheen: read when the background is applied.
-   * [CN] 应用颜色模式是否为深色（AppStorage 的 `cyl_colorMode`，由 cyltabbar 的 `cyl_updateColorMode` 设置；未设置时为浅色）。细边与高光的规则：
-   *      应用背景时读取。
+   * [EN] Registers ArkUI's system color mode in AppStorage under 'colorMode' (`Environment.envProp`); idempotent, safe to call often. Without it
+   *      the system mode is not tracked. [CN] 把系统颜色模式登记到 AppStorage 的 'colorMode'（`Environment.envProp`）；幂等，可反复调用。
+   */
+  static trackSystemColorMode(): boolean {
+    if (!CYLLiquidGlass.systemModeTracked) {
+      CYLLiquidGlass.systemModeTracked = true;
+      Environment.envProp<ColorMode>('colorMode', ColorMode.LIGHT);
+    }
+    return CYLLiquidGlass.systemModeTracked;
+  }
+  private static systemModeTracked: boolean = false;
+
+  /**
+   * [EN] The one resolver of the color mode: `explicit` (AppStorage `cyl_colorMode`, set by cyltabbar's `cyl_updateColorMode`) when it is 'dark' or
+   *      'light', else the system mode (`system`, AppStorage 'colorMode' as a ColorMode).
+   * [CN] 颜色模式的唯一解析：`explicit`（AppStorage 的 `cyl_colorMode`）为 'dark' 或 'light' 时取它，否则取系统模式（`system`）。
+   */
+  static resolveDark(explicit: string | undefined, system: number | undefined): boolean {
+    if (explicit === 'dark') {
+      return true;
+    }
+    if (explicit === 'light') {
+      return false;
+    }
+    return system === ColorMode.DARK;
+  }
+
+  /**
+   * [EN] Whether the color mode is dark: the explicit `cyl_colorMode` ('dark' / 'light', set by cyltabbar's `cyl_updateColorMode`) wins; when it
+   *      is unset the system dark / light mode decides. The rule of the rim and the sheen: read when the background is applied.
+   * [CN] 颜色模式是否为深色：明确的 `cyl_colorMode`（'dark' / 'light'，由 cyltabbar 的 `cyl_updateColorMode` 设置）优先；未设置时由系统深浅色决定。
+   *      细边与高光的规则：应用背景时读取。
    */
   static isDark(): boolean {
-    return AppStorage.get<string>('cyl_colorMode') === 'dark';
+    CYLLiquidGlass.trackSystemColorMode();
+    return CYLLiquidGlass.resolveDark(AppStorage.get<string>('cyl_colorMode'), AppStorage.get<number>('colorMode'));
   }
 
   /**
