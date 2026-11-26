@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "most: pauza %d, nastavak %d";
 "last event: -" = "posljednji događaj: -";
 "last event: %@" = "posljednji događaj: %@";
+"Content inset" = "Uvlaka sadržaja";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset nije postavljeno: ravna stavka i stavka Liquid Glass, normalna i odabrana";
+"Flat: itemContentHorizontalInset unset" = "Ravno: itemContentHorizontalInset nije postavljeno";
+"Normal" = "Normalno";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset nije postavljeno";

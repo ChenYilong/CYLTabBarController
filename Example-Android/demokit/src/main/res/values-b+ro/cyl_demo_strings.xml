@@ -30,6 +30,8 @@
     <string name="cyl_demo_6a69211e0f">Fiecare scenă este o bară de file creată cu API-ul public: stiluri, animații, insigne, Lottie și noul API pentru file</string>
     <string name="cyl_demo_7efc907fe3">Element animat</string>
     <string name="cyl_demo_9244b5dc65">Componenta de pictogramă animată + titlu, separat: GIF, Lottie, un fișier lipsă, un accesoriu și tragere</string>
+    <string name="cyl_demo_5dbde9a698">Margine interioară a conținutului</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset nesetat: un element plat și unul Liquid Glass, normal și selectat</string>
     <string name="cyl_demo_185d8ef0ae">Insigne</string>
     <string name="cyl_demo_2db1db0706">Redare</string>
     <string name="cyl_demo_34bffc9c7a">Animații pentru pictogramele filelor: Redă tot, viteză, buclă</string>
@@ -131,7 +133,10 @@
     <string name="cyl_demo_7108183f18">Cerere anulată</string>
     <string name="cyl_demo_5fbceaee5f">Cerere fără URL</string>
     <string name="cyl_demo_4334569b3d">O pagină HTML (rețea)</string>
+    <string name="cyl_demo_e2917c5f0d">Plat: itemContentHorizontalInset nesetat</string>
+    <string name="cyl_demo_a7248eeb45">Normal</string>
     <string name="cyl_demo_57fd7a0cf3">Selectat</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset nesetat</string>
     <string name="cyl_demo_d84eebada9">Fotografie</string>
     <string name="cyl_demo_d47d7cb0e4">Mai multe</string>
     <string name="cyl_demo_0e35f6e974">De bază</string>

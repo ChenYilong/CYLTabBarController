@@ -30,6 +30,8 @@
     <string name="cyl_demo_6a69211e0f">Κάθε σκηνή είναι μια γραμμή καρτελών φτιαγμένη με το δημόσιο API: στυλ, κινήσεις, σήματα, Lottie και το νεότερο API καρτελών</string>
     <string name="cyl_demo_7efc907fe3">Κινούμενο στοιχείο</string>
     <string name="cyl_demo_9244b5dc65">Το στοιχείο κινούμενου εικονιδίου + τίτλου μόνο του: GIF, Lottie, αρχείο που λείπει, αξεσουάρ και σύρσιμο</string>
+    <string name="cyl_demo_5dbde9a698">Εσωτερικό περιθώριο περιεχομένου</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset δεν έχει οριστεί: ένα επίπεδο και ένα στοιχείο Liquid Glass, κανονικό και επιλεγμένο</string>
     <string name="cyl_demo_185d8ef0ae">Σήματα</string>
     <string name="cyl_demo_2db1db0706">Αναπαραγωγή</string>
     <string name="cyl_demo_34bffc9c7a">Κινήσεις εικονιδίων καρτελών: Αναπαραγωγή όλων, ταχύτητα, επανάληψη</string>
@@ -131,7 +133,10 @@
     <string name="cyl_demo_7108183f18">Το αίτημα ακυρώθηκε</string>
     <string name="cyl_demo_5fbceaee5f">Αίτημα χωρίς URL</string>
     <string name="cyl_demo_4334569b3d">Μια σελίδα HTML (δίκτυο)</string>
+    <string name="cyl_demo_e2917c5f0d">Επίπεδο: itemContentHorizontalInset δεν έχει οριστεί</string>
+    <string name="cyl_demo_a7248eeb45">Κανονικό</string>
     <string name="cyl_demo_57fd7a0cf3">Επιλεγμένο</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset δεν έχει οριστεί</string>
     <string name="cyl_demo_d84eebada9">Φωτογραφία</string>
     <string name="cyl_demo_d47d7cb0e4">Περισσότερα</string>
     <string name="cyl_demo_0e35f6e974">Βασικά</string>

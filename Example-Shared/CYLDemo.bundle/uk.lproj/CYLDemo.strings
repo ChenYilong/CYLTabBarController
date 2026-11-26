@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "міст: пауза %d, відновлення %d";
 "last event: -" = "остання подія: -";
 "last event: %@" = "остання подія: %@";
+"Content inset" = "Відступ вмісту";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset не задано: плаский елемент і елемент Liquid Glass, звичайний і вибраний";
+"Flat: itemContentHorizontalInset unset" = "Пласкі: itemContentHorizontalInset не задано";
+"Normal" = "Звичайний";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset не задано";

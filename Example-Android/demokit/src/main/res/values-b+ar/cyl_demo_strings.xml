@@ -30,6 +30,8 @@
     <string name="cyl_demo_6a69211e0f">كل مشهد هو شريط علامات تبويب مبني بواجهة API العامة: الأنماط، والحركات، والشارات، وLottie، وواجهة API الأحدث لعلامات التبويب</string>
     <string name="cyl_demo_7efc907fe3">عنصر متحرك</string>
     <string name="cyl_demo_9244b5dc65">مكوّن الأيقونة المتحركة + العنوان بمفرده: GIF، وLottie، وملف مفقود، وملحق، والسحب</string>
+    <string name="cyl_demo_5dbde9a698">الهامش الداخلي للمحتوى</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset غير معيّن: عنصر مسطح وعنصر Liquid Glass، في الحالة العادية والمحددة</string>
     <string name="cyl_demo_185d8ef0ae">الشارات</string>
     <string name="cyl_demo_2db1db0706">التشغيل</string>
     <string name="cyl_demo_34bffc9c7a">حركات أيقونات علامات التبويب: تشغيل الكل، السرعة، التكرار</string>
@@ -131,7 +133,10 @@
     <string name="cyl_demo_7108183f18">تم إلغاء الطلب</string>
     <string name="cyl_demo_5fbceaee5f">طلب بدون URL</string>
     <string name="cyl_demo_4334569b3d">صفحة HTML (شبكة)</string>
+    <string name="cyl_demo_e2917c5f0d">مسطح: itemContentHorizontalInset غير معيّن</string>
+    <string name="cyl_demo_a7248eeb45">عادي</string>
     <string name="cyl_demo_57fd7a0cf3">محدد</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset غير معيّن</string>
     <string name="cyl_demo_d84eebada9">صورة</string>
     <string name="cyl_demo_d47d7cb0e4">المزيد</string>
     <string name="cyl_demo_0e35f6e974">أساسي</string>

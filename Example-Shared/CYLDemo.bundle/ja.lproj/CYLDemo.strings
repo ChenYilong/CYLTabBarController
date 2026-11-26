@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "ブリッジ: 一時停止 %d、再開 %d";
 "last event: -" = "最後のイベント: -";
 "last event: %@" = "最後のイベント: %@";
+"Content inset" = "コンテンツの余白";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset 未設定: フラットと Liquid Glass の項目、通常時と選択時";
+"Flat: itemContentHorizontalInset unset" = "フラット: itemContentHorizontalInset 未設定";
+"Normal" = "通常";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset 未設定";

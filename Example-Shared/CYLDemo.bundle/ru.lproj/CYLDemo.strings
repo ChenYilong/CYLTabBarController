@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "мост: пауза %d, возобновление %d";
 "last event: -" = "последнее событие: -";
 "last event: %@" = "последнее событие: %@";
+"Content inset" = "Внутренний отступ содержимого";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset не задан: плоский элемент и элемент Liquid Glass, обычное и выбранное состояние";
+"Flat: itemContentHorizontalInset unset" = "Плоский: itemContentHorizontalInset не задан";
+"Normal" = "Обычное";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset не задан";

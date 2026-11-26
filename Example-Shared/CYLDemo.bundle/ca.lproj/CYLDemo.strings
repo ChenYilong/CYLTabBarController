@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "pont: pausa %d, represa %d";
 "last event: -" = "últim esdeveniment: -";
 "last event: %@" = "últim esdeveniment: %@";
+"Content inset" = "Marge interior del contingut";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset sense definir: un element pla i un de Liquid Glass, normal i seleccionat";
+"Flat: itemContentHorizontalInset unset" = "Pla: itemContentHorizontalInset sense definir";
+"Normal" = "Normal";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset sense definir";

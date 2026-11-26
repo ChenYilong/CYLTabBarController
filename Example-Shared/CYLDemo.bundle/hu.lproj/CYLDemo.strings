@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "híd: szünet %d, folytatás %d";
 "last event: -" = "utolsó esemény: -";
 "last event: %@" = "utolsó esemény: %@";
+"Content inset" = "Tartalom behúzása";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset nincs beállítva: egy lapos és egy Liquid Glass elem, normál és kijelölt";
+"Flat: itemContentHorizontalInset unset" = "Lapos: itemContentHorizontalInset nincs beállítva";
+"Normal" = "Normál";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset nincs beállítva";

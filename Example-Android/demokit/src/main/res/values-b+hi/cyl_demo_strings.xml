@@ -30,6 +30,8 @@
     <string name="cyl_demo_6a69211e0f">हर दृश्य सार्वजनिक API से बना एक टैब बार है: स्टाइल, एनिमेशन, बैज, Lottie और नया टैब API</string>
     <string name="cyl_demo_7efc907fe3">एनिमेटेड आइटम</string>
     <string name="cyl_demo_9244b5dc65">अकेला एनिमेटेड आइकन + शीर्षक कंपोनेंट: GIF, Lottie, गायब फ़ाइल, एक्सेसरी और खींचना</string>
+    <string name="cyl_demo_5dbde9a698">सामग्री इनसेट</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset सेट नहीं: एक फ़्लैट और एक Liquid Glass आइटम, सामान्य और चयनित</string>
     <string name="cyl_demo_185d8ef0ae">बैज</string>
     <string name="cyl_demo_2db1db0706">प्लेबैक</string>
     <string name="cyl_demo_34bffc9c7a">टैब आइकन एनिमेशन: सभी चलाएँ, गति, लूप</string>
@@ -131,7 +133,10 @@
     <string name="cyl_demo_7108183f18">अनुरोध रद्द किया गया</string>
     <string name="cyl_demo_5fbceaee5f">बिना URL का अनुरोध</string>
     <string name="cyl_demo_4334569b3d">एक HTML पेज (नेटवर्क)</string>
+    <string name="cyl_demo_e2917c5f0d">फ़्लैट: itemContentHorizontalInset सेट नहीं</string>
+    <string name="cyl_demo_a7248eeb45">सामान्य</string>
     <string name="cyl_demo_57fd7a0cf3">चुना गया</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset सेट नहीं</string>
     <string name="cyl_demo_d84eebada9">फ़ोटो</string>
     <string name="cyl_demo_d47d7cb0e4">अधिक</string>
     <string name="cyl_demo_0e35f6e974">बुनियादी</string>

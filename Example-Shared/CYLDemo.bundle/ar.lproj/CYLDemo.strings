@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "الجسر: إيقاف مؤقت %d، استئناف %d";
 "last event: -" = "آخر حدث: -";
 "last event: %@" = "آخر حدث: %@";
+"Content inset" = "الهامش الداخلي للمحتوى";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset غير معيّن: عنصر مسطح وعنصر Liquid Glass، في الحالة العادية والمحددة";
+"Flat: itemContentHorizontalInset unset" = "مسطح: itemContentHorizontalInset غير معيّن";
+"Normal" = "عادي";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset غير معيّن";

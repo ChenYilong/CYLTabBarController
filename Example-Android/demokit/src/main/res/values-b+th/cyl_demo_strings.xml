@@ -30,6 +30,8 @@
     <string name="cyl_demo_6a69211e0f">ทุกฉากคือแท็บบาร์ที่สร้างด้วย API สาธารณะ: สไตล์ แอนิเมชัน แบดจ์ Lottie และ API แท็บแบบใหม่</string>
     <string name="cyl_demo_7efc907fe3">รายการแบบเคลื่อนไหว</string>
     <string name="cyl_demo_9244b5dc65">คอมโพเนนต์ไอคอนเคลื่อนไหว + ชื่อแบบเดี่ยว: GIF, Lottie, ไฟล์ที่หายไป, ส่วนเสริม และการลาก</string>
+    <string name="cyl_demo_5dbde9a698">ระยะขอบเนื้อหา</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset ไม่ได้ตั้งค่า: รายการแบบแบนและรายการ Liquid Glass ทั้งสถานะปกติและที่เลือก</string>
     <string name="cyl_demo_185d8ef0ae">ป้าย</string>
     <string name="cyl_demo_2db1db0706">การเล่น</string>
     <string name="cyl_demo_34bffc9c7a">แอนิเมชันไอคอนแท็บ: เล่นทั้งหมด ความเร็ว วนซ้ำ</string>
@@ -131,7 +133,10 @@
     <string name="cyl_demo_7108183f18">ยกเลิกคำขอแล้ว</string>
     <string name="cyl_demo_5fbceaee5f">คำขอที่ไม่มี URL</string>
     <string name="cyl_demo_4334569b3d">หน้า HTML (เครือข่าย)</string>
+    <string name="cyl_demo_e2917c5f0d">แบบแบน: itemContentHorizontalInset ไม่ได้ตั้งค่า</string>
+    <string name="cyl_demo_a7248eeb45">ปกติ</string>
     <string name="cyl_demo_57fd7a0cf3">เลือกแล้ว</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset ไม่ได้ตั้งค่า</string>
     <string name="cyl_demo_d84eebada9">รูปภาพ</string>
     <string name="cyl_demo_d47d7cb0e4">เพิ่มเติม</string>
     <string name="cyl_demo_0e35f6e974">พื้นฐาน</string>

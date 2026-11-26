@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "cầu nối: tạm dừng %d, tiếp tục %d";
 "last event: -" = "sự kiện gần nhất: -";
 "last event: %@" = "sự kiện gần nhất: %@";
+"Content inset" = "Lề nội dung";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset chưa đặt: một mục phẳng và một mục Liquid Glass, bình thường và được chọn";
+"Flat: itemContentHorizontalInset unset" = "Phẳng: itemContentHorizontalInset chưa đặt";
+"Normal" = "Bình thường";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset chưa đặt";

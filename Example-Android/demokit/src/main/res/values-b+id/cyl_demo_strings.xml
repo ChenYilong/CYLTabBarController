@@ -30,6 +30,8 @@
     <string name="cyl_demo_6a69211e0f">Setiap adegan adalah tab bar yang dibuat dengan API publik: gaya, animasi, badge, Lottie, dan API tab yang lebih baru</string>
     <string name="cyl_demo_7efc907fe3">Item animasi</string>
     <string name="cyl_demo_9244b5dc65">Komponen ikon animasi + judul secara mandiri: GIF, Lottie, file hilang, aksesori, dan seret</string>
+    <string name="cyl_demo_5dbde9a698">Inset konten</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset tidak diatur: satu item datar dan satu item Liquid Glass, normal dan terpilih</string>
     <string name="cyl_demo_185d8ef0ae">Lencana</string>
     <string name="cyl_demo_2db1db0706">Pemutaran</string>
     <string name="cyl_demo_34bffc9c7a">Animasi ikon tab: Putar semua, kecepatan, ulang</string>
@@ -131,7 +133,10 @@
     <string name="cyl_demo_7108183f18">Permintaan dibatalkan</string>
     <string name="cyl_demo_5fbceaee5f">Permintaan tanpa URL</string>
     <string name="cyl_demo_4334569b3d">Halaman HTML (jaringan)</string>
+    <string name="cyl_demo_e2917c5f0d">Datar: itemContentHorizontalInset tidak diatur</string>
+    <string name="cyl_demo_a7248eeb45">Normal</string>
     <string name="cyl_demo_57fd7a0cf3">Dipilih</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset tidak diatur</string>
     <string name="cyl_demo_d84eebada9">Foto</string>
     <string name="cyl_demo_d47d7cb0e4">Lainnya</string>
     <string name="cyl_demo_0e35f6e974">Dasar</string>

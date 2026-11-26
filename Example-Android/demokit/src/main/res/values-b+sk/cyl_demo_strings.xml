@@ -30,6 +30,8 @@
     <string name="cyl_demo_6a69211e0f">Každá scéna je panel kariet vytvorený pomocou verejného API: štýly, animácie, odznaky, Lottie a novšie API kariet</string>
     <string name="cyl_demo_7efc907fe3">Animovaná položka</string>
     <string name="cyl_demo_9244b5dc65">Samostatný komponent animovanej ikony + názvu: GIF, Lottie, chýbajúci súbor, doplnok a presúvanie</string>
+    <string name="cyl_demo_5dbde9a698">Odsadenie obsahu</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset nenastavené: plochá položka a položka Liquid Glass, normálna a vybraná</string>
     <string name="cyl_demo_185d8ef0ae">Odznaky</string>
     <string name="cyl_demo_2db1db0706">Prehrávanie</string>
     <string name="cyl_demo_34bffc9c7a">Animácie ikon kariet: Prehrať všetko, rýchlosť, opakovanie</string>
@@ -131,7 +133,10 @@
     <string name="cyl_demo_7108183f18">Požiadavka zrušená</string>
     <string name="cyl_demo_5fbceaee5f">Požiadavka bez URL</string>
     <string name="cyl_demo_4334569b3d">Stránka HTML (sieť)</string>
+    <string name="cyl_demo_e2917c5f0d">Plochý: itemContentHorizontalInset nenastavené</string>
+    <string name="cyl_demo_a7248eeb45">Normálny</string>
     <string name="cyl_demo_57fd7a0cf3">Vybrané</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset nenastavené</string>
     <string name="cyl_demo_d84eebada9">Fotka</string>
     <string name="cyl_demo_d47d7cb0e4">Viac</string>
     <string name="cyl_demo_0e35f6e974">Základné</string>

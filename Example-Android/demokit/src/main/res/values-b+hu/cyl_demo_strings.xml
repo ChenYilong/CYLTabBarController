@@ -30,6 +30,8 @@
     <string name="cyl_demo_6a69211e0f">Minden jelenet a nyilvános API-val készült lapsáv: stílusok, animációk, jelvények, Lottie és az újabb lap API</string>
     <string name="cyl_demo_7efc907fe3">Animált elem</string>
     <string name="cyl_demo_9244b5dc65">Az animált ikon + cím összetevő önmagában: GIF, Lottie, hiányzó fájl, kiegészítő és húzás</string>
+    <string name="cyl_demo_5dbde9a698">Tartalom behúzása</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset nincs beállítva: egy lapos és egy Liquid Glass elem, normál és kijelölt</string>
     <string name="cyl_demo_185d8ef0ae">Jelvények</string>
     <string name="cyl_demo_2db1db0706">Lejátszás</string>
     <string name="cyl_demo_34bffc9c7a">Lapikon-animációk: Összes lejátszása, sebesség, ismétlés</string>
@@ -131,7 +133,10 @@
     <string name="cyl_demo_7108183f18">Kérés megszakítva</string>
     <string name="cyl_demo_5fbceaee5f">Kérés URL nélkül</string>
     <string name="cyl_demo_4334569b3d">Egy HTML-oldal (hálózat)</string>
+    <string name="cyl_demo_e2917c5f0d">Lapos: itemContentHorizontalInset nincs beállítva</string>
+    <string name="cyl_demo_a7248eeb45">Normál</string>
     <string name="cyl_demo_57fd7a0cf3">Kiválasztva</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset nincs beállítva</string>
     <string name="cyl_demo_d84eebada9">Fotó</string>
     <string name="cyl_demo_d47d7cb0e4">Továbbiak</string>
     <string name="cyl_demo_0e35f6e974">Alapok</string>

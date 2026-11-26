@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "most: pauza %d, pokračovanie %d";
 "last event: -" = "posledná udalosť: -";
 "last event: %@" = "posledná udalosť: %@";
+"Content inset" = "Odsadenie obsahu";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset nenastavené: plochá položka a položka Liquid Glass, normálna a vybraná";
+"Flat: itemContentHorizontalInset unset" = "Plochý: itemContentHorizontalInset nenastavené";
+"Normal" = "Normálny";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset nenastavené";

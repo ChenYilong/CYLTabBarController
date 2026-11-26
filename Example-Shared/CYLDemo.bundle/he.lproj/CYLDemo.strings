@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "גשר: השהיה %d, חידוש %d";
 "last event: -" = "אירוע אחרון: -";
 "last event: %@" = "אירוע אחרון: %@";
+"Content inset" = "ריווח פנימי של התוכן";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset לא הוגדר: פריט שטוח ופריט Liquid Glass, במצב רגיל ובמצב נבחר";
+"Flat: itemContentHorizontalInset unset" = "שטוח: itemContentHorizontalInset לא הוגדר";
+"Normal" = "רגיל";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset לא הוגדר";

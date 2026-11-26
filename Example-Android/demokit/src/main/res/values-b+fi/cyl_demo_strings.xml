@@ -30,6 +30,8 @@
     <string name="cyl_demo_6a69211e0f">Jokainen näkymä on julkisella API:lla rakennettu välilehtipalkki: tyylit, animaatiot, merkit, Lottie ja uudempi välilehti-API</string>
     <string name="cyl_demo_7efc907fe3">Animoitu kohde</string>
     <string name="cyl_demo_9244b5dc65">Animoitu kuvake + otsikko -komponentti yksinään: GIF, Lottie, puuttuva tiedosto, lisäosa ja vetäminen</string>
+    <string name="cyl_demo_5dbde9a698">Sisällön sisennys</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset ei asetettu: tasainen ja Liquid Glass -kohde, normaali ja valittu</string>
     <string name="cyl_demo_185d8ef0ae">Merkit</string>
     <string name="cyl_demo_2db1db0706">Toisto</string>
     <string name="cyl_demo_34bffc9c7a">Välilehtikuvakkeiden animaatiot: Toista kaikki, nopeus, silmukka</string>
@@ -131,7 +133,10 @@
     <string name="cyl_demo_7108183f18">Pyyntö peruttu</string>
     <string name="cyl_demo_5fbceaee5f">Pyyntö ilman URL-osoitetta</string>
     <string name="cyl_demo_4334569b3d">HTML-sivu (verkko)</string>
+    <string name="cyl_demo_e2917c5f0d">Tasainen: itemContentHorizontalInset ei asetettu</string>
+    <string name="cyl_demo_a7248eeb45">Normaali</string>
     <string name="cyl_demo_57fd7a0cf3">Valittu</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset ei asetettu</string>
     <string name="cyl_demo_d84eebada9">Kuva</string>
     <string name="cyl_demo_d47d7cb0e4">Lisää</string>
     <string name="cyl_demo_0e35f6e974">Perus</string>

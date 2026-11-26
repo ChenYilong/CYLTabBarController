@@ -30,6 +30,8 @@
     <string name="cyl_demo_6a69211e0f">Jede Szene ist eine mit der öffentlichen API erstellte Tab-Leiste: Stile, Animationen, Badges, Lottie und die neuere Tab-API</string>
     <string name="cyl_demo_7efc907fe3">Animiertes Element</string>
     <string name="cyl_demo_9244b5dc65">Die animierte Symbol- + Titel-Komponente allein: GIF, Lottie, eine fehlende Datei, ein Zubehör und Ziehen</string>
+    <string name="cyl_demo_5dbde9a698">Inhaltsabstand</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset nicht gesetzt: ein flaches und ein Liquid-Glass-Element, normal und ausgewählt</string>
     <string name="cyl_demo_185d8ef0ae">Badges</string>
     <string name="cyl_demo_2db1db0706">Wiedergabe</string>
     <string name="cyl_demo_34bffc9c7a">Tab-Symbolanimationen: Alle abspielen, Geschwindigkeit, Schleife</string>
@@ -131,7 +133,10 @@
     <string name="cyl_demo_7108183f18">Anfrage abgebrochen</string>
     <string name="cyl_demo_5fbceaee5f">Anfrage ohne URL</string>
     <string name="cyl_demo_4334569b3d">Eine HTML-Seite (Netzwerk)</string>
+    <string name="cyl_demo_e2917c5f0d">Flach: itemContentHorizontalInset nicht gesetzt</string>
+    <string name="cyl_demo_a7248eeb45">Normal</string>
     <string name="cyl_demo_57fd7a0cf3">Ausgewählt</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset nicht gesetzt</string>
     <string name="cyl_demo_d84eebada9">Foto</string>
     <string name="cyl_demo_d47d7cb0e4">Mehr</string>
     <string name="cyl_demo_0e35f6e974">Grundlagen</string>

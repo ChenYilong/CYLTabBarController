@@ -30,6 +30,8 @@
     <string name="cyl_demo_6a69211e0f">每個場景都是用公開 API 建立的 TabBar：樣式、動態效果、標記、Lottie 與新的 Tab API</string>
     <string name="cyl_demo_7efc907fe3">動效 icon 元件</string>
     <string name="cyl_demo_9244b5dc65">單獨使用的動態圖示 + 標題元件：GIF、Lottie、檔案缺失、附加圖示與拖曳</string>
+    <string name="cyl_demo_5dbde9a698">內容邊距</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset 未設定: 扁平與液態玻璃項目，一般與選取狀態</string>
     <string name="cyl_demo_185d8ef0ae">徽章</string>
     <string name="cyl_demo_2db1db0706">播放</string>
     <string name="cyl_demo_34bffc9c7a">Tab 圖示動態效果：全部播放、速度、循環</string>
@@ -131,7 +133,10 @@
     <string name="cyl_demo_7108183f18">請求已取消</string>
     <string name="cyl_demo_5fbceaee5f">沒有 URL 的請求</string>
     <string name="cyl_demo_4334569b3d">HTML 網頁（網路）</string>
+    <string name="cyl_demo_e2917c5f0d">扁平: itemContentHorizontalInset 未設定</string>
+    <string name="cyl_demo_a7248eeb45">一般</string>
     <string name="cyl_demo_57fd7a0cf3">選取</string>
+    <string name="cyl_demo_596fe517ac">液態玻璃: itemContentHorizontalInset 未設定</string>
     <string name="cyl_demo_d84eebada9">照片</string>
     <string name="cyl_demo_d47d7cb0e4">更多</string>
     <string name="cyl_demo_0e35f6e974">基礎</string>

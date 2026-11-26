@@ -30,6 +30,8 @@
     <string name="cyl_demo_6a69211e0f">Каждая сцена — панель вкладок на публичном API: стили, анимации, бейджи, Lottie и новый API вкладок</string>
     <string name="cyl_demo_7efc907fe3">Анимированный элемент</string>
     <string name="cyl_demo_9244b5dc65">Компонент анимированного значка + заголовка отдельно: GIF, Lottie, отсутствующий файл, аксессуар и перетаскивание</string>
+    <string name="cyl_demo_5dbde9a698">Внутренний отступ содержимого</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset не задан: плоский элемент и элемент Liquid Glass, обычное и выбранное состояние</string>
     <string name="cyl_demo_185d8ef0ae">Бейджи</string>
     <string name="cyl_demo_2db1db0706">Воспроизведение</string>
     <string name="cyl_demo_34bffc9c7a">Анимации значков вкладок: Воспроизвести все, скорость, повтор</string>
@@ -131,7 +133,10 @@
     <string name="cyl_demo_7108183f18">Запрос отменён</string>
     <string name="cyl_demo_5fbceaee5f">Запрос без URL</string>
     <string name="cyl_demo_4334569b3d">HTML-страница (сеть)</string>
+    <string name="cyl_demo_e2917c5f0d">Плоский: itemContentHorizontalInset не задан</string>
+    <string name="cyl_demo_a7248eeb45">Обычное</string>
     <string name="cyl_demo_57fd7a0cf3">Выбрано</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset не задан</string>
     <string name="cyl_demo_d84eebada9">Фото</string>
     <string name="cyl_demo_d47d7cb0e4">Ещё</string>
     <string name="cyl_demo_0e35f6e974">Основное</string>

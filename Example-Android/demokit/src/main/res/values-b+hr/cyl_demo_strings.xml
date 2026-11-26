@@ -30,6 +30,8 @@
     <string name="cyl_demo_6a69211e0f">Svaka scena je traka s karticama izrađena javnim API-jem: stilovi, animacije, značke, Lottie i noviji API kartica</string>
     <string name="cyl_demo_7efc907fe3">Animirana stavka</string>
     <string name="cyl_demo_9244b5dc65">Komponenta animirane ikone + naslova zasebno: GIF, Lottie, datoteka koja nedostaje, dodatak i povlačenje</string>
+    <string name="cyl_demo_5dbde9a698">Uvlaka sadržaja</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset nije postavljeno: ravna stavka i stavka Liquid Glass, normalna i odabrana</string>
     <string name="cyl_demo_185d8ef0ae">Značke</string>
     <string name="cyl_demo_2db1db0706">Reprodukcija</string>
     <string name="cyl_demo_34bffc9c7a">Animacije ikona kartica: Reproduciraj sve, brzina, petlja</string>
@@ -131,7 +133,10 @@
     <string name="cyl_demo_7108183f18">Zahtjev otkazan</string>
     <string name="cyl_demo_5fbceaee5f">Zahtjev bez URL-a</string>
     <string name="cyl_demo_4334569b3d">HTML stranica (mreža)</string>
+    <string name="cyl_demo_e2917c5f0d">Ravno: itemContentHorizontalInset nije postavljeno</string>
+    <string name="cyl_demo_a7248eeb45">Normalno</string>
     <string name="cyl_demo_57fd7a0cf3">Odabrano</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset nije postavljeno</string>
     <string name="cyl_demo_d84eebada9">Fotografija</string>
     <string name="cyl_demo_d47d7cb0e4">Više</string>
     <string name="cyl_demo_0e35f6e974">Osnovno</string>

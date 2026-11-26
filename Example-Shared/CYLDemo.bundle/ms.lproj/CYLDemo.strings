@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "jambatan: jeda %d, sambung semula %d";
 "last event: -" = "peristiwa terakhir: -";
 "last event: %@" = "peristiwa terakhir: %@";
+"Content inset" = "Inset kandungan";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset tidak ditetapkan: satu item rata dan satu item Liquid Glass, biasa dan dipilih";
+"Flat: itemContentHorizontalInset unset" = "Rata: itemContentHorizontalInset tidak ditetapkan";
+"Normal" = "Biasa";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset tidak ditetapkan";

@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "bridge: pausa %d, ripresa %d";
 "last event: -" = "ultimo evento: -";
 "last event: %@" = "ultimo evento: %@";
+"Content inset" = "Margine interno del contenuto";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset non impostato: un elemento piatto e uno Liquid Glass, normale e selezionato";
+"Flat: itemContentHorizontalInset unset" = "Piatto: itemContentHorizontalInset non impostato";
+"Normal" = "Normale";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset non impostato";

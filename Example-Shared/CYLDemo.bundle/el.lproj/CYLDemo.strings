@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "γέφυρα: παύση %d, συνέχιση %d";
 "last event: -" = "τελευταίο συμβάν: -";
 "last event: %@" = "τελευταίο συμβάν: %@";
+"Content inset" = "Εσωτερικό περιθώριο περιεχομένου";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset δεν έχει οριστεί: ένα επίπεδο και ένα στοιχείο Liquid Glass, κανονικό και επιλεγμένο";
+"Flat: itemContentHorizontalInset unset" = "Επίπεδο: itemContentHorizontalInset δεν έχει οριστεί";
+"Normal" = "Κανονικό";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset δεν έχει οριστεί";

@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "punte: pauză %d, reluare %d";
 "last event: -" = "ultimul eveniment: -";
 "last event: %@" = "ultimul eveniment: %@";
+"Content inset" = "Margine interioară a conținutului";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset nesetat: un element plat și unul Liquid Glass, normal și selectat";
+"Flat: itemContentHorizontalInset unset" = "Plat: itemContentHorizontalInset nesetat";
+"Normal" = "Normal";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset nesetat";

@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "橋接：暫停 %d，恢復 %d";
 "last event: -" = "最近事件：-";
 "last event: %@" = "最近事件：%@";
+"Content inset" = "內容邊距";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset 未設定: 扁平與液態玻璃項目，一般與選取狀態";
+"Flat: itemContentHorizontalInset unset" = "扁平: itemContentHorizontalInset 未設定";
+"Normal" = "一般";
+"Liquid Glass: itemContentHorizontalInset unset" = "液態玻璃: itemContentHorizontalInset 未設定";

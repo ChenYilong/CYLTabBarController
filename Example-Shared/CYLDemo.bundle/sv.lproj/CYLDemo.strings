@@ -481,3 +481,8 @@
 "bridge: pause %d, resume %d" = "brygga: paus %d, återuppta %d";
 "last event: -" = "senaste händelse: -";
 "last event: %@" = "senaste händelse: %@";
+"Content inset" = "Innehållsindrag";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset inte angiven: ett platt och ett Liquid Glass-objekt, normalt och valt";
+"Flat: itemContentHorizontalInset unset" = "Platt: itemContentHorizontalInset inte angiven";
+"Normal" = "Normal";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset inte angiven";
