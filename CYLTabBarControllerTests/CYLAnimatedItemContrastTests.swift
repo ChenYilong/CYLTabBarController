@@ -93,7 +93,7 @@ final class CYLAnimatedItemContrastTests: XCTestCase {
         let model = CYLAnimatedItemContrast.glassReferenceLuminance(glassTint: nil, tintAlpha: nil)
         let rendered = CYLAnimatedItemContrast.renderedGlassReferenceLuminance(glassTint: nil, tintAlpha: nil)
         XCTAssertGreaterThan(rendered, model, "the floor is above the 0.14 model")
-        XCTAssertEqual(rendered, CYLAnimatedItemContrast.relativeLuminance(red: 0.26, green: 0.26, blue: 0.26), accuracy: 0.0001)
+        XCTAssertEqual(rendered, CYLAnimatedItemContrast.relativeLuminance(red: 0.28, green: 0.28, blue: 0.28), accuracy: 0.0001)
         let lifted = CYLAnimatedItemContrast.adjustedTitle(grey, glassTint: nil, tintAlpha: nil)
         XCTAssertGreaterThanOrEqual(CYLAnimatedItemContrast.contrastRatio(luminance(lifted), rendered), 4.5 - 0.01, "4.5:1 on the rendered glass")
         // A bright explicit tint is never judged darker than its own model.

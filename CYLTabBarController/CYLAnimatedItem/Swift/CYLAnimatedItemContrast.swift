@@ -43,15 +43,15 @@ public enum CYLAnimatedItemContrast {
     public static let defaultTintShare: CGFloat = 0.75
 
     /**
-     [EN] How bright iOS actually renders dark Liquid Glass over a black page, as a white share (sRGB 0.26, luminance about 0.055; measured on iOS 27.2 as
-          Y 66 on a tag over a section board). The rule judges a color against `max(model, this floor)` (`renderedGlassReferenceLuminance`): the shared
+     [EN] How bright iOS actually renders dark Liquid Glass over a black page, as a white share (sRGB 0.28, luminance about 0.063: measured 0.26, luminance about 0.055, on iOS 27.2 as
+          Y 66 on a tag over a section board, plus a margin of about 0.02 for the anti-aliased glyph edges and the spread of the glass, Y 66 to 68). The rule judges a color against `max(model, this floor)` (`renderedGlassReferenceLuminance`): the shared
           model (`glassReferenceLuminance`, frosted white 0.14) alone gave only about 2.9:1 on the real glass. The algorithm is the shared one; this
           value is per platform, each platform measures its own.
-     [CN] iOS 在黑色页面上实际渲染的深色液态玻璃亮度，以白色占比表示（sRGB 0.26，亮度约 0.055；iOS 27.2 上实测，分组底板上的标签 Y 为 66）。规则以
+     [CN] iOS 在黑色页面上实际渲染的深色液态玻璃亮度，以白色占比表示（sRGB 0.28，亮度约 0.063：iOS 27.2 上实测 0.26、亮度约 0.055，分组底板上的标签 Y 为 66，再加约 0.02 的余量，用于字形抗锯齿边缘与玻璃的波动，Y 66 到 68）。规则以
           `max(模型值, 此下限)`（`renderedGlassReferenceLuminance`）作为对照：只用共享模型（`glassReferenceLuminance`，磨砂白 0.14）时在真实玻璃上只有约 2.9:1。
           算法是共享的；此值因平台而异，各平台自己测量。
      */
-    public static let renderedDarkGlassWhiteShare: CGFloat = 0.26
+    public static let renderedDarkGlassWhiteShare: CGFloat = 0.28
 
     /** [EN] The lightness rise per step (HSL, 0...1). [CN] 每步亮度增量（HSL，0...1）。 */
     public static let lightnessStep: CGFloat = 0.005
