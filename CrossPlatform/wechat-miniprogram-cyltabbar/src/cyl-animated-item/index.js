@@ -16,7 +16,7 @@
  *      `accessibility-label`（否则为标题），带选中与禁用状态。
  */
 const {
-  cylAnimatedItemBackground, cylAnimatedItemMissingReason, cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemRenderingMode, cylAnimatedItemResource, cylAnimatedItemRestingProgress,
+  cylAnimatedItemBackground, cylAnimatedItemIsDark, cylAnimatedItemMissingReason, cylAnimatedItemModel, cylAnimatedItemPackage, cylAnimatedItemRenderingMode, cylAnimatedItemResource, cylAnimatedItemRestingProgress,
 } = require('./cyl_animated_item_model')
 const { cylGIFImageInfo } = require('./cyl_gif_image')
 const { cylGIFColorKind } = require('./cyl_one_color_detector')
@@ -320,9 +320,8 @@ Component({
   },
 
   observers: {
-    'itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha, itemContentHorizontalInset': function (style, color, radius, width, borderColor, tintAlpha, inset) {
-      const background = cylAnimatedItemBackground(style, color, radius, width, borderColor, false, tintAlpha, inset)
-      this.setData({ itemBackgroundCss: background.css, itemGlassDrawn: background.glass })
+    'itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha, itemContentHorizontalInset, userInterfaceStyle': function () {
+      this.cyl_refreshBackground()
     },
     'animationUrl, animationData, animationType': function (animationUrl, animationData, animationType) {
       // [EN] A host re-renders and sets the same file (or the same Lottie data object) again: keep the loaded / failed
@@ -423,8 +422,10 @@ Component({
         theme = 'light'
       }
       this.data.systemTheme = theme
+      this.cyl_refreshBackground()
       this.cylThemeListener = (result) => {
         this.data.systemTheme = result?.theme === 'dark' ? 'dark' : 'light'
+        this.cyl_refreshBackground()
         this.cyl_update()
       }
       if (typeof wx !== 'undefined' && typeof wx.onThemeChange === 'function') wx.onThemeChange(this.cylThemeListener)
@@ -442,6 +443,19 @@ Component({
   },
 
   methods: {
+    /**
+     * [EN] Builds the background (flat or drawn Liquid Glass) for the current inputs and mode: the default frosted tint of dark mode is white at 0.14, of
+     *      light mode (225, 222, 220) at 0.5. Called by the observer and again when the system theme changes (`userInterfaceStyle` `system`).
+     * [CN] 按当前输入与模式构建背景（扁平或绘制的液态玻璃）：深色模式的默认磨砂着色是透明度 0.14 的白色，浅色模式是透明度 0.5 的 (225, 222, 220)。由 observer 调用，
+     *      系统主题变化时（`userInterfaceStyle` 为 `system`）再次调用。
+     */
+    cyl_refreshBackground() {
+      const d = this.data
+      const dark = cylAnimatedItemIsDark({ userInterfaceStyle: d.userInterfaceStyle, systemTheme: d.systemTheme })
+      const background = cylAnimatedItemBackground(d.itemBackgroundStyle, d.itemBackgroundColor, d.itemCornerRadius, d.itemBorderWidth, d.itemBorderColor, dark, d.itemGlassTintAlpha, d.itemContentHorizontalInset)
+      this.setData({ itemBackgroundCss: background.css, itemGlassDrawn: background.glass })
+    },
+
     /**
      * [EN] The countdown state machine of this item, made on first use with the local clock and the mini program storage.
      * [CN] 本条目的倒计时状态机，首次使用时以本地时钟与小程序存储创建。

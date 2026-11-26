@@ -333,3 +333,28 @@ test('a file of no known type is reported as decode failed, inline Lottie data h
   inline.cyl_onAnimationError({ detail: { message: 'bad' } })
   assert.deepEqual(inline.events.filter(([name]) => name === 'resourcemissing'), [])
 })
+
+test('the drawn glass has the default tint of the current mode: white 0.14 in dark mode, frosted (225, 222, 220) 0.5 in light mode, and follows a theme change', () => {
+  const { cylAnimatedItemLiquidGlassSetActiveOverride } = require('../src/cyl-animated-item/cyl_animated_item_model')
+  let listener = null
+  global.wx = {
+    getAppBaseInfo: () => ({ theme: 'light' }),
+    onThemeChange: (fn) => { listener = fn },
+    offThemeChange: (fn) => { if (listener === fn) listener = null },
+  }
+  cylAnimatedItemLiquidGlassSetActiveOverride(true)
+  try {
+    const { item, detach } = cylMount({ title: 'A', itemBackgroundStyle: 'liquidGlass' }, null)
+    assert.match(item.data.itemBackgroundCss, /background-color:rgba\(225,222,220,0.5\);/)
+    listener({ theme: 'dark' })
+    assert.match(item.data.itemBackgroundCss, /background-color:rgba\(255,255,255,0.14\);/)
+    item.set({ userInterfaceStyle: 'light' })
+    assert.match(item.data.itemBackgroundCss, /background-color:rgba\(225,222,220,0.5\);/, 'an explicit light style wins over the dark system theme')
+    item.set({ userInterfaceStyle: 'dark' })
+    assert.match(item.data.itemBackgroundCss, /background-color:rgba\(255,255,255,0.14\);/)
+    detach()
+  } finally {
+    cylAnimatedItemLiquidGlassSetActiveOverride(false)
+    delete global.wx
+  }
+})
