@@ -10,7 +10,22 @@ import CYLTabBarController
 import CollectionViewClassifyMenu
 
 /**
- [EN] The demo sections (`UIViewController (CYLDemoSections)`) as a CollectionViewClassifyMenu tag list (docs/instructions/examples.md,
+ [EN] Where the tag list gets its sections from: the Objective-C example's `UIViewController (CYLDemoSections)` (through an adapter in
+      `CYLDemoBadgeTableViewController.swift`) or a Swift page that implements this protocol itself (Example-Swift-04's
+      `CYLBadgeTagTableViewController`). The cells are only read for their title, subtitle, icon and checkmark.
+ [CN] TagList 的 section 来源：Objective-C 示例的 `UIViewController (CYLDemoSections)`（通过 `CYLDemoBadgeTableViewController.swift` 中的适配器），
+      或由 Swift 页面自己实现本协议（Example-Swift-04 的 `CYLBadgeTagTableViewController`）。cell 只用于读取标题、副标题、图标与勾号。
+ */
+protocol CYLDemoTagSectionSource: AnyObject {
+    func demoSectionCount() -> Int
+    func demoRowCount(inSection section: Int) -> Int
+    func demoTitle(forSection section: Int) -> String?
+    func demoCell(for tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell
+    func demoDidSelectRow(at indexPath: IndexPath, in tableView: UITableView)
+}
+
+/**
+ [EN] The demo sections (`CYLDemoTagSectionSource`) as a CollectionViewClassifyMenu tag list (docs/instructions/examples.md,
       "Demo lists that need sections use a ClassifyMenu tag list"): one tag per row (its main title and icon; the subtitle is the
       long-press callout), a titled header per section, tags as wide as their title, titles that wrap up to 3 lines, a More / Less
       icon as the last tag after 3 rows of tags, the library's Liquid Glass tag style and a clear list background, so the page's grouped
@@ -65,7 +80,10 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
         return [stripped, parts.joined(separator: " · ")]
     }
 
-    private weak var host: UIViewController?
+    /// [EN] Where the sections come from; weak, because a Swift page that is its own source also owns this list. [CN] section 的来源；弱引用，因为作为自身来源的 Swift 页面同时持有本 TagList。
+    private weak var source: CYLDemoTagSectionSource?
+    /// [EN] Keeps an adapter source alive (a page that is its own source leaves this nil). [CN] 持有适配器来源（页面自身作为来源时为 nil）。
+    var ownedSource: CYLDemoTagSectionSource?
     private weak var tableView: UITableView?
     /// [EN] The demo rows are made and run with this table: it has no window, so the rows never reload the real table. [CN] 演示行用这个表格生成与执行：它没有 window，行不会刷新真正的表格。
     private let sourceTable = UITableView(frame: .zero, style: .insetGrouped)
@@ -79,16 +97,15 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
 
     /// [EN] Makes the tag list; the host's table shows `cell` as the only row of its first section. [CN] 生成 TagList；宿主的表格把 `cell` 作为第一个 section 的唯一一行显示。
     @discardableResult
-    @objc(installOnTableView:host:badgeRowCount:badgeCell:didSelectBadgeRow:)
-    static func install(on tableView: UITableView, host: UIViewController, badgeRowCount: Int, badgeCell: @escaping (Int) -> UITableViewCell,
-                        didSelectBadgeRow: @escaping (Int) -> Void) -> CYLDemoTagList {
+    static func install(on tableView: UITableView, host: UIViewController, source: CYLDemoTagSectionSource, badgeRowCount: Int,
+                        badgeCell: @escaping (Int) -> UITableViewCell, didSelectBadgeRow: @escaping (Int) -> Void) -> CYLDemoTagList {
         let list = CYLDemoTagList()
+        list.source = source
         list.badgeRowCount = badgeRowCount
         list.badgeCell = badgeCell
         list.didSelectBadgeRow = didSelectBadgeRow
         // [EN] The page behind the glass is a gradient (light and dark), so the glass has colors to bend and blur. [CN] 玻璃之后的页面是渐变色（浅色与深色），玻璃才有可折射、可模糊的颜色。
         tableView.backgroundView = CYLDemoGradientView()
-        list.host = host
         list.tableView = tableView
         list.cell.tableView = tableView
         list.cell.list.menuDelegate = list
@@ -100,17 +117,17 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
 
     /// [EN] Builds the tags again when a row's title, subtitle or checkmark changed; the sections the user expanded stay expanded. [CN] 行的标题、副标题或勾号变化时重新生成 Tag；用户已展开的分组保持展开。
     @objc func reload() {
-        guard let host else { return }
-        let sectionCount = host.cyl_demoSectionCount()
+        guard let source else { return }
+        let sectionCount = source.demoSectionCount()
         var sections: [[String: Any]] = []
         var counts: [Int] = []
         for section in 0..<sectionCount {
-            let rows = host.cyl_demoRowCount(inSection: section)
+            let rows = source.demoRowCount(inSection: section)
             counts.append(rows)
             let items: [[String: Any]] = (0..<rows).map { row in
-                Self.item(from: host.cyl_demoCell(for: sourceTable, indexPath: IndexPath(row: row, section: section)), identifier: "\(section)-\(row)")
+                Self.item(from: source.demoCell(for: sourceTable, at: IndexPath(row: row, section: section)), identifier: "\(section)-\(row)")
             }
-            sections.append([CYLTagSectionKey.title: host.cyl_demoTitle(forSection: section) ?? "", CYLTagSectionKey.items: items])
+            sections.append([CYLTagSectionKey.title: source.demoTitle(forSection: section) ?? "", CYLTagSectionKey.items: items])
         }
         // [EN] The badge samples are tags too (docs/instructions/examples.md): the sample's title, its page and a badge image before the title. [CN] 角标样例也是 Tag（docs/instructions/examples.md）：样例的标题、页面，以及标题前的角标图片。
         if let badgeCell, badgeRowCount > 0 {
@@ -187,12 +204,12 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
     // MARK: - CYLMenuDelegate
 
     func menu(_: Any, didSelectItemAt indexPath: IndexPath) {
-        guard let host, indexPath.section < rowCounts.count, indexPath.item < rowCounts[indexPath.section] else { return }
-        if indexPath.section == host.cyl_demoSectionCount() {
+        guard let source, indexPath.section < rowCounts.count, indexPath.item < rowCounts[indexPath.section] else { return }
+        if indexPath.section == source.demoSectionCount() {
             didSelectBadgeRow?(indexPath.item)
             return
         }
-        host.cyl_demoDidSelectRow(at: indexPath, in: sourceTable)
+        source.demoDidSelectRow(at: indexPath, in: sourceTable)
         // [EN] The row may change a title or a checkmark (a skin, a switch). [CN] 该行可能改变标题或勾号（皮肤、开关）。
         DispatchQueue.main.async { [weak self] in self?.reload() }
     }

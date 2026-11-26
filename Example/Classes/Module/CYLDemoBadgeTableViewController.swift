@@ -138,3 +138,40 @@ class CYLDemoBadgeTableViewController: CYLBaseTableViewController {
         didSelectPageRow(at: indexPath)
     }
 }
+
+/**
+ [EN] The Objective-C example's demo sections (`UIViewController (CYLDemoSections)`, implemented in `CYLFlatDesignTableViewController.m`) as the source of the
+      shared tag list (`Example-Shared/CYLDemoTagList.swift`), which Example-Swift-04 also compiles and so cannot name those Objective-C methods itself.
+ [CN] Objective-C 示例的演示 section（`UIViewController (CYLDemoSections)`，实现在 `CYLFlatDesignTableViewController.m`）作为共用 TagList
+      （`Example-Shared/CYLDemoTagList.swift`）的来源；Example-Swift-04 也编译该文件，因此它自己不能引用这些 Objective-C 方法。
+ */
+private final class CYLDemoObjCSectionSource: NSObject, CYLDemoTagSectionSource {
+    private weak var host: UIViewController?
+
+    init(host: UIViewController) {
+        self.host = host
+    }
+
+    func demoSectionCount() -> Int { host?.cyl_demoSectionCount() ?? 0 }
+    func demoRowCount(inSection section: Int) -> Int { host?.cyl_demoRowCount(inSection: section) ?? 0 }
+    func demoTitle(forSection section: Int) -> String? { host?.cyl_demoTitle(forSection: section) }
+    func demoCell(for tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell {
+        host?.cyl_demoCell(for: tableView, indexPath: indexPath) ?? UITableViewCell()
+    }
+    func demoDidSelectRow(at indexPath: IndexPath, in tableView: UITableView) {
+        host?.cyl_demoDidSelectRow(at: indexPath, in: tableView)
+    }
+}
+
+extension CYLDemoTagList {
+    /// [EN] The Objective-C entry (`CYLFlatDesignTableViewController.m`): the host's `CYLDemoSections` are the source. [CN] Objective-C 入口（`CYLFlatDesignTableViewController.m`）：宿主的 `CYLDemoSections` 为来源。
+    @discardableResult
+    @objc(installOnTableView:host:badgeRowCount:badgeCell:didSelectBadgeRow:)
+    static func install(on tableView: UITableView, host: UIViewController, badgeRowCount: Int, badgeCell: @escaping (Int) -> UITableViewCell,
+                        didSelectBadgeRow: @escaping (Int) -> Void) -> CYLDemoTagList {
+        let source = CYLDemoObjCSectionSource(host: host)
+        let list = install(on: tableView, host: host, source: source, badgeRowCount: badgeRowCount, badgeCell: badgeCell, didSelectBadgeRow: didSelectBadgeRow)
+        list.ownedSource = source
+        return list
+    }
+}

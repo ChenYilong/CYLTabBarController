@@ -745,7 +745,7 @@
 		A51C0051D3E4F5061728394A /* CYLTabBar+CYLImplementation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLTabBar+CYLImplementation.swift"; sourceTree = "<group>"; };
 		A52C0051D3E4F5061728394A /* CYLPlusButton+CYLImplementation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CYLPlusButton+CYLImplementation.swift"; sourceTree = "<group>"; };
 		A68F5E8606BC86D5CA3E2791 /* CYLFlatDesignTabBarItem.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLFlatDesignTabBarItem.swift; sourceTree = "<group>"; };
-		A7D3C0DE5E1141F2B9A0C101 /* CYLDemoTagList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoTagList.swift; path = Example/Classes/Module/CYLDemoTagList.swift; sourceTree = SOURCE_ROOT; };
+		A7D3C0DE5E1141F2B9A0C101 /* CYLDemoTagList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoTagList.swift; path = "Example-Shared/CYLDemoTagList.swift"; sourceTree = SOURCE_ROOT; };
 		AB746249D061B771D1BA3E95 /* CYLTabBarController+CYLMemoryWarning.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "Swift/CYLTabBarController+CYLMemoryWarning.swift"; sourceTree = "<group>"; };
 		ABD5E0C8522D79C46B45E57D /* CYLLocalizedString.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLLocalizedString.swift; sourceTree = "<group>"; };
 		AD8BDCD2C68335FCFB086C77 /* CYLHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CYLHomeViewController.swift; sourceTree = "<group>"; };
