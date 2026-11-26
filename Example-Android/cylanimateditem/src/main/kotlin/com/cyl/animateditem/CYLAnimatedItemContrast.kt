@@ -73,6 +73,17 @@ internal object CYLAnimatedItemContrast {
     }
 
     /**
+     * [EN] The reference of a FLAT item that draws a fill (iOS `flatReferenceLuminance(fill:traits:)`): the fill composited over black by its alpha. No floor (the
+     *      0.37 floor is glass-only). A lift-only rule cannot exceed white's contrast: on a white 0.5-alpha fill (luminance 0.214) the cap is 3.98:1.
+     * [CN] 绘制填充的扁平条目的参考亮度（对应 iOS `flatReferenceLuminance(fill:traits:)`）：填充按其透明度叠在黑色上。没有下限（0.37 下限仅用于玻璃）。
+     *      仅提亮的规则不可能超过白色的对比度：白色 0.5 透明度填充（亮度 0.214）的上限是 3.98:1。
+     */
+    fun flatReferenceLuminance(fill: Int): Double {
+        val share = alphaOf(fill) / CHANNEL_MAX
+        return relativeLuminance(redOf(fill) / CHANNEL_MAX * share, greenOf(fill) / CHANNEL_MAX * share, blueOf(fill) / CHANNEL_MAX * share)
+    }
+
+    /**
      * [EN] The reference the lift judges against: the model [glassReferenceLuminance], never below the rendered dark glass ([renderedDarkGlassWhiteShare]).
      * [CN] 提亮所对照的参考亮度：模型 [glassReferenceLuminance]，但不低于实际渲染的深色玻璃（[renderedDarkGlassWhiteShare]）。
      */

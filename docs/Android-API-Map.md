@@ -17,7 +17,7 @@
 | 中文 | English |
 |:---|:---|
 | iOS 库的每个公开符号（公开头文件中的类、协议、方法、属性、常量、枚举、函数）及其 Android 版本（`Example-Android/cyltabbar`，Kotlin 与 Java）。状态：done 行为相同；partial 部分行为（见说明）；planned 尚未移植；n/a 仅 iOS（UIKit、扁平样式、液态玻璃、Core Animation 等），不计入完成率。 | Every public symbol of the iOS library (classes, protocols, methods, properties, constants, enums and functions of the public headers) with its Android version (`Example-Android/cyltabbar`, Kotlin and Java). Status: done, the same behavior; partial, part of it (see the note); planned, not ported yet; n/a, iOS only (UIKit, FlatDesign, Liquid Glass, Core Animation...), left out of the score. |
-| **迁移完成率：98 / 100**（done + 0.5 × partial，共 1091 个计入的符号；done 1062、partial 6、planned 23、n/a 387）。 | **Migration score: 98 / 100** (done + 0.5 × partial over 1091 counted symbols; done 1062, partial 6, planned 23, n/a 387). |
+| **迁移完成率：97 / 100**（done + 0.5 × partial，共 1093 个计入的符号；done 1062、partial 6、planned 25、n/a 387）。 | **Migration score: 97 / 100** (done + 0.5 × partial over 1093 counted symbols; done 1062, partial 6, planned 25, n/a 387). |
 
 ## 目录 / Contents
 
@@ -1068,6 +1068,8 @@
 | iOS API | Android API | 状态 Status | 说明 / Note |
 |:---|:---|:---|:---|
 | `CYLTabBarItemAnimationPrepareTint()` | — | planned |  |
+| `CYLTabBarItemAnimationPrepareTabTint()` | — | planned |  |
+| `CYLTabBarItemAnimationResetTint()` | — | planned |  |
 | `CYLTabBarItemAnimationPrepareItemTint()` | — | planned |  |
 | `CYLTabBarItemAnimationRenderingMode` | — | planned |  |
 | `CYLTabBarItemAnimationRenderingModeFromString()` | — | planned |  |

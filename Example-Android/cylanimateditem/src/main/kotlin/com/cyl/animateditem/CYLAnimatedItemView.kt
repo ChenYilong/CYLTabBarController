@@ -877,8 +877,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     private fun applyTitleColor(configuration: Configuration = resources.configuration) {
         val color = titleResolution(configuration)?.let { (resolved, level) ->
-            // [EN] Explicit and built-in colours (not the disabled look) are adapted, only on dark drawn glass. [CN] 显式与内置颜色（禁用外观除外）才适配，且仅在深色玻璃确实绘制时。
-            if (level != ColorLevel.DisabledBuiltIn && glassContrastApplies(configuration)) CYLAnimatedItemContrast.adjustedTitle(resolved, itemBackgroundColor, itemGlassTintAlpha) else resolved
+            // [EN] Explicit and built-in colours (not the disabled look) are adapted where the contrast rule applies ([contrastApplies]). [CN] 显式与内置颜色（禁用外观除外）在对比度规则适用时（[contrastApplies]）才适配。
+            if (level != ColorLevel.DisabledBuiltIn) contrastAdapted(resolved, CYLAnimatedItemColorKind.Title, configuration) else resolved
         }
         if (color != null) {
             if (!appliesTitleColor) defaultTitleColor = titleView.currentTextColor
@@ -953,27 +953,80 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     val drawsFlatBackground: Boolean get() = !drawsLiquidGlass
 
     /**
-     * [EN] The item's own dark-glass rule as a function: `color` lifted to the least contrast of `kind` (icon 3, title 4.5) against the rendered glass when
-     *      [drawsLiquidGlass] and the item is in night mode (its own resources configuration), judged with `itemBackgroundColor` and `itemGlassTintAlpha`; else `color` as it is.
-     * [CN] 条目自己的深色玻璃规则（函数形式）：[drawsLiquidGlass] 且条目处于夜间模式（自己的资源配置）时，把 `color` 提亮到 `kind`（图标 3，标题 4.5）对实际渲染玻璃的最小对比度，
-     *      按 `itemBackgroundColor` 与 `itemGlassTintAlpha` 判断；否则原样返回。
+     * [EN] The contrast rule for a colour the host draws itself (a subclass's delete cross, a label of its own), iOS `adaptedForContrast(_:kind:)`: `color` unchanged unless the
+     *      item is in night mode (its own resources configuration) AND draws Liquid Glass or a flat fill; then lifted to the least contrast of `kind` (icon 3:1, title 4.5:1)
+     *      against it: the rendered glass (`itemBackgroundColor`, `itemGlassTintAlpha`) or the flat fill over black. The item applies it to its own title and icon colours.
+     *      Limits: the rule only RAISES lightness: light mode is never adapted and there is no darkening rule, so LIGHT text on a mid-luminance fill (white on an orange fill,
+     *      2.89:1; the countdown's light built-in fill) is NOT fixed (white is the cap; on a white 0.5-alpha fill the cap is 3.98:1). The disabled look is never adapted. Flat
+     *      WITHOUT a fill (tab bar items, tags without a background) is NOT adapted: the item cannot know what is behind it. The 0.37 floor is glass-only. A fixed `animationTint`
+     *      is adapted on glass only.
+     * [CN] 宿主自己绘制的颜色（子类的删除叉号、自己的标签）适用的对比度规则，对应 iOS `adaptedForContrast(_:kind:)`：除非条目处于夜间模式（自己的资源配置）且绘制液态玻璃或扁平填充，
+     *      否则原样返回 `color`；适用时按 `kind`（图标 3:1，标题 4.5:1）对照它提亮：实际渲染的玻璃（`itemBackgroundColor`、`itemGlassTintAlpha`）或叠在黑色上的扁平填充。
+     *      条目自己的标题与图标颜色也使用该规则。限制：规则只会提亮：浅色模式从不调整，也没有压暗规则，所以中等亮度填充上的浅色文字（橙色填充上的白色 2.89:1；倒计时的浅色内置填充）
+     *      不会被修复（白色是上限；白色 0.5 透明度填充上限为 3.98:1）。禁用外观从不调整。没有填充的扁平背景（Tab 栏条目、没有背景的标签）不调整：条目无法知道其后是什么。
+     *      0.37 下限仅用于玻璃。固定的 `animationTint` 只在玻璃上调整。
      */
-    fun adaptedOnGlass(color: Int, kind: CYLAnimatedItemColorKind): Int = adaptedOnGlass(color, kind, resources.configuration)
+    fun adaptedForContrast(color: Int, kind: CYLAnimatedItemColorKind): Int = contrastAdapted(color, kind, resources.configuration)
 
-    private fun adaptedOnGlass(color: Int, kind: CYLAnimatedItemColorKind, configuration: Configuration): Int {
-        if (!glassContrastApplies(configuration)) return color
-        return when (kind) {
-            CYLAnimatedItemColorKind.Icon -> CYLAnimatedItemContrast.adjustedIcon(color, itemBackgroundColor, itemGlassTintAlpha)
-            CYLAnimatedItemColorKind.Title -> CYLAnimatedItemContrast.adjustedTitle(color, itemBackgroundColor, itemGlassTintAlpha)
+    /**
+     * [EN] The former name of [adaptedForContrast], kept (not deprecated, the other platforms use it); it forwards, so it now adapts on a flat fill too.
+     * [CN] [adaptedForContrast] 的旧名称，保留（不弃用，其他平台使用该名称）；它转发调用，因此现在在扁平填充上也会调整。
+     */
+    fun adaptedOnGlass(color: Int, kind: CYLAnimatedItemColorKind): Int = adaptedForContrast(color, kind)
+
+    /**
+     * [EN] THE predicate of the contrast rule: `configuration` is night AND something known is behind the content: drawn Liquid Glass or a flat fill ([flatFill]).
+     *      The glass-only rules (default tint, floor, a fixed `animationTint`) keep [drawsLiquidGlass].
+     * [CN] 对比度规则的唯一判断：`configuration` 为夜间模式，且内容后面有已知的东西：绘制的液态玻璃或扁平填充（[flatFill]）。仅玻璃的规则（默认着色、下限、固定的 `animationTint`）仍用 [drawsLiquidGlass]。
+     */
+    private fun contrastApplies(configuration: Configuration): Boolean =
+        (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES && (drawsLiquidGlass || flatFill != null)
+
+    /**
+     * [EN] The fill a flat item draws now, or null: the pressed colour while it is drawn, else the countdown's built-in fill, else `itemBackgroundColor`; a clear fill
+     *      (alpha 0) is null. Always null while glass is drawn.
+     * [CN] 扁平条目当前绘制的填充，没有时为 null：绘制按下背景时为按下颜色，其次倒计时的内置填充，再次 `itemBackgroundColor`；透明填充（alpha 0）为 null。绘制玻璃时总为 null。
+     */
+    internal val flatFill: Int?
+        get() {
+            if (drawsLiquidGlass) return null
+            val fill = (if (highlightApplies()) itemHighlightedBackgroundColor else null)
+                ?: (if (itemStyle == CYLAnimatedItemStyle.Countdown) COUNTDOWN_FILL else itemBackgroundColor)
+            return fill?.takeIf { (it ushr 24) != 0 }
         }
+
+    /**
+     * [EN] THE reference of the contrast rule: the rendered glass, or the flat fill over black. Only read while [contrastApplies].
+     * [CN] 对比度规则的唯一对照：实际渲染的玻璃，或叠在黑色上的扁平填充。只在 [contrastApplies] 时读取。
+     */
+    private fun contrastReferenceLuminance(): Double {
+        val fill = flatFill
+        return if (drawsLiquidGlass || fill == null) CYLAnimatedItemContrast.renderedGlassReferenceLuminance(itemBackgroundColor, itemGlassTintAlpha)
+        else CYLAnimatedItemContrast.flatReferenceLuminance(fill)
     }
 
-    /** [EN] True when the dark-glass contrast rule applies: [drawsLiquidGlass] and `configuration` is night. [CN] 深色玻璃对比度规则适用：[drawsLiquidGlass] 且 `configuration` 为夜间模式。 */
-    private fun glassContrastApplies(configuration: Configuration): Boolean =
-        drawsLiquidGlass && (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+    /** [EN] THE adaptation step. [CN] 唯一的调整步骤。 */
+    private fun contrastAdapted(color: Int, kind: CYLAnimatedItemColorKind, configuration: Configuration): Int {
+        if (!contrastApplies(configuration)) return color
+        val minimum = if (kind == CYLAnimatedItemColorKind.Icon) CYLAnimatedItemContrast.ICON_MINIMUM_CONTRAST else CYLAnimatedItemContrast.TITLE_MINIMUM_CONTRAST
+        return CYLAnimatedItemContrast.adjusted(color, contrastReferenceLuminance(), minimum)
+    }
 
-    /** [EN] An explicit icon colour, adapted to the dark glass when the rule applies. [CN] 规则适用时，把显式图标颜色调整到适合深色玻璃。 */
-    private fun adaptedIconColor(color: Int, configuration: Configuration): Int = adaptedOnGlass(color, CYLAnimatedItemColorKind.Icon, configuration)
+    /** [EN] The reference the colours were last adapted to (null: the rule did not apply). [CN] 颜色上次适配所用的对照（null：规则不适用）。 */
+    private var contrastKey: Double? = null
+
+    /** [EN] Re-applies the colours when the reference (or whether the rule applies) changed: glass, fill, press, style. [CN] 对照（或规则是否适用）变化时重新应用颜色：玻璃、填充、按下、样式。 */
+    private fun refreshContrastColorsIfNeeded() {
+        val configuration = resources.configuration
+        val key = if (contrastApplies(configuration)) contrastReferenceLuminance() else null
+        if (key == contrastKey) return
+        contrastKey = key
+        applyTitleColor(configuration)
+        applyIconColor(configuration)
+    }
+
+    /** [EN] An explicit icon colour, adapted where the contrast rule applies. [CN] 规则适用时调整显式图标颜色。 */
+    private fun adaptedIconColor(color: Int, configuration: Configuration): Int = contrastAdapted(color, CYLAnimatedItemColorKind.Icon, configuration)
 
     // MARK: - Divider mode 分隔线模式
 
@@ -1121,10 +1174,11 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             tint, CYLTabBarItemAnimationTint.darkTintOption(options), mode, kind, isSelected, night,
             CYLTabBarItemAnimationTint.IconColors(resolvedIcon, explicitSelectedIconColor),
         )
-        // [EN] Dark drawn glass: an explicit tint (fixed, or the explicit icon colour) and the built-in icon colours (normal and selected) are adapted; the disabled look is not.
-        // [CN] 深色玻璃确实绘制时：显式着色（固定色或显式图标颜色）与内置图标颜色（普通与选中）会被调整；禁用外观不调整。
+        // [EN] Where the contrast rule applies: the icon colours (explicit and built-in) are adapted; a fixed tint only on drawn glass; the disabled look never.
+        // [CN] 对比度规则适用时：图标颜色（显式与内置）会被调整；固定着色只在绘制玻璃时调整；禁用外观从不调整。
         val disabledLook = color == resolvedIcon && resolution?.second == ColorLevel.DisabledBuiltIn
-        if (color != null && !disabledLook) color = adaptedOnGlass(color, CYLAnimatedItemColorKind.Icon, configuration)
+        val fixedTint = tintIsSet && tint?.trim() != CYLTabBarItemAnimationTint.TINT_TITLE && !(isSelected && explicitSelectedIconColor != null)
+        if (color != null && !disabledLook && (!fixedTint || drawsLiquidGlass)) color = contrastAdapted(color, CYLAnimatedItemColorKind.Icon, configuration)
         CYLTabBarItemAnimationTint.applyToAnimationView(view, color)
     }
 
@@ -1553,6 +1607,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             countdown.reset()
             background = null
             titleView.minWidth = 0
+            refreshContrastColorsIfNeeded()
         }
         requestLayout()
     }
@@ -1594,9 +1649,11 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val running = countdown.state == CYLAnimatedItemCountdownState.Running
         background = GradientDrawable().apply {
             cornerRadius = dp(6f)
-            setColor(0xFFF2F2F7.toInt())
+            setColor(COUNTDOWN_FILL)
             setStroke(max(1, dp(0.5f).roundToInt()), if (running) Color.LTGRAY else countdownBorderColor)
         }
+        // [EN] Before the running colour, which must win. [CN] 在倒计时颜色之前，倒计时颜色必须优先。
+        refreshContrastColorsIfNeeded()
         if (running) titleView.setTextColor(countdownRunningTitleColor)
     }
 
@@ -1696,7 +1753,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      * [CN] 条目被按下且可用时绘制的按下背景（ARGB 纯色），按条目圆角裁剪，位于玻璃或扁平颜色之上、内容之下。null（默认）：没有按下外观。对应 iOS `itemHighlightedBackgroundColor`。
      */
     var itemHighlightedBackgroundColor: Int? = null
-        set(value) { if (field != value) { field = value; invalidate() } }
+        set(value) { if (field != value) { field = value; refreshContrastColorsIfNeeded(); invalidate() } }
 
     /**
      * [EN] The animation view's alpha while the item is disabled (0...1); null (default) is 1 (the view's own `disabledAlpha` still applies to the whole item).
@@ -1790,7 +1847,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
 
     override fun setPressed(pressed: Boolean) {
         super.setPressed(pressed)
-        if (itemHighlightedBackgroundColor != null) invalidate()
+        if (itemHighlightedBackgroundColor != null) { refreshContrastColorsIfNeeded(); invalidate() }
     }
 
     private fun drawOutline(canvas: android.graphics.Canvas) {
@@ -1907,15 +1964,9 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     private fun applyItemBackground() {
         if (!usesItemBackground) return
         itemBackgroundRenderer.apply(itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha, itemGlassBackdropSource)
-        // [EN] The glass state (drawn or not, its tint) decides the contrast adaptation: re-apply the colours when it changes. [CN] 玻璃状态（是否绘制、着色）决定对比度调整：变化时重新应用颜色。
-        val key = if (glassContrastApplies(resources.configuration)) listOf(itemBackgroundColor, itemGlassTintAlpha) else null
-        if (key != glassContrastKey) {
-            glassContrastKey = key
-            applyTitleColor()
-            applyIconColor()
-        }
+        // [EN] The background (glass or fill) decides the contrast adaptation. [CN] 背景（玻璃或填充）决定对比度调整。
+        refreshContrastColorsIfNeeded()
     }
-    private var glassContrastKey: List<Any?>? = null
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
@@ -1923,6 +1974,9 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     }
 
     companion object {
+        /** [EN] The built-in fill of the countdown style (the original SMSCodeButton look). [CN] 倒计时样式的内置填充（最初 SMSCodeButton 的外观）。 */
+        internal const val COUNTDOWN_FILL: Int = 0xFFF2F2F7.toInt()
+
         /**
          * [EN] Whether the device draws Liquid Glass, the one rule the tab bar uses too: Android 12 and later (Android 13+ the full
          *      glass with refraction, Android 12 the blur only); false on older versions. Same name as iOS and HarmonyOS.
