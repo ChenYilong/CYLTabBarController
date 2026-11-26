@@ -1611,9 +1611,12 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      *      item and NOT an ancestor of it (a sibling plate, e.g. the gradient behind a list): a glass inside its own source cannot sample it and draws only
      *      its tint and rim. Applied to the glass layer, also when the layer is created later, and re-applied to the shown glass when set. Below API 31
      *      (no glass is drawn) the property is kept but has no effect and the item draws its flat color. Not used by the flat style.
+     *      Besides the source, the glass samples, automatically, the Liquid Glass items BEHIND it that cover it (an earlier sibling of it or of one of its
+     *      ancestors, e.g. the section card a tag sits on), drawn over the source: so a tag looks lighter than its card, as on HarmonyOS. Nothing to set.
      * [CN] 液态玻璃背景所模糊、折射的视图：null（默认）为窗口视图的根。源必须是位于该条目后面、且不是其祖先的视图（同级的背板，例如列表后面的渐变）：
      *      位于自己的源之内的玻璃不能采样它，只绘制着色与边缘。应用到玻璃层，层稍后创建时也会应用，设置时重新应用到正在显示的玻璃。API 31 以下
-     *      （不绘制玻璃）属性被保留但不起作用，条目绘制其扁平颜色。扁平样式不使用。
+     *      （不绘制玻璃）属性被保留但不起作用，条目绘制其扁平颜色。扁平样式不使用。除源之外，玻璃还会自动采样位于它后面并覆盖它的液态玻璃条目
+     *      （它自己或其某个祖先的前面的同级，例如标签所在的分区卡片），绘制在源之上：因此标签比所在的卡片更亮，与鸿蒙一致。无需设置。
      */
     var itemGlassBackdropSource: View? = null
         set(value) { if (field !== value) { field = value; if (usesItemBackground) itemBackgroundDidChange() } }
