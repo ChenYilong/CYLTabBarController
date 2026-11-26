@@ -123,10 +123,14 @@ public enum CYLAnimatedItemContrast {
           （每步 `lightnessStep`，最高为白色）的通过颜色；分量取整到 1/255。
      */
     public static func adjusted(_ color: UIColor, glassTint: UIColor?, tintAlpha: CGFloat?, minimumContrast: CGFloat) -> UIColor {
+        adjusted(color, referenceLuminance: renderedGlassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha), minimumContrast: minimumContrast)
+    }
+
+    /// [EN] The same against a reference luminance given by the caller. [CN] 同上，对照由调用方给出的参考亮度。
+    public static func adjusted(_ color: UIColor, referenceLuminance reference: CGFloat, minimumContrast: CGFloat) -> UIColor {
         guard isStatic(color) else { return color }
         var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
         guard color.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else { return color }
-        let reference = renderedGlassReferenceLuminance(glassTint: glassTint, tintAlpha: tintAlpha)
         let hsl = hslFromRGB(red: min(max(red, 0), 1), green: min(max(green, 0), 1), blue: min(max(blue, 0), 1))
         func passes(_ lightness: CGFloat) -> Bool {
             let rgb = rgbFromHSL(hue: hsl.hue, saturation: hsl.saturation, lightness: lightness)
