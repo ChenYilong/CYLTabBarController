@@ -52,7 +52,11 @@ object CYLAnimatedItemBuiltInColors {
     private fun contextFor(context: Context, configuration: Configuration): Context {
         if (isNight(context.resources.configuration) == isNight(configuration)) return context
         return try {
-            ContextThemeWrapper(context, 0).also { it.applyOverrideConfiguration(configuration) }
+            ContextThemeWrapper(context, 0).also {
+                it.applyOverrideConfiguration(configuration)
+                // [EN] A wrapper with theme 0 lays the framework default theme over the copied one; copy the host theme back. [CN] 主题为 0 的包装会在复制的主题上叠加框架默认主题；这里把宿主主题复制回来。
+                it.theme.setTo(context.theme)
+            }
         } catch (error: RuntimeException) { context }
     }
 
@@ -73,14 +77,32 @@ object CYLAnimatedItemBuiltInColors {
         } catch (error: RuntimeException) { null }
     }
 
+    /** [EN] `configuration` with its night mode forced to `night`. [CN] 夜间模式被强制为 `night` 的 `configuration` 副本。 */
+    private fun withNight(configuration: Configuration, night: Boolean) = Configuration(configuration).apply {
+        uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or (if (night) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO)
+    }
+
     /**
-     * [EN] The built-in normal icon / title color: `textColorPrimary`, else the label fallback. [CN] 内置的普通图标 / 标题颜色：`textColorPrimary`，否则为 label 回退值。
+     * [EN] The theme color `attr` for `configuration`, or null when the theme has none. In night mode a color is used only when it is NIGHT-AWARE,
+     *      i.e. the theme resolves it to a DIFFERENT value under a light configuration (a DayNight theme); a color identical in both modes
+     *      (a light-only host theme keeps its dark text in night) is not adapted by the theme, so `nightFallback` is returned instead.
+     * [CN] `configuration` 下主题属性 `attr` 的颜色，主题没有时为 null。夜间模式下只有颜色「感知夜间」才使用：主题在日间配置下解析出不同的值
+     *      （DayNight 主题）；两种模式下相同的颜色（仅日间主题在夜间仍是深色文字）不随夜间变化，改用 `nightFallback`。
+     */
+    private fun nightAwareThemeColor(context: Context, configuration: Configuration, attr: Int, nightFallback: Int): Int? {
+        val color = themeColor(contextFor(context, configuration), attr) ?: return null
+        if (!isNight(configuration)) return color
+        val light = themeColor(contextFor(context, withNight(configuration, false)), attr)
+        return if (light == color) nightFallback else color
+    }
+
+    /**
+     * [EN] The built-in normal icon / title color: `textColorPrimary` (night: only when the theme is night-aware, else the dark fallback), else the
+     *      label fallback. [CN] 内置的普通图标 / 标题颜色：`textColorPrimary`（夜间：仅当主题感知夜间，否则取深色回退值），否则为 label 回退值。
      */
     @JvmStatic
-    fun normal(context: Context, configuration: Configuration = context.resources.configuration): Int {
-        val styled = contextFor(context, configuration)
-        return themeColor(styled, android.R.attr.textColorPrimary) ?: if (isNight(configuration)) NORMAL_DARK else NORMAL_LIGHT
-    }
+    fun normal(context: Context, configuration: Configuration = context.resources.configuration): Int =
+        nightAwareThemeColor(context, configuration, android.R.attr.textColorPrimary, NORMAL_DARK) ?: if (isNight(configuration)) NORMAL_DARK else NORMAL_LIGHT
 
     /**
      * [EN] The built-in selected icon / title color: `colorPrimary` (appcompat, else the framework's), else the tint fallback.
@@ -100,9 +122,8 @@ object CYLAnimatedItemBuiltInColors {
      */
     @JvmStatic
     fun disabled(context: Context, configuration: Configuration = context.resources.configuration): Int {
-        val styled = contextFor(context, configuration)
-        val base = themeColor(styled, android.R.attr.textColorPrimary) ?: return if (isNight(configuration)) DISABLED_DARK else DISABLED_LIGHT
-        return withAlpha(base, DISABLED_ALPHA)
+        if (themeColor(contextFor(context, configuration), android.R.attr.textColorPrimary) == null) return if (isNight(configuration)) DISABLED_DARK else DISABLED_LIGHT
+        return withAlpha(normal(context, configuration), DISABLED_ALPHA)
     }
 
     /**
@@ -110,8 +131,7 @@ object CYLAnimatedItemBuiltInColors {
      */
     @JvmStatic
     fun divider(context: Context, configuration: Configuration = context.resources.configuration): Int {
-        val styled = contextFor(context, configuration)
-        return themeColor(styled, android.R.attr.textColorSecondary) ?: if (isNight(configuration)) DIVIDER_DARK else DIVIDER_LIGHT
+        return nightAwareThemeColor(context, configuration, android.R.attr.textColorSecondary, DIVIDER_DARK) ?: if (isNight(configuration)) DIVIDER_DARK else DIVIDER_LIGHT
     }
 
     /**

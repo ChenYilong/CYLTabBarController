@@ -592,6 +592,8 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        // [EN] An item nothing was set on has not applied its built-in title colour yet (no state change ran): do it once, else the TextView default (a dark theme text colour) stays. [CN] 什么都没设置的条目尚未应用内置标题颜色（没有状态变化发生）：应用一次，否则保留 TextView 默认色（深色主题文字色）。
+        if (!appliesTitleColor && usesBuiltInColors) applyTitleColor()
         itemBackgroundRenderer.layoutGlass(r - l, b - t)
         if (isDividerMode) return
         val inset = contentInsetPx()
@@ -769,10 +771,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             else -> CYLAnimatedItemBuiltInColors.normal(context, configuration)
         }
 
+    /** [EN] True while the colours in effect are the built-in NORMAL ones: unselected, not showing the disabled look, built-ins on. [CN] 当前生效的是内置普通色：未选中、未显示禁用外观、启用内置色。 */
+    private fun usesBuiltInNormal() = usesBuiltInColors && !isSelected && !showsDisabledColor()
+
     private fun applyTitleColor(configuration: Configuration = resources.configuration) {
         val color = resolvedTitleColor(configuration)?.let { resolved ->
-            // [EN] Only an EXPLICIT colour is adapted, and only on dark drawn glass. [CN] 只调整显式颜色，且仅在深色玻璃确实绘制时。
-            if ((titleColor ?: stackTitleColor) != null && glassContrastApplies(configuration)) {
+            // [EN] An EXPLICIT colour or the built-in NORMAL one (unselected, not disabled) is adapted, only on dark drawn glass. [CN] 显式颜色与内置普通色（未选中、未禁用）才调整，且仅在深色玻璃确实绘制时。
+            if (((titleColor ?: stackTitleColor) != null || usesBuiltInNormal()) && glassContrastApplies(configuration)) {
                 CYLAnimatedItemContrast.adjustedTitle(resolved, itemBackgroundColor, itemGlassTintAlpha)
             } else resolved
         }
@@ -986,9 +991,10 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             tint, CYLTabBarItemAnimationTint.darkTintOption(options), mode, kind, isSelected, night,
             CYLTabBarItemAnimationTint.IconColors(resolvedIcon, explicitSelectedIconColor),
         )
-        // [EN] Dark drawn glass: an explicit tint (fixed, or the explicit icon colour) is adapted; the built-in icon colour is not.
-        // [CN] 深色玻璃确实绘制时：显式着色（固定色或显式图标颜色）会被调整；内置图标颜色不调整。
-        if (color != null && glassContrastApplies(configuration) && !(color == resolvedIcon && (if (isSelected) explicitSelectedIconColor else explicitIconColor) == null)) {
+        // [EN] Dark drawn glass: an explicit tint (fixed, or the explicit icon colour) and the built-in NORMAL icon colour are adapted; the built-in selected / disabled ones are not.
+        // [CN] 深色玻璃确实绘制时：显式着色（固定色或显式图标颜色）与内置普通图标颜色会被调整；内置选中 / 禁用颜色不调整。
+        val builtInIcon = color == resolvedIcon && (if (isSelected) explicitSelectedIconColor else explicitIconColor) == null
+        if (color != null && glassContrastApplies(configuration) && (!builtInIcon || usesBuiltInNormal())) {
             color = CYLAnimatedItemContrast.adjustedIcon(color, itemBackgroundColor, itemGlassTintAlpha)
         }
         CYLTabBarItemAnimationTint.applyToAnimationView(view, color)
