@@ -170,7 +170,7 @@ final class CYLAnimatedItemSubclassChannelTests: XCTestCase {
                                     CYLAnimatedItemContrast.iconMinimumContrast - 0.05)
     }
 
-    func testTheSubclassBuiltInTitleAndIconColorsAreNotAdapted() {
+    func testTheSubclassBuiltInTitleAndIconColorsGoThroughTheSameResolutionAndAdaptation() {
         CYLAnimatedItemView.liquidGlassActiveOverride = true
         let dark = UIColor(red: 0x3C / 255, green: 0x3C / 255, blue: 0x43 / 255, alpha: 1)
         let item = ChannelTag(frame: .zero)
@@ -178,8 +178,23 @@ final class CYLAnimatedItemSubclassChannelTests: XCTestCase {
         place(item, dark: true)
         item.applyTitleTintColor(dark)
         item.applyIconTintColor(dark)
-        assertSame(item.titleLabel.textColor, dark, "built-in title: as set")
-        assertSame(item.imageView.tintColor, dark, "built-in icon: as set")
+        XCTAssertGreaterThan(luminance(item.titleLabel.textColor), luminance(dark), "a static built-in title is adapted on drawn dark glass")
+        XCTAssertGreaterThan(luminance(item.imageView.tintColor), luminance(dark), "a static built-in icon is adapted too")
+        XCTAssertGreaterThan(CYLAnimatedItemContrast.contrastRatio(luminance(item.titleLabel.textColor),
+            CYLAnimatedItemContrast.glassReferenceLuminance(glassTint: nil, tintAlpha: nil)), CYLAnimatedItemContrast.titleMinimumContrast - 0.01)
+    }
+
+    func testTheComponentBuiltInNormalAndSelectedTitlesShareOnePath() {
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        let item = CYLAnimatedItemView(frame: .zero)
+        item.itemBackgroundStyle = .liquidGlass
+        place(item, dark: true)
+        assertSame(item.titleLabel.textColor, .white, "normal: the dark label color, unchanged by the rule", dark: true)
+        item.isSelected = true
+        item.layoutIfNeeded()
+        assertSame(item.titleLabel.textColor, item.tintColor.resolvedColor(with: item.traitCollection), "selected: the inherited tint resolved like normal", dark: true)
+        // Both are plain colors resolved with the item's traits (the same function), not dynamic ones.
+        XCTAssertFalse(item.titleLabel.textColor.isEqual(UIColor.label), "a resolved color, not the dynamic label")
     }
 
     func testTheExplicitColorsAreNotAdaptedInLightModeOrOnFlat() {
