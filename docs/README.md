@@ -421,6 +421,7 @@ docs/
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-badge-tag-list-light-dark-c738ca8a-2026-11-26-1542.png
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-plus-title-light-dark-a59ecb55-2026-11-26-1419.png
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-tag-title-colors-dark-light-3ed3ab61-2026-11-26-1629.png
+│   ├── ios-27.2-iphone-18-pro-example-swift-04-tag-title-contrast-dark-light-dfbe9190-2026-11-26-1652.png
 │   ├── ios-animated-item-engine-api.png
 │   ├── ios-badge-breathe-not-under-icon.png
 │   ├── ios-badges-follow-swapped-animation-skin.png
