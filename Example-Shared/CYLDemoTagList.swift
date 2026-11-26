@@ -94,6 +94,8 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
     private var badgeRowCount = 0
     private var badgeCell: ((Int) -> UITableViewCell)?
     private var didSelectBadgeRow: ((Int) -> Void)?
+    /// [EN] The badge samples whose badge a tap cleared, as tapping the old row cleared its badge. [CN] 已被点击清除角标的角标样例，与点击旧行清除其角标相同。
+    private var clearedBadgeRows = Set<Int>()
 
     /// [EN] Makes the tag list; the host's table shows `cell` as the only row of its first section. [CN] 生成 TagList；宿主的表格把 `cell` 作为第一个 section 的唯一一行显示。
     @discardableResult
@@ -133,14 +135,14 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
         if let badgeCell, badgeRowCount > 0 {
             counts.append(badgeRowCount)
             sections.append([CYLTagSectionKey.title: cylDemoLocalizedString("角标"),
-                             CYLTagSectionKey.items: (0..<badgeRowCount).map { Self.badgeItem(from: badgeCell($0), row: $0) }])
+                             CYLTagSectionKey.items: (0..<badgeRowCount).map { Self.badgeItem(from: badgeCell($0), row: $0, cleared: clearedBadgeRows.contains($0)) }])
         }
         let newSignature = sections.map { section in
             let items = (section[CYLTagSectionKey.items] as? [[String: Any]]) ?? []
             return ((section[CYLTagSectionKey.title] as? String) ?? "") + "|" + items.map {
                 "\($0[CYLTagItemKey.title] ?? "")-\($0[CYLTagItemKey.subtitle] ?? "")"
             }.joined(separator: "|")
-        }.joined(separator: "||")
+        }.joined(separator: "||") + "|cleared:" + clearedBadgeRows.sorted().map(String.init).joined(separator: ",")
         guard newSignature != signature else { return }
         let expanded = (0..<sectionCount).filter { signature != nil && cell.list.isSectionExpanded($0) }
         signature = newSignature
@@ -161,10 +163,11 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
         return item
     }
 
-    /// [EN] A badge sample's tag: like `item(from:)` but without the row's icon; the badge (`CYLTag.badgeText`, `badgeColor`, `badgeAccessibilityLabel`) is the image before the title. [CN] 角标样例的 Tag：与 `item(from:)` 相同但不用行图标；角标（`CYLTag.badgeText`、`badgeColor`、`badgeAccessibilityLabel`）是标题前的图片。
-    private static func badgeItem(from cell: UITableViewCell, row: Int) -> [String: Any] {
+    /// [EN] A badge sample's tag: like `item(from:)` but without the row's icon; the badge (`CYLTag.badgeText`, `badgeColor`, `badgeAccessibilityLabel`) is the image before the title, none once `cleared`. [CN] 角标样例的 Tag：与 `item(from:)` 相同但不用行图标；角标（`CYLTag.badgeText`、`badgeColor`、`badgeAccessibilityLabel`）是标题前的图片，`cleared` 后没有。
+    private static func badgeItem(from cell: UITableViewCell, row: Int, cleared: Bool) -> [String: Any] {
         var result = item(from: cell, identifier: "badge-\(row)")
         result.removeValue(forKey: CYLTagItemKey.image)
+        if cleared { return result }
         let sample = badgeSamples[row % badgeSamples.count]
         let tag = CYLTag(title: result[CYLTagItemKey.title] as? String ?? "")
         tag.badgeText = sample.text
@@ -206,6 +209,9 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
     func menu(_: Any, didSelectItemAt indexPath: IndexPath) {
         guard let source, indexPath.section < rowCounts.count, indexPath.item < rowCounts[indexPath.section] else { return }
         if indexPath.section == source.demoSectionCount() {
+            // [EN] As tapping the old row did: its badge is cleared first, then the host's action runs. [CN] 与点击旧行相同：先清除其角标，再执行宿主的动作。
+            clearedBadgeRows.insert(indexPath.item)
+            reload()
             didSelectBadgeRow?(indexPath.item)
             return
         }
