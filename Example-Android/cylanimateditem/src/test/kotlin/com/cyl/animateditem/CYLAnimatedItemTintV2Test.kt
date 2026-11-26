@@ -494,4 +494,27 @@ class CYLAnimatedItemTintV2Test {
         stack.dividerColor = Color.GREEN
         assertEquals("an explicit dividerColor is used as it is", Color.GREEN, divider.resolvedDividerColor())
     }
+
+    /**
+     * [EN] Documents the table row that a selected one-color GIF tag shows on every platform (a white dot with a white `selected.iconColor`, a red dot
+     *      without one): with the tint unset, AUTOMATIC mode follows the effective icon color of the state for a ONE-color file, ALWAYS-ORIGINAL keeps
+     *      the artwork, and a multi-color or undetectable file keeps its own colors; with no explicit icon color the artwork stays. iOS shows the same.
+     * [CN] 记录选中的单色 GIF 标签在各平台显示的表中一行（`selected.iconColor` 为白色时是白点，没有时是红点）：着色未设置时，自动模式对单色文件跟随该状态的有效
+     *      图标颜色，始终原色保持素材，多色或无法检测的文件保持自身颜色；没有显式图标颜色时素材保持不变。iOS 的表现相同。
+     */
+    @Test
+    fun aOneColorGifFollowsAnExplicitSelectedIconColorUnderAutomaticButNotUnderOriginal() {
+        val white = Color.WHITE
+        val icons = CYLTabBarItemAnimationTint.IconColors(white, white)
+        assertEquals("automatic, one color, explicit selected icon color: the white dot", white,
+            CYLTabBarItemAnimationTint.resolveItem(null, null, CYLAnimationRenderingMode.Automatic, one, true, true, icons))
+        assertNull("always original keeps the artwork",
+            CYLTabBarItemAnimationTint.resolveItem(null, null, CYLAnimationRenderingMode.AlwaysOriginal, one, true, true, icons))
+        assertNull("a multi-color file keeps its own colors under automatic",
+            CYLTabBarItemAnimationTint.resolveItem(null, null, CYLAnimationRenderingMode.Automatic, multi, true, true, icons))
+        assertNull("an undetectable file keeps its own colors under automatic",
+            CYLTabBarItemAnimationTint.resolveItem(null, null, CYLAnimationRenderingMode.Automatic, CYLAnimationColorCount.Kind.Undetectable, true, true, icons))
+        assertNull("no explicit icon color reaches the item: the artwork stays (the red dot)",
+            CYLTabBarItemAnimationTint.resolveItem(null, null, CYLAnimationRenderingMode.Automatic, one, true, true, CYLTabBarItemAnimationTint.IconColors(null, null)))
+    }
 }
