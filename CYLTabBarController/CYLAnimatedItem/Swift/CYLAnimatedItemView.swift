@@ -117,6 +117,17 @@ public let cylAnimatedItemDividerLength: CGFloat = 20
 }
 
 /**
+ [EN] The kind of `CYLAnimatedItemView.adaptedOnGlass(_:kind:)`: an icon or animation tint (3:1) or a title text (4.5:1).
+ [CN] `CYLAnimatedItemView.adaptedOnGlass(_:kind:)` 的类型：图标或动画着色（3:1）或标题文字（4.5:1）。
+ */
+@objc public enum CYLAnimatedItemGlassColorKind: Int {
+    /** [EN] An icon or animation tint, 3:1. [CN] 图标或动画着色，3:1。 */
+    case icon = 0
+    /** [EN] A title text, 4.5:1. [CN] 标题文字，4.5:1。 */
+    case title
+}
+
+/**
  [EN] The look of the control: the plain animated icon + title (default), or a countdown button, e.g. for "Get the SMS
       code" (see `CYLAnimatedItemView.startCountdown()`).
  [CN] 控件的样式：普通的动效 icon + title（默认），或倒计时按钮，例如「获取验证码」（见 `CYLAnimatedItemView.startCountdown()`）。
@@ -568,6 +579,19 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     public var resolvedItemContentHorizontalInset: CGFloat {
         CYLAnimatedItemBackgroundRenderer.resolvedContentHorizontalInset(itemContentHorizontalInset, style: itemBackgroundStyle)
     }
+    /**
+     [EN] The background color (or glass tint) used while `isHighlighted && isEnabled`, e.g. a tag's pressed color; nil (the default) keeps
+          `itemBackgroundColor` while pressed. Same flat color / glass tint rules as `itemBackgroundColor`.
+     [CN] `isHighlighted && isEnabled` 期间使用的背景色（或玻璃着色），例如标签的按下颜色；nil（默认）表示按下时仍用 `itemBackgroundColor`。
+          纯色 / 玻璃着色的规则与 `itemBackgroundColor` 相同。
+     */
+    public var itemHighlightedBackgroundColor: UIColor? {
+        didSet { if oldValue != itemHighlightedBackgroundColor { itemBackgroundDidChange() } }
+    }
+    /// [EN] The background color in use now: the pressed one while `isHighlighted && isEnabled`, else `itemBackgroundColor`. [CN] 当前使用的背景色：`isHighlighted && isEnabled` 时为按下颜色，否则为 `itemBackgroundColor`。
+    private var effectiveItemBackgroundColor: UIColor? {
+        isHighlighted && isEnabled ? (itemHighlightedBackgroundColor ?? itemBackgroundColor) : itemBackgroundColor
+    }
     /** [EN] The border width in points. [CN] 边框宽度（点）。 */
     public var itemBorderWidth: CGFloat = 0 {
         didSet { if oldValue != itemBorderWidth { itemBackgroundDidChange() } }
@@ -586,6 +610,42 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     public var itemGlassTintAlpha: CGFloat? {
         didSet { if oldValue != itemGlassTintAlpha { itemBackgroundDidChange() } }
     }
+    /** [EN] The alpha of the default glass tint in light mode, 0.10. [CN] 浅色模式下默认玻璃着色的透明度，0.10。 */
+    public static let defaultGlassTintAlphaLight: CGFloat = 0.10
+    /** [EN] The alpha of the default glass tint in dark mode, 0.04. [CN] 深色模式下默认玻璃着色的透明度，0.04。 */
+    public static let defaultGlassTintAlphaDark: CGFloat = 0.04
+    /**
+     [EN] The tint of a Liquid Glass whose `itemBackgroundColor` is nil or fully transparent: a frosted gray (225, 222, 220) at `defaultGlassTintAlphaLight`
+          in light mode, white at `defaultGlassTintAlphaDark` in dark mode, used as it is (not times 0.75, not times `itemGlassTintAlpha`). A host with no
+          color of its own (a tag with no explicit background, a section board) passes nil. iOS only for now: the other platforms keep 0.5 / 0.14 until they port it.
+     [CN] `itemBackgroundColor` 为 nil 或完全透明时液态玻璃的着色：浅色模式为磨砂灰（225, 222, 220），透明度 `defaultGlassTintAlphaLight`；深色模式为白色，
+          透明度 `defaultGlassTintAlphaDark`；按原值使用（不乘 0.75，不乘 `itemGlassTintAlpha`）。没有自己颜色的宿主（没有显式背景的标签、分区面板）传 nil。
+          目前仅 iOS：其他平台保持 0.5 / 0.14，直到移植。
+     */
+    public static let defaultGlassTint = UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(white: 1, alpha: defaultGlassTintAlphaDark)
+            : UIColor(red: 225 / 255, green: 222 / 255, blue: 220 / 255, alpha: defaultGlassTintAlphaLight)
+    }
+    /**
+     [EN] The content inset in use for an explicit `itemContentHorizontalInset` (nil: not set) and a style: `explicit` when set (0 included), else the glass
+          constant where Liquid Glass is really drawn (`resolvedItemBackgroundStyle` rule), 0 when flat. What `resolvedItemContentHorizontalInset`
+          computes for an instance; for a layout that measures before the item exists (a tag's size).
+     [CN] 给定显式 `itemContentHorizontalInset`（nil：未设置）与样式时实际使用的内缩：已设置时为 `explicit`（包括 0），否则真正绘制液态玻璃时为玻璃常量，
+          扁平时为 0。即实例的 `resolvedItemContentHorizontalInset` 的算法；用于条目创建之前就要测量的布局（标签的尺寸）。
+     */
+    public static func resolvedContentHorizontalInset(_ explicit: CGFloat?, style: CYLAnimatedItemBackgroundStyle) -> CGFloat {
+        CYLAnimatedItemBackgroundRenderer.resolvedContentHorizontalInset(explicit, style: style)
+    }
+    /**
+     [EN] Whether an animation engine is in the app (`CYLTabBarItemAnimationFactory`, brought by an engine subspec such as `CYLAnimatedItem/LottieSwift`).
+          Without one an animation file cannot play and the static image shows. A runtime check, unlike the compile-time `CYL_ANIMATION_ENGINE_AVAILABLE`.
+     [CN] App 中是否有动画引擎（`CYLTabBarItemAnimationFactory`，由 `CYLAnimatedItem/LottieSwift` 等引擎子库带来）。没有时动画文件无法播放，显示静态图片。
+          运行时检查，不同于编译期的 `CYL_ANIMATION_ENGINE_AVAILABLE`。
+     */
+    @objc public static var isAnimationEngineAvailable: Bool {
+        NSClassFromString("CYLTabBarItemAnimationFactory") != nil
+    }
     /**
      [EN] The background really drawn: `itemBackgroundStyle`, or `.flat` where `isLiquidGlassActive()` is false.
      [CN] 实际绘制的背景：`itemBackgroundStyle`，`isLiquidGlassActive()` 为 false 时为 `.flat`。
@@ -598,6 +658,35 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      [CN] 绘制液态玻璃时位于内容后面的玻璃层；视图为扁平时为 nil。
      */
     public var itemLiquidGlassView: UIView? { backgroundRenderer.glassView }
+    /**
+     [EN] Whether Liquid Glass is really drawn behind the content: `resolvedItemBackgroundStyle == .liquidGlass` (the style was asked for AND the system draws
+          glass, `isLiquidGlassActive()`). The one condition every glass-only rule of the item sits behind (dark-glass color adaptation, the nil-tint default
+          tint, the pressed tint); a host that must choose its own glass-only values reads it too. A glass that was asked for but is not drawn is flat.
+     [CN] 内容后面是否确实绘制液态玻璃：`resolvedItemBackgroundStyle == .liquidGlass`（请求了该样式且系统绘制玻璃，`isLiquidGlassActive()`）。
+          条目所有仅玻璃适用的规则（深色玻璃颜色调整、nil 着色的默认着色、按下着色）都以它为唯一条件；需要自选仅玻璃值的宿主也读取它。
+          请求了玻璃但没有绘制时视为扁平。
+     */
+    public var drawsLiquidGlass: Bool { resolvedItemBackgroundStyle == .liquidGlass }
+    /**
+     [EN] The opposite of `drawsLiquidGlass`: the background is the flat color (`itemBackgroundStyle` is `.flat`, or glass was asked for and the system draws none).
+     [CN] `drawsLiquidGlass` 的反面：背景为纯色（`itemBackgroundStyle` 为 `.flat`，或请求了玻璃但系统不绘制）。
+     */
+    public var drawsFlatBackground: Bool { !drawsLiquidGlass }
+
+    /**
+     [EN] Whether an Increase Contrast outline is drawn (off by default): while the system's Increase Contrast is on (`traitCollection.accessibilityContrast`
+          is high, or `UIAccessibility.isDarkerSystemColorsEnabled`) the border takes the effective title color and the width `max(1, itemBorderWidth)`.
+          Refreshed when the trait changes. Needs the item background (`itemBackgroundColor`, `itemBackgroundStyle`, `itemBorderWidth` … in use).
+     [CN] 是否绘制增强对比度轮廓（默认关闭）：系统「增强对比度」开启期间（`traitCollection.accessibilityContrast` 为 high，或
+          `UIAccessibility.isDarkerSystemColorsEnabled`）边框使用有效标题颜色，宽度为 `max(1, itemBorderWidth)`。trait 变化时刷新。需要已使用条目背景
+          （`itemBackgroundColor`、`itemBackgroundStyle`、`itemBorderWidth` 等）。
+     */
+    public var showsOutlineWhenIncreaseContrast = false {
+        didSet { if oldValue != showsOutlineWhenIncreaseContrast { layoutItemBackground() } }
+    }
+    private var isIncreaseContrastOn: Bool {
+        traitCollection.accessibilityContrast == .high || UIAccessibility.isDarkerSystemColorsEnabled
+    }
 
     private let backgroundRenderer = CYLAnimatedItemBackgroundRenderer()
     /**
@@ -620,6 +709,13 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     private var usesItemBackground = false
 
+    /// [EN] The pressed color depends on the state: lays the background out again and re-adapts the colors to the glass. [CN] 按下颜色随状态变化：重新布局背景并按玻璃重新调整颜色。
+    private func refreshItemBackgroundForState() {
+        guard usesItemBackground, itemHighlightedBackgroundColor != nil else { return }
+        layoutItemBackground()
+        refreshGlassContrastColorsIfNeeded()
+    }
+
     private func itemBackgroundDidChange() {
         usesItemBackground = true
         layoutItemBackground()
@@ -635,7 +731,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      [CN] 深色玻璃对比度规则（`CYLAnimatedItemContrast`）是否适用：液态玻璃确实绘制（`resolvedItemBackgroundStyle`）且本条目自己的 trait 为深色。
      */
     private var glassContrastApplies: Bool {
-        usesItemBackground && resolvedItemBackgroundStyle == .liquidGlass && traitCollection.userInterfaceStyle == .dark
+        guard usesItemBackground, drawsLiquidGlass else { return false }
+        return traitCollection.userInterfaceStyle == .dark
     }
 
     /// [EN] The glass state the colors were last adapted to (nil: the rule did not apply). [CN] 颜色上次适配的玻璃状态（nil：规则不适用）。
@@ -643,7 +740,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     /// [EN] The glass (drawn or not, its tint) decides the contrast adaptation: the colors are applied again when it changes. [CN] 玻璃（是否绘制、着色）决定对比度调整：变化时重新应用颜色。
     private func refreshGlassContrastColorsIfNeeded() {
-        let key: [AnyHashable?]? = glassContrastApplies ? [itemBackgroundColor, itemGlassTintAlpha.map { Double($0) }] : nil
+        // [EN] Flat (or glass not drawn): nothing is adapted, so the key is nil. [CN] 扁平（或未绘制玻璃）：不调整，key 为 nil。
+        var key: [AnyHashable?]?
+        if glassContrastApplies { key = [effectiveItemBackgroundColor, itemGlassTintAlpha.map { Double($0) }] }
         guard key != glassContrastKey else { return }
         glassContrastKey = key
         refreshIconColor()
@@ -654,14 +753,36 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     /// [EN] An explicit color adapted to the dark glass when the rule applies; `minimumContrast` picks title or icon. [CN] 规则适用时把显式颜色调整到适合深色玻璃；`minimumContrast` 区分标题与图标。
     private func glassAdapted(_ color: UIColor, minimumContrast: CGFloat) -> UIColor {
         guard glassContrastApplies else { return color }
-        return CYLAnimatedItemContrast.adjusted(color, glassTint: itemBackgroundColor, tintAlpha: itemGlassTintAlpha, minimumContrast: minimumContrast)
+        return CYLAnimatedItemContrast.adjusted(color, glassTint: effectiveItemBackgroundColor, tintAlpha: itemGlassTintAlpha, minimumContrast: minimumContrast)
+    }
+
+    /**
+     [EN] The dark-glass rule for a color the host draws itself (a subclass's delete cross, a label of its own): `color` unchanged unless Liquid Glass
+          is really drawn behind this item (`itemBackgroundStyle`, `resolvedItemBackgroundStyle`) and the item's traits are dark, else lifted to the
+          contrast of `kind` (icon 3:1, title 4.5:1) against this item's glass (`itemBackgroundColor`, `itemGlassTintAlpha`; the default tint when unset).
+          Dynamic colors are returned as they are. The item itself applies it to every EXPLICIT color; the twin of HarmonyOS's and the mini program's
+          `adaptedOnGlass(color, kind, style, glassTint, tintAlpha)`, which take the glass as parameters.
+     [CN] 宿主自己绘制的颜色（子类的删除叉号、自己的标签）适用的深色玻璃规则：除非本条目背后确实绘制液态玻璃（`itemBackgroundStyle`、
+          `resolvedItemBackgroundStyle`）且本条目的 trait 为深色，否则原样返回 `color`；否则按 `kind`（图标 3:1，标题 4.5:1）对照本条目的玻璃
+          （`itemBackgroundColor`、`itemGlassTintAlpha`；未设置时为默认着色）提亮。动态颜色原样返回。条目自己对每个显式颜色都应用该规则；
+          对应鸿蒙与小程序的 `adaptedOnGlass(color, kind, style, glassTint, tintAlpha)`（它们把玻璃作为参数）。
+     */
+    public func adaptedOnGlass(_ color: UIColor, kind: CYLAnimatedItemGlassColorKind) -> UIColor {
+        glassAdapted(color, minimumContrast: kind == .icon ? CYLAnimatedItemContrast.iconMinimumContrast : CYLAnimatedItemContrast.titleMinimumContrast)
     }
 
     /// [EN] Applies the background, radius and border for the current bounds (`CYLAnimatedItemBackgroundRenderer`). [CN] 按当前 bounds 应用背景、圆角与边框。
     private func layoutItemBackground() {
         guard usesItemBackground else { return }
-        backgroundRenderer.apply(on: self, style: itemBackgroundStyle, color: itemBackgroundColor, cornerRadius: itemCornerRadius,
-                                 borderWidth: itemBorderWidth, borderColor: itemBorderColor, tintAlpha: itemGlassTintAlpha)
+        var borderWidth = itemBorderWidth
+        var borderColor = itemBorderColor
+        if showsOutlineWhenIncreaseContrast && isIncreaseContrastOn {
+            // [EN] Increase Contrast: a visible outline in the effective title color. [CN] 增强对比度：以有效标题颜色绘制可见轮廓。
+            borderColor = titleLabel.textColor
+            borderWidth = max(1, itemBorderWidth)
+        }
+        backgroundRenderer.apply(on: self, style: itemBackgroundStyle, color: effectiveItemBackgroundColor, cornerRadius: itemCornerRadius,
+                                 borderWidth: borderWidth, borderColor: borderColor, tintAlpha: itemGlassTintAlpha)
     }
     /** [EN] The length in seconds, 60 by default. Used by `startCountdown()`. [CN] 总时长（秒），默认 60。`startCountdown()` 使用。 */
     public var countdownDuration: TimeInterval = 60
@@ -882,11 +1003,15 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
 
     /**
-     [EN] Whether `itemAppearance` was given by the stack (the item had none of its own). Then an icon color the item sets itself through
-          `applyIconTintColor(_:)` (a subclass with its own colors, e.g. a tag button) keeps winning over the appearance's icon color.
-          Set by `CYLAnimatedItemStackView`; any other assignment of `itemAppearance` makes it false. false by default.
-     [CN] `itemAppearance` 是否由堆叠视图给出（条目自己没有）。此时条目自己通过 `applyIconTintColor(_:)` 设置的图标颜色（有自己颜色的子类，
-          例如标签按钮）优先于外观中的图标颜色。由 `CYLAnimatedItemStackView` 设置；以其他方式给 `itemAppearance` 赋值会使其变为 false。默认 false。
+     [EN] Whether `itemAppearance` was given by the stack (the item had none of its own). The colors of one state are decided by PRECEDENCE, high to low:
+          (1) the item's own `itemAppearance` (an integrator's; this property false), (2) the subclass-explicit colors (`setSubclassTitleColor(_:for:)`,
+          `setSubclassIconColor(_:for:)`), (3) the stack's inherited `itemAppearance` (this property true), (4) the subclass built-in colors
+          (`applyIconTintColor(_:)`, `applyTitleTintColor(_:)`), (5) the component's built-ins. Levels 1 to 3 are explicit (adapted on drawn dark glass).
+          Set by `CYLAnimatedItemStackView`; any other assignment of `itemAppearance` makes it false. The subclass channels never change it. false by default.
+     [CN] `itemAppearance` 是否由堆叠视图给出（条目自己没有）。同一状态的颜色按优先级决定，由高到低：（1）条目自己的 `itemAppearance`（集成方设置，
+          本属性为 false），（2）子类显式颜色（`setSubclassTitleColor(_:for:)`、`setSubclassIconColor(_:for:)`），（3）堆叠视图继承的 `itemAppearance`
+          （本属性为 true），（4）子类内置颜色（`applyIconTintColor(_:)`、`applyTitleTintColor(_:)`），（5）组件内置值。1 到 3 级为显式值（深色玻璃确实绘制时调整）。
+          由 `CYLAnimatedItemStackView` 设置；以其他方式给 `itemAppearance` 赋值会使其变为 false。子类通道从不改变它。默认 false。
      */
     public private(set) var isItemAppearanceInherited = false
     private var assigningInheritedAppearance = false
@@ -904,7 +1029,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         itemAppearance = appearance
     }
 
-    /// [EN] The SUBCLASS built-in level: the color a subclass (a tag button) gave through `applyIconTintColor(_:)`. Explicit item and stack values win over it, it wins over the component's built-ins. [CN] 子类内置层：子类通过 `applyIconTintColor(_:)` 给出的颜色。条目与堆叠视图的显式值优先于它，它优先于组件内置值。
+    /// [EN] The SUBCLASS built-in level: the color a subclass (a tag button) gave through `applyIconTintColor(_:)`. Explicit values (own appearance, subclass-explicit, stack's) win over it, it wins over the component's built-ins. [CN] 子类内置层：子类通过 `applyIconTintColor(_:)` 给出的颜色。条目与堆叠视图的显式值优先于它，它优先于组件内置值。
     private var hostIconColor: UIColor?
 
     private func reapplyAnimationTint() {
@@ -1058,6 +1183,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             #if CYL_ANIMATION_ENGINE_AVAILABLE
             if !playing, drivesAnimationPlayback { setPlayerValue(storedRestingProgress, for: "progress") }
             #endif
+            updateSelectedAnimationFrame()
         }
     }
     private var storedRestingProgress: CGFloat = 0
@@ -1227,7 +1353,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
 
     private func updateIcon() {
-        var icon = (isSelected && selectedImage != nil) ? selectedImage : image
+        var icon = (isSelected && selectedImage != nil && (!disabledWinsImage || isEnabled)) ? selectedImage : image
         if countdownState == .running, let countdownIcon = countdownImage { icon = countdownIcon }
         if icon == nil { icon = placeholderIfNeeded() }
         // [EN] An animated image (`UIImage.images`, e.g. a GIF) rests on its first frame until it is played, like an animation
@@ -1429,6 +1555,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             guard isSelected != oldValue else { return }
             applyItemAppearance()
             updateIcon()
+            updateSelectedAnimationFrame()
             itemStateDidChange()
             updateItemAccessibility()
         }
@@ -1437,6 +1564,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     open override var isHighlighted: Bool {
         didSet {
             guard isHighlighted != oldValue else { return }
+            if itemHighlightedBackgroundColor != nil { refreshItemBackgroundForState() }
             applyCountdownAppearance()
             itemStateDidChange()
         }
@@ -1445,6 +1573,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     open override var isEnabled: Bool {
         didSet {
             guard isEnabled != oldValue else { return }
+            if itemHighlightedBackgroundColor != nil { refreshItemBackgroundForState() }
+            if disabledWinsImage { updateIcon() }
             applyItemAppearance()
             applyCountdownAppearance()
             itemStateDidChange()
@@ -1477,6 +1607,51 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         refreshIconColor()
     }
 
+    /**
+     [EN] The SUBCLASS built-in title color, the twin of `applyIconTintColor(_:)`: stored, then the title takes it where nothing is explicit (the item's
+          own, the subclass-explicit and the stack's `itemAppearance` title colors win over it; it wins over the component's built-in and over a
+          `titleLabel.textColor` set by hand). NOT adapted to dark glass. nil forgets it.
+     [CN] 子类内置标题颜色，`applyIconTintColor(_:)` 的标题版本：先保存，然后在没有显式值的地方标题使用它（条目自己的、子类显式的以及堆叠视图
+          `itemAppearance` 的标题颜色优先于它；它优先于组件内置值与手动设置的 `titleLabel.textColor`）。不按深色玻璃调整。nil 表示忘记。
+     */
+    open func applyTitleTintColor(_ color: UIColor?) {
+        if hostTitleColor == color { return }
+        hostTitleColor = color
+        refreshTitleColor()
+    }
+
+    /**
+     [EN] The SUBCLASS-EXPLICIT title color of a state (`.normal`, `.selected`, `.disabled`; nil clears): a color the subclass's own configuration set on
+          purpose. Precedence (high to low): the item's OWN `itemAppearance` (set by an integrator, `isItemAppearanceInherited` false) > this
+          channel > the stack's inherited `itemAppearance` (`isItemAppearanceInherited` true) > the subclass built-in (`applyTitleTintColor`)
+          > the component's built-in. It counts as explicit: on drawn dark glass it is adapted (4.5:1, `CYLAnimatedItemContrast`). It never
+          touches `itemAppearance` or `isItemAppearanceInherited`, so stack inheritance (fonts, icon colors) survives.
+     [CN] 某状态（`.normal`、`.selected`、`.disabled`；nil 清除）的子类显式标题颜色：子类自己的配置有意设置的颜色。优先级（高到低）：条目自己的
+          `itemAppearance`（由集成方设置，`isItemAppearanceInherited` 为 false）> 本通道 > 堆叠视图继承的 `itemAppearance`
+          （`isItemAppearanceInherited` 为 true）> 子类内置（`applyTitleTintColor`）> 组件内置。它视为显式值：深色玻璃确实绘制时按 4.5:1 调整
+          （`CYLAnimatedItemContrast`）。从不改动 `itemAppearance` 或 `isItemAppearanceInherited`，因此堆叠视图的继承（字体、图标颜色）保持有效。
+     */
+    open func setSubclassTitleColor(_ color: UIColor?, for state: UIControl.State) {
+        if subclassTitleColors[state.rawValue] == color { return }
+        subclassTitleColors[state.rawValue] = color
+        refreshTitleColor()
+    }
+
+    /**
+     [EN] The SUBCLASS-EXPLICIT icon color of a state (nil clears); same precedence and adaptation as `setSubclassTitleColor(_:for:)`, the icon and the
+          animation tint are adapted at 3:1.
+     [CN] 某状态的子类显式图标颜色（nil 清除）；优先级与调整同 `setSubclassTitleColor(_:for:)`，图标与动画着色按 3:1 调整。
+     */
+    open func setSubclassIconColor(_ color: UIColor?, for state: UIControl.State) {
+        if subclassIconColors[state.rawValue] == color { return }
+        subclassIconColors[state.rawValue] = color
+        refreshIconColor()
+    }
+
+    private var subclassTitleColors: [UInt: UIColor] = [:]
+    private var subclassIconColors: [UInt: UIColor] = [:]
+    private var hostTitleColor: UIColor?
+
     private enum IconState { case normal, selected, disabled }
 
     private var currentIconState: IconState {
@@ -1484,14 +1659,33 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         return isSelected ? .selected : .normal
     }
 
-    /// [EN] EXPLICIT icon color of a state: `itemAppearance` (the item's own, or the stack's given one); no built-ins, no subclass color. [CN] 某状态的显式图标颜色：`itemAppearance`（条目自己的或堆叠视图给的）；不含内置值与子类颜色。
-    private func explicitIconColor(_ state: IconState) -> UIColor? {
+    /// [EN] The `itemAppearance` icon color of a state (the item's own or the stack's); nil without one. [CN] `itemAppearance` 中某状态的图标颜色（条目自己的或堆叠视图的）；没有时为 nil。
+    private func appearanceIconColor(_ state: IconState) -> UIColor? {
         guard let appearance = itemAppearance else { return nil }
         switch state {
         case .normal: return appearance.normal.iconColor
         case .selected: return appearance.selected.iconColor
         case .disabled: return appearance.disabled.iconColor
         }
+    }
+
+    /// [EN] The `UIControl.State` a subclass-explicit color is stored under. [CN] 子类显式颜色保存时使用的 `UIControl.State`。
+    private func controlState(_ state: IconState) -> UIControl.State {
+        switch state {
+        case .normal: return .normal
+        case .selected: return .selected
+        case .disabled: return .disabled
+        }
+    }
+
+    /// [EN] EXPLICIT icon color of a state, by precedence: the item's OWN `itemAppearance` > the subclass-explicit color (`setSubclassIconColor`) > the
+    ///      stack's INHERITED `itemAppearance`; no built-ins, no `applyIconTintColor` color. [CN] 某状态的显式图标颜色，按优先级：条目自己的 `itemAppearance` >
+    ///      子类显式颜色（`setSubclassIconColor`）> 堆叠视图继承的 `itemAppearance`；不含内置值与 `applyIconTintColor` 的颜色。
+    private func explicitIconColor(_ state: IconState) -> UIColor? {
+        let fromAppearance = appearanceIconColor(state)
+        if !isItemAppearanceInherited, let own = fromAppearance { return own }
+        if let subclass = subclassIconColors[controlState(state).rawValue] { return subclass }
+        return fromAppearance
     }
 
     /// [EN] The component's built-in colors, evaluated now with this item's own tint chain and traits (never stored): normal `UIColor.label`, selected
@@ -1528,6 +1722,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     /// [EN] The icon and the animation take the effective icon color; called on every change of state, appearance, tint and traits. [CN] 图标与动画使用有效图标颜色；状态、外观、tint 与 trait 每次变化时调用。
     private func refreshIconColor() {
         guard !cylIsDivider else { return }
+        refreshAnimationAlpha()
         imageView.tintColor = effectiveIconColor()
         // [EN] The inherited tint is already adjusted by this item's `tintAdjustmentMode`; the image view must not dim it a second time.
         // [CN] 继承的 tint 已按本条目的 `tintAdjustmentMode` 调整；图片视图不能再调暗一次。
@@ -1598,16 +1793,35 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             let shown = glassAdapted(explicit, minimumContrast: CYLAnimatedItemContrast.titleMinimumContrast)
             titleLabel.textColor = shown
             appliedTitleColor = shown
+            refreshOutlineForTitleColor()
             return
         }
         if itemStyle == .countdown && countdownState == .running { return }
+        // [EN] The subclass built-in title color (`applyTitleTintColor`): not adapted. [CN] 子类内置标题颜色（`applyTitleTintColor`）：不调整。
+        if let host = hostTitleColor {
+            titleLabel.textColor = host
+            appliedTitleColor = host
+            refreshOutlineForTitleColor()
+            return
+        }
         let current: UIColor? = titleLabel.textColor
         if current == nil || (appliedTitleColor != nil && current!.isEqual(appliedTitleColor)) { setBuiltInTitleColor() }
+        refreshOutlineForTitleColor()
+    }
+
+    /// [EN] The Increase Contrast outline follows the title color. [CN] 增强对比度轮廓跟随标题颜色。
+    private func refreshOutlineForTitleColor() {
+        if showsOutlineWhenIncreaseContrast && isIncreaseContrastOn { layoutItemBackground() }
     }
 
     /// [EN] The explicit `titleTextAttributes` color of the current state. [CN] 当前状态 `titleTextAttributes` 中的显式颜色。
+    ///      By precedence: own `itemAppearance` > subclass-explicit (`setSubclassTitleColor`) > the stack's inherited `itemAppearance`.
+    ///      [CN] 按优先级：条目自己的 `itemAppearance` > 子类显式（`setSubclassTitleColor`）> 堆叠视图继承的 `itemAppearance`。
     private var explicitTitleColor: UIColor? {
-        currentItemStateAppearance?.titleTextAttributes[.foregroundColor] as? UIColor
+        let fromAppearance = currentItemStateAppearance?.titleTextAttributes[.foregroundColor] as? UIColor
+        if !isItemAppearanceInherited, let own = fromAppearance { return own }
+        if let subclass = subclassTitleColors[controlState(currentIconState).rawValue] { return subclass }
+        return fromAppearance
     }
 
     private func setBuiltInTitleColor() {
@@ -1634,6 +1848,10 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         // [EN] Dynamic colors (icon, title, tint, divider) are resolved again against THIS item's new traits. [CN] 动态颜色（图标、标题、tint、分隔条）用本条目新的 trait 重新解析。
         if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
             applyItemAppearance()
+        }
+        if showsOutlineWhenIncreaseContrast,
+           traitCollection.accessibilityContrast != previousTraitCollection?.accessibilityContrast {
+            layoutItemBackground()
         }
         updateDividerLine()
     }
@@ -1767,6 +1985,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             notifyAnimationFailed()
         }
         #endif
+        refreshAnimationAlpha()
+        updateSelectedAnimationFrame()
         updateIcon()
         contentDidChange()
     }
@@ -1796,8 +2016,54 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         DispatchQueue.main.async { [weak self] in self?.onAnimationFailed?() }
     }
 
+    /**
+     [EN] The alpha of the animation view while the item is disabled; nil (the default) is 1 (unchanged). The static image is not changed.
+     [CN] 条目不可用时动画视图的透明度；nil（默认）为 1（不变）。静态图片不受影响。
+     */
+    public var itemDisabledAnimationAlpha: CGFloat? {
+        didSet { if oldValue != itemDisabledAnimationAlpha { refreshAnimationAlpha() } }
+    }
+    private func refreshAnimationAlpha() {
+        #if CYL_ANIMATION_ENGINE_AVAILABLE
+        guard let view = animationView else { return }
+        let alpha = isEnabled ? 1 : (itemDisabledAnimationAlpha ?? 1)
+        if view.alpha != alpha { view.alpha = alpha }
+        #endif
+    }
+    /**
+     [EN] Whether a selected item shows the animation's last frame and an unselected one its resting progress, without playing (off by default; a
+          selected tab's icon). Applied when the selection changes and when the animation view is built.
+     [CN] 选中的条目是否显示动画最后一帧、未选中的显示静止进度（不播放；默认关闭；选中 Tab 的图标）。选中状态变化与动画视图创建时应用。
+     */
+    public var showsLastFrameWhenSelected = false {
+        didSet { if oldValue != showsLastFrameWhenSelected { updateSelectedAnimationFrame() } }
+    }
+    private func updateSelectedAnimationFrame() {
+        guard showsLastFrameWhenSelected, animationView != nil else { return }
+        if isSelected { showAnimationLastFrame() } else { stopAnimation() }
+    }
+    /**
+     [EN] Whether `playAnimation()` honours Reduce Motion (off by default): with the system's Reduce Motion on it does not play but shows the state's
+          frame (the last frame when selected, else the resting progress).
+     [CN] `playAnimation()` 是否遵循「减弱动态效果」（默认关闭）：系统开启时不播放，而是显示该状态的画面（选中为最后一帧，否则为静止进度）。
+     */
+    public var respectsReduceMotion = false
+    /**
+     [EN] The disabled-wins image rule (off by default): `selectedImage` shows only while `isSelected && isEnabled`; a disabled selected item shows `image`.
+     [CN] 不可用优先的图片规则（默认关闭）：只有 `isSelected && isEnabled` 时才显示 `selectedImage`；不可用的选中条目显示 `image`。
+     */
+    public var disabledWinsImage = false {
+        didSet { if oldValue != disabledWinsImage { updateIcon() } }
+    }
+
     /** [EN] Plays from the current progress. [CN] 从当前进度开始播放。 */
     open func playAnimation() {
+        if respectsReduceMotion && UIAccessibility.isReduceMotionEnabled {
+            if animationView != nil {
+                if isSelected { showAnimationLastFrame() } else { stopAnimation() }
+            }
+            return
+        }
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         guard let player = animationPlayer else { playAnimatedImage(); return }
         showAnimationAgain()

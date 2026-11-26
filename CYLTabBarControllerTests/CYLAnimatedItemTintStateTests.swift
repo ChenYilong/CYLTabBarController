@@ -150,7 +150,7 @@ final class CYLAnimatedItemBackgroundTests: XCTestCase {
         var alpha: CGFloat = -1
         (glass.effect as? UIGlassEffect)?.tintColor?.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light))
             .getRed(nil, green: nil, blue: nil, alpha: &alpha)
-        XCTAssertEqual(alpha, 0.5, accuracy: 0.01, "no color set: the default frosted tint, so one style parameter is visible")
+        XCTAssertEqual(alpha, 0.10, accuracy: 0.01, "no color set: the default frosted tint, so one style parameter is visible")
     }
 
     func testAClearColorMeansNoColorAndGetsTheDefaultFrostedTint() throws {
@@ -168,7 +168,7 @@ final class CYLAnimatedItemBackgroundTests: XCTestCase {
         var alpha: CGFloat = -1
         (glass.effect as? UIGlassEffect)?.tintColor?.resolvedColor(with: UITraitCollection(userInterfaceStyle: .light))
             .getRed(nil, green: nil, blue: nil, alpha: &alpha)
-        XCTAssertEqual(alpha, 0.5, accuracy: 0.01, "UIColor.clear is no color: the default frosted tint, like nil")
+        XCTAssertEqual(alpha, 0.10, accuracy: 0.01, "UIColor.clear is no color: the default frosted tint, like nil")
         XCTAssertEqual(item.layer.borderWidth, 1, "the border and the corner radius stay as set")
         XCTAssertEqual(item.layer.cornerRadius, 12)
         // A color with a real alpha still tints at 75% of it.

@@ -140,16 +140,17 @@ final class CYLAnimatedItemBackgroundRenderer {
     static let glassTintAlpha: CGFloat = 0.75
 
     /**
-     * [EN] The tint of a glass whose host set no color: a light frosted gray in light mode (225, 222, 220 at alpha 0.5) and a faint white in dark
-     *      mode (alpha 0.14), so `itemBackgroundStyle = .liquidGlass` alone is visible on a plain page (the same values on every platform).
-     * [CN] 宿主未设置颜色时玻璃的着色：浅色模式为淡灰（225, 222, 220，透明度 0.5），深色模式为淡白（透明度 0.14），因此只设置
-     *      `itemBackgroundStyle = .liquidGlass` 在纯色页面上也看得见（各平台数值相同）。
+     * [EN] The tint of a glass whose host set no color: `CYLAnimatedItemView.defaultGlassTint` (a light frosted gray, 225, 222, 220 at alpha 0.10 in
+     *      light mode, white at 0.04 in dark mode), low so that the interior stays clear and the lit edge shows, so `itemBackgroundStyle = .liquidGlass`
+     *      alone is visible on a plain page. It is the tint as it is: it never takes the 0.75 share or `itemGlassTintAlpha`. Since 2026-11-26 the
+     *      iOS values differ from the other platforms (Android, HarmonyOS, the mini program: 0.5 light, 0.14 dark) until they port the same default;
+     *      the owner paused that port.
+     * [CN] 宿主未设置颜色时玻璃的着色：`CYLAnimatedItemView.defaultGlassTint`（浅色模式为淡灰，225, 222, 220，透明度 0.10；深色模式为白色，透明度 0.04），
+     *      透明度低，内部保持通透、亮边可见，因此只设置 `itemBackgroundStyle = .liquidGlass` 在纯色页面上也看得见。按原值使用：不乘 0.75 比例，也不受
+     *      `itemGlassTintAlpha` 影响。自 2026-11-26 起 iOS 的数值与其他平台（Android、鸿蒙、小程序：浅色 0.5，深色 0.14）不同，直到它们移植同一默认值；
+     *      所有者已暂停该移植。
      */
-    static let defaultGlassTint = UIColor { traits in
-        traits.userInterfaceStyle == .dark
-            ? UIColor(white: 1, alpha: 0.14)
-            : UIColor(red: 225 / 255, green: 222 / 255, blue: 220 / 255, alpha: 0.5)
-    }
+    static var defaultGlassTint: UIColor { CYLAnimatedItemView.defaultGlassTint }
 
     /**
      * [EN] nil, and a color that is fully transparent (alpha 0 after resolving a dynamic color for `traits`, e.g. `UIColor.clear`), both mean "no
