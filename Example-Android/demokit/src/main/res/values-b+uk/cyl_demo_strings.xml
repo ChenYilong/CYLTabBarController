@@ -133,7 +133,7 @@
     <string name="cyl_demo_7108183f18">Запит скасовано</string>
     <string name="cyl_demo_5fbceaee5f">Запит без URL</string>
     <string name="cyl_demo_4334569b3d">HTML-сторінка (мережа)</string>
-    <string name="cyl_demo_e2917c5f0d">Пласкі: itemContentHorizontalInset не задано</string>
+    <string name="cyl_demo_e2917c5f0d">Плаский: itemContentHorizontalInset не задано</string>
     <string name="cyl_demo_a7248eeb45">Звичайний</string>
     <string name="cyl_demo_57fd7a0cf3">Вибрано</string>
     <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset не задано</string>

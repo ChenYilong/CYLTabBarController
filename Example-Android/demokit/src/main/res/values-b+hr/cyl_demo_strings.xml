@@ -30,7 +30,7 @@
     <string name="cyl_demo_6a69211e0f">Svaka scena je traka s karticama izrađena javnim API-jem: stilovi, animacije, značke, Lottie i noviji API kartica</string>
     <string name="cyl_demo_7efc907fe3">Animirana stavka</string>
     <string name="cyl_demo_9244b5dc65">Komponenta animirane ikone + naslova zasebno: GIF, Lottie, datoteka koja nedostaje, dodatak i povlačenje</string>
-    <string name="cyl_demo_5dbde9a698">Uvlaka sadržaja</string>
+    <string name="cyl_demo_5dbde9a698">Unutarnja margina sadržaja</string>
     <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset nije postavljeno: ravna stavka i stavka Liquid Glass, normalna i odabrana</string>
     <string name="cyl_demo_185d8ef0ae">Značke</string>
     <string name="cyl_demo_2db1db0706">Reprodukcija</string>

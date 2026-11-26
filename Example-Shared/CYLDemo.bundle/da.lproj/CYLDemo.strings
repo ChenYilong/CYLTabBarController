@@ -481,7 +481,7 @@
 "bridge: pause %d, resume %d" = "bro: pause %d, genoptag %d";
 "last event: -" = "seneste hændelse: -";
 "last event: %@" = "seneste hændelse: %@";
-"Content inset" = "Indholdsindrykning";
+"Content inset" = "Indre margen";
 "itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset ikke angivet: et fladt og et Liquid Glass-element, normalt og valgt";
 "Flat: itemContentHorizontalInset unset" = "Flad: itemContentHorizontalInset ikke angivet";
 "Normal" = "Normal";

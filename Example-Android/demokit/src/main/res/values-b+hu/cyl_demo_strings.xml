@@ -30,7 +30,7 @@
     <string name="cyl_demo_6a69211e0f">Minden jelenet a nyilvános API-val készült lapsáv: stílusok, animációk, jelvények, Lottie és az újabb lap API</string>
     <string name="cyl_demo_7efc907fe3">Animált elem</string>
     <string name="cyl_demo_9244b5dc65">Az animált ikon + cím összetevő önmagában: GIF, Lottie, hiányzó fájl, kiegészítő és húzás</string>
-    <string name="cyl_demo_5dbde9a698">Tartalom behúzása</string>
+    <string name="cyl_demo_5dbde9a698">Tartalom belső margója</string>
     <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset nincs beállítva: egy lapos és egy Liquid Glass elem, normál és kijelölt</string>
     <string name="cyl_demo_185d8ef0ae">Jelvények</string>
     <string name="cyl_demo_2db1db0706">Lejátszás</string>

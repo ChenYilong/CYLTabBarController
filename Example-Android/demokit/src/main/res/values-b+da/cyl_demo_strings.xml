@@ -30,7 +30,7 @@
     <string name="cyl_demo_6a69211e0f">Hver scene er en fanelinje bygget med den offentlige API: stilarter, animationer, badges, Lottie og den nyere fane-API</string>
     <string name="cyl_demo_7efc907fe3">Animeret element</string>
     <string name="cyl_demo_9244b5dc65">Den animerede ikon + titel-komponent alene: GIF, Lottie, en manglende fil, et tilbehør og trækning</string>
-    <string name="cyl_demo_5dbde9a698">Indholdsindrykning</string>
+    <string name="cyl_demo_5dbde9a698">Indre margen</string>
     <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset ikke angivet: et fladt og et Liquid Glass-element, normalt og valgt</string>
     <string name="cyl_demo_185d8ef0ae">Badges</string>
     <string name="cyl_demo_2db1db0706">Afspilning</string>

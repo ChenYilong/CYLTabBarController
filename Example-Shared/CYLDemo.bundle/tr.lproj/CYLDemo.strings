@@ -481,7 +481,7 @@
 "bridge: pause %d, resume %d" = "köprü: duraklat %d, devam %d";
 "last event: -" = "son olay: -";
 "last event: %@" = "son olay: %@";
-"Content inset" = "İçerik girintisi";
+"Content inset" = "İçerik iç boşluğu";
 "itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset ayarlanmadı: düz bir öğe ve bir Liquid Glass öğesi, normal ve seçili";
 "Flat: itemContentHorizontalInset unset" = "Düz: itemContentHorizontalInset ayarlanmadı";
 "Normal" = "Normal";

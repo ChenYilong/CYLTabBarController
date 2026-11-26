@@ -481,7 +481,7 @@
 "bridge: pause %d, resume %d" = "silta: tauko %d, jatko %d";
 "last event: -" = "viimeisin tapahtuma: -";
 "last event: %@" = "viimeisin tapahtuma: %@";
-"Content inset" = "Sisällön sisennys";
+"Content inset" = "Sisällön sisämarginaali";
 "itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset ei asetettu: tasainen ja Liquid Glass -kohde, normaali ja valittu";
 "Flat: itemContentHorizontalInset unset" = "Tasainen: itemContentHorizontalInset ei asetettu";
 "Normal" = "Normaali";

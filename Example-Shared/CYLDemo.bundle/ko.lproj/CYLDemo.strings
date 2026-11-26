@@ -484,5 +484,5 @@
 "Content inset" = "콘텐츠 여백";
 "itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset 설정 안 됨: 플랫 항목과 Liquid Glass 항목, 일반 및 선택 상태";
 "Flat: itemContentHorizontalInset unset" = "플랫: itemContentHorizontalInset 설정 안 됨";
-"Normal" = "보통";
+"Normal" = "일반";
 "Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset 설정 안 됨";

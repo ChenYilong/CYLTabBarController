@@ -482,7 +482,7 @@
 "last event: -" = "最近事件：-";
 "last event: %@" = "最近事件：%@";
 "Content inset" = "内容边距";
-"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset 未设置: 扁平和液态玻璃项目，常规与选中状态";
-"Flat: itemContentHorizontalInset unset" = "扁平: itemContentHorizontalInset 未设置";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset 未设置：扁平和液态玻璃条目，常规与选中状态";
+"Flat: itemContentHorizontalInset unset" = "扁平：itemContentHorizontalInset 未设置";
 "Normal" = "常规";
-"Liquid Glass: itemContentHorizontalInset unset" = "液态玻璃: itemContentHorizontalInset 未设置";
+"Liquid Glass: itemContentHorizontalInset unset" = "液态玻璃：itemContentHorizontalInset 未设置";

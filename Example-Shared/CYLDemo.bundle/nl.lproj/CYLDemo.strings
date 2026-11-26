@@ -481,7 +481,7 @@
 "bridge: pause %d, resume %d" = "bridge: pauze %d, hervat %d";
 "last event: -" = "laatste gebeurtenis: -";
 "last event: %@" = "laatste gebeurtenis: %@";
-"Content inset" = "Inhoudsinspringing";
+"Content inset" = "Binnenmarge van inhoud";
 "itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset niet ingesteld: een plat en een Liquid Glass-item, normaal en geselecteerd";
 "Flat: itemContentHorizontalInset unset" = "Plat: itemContentHorizontalInset niet ingesteld";
 "Normal" = "Normaal";

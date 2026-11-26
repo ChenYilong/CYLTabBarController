@@ -30,7 +30,7 @@
     <string name="cyl_demo_6a69211e0f">Varje scen är ett flikfält byggt med det publika API:et: stilar, animationer, märken, Lottie och det nyare flik-API:et</string>
     <string name="cyl_demo_7efc907fe3">Animerat objekt</string>
     <string name="cyl_demo_9244b5dc65">Den animerade ikon + titel-komponenten för sig: GIF, Lottie, en saknad fil, ett tillbehör och dragning</string>
-    <string name="cyl_demo_5dbde9a698">Innehållsindrag</string>
+    <string name="cyl_demo_5dbde9a698">Inre marginal</string>
     <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset inte angiven: ett platt och ett Liquid Glass-objekt, normalt och valt</string>
     <string name="cyl_demo_185d8ef0ae">Märken</string>
     <string name="cyl_demo_2db1db0706">Uppspelning</string>
