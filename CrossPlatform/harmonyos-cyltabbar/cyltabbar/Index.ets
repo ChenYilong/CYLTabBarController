@@ -4,7 +4,7 @@
 export {
   CYLTabBarItemAttributes, CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemImage, CYLTabBarItemSelectedImage,
   CYLTabBarItemIdentifier, CYLTitleOffset, CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor,
-  CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor,
+  CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor, CYLTabBarItemIconRenderingMode,
   CYLTabBarItemBackgroundColor, CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemImageInsets
 } from './src/main/ets/CYLTabBarItem';
 export { CYLPlusButton, CYLPlusButtonInsets, cyl_plusButtonOverhang, cyl_liquidGlassContentDy } from './src/main/ets/CYLPlusButton';
@@ -46,7 +46,7 @@ export {
   CYLLocalizedString, cyl_localizationKey, cyl_setLocalizationContext, cyl_textOf, CYLLocalizationLanguage,
   CYLSetLocalizationLanguage, cyl_addLocalizationLanguageListener, cyl_removeLocalizationLanguageListener, cyl_pickerLanguages
 } from './src/main/ets/CYLLocalization';
-export { cyl_badgeAccessibilityText } from './src/main/ets/CYLTabBarController';
+export { cyl_badgeAccessibilityText, cylIconRenderingMode, cylStaticIconTintColor } from './src/main/ets/CYLTabBarController';
 export {
   CYLTabBarStyleType,
   CYLFlatDesignTintColor,

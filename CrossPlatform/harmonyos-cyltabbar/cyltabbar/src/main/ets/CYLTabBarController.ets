@@ -356,6 +356,11 @@ export struct CYLTabBarController {
    * [EN] CYLTabBarControllerSelectedIconColor: the same for the selected icon. [CN] 选中图标的颜色。
    */
   @Prop selectedIconColor: ResourceColor | undefined = undefined;
+  /**
+   * [EN] CYLTabBarControllerIconRenderingMode: the static icon rendering mode ('template' / 'original' / 'automatic') of every tab without its
+   *      own `iconRenderingMode`; undefined = 'automatic'. [CN] 未单独设置 `iconRenderingMode` 的 Tab 的静态图标渲染方式；未设置时为 'automatic'。
+   */
+  @Prop iconRenderingMode: string | undefined = undefined;
   plusButtonTitleSelectedColor?: ResourceColor;
   /** [EN] cyl_tabBarBackgroundColor / CYLTabBarBackgroundColor. [CN] TabBar 背景色。 */
   @Prop tabBarBackgroundColor: ResourceColor = '#F8F8F8';
@@ -1610,10 +1615,10 @@ export struct CYLTabBarController {
     if (item.gifFilePath !== undefined) {
       return this.cylGifColorFilter(index);
     }
-    const color = this.selectedIndex === index
-      ? (item.selectedIconColor ?? this.selectedIconColor)
-      : (item.iconColor ?? this.iconColor);
-    return cylTintColorFilter(color ?? '');
+    const selected = this.selectedIndex === index;
+    const explicit = selected ? (item.selectedIconColor ?? this.selectedIconColor) : (item.iconColor ?? this.iconColor);
+    const fallback = selected ? this.cylTabSelectedIconColor(index) : this.cylTabNormalIconColor(index);
+    return cylTintColorFilter(cylStaticIconTintColor(item.iconRenderingMode ?? this.iconRenderingMode, explicit, fallback));
   }
 
   cylTabAnimationSize(index: number): number {
@@ -2145,6 +2150,25 @@ export struct CYLTabBarController {
  * [CN] `tint` 的 SRC_IN 颜色滤镜：RGB = 着色，alpha = 图像的 alpha 乘以着色的 alpha。支持 "#RRGGBB" / "#AARRGGBB" 字符串与 0xAARRGGBB
  *      数字；其他（无、''、资源）为单位矩阵。
  */
+export function cylIconRenderingMode(mode: string | undefined): string {
+  const lower = (mode ?? '').toLowerCase();
+  return lower === 'template' || lower === 'original' ? lower : 'automatic';
+}
+
+/**
+ * [EN] The tint of a static tab icon for its state: 'original' none (''), 'template' the explicit icon color, else `fallback` (the bar's
+ *      selected / unselected title color), 'automatic' the explicit icon color only ('' without one: the image keeps its colors).
+ * [CN] 静态 Tab 图标在其状态下的着色：'original' 无（''），'template' 为显式图标颜色，否则用 `fallback`（TabBar 的选中 / 未选中标题色），
+ *      'automatic' 只用显式图标颜色（没有则为 ''：图片保持原色）。
+ */
+export function cylStaticIconTintColor(mode: string | undefined, explicit: ResourceColor | undefined, fallback: ResourceColor): ResourceColor {
+  const resolved = cylIconRenderingMode(mode);
+  if (resolved === 'original') {
+    return '';
+  }
+  return explicit ?? (resolved === 'template' ? fallback : '');
+}
+
 export function cylTintColorFilter(tint: ResourceColor): ColorFilter {
   const identity: number[] = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
   let hex: string;
