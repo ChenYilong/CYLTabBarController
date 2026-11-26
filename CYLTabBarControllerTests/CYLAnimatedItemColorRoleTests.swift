@@ -301,4 +301,16 @@ final class CYLAnimatedItemAnimationTintRoleEngineTests: XCTestCase {
             XCTAssertEqual(rgba(last), rgba(dark), "\(engine): light mode: as it is")
         }
     }
+
+    func testAFixedAnimationTintIsAdaptedOnGlassOnlyNotOnADarkFlatFill() throws {
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        let blue = UIColor(red: 0, green: 0, blue: 1, alpha: 1)
+        let (flat, flatFactory) = try makeItem(.lottie, mode: .alwaysTemplate, dark: true, glass: false)
+        flat.itemBackgroundColor = UIColor(red: 28 / 255, green: 28 / 255, blue: 30 / 255, alpha: 1)
+        flat.animationTint = "#0000FF"
+        XCTAssertEqual(rgba(try XCTUnwrap(try XCTUnwrap(flatFactory.view.calls.last))), rgba(blue), "flat fill: the fixed tint is as it is (glass-only)")
+        let (glass, glassFactory) = try makeItem(.lottie, mode: .alwaysTemplate, dark: true, glass: true)
+        glass.animationTint = "#0000FF"
+        XCTAssertNotEqual(rgba(try XCTUnwrap(try XCTUnwrap(glassFactory.view.calls.last))), rgba(blue), "drawn glass: the fixed tint is lifted")
+    }
 }

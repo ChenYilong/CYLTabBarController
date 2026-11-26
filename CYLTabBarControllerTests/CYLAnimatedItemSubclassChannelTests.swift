@@ -197,7 +197,7 @@ final class CYLAnimatedItemSubclassChannelTests: XCTestCase {
         XCTAssertFalse(item.titleLabel.textColor.isEqual(UIColor.label), "a resolved color, not the dynamic label")
     }
 
-    func testTheExplicitColorsAreNotAdaptedInLightModeOrOnFlat() {
+    func testTheExplicitColorsAreNotAdaptedInLightModeOrOnFlatWithoutAFill() {
         CYLAnimatedItemView.liquidGlassActiveOverride = true
         let dark = UIColor(red: 0x3C / 255, green: 0x3C / 255, blue: 0x43 / 255, alpha: 1)
         let light = ChannelTag(frame: .zero)
@@ -205,11 +205,106 @@ final class CYLAnimatedItemSubclassChannelTests: XCTestCase {
         place(light, dark: false)
         light.setSubclassTitleColor(dark, for: .normal)
         assertSame(light.titleLabel.textColor, dark, "light mode: as set")
+        // Step 2 (flat extension): a flat item WITHOUT a fill is still as set; one with a fill is adapted (see the flat tests below).
         let flat = ChannelTag(frame: .zero)
-        flat.itemBackgroundColor = .black
         place(flat, dark: true)
         flat.setSubclassTitleColor(dark, for: .normal)
-        assertSame(flat.titleLabel.textColor, dark, "flat: as set")
+        assertSame(flat.titleLabel.textColor, dark, "flat without a fill: as set", dark: true)
+    }
+
+    // MARK: - Dark flat 深色扁平
+
+    private func flatItem(fill: UIColor?, dark: Bool = true) -> ChannelTag {
+        CYLAnimatedItemView.liquidGlassActiveOverride = false
+        let item = ChannelTag(frame: .zero)
+        item.itemBackgroundColor = fill
+        place(item, dark: dark)
+        return item
+    }
+
+    private func ratio(_ color: UIColor?, against reference: CGFloat) -> CGFloat {
+        CYLAnimatedItemContrast.contrastRatio(luminance(color), reference)
+    }
+
+    private let flatDarkText = UIColor(red: 0x3C / 255, green: 0x3C / 255, blue: 0x43 / 255, alpha: 1)
+
+    func testDarkFlatWithAnOpaqueFillIsAdaptedAgainstTheFill() {
+        let fill = UIColor(red: 28 / 255, green: 28 / 255, blue: 30 / 255, alpha: 1)
+        let item = flatItem(fill: fill)
+        item.setSubclassTitleColor(flatDarkText, for: .normal)
+        item.setSubclassIconColor(flatDarkText, for: .normal)
+        let reference = CYLAnimatedItemContrast.flatReferenceLuminance(fill: fill, traits: item.traitCollection)
+        XCTAssertLessThan(ratio(flatDarkText, against: reference), 1.6, "before: about 1.5:1")
+        XCTAssertGreaterThanOrEqual(ratio(item.titleLabel.textColor, against: reference), CYLAnimatedItemContrast.titleMinimumContrast - 0.05)
+        XCTAssertGreaterThanOrEqual(ratio(item.imageView.tintColor, against: reference), CYLAnimatedItemContrast.iconMinimumContrast - 0.05)
+        assertSame(item.adaptedForContrast(flatDarkText, kind: .title), item.titleLabel.textColor.resolvedColor(with: item.traitCollection), "the public rule is the same", dark: true)
+        assertSame(item.adaptedOnGlass(flatDarkText, kind: .title), item.adaptedForContrast(flatDarkText, kind: .title), "the old name forwards", dark: true)
+        XCTAssertFalse(item.drawsLiquidGlass)
+    }
+
+    func testDarkFlatDefaultLabelPassesUnchanged() {
+        let item = flatItem(fill: UIColor(red: 28 / 255, green: 28 / 255, blue: 30 / 255, alpha: 1))
+        assertSame(item.titleLabel.textColor, .white, "the default dark label is as it is", dark: true)
+    }
+
+    func testDarkFlatWithAHalfAlphaFillIsJudgedAgainstTheFillOverBlack() {
+        let fill = UIColor(red: 1, green: 1, blue: 1, alpha: 0.5)
+        let item = flatItem(fill: fill)
+        item.setSubclassTitleColor(flatDarkText, for: .normal)
+        let reference = CYLAnimatedItemContrast.flatReferenceLuminance(fill: fill, traits: item.traitCollection)
+        XCTAssertEqual(reference, CYLAnimatedItemContrast.relativeLuminance(red: 0.5, green: 0.5, blue: 0.5), accuracy: 0.001, "white at 0.5 over black")
+        XCTAssertGreaterThanOrEqual(ratio(item.titleLabel.textColor, against: reference), CYLAnimatedItemContrast.titleMinimumContrast - 0.05)
+    }
+
+    func testDarkFlatWithNoFillOrAClearFillIsNotAdapted() {
+        let none = flatItem(fill: nil)
+        none.setSubclassTitleColor(flatDarkText, for: .normal)
+        none.setSubclassIconColor(flatDarkText, for: .normal)
+        assertSame(none.titleLabel.textColor, flatDarkText, "no fill: as set (the item cannot know what is behind it)", dark: true)
+        assertSame(none.imageView.tintColor, flatDarkText, "no fill: the icon as set", dark: true)
+        assertSame(none.adaptedForContrast(flatDarkText, kind: .title), flatDarkText, "no fill: the public rule returns it", dark: true)
+        let clear = flatItem(fill: .clear)
+        clear.setSubclassTitleColor(flatDarkText, for: .normal)
+        assertSame(clear.titleLabel.textColor, flatDarkText, "a clear fill is no fill", dark: true)
+    }
+
+    func testDarkFlatTakesTheViewsOwnBackgroundColorAsTheFill() {
+        CYLAnimatedItemView.liquidGlassActiveOverride = false
+        let item = ChannelTag(frame: .zero)
+        item.backgroundColor = UIColor(red: 28 / 255, green: 28 / 255, blue: 30 / 255, alpha: 1)
+        place(item, dark: true)
+        item.setSubclassTitleColor(flatDarkText, for: .normal)
+        XCTAssertGreaterThan(luminance(item.titleLabel.textColor), luminance(flatDarkText), "the fill the item draws (no item background in use)")
+    }
+
+    func testLightFlatIsNotAdapted() {
+        let item = flatItem(fill: .black, dark: false)
+        item.setSubclassTitleColor(flatDarkText, for: .normal)
+        assertSame(item.titleLabel.textColor, flatDarkText, "light mode: as set")
+    }
+
+    func testDarkFlatDisabledAndDynamicColorsAreNotAdapted() {
+        let item = flatItem(fill: UIColor(red: 28 / 255, green: 28 / 255, blue: 30 / 255, alpha: 1))
+        assertSame(item.adaptedForContrast(.label, kind: .title), .label, "dynamic: as it is", dark: true)
+        item.applyTitleTintColor(flatDarkText)
+        item.isEnabled = false
+        item.layoutIfNeeded()
+        assertSame(item.titleLabel.textColor, flatDarkText, "the disabled look is never adapted", dark: true)
+    }
+
+    func testGlassIsUnchangedAndTheFloorStaysGlassOnly() {
+        CYLAnimatedItemView.liquidGlassActiveOverride = true
+        let item = ChannelTag(frame: .zero)
+        item.itemBackgroundStyle = .liquidGlass
+        item.itemBackgroundColor = UIColor(white: 0.1, alpha: 1)
+        place(item, dark: true)
+        item.setSubclassTitleColor(flatDarkText, for: .normal)
+        let glass = CYLAnimatedItemContrast.renderedGlassReferenceLuminance(glassTint: item.itemBackgroundColor, tintAlpha: nil)
+        let model = CYLAnimatedItemContrast.glassReferenceLuminance(glassTint: item.itemBackgroundColor, tintAlpha: nil)
+        XCTAssertGreaterThan(glass, model, "the 0.28 floor applies on glass")
+        XCTAssertGreaterThanOrEqual(ratio(item.titleLabel.textColor, against: glass), CYLAnimatedItemContrast.titleMinimumContrast - 0.05)
+        let flatReference = CYLAnimatedItemContrast.flatReferenceLuminance(fill: item.itemBackgroundColor, traits: item.traitCollection)
+        XCTAssertLessThan(flatReference, glass, "the flat reference has no floor")
     }
 
     func testAdaptedOnGlassIsThePublicRuleOfTheItem() {
@@ -332,9 +427,12 @@ final class CYLAnimatedItemSubclassChannelTests: XCTestCase {
         place(item, dark: true)
         item.setSubclassTitleColor(dark, for: .normal)
         item.setSubclassIconColor(dark, for: .normal)
-        assertSame(item.titleLabel.textColor, dark, "not drawn: the title is as set", dark: true)
-        assertSame(item.imageView.tintColor, dark, "not drawn: the icon is as set", dark: true)
+        // Step 2: not drawn = flat WITH a fill, so the rule judges against the teal fill (no glass floor); this color already passes there, so it stays as set.
+        assertSame(item.titleLabel.textColor, dark, "not drawn: the title already passes against the flat teal fill", dark: true)
+        assertSame(item.imageView.tintColor, dark, "not drawn: the icon already passes against the flat teal fill", dark: true)
         assertSame(item.adaptedOnGlass(dark, kind: .title), dark, "not drawn: adaptedOnGlass returns it", dark: true)
+        item.itemBackgroundColor = .black
+        XCTAssertGreaterThan(luminance(item.titleLabel.textColor), luminance(dark), "not drawn, a black flat fill: adapted against the fill, not the glass")
         XCTAssertNil(item.itemLiquidGlassView)
         XCTAssertNotNil(item.backgroundColor, "the flat color is drawn")
         // The system starts to draw glass: the same colors are adapted without being set again.

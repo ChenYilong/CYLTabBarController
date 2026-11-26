@@ -102,6 +102,18 @@ public enum CYLAnimatedItemContrast {
     }
 
     /**
+     [EN] The luminance a color is judged against on a FLAT background: the fill resolved with `traits`, composited over black by its alpha. nil or a clear fill gives 0
+          (black), but the item does not adapt without a fill (it cannot know what is behind it). The 0.28 rendered-glass floor does not apply.
+     [CN] 纯色背景上颜色所对照的亮度：填充用 `traits` 解析，再按其透明度叠在黑色上。nil 或透明填充得到 0（黑色），但没有填充时条目不做调整（无法知道其后是什么）。
+          渲染玻璃的 0.28 下限不适用。
+     */
+    public static func flatReferenceLuminance(fill: UIColor?, traits: UITraitCollection) -> CGFloat {
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        guard let fill, fill.resolvedColor(with: traits).getRed(&red, green: &green, blue: &blue, alpha: &alpha), alpha > 0 else { return 0 }
+        return relativeLuminance(red: red * alpha, green: green * alpha, blue: blue * alpha)
+    }
+
+    /**
      [EN] Whether `color` is static: the same color resolved with the light and the dark traits.
      [CN] `color` 是否为静态颜色：用浅色与深色 trait 解析得到相同颜色。
      */

@@ -821,26 +821,44 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         setNeedsLayout()
     }
 
-    /**
-     [EN] THE predicate of the contrast rule (`CYLAnimatedItemContrast`): whether the colors of the roles are adapted. Today: Liquid Glass is really drawn
-          (`resolvedItemBackgroundStyle`, `drawsLiquidGlass`) and this item's own traits are dark. (The disabled look is skipped for the built-in levels in `resolvedBuiltInColor`.)
-          The ONE place to change when the rule applies elsewhere; the glass-only rules (default tint, floor, border, selected tint alpha) keep `drawsLiquidGlass`.
-     [CN] 对比度规则（`CYLAnimatedItemContrast`）的唯一判断：各角色的颜色是否需要调整。目前：液态玻璃确实绘制（`resolvedItemBackgroundStyle`、`drawsLiquidGlass`）
-          且本条目自己的 trait 为深色。（内置层的禁用外观在 `resolvedBuiltInColor` 中跳过。）规则适用范围变化时唯一要改的地方；仅玻璃的规则（默认着色、下限、边框、选中着色透明度）仍用 `drawsLiquidGlass`。
-     */
-    private var contrastApplies: Bool {
-        guard usesItemBackground, drawsLiquidGlass else { return false }
-        return traitCollection.userInterfaceStyle == .dark
+    /// [EN] The flat fill the item draws now, or nil when there is none (nil, or fully transparent): `effectiveItemBackgroundColor` (the pressed color included) when an
+    ///      item background is in use, else the view's own `backgroundColor` (the countdown button's built-in fill). [CN] 条目当前绘制的纯色填充；没有（nil 或完全透明）时为 nil：
+    ///      使用条目背景时为 `effectiveItemBackgroundColor`（含按下颜色），否则为视图自己的 `backgroundColor`（倒计时按钮的内置填充）。
+    private var flatFill: UIColor? {
+        guard let fill = usesItemBackground ? effectiveItemBackgroundColor : backgroundColor else { return nil }
+        var alpha: CGFloat = 0
+        guard fill.resolvedColor(with: traitCollection).getRed(nil, green: nil, blue: nil, alpha: &alpha), alpha > 0 else { return nil }
+        return fill
     }
 
     /**
-     [EN] THE reference of the contrast rule: the luminance the colors are judged against. Today the rendered glass behind the item
-          (`CYLAnimatedItemContrast.renderedGlassReferenceLuminance`, from `effectiveItemBackgroundColor` and `itemGlassTintAlpha`). The ONE place to change with `contrastApplies`.
-     [CN] 对比度规则的唯一对照：颜色所对照的亮度。目前是条目背后渲染的玻璃（`CYLAnimatedItemContrast.renderedGlassReferenceLuminance`，由
-          `effectiveItemBackgroundColor` 与 `itemGlassTintAlpha` 得出）。与 `contrastApplies` 一起修改的唯一地方。
+     [EN] THE predicate of the contrast rule (`CYLAnimatedItemContrast`): whether the colors of the roles are adapted: this item's own traits are dark AND something known is
+          behind the content: drawn Liquid Glass (`drawsLiquidGlass`) or a flat fill (`flatFill`). Flat WITHOUT a fill (tab bar items, tags without a background) is NOT adapted:
+          the item cannot know what is behind it. Light mode is never adapted: the rule only raises lightness. (The disabled look is skipped for the built-in levels in
+          `resolvedBuiltInColor`.) The ONE place to change when the rule applies elsewhere; the glass-only rules (default tint, floor, border, selected tint alpha, a fixed
+          `animationTint`) keep `drawsLiquidGlass`.
+     [CN] 对比度规则（`CYLAnimatedItemContrast`）的唯一判断：各角色的颜色是否需要调整：本条目自己的 trait 为深色，并且内容后面有已知的东西：绘制的液态玻璃
+          （`drawsLiquidGlass`）或纯色填充（`flatFill`）。没有填充的纯色背景（Tab 栏条目、没有背景的标签）不调整：条目无法知道其后是什么。浅色模式从不调整：
+          规则只会提亮。（内置层的禁用外观在 `resolvedBuiltInColor` 中跳过。）规则适用范围变化时唯一要改的地方；仅玻璃的规则（默认着色、下限、边框、选中着色透明度、
+          固定的 `animationTint`）仍用 `drawsLiquidGlass`。
+     */
+    private var contrastApplies: Bool {
+        traitCollection.userInterfaceStyle == .dark && (drawsLiquidGlass || flatFill != nil)
+    }
+
+    /**
+     [EN] THE reference of the contrast rule: the luminance the colors are judged against, picked by what is behind the item. Drawn glass: the rendered glass
+          (`CYLAnimatedItemContrast.renderedGlassReferenceLuminance`, from `effectiveItemBackgroundColor` and `itemGlassTintAlpha`; the 0.28 floor is glass-only).
+          Flat with a fill: that fill (`flatFill`), resolved with this item's traits and composited over black by its alpha. (Only read while `contrastApplies`.)
+     [CN] 对比度规则的唯一对照：颜色所对照的亮度，由条目背后的内容决定。绘制玻璃：渲染出的玻璃（`CYLAnimatedItemContrast.renderedGlassReferenceLuminance`，由
+          `effectiveItemBackgroundColor` 与 `itemGlassTintAlpha` 得出；0.28 下限仅用于玻璃）。有填充的纯色背景：该填充（`flatFill`），用本条目的 trait 解析，
+          再按其透明度叠在黑色上。（只在 `contrastApplies` 时读取。）
      */
     private var contrastReferenceLuminance: CGFloat {
-        CYLAnimatedItemContrast.renderedGlassReferenceLuminance(glassTint: effectiveItemBackgroundColor, tintAlpha: itemGlassTintAlpha)
+        if drawsLiquidGlass {
+            return CYLAnimatedItemContrast.renderedGlassReferenceLuminance(glassTint: effectiveItemBackgroundColor, tintAlpha: itemGlassTintAlpha)
+        }
+        return CYLAnimatedItemContrast.flatReferenceLuminance(fill: flatFill, traits: traitCollection)
     }
 
     /// [EN] The reference the colors were last adapted to (nil: the rule did not apply). [CN] 颜色上次适配所用的对照（nil：规则不适用）。
@@ -857,25 +875,31 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
 
     /// [EN] THE adaptation step: a color adapted when the rule applies (`kind` picks title or icon contrast), against `contrastReferenceLuminance`. [CN] 唯一的调整步骤：规则适用时按 `contrastReferenceLuminance` 调整颜色（`kind` 区分标题与图标对比度）。
-    private func glassAdapted(_ color: UIColor, kind: CYLAnimatedItemGlassColorKind) -> UIColor {
+    private func contrastAdapted(_ color: UIColor, kind: CYLAnimatedItemGlassColorKind) -> UIColor {
         guard contrastApplies else { return color }
         let minimumContrast = kind == .icon ? CYLAnimatedItemContrast.iconMinimumContrast : CYLAnimatedItemContrast.titleMinimumContrast
         return CYLAnimatedItemContrast.adjusted(color, referenceLuminance: contrastReferenceLuminance, minimumContrast: minimumContrast)
     }
 
     /**
-     [EN] The dark-glass rule for a color the host draws itself (a subclass's delete cross, a label of its own): `color` unchanged unless Liquid Glass
-          is really drawn behind this item (`itemBackgroundStyle`, `resolvedItemBackgroundStyle`) and the item's traits are dark, else lifted to the
-          contrast of `kind` (icon 3:1, title 4.5:1) against this item's glass (`itemBackgroundColor`, `itemGlassTintAlpha`; the default tint when unset).
-          Dynamic colors are returned as they are. The item itself applies it to every EXPLICIT color; the twin of HarmonyOS's and the mini program's
-          `adaptedOnGlass(color, kind, style, glassTint, tintAlpha)`, which take the glass as parameters.
-     [CN] 宿主自己绘制的颜色（子类的删除叉号、自己的标签）适用的深色玻璃规则：除非本条目背后确实绘制液态玻璃（`itemBackgroundStyle`、
-          `resolvedItemBackgroundStyle`）且本条目的 trait 为深色，否则原样返回 `color`；否则按 `kind`（图标 3:1，标题 4.5:1）对照本条目的玻璃
-          （`itemBackgroundColor`、`itemGlassTintAlpha`；未设置时为默认着色）提亮。动态颜色原样返回。条目自己对每个显式颜色都应用该规则；
-          对应鸿蒙与小程序的 `adaptedOnGlass(color, kind, style, glassTint, tintAlpha)`（它们把玻璃作为参数）。
+     [EN] The contrast rule for a color the host draws itself (a subclass's delete cross, a label of its own): `color` unchanged unless this item's traits are dark
+          AND the item draws glass or a flat fill; then lifted to the contrast of `kind` (icon 3:1, title 4.5:1) against it: the drawn glass (`itemBackgroundColor`,
+          `itemGlassTintAlpha`; the default tint when unset) or the flat fill over black. Flat WITHOUT a fill is returned as it is (the item cannot know what is behind it).
+          Dynamic colors are returned as they are. The item itself applies it to every EXPLICIT color; the neutral name of `adaptedOnGlass`.
+     [CN] 宿主自己绘制的颜色（子类的删除叉号、自己的标签）适用的对比度规则：除非本条目的 trait 为深色且条目绘制玻璃或纯色填充，否则原样返回 `color`；
+          适用时按 `kind`（图标 3:1，标题 4.5:1）对照它提亮：绘制的玻璃（`itemBackgroundColor`、`itemGlassTintAlpha`；未设置时为默认着色）或叠在黑色上的纯色填充。
+          没有填充的纯色背景原样返回（条目无法知道其后是什么）。动态颜色原样返回。条目自己对每个显式颜色都应用该规则；是 `adaptedOnGlass` 的中性名称。
+     */
+    public func adaptedForContrast(_ color: UIColor, kind: CYLAnimatedItemGlassColorKind) -> UIColor {
+        contrastAdapted(color, kind: kind)
+    }
+
+    /**
+     [EN] The former name of `adaptedForContrast(_:kind:)`, kept (not deprecated) because the other platforms port it under this name; it forwards.
+     [CN] `adaptedForContrast(_:kind:)` 的旧名称，保留（不标记弃用），因为其他平台以此名称移植；它直接转发。
      */
     public func adaptedOnGlass(_ color: UIColor, kind: CYLAnimatedItemGlassColorKind) -> UIColor {
-        glassAdapted(color, kind: kind)
+        adaptedForContrast(color, kind: kind)
     }
 
     /// [EN] Applies the background, radius and border for the current bounds (`CYLAnimatedItemBackgroundRenderer`). [CN] 按当前 bounds 应用背景、圆角与边框。
@@ -1844,7 +1868,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     ///      （仅静态颜色，`CYLAnimatedItemContrast`）；内置层用本条目的 trait 解析为普通颜色（`resolvedBuiltInColor`），`role.adaptsBuiltIn` 时除禁用外观外同样调整。
     func resolvedColor(_ role: CYLAnimatedItemColorRole, state: UIControl.State) -> CYLAnimatedItemResolvedColor {
         if let explicit = explicitColor(role, state: state) {
-            return CYLAnimatedItemResolvedColor(color: glassAdapted(explicit, kind: role.kind), level: .explicit)
+            return CYLAnimatedItemResolvedColor(color: contrastAdapted(explicit, kind: role.kind), level: .explicit)
         }
         if let subclass = subclassBuiltInColors[role.id] {
             return CYLAnimatedItemResolvedColor(color: resolvedBuiltInColor(subclass, state: state, role: role), level: .subclassBuiltIn)
@@ -1857,13 +1881,13 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
 
     /// [EN] The ONE resolution of a built-in color (the component's or a subclass's, every role, every state): resolved with THIS item's traits into a
     ///      plain color, so normal and selected go the same way, and, except for the disabled look, adapted to drawn dark glass like an explicit color
-    ///      (`glassAdapted`; static colors only, so the default dark `UIColor.label` passes unchanged).
+    ///      (`contrastAdapted`; static colors only, so the default dark `UIColor.label` passes unchanged).
     /// [CN] 内置颜色（组件的或子类的，所有角色、所有状态）的唯一解析：用本条目自己的 trait 解析为普通颜色，普通与选中走同一条路径，
-    ///      并且除禁用外观外，与显式颜色一样适配深色玻璃（`glassAdapted`；仅静态颜色，因此深色默认 `UIColor.label` 保持不变）。
+    ///      并且除禁用外观外，与显式颜色一样适配深色玻璃（`contrastAdapted`；仅静态颜色，因此深色默认 `UIColor.label` 保持不变）。
     private func resolvedBuiltInColor(_ color: UIColor, state: UIControl.State, role: CYLAnimatedItemColorRole) -> UIColor {
         let resolved = color.resolvedColor(with: traitCollection)
         guard role.adaptsBuiltIn, state != .disabled else { return resolved }
-        return glassAdapted(resolved, kind: role.kind)
+        return contrastAdapted(resolved, kind: role.kind)
     }
 
     /// [EN] The ONE refresh: resolves every registered role (or `only` that role and the roles derived from it) and hands the color to its `apply`; called on every change of
@@ -1926,9 +1950,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         // [EN] Drawn dark glass: an explicit tint (a fixed `animationTint`, or the explicit icon color, already adapted) is adapted (3:1); the
         //      subclass and built-in icon colors are not. [CN] 深色玻璃确实绘制时：显式着色（固定 `animationTint`，或已调整的显式图标颜色）按 3:1 调整；
         //      子类与内置图标颜色不调整。
-        if let tint = resolved, contrastApplies,
+        if let tint = resolved, contrastApplies, drawsLiquidGlass,
            !(tint.isEqual(effective) && explicitColor(.icon, state: currentColorState) == nil) {
-            resolved = glassAdapted(tint, kind: .icon)
+            resolved = contrastAdapted(tint, kind: .icon)
         }
         // [EN] A view that resolves its own tint from its URL options (Rive) takes the final color instead, so the properties reach it too.
         // [CN] 自行从 URL 选项解析着色的视图（Rive）改为接收最终颜色，使属性对它也生效。
