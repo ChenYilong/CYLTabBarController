@@ -213,6 +213,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [PlusButton 的实现：真实按钮、液态玻璃替身与选中态图片](docs/PlusButton.md) | [How the PlusButton works: the real button, its Liquid Glass stand-in and selected images](docs/PlusButton.md) |
 | [在任意位置获取导航控制器并 Push](docs/Push-From-Anywhere.md) | [Get the navigation controller and push from anywhere](docs/Push-From-Anywhere.md) |
 | [React Native 接入：react-native-cyltabbar](docs/React-Native-Component.md) | [React Native integration: react-native-cyltabbar](docs/React-Native-Component.md) |
+| [Release RAM](docs/Release-RAM.md) | [Release RAM](docs/Release-RAM.md) |
 | [资源路由](docs/Resource-Routes.md) | [Resource routes](docs/Resource-Routes.md) |
 | [Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）](docs/Rive-Animation.md) | [Rive animated tab icons (used like Lottie and PAG)](docs/Rive-Animation.md) |
 | [SVGA 动画 Tab 图标（与 Rive、PAG、Lottie 用法相同）](docs/SVGA-Animation.md) | [SVGA animated tab icons (used like Rive, PAG and Lottie)](docs/SVGA-Animation.md) |

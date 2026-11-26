@@ -63,6 +63,7 @@
 | [PlusButton 的实现：真实按钮、液态玻璃替身与选中态图片](PlusButton.md) | [How the PlusButton works: the real button, its Liquid Glass stand-in and selected images](PlusButton.md) |
 | [在任意位置获取导航控制器并 Push](Push-From-Anywhere.md) | [Get the navigation controller and push from anywhere](Push-From-Anywhere.md) |
 | [React Native 接入：react-native-cyltabbar](React-Native-Component.md) | [React Native integration: react-native-cyltabbar](React-Native-Component.md) |
+| [Release RAM](Release-RAM.md) | [Release RAM](Release-RAM.md) |
 | [资源路由](Resource-Routes.md) | [Resource routes](Resource-Routes.md) |
 | [Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）](Rive-Animation.md) | [Rive animated tab icons (used like Lottie and PAG)](Rive-Animation.md) |
 | [SVGA 动画 Tab 图标（与 Rive、PAG、Lottie 用法相同）](SVGA-Animation.md) | [SVGA animated tab icons (used like Rive, PAG and Lottie)](SVGA-Animation.md) |
@@ -169,6 +170,7 @@ docs/
 ├── Push-From-Anywhere.md
 ├── README.md
 ├── React-Native-Component.md
+├── Release-RAM.md
 ├── Resource-Routes.md
 ├── Rive-Animation.md
 ├── SVGA-Animation.md

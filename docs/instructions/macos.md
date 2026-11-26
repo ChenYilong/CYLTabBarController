@@ -10,6 +10,7 @@ by tag and kept under 200 lines: see [instructions.md](instructions.md)).
   library only, so a reused build tests an old binary and its result means nothing (2026-11-09: two experiments ran
   stale code). Confirm a new symbol is in the app (`strings <app>/<binary> | grep <symbol>`) when in doubt.
 - **Simulator**: run `scripts/free-ram.sh` before every simulator use. Details and common failures: the `cyl-verify` skill.
+- **Releasing RAM by hand** (a developer step, never an agent step unless the owner asks): [docs/Release-RAM.md](../Release-RAM.md) with `release-ram.sh` (macOS) and `release-ram.ps1` (Windows); it quits apps and restarts simulators, so run it only when no session is debugging, and never shut down simulators of other sessions.
 
 ## Xcode projects: Podfile, app icon, launch screen
 
