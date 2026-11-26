@@ -196,3 +196,109 @@ Doc links are relative to the repository: https://github.com/ChenYilong/CYLTabBa
 - Shared spec I used for parity work: the item contrast and colour rules are in the platform sources: Android `Example-Android/cylanimateditem/src/main/kotlin/com/cyl/animateditem/`, HarmonyOS `CrossPlatform/harmonyos-cyltabbar/cylanimateditem/src/main/ets/`, mini program `CrossPlatform/wechat-miniprogram-cyltabbar/src/cyl-animated-item/`.
 - Evidence screenshots: `docs/assets/` (labelled sheets).
 - Last pushed SHAs of this period: `b5b36fbf` (Lottie last frame), `d19e138e` (tab icon tint: Android alpha, HarmonyOS rendering mode), `af56db22` (More icon + dark mode doc), `53372bce` (HarmonyOS fill SVG).
+
+---
+
+## 8. iOS and Mac addendum (read this together with sections 0 to 7)
+
+Appended on 2026-11-26 by the macOS session. Folder name rule used: year, month, week of month, where week = ceil(day / 7); 26 November 2026 is week 4, so `20261104`.
+
+**Next focus, in one sentence: finish and push the flat tab bar tint unification, get every CI job green on the same head, then merge PR #824, #823 (after 1.4.0), #813 and finally #788.**
+
+### 8.1 iOS next steps, in order
+
+1. **Land the flat-tint work.** The implementation **finished while this file was written and is still uncommitted, on the departing developer's Mac only** (worktree `/tmp/xpr/cyl-824b`, base `9d2b9e7b`). Its report: Framework tests 401, 3 skipped, 0 failures (one later edit that only moves code inside the engine `#if` was checked by a Framework build alone); ObjC Example, Example-Swift-04, Gallery, SwiftManager-FlatDesign and Example-Rive build; light and dark pixel checks show selected title = selected icon in Gallery, SwiftManager and flat Rive, and the ObjC green Lottie unchanged. It contains: one title and icon resolver, the yellow default deleted, the flat path honouring URL `tint` / `darkTint` / `renderingMode` (fragment and file-URL query form), `animationTint` working on the flat button, and the new API `CYLTabBarController.tabBarItemAnimationRenderingMode` (`.automatic` = unset, `.alwaysTemplate`, `.alwaysOriginal`). Check that it is on the branch (`git log`, search for `tabBarItemAnimationRenderingMode`). If it never arrived, redo it from [Tint-Special.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/harmony-animated-item-engines/docs/Tint-Special.md).
+2. Check Git history before doubting the yellow default: it **was** written in Objective-C (`efd0b90e`, 2026-07-08, `CYLTabBarController.m`, author field ChenYilong). The Objective-C flat button itself defaults to `tintColor` (selected) and `systemGray` (normal). Owner decision: delete the yellow, move it nowhere.
+3. Re-run on the merged head: Framework tests (last green: 384 tests, 3 skipped, 0 failures at `4d0e00ae`), ObjC `Example/`, `Example-Swift-04`, Gallery, SwiftManager-FlatDesign and `Example-Rive` builds.
+4. Keep the ClassifyMenu pin consistent: the root `Podfile` and `Example-Swift-04/Podfile` pin `44f226c42441d22c74c6d9e37be5b899bf45f91f` (iOS). The Android / HarmonyOS pins differ (section 0, item 5). Any ClassifyMenu change to library code needs a repin and a new build.
+5. Then the CI and merge chain (section 8.2).
+
+### 8.2 CI and static analysis, facts checked on 2026-11-26
+
+| Check | Result | Evidence |
+|---|---|---|
+| Android on `ff2ada53` | success | https://github.com/ChenYilong/CYLTabBarController/actions/runs/45789846677 |
+| WeChat Mini Program on `80fa2f12` | success | https://github.com/ChenYilong/CYLTabBarController/actions/runs/45794839448 |
+| Docs navigation on `80fa2f12` | **failure**, step "Check the agent skills": `docs/Dark-Mode-Adaptation.md` had no row in the `cyl-api-map` skill. The row is added in the commit that appends this section; confirm the next run is green. (Section 6, B1 describes the earlier `bound-classes` cause; this was a second cause.) | https://github.com/ChenYilong/CYLTabBarController/actions/runs/45794839370 |
+| iOS and Animation tests on `ff2ada53` | **cancelled** by a newer push; no completed green run on a recent head. Not verified in CI. | https://github.com/ChenYilong/CYLTabBarController/actions/runs/45789846643 |
+| SonarCloud quality gate, PR 824, analysed `ff2ada53` | **passed** (reliability, security, maintainability rating A; duplication 0.8%). **97 issues are still open**; passing the gate does not mean zero issues. | https://sonarcloud.io/summary/new_code?id=ChenYilong_CYLTabBarController&pullRequest=824 |
+
+The numbers in sections 1 and 6 (B21) about Sonar are older than this table.
+
+### 8.3 Project score (advisor, replaces the author estimate in section 1)
+
+**62 / 100 was the advisor's provisional score toward the release standard; its rule (+3 when the Sonar gate has passed) gives 65 / 100.** CI stays at its low score because no recent head has all workflows green. This is an estimate from evidence up to `ff2ada53`, not a measurement.
+
+Release standard: #824 merged into #788, #788 merged into master, all CI green on one head, Sonar gate passed, shipped features checked on a device or emulator for every platform, owner decisions closed, 1.4.0 published.
+
+| Area | Weight | Score | Missed points |
+|---|---|---|---|
+| iOS core and tests | 20 | 16 | flat tint and yellow default not pushed (scored before the implementation finished); one Example-Swift-04 link error not explained |
+| Other platforms | 20 | 12 | today's colour-role and tint priority not ported; Rive and PAG only on the x86_64 debug engine; mini program needs a device |
+| CI on head | 15 | 7 | no head with all workflows green; PR state "unstable" |
+| Static analysis | 10 | 9 | gate passed; 97 open issues remain |
+| Examples | 10 | 7 | Swift, React Native and Flutter tag lists; several flat toggles untested |
+| Docs | 10 | 8 | stale status rows; 13 locales of the demo strings not reviewed by native speakers |
+| Release | 15 | 6 | nothing merged up; #823 draft; no version bump, no publish |
+| **Total** | **100** | **65** | |
+
+### 8.4 Branches (iOS view; the full list is section 2)
+
+Classified with `git cherry` against the feature branch (every patch already applied = superseded).
+
+| Open branch (link) | Progress | iOS TODO |
+|---|---|---|
+| https://github.com/ChenYilong/CYLTabBarController/tree/feat/harmony-animated-item-engines ([PR #824](https://github.com/ChenYilong/CYLTabBarController/pull/824)) | 80% | 8.1, 8.2, tables below |
+| https://github.com/ChenYilong/CYLTabBarController/tree/feat/cross-platform-components ([PR #788](https://github.com/ChenYilong/CYLTabBarController/pull/788) -> master) | 90% | merge #823 / #813 / #824, final CI, release |
+| https://github.com/ChenYilong/CYLTabBarController/tree/feat/dealloc-block-executor-dependency ([PR #823](https://github.com/ChenYilong/CYLTabBarController/pull/823), draft) | 85% | 28 commits not in the feature branch; wait for 1.4.0 |
+| https://github.com/ChenYilong/CYLTabBarController/tree/feat/firebase-remote-config ([PR #813](https://github.com/ChenYilong/CYLTabBarController/pull/813)) | 80% | 12 commits not in the feature branch; step 2 needs the owner |
+| https://github.com/ChenYilong/CYLTabBarController/tree/refactor/item-color-roles | 100% (merged into #824 at `4d0e00ae`) | delete candidate. Section 2a calls it a 40% reference: the **iOS** work in it is finished and merged; only the Android / HarmonyOS / mini ports are open. |
+
+Superseded, every patch already applied (owner decides on deletion): `feat/harmonyos-demo-7-flatdesign`, `feat/harmonyos-plus-button-configuration`, `fix/miniprogram-lottie-reload-loop`. Branches with commits the feature branch does not have, to be compared before deletion: `docs/harmonyos-emulator-screenshots` (4), `feat/harmonyos-flatdesign-api` (2), `feat/harmonyos-svga` (1), `fix/lottie-unplayable-file` (1), `fix/flutter-plus-title-hidden` (3).
+
+### 8.5 iOS TODOs (in addition to section 3.2)
+
+| # | Item | Where recorded |
+|---|---|---|
+| M1 | Flat tint unification, bar-wide default rendering mode, SwiftManager opt-in, priority table, tests, read-only check of the classic (non-flat) path | [Tint-Special.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/harmony-animated-item-engines/docs/Tint-Special.md) TODO table |
+| M2 | Android / HarmonyOS / mini program / React Native / Flutter must follow the same tint priority table and the iOS glass default `0.10 / 0.04` (`7eea93b1`; the other platforms still use `0.5 / 0.14`) | Tint-Special.md, [Animated-Item.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/harmony-animated-item-engines/docs/Animated-Item.md) |
+| M3 | Convert `Example-Swift`, `-02`, `-03`, `SwiftManager-FlatDesign` pages, React Native and Flutter examples to the ClassifyMenu tag list; rows under the tag list are not glass | [examples.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/harmony-animated-item-engines/docs/instructions/examples.md) |
+| M4 | Untested flat toggles: `Example-network-download`, `Example-GIF`, `Example-SwiftUI-Rive`; PNG template, SVGA, GIF icons in the flat bar; a multi-colour Rive in a tab bar | Tint-Special.md |
+| M5 | `Example-Rive/Pods` is local, git-ignored and stale: run `pod install` there before building (nothing to add to `.gitignore`) | `.gitignore` lines 19 and 22 |
+| M6 | `release-ram.sh`: display mirroring, reduce transparency and iTerm2 hiding never run live; the "simulators restarted" announcement is manual | [Release-RAM.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/harmony-animated-item-engines/docs/Release-RAM.md) |
+| M7 | Open items without a code fix: Issue #13 context menu (tag library has no API), custom badge rows 26 to 29, white row in the Tab Bar Gallery, empty plus-button icon slot rows, dark header pills in FlatDesign, native-speaker review of translations (including the "Content inset" captions) | [Animated-Item.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/harmony-animated-item-engines/docs/Animated-Item.md) task log |
+
+### 8.6 Owner decisions still open (in addition to section 4)
+
+1. White text on the selected orange fill is 2.89:1 and a lift-only rule cannot exceed 3.98:1 on a 0.5-grey fill: darker fill colour, a darkening rule, or accept it.
+2. Colour-string order for 8-digit hex (`#RRGGBBAA` is used by the unified tint; HarmonyOS `cylTintColorFilter` still reads `#AARRGGBB`).
+3. Per-tab `onResourceMissing` on iOS UIKit tab buttons.
+4. Plus-button title default: since `a59ecb55` a titled plus button aligns with the tab titles by default (ordered by the owner).
+5. The 1.4.0 release (the Android pin moves with it), what to do with #823 versus #824, and the badge / TableViewPlaceHolder corner radius rule.
+6. Tint: in the new code, tab animations with no setting keep the file's own colours; `docs/Tint-Special.md` says the default `automatic` tints one-colour files. Keep the code, or add one-colour detection as a bar-wide value (needs a fourth value or changes today's look).
+7. Tint: an app that sets only a normal-state title colour now gets it on the selected title too (as the Objective-C button did; the deleted yellow used to hide this), while the icon is the bar tint. Keep, or skip the normal colour for the selected state.
+8. Visible changes to accept: flat apps without a selected title colour go from yellow to their tint; an item's own title colour now beats the bar appearance (the font still comes from the appearance); in the ObjC Example unselected titles turn from red to grey after a tab tap.
+
+### 8.7 Bugs (iOS; continues table 2)
+
+| # | Bug | Why not fixed yet | Fix plan and idea | Docs |
+|---|---|---|---|---|
+| B26 | Flat tab bar: selected title is yellow while the icon is the bar tint | implemented and verified on the Mac, not committed | delete the default at `CYLTabBarController+CYLFlatDesign.swift:902`; one resolver for title and icon | [Tint-Special.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/harmony-animated-item-engines/docs/Tint-Special.md) |
+| B27 | Flat tab bar ignores the tab URL tint options (Rive `tint=title`; icon nearly invisible in light mode); a fixed tint is ignored too | implemented and verified on the Mac, not committed. Cause from code reading: the button keeps the file in a private `tabBarAnimationURL` and never sets `animationURL` | pass the URL options into the flat tint calculation, same priority as the Liquid Glass path | Tint-Special.md |
+| B28 | A multi-colour animation keeps its own colours in a selected tab | by design (`automatic` tints one-colour files only; Rive cannot be classified) | opt in per tab (`animationTint`, URL `tint`, `renderingMode=alwaysTemplate`); an opaque tint turns multi-colour art into a silhouette | Tint-Special.md |
+| B29 | One batch reported an Example-Swift-04 link error (`CYLTabBarItemAnimationPrepareTint` undefined) | did not reproduce in two clean rebuilds; cause not found | suspect: the Core podspec excludes `CYLTabBarItemAnimationTint.m` but still compiles `CYLTabBarItemAnimationEngine.m` | [Animated-Item.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/harmony-animated-item-engines/docs/Animated-Item.md) |
+| B30 | Tapping a badge tag shows nothing | not investigated (the handler runs, then a simulated memory warning) | log the handler, decide the intended effect | Animated-Item.md |
+| B31 | Dynamic Island missing in a dark-mode capture | not investigated | capture again, compare | Animated-Item.md |
+| B32 | Selected tab title on glass can be below 4.5:1 (orange on Home 2.57 dark / 2.33 light measured at `dfbe9190`) | accent colour, owner decision 8.6 item 1 | see 8.6 | Animated-Item.md |
+| B33 | Android shows the other end frame of the Configuration page's selected Lottie tag compared with iOS | found by the ClassifyMenu session; iOS shows the last frame as designed | compare the Android frame choice (see also B9) | Animated-Item.md |
+| B34 | SwiftManager-FlatDesign: launch in dark, tap a tab, switch to light: the whole flat bar stays dark until the next tap | found during the tint verification; it also happens without the tint change; not fixed | trace the flat bar's trait-change handling after a selection | this file |
+| B35 | The classic (non-flat) and glass animation tint ignore per-tab icon colours (`cylTabBarItemIconColor`, `...SelectedIconColor`): `cylTemplateTintColor` reads only the bar's `standardAppearance` (code reading) | read-only check, not changed | resolve the per-tab appearance first; add tests, then compare both paths with the table in Animated-Item.md | [Tint-Special.md](https://github.com/ChenYilong/CYLTabBarController/blob/feat/harmony-animated-item-engines/docs/Tint-Special.md) |
+
+GitHub issues labelled `bug` (about 18 of 35 open issues) were **not triaged in this period**: no root cause or plan is claimed for them. List: https://github.com/ChenYilong/CYLTabBarController/issues?q=is%3Aissue+is%3Aopen+label%3Abug
+
+### 8.8 Mac setup and traps
+
+- Own simulator by UDID only; **never** `xcrun simctl shutdown all` (shared machine). Terminate the app and shut your simulator down after every run.
+- `release-ram.sh` quits apps and restarts simulators. In its first test it shut down another session's simulator; unnamed simulators are now left alone unless `--shutdown-others` is given.
+- The repository is on a slow exFAT volume: run long git commands in the background, work in a separate worktree, never stash.
+- Not in Git, so you will not have it: the uncommitted flat-tint worktree, a copy of `Example-Rive` under `/tmp/xpr/rive-copy`, local DerivedData, and the Claude session setup.
