@@ -1268,9 +1268,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
     /**
      [EN] Grows by one on every `restartAnimation()` (Play all), the name and meaning of HarmonyOS's `animationRestartToken`:
-          a host that sees it change knows the item restarted. Read only here; React Native and Flutter call
+          a host that sees it change knows the item restarted. Read only here (a subclass raises it with `noteAnimationRestart()`); React Native and Flutter call
           `restartAnimation()` when their own restart token prop changes.
-     [CN] 每次 `restartAnimation()`（全部播放）加一，名称与含义同鸿蒙的 `animationRestartToken`：宿主看到它变化就知道条目重新播放了。这里只读；
+     [CN] 每次 `restartAnimation()`（全部播放）加一，名称与含义同鸿蒙的 `animationRestartToken`：宿主看到它变化就知道条目重新播放了。这里只读（子类用 `noteAnimationRestart()` 增加）；
           React Native 与 Flutter 在各自的重播 token 属性变化时调用 `restartAnimation()`。
      */
     public private(set) var animationRestartToken = 0
@@ -2502,9 +2502,19 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         #endif
     }
 
+    /**
+     [EN] Raises `animationRestartToken` by one and does nothing else. `restartAnimation()` calls it first; a subclass that overrides
+          `restartAnimation()` without calling super (its own playback policy) calls it, so hosts still see the restart.
+     [CN] 只把 `animationRestartToken` 加一，不做其他事。`restartAnimation()` 会先调用它；重写 `restartAnimation()` 但不调用 super 的子类（有自己的
+          播放策略）调用它，宿主仍能看到重新播放。
+     */
+    open func noteAnimationRestart() {
+        animationRestartToken += 1
+    }
+
     /** [EN] Plays from progress 0 (the examples' "Play all"). [CN] 从进度 0 开始播放（示例中的「全部播放」）。 */
     open func restartAnimation() {
-        animationRestartToken += 1
+        noteAnimationRestart()
         if animationView == nil, playAnimatedImage() { return }
         #if CYL_ANIMATION_ENGINE_AVAILABLE
         setPlayerValue(CGFloat(0), for: "progress")
