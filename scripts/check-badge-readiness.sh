@@ -28,9 +28,10 @@ else note "pod not installed (gem install cocoapods): podspecs unchecked"; fi
 # 2. Layering greps ("Common mistakes" of the iOS document).
 U=CYLTabBarController/CYLUtils; B=CYLTabBarController/CYLBadgeView
 if [ -f CYLUtils.podspec ]; then
-  # [EN] Only real imports count: comments, `__has_include` feature checks and the animation key files (built by CYLAnimatedItem) do not.
+  # [EN] Only real imports count: comments, `__has_include` feature checks, the animation key files (built by CYLAnimatedItem) and the single-module fallback to
+#      `CYLTabBarController-Swift.h` (Xcode framework and Carthage build the three layers into one module) do not.
   # [CN] 只有真正的导入才算：注释、`__has_include` 功能检测与动画 key 文件（由 CYLAnimatedItem 编译）不算。
-  ! grep -rnE "^\s*(#\s*import|@import|import|@_exported import)\s.*(CYLAnimatedItem|CYLTabBarController)" "$U" "$B" --include=*.swift --include=*.h --include=*.m | grep -v "CYLAnimationKeys\." \
+  ! grep -rnE "^\s*(#\s*import|@import|import|@_exported import)\s.*(CYLAnimatedItem|CYLTabBarController)" "$U" "$B" --include=*.swift --include=*.h --include=*.m | grep -v "CYLAnimationKeys\.\|CYLTabBarController-Swift\.h" \
     && ok "CYLUtils and CYLBadge import nothing above them" || bad "CYLUtils or CYLBadge imports a higher layer"
 else note "layering grep waits for CYLUtils.podspec"; fi
 n=$(grep -rn "cylBadgeSnapshotImage" CYLTabBarController Example-Shared Example --include=*.swift --include=*.h --include=*.m 2>/dev/null | wc -l)
