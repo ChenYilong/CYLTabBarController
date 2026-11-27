@@ -29,11 +29,11 @@ import { CYLGIFImagePlayback, CYLGIFImageState, cylIsGIFImagePath, cylGIFDuratio
  * [EN] What a screen reader says for a badge (read as part of its host, e.g. "Messages, 99+ new messages"); '' none.
  * [CN] 屏幕阅读器读出的角标内容（作为宿主的一部分读出）；无角标时为 ''。
  */
-export function cyl_badgeAccessibilityText(badge: CYLBadge | undefined): string {
-  if (badge === undefined || !badge.cyl_isShowBadge()) {
+export function badgeAccessibilityText(badge: CYLBadge | undefined): string {
+  if (badge === undefined || !badge.isShowBadge()) {
     return '';
   }
-  const text = badge.cyl_displayText();
+  const text = badge.displayText();
   if (text === null) {
     return CYLLocalizedString('有新内容');
   }
@@ -335,7 +335,7 @@ export struct CYLTabBarController {
   /** [EN] CYLTabBarControllerPlusButton; a new object updates the plus button in place (issue list #7). [CN] 新对象即原地更新加号按钮。 */
   @Prop plusButton: CYLPlusButton | undefined = undefined;
   @Link @Watch('cylOnSelectedIndexChange') selectedIndex: number;
-  /** [EN] The badge of each tab (-[UIView cyl_showBadgeValue:] on its tab button); created when unset. [CN] 每个 Tab 的角标；未设置时自动创建。 */
+  /** [EN] The badge of each tab (-[UIView showBadgeValue:] on its tab button); created when unset. [CN] 每个 Tab 的角标；未设置时自动创建。 */
   @State @Watch('cylOnBadgesChange') badges: CYLBadge[] = [];
   /** [EN] The plus button's badge. [CN] 加号按钮的角标。 */
   @State plusButtonBadge: CYLBadge = new CYLBadge();
@@ -1371,7 +1371,7 @@ export struct CYLTabBarController {
     const item = this.tabBarItemsAttributes[index];
     const title = cyl_textOf(this.selectedIndex === index ? (item.selectedTitle ?? item.title) : item.title);
     const label = title.length > 0 ? title : (item.identifier ?? `${index + 1}`);
-    const badge = cyl_badgeAccessibilityText(this.badges[index]);
+    const badge = badgeAccessibilityText(this.badges[index]);
     return badge.length > 0 ? CYLLocalizedString('%@, %@', label, badge) : label;
   }
 
@@ -1398,7 +1398,7 @@ export struct CYLTabBarController {
   cylPlusAccessibilityLabel(): string {
     const title = cyl_textOf(this.plusButton?.title);
     const label = title.length > 0 ? title : CYLLocalizedString('加号按钮');
-    const badge = cyl_badgeAccessibilityText(this.plusButtonBadge);
+    const badge = badgeAccessibilityText(this.plusButtonBadge);
     return badge.length > 0 ? CYLLocalizedString('%@, %@', label, badge) : label;
   }
 

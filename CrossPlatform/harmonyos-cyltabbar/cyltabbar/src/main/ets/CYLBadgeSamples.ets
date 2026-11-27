@@ -34,27 +34,27 @@ export const CYLBadgeSamples: CYLBadgeSample[] = [
   { title: cyl_localizationKey('Shake (forever)'), api: 'CYLBadgeAnimationTypeShake', value: '3', animationType: A.Shake },
   { title: cyl_localizationKey('Bounce (forever)'), api: 'CYLBadgeAnimationTypeBounce', value: '3', animationType: A.Bounce },
   { title: cyl_localizationKey('Breathe (forever)'), api: 'CYLBadgeAnimationTypeBreathe', value: '', animationType: A.Breathe },
-  { title: cyl_localizationKey('Shake, stops with Reduce Motion'), api: 'cyl_badgeRespectsReduceMotion', value: '3', animationType: A.Shake, reduceMotion: true },
-  { title: cyl_localizationKey('Rotation (forever)'), api: 'cyl_rotationAnimationWithDuration:', value: 'new', custom: 'rotation' },
+  { title: cyl_localizationKey('Shake, stops with Reduce Motion'), api: 'badgeRespectsReduceMotion', value: '3', animationType: A.Shake, reduceMotion: true },
+  { title: cyl_localizationKey('Rotation (forever)'), api: 'rotationAnimationWithDuration:', value: 'new', custom: 'rotation' },
   { title: cyl_localizationKey('Spring (forever)'), api: 'cyl_springAnimationForDuration:', value: '3', animationType: A.ScaleOnce, repeats: -1 },
   { title: cyl_localizationKey('Shake ×3 (cyl_shakeAnimationRepeatTimes)'), value: '3', animationType: A.Shake, repeats: 3 },
   { title: cyl_localizationKey('Bounce ×3 (cyl_bounceAnimationRepeatTimes)'), value: '3', animationType: A.Bounce, repeats: 3 },
   { title: cyl_localizationKey('Scale ×3'), api: 'cyl_scaleAnimationFromScale:', value: '3', animationType: A.Scale, repeats: 3 },
   { title: cyl_localizationKey('Blink ×3'), api: 'cyl_opacityTimesAnimationRepeatTimes:', value: '', animationType: A.Breathe, repeats: 3 },
-  { title: cyl_localizationKey('Flip ×2'), api: 'cyl_rotationAnimationWithDuration:', value: '3', custom: 'flip' },
+  { title: cyl_localizationKey('Flip ×2'), api: 'rotationAnimationWithDuration:', value: '3', custom: 'flip' },
   { title: cyl_localizationKey('Left to right once'), api: 'CYLBadgeAnimationTypeLeftRightOnce', value: '3', animationType: A.LeftRightOnce },
   { title: cyl_localizationKey('Right to left once'), api: 'CYLBadgeAnimationTypeRightLeftOnce', value: '3', animationType: A.RightLeftOnce },
   { title: cyl_localizationKey('Fade in once'), api: 'CYLBadgeAnimationTypeFadeInOnce', value: '3', animationType: A.FadeInOnce },
   { title: cyl_localizationKey('Rolling once'), api: 'CYLBadgeAnimationTypeRollingOnce', value: '3', animationType: A.RollingOnce },
   { title: cyl_localizationKey('Scale once'), api: 'CYLBadgeAnimationTypeScaleOnce', value: '3', animationType: A.ScaleOnce },
   { title: cyl_localizationKey('Spring once'), api: 'cyl_springAnimationForDuration:', value: '3', animationType: A.ScaleOnce },
-  { title: cyl_localizationKey('Red dot'), api: 'cyl_showBadge', value: '' },
-  { title: cyl_localizationKey('Number'), api: 'cyl_showBadgeValue:', value: '8' },
+  { title: cyl_localizationKey('Red dot'), api: 'showBadge', value: '' },
+  { title: cyl_localizationKey('Number'), api: 'showBadgeValue:', value: '8' },
   { title: cyl_localizationKey('Number above maximum'), api: 'cyl_badgeMaximumBadgeNumber', value: '100' },
   { title: cyl_localizationKey('Custom maximum (9)'), api: 'cyl_badgeMaximumBadgeNumber', value: '10', maximum: 9 },
-  { title: cyl_localizationKey('New'), api: 'cyl_showBadgeValue:@"new"', value: 'new' },
-  { title: cyl_localizationKey('NEW'), api: 'cyl_showBadgeValue:@"NEW"', value: 'NEW' },
-  { title: cyl_localizationKey('Other text'), api: 'cyl_showBadgeValue:', value: 'hot' },
+  { title: cyl_localizationKey('New'), api: 'showBadgeValue:@"new"', value: 'new' },
+  { title: cyl_localizationKey('NEW'), api: 'showBadgeValue:@"NEW"', value: 'NEW' },
+  { title: cyl_localizationKey('Other text'), api: 'showBadgeValue:', value: 'hot' },
   { title: cyl_localizationKey('Custom colors'), api: 'cyl_badgeBackgroundColor / cyl_badgeTextColor', value: '5', colors: true },
   { title: cyl_localizationKey('Custom font'), api: 'cyl_badgeFont', value: '5', font: true },
   { title: cyl_localizationKey('Border'), api: 'cyl_badgeBorderColor / cyl_badgeBorderWidth', value: '5', border: true },
@@ -94,7 +94,7 @@ export function cyl_badgeStyleCount(): number {
  */
 export function cyl_applyBadgeSample(badge: CYLBadge, row: number, iconSize: number = 30): void {
   const sample = sampleForRow(row);
-  badge.cyl_resetBadgeAppearance();
+  badge.resetBadgeAppearance();
   badge.repeatCount = sample.repeats;
   badge.customAnimation = sample.custom;
   badge.respectsReduceMotion = sample.reduceMotion === true;
@@ -128,5 +128,5 @@ export function cyl_applyBadgeSample(badge: CYLBadge, row: number, iconSize: num
   } else if (sample.position === 'bottomRight') {
     badge.centerOffset = { horizontal: 0, vertical: iconSize };
   }
-  badge.cyl_showBadgeValue(sample.value, sample.animationType ?? CYLBadgeAnimationType.None);
+  badge.showBadgeValue(sample.value, sample.animationType ?? CYLBadgeAnimationType.None);
 }

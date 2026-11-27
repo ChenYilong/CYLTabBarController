@@ -114,7 +114,7 @@ export class CYLBadgeAppearance {
 
 /**
  * [EN] The badge of one view (a tab, the plus button or any view): CYLBadgeProtocol's state and methods
- *      (-cyl_showBadge, -cyl_showBadgeValue:animationType:, -cyl_clearBadge, -cyl_pauseBadge, -cyl_resumeBadge, ...).
+ *      (-showBadge, -showBadgeValue:animationType:, -clearBadge, -pauseBadge, -resumeBadge, ...).
  *      Unset appearance values follow CYLBadgeAppearance.globalAppearance. Shown by CYLBadgeView.
  * [CN] 单个视图（Tab、加号按钮或任意视图）的角标：CYLBadgeProtocol 的状态与方法。未设置的外观值跟随全局外观。由 CYLBadgeView 显示。
  */
@@ -138,18 +138,18 @@ export class CYLBadge {
   borderWidth?: number;
   /**
    * [EN] How many times the animation plays: undefined uses the type's default (forever for Scale / Shake / Bounce /
-   *      Breathe, once for the *Once types), -1 forever, n > 0 n times (cyl_shakeAnimationRepeatTimes,
-   *      cyl_bounceAnimationRepeatTimes, CAAnimation+CYLBadgeExtention repeatCount).
+   *      Breathe, once for the *Once types), -1 forever, n > 0 n times (shakeAnimationRepeatTimes,
+   *      bounceAnimationRepeatTimes, CAAnimation+CYLBadgeExtention repeatCount).
    * [CN] 动画播放次数：undefined 用类型默认值（Scale/Shake/Bounce/Breathe 永久，*Once 一次），-1 永久，n > 0 播放 n 次。
    */
   repeatCount?: number;
   /**
    * [EN] An animation of CAAnimation+CYLBadgeExtention that no CYLBadgeAnimationType matches: 'rotation' (a full turn
-   *      every 2 s, cyl_rotationAnimationWithDuration: around z) or 'flip' (half a turn around y). Wins over animationType.
+   *      every 2 s, rotationAnimationWithDuration: around z) or 'flip' (half a turn around y). Wins over animationType.
    * [CN] 没有对应 CYLBadgeAnimationType 的 CAAnimation+CYLBadgeExtention 动画：'rotation'（每 2 秒绕 z 轴一圈）或 'flip'（绕 y 轴半圈）。优先于 animationType。
    */
   customAnimation?: string;
-  /** [EN] cyl_badgeRespectsReduceMotion: no animation while the system reduces motion. [CN] 系统减少动态效果时不播放动画。 */
+  /** [EN] badgeRespectsReduceMotion: no animation while the system reduces motion. [CN] 系统减少动态效果时不播放动画。 */
   respectsReduceMotion: boolean = false;
   /** [EN] Localized "new" / "NEW" (CYLLocalization). [CN] 本地化的 "new" / "NEW"。 */
   newText: string = 'new';
@@ -162,16 +162,16 @@ export class CYLBadge {
    */
   eventPoster?: (name: string, info: Record<string, Object>) => void;
 
-  /** [EN] -cyl_showBadge: a red dot. [CN] 显示红点。 */
-  cyl_showBadge(): void {
-    this.cyl_showBadgeValue('', this.animationType);
+  /** [EN] -showBadge: a red dot. [CN] 显示红点。 */
+  showBadge(): void {
+    this.showBadgeValue('', this.animationType);
   }
 
-  /** [EN] -cyl_showBadgeValue:animationType:; a number <= 0 clears the badge. [CN] 显示值；<= 0 的数字清除角标。 */
-  cyl_showBadgeValue(value: string, animationType?: CYLBadgeAnimationType): void {
+  /** [EN] -showBadgeValue:animationType:; a number <= 0 clears the badge. [CN] 显示值；<= 0 的数字清除角标。 */
+  showBadgeValue(value: string, animationType?: CYLBadgeAnimationType): void {
     const number = Number.parseInt(value, 10);
     if (`${number}` === value.trim() && number <= 0) {
-      this.cyl_clearBadge();
+      this.clearBadge();
       return;
     }
     this.value = value;
@@ -184,13 +184,13 @@ export class CYLBadge {
     this.eventPoster?.('cyl.badge.didShow', info);
   }
 
-  /** [EN] -cyl_showNewBadge: "new" (uppercase: "NEW"). [CN] 显示 "new"。 */
-  cyl_showNewBadge(uppercase?: boolean): void {
-    this.cyl_showBadgeValue(uppercase ? 'NEW' : 'new');
+  /** [EN] -showNewBadge: "new" (uppercase: "NEW"). [CN] 显示 "new"。 */
+  showNewBadge(uppercase?: boolean): void {
+    this.showBadgeValue(uppercase ? 'NEW' : 'new');
   }
 
-  /** [EN] -cyl_clearBadge. [CN] 移除角标。 */
-  cyl_clearBadge(): void {
+  /** [EN] -clearBadge. [CN] 移除角标。 */
+  clearBadge(): void {
     const hadBadge: boolean = this.value !== null;
     this.value = null;
     this.paused = false;
@@ -199,26 +199,26 @@ export class CYLBadge {
     }
   }
 
-  /** [EN] -cyl_pauseBadge: hidden, kept. [CN] 暂停：隐藏但保留。 */
-  cyl_pauseBadge(): void {
+  /** [EN] -pauseBadge: hidden, kept. [CN] 暂停：隐藏但保留。 */
+  pauseBadge(): void {
     this.paused = true;
   }
 
-  /** [EN] -cyl_resumeBadge. [CN] 恢复显示。 */
-  cyl_resumeBadge(): void {
+  /** [EN] -resumeBadge. [CN] 恢复显示。 */
+  resumeBadge(): void {
     this.paused = false;
   }
 
-  cyl_isShowBadge(): boolean {
+  isShowBadge(): boolean {
     return this.value !== null && !this.paused;
   }
 
-  cyl_isPauseBadge(): boolean {
+  isPauseBadge(): boolean {
     return this.paused;
   }
 
-  /** [EN] -cyl_resetBadgeAppearance: back to the global appearance. [CN] 恢复为全局外观。 */
-  cyl_resetBadgeAppearance(): void {
+  /** [EN] -resetBadgeAppearance: back to the global appearance. [CN] 恢复为全局外观。 */
+  resetBadgeAppearance(): void {
     this.backgroundColor = undefined;
     this.textColor = undefined;
     this.fontSize = undefined;
@@ -232,13 +232,13 @@ export class CYLBadge {
   }
 
   /** [EN] The shown text: null for a red dot (as CYLBadge.kt). [CN] 显示的文字：红点为 null。 */
-  cyl_displayText(): string | null {
+  displayText(): string | null {
     const value = this.value;
     if (value === null || value.length === 0) {
       return null;
     }
     const number = Number.parseInt(value, 10);
-    const maximum = this.cyl_maximum();
+    const maximum = this.maximumNumber();
     if (`${number}` === value.trim() && number > maximum) {
       return `${maximum}+`;
     }
@@ -251,7 +251,7 @@ export class CYLBadge {
     return value;
   }
 
-  cyl_maximum(): number {
+  maximumNumber(): number {
     return this.maximumBadgeNumber !== undefined ? Math.max(1, this.maximumBadgeNumber)
       : CYLBadgeAppearance.globalAppearance.maximumBadgeNumber;
   }
@@ -336,19 +336,19 @@ export struct CYLBadgeView {
         }, () => { this.scaleValue = 1.4; });
         break;
       case CYLBadgeAnimationType.Shake:
-        // [EN] As iOS (cyl_shakeAnimationRepeatTimes, translation.x): 0, -w/4, 0, +w/4, 0 in 1 s, around the badge's place.
+        // [EN] As iOS (shakeAnimationRepeatTimes, translation.x): 0, -w/4, 0, +w/4, 0 in 1 s, around the badge's place.
         // [CN] 与 iOS 相同（translation.x）：1 秒内 0、-w/4、0、+w/4、0，围绕角标原位。
         this.cylPlayAround(true, this.cylBadgeWidth() / 4, repeats);
         break;
       case CYLBadgeAnimationType.Bounce:
-        // [EN] As iOS (cyl_bounceAnimationRepeatTimes, translation.y): 0, -h/4, 0, +h/4, 0 in 1 s, around the badge's place.
+        // [EN] As iOS (bounceAnimationRepeatTimes, translation.y): 0, -h/4, 0, +h/4, 0 in 1 s, around the badge's place.
         //      It used to go only up, 8 vp every 250 ms, so the badge (e.g. "100" on Messages) sat about 4 vp too high.
         // [CN] 与 iOS 相同（translation.y）：1 秒内 0、-h/4、0、+h/4、0，围绕角标原位。此前只向上 8 vp、每 250 毫秒一次，
         //      角标（如「消息」上的 "100"）平均高出约 4 vp。
         this.cylPlayAround(false, this.cylBadgeHeight() / 4, repeats);
         break;
       case CYLBadgeAnimationType.Breathe:
-        // [EN] As iOS (cyl_opacityForeverAnimation 1.4 s): opacity 1 to 0.1 and back, 1.4 s each way, linear.
+        // [EN] As iOS (opacityForeverAnimation 1.4 s): opacity 1 to 0.1 and back, 1.4 s each way, linear.
         // [CN] 与 iOS 相同：透明度 1 到 0.1 再回到 1，每个方向 1.4 秒，线性。
         animateTo({ duration: 1400, iterations: forever, playMode: PlayMode.Alternate, curve: Curve.Linear },
           () => { this.opacityValue = 0.1; });
@@ -380,7 +380,7 @@ export struct CYLBadgeView {
 
   /** [EN] The badge's height: a dot's diameter, or a text badge's height. [CN] 角标高度：红点直径或文字角标高度。 */
   private cylBadgeHeight(): number {
-    if (this.badge.cyl_displayText() === null) {
+    if (this.badge.displayText() === null) {
       return (this.badge.radius ?? this.appearance().radius) * 2;
     }
     return (this.badge.fontSize ?? this.appearance().fontSize) * 1.2 + (this.badge.margin ?? this.appearance().margin);
@@ -388,7 +388,7 @@ export struct CYLBadgeView {
 
   /** [EN] The badge's width: a dot's diameter, or a text badge's width. [CN] 角标宽度：红点直径或文字角标宽度。 */
   private cylBadgeWidth(): number {
-    return this.badge.cyl_displayText() === null ? (this.badge.radius ?? this.appearance().radius) * 2 : this.cylTextBadgeWidth();
+    return this.badge.displayText() === null ? (this.badge.radius ?? this.appearance().radius) * 2 : this.cylTextBadgeWidth();
   }
 
   /**
@@ -413,7 +413,7 @@ export struct CYLBadgeView {
   }
 
   /**
-   * [EN] The width of a text badge, as Android CYLBadge.onMeasure and iOS -cyl_adjustLabelWidth: the measured text width
+   * [EN] The width of a text badge, as Android CYLBadge.onMeasure and iOS -adjustLabelWidth: the measured text width
    *      plus the margin, at least the badge height (a circle for one digit). Never fixed, so "NEW" stays on one line.
    * [CN] 文字角标宽度：测量的文字宽度加边距，至少为角标高度（一位数字为圆形）。不写死，"NEW" 保持单行。
    */
@@ -421,7 +421,7 @@ export struct CYLBadgeView {
     const fontSize = this.badge.fontSize ?? this.appearance().fontSize;
     const margin = this.badge.margin ?? this.appearance().margin;
     const height = fontSize * 1.2 + margin;
-    const text = this.badge.cyl_displayText() ?? '';
+    const text = this.badge.displayText() ?? '';
     let textWidth = text.length * fontSize * 0.62;
     try {
       const px = this.getUIContext().getMeasureUtils().measureText({
@@ -440,13 +440,13 @@ export struct CYLBadgeView {
   build() {
     if (this.badge.value !== null) {
       Stack() {
-        if (this.badge.cyl_displayText() === null) {
+        if (this.badge.displayText() === null) {
           Circle()
             .width((this.badge.radius ?? this.appearance().radius) * 2)
             .height((this.badge.radius ?? this.appearance().radius) * 2)
             .fill(this.badge.backgroundColor ?? this.appearance().backgroundColor)
         } else {
-          Text(this.badge.cyl_displayText())
+          Text(this.badge.displayText())
             .fontSize(this.badge.fontSize ?? this.appearance().fontSize)
             .fontWeight(FontWeight.Bold)
             .fontColor(this.badge.textColor ?? this.appearance().textColor)
@@ -465,10 +465,10 @@ export struct CYLBadgeView {
         }
       }
       // [EN] Every badge (dot, number, text) is centred 2 vp right of the icon's top-right corner, plus centerOffset, as iOS
-      //      (center 2 pt right of the host's right edge) and Android (cyl_badgeOrigin: anchorRight + 2 dp - width / 2):
+      //      (center 2 pt right of the host's right edge) and Android (badgeOrigin: anchorRight + 2 dp - width / 2):
       //      a wide badge grows to both sides of that point (issue list #25).
       // [CN] 所有角标（红点、数字、文字）的中心都在图标右上角右侧 2 vp 处，再加 centerOffset，与 iOS（宿主右边缘右侧 2 pt）和
-      //      Android（cyl_badgeOrigin：anchorRight + 2 dp - 宽度 / 2）相同：宽角标向两侧延伸（问题 #25）。
+      //      Android（badgeOrigin：anchorRight + 2 dp - 宽度 / 2）相同：宽角标向两侧延伸（问题 #25）。
       .markAnchor({ x: '50%', y: '50%' })
       .position({ x: this.anchorWidth + 2 + (this.badge.centerOffset ?? this.appearance().centerOffset).horizontal,
         y: (this.badge.centerOffset ?? this.appearance().centerOffset).vertical })
@@ -479,7 +479,7 @@ export struct CYLBadgeView {
       .rotate({ x: 1, y: 0, z: 0, angle: this.rotateX })
       .rotate({ x: 0, y: this.rotateY !== 0 ? 1 : 0, z: this.rotateZ !== 0 ? 1 : 0,
         angle: this.rotateY !== 0 ? this.rotateY : this.rotateZ })
-      // [EN] Read as part of its host (cyl_badgeAccessibilityText), not on its own. [CN] 作为宿主的一部分读出，不单独读出。
+      // [EN] Read as part of its host (badgeAccessibilityText), not on its own. [CN] 作为宿主的一部分读出，不单独读出。
       .accessibilityLevel('no')
       .onAppear(() => this.cylPlay())
       .onAttach(() => this.cylPlay())

@@ -6,7 +6,7 @@ import {
   CYLTabBarMinimizeBehavior, cyl_reportScroll, cyl_reportScrollStarted, cyl_pausesAnimationsWhileUserScrolls, cyl_reportScrollStopped, cyl_pushViewController, CYLThemeManager, CYLThemeManagerCenter,
   cyl_tabBarItemIdentifiers, cyl_indexOfTabBarItemWithIdentifier, cyl_selectTabBarItemWithIdentifier
 } from 'cyltabbar';
-import { CYLLocalizedString, cyl_localizationKey, cyl_badgeAccessibilityText, CYLTabBarDefaultHeight } from 'cyltabbar';
+import { CYLLocalizedString, cyl_localizationKey, badgeAccessibilityText, CYLTabBarDefaultHeight } from 'cyltabbar';
 import { DemoTheme, DEMO_THEMES, demoRegisterThemes } from '../demo/DemoThemes';
 import { DemoScrollKind, DemoScrollSimulation, DEMO_SCROLL_SIMULATIONS, demoScrollKindName, demoScrollTitle } from '../demo/DemoScrollHide';
 import { cyl_restoreTabBar, CYLSetLocalizationLanguage, CYLLocalizationLanguage } from 'cyltabbar';
@@ -266,7 +266,7 @@ struct Index {
     // [EN] SceneDelegate.m -setUpBadgeAppearance (#425). [CN] 全局角标偏移。
     CYLBadgeAppearance.globalAppearance.centerOffset = { horizontal: -5, vertical: 3 };
     // [EN] cyl_demo_showPlusButtonBadge: 1 at launch. [CN] 启动时加号角标为 1。
-    this.plusButtonBadge.cyl_showBadgeValue('1');
+    this.plusButtonBadge.showBadgeValue('1');
     const current = CYLLocalizationLanguage();
     // [EN] A language outside the picker (set elsewhere) shows as "Follow system". [CN] 不在选项中的语言显示为「跟随系统」。
     const known = DEMO_LANGUAGES.indexOf(current);
@@ -296,15 +296,15 @@ struct Index {
       const home = this.badges[0];
       home.backgroundColor = CYL_RANDOM_COLORS[Math.floor(Math.random() * CYL_RANDOM_COLORS.length)];
       home.radius = 11 / 2;
-      home.cyl_showBadgeValue('', CYLBadgeAnimationType.Breathe);
+      home.showBadgeValue('', CYLBadgeAnimationType.Breathe);
       this.badges[1].backgroundColor = '#AF52DE';
-      this.badges[1].cyl_showBadgeValue('8', CYLBadgeAnimationType.Scale);
-      this.badges[2].cyl_showBadgeValue('100', CYLBadgeAnimationType.Bounce);
+      this.badges[1].showBadgeValue('8', CYLBadgeAnimationType.Scale);
+      this.badges[2].showBadgeValue('100', CYLBadgeAnimationType.Bounce);
       this.badges[3].centerOffset = { horizontal: -1, vertical: 3 };
-      this.badges[3].cyl_showBadgeValue('NEW', CYLBadgeAnimationType.Breathe);
+      this.badges[3].showBadgeValue('NEW', CYLBadgeAnimationType.Breathe);
       // [EN] The cover replaces the Home button, so its badge is cleared (MainTabBarController.m). [CN] 封面替换首页按钮，因此清除其角标。
       this.covers = [$r('app.media.home_select_cover')];
-      this.badges[0].cyl_clearBadge();
+      this.badges[0].clearBadge();
     }, 1500);
   }
 
@@ -540,7 +540,7 @@ struct Index {
     } else if (page === DEMO_CITY) {
       this.push('pages/TextPage', { title: 'CYLDetailsViewController (navigation bar hidden)', color: '#5AC8FA', hidesNavigationBar: true } as DemoPushParams);
     } else {
-      this.badges[3].cyl_showBadgeValue(`${row}`, CYLBadgeAnimationType.None);
+      this.badges[3].showBadgeValue(`${row}`, CYLBadgeAnimationType.None);
       this.push('pages/TextPage', { title: 'testPush', color: '#FF0000' } as DemoPushParams);
     }
   }
@@ -1130,7 +1130,7 @@ struct Index {
     .accessibilityGroup(true)
     .accessibilityText(row.title)
     .accessibilityDescription([row.subtitle ?? '', row.badgeRow !== undefined
-      ? cyl_badgeAccessibilityText((this.rowBadges.get(page) ?? [])[row.badgeRow]) : ''].filter((t: string) => t.length > 0).join(', '))
+      ? badgeAccessibilityText((this.rowBadges.get(page) ?? [])[row.badgeRow]) : ''].filter((t: string) => t.length > 0).join(', '))
     .id(`cyl-row-${page}-${row.id}`)
     .onClick(() => row.action())
   }
@@ -1296,7 +1296,7 @@ struct Index {
     this.styleType = CYLTabBarStyleType.FlatDesign;
     this.selectedIndex = 0;
     this.covers = [];
-    this.badges.forEach((badge: CYLBadge) => badge.cyl_clearBadge());
+    this.badges.forEach((badge: CYLBadge) => badge.clearBadge());
     this.tabBarKey += 1;
     this.showLaunchBadges();
   }
@@ -1328,8 +1328,8 @@ struct Index {
         didSelectControl: (index: number, previous: number) => {
           // [EN] Item 55: a tap on a newly selected tab turns its badge into a dot of the same color; a re-tap of the
           //      selected tab changes nothing. [CN] 第 55 项：点击新选中的 Tab 时把角标变为同色红点；再次点击已选中的 Tab 不变。
-          if (index >= 0 && index !== previous && this.badges[index].cyl_isShowBadge() && this.badges[index].value !== '') {
-            this.badges[index].cyl_showBadgeValue('', CYLBadgeAnimationType.None);
+          if (index >= 0 && index !== previous && this.badges[index].isShowBadge() && this.badges[index].value !== '') {
+            this.badges[index].showBadgeValue('', CYLBadgeAnimationType.None);
           }
         },
         didLongPress: (index: number, identifier: string) => this.toast(CYLLocalizedString('长按了「%@」', identifier)),
@@ -1368,7 +1368,7 @@ struct Index {
         plusButtonAction: () => {
           // [EN] Item 5: the badge goes up by one per tap. [CN] 第 5 项：每次点击角标加 1。
           this.plusBadge += 1;
-          this.plusButtonBadge.cyl_showBadgeValue(`${this.plusBadge}`);
+          this.plusButtonBadge.showBadgeValue(`${this.plusBadge}`);
           this.toast(`Post tapped (${this.plusBadge - 1})`);
         },
         pageBuilder: (index: number, identifier: string) => {

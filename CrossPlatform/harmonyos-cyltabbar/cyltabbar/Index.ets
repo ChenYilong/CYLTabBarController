@@ -46,7 +46,7 @@ export {
   CYLLocalizedString, cyl_localizationKey, cyl_setLocalizationContext, cyl_textOf, CYLLocalizationLanguage,
   CYLSetLocalizationLanguage, cyl_addLocalizationLanguageListener, cyl_removeLocalizationLanguageListener, cyl_pickerLanguages
 } from './src/main/ets/CYLLocalization';
-export { cyl_badgeAccessibilityText, cylIconRenderingMode, cylStaticIconTintColor, cylIconFillColorOf, cylTabBarBackgroundColor } from './src/main/ets/CYLTabBarController';
+export { badgeAccessibilityText, cylIconRenderingMode, cylStaticIconTintColor, cylIconFillColorOf, cylTabBarBackgroundColor } from './src/main/ets/CYLTabBarController';
 export {
   CYLTabBarStyleType,
   CYLFlatDesignTintColor,
