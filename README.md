@@ -170,6 +170,8 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [Android 版 CYLTabBarController](docs/Android-Library.md) | [CYLTabBarController for Android](docs/Android-Library.md) |
 | [Android 液态玻璃](docs/Android-Liquid-Glass.md) | [Android Liquid Glass](docs/Android-Liquid-Glass.md) |
 | [Android 库与 QMUI_Android、XUI 的 Tab 对比](docs/Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's and XUI's tabs](docs/Android-QMUI-Comparison.md) |
+| [CYLBadge 抽离与动效 item 角标：其他平台（实施指南）](docs/Animated-Item-Badge-CrossPlatform.md) | [Extracting CYLBadge and badging animated items: the other platforms (implementation guide)](docs/Animated-Item-Badge-CrossPlatform.md) |
+| [CYLBadge 独立组件与动效 item 角标（API 设计）](docs/Animated-Item-Badge.md) | [CYLBadge as an independent component, and animated item badges (API design)](docs/Animated-Item-Badge.md) |
 | [动效 icon + title 共用组件：CYLAnimatedItem](docs/Animated-Item.md) | [The shared animated icon + title component: CYLAnimatedItem](docs/Animated-Item.md) |
 | [角标调试](docs/Badge-Debugging.md) | [Badge debugging](docs/Badge-Debugging.md) |
 | [中英文双语文档](docs/Bilingual-Documentation.md) | [Bilingual Documentation](docs/Bilingual-Documentation.md) |
@@ -272,6 +274,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | **支持指定 PlusButton 位置**<br>可指定 PlusButton 的位置，并支持 Airbnb 风格布局。 | **Supports a custom PlusButton position.**<br>Place the PlusButton at a custom index and support Airbnb-style layouts. |
 | **仅显示图标并垂直居中**<br>不设置标题即可只显示图标，并可自定义 TabBar 高度。 | **Icon-only, vertically centered items.**<br>Omit the title to show only icons and customize the TabBar height. |
 | **支持自定义角标 View**<br>可以使用自定义 View 展示角标。 | **Supports custom badge views.**<br>Use a custom view to display badges. |
+| **带角标的图标快照，按图标对齐**<br>`cylBadgeSnapshotImage(hidingBadge:traitCollection:)` 把视图和角标合成一张图片，`CYLAnimatedItemView` 自动按图标而不是图标加角标居中（[说明](docs/Animated-Item.md#enicon-alignment-the-badge-part-of-an-image)）。 | **Badged icon snapshots, aligned by the icon.**<br>`cylBadgeSnapshotImage(hidingBadge:traitCollection:)` turns a view and its badge into one image; `CYLAnimatedItemView` centres the icon, not the icon plus its badge, on its own ([details](docs/Animated-Item.md#enicon-alignment-the-badge-part-of-an-image)). |
 | **支持多 TabBar 嵌套**<br>可嵌套多个 TabBar，并指定 PlusButton 所属的 context。 | **Supports nested TabBars.**<br>Nest multiple TabBars and associate a PlusButton with a specific context. |
 | **CocoaPods、Carthage、Swift Package Manager**<br>核心库用 Swift 编写，保留全部 Objective-C 接口；另有 Android、React Native、Flutter、鸿蒙与微信小程序版本。 | **CocoaPods, Carthage and Swift Package Manager.**<br>The core is written in Swift and keeps its whole Objective-C API; there are Android, React Native, Flutter, HarmonyOS and WeChat mini program versions too. |
 | **支持横竖屏**<br>自动适配不同屏幕方向。 | **Supports portrait and landscape orientations.**<br>Layout adapts to both orientations. |

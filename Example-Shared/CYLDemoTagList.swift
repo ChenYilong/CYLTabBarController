@@ -168,20 +168,12 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
         return result
     }
 
-    /// [EN] `iconView` and its badge (which sits partly outside the icon) as one image; `hidingBadge`: the icon alone in the same frame. [CN] `iconView` 及其角标（部分位于图标之外）合成的一张图片；`hidingBadge`：在相同范围内只画图标。
+    /// [EN] `iconView` and its badge as one image, by the badge component (`cylBadgeSnapshotImage`): the image marks the icon with its
+    ///      `alignmentRectInsets`, so the tag aligns by the icon on its own; `hidingBadge`: the icon alone at the same size.
+    ///      [CN] 由角标组件（`cylBadgeSnapshotImage`）将 `iconView` 及其角标合成一张图片：图片用 `alignmentRectInsets` 标出图标，Tag 自动按图标对齐；
+    ///      `hidingBadge`：同尺寸下只画图标。
     private static func iconWithBadge(_ iconView: UIImageView, traits: UITraitCollection, hidingBadge: Bool) -> UIImage? {
-        iconView.superview?.layoutIfNeeded()
-        guard let badge = iconView.cyl_badge, !badge.isHidden, !iconView.bounds.isEmpty else { return nil }
-        let rect = iconView.bounds.union(badge.convert(badge.bounds, to: iconView)).integral
-        let format = UIGraphicsImageRendererFormat(for: traits)
-        format.opaque = false
-        badge.isHidden = hidingBadge
-        let image = UIGraphicsImageRenderer(bounds: rect, format: format).image { context in
-            traits.performAsCurrent { iconView.layer.render(in: context.cgContext) }
-        }
-        badge.isHidden = false
-        if !hidingBadge { image.accessibilityLabel = cylBadgeAccessibilityDescriptionEntryPoint(badge.text as NSString?) as String? }
-        return image
+        iconView.cylBadgeSnapshotImage(hidingBadge: hidingBadge, traitCollection: traits)
     }
 
     private static let styleConfiguration: [String: Any] = [

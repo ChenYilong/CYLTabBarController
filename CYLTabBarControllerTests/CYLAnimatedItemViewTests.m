@@ -247,6 +247,12 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL
     XCTAssertEqual(item.animationRestartToken, 2, @"only a restart grows it");
 }
 
+- (void)testNoteAnimationRestartGrowsOnlyTheToken {
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] init];
+    [item noteAnimationRestart];
+    XCTAssertEqual(item.animationRestartToken, 1, @"a subclass that overrides restartAnimation without super still reports the restart");
+}
+
 - (void)testAHostThatDrivesPlaybackGetsThePlayerAndNoDefaultRules {
     CYLAnimatedItemFakeSource *source = [[CYLAnimatedItemFakeSource alloc] init];
     CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];

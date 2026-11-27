@@ -58,13 +58,36 @@ by tag and kept under 200 lines: see [instructions.md](instructions.md)).
   another project, a sample, a snippet) follows the same rules:
   - Name new classes, structs, enums, protocols, file-private C functions and constants with the `CYL` prefix
     (`CYLBadgeView`, `CYLDemoTheme`), and the file after its main type (`CYLBadgeView.m`, `UIView+CYLBadgeExtention.m`).
-  - Name every method and property added in a category with the `cyl_` prefix (`-cyl_showBadgeValue:`), also in
-    extensions of system types written in Swift, Kotlin, Dart or TypeScript in this repository.
+  - **The prefix exists to stop silent overriding (amended 2026-11-27, owner decisions N0-N3,
+    [docs/Animated-Item-Badge-CrossPlatform.md](../Animated-Item-Badge-CrossPlatform.md#ennaming-where-a-cyl-prefix-is-needed-reassessed-per-platform)).**
+    Why iOS uses `cyl_`: Objective-C categories have no namespace. A category method silently overrides, or is
+    overridden by, a method with the same name that the integrating app, the system or another library has on that
+    class, so someone else's implementation is replaced. The `cyl_` prefix makes such a clash impossible. On every other
+    platform, reassess whether the language already prevents this, and keep a prefix only where it does not. The
+    spelling always follows the language:
+    - Objective-C selectors of category methods and properties (also `@objc` members added in Swift extensions):
+      `cyl_` is required (`-cyl_showBadgeValue:`); the Swift name is `cylFoo` (see the SonarCloud bullet below).
+    - Kotlin, Dart and TypeScript extensions: **`cyl_` is not required.** Extensions are resolved at compile time and
+      never override a member. On a platform type (`View`, `TextView`, `MenuItem`, Flutter classes) use `cylFoo`, with
+      no underscore, because a member the platform adds later silently wins over the extension; on our own types, no
+      prefix.
+    - Public methods of a WeChat Mini Program component instance: keep a prefix, spelled `cylFoo` (they share the
+      instance namespace with the framework's own methods and behaviours, so a same-named method silently shadows
+      them).
+    - No prefix: members of our own types on every platform, ArkTS APIs (ArkTS cannot extend system components or
+      prototypes), TypeScript / React Native props and ES module members, Dart library members. Global names keep a
+      prefix (Android resources, channel and native module names, component tags, CSS classes, event names, storage
+      keys).
+    - **Release status (owner, 2026-11-27): only iOS is released; Android, HarmonyOS, the WeChat Mini Program, React
+      Native and Flutter are not released yet.** iOS names keep their spelling (public API rule). On the other
+      platforms, existing names that break this rule (for example Android `View.cyl_*`, HarmonyOS `CYLBadge.cyl_*`,
+      mini program `cyl_*` component methods) are renamed directly, with no aliases and no deprecated forwards. Once a
+      platform is released, the public API rule applies to it too.
   - Remove any other prefix the copied code carries (another project's or author's prefix, `XX`, `My`, `QMUI`, `JX`…)
     and rename its symbols, files and references accordingly; keep a credit to the source in a comment instead.
   - Keep the names of public APIs that already shipped, as the Public API rule requires; this rule is for new code.
   - **Swift names follow SonarCloud (added 2026-11-23, owner; swift:S100 / S101 / S115 / S116 / S117 and the Swift
-    API Design Guidelines).** The `cyl_` rule above is for Objective-C selectors and for non-Swift languages. In Swift:
+    API Design Guidelines).** The `cyl_` rule above is for Objective-C selectors (and the reasons above for other languages). In Swift:
     types keep `CYL` (`CYLFoo`, no leading underscore); a member of our own type has no prefix (`reloadTabButtons`);
     a member added to a system type or to one of our types in an extension is `cylFoo` (add `@objc(cyl_foo)` when
     Objective-C calls it, so the selector stays); a global function or constant is `cylFoo`; a test helper is
