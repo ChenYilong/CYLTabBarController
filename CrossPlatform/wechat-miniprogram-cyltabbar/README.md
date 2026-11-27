@@ -60,7 +60,7 @@ package it installed.
 Properties: `tabBarHeight` (px; the default, 0, is 48 px, the WeChat native tab bar's height; not used by Liquid Glass), `itemStyle` (CYLTabBarItemStyle `flat` / `liquidGlass`), `glassLensStyle` (CYLGlassLensStyle `regular`, the default "liquid", / `skeuomorphic`, "skeuomorphic liquid"; Liquid Glass only), `animationSpeed`, `animationLoop`, `configuration`, `strings`, `symbolsByTheme`, `imageBasePath`, `animationBasePath`, `selectedIdentifier`,
 `loggedIn`, `appVersion`. Events: `select`, `reselect`, `plustap`, `loginrequired` (detail: `index`, `identifier`,
 `pageIdentifier`, `pageParameters`, `context`, `isPlusButton`). Methods: `cylSelectIdentifier`, `cylShowBadgeValue`,
-`cylShowBadgeDot`, `cylRemoveBadge`, `cylSetThemeIdentifier`, `cylThemeIdentifiers`, `cylPlayLottie`,
+`cylShowBadge`, `cylClearBadge`, `cylSetThemeIdentifier`, `cylThemeIdentifiers`, `cylPlayLottie`,
 `cylSelectAdjacent`, `cylSetItemStyle`, `cylSetGlassLensStyle`, `cylTabBarPlayAll`, `cylSetAnimationSpeed`, `cylSetAnimationLoop`, `cylSetHiddenIdentifiers` (property `hiddenIdentifiers`: tabs or the plus button left out of the bar, e.g. by user role), `cylSetTabBarHidden` (property `tabBarHidden`: hides the bar of one page). Page behavior for swiping between tabs: `cyl-tabbar-miniprogram/cyl-tab-bar/cyl_swipe_behavior`.
 
 ## The icon + title component: `cyl-animated-item`

@@ -79,7 +79,7 @@ Component({
         Object.keys(state.badges).forEach((identifier) => {
           const value = state.badges[identifier];
           if (value === '' || value === null || value === undefined) {
-            tabBar.cylRemoveBadge(identifier);
+            tabBar.cylClearBadge(identifier);
           } else {
             tabBar.cylShowBadgeValue(identifier, value, attributes[identifier]);
           }

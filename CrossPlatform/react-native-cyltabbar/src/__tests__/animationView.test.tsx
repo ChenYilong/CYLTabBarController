@@ -15,7 +15,7 @@ jest.mock('react', () => ({
   useImperativeHandle: () => {},
 }));
 
-import { CYLAnimationView, animationURLWithOptions, cylAnimatedItemCornerRadiusCapsule } from '../CYLAnimationView.native';
+import { CYLAnimationView, animationURLWithOptions, cylAnimatedItemCornerRadiusCapsule, cylBadgeNativeProps, CYLBadgeAttributeKey } from '../CYLAnimationView.native';
 
 type Case = { input: string; file?: string; options: Record<string, string> };
 
@@ -147,5 +147,36 @@ describe('the v2 tint props', () => {
     expect(spec).toContain('animationTint?: string');
     expect(spec).toContain('animationDarkTint?: string');
     expect(spec).toContain("animationRenderingMode?: CodegenTypes.WithDefault<'automatic' | 'alwaysTemplate' | 'alwaysOriginal', 'automatic'>");
+  });
+});
+
+describe('the item badge props (docs/Animated-Item-Badge-CrossPlatform.md, phase 2)', () => {
+  it('sends null and undefined as hidden, "" as a dot and a string as the text', () => {
+    expect(cylBadgeNativeProps(null)).toEqual({ badgeValue: '', badgeHidden: true, badgeAttributesJSON: '' });
+    expect(cylBadgeNativeProps(undefined)).toEqual({ badgeValue: '', badgeHidden: true, badgeAttributesJSON: '' });
+    expect(cylBadgeNativeProps('')).toEqual({ badgeValue: '', badgeHidden: false, badgeAttributesJSON: '' });
+    expect(cylBadgeNativeProps('3').badgeHidden).toBe(false);
+    expect(cylBadgeNativeProps('3').badgeValue).toBe('3');
+  });
+
+  it('sends the style keys as JSON and keeps the iOS key names', () => {
+    const json = cylBadgeNativeProps('3', { [CYLBadgeAttributeKey.animation]: 'scale', [CYLBadgeAttributeKey.color]: '#FF3B30' }).badgeAttributesJSON;
+    expect(JSON.parse(json)).toEqual({ animation: 'scale', color: '#FF3B30' });
+    expect(Object.values(CYLBadgeAttributeKey)).toEqual(['value', 'color', 'animation', 'radius', 'centerOffset', 'textColor', 'font', 'borderColor', 'borderWidth', 'maximumNumber', 'respectsReduceMotion']);
+  });
+
+  it('declares the four internal props in the native spec, no badge by default', () => {
+    const spec = readFileSync(join(__dirname, '../CyltabbarAnimationViewNativeComponent.ts'), 'utf8');
+    expect(spec).toContain("badgeValue?: CodegenTypes.WithDefault<string, ''>");
+    expect(spec).toContain('badgeHidden?: CodegenTypes.WithDefault<boolean, true>');
+    expect(spec).toContain("badgeAttributesJSON?: CodegenTypes.WithDefault<string, ''>");
+    expect(spec).toContain('reservesBadgeSpace?: CodegenTypes.WithDefault<boolean, false>');
+  });
+
+  it('passes the badge to the native view and draws nothing itself', () => {
+    const element = (CYLAnimationView as unknown as (props: object) => { props: Record<string, unknown> })({ file: 'a.riv', badgeValue: '', reservesBadgeSpace: true });
+    expect(element.props.badgeHidden).toBe(false);
+    expect(element.props.badgeValue).toBe('');
+    expect(element.props.reservesBadgeSpace).toBe(true);
   });
 });

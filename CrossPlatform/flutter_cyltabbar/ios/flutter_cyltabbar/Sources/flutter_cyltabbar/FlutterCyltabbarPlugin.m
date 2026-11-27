@@ -382,6 +382,10 @@ static UIColor *CYLFlutterColor(id value) {
     [self applyItemContentHorizontalInset:arguments[@"itemContentHorizontalInset"]];
     [self applyItemBorderWidth:arguments[@"itemBorderWidth"]];
     _item.itemBorderColor = CYLFlutterColor(arguments[@"itemBorderColor"]);
+    // [EN] The badge (docs/Animated-Item-Badge-CrossPlatform.md, phase 2): the item draws it. Absent is no badge, "" a dot. Written statically, not compiled yet.
+    // [CN] 角标（docs/Animated-Item-Badge-CrossPlatform.md，阶段 2）：由条目绘制。缺省为无角标，"" 为红点。静态编写，尚未编译。
+    [self applyBadgeValue:arguments[@"badgeValue"] attributes:arguments[@"badgeAttributes"]];
+    _item.reservesBadgeSpace = [arguments[@"reservesBadgeSpace"] boolValue];
     if ([arguments[@"selected"] isKindOfClass:[NSNumber class]]) {
         _selected = [arguments[@"selected"] boolValue];
         _item.selected = _selected;
@@ -442,6 +446,14 @@ static UIColor *CYLFlutterColor(id value) {
 /// [EN] `itemBorderWidth` in points; nil is 0. [CN] `itemBorderWidth`（点）；nil 为 0。
 - (void)applyItemBorderWidth:(id)width {
     _item.itemBorderWidth = [width isKindOfClass:[NSNumber class]] ? [width doubleValue] : 0;
+}
+
+/// [EN] The badge of the item: a string is the text ("" a dot), anything else (null) clears it; `attributes` is the style dictionary of
+///      `CYLBadgeAttributeKey`, set first so the badge appears with its style. Nothing is drawn here.
+/// [CN] 条目的角标：字符串为文字（"" 为红点），其他值（null）清除；`attributes` 为 `CYLBadgeAttributeKey` 的样式字典，先设置，使角标带着样式出现。这里不绘制任何内容。
+- (void)applyBadgeValue:(id)value attributes:(id)attributes {
+    _item.badgeAttributes = [attributes isKindOfClass:[NSDictionary class]] ? attributes : nil;
+    _item.badgeValue = [value isKindOfClass:[NSString class]] ? value : nil;
 }
 
 /// [EN] The default rule of the bridge (`drivesAnimationPlayback` true): selected plays from the resting frame, unselected
@@ -565,6 +577,11 @@ static UIColor *CYLFlutterColor(id value) {
         [self applyItemBorderWidth:argument];
     } else if ([method isEqualToString:@"setItemBorderColor"]) {
         _item.itemBorderColor = CYLFlutterColor(argument);
+    } else if ([method isEqualToString:@"setBadge"]) {
+        NSDictionary *badge = [argument isKindOfClass:[NSDictionary class]] ? argument : @{};
+        [self applyBadgeValue:badge[@"value"] attributes:badge[@"attributes"]];
+    } else if ([method isEqualToString:@"setReservesBadgeSpace"]) {
+        _item.reservesBadgeSpace = [argument boolValue];
     } else if ([method isEqualToString:@"play"]) {
         [[self player] play];
     } else if ([method isEqualToString:@"stopAtProgress"]) {

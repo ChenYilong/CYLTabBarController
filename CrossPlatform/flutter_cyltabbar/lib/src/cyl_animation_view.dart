@@ -4,6 +4,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+export 'cyl_badge_attribute_key.dart';
+
 const String _viewType = 'flutter_cyltabbar/CYLAnimationView';
 
 /// The URL of [file] with [options] in its fragment, sorted by name, like `CYLTabBarAnimationURLWithOptions()`.
@@ -79,6 +81,10 @@ Map<String, Object?> _creationParams(CYLAnimationView widget) => <String, Object
       if (widget.itemContentHorizontalInset != null) 'itemContentHorizontalInset': widget.itemContentHorizontalInset,
       'itemBorderWidth': widget.itemBorderWidth,
       if (widget.itemBorderColor != null) 'itemBorderColor': widget.itemBorderColor!.toARGB32(),
+      // The badge: null is no badge and is left out, '' is a dot. Drawn by the native item, never by Flutter.
+      if (widget.badgeValue != null) 'badgeValue': widget.badgeValue,
+      if (widget.badgeAttributes != null) 'badgeAttributes': widget.badgeAttributes,
+      'reservesBadgeSpace': widget.reservesBadgeSpace,
     };
 
 /// Plays an animation by hand, for a [CYLAnimationView] whose `drivesAnimationPlayback` is false (the cross-platform engine
@@ -133,6 +139,9 @@ class CYLAnimationView extends StatefulWidget {
     this.itemContentHorizontalInset,
     this.itemBorderWidth = 0,
     this.itemBorderColor,
+    this.badgeValue,
+    this.badgeAttributes,
+    this.reservesBadgeSpace = false,
     this.controller,
     this.onAnimationLoaded,
     this.onAnimationFailed,
@@ -208,6 +217,16 @@ class CYLAnimationView extends StatefulWidget {
   /// The border color; null for none.
   final Color? itemBorderColor;
 
+  /// The badge: null (default) none, '' a dot, otherwise the text (a number above `maximumNumber` shows "99+"). Drawn by the native
+  /// item, so its layout, accessibility and animation are the item's; a Flutter widget is never stacked over the platform view.
+  final String? badgeValue;
+
+  /// The badge's style, the keys of [CYLBadgeAttributeKey].
+  final Map<String, Object?>? badgeAttributes;
+
+  /// Reserves the badge's overhang when measuring (default false: the badge is not measured).
+  final bool reservesBadgeSpace;
+
   final CYLAnimationController? controller;
 
   /// The animation is in place (a local file once parsed, a download once it arrived).
@@ -280,6 +299,13 @@ class _CYLAnimationViewState extends State<CYLAnimationView> {
     }
     if (widget.itemBorderColor != oldWidget.itemBorderColor) {
       channel.invokeMethod<void>('setItemBorderColor', widget.itemBorderColor?.toARGB32());
+    }
+    // Only a change is sent: sending on every build would replay the badge animation.
+    if (widget.badgeValue != oldWidget.badgeValue || !mapEquals(widget.badgeAttributes, oldWidget.badgeAttributes)) {
+      channel.invokeMethod<void>('setBadge', <String, Object?>{'value': widget.badgeValue, 'attributes': widget.badgeAttributes});
+    }
+    if (widget.reservesBadgeSpace != oldWidget.reservesBadgeSpace) {
+      channel.invokeMethod<void>('setReservesBadgeSpace', widget.reservesBadgeSpace);
     }
     if (widget.selected != oldWidget.selected) {
       channel.invokeMethod<void>('setSelected', widget.selected);

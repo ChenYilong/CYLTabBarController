@@ -152,4 +152,26 @@ void tintTests() {
       expect(down.first.value, isNull);
     });
   });
+
+  test('the badge: null is left out of the creation params, "" is a dot, the keys keep the iOS names', () {
+    expect(cylAnimationCreationParams(const CYLAnimationView(file: 'a.riv')).containsKey('badgeValue'), false);
+    expect(cylAnimationCreationParams(const CYLAnimationView(file: 'a.riv', badgeValue: '')) ['badgeValue'], '');
+    final params = cylAnimationCreationParams(const CYLAnimationView(
+      file: 'a.riv',
+      badgeValue: '3',
+      reservesBadgeSpace: true,
+      badgeAttributes: {CYLBadgeAttributeKey.animation: 'scale', CYLBadgeAttributeKey.color: '#FF3B30'},
+    ));
+    expect(params['badgeValue'], '3');
+    expect(params['reservesBadgeSpace'], true);
+    expect(params['badgeAttributes'], {'animation': 'scale', 'color': '#FF3B30'});
+    expect(
+      [
+        CYLBadgeAttributeKey.value, CYLBadgeAttributeKey.color, CYLBadgeAttributeKey.animation, CYLBadgeAttributeKey.radius,
+        CYLBadgeAttributeKey.centerOffset, CYLBadgeAttributeKey.textColor, CYLBadgeAttributeKey.font, CYLBadgeAttributeKey.borderColor,
+        CYLBadgeAttributeKey.borderWidth, CYLBadgeAttributeKey.maximumNumber, CYLBadgeAttributeKey.respectsReduceMotion,
+      ],
+      ['value', 'color', 'animation', 'radius', 'centerOffset', 'textColor', 'font', 'borderColor', 'borderWidth', 'maximumNumber', 'respectsReduceMotion'],
+    );
+  });
 }

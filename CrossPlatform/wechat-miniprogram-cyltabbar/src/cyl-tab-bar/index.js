@@ -3,12 +3,12 @@
  *      CYLTabBarController configuration (the same keys as the iOS and Android libraries, docs/Configuration-File.md)
  *      and renders the tabs, a raised plus button, badges, skins and the style types. Use it inside the mini program's
  *      `custom-tab-bar` (app.json: "tabBar": {"custom": true}). Events: `select`, `reselect`, `plustap`,
- *      `loginrequired`; methods: `cylSelectIdentifier`, `cylShowBadgeValue`, `cylShowBadgeDot`, `cylRemoveBadge`,
+ *      `loginrequired`; methods: `cylSelectIdentifier`, `cylShowBadgeValue`, `cylShowBadge`, `cylClearBadge`,
  *      `cylSetThemeIdentifier`, `cylSetHiddenIdentifiers`, `cylSetTabBarHidden`.
  * [CN] cyl-tab-bar：微信小程序版 CYLTabBarController。自定义 TabBar 组件，接收 CYLTabBarController 配置（与 iOS、Android
  *      库相同的键，见 docs/Configuration-File.md），渲染 Tab、凸起的 PlusButton、角标、皮肤与样式。在小程序的
  *      `custom-tab-bar` 中使用（app.json："tabBar": {"custom": true}）。事件：`select`、`reselect`、`plustap`、
- *      `loginrequired`；方法：`cylSelectIdentifier`、`cylShowBadgeValue`、`cylShowBadgeDot`、`cylRemoveBadge`、
+ *      `loginrequired`；方法：`cylSelectIdentifier`、`cylShowBadgeValue`、`cylShowBadge`、`cylClearBadge`、
  *      `cylSetThemeIdentifier`、`cylSetHiddenIdentifiers`、`cylSetTabBarHidden`。
  */
 const { cylReadConfiguration } = require('./cyl_configuration');
@@ -1220,7 +1220,7 @@ Component({
      * [EN] Shows a dot badge on the tab with this identifier.
      * [CN] 在该标识的 Tab 上显示小红点。
      */
-    cylShowBadgeDot(identifier) {
+    cylShowBadge(identifier) {
       this.cylShowBadgeValue(identifier, '•');
     },
 
@@ -1228,7 +1228,7 @@ Component({
      * [EN] Removes the badge of the tab with this identifier.
      * [CN] 移除该标识的 Tab 的角标。
      */
-    cylRemoveBadge(identifier) {
+    cylClearBadge(identifier) {
       const had = this.cylBadges[identifier] !== undefined && this.cylBadges[identifier] !== null;
       delete this.cylBadges[identifier];
       delete this.cylBadgeAttributes[identifier];

@@ -120,6 +120,19 @@ export interface NativeProps extends ViewProps {
    * The border color; unset for none.
    */
   itemBorderColor?: ColorValue;
+  /**
+   * The item's badge (docs/Animated-Item-Badge-CrossPlatform.md, phase 2), drawn by the native `CYLAnimatedItemView` itself. Codegen cannot
+   * say `string | null`, so the JavaScript side sends three internal props: `badgeValue` (the text; '' with `badgeHidden` false is a dot),
+   * `badgeHidden` (true, the default: no badge) and `badgeAttributesJSON` (the style keys of `CYLBadgeAttributeKey` as JSON; '' for none).
+   * Written statically, not run on a device yet.
+   */
+  badgeValue?: CodegenTypes.WithDefault<string, ''>;
+  badgeHidden?: CodegenTypes.WithDefault<boolean, true>;
+  badgeAttributesJSON?: CodegenTypes.WithDefault<string, ''>;
+  /**
+   * Reserves the badge's overhang when measuring (default false: the badge is not measured).
+   */
+  reservesBadgeSpace?: CodegenTypes.WithDefault<boolean, false>;
   onAnimationLoaded?: CodegenTypes.DirectEventHandler<AnimationEvent>;
   onAnimationFailed?: CodegenTypes.DirectEventHandler<AnimationEvent>;
   onAnimationEnd?: CodegenTypes.DirectEventHandler<AnimationEvent>;

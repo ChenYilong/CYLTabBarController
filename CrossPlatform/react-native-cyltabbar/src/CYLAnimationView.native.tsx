@@ -65,7 +65,53 @@ export type CYLAnimationViewHandle = {
  */
 export type CYLAnimationRenderingMode = 'automatic' | 'alwaysTemplate' | 'alwaysOriginal';
 
+/**
+ * [EN] The three internal props the Codegen spec carries for a badge: `null` / `undefined` is no badge (hidden), `""` a dot, any other
+ *      string the text; the style keys (`CYLBadgeAttributeKey`) travel as JSON. Never `""` for no badge: `""` is a dot.
+ * [CN] Codegen 规范为角标携带的三个内部 prop：`null` / `undefined` 表示无角标（隐藏），`""` 为红点，其他字符串为文字；样式键
+ *      （`CYLBadgeAttributeKey`）以 JSON 传递。不能用 `""` 表示无角标：`""` 是红点。
+ */
+export function cylBadgeNativeProps(badgeValue?: string | null, badgeAttributes?: CYLBadgeAttributes | null) {
+  return {
+    badgeValue: badgeValue ?? '',
+    badgeHidden: badgeValue === null || badgeValue === undefined,
+    badgeAttributesJSON: badgeAttributes ? JSON.stringify(badgeAttributes) : '',
+  };
+}
+
+/**
+ * [EN] The style keys of a badge, the same strings as iOS' `CYLBadgeAttributeKey` and the host view's `badgeAttributes`: `value`, `color`,
+ *      `animation` (one of the 10 names), `radius`, `centerOffset`, `textColor`, `font`, `borderColor`, `borderWidth`, `maximumNumber`,
+ *      `respectsReduceMotion`.
+ * [CN] 角标的样式键，与 iOS 的 `CYLBadgeAttributeKey` 和宿主视图的 `badgeAttributes` 相同的字符串。
+ */
+export const CYLBadgeAttributeKey = {
+  value: 'value',
+  color: 'color',
+  animation: 'animation',
+  radius: 'radius',
+  centerOffset: 'centerOffset',
+  textColor: 'textColor',
+  font: 'font',
+  borderColor: 'borderColor',
+  borderWidth: 'borderWidth',
+  maximumNumber: 'maximumNumber',
+  respectsReduceMotion: 'respectsReduceMotion',
+} as const;
+
+/** The values are strings or numbers (`#RRGGBB` colors, `{x, y}` offsets); unknown keys and types are ignored by the native side. */
+export type CYLBadgeAttributes = Record<string, string | number | boolean | null | undefined>;
+
 export type CYLAnimationViewProps = ViewProps & {
+  /**
+   * The badge: `null` / `undefined` (default) none, `""` a dot, otherwise the text (a number above `maximumNumber` shows "99+").
+   * Drawn by the native item, never by JavaScript. Written statically, not run on a device yet.
+   */
+  badgeValue?: string | null;
+  /** The badge's style, the keys of `CYLBadgeAttributeKey`. */
+  badgeAttributes?: CYLBadgeAttributes;
+  /** Reserves the badge's overhang when measuring (default false: the badge is not measured). */
+  reservesBadgeSpace?: boolean;
   /**
    * A file name in the app (iOS main bundle, Android assets), a path or a URL: `.riv`, `.json` (Lottie), `.pag`, `.gif`, `.svga`.
    */
@@ -158,6 +204,9 @@ export function CYLAnimationView({
   animationTint,
   animationDarkTint,
   animationRenderingMode,
+  badgeValue,
+  badgeAttributes,
+  reservesBadgeSpace,
   ref,
   ...rest
 }: CYLAnimationViewProps) {
@@ -180,6 +229,8 @@ export function CYLAnimationView({
       animationTint={animationTint || undefined}
       animationDarkTint={animationDarkTint || undefined}
       animationRenderingMode={animationRenderingMode ?? 'automatic'}
+      {...cylBadgeNativeProps(badgeValue, badgeAttributes)}
+      reservesBadgeSpace={reservesBadgeSpace ?? false}
       onAnimationLoaded={onAnimationLoaded ? () => onAnimationLoaded() : undefined}
       onAnimationFailed={onAnimationFailed ? () => onAnimationFailed() : undefined}
       onAnimationEnd={onAnimationEnd ? () => onAnimationEnd() : undefined}

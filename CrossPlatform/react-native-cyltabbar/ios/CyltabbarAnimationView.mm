@@ -53,6 +53,8 @@ using namespace facebook::react;
 
 @implementation CyltabbarAnimationView {
   NSString *_source;
+  NSString *_badgeValue;
+  NSString *_badgeAttributesJSON;
   BOOL _playing;
 #if CYL_RN_ANIMATION_AVAILABLE
   CYLAnimatedItemView *_item;
@@ -250,6 +252,24 @@ static NSURL *CYLRNAnimationURL(NSString *source)
   _item.itemContentHorizontalInsetNumber = newProps.itemContentHorizontalInset >= 0 ? @(newProps.itemContentHorizontalInset) : nil;
   _item.itemBorderWidth = newProps.itemBorderWidth;
   _item.itemBorderColor = RCTUIColorFromSharedColor(newProps.itemBorderColor);
+  // [EN] The badge (docs/Animated-Item-Badge-CrossPlatform.md, phase 2): the item draws it, nothing here does. `badgeHidden` is no badge,
+  //      `badgeValue` "" a dot; the style keys arrive as JSON and go to the item as a dictionary. Set only when changed, so the badge
+  //      animation does not replay on every update. Written statically, not compiled yet.
+  // [CN] 角标（docs/Animated-Item-Badge-CrossPlatform.md，阶段 2）：由条目绘制，这里不画。`badgeHidden` 表示无角标，`badgeValue` 为 "" 是红点；
+  //      样式键以 JSON 传入，转成字典交给条目。只在变化时设置，避免每次更新都重播角标动画。静态编写，尚未编译。
+  NSString *badgeValue = newProps.badgeHidden ? nil : [NSString stringWithUTF8String:newProps.badgeValue.c_str()];
+  if (!((badgeValue == nil && _badgeValue == nil) || [badgeValue isEqualToString:_badgeValue ?: @"\x01"])) {
+    _badgeValue = badgeValue;
+    _item.badgeValue = badgeValue;
+  }
+  NSString *badgeAttributesJSON = [NSString stringWithUTF8String:newProps.badgeAttributesJSON.c_str()];
+  if (![badgeAttributesJSON isEqualToString:_badgeAttributesJSON ?: @""]) {
+    _badgeAttributesJSON = badgeAttributesJSON;
+    NSData *data = [badgeAttributesJSON dataUsingEncoding:NSUTF8StringEncoding];
+    id parsed = data.length > 0 ? [NSJSONSerialization JSONObjectWithData:data options:0 error:nil] : nil;
+    _item.badgeAttributes = [parsed isKindOfClass:[NSDictionary class]] ? parsed : nil;
+  }
+  _item.reservesBadgeSpace = newProps.reservesBadgeSpace;
   _item.selected = newProps.selected;
   const BOOL selectionChanged = newProps.selected != _selected;
   _selected = newProps.selected;

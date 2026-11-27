@@ -129,8 +129,8 @@
 | `loginrequired` | 事件 / event | ✅ 10（route 仍为 / stays `pages/home/index`） |
 | `cylSelectIdentifier` | 方法 / method | ✅ 测试 / test（同 `selectedIdentifier` / as `selectedIdentifier`） |
 | `cylShowBadgeValue` | 方法 / method | ✅ 03（3）、09（99+） |
-| `cylShowBadgeDot` | 方法 / method | ✅ 03 |
-| `cylRemoveBadge` | 方法 / method | ✅ 06 |
+| `cylShowBadge` | 方法 / method | ✅ 03 |
+| `cylClearBadge` | 方法 / method | ✅ 06 |
 | `cylSetThemeIdentifier` | 方法 / method | ✅ 04、09 |
 | `cylThemeIdentifiers` | 方法 / method | ✅ Me 页面的皮肤列表 / the skin list of the Me page |
 | `cylPlayLottie` | 方法 / method | ✅ evaluate：第 0 帧 → 200 ms 后第 5 帧 → 停在第 29 帧 / frame 0 → frame 5 after 200 ms → stops on frame 29 |

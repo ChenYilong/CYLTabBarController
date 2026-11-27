@@ -1,5 +1,5 @@
 @import "./cyl_tap_animations.wxss";
-@import "./cyl_badge_animations.wxss";
+@import "../cyl-badge/cyl_badge_animations.wxss";
 
 /* [EN] Classic bar (default, system): the system tab bar's 48 px (or tabBarHeight, through --cyl-bar-height) with a hairline on top, above the home indicator. [CN] 经典 TabBar（default、system）：系统 tabBar 的 48 px（或 tabBarHeight，经由 --cyl-bar-height）、顶部一条细线，位于 Home 指示条之上。 */
 .cyl-tab-bar {
