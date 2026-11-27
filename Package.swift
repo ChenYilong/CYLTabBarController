@@ -154,6 +154,8 @@ let package = Package(
             cSettings: [
                 .headerSearchPath("."),
                 .headerSearchPath("CYLUtils"),
+                // [EN] The Core interface header imports `CYLBadgeSwiftInterface.h` from here (docs/Animated-Item-Badge.md, step 3). [CN] Core 的接口头文件从这里导入 `CYLBadgeSwiftInterface.h`（docs/Animated-Item-Badge.md，第 3 步）。
+                .headerSearchPath("CYLBadgeView"),
                 .headerSearchPath("CYLTabBarItemAnimation"),
                 .headerSearchPath("CYLAnimatedItem"),
                 .headerSearchPath("CYLTabBarItemAnimation/GIF"),
