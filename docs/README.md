@@ -20,6 +20,7 @@
 | [Android 版 CYLTabBarController](Android-Library.md) | [CYLTabBarController for Android](Android-Library.md) |
 | [Android 液态玻璃](Android-Liquid-Glass.md) | [Android Liquid Glass](Android-Liquid-Glass.md) |
 | [Android 库与 QMUI_Android、XUI 的 Tab 对比](Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's and XUI's tabs](Android-QMUI-Comparison.md) |
+| [动效 item 角标：CYLAnimatedItemView 直接显示角标（API 设计）](Animated-Item-Badge.md) | [Animated item badges: CYLAnimatedItemView shows its own badge (API design)](Animated-Item-Badge.md) |
 | [动效 icon + title 共用组件：CYLAnimatedItem](Animated-Item.md) | [The shared animated icon + title component: CYLAnimatedItem](Animated-Item.md) |
 | [角标调试](Badge-Debugging.md) | [Badge debugging](Badge-Debugging.md) |
 | [中英文双语文档](Bilingual-Documentation.md) | [Bilingual Documentation](Bilingual-Documentation.md) |
@@ -126,6 +127,7 @@ docs/
 ├── Android-Library.md
 ├── Android-Liquid-Glass.md
 ├── Android-QMUI-Comparison.md
+├── Animated-Item-Badge.md
 ├── Animated-Item.md
 ├── Badge-Debugging.md
 ├── Bilingual-Documentation.md
@@ -453,6 +455,7 @@ docs/
 │   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-flat-selected-icon-tint-light-9d2b9e7b-2026-11-26-2122.png
 │   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-normal-title-dark-d5f1b436-2026-11-27.png
 │   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-tint-optin-9d2b9e7b-2026-11-26-2240.png
+│   ├── ios-animated-item-badge-tags-before-after-6baaf74e.png
 │   ├── ios-animated-item-engine-api.png
 │   ├── ios-badge-breathe-not-under-icon.png
 │   ├── ios-badges-follow-swapped-animation-skin.png
