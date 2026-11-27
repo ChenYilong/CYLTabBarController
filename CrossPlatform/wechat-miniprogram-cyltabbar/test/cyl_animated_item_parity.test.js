@@ -343,19 +343,19 @@ test('component: itemHighlightedBackgroundColor shows while pressed and enabled 
   global.wx = { getAppBaseInfo: () => ({ theme: 'light' }) }
   try {
     const plain = cylMount()
-    plain.cyl_onTouchStart({ touches: [{ clientX: 0, clientY: 0 }] })
+    plain.cylOnTouchStart({ touches: [{ clientX: 0, clientY: 0 }] })
     assert.equal(plain.data.itemPressed, false)
     const item = cylMount({ itemHighlightedBackgroundColor: '#336699' })
     assert.equal(item.data.itemBackgroundCss.includes('#336699'), false)
-    item.cyl_onTouchStart({ touches: [{ clientX: 0, clientY: 0 }] })
+    item.cylOnTouchStart({ touches: [{ clientX: 0, clientY: 0 }] })
     assert.ok(item.data.itemBackgroundCss.includes('background-color:#336699;'))
-    item.cyl_onTouchEnd({ changedTouches: [{ clientX: 0, clientY: 0 }] })
+    item.cylOnTouchEnd({ changedTouches: [{ clientX: 0, clientY: 0 }] })
     assert.equal(item.data.itemBackgroundCss.includes('#336699'), false)
-    item.cyl_onTouchStart({ touches: [{ clientX: 0, clientY: 0 }] })
-    item.cyl_onTouchCancel()
+    item.cylOnTouchStart({ touches: [{ clientX: 0, clientY: 0 }] })
+    item.cylOnTouchCancel()
     assert.equal(item.data.itemBackgroundCss.includes('#336699'), false)
     item.set({ enabled: false })
-    item.cyl_onTouchStart({ touches: [{ clientX: 0, clientY: 0 }] })
+    item.cylOnTouchStart({ touches: [{ clientX: 0, clientY: 0 }] })
     assert.equal(item.data.itemBackgroundCss.includes('#336699'), false)
   } finally {
     delete global.wx

@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -94,7 +95,10 @@ interface CYLPlusButtonSubclassing {
  *      大于边界的可点击区域（#91）、像任何视图一样的角标，以及选中态（自己的页面、`selectedContentImage` / `selectedContentView`）。
  *      子类化并实现 `CYLPlusButtonSubclassing`，然后注册：`CYLPlusButton.registerPlusButton(MyPlusButton.Provider)`。
  */
-open class CYLPlusButton(context: Context) : FrameLayout(context) {
+open class CYLPlusButton(context: Context) : FrameLayout(context), CYLBadgeHosting {
+    /** [EN] The button itself hosts its badge. [CN] 按钮自身承载其角标。 */
+    override val cylBadgeAnchorView: ViewGroup get() = this
+
 
     /**
      * [EN] The image (`imageView`) and the title (`titleLabel`), like `UIButton`. [CN] 图片与标题，与 `UIButton` 相同。

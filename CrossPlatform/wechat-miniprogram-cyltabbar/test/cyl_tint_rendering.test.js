@@ -204,10 +204,10 @@ function runtime() {
       },
       ...definition.methods,
     }
-    bar.cyl_syncLottie = () => {}
-    bar.cyl_playTapAnimation = () => {}
-    bar.cyl_playTabButtonTapFeedback = () => {}
-    bar.cyl_recordTap = () => {}
+    bar.cylSyncLottie = () => {}
+    bar.cylPlayTapAnimation = () => {}
+    bar.cylPlayTabButtonTapFeedback = () => {}
+    bar.cylRecordTap = () => {}
     bar.cylLongPressed = false
     definition.lifetimes.attached.call(bar)
     return bar

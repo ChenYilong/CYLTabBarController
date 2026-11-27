@@ -22,8 +22,8 @@ function cylMount(definition, model) {
   const bar = { cylModel: model, sent: [], data: { selectedIdentifier: 'home', loggedIn: true, cylSlots: [{ key: 'home' }, { key: 'message' }] } }
   Object.assign(bar, definition.methods)
   bar.setData = (patch, callback) => { bar.sent.push(patch); Object.assign(bar.data, patch); if (callback) callback() }
-  bar.cyl_render = () => {}
-  bar.cyl_playTabButtonTapFeedback = () => {}
+  bar.cylRender = () => {}
+  bar.cylPlayTabButtonTapFeedback = () => {}
   bar.triggerEvent = () => {}
   bar.cylLongPressed = false
   definition.lifetimes.attached.call(bar)
@@ -57,7 +57,7 @@ test('detached takes the bar out of the live bars: a tap on another bar no longe
   const shown = cylMount(definition, model)
   const detached = cylMount(definition, model)
   definition.lifetimes.detached.call(detached)
-  shown.cyl_onTap({ type: 'tap', currentTarget: { dataset: { key: 'message' } } })
+  shown.cylOnTap({ type: 'tap', currentTarget: { dataset: { key: 'message' } } })
   assert.equal(detached.data.selectedIdentifier, 'home')
   definition.lifetimes.detached.call(shown)
   delete global.wx
@@ -75,8 +75,8 @@ test('detached clears the tap animation timer; a new timer replaces the keyed cl
   global.setTimeout = () => ++next
   global.clearTimeout = (handle) => { cleared.push(handle) }
   try {
-    bar.cyl_playTapAnimation('home')
-    bar.cyl_playTapAnimation('home')
+    bar.cylPlayTapAnimation('home')
+    bar.cylPlayTapAnimation('home')
     assert.equal(bar.cylAnimationTimer, 102)
     cleared.length = 0
     definition.lifetimes.detached.call(bar)

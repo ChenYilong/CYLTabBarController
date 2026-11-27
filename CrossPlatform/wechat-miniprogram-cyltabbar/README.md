@@ -59,9 +59,9 @@ package it installed.
 
 Properties: `tabBarHeight` (px; the default, 0, is 48 px, the WeChat native tab bar's height; not used by Liquid Glass), `itemStyle` (CYLTabBarItemStyle `flat` / `liquidGlass`), `glassLensStyle` (CYLGlassLensStyle `regular`, the default "liquid", / `skeuomorphic`, "skeuomorphic liquid"; Liquid Glass only), `animationSpeed`, `animationLoop`, `configuration`, `strings`, `symbolsByTheme`, `imageBasePath`, `animationBasePath`, `selectedIdentifier`,
 `loggedIn`, `appVersion`. Events: `select`, `reselect`, `plustap`, `loginrequired` (detail: `index`, `identifier`,
-`pageIdentifier`, `pageParameters`, `context`, `isPlusButton`). Methods: `cyl_selectIdentifier`, `cyl_showBadgeValue`,
-`cyl_showBadgeDot`, `cyl_removeBadge`, `cyl_setThemeIdentifier`, `cyl_themeIdentifiers`, `cyl_playLottie`,
-`cyl_selectAdjacent`, `cyl_setItemStyle`, `cyl_setGlassLensStyle`, `cyl_playAll`, `cyl_setAnimationSpeed`, `cyl_setAnimationLoop`, `cyl_setHiddenIdentifiers` (property `hiddenIdentifiers`: tabs or the plus button left out of the bar, e.g. by user role), `cyl_setTabBarHidden` (property `tabBarHidden`: hides the bar of one page). Page behavior for swiping between tabs: `cyl-tabbar-miniprogram/cyl-tab-bar/cyl_swipe_behavior`.
+`pageIdentifier`, `pageParameters`, `context`, `isPlusButton`). Methods: `cylSelectIdentifier`, `cylShowBadgeValue`,
+`cylShowBadgeDot`, `cylRemoveBadge`, `cylSetThemeIdentifier`, `cylThemeIdentifiers`, `cylPlayLottie`,
+`cylSelectAdjacent`, `cylSetItemStyle`, `cylSetGlassLensStyle`, `cyl_playAll`, `cylSetAnimationSpeed`, `cylSetAnimationLoop`, `cylSetHiddenIdentifiers` (property `hiddenIdentifiers`: tabs or the plus button left out of the bar, e.g. by user role), `cylSetTabBarHidden` (property `tabBarHidden`: hides the bar of one page). Page behavior for swiping between tabs: `cyl-tabbar-miniprogram/cyl-tab-bar/cyl_swipe_behavior`.
 
 ## The icon + title component: `cyl-animated-item`
 
@@ -113,10 +113,10 @@ The same contract HarmonyOS defines (`CrossPlatform/harmonyos-cyltabbar/cylanima
 The same as iOS (`CYLTabBar` / `CYLAnimatedItemView`): **a switch stops and resets every other tab first, then the selected tab
 plays.** After any switch exactly one tab is selected (its `selected` comes from the one `selectedIdentifier`), and every other tab is
 stopped on its unselected look (`restingProgress` frame or static image), also when the switch comes mid-animation or two taps arrive
-quickly. `cyl-tab-bar` does it in `cyl_syncLottie` (`cyl_stopOtherAnimations`, then `cyl_playLottie`); `cyl-animated-item` does it for
-itself when `selected` turns false (`cyl_halt`: cancel a play still waiting for the file, pause the engine, then the resting frame).
-Exception: a tab with `CYLTabBarLottieLoopsWhenUnselected` keeps looping. Engines must stop on `cyl_pause()` and cancel a pending
-`cyl_playFromStart`; a seek alone (`cyl_setProgress`) is not a stop. Tests: `test/cyl_tab_switch.test.js`.
+quickly. `cyl-tab-bar` does it in `cylSyncLottie` (`cylStopOtherAnimations`, then `cylPlayLottie`); `cyl-animated-item` does it for
+itself when `selected` turns false (`cylHalt`: cancel a play still waiting for the file, pause the engine, then the resting frame).
+Exception: a tab with `CYLTabBarLottieLoopsWhenUnselected` keeps looping. Engines must stop on `cylPause()` and cancel a pending
+`cylPlayFromStart`; a seek alone (`cylSetProgress`) is not a stop. Tests: `test/cyl_tab_switch.test.js`.
 
 ## Layout
 

@@ -33,8 +33,8 @@ function cylMountStack(properties) {
 
 function cylTap(stack, index, timeStamp) {
   // [EN] A tap on an item bubbles from its wrapper to the container. [CN] 点击条目时事件从其包装视图冒泡到容器。
-  if (index >= 0) stack.cyl_onItemTap({ currentTarget: { dataset: { index } }, timeStamp })
-  stack.cyl_onBackgroundTap({ timeStamp })
+  if (index >= 0) stack.cylOnItemTap({ currentTarget: { dataset: { index } }, timeStamp })
+  stack.cylOnBackgroundTap({ timeStamp })
 }
 
 test('items keep their order and every element is a vertical cyl-animated-item model', () => {

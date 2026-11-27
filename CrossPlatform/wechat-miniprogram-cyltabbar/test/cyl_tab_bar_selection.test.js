@@ -25,24 +25,24 @@ function cylBar(configuration, properties) {
     data, events, cylBadges: {}, cylCovers: {}, cylBadgeAttributes: {},
     setData(patch, callback) {
       Object.assign(this.data, patch)
-      if (observed.some((key) => key in patch)) this.cyl_render()
+      if (observed.some((key) => key in patch)) this.cylRender()
       if (callback) callback()
     },
     selectComponent: () => null,
     triggerEvent(name, detail) { events.push({ name, detail }) },
     ...definition.methods,
   }
-  bar.cyl_syncLottie = () => {}
-  bar.cyl_playTapAnimation = () => {}
-  bar.cyl_playTabButtonTapFeedback = () => {}
-  bar.cyl_recordTap = () => {}
+  bar.cylSyncLottie = () => {}
+  bar.cylPlayTapAnimation = () => {}
+  bar.cylPlayTabButtonTapFeedback = () => {}
+  bar.cylRecordTap = () => {}
   bar.cylLongPressed = false
   definition.lifetimes.attached.call(bar)
   return bar
 }
 
 const selected = (bar) => bar.data.cylSlots.map((slot) => Boolean(slot.selected))
-const tap = (bar, position) => bar.cyl_onTap({ type: 'tap', currentTarget: { dataset: { key: bar.data.cylSlots[position].key } } })
+const tap = (bar, position) => bar.cylOnTap({ type: 'tap', currentTarget: { dataset: { key: bar.data.cylSlots[position].key } } })
 
 test('an icon-only bar (no titles, no identifiers) selects the tapped tab, not the first one', () => {
   const bar = cylBar({ CYLTabBarControllerTabBarItemsAttributes: [
@@ -65,7 +65,7 @@ test('two tabs with the same title are told apart by position', () => {
     { CYLTabBarItemTitle: 'Home', CYLTabBarItemImage: 'b.png' } ] })
   tap(bar, 1)
   assert.deepEqual(selected(bar), [false, true])
-  bar.cyl_selectIndex(0)
+  bar.cylSelectIndex(0)
   assert.deepEqual(selected(bar), [true, false], 'selectedIndex selects by position')
   bar.setData({ selectedIndex: 1 })
   assert.deepEqual(selected(bar), [false, true])

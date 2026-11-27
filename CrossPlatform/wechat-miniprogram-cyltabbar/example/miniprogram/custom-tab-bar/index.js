@@ -73,21 +73,21 @@ Component({
         // [EN] A skin with colors and a standardAppearance theme are skins the configuration selects (utils/cyl_demo_skins.js,
         //      utils/cyl_demo_updates.js). [CN] 带颜色的皮肤与 standardAppearance 主题都是配置所选的皮肤。
         const configured = String(this.data.configuration.CYLTabBarControllerThemeIdentifier || '').includes(':');
-        tabBar.cyl_setThemeIdentifier(configured ? '' : state.themeIdentifier);
-        tabBar.cyl_setTabBarHidden(Boolean(state.tabBarHidden));
+        tabBar.cylSetThemeIdentifier(configured ? '' : state.themeIdentifier);
+        tabBar.cylSetTabBarHidden(Boolean(state.tabBarHidden));
         const attributes = this.cyl_badgeAttributesInSkin(state.badgeAttributes || {}, state.badges, skin);
         Object.keys(state.badges).forEach((identifier) => {
           const value = state.badges[identifier];
           if (value === '' || value === null || value === undefined) {
-            tabBar.cyl_removeBadge(identifier);
+            tabBar.cylRemoveBadge(identifier);
           } else {
-            tabBar.cyl_showBadgeValue(identifier, value, attributes[identifier]);
+            tabBar.cylShowBadgeValue(identifier, value, attributes[identifier]);
           }
         });
         const covers = state.covers || {};
         Object.keys(covers).forEach((identifier) => {
           const cover = covers[identifier];
-          tabBar.cyl_setCoverImage(identifier, cover?.image, cover?.size);
+          tabBar.cylSetCoverImage(identifier, cover?.image, cover?.size);
         });
       });
     },
@@ -112,9 +112,9 @@ Component({
     },
 
     cyl_isLiquidGlass() {
-      // [EN] The bar's resolved style first (it also knows a style set with cyl_setItemStyle and a numeric style type): the example's own reading missed
+      // [EN] The bar's resolved style first (it also knows a style set with cylSetItemStyle and a numeric style type): the example's own reading missed
       //      them, so on Liquid Glass a tap cleared the badge instead of turning it into a dot (DevTools UI run on 2b99043f, launch sequence, item 55).
-      // [CN] 先取 TabBar 解析后的样式（它也知道 cyl_setItemStyle 设置的样式与数字样式类型）：示例自己的判断漏掉了它们，因此液态玻璃下点击清除了角标而不是变成红点
+      // [CN] 先取 TabBar 解析后的样式（它也知道 cylSetItemStyle 设置的样式与数字样式类型）：示例自己的判断漏掉了它们，因此液态玻璃下点击清除了角标而不是变成红点
       //      （2b99043f 上的 DevTools UI 运行，启动流程，第 55 项）。
       const bar = this.selectComponent('#cyl-tab-bar');
       if (bar && bar.data && bar.data.cylStyleType) {
@@ -131,10 +131,10 @@ Component({
     cyl_syncWithRoute(route) {
       // [EN] The route is converted to the tab's position inside the bar (as iOS selects by index), not matched by
       //      identifier or title. Each tab page has its own tab bar, so the page that appears also plays the selected
-      //      Lottie icon (cyl_selectPage does both). A page shown before this bar's cyl-tab-bar has its configuration
+      //      Lottie icon (cylSelectPage does both). A page shown before this bar's cyl-tab-bar has its configuration
       //      (the first visit) finds no tab yet: the route waits in cylPendingPage until cyl_apply has set it.
       // [CN] 路由被转换为 Tab 在 TabBar 中的位置（与 iOS 按 index 选中一致），而不是按标识或标题匹配。每个 Tab 页面都有自己的
-      //      TabBar，因此出现的页面同时播放选中 Tab 的 Lottie 图标（cyl_selectPage 两件事都做）。页面在本 TabBar 的 cyl-tab-bar
+      //      TabBar，因此出现的页面同时播放选中 Tab 的 Lottie 图标（cylSelectPage 两件事都做）。页面在本 TabBar 的 cyl-tab-bar
       //      拿到配置之前显示（首次访问）时还找不到 Tab：路由保存在 cylPendingPage，等 cyl_apply 设置配置后再应用。
       const prefix = 'pages/';
       const suffix = '/index';
@@ -150,7 +150,7 @@ Component({
      */
     cyl_applyPendingPage() {
       const tabBar = this.cylPendingPage ? this.selectComponent('#cyl-tab-bar') : null;
-      if (tabBar?.cyl_selectPage(this.cylPendingPage)) {
+      if (tabBar?.cylSelectPage(this.cylPendingPage)) {
         this.cylPendingPage = '';
       }
     },
@@ -163,17 +163,17 @@ Component({
      */
     cyl_swipe(step) {
       const tabBar = this.selectComponent('#cyl-tab-bar');
-      return tabBar ? tabBar.cyl_selectAdjacent(step) : false;
+      return tabBar ? tabBar.cylSelectAdjacent(step) : false;
     },
 
     /**
-     * [EN] Hides or shows this page's bar (cyl-tab-bar cyl_setTabBarHidden, iOS -setTabBarHidden:).
-     * [CN] 隐藏或显示本页面的 TabBar（cyl-tab-bar 的 cyl_setTabBarHidden，iOS -setTabBarHidden:）。
+     * [EN] Hides or shows this page's bar (cyl-tab-bar cylSetTabBarHidden, iOS -setTabBarHidden:).
+     * [CN] 隐藏或显示本页面的 TabBar（cyl-tab-bar 的 cylSetTabBarHidden，iOS -setTabBarHidden:）。
      */
-    cyl_setTabBarHidden(hidden) {
+    cylSetTabBarHidden(hidden) {
       const tabBar = this.selectComponent('#cyl-tab-bar');
       if (tabBar) {
-        tabBar.cyl_setTabBarHidden(hidden);
+        tabBar.cylSetTabBarHidden(hidden);
       }
     },
 
@@ -233,7 +233,7 @@ Component({
      * [EN] The Home switch "Long press on tabs" (issue #535): a long press shows the identifier of the tab or plus button.
      * [CN] 首页「长按 Tab」开关（issue #535）：长按显示 Tab 或 PlusButton 的标识。
      */
-    cyl_onLongPress(event) {
+    cylOnLongPress(event) {
       if (getApp().globalData.cylTabBarState.longPressEnabled && event.detail) {
         wx.showToast({ title: String(event.detail.identifier), icon: 'none' });
       }

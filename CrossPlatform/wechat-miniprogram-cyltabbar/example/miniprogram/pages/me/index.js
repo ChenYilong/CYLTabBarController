@@ -81,11 +81,11 @@ Component({
         animationAvailable: cylInstalledAnimation() === 'lottie' || cylAvailableAnimationFiles().length > 0,
       });
     },
-    cyl_update(change) {
+    cylUpdate(change) {
       getApp().cyl_updateTabBarState(change);
     },
     cyl_override(change) {
-      this.cyl_update({ overrides: { ...getApp().globalData.cylTabBarState.overrides, ...change } });
+      this.cylUpdate({ overrides: { ...getApp().globalData.cylTabBarState.overrides, ...change } });
     },
     cyl_badge(event) {
       const value = event.currentTarget.dataset.value;
@@ -97,17 +97,17 @@ Component({
       } else {
         badges[event.currentTarget.dataset.identifier] = value;
       }
-      this.cyl_update({ badges });
+      this.cylUpdate({ badges });
     },
     // [EN] CYLMineViewController: shows the row number as Me's badge, then pushes a red page with the pop gesture off.
     // [CN] CYLMineViewController：把行号显示为「我的」的角标，然后 push 一个关闭返回手势的红色页面。
     cyl_onFeedRow(event) {
       const badges = { ...getApp().globalData.cylTabBarState.badges, me: String(event.currentTarget.dataset.index) };
-      this.cyl_update({ badges });
+      this.cylUpdate({ badges });
       wx.navigateTo({ url: `/pages/pushed/locked?color=red&note=${encodeURIComponent('Pushed by Me: the pop gesture is off')}` });
     },
     cyl_skin(event) {
-      this.cyl_update({ themeIdentifier: event.currentTarget.dataset.value });
+      this.cylUpdate({ themeIdentifier: event.currentTarget.dataset.value });
     },
     // [EN] The tab bar of this page, whose icons the playback controls play through cyl_player() (utils/cyl_item_players.js).
     // [CN] 本页面的 TabBar，播放控件通过 cyl_player() 播放其图标（utils/cyl_item_players.js）。
@@ -126,18 +126,18 @@ Component({
       const speed = Number(event.detail.value);
       if (speed !== getApp().globalData.cylTabBarState.animationSpeed) {
         cylSetSpeed(this.cyl_tabBar(), speed);
-        this.cyl_update({ animationSpeed: speed });
+        this.cylUpdate({ animationSpeed: speed });
       }
     },
     cyl_loop(event) {
       cylSetLoops(this.cyl_tabBar(), event.detail.value);
-      this.cyl_update({ animationLoop: event.detail.value });
+      this.cylUpdate({ animationLoop: event.detail.value });
     },
     cyl_itemStyle(event) {
-      this.cyl_update({ itemStyle: event.currentTarget.dataset.value });
+      this.cylUpdate({ itemStyle: event.currentTarget.dataset.value });
     },
     cyl_glassLensStyle(event) {
-      this.cyl_update({ glassLensStyle: event.currentTarget.dataset.value });
+      this.cylUpdate({ glassLensStyle: event.currentTarget.dataset.value });
     },
     cyl_style(event) {
       this.cyl_override({ CYLTabBarControllerStyleType: event.currentTarget.dataset.value });
@@ -166,7 +166,7 @@ Component({
       if (icons === 'rive' && (!state.themeIdentifier || state.themeIdentifier === 'light')) {
         change.themeIdentifier = 'dark';
       }
-      this.cyl_update(change);
+      this.cylUpdate(change);
     },
     cyl_swipeOption(event) {
       this.cyl_override({ CYLTabBarControllerSwipeToSwitchTab: event.detail.value });
@@ -176,7 +176,7 @@ Component({
     },
     cyl_loginRequired(event) {
       this.cyl_override({ CYLTabBarControllerLoginRequiredTabBarItemIdentifiers: event.detail.value ? ['CYLMineViewController'] : [] });
-      this.cyl_update({ loggedIn: !event.detail.value });
+      this.cylUpdate({ loggedIn: !event.detail.value });
     },
   },
 });

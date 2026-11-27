@@ -83,7 +83,7 @@ async function cylTap(key) {
     setTimeout(() => {
       const pages = getCurrentPages();
       pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar')
-        .cyl_onTap({ currentTarget: { dataset: { key: identifier } } });
+        .cylOnTap({ currentTarget: { dataset: { key: identifier } } });
     }, 0);
   }, key);
   await cylSleep(CYL_SETTLE_MS * 2);
@@ -215,8 +215,8 @@ test('the playback controls reach the bar: speed, loop, Play all', async () => {
     setTimeout(() => {
       const pages = getCurrentPages();
       const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
-      bar.cyl_setAnimationSpeed(2);
-      bar.cyl_setAnimationLoop(true);
+      bar.cylSetAnimationSpeed(2);
+      bar.cylSetAnimationLoop(true);
       bar.cyl_playAll();
       setTimeout(() => resolve({
         speed: bar.data.animationSpeed,
@@ -234,8 +234,8 @@ test('the playback controls reach the bar: speed, loop, Play all', async () => {
   const reset = await miniProgram.evaluate(() => {
     const pages = getCurrentPages();
     const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
-    bar.cyl_setAnimationSpeed(1);
-    bar.cyl_setAnimationLoop(false);
+    bar.cylSetAnimationSpeed(1);
+    bar.cylSetAnimationLoop(false);
     return { speed: bar.data.animationSpeed, loop: bar.data.animationLoop };
   });
   assert.deepEqual(reset, { speed: 1, loop: false });
@@ -361,7 +361,7 @@ test('looping icons stay one layer and keep playing during a page scroll (WeChat
   await miniProgram.evaluate(() => {
     const pages = getCurrentPages();
     const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
-    bar.cyl_setAnimationLoop(true);
+    bar.cylSetAnimationLoop(true);
     bar.cyl_playAll();
   });
   try {
@@ -375,7 +375,7 @@ test('looping icons stay one layer and keep playing during a page scroll (WeChat
   } finally {
     await miniProgram.evaluate(() => {
       const pages = getCurrentPages();
-      pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar').cyl_setAnimationLoop(false);
+      pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar').cylSetAnimationLoop(false);
     });
     await cylSleep(2500);
     await miniProgram.pageScrollTo(0);
@@ -402,7 +402,7 @@ test('hiddenIdentifiers leaves a tab out of every bar, and tabBarHidden hides on
     const cylBarHeight = (hidden) => miniProgram.evaluate((value) => new Promise((resolve) => {
       const pages = getCurrentPages();
       const tabBar = pages[pages.length - 1].getTabBar();
-      tabBar.cyl_setTabBarHidden(value);
+      tabBar.cylSetTabBarHidden(value);
       setTimeout(() => {
         tabBar.selectComponent('#cyl-tab-bar').createSelectorQuery().select('.cyl-tab-bar').boundingClientRect()
           .exec((result) => resolve(result[0] ? result[0].height : -1));
@@ -989,7 +989,7 @@ test('the tap animation and the tap sound and haptics rows cycle as the Objectiv
       // [EN] Played again once the new configuration is in the bar. [CN] 新配置进入 TabBar 后再播放一次。
       await miniProgram.evaluate(() => {
         const pages = getCurrentPages();
-        pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar').cyl_playSelectedTapAnimation();
+        pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar').cylPlaySelectedTapAnimation();
       });
       await cylSleep(200);
       assert.equal((await model()).particles, 10, 'fireworks');

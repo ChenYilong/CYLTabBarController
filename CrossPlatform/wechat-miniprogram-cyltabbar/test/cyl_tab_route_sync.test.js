@@ -37,7 +37,7 @@ test('a route synced before the cyl-tab-bar is mounted does not throw and is app
   const customTabBar = cylCustomTabBar()
   assert.doesNotThrow(() => customTabBar.cyl_syncWithRoute('pages/message/index'))
   const selected = []
-  customTabBar.bar = { cyl_selectPage: (page) => { selected.push(page); return true } }
+  customTabBar.bar = { cylSelectPage: (page) => { selected.push(page); return true } }
   customTabBar.cyl_applyPendingPage()
   assert.deepEqual(selected, ['message'])
   customTabBar.cyl_applyPendingPage()
@@ -47,7 +47,7 @@ test('a route synced before the cyl-tab-bar is mounted does not throw and is app
 test('a bar without configuration (no tab for the page yet) keeps the route waiting', () => {
   const customTabBar = cylCustomTabBar()
   let ready = false
-  customTabBar.bar = { cyl_selectPage: () => ready }
+  customTabBar.bar = { cylSelectPage: () => ready }
   customTabBar.cyl_syncWithRoute('pages/me/index')
   assert.equal(customTabBar.cylPendingPage, 'me')
   ready = true
@@ -57,7 +57,7 @@ test('a bar without configuration (no tab for the page yet) keeps the route wait
 
 test('a route that is not a tab page path is ignored', () => {
   const customTabBar = cylCustomTabBar()
-  customTabBar.bar = { cyl_selectPage: () => assert.fail('no page to select') }
+  customTabBar.bar = { cylSelectPage: () => assert.fail('no page to select') }
   assert.doesNotThrow(() => customTabBar.cyl_syncWithRoute('other/path'))
   assert.doesNotThrow(() => customTabBar.cyl_syncWithRoute(undefined))
 })

@@ -160,7 +160,7 @@ test('cyl-animated-item: the same file set again keeps the loaded state (the eng
   const item = {
     data: { animationFailed: false },
     setData(data) { if (data.animationLoaded === false) resets.push(data) },
-    cyl_update() {},
+    cylUpdate() {},
   }
   observer.call(item, '/a.json', null, '')
   observer.call(item, '/a.json', null, '')
@@ -182,7 +182,7 @@ test('cyl-animated-item: the same file after a failure is a retry and resets the
   const item = {
     data: { animationFailed: false },
     setData(data) { Object.assign(this.data, data) },
-    cyl_update() {},
+    cylUpdate() {},
   }
   observer.call(item, 'https://x/a.json', null, '')
   item.data.animationFailed = true

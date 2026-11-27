@@ -44,17 +44,17 @@ function runtime() {
       },
       ...definition.methods,
     }
-    bar.cyl_syncLottie = () => {}
-    bar.cyl_playTapAnimation = () => {}
-    bar.cyl_playTabButtonTapFeedback = () => {}
-    bar.cyl_recordTap = () => {}
+    bar.cylSyncLottie = () => {}
+    bar.cylPlayTapAnimation = () => {}
+    bar.cylPlayTabButtonTapFeedback = () => {}
+    bar.cylRecordTap = () => {}
     bar.cylLongPressed = false
     definition.lifetimes.attached.call(bar)
     return bar
   }
 }
 
-const tap = (bar, position) => bar.cyl_onTap({ type: 'tap', currentTarget: { dataset: { key: bar.data.cylSlots[position].key } } })
+const tap = (bar, position) => bar.cylOnTap({ type: 'tap', currentTarget: { dataset: { key: bar.data.cylSlots[position].key } } })
 
 test('static icons: both images are passed at every selection and the item model does not swap src', () => {
   const states = [false, true].map((selected) => cylItemModel({ image: 'a.png', selectedImage: 'a-s.png', selected }))
@@ -127,7 +127,7 @@ test('the lens springs in only for a tap on the same instance', () => {
   assert.equal(first.data.cylLensAnimated, false, 'a parent-driven selection after a tap does not spring in')
   tap(first, 0)
   assert.equal(first.data.cylLensAnimated, true)
-  assert.equal(first.cyl_selectPage('message'), true)
+  assert.equal(first.cylSelectPage('message'), true)
   assert.equal(first.data.cylLensAnimated, false, 'a route sync')
 })
 
@@ -138,7 +138,7 @@ test('a route sync replaces the remembered tap, so a bar shown later cannot pain
   // [EN] A programmatic switch to `me` within 3 s of the tap on `message`: the route sync of that page is the newest truth.
   // [CN] 点击 `message` 后 3 秒内以编程方式切换到 `me`：该页面的路由同步是最新的事实。
   const synced = create({ configuration: CONFIG })
-  synced.cyl_selectPage('me')
+  synced.cylSelectPage('me')
   const shown = create({ configuration: {} })
   shown.setData({ configuration: CONFIG })
   assert.deepEqual(shown.data.cylSlots.map((slot) => Boolean(slot.selected)), [false, false, true])

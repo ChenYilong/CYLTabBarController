@@ -7,11 +7,11 @@
     style="{{item.itemStyle}}"
     data-key="{{item.key}}"
     id="{{item.accessibilityIdentifier}}"
-    bindtap="cyl_onTap"
-    bindtouchstart="cyl_onTouchStart"
-    bindtouchend="cyl_onTouchEnd"
-    bindtouchcancel="cyl_onTouchEnd"
-    bindtouchmove="cyl_onTouchEnd"
+    bindtap="cylOnTap"
+    bindtouchstart="cylOnTouchStart"
+    bindtouchend="cylOnTouchEnd"
+    bindtouchcancel="cylOnTouchEnd"
+    bindtouchmove="cylOnTouchEnd"
     aria-role="{{item.isPlusButton ? 'button' : 'tab'}}"
     aria-label="{{item.accessibilityLabel}}"
     aria-selected="{{item.selected}}"
@@ -80,7 +80,7 @@
           <view wx:else class="cyl-firework" style="{{particle.style}}"></view>
         </block>
       </view>
-      <!-- [EN] cyl_setCoverImage: a decoration over the tab; VoiceOver / TalkBack read the tab, not the cover. [CN] 覆盖在 Tab 上的装饰；读屏朗读 Tab 本身，而不是封面。 -->
+      <!-- [EN] cylSetCoverImage: a decoration over the tab; VoiceOver / TalkBack read the tab, not the cover. [CN] 覆盖在 Tab 上的装饰；读屏朗读 Tab 本身，而不是封面。 -->
       <image wx:if="{{item.cover}}" class="cyl-tab-cover" src="{{item.cover.image}}" style="{{item.cover.style}}" mode="aspectFit" aria-hidden="true" />
     </block>
   </view>

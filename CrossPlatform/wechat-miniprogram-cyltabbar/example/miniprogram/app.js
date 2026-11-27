@@ -32,9 +32,9 @@ App({
   globalData: {
     cylTabBarState: {
       badges: {},
-      // [EN] cyl_showBadgeValue attributes by identifier: {color, animation, radius, centerOffset}. [CN] 按标识的角标属性。
+      // [EN] cylShowBadgeValue attributes by identifier: {color, animation, radius, centerOffset}. [CN] 按标识的角标属性。
       badgeAttributes: {},
-      // [EN] cyl_setCoverImage by identifier: {image, size}. [CN] 按标识的封面。
+      // [EN] cylSetCoverImage by identifier: {image, size}. [CN] 按标识的封面。
       covers: {},
       themeIdentifier: '',
       // [EN] The skin of the skin picker (utils/cyl_demo_skins.js), following the system Dark Mode or not, and the

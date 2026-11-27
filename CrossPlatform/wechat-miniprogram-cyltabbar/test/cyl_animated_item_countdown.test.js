@@ -203,11 +203,11 @@ test('the component: a tap starts the countdown, the app shown again reads the c
   const clock = cylClock(1000)
   const { item, showApp, detach } = cylMount({ itemStyle: 'countdown', startsCountdownOnTap: true, countdownDuration: 60, countdownCacheKey: 'sms' }, clock, cylStorage())
   assert.equal(item.data.m.title, 'Get code')
-  item.cyl_onTap()
+  item.cylOnTap()
   assert.equal(item.data.countdownState, 'running')
   assert.equal(item.data.m.title, '60 s left')
   assert.equal(item.data.m.ariaDisabled, true)
-  item.cyl_onTap()
+  item.cylOnTap()
   assert.deepEqual(item.events.map((e) => e[0]), ['itemtap', 'countdownstart', 'countdowntick'], 'a running countdown takes no tap')
 
   clock.set(1046)

@@ -409,7 +409,19 @@ fun View.cylIsHidden(): Boolean {
 /**
  * [EN] `-cylGetActualBadgeSuperView`: the parent the badge is added to. [CN] 角标实际添加到的父视图。
  */
-fun View.cylGetActualBadgeSuperView(): ViewGroup? = (this as? CYLTabBarItemButton) ?: (this as? CYLPlusButton) ?: (parent as? ViewGroup)
+fun View.cylGetActualBadgeSuperView(): ViewGroup? = (this as? CYLBadgeHosting)?.cylBadgeAnchorView ?: (parent as? ViewGroup)
+
+/**
+ * [EN] A view that names the view its badge is added to (owner answer to the Android extraction question, docs/Animated-Item-Badge-CrossPlatform.md:
+ *      the same `CYLBadgeHosting` as iOS, so `:cylbadge` never names a tab bar class). The tab button and the plus button adopt it.
+ *      Requirements only; a new member of this released interface is always optional (a default implementation).
+ * [CN] 给出其角标所加到的视图的视图（对 Android 抽离问题的回答，见 docs/Animated-Item-Badge-CrossPlatform.md：与 iOS 相同的 `CYLBadgeHosting`，
+ *      因此 `:cylbadge` 从不提到 TabBar 的类）。Tab 按钮与加号按钮遵守它。这里只有要求；此接口发布后新增的成员一律是可选的（带默认实现）。
+ */
+interface CYLBadgeHosting {
+    /** [EN] The view the badge is added to. [CN] 角标所加到的视图。 */
+    val cylBadgeAnchorView: ViewGroup
+}
 
 /**
  * [EN] `-cylIsReady`: the view is laid out. [CN] 视图已布局。

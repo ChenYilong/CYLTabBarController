@@ -26,8 +26,8 @@ function cylBar(properties) {
     triggerEvent() {},
     ...definition.methods,
   }
-  bar.cyl_syncLottie = () => {}
-  bar.cyl_render()
+  bar.cylSyncLottie = () => {}
+  bar.cylRender()
   return bar
 }
 

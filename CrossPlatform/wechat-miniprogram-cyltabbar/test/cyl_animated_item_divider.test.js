@@ -227,17 +227,17 @@ function mount(properties) {
 
 test('dispatchesItemTaps false: no item action, no background action, no performAction', () => {
   const { stack, events } = mount({ items: [{ title: 'a', action: 'a' }], backgroundAction: 'bg', dispatchesItemTaps: false })
-  stack.cyl_onItemTap({ currentTarget: { dataset: { index: 0 } }, timeStamp: 1 })
-  stack.cyl_onBackgroundTap({ timeStamp: 1 })
+  stack.cylOnItemTap({ currentTarget: { dataset: { index: 0 } }, timeStamp: 1 })
+  stack.cylOnBackgroundTap({ timeStamp: 1 })
   assert.equal(stack.performAction('a'), false)
   assert.deepEqual(events, [])
 })
 
 test('the divider is an internal item instance: not in items, tap swallowed, hidden, its flags are internal-only', () => {
   const { definition } = mount({})
-  assert.equal(typeof definition.methods.cyl_noop, 'function')
+  assert.equal(typeof definition.methods.cylNoop, 'function')
   const wxml = require('node:fs').readFileSync(path.join(__dirname, '../src/cyl-animated-item-stack/index.wxml'), 'utf8')
-  assert.match(wxml, /class="cyl-stack-divider"[^>]*catchtap="cyl_noop"/)
+  assert.match(wxml, /class="cyl-stack-divider"[^>]*catchtap="cylNoop"/)
   assert.match(wxml, /<cyl-animated-item\s+cyl-internal-divider/)
   assert.match(wxml, /accessibility-hidden="\{\{true\}\}"/)
   const itemJs = require('node:fs').readFileSync(path.join(__dirname, '../src/cyl-animated-item/index.js'), 'utf8')

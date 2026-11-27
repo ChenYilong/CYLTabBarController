@@ -77,21 +77,21 @@ Page({
     const pag = this.cylPAGFiles.find((candidate) => candidate.endsWith(`/${file}.bin`));
     this.setData({ file, path: pag || `/shared/lottie/${file}.json`, isPAG: Boolean(pag) });
   },
-  cyl_play() {
-    // [EN] cyl-rive's cyl_play only resumes; a play from the start sets the next Rooms value of house.riv.
-    // [CN] cyl-rive 的 cyl_play 只是继续播放；从头播放才会设置 house.riv 的下一个 Rooms 值。
+  cylPlay() {
+    // [EN] cyl-rive's cylPlay only resumes; a play from the start sets the next Rooms value of house.riv.
+    // [CN] cyl-rive 的 cylPlay 只是继续播放；从头播放才会设置 house.riv 的下一个 Rooms 值。
     const view = this.cyl_lottie();
-    if (this.data.isRive && typeof view.cyl_playFromStart === 'function') {
-      view.cyl_playFromStart();
+    if (this.data.isRive && typeof view.cylPlayFromStart === 'function') {
+      view.cylPlayFromStart();
     } else {
-      view.cyl_play();
+      view.cylPlay();
     }
   },
-  cyl_pause() {
-    this.cyl_lottie().cyl_pause();
+  cylPause() {
+    this.cyl_lottie().cylPause();
   },
-  cyl_stop() {
-    this.cyl_lottie().cyl_stop();
+  cylStop() {
+    this.cyl_lottie().cylStop();
   },
   cyl_speed(event) {
     this.setData({ speed: Number(event.currentTarget.dataset.value) });

@@ -24,7 +24,7 @@ Component({
       this.cylCase.actions[event.currentTarget.dataset.index].run(this);
     },
 
-    cyl_select(event) {
+    cylSelect(event) {
       const identifier = event.detail.identifier;
       const index = this.data.slideTitles.findIndex((title) => title.toLowerCase() === identifier);
       this.setData({ selectedIdentifier: identifier, slideIndex: index < 0 ? this.data.slideIndex : index, result: this.data.demo.slide ? '' : `select: ${identifier}` });

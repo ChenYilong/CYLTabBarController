@@ -8,8 +8,8 @@
  *      engine never leaves it stale. What an engine cannot do it says (`supportsSpeed`, `supportsLoops`, `supportsProgress`,
  *      `supportsColors`) and the call is a no-op. The answers come from the animation type, so they are right before the
  *      engine is ready; `play()` before `animationready` is kept and happens when the file is ready.
- *      It is built over what the engine components already expose: `cyl_playFromStart`, `cyl_pause`, `cyl_setProgress`
- *      (Lottie: `cyl_goToAndStop`), `cyl_stop` and `cyl_setSpeed` (through the item: `playAnimation()`, `cyl_stopAtProgress()`,
+ *      It is built over what the engine components already expose: `cylPlayFromStart`, `cylPause`, `cylSetProgress`
+ *      (Lottie: `cylGoToAndStop`), `cylStop` and `cylSetSpeed` (through the item: `playAnimation()`, `cylStopAtProgress()`,
  *      and the item's `speed`, `loop` and `colors` properties, which the item hands to the engine).
  * [CN] 一个 cyl-animated-item 的播放器（`item.cyl_player()`）：对应鸿蒙的 `CYLAnimatedItemPlayer`
  *      （`cylanimateditem/src/main/ets/CYLAnimatedItemPlayer.ts`，docs/Animated-Item.md「Engine API across platforms」中引擎约定的基准）。
@@ -18,17 +18,17 @@
  *      一个播放器与其条目同寿命；每次调用都会重新查找引擎组件，因此换文件或换引擎后不会过期。引擎做不到的事通过 `supportsSpeed`、
  *      `supportsLoops`、`supportsProgress`、`supportsColors` 说明，调用则为空操作。答案取决于动画类型，因此在引擎就绪之前就是正确的；
  *      `animationready` 之前调用 `play()` 会被保留，文件就绪后再播放。
- *      它建立在引擎组件已有的方法之上：`cyl_playFromStart`、`cyl_pause`、`cyl_setProgress`（Lottie 为 `cyl_goToAndStop`）、`cyl_stop` 与
- *      `cyl_setSpeed`（通过条目：`playAnimation()`、`cyl_stopAtProgress()`，以及条目交给引擎的 `speed`、`loop`、`colors` 属性）。
+ *      它建立在引擎组件已有的方法之上：`cylPlayFromStart`、`cylPause`、`cylSetProgress`（Lottie 为 `cylGoToAndStop`）、`cylStop` 与
+ *      `cylSetSpeed`（通过条目：`playAnimation()`、`cylStopAtProgress()`，以及条目交给引擎的 `speed`、`loop`、`colors` 属性）。
  */
 
 /**
  * [EN] What each animation type can do, as the engine packages implement it (docs/Animated-Item.md): `progress` is a seek
- *      (`cyl_setProgress`, or Lottie's `cyl_goToAndStop`; Rive has none and rests through `cyl_stop`), `speed` is
- *      `cyl_setSpeed`, `colors` the engine's `colors` property (Lottie keypaths, Rive view model colors). GIF is drawn by
+ *      (`cylSetProgress`, or Lottie's `cylGoToAndStop`; Rive has none and rests through `cylStop`), `speed` is
+ *      `cylSetSpeed`, `colors` the engine's `colors` property (Lottie keypaths, Rive view model colors). GIF is drawn by
  *      `<image>`: no speed, no seek; a GIF with stills plays one pass and loops, which the item times itself.
- * [CN] 每种动画类型能做什么，与各引擎包的实现一致（docs/Animated-Item.md）：`progress` 为跳转（`cyl_setProgress`，或 Lottie 的
- *      `cyl_goToAndStop`；Rive 没有，通过 `cyl_stop` 静止），`speed` 为 `cyl_setSpeed`，`colors` 为引擎的 `colors` 属性（Lottie 的
+ * [CN] 每种动画类型能做什么，与各引擎包的实现一致（docs/Animated-Item.md）：`progress` 为跳转（`cylSetProgress`，或 Lottie 的
+ *      `cylGoToAndStop`；Rive 没有，通过 `cylStop` 静止），`speed` 为 `cylSetSpeed`，`colors` 为引擎的 `colors` 属性（Lottie 的
  *      keypath、Rive 的 view model 颜色）。GIF 由 `<image>` 绘制：没有速度、没有跳转；有静帧的 GIF 播放一遍并可循环，由条目自己计时。
  */
 const CYL_PLAYER_CAPABILITIES = {

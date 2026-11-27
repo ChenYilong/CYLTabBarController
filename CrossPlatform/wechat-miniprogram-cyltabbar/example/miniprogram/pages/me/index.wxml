@@ -1,7 +1,7 @@
 <!-- [EN] Arabic: the page right to left. [CN] 阿拉伯语：页面从右到左。 -->
 <page-meta page-style="{{cylRTL ? 'direction: rtl;' : ''}}"></page-meta>
 <import src="/templates/cyl_feed.wxml" />
-<view wx:if="{{!cylUnloaded}}" class="cyl-page" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
+<view wx:if="{{!cylUnloaded}}" class="cyl-page" bindtouchstart="cylOnSwipeStart" bindtouchend="cylOnSwipeEnd">
   <view class="cyl-section">
     <view wx:if="{{installed === 'lottie' || installed === 'pag'}}" class="cyl-row cyl-row-action" bindtap="cyl_openPlayground" aria-role="button" aria-label="{{texts['cyl-lottie playground']}}"><text aria-hidden="true">{{texts['cyl-lottie playground']}}</text></view>
     <view class="cyl-row cyl-row-action" bindtap="cyl_openItemPlayground" aria-role="button" aria-label="{{texts['cyl-tab-bar-item playground']}}"><text aria-hidden="true">{{texts['cyl-tab-bar-item playground']}}</text></view>

@@ -41,7 +41,7 @@ function cylPauseAnimation(item) {
   if (!cylPlayingItems.has(item) || item.cylPausedByUser) return false
   item.cylPausedByUser = true
   const engine = item.selectComponent ? item.selectComponent('#cyl-animated-item-engine') : null
-  if (engine && typeof engine.cyl_pause === 'function') engine.cyl_pause()
+  if (engine && typeof engine.cylPause === 'function') engine.cylPause()
   cylPostAnimationEvent(item, AnimationEvents.didPause)
   return true
 }
@@ -50,7 +50,7 @@ function cylResumeAnimation(item) {
   if (!item.cylPausedByUser) return false
   item.cylPausedByUser = false
   const engine = item.selectComponent ? item.selectComponent('#cyl-animated-item-engine') : null
-  if (engine && typeof engine.cyl_play === 'function') engine.cyl_play()
+  if (engine && typeof engine.cylPlay === 'function') engine.cylPlay()
   cylPostAnimationEvent(item, AnimationEvents.didResume)
   return true
 }

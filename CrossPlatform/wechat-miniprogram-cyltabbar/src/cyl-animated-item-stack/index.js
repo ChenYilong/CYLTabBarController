@@ -90,7 +90,7 @@ Component({
     hasDividerAfter(index) { return cylStackHasDivider(this.data.m, index) },
 
     /** [EN] A tap on a built-in divider does nothing. [CN] 点击内置分割线不做任何事。 */
-    cyl_noop() {},
+    cylNoop() {},
 
     /**
      * [EN] Triggers `action` for `name` (as a tap on its item would); false for an empty name.
@@ -111,7 +111,7 @@ Component({
       return cylStackIndexForAction(this.data.m, action)
     },
 
-    cyl_onItemTap(event) {
+    cylOnItemTap(event) {
       if (!this.data.dispatchesItemTaps) return
       const index = Number(event.currentTarget.dataset.index)
       const action = cylStackActionAt(this.data.m, index)
@@ -122,7 +122,7 @@ Component({
       this.triggerEvent('action', { action, index, background: false })
     },
 
-    cyl_onBackgroundTap(event) {
+    cylOnBackgroundTap(event) {
       if (!this.data.dispatchesItemTaps) return
       if (this.cyl_handledTap !== undefined && this.cyl_handledTap === event.timeStamp) return
       const action = this.data.m.backgroundAction

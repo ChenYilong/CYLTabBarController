@@ -36,11 +36,11 @@ function mount(configuration) {
     },
     ...definition.methods,
   }
-  const render = bar.cyl_render
-  bar.cyl_render = function () { bar.renders += 1; return render.call(bar) }
-  bar.cyl_syncLottie = () => {}
-  bar.cyl_playTabButtonTapFeedback = () => {}
-  bar.cyl_recordTap = () => {}
+  const render = bar.cylRender
+  bar.cylRender = function () { bar.renders += 1; return render.call(bar) }
+  bar.cylSyncLottie = () => {}
+  bar.cylPlayTabButtonTapFeedback = () => {}
+  bar.cylRecordTap = () => {}
   bar.cylLongPressed = false
   definition.lifetimes.attached.call(bar)
   return bar
@@ -49,19 +49,19 @@ function mount(configuration) {
 test('selecting a tab renders once: the mirrored selectedIdentifier / selectedIndex do not re-run the render', () => {
   const bar = mount(CONFIG)
   const before = bar.renders
-  bar.cyl_select(bar.data.cylSlots[1].key)
-  assert.equal(bar.renders, before, 'cyl_select writes the mirror without a render')
+  bar.cylSelect(bar.data.cylSlots[1].key)
+  assert.equal(bar.renders, before, 'cylSelect writes the mirror without a render')
   assert.equal(bar.data.selectedIdentifier, 'me')
   bar.setData({ selectedIdentifier: 'home' })
   assert.equal(bar.renders, before + 1, 'a parent write is still an input and renders')
   assert.equal(bar.data.cylSlots[0].selected, true)
 })
 
-test('cyl_playSelectedTapAnimation plays on the selected key, also after a configuration rebuild', () => {
+test('cylPlaySelectedTapAnimation plays on the selected key, also after a configuration rebuild', () => {
   const bar = mount(CONFIG)
-  bar.cyl_select(bar.data.cylSlots[1].key)
+  bar.cylSelect(bar.data.cylSlots[1].key)
   bar.setData({ configuration: { ...CONFIG, CYLTabBarControllerTabButtonTapAnimationDuration: 500 } })
-  bar.cyl_playSelectedTapAnimation()
+  bar.cylPlaySelectedTapAnimation()
   assert.equal(bar.data.cylAnimatingIdentifier, 'me')
   assert.equal(bar.data.cylAnimatingName, 'bounceWithFireworks')
   assert.ok(bar.data.cylFireworks)
@@ -73,7 +73,7 @@ test('a bar that first renders an empty configuration plays on the tapped key on
   bar.cylSelectedKey = 'me'
   bar.setData({ configuration: CONFIG })
   assert.equal(bar.cylSelectedKey, 'me')
-  bar.cyl_playSelectedTapAnimation()
+  bar.cylPlaySelectedTapAnimation()
   assert.equal(bar.data.cylAnimatingIdentifier, 'me')
   clearTimeout(bar.cylAnimationTimer)
 })

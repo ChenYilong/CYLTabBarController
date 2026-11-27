@@ -39,14 +39,14 @@ Component({
   },
 
   methods: {
-    cyl_play: cylNothing,
-    cyl_pause: cylNothing,
-    cyl_stop: cylNothing,
-    cyl_playFromStart: cylNothing,
-    cyl_goToAndStop: cylNothing,
-    cyl_goToAndPlay: cylNothing,
-    cyl_setProgress: cylNothing,
-    cyl_setSpeed: cylNothing,
+    cylPlay: cylNothing,
+    cylPause: cylNothing,
+    cylStop: cylNothing,
+    cylPlayFromStart: cylNothing,
+    cylGoToAndStop: cylNothing,
+    cylGoToAndPlay: cylNothing,
+    cylSetProgress: cylNothing,
+    cylSetSpeed: cylNothing,
     /** [EN] Always null: no animation. [CN] 始终为 null：没有动画。 */
     cyl_animation() {
       return null

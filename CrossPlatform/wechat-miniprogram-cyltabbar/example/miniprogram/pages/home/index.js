@@ -93,7 +93,7 @@ Component({
       // [EN] -[CYLHomeViewController viewDidLoad]: dots in random colors on "Flat Design" and "Liquid Glass".
       // [CN] 「Flat Design」与「Liquid Glass」按钮上的随机颜色红点。
       this.setData({ nav: Object.assign(cylNavigationFrame(), { dots: [cylRandomColor(), cylRandomColor()] }) });
-      this.cylUnsubscribe = getApp().cyl_subscribe(() => this.cyl_render());
+      this.cylUnsubscribe = getApp().cyl_subscribe(() => this.cylRender());
     },
     detached() {
       if (this.cylUnsubscribe) {
@@ -103,7 +103,7 @@ Component({
   },
   pageLifetimes: {
     show() {
-      this.cyl_render();
+      this.cylRender();
     },
   },
   methods: {
@@ -159,7 +159,7 @@ Component({
         const host = typeof page.getTabBar === 'function' ? page.getTabBar() : null;
         return { bar: host ? host.selectComponent('#cyl-tab-bar') : null, name: route };
       });
-      cylTeardown.cylStart(bars, () => this.cyl_render(), () => wx.reLaunch({ url: '/pages/released/index' }));
+      cylTeardown.cylStart(bars, () => this.cylRender(), () => wx.reLaunch({ url: '/pages/released/index' }));
     },
 
     cyl_tabBar() {
@@ -167,7 +167,7 @@ Component({
       return tabBar ? tabBar.selectComponent('#cyl-tab-bar') : null;
     },
 
-    cyl_render() {
+    cylRender() {
       const state = getApp().globalData.cylTabBarState;
       const skin = cylEffectiveSkin(state);
       const configuration = cylDemoConfiguration(state.overrides, skin);
@@ -391,12 +391,12 @@ Component({
       return style;
     },
 
-    cyl_update(change) {
+    cylUpdate(change) {
       getApp().cyl_updateTabBarState(change);
     },
 
     cyl_override(change) {
-      this.cyl_update({ overrides: { ...getApp().globalData.cylTabBarState.overrides, ...change } });
+      this.cylUpdate({ overrides: { ...getApp().globalData.cylTabBarState.overrides, ...change } });
     },
 
     // [EN] A tap on a tag does what a tap on its row did: `tagtap` {section: 0, item}, from the tag list of the section `data-section`.
@@ -434,11 +434,11 @@ Component({
           const tabs = bar.data.cylSlots.filter((slot) => !slot.isPlusButton);
           const current = tabs.findIndex((slot) => slot.selected);
           const next = tabs[current < 0 ? 0 : (current + 1) % tabs.length];
-          bar.cyl_onTap({ currentTarget: { dataset: { key: next.key } } });
+          bar.cylOnTap({ currentTarget: { dataset: { key: next.key } } });
         },
         gallery: () => wx.navigateTo({ url: '/pages/glass/index' }),
         releaseTabBar: () => this.cyl_releaseTabBars(),
-        login: () => this.cyl_update({ loggedIn: !state.loggedIn }),
+        login: () => this.cylUpdate({ loggedIn: !state.loggedIn }),
         swipe: () => this.cyl_override({ CYLTabBarControllerSwipeToSwitchTab: !state.overrides?.CYLTabBarControllerSwipeToSwitchTab }),
       };
       if (actions[id]) {
@@ -460,7 +460,7 @@ Component({
         state: () => app.globalData.cylTabBarState,
         overrides: () => app.globalData.cylTabBarState.overrides || {},
         configuration: () => cylDemoConfiguration(app.globalData.cylTabBarState.overrides, cylEffectiveSkin(app.globalData.cylTabBarState)),
-        update: (change) => this.cyl_update(change),
+        update: (change) => this.cylUpdate(change),
         override: (change) => this.cyl_override(change),
         tabBar: () => this.cyl_tabBar(),
         toast: (title) => wx.showToast({ title, icon: 'none' }),
@@ -504,18 +504,18 @@ Component({
       const down = top > last && top > 60;
       const hidden = behavior === 'OnScrollDown' ? down : !down && top > 60;
       if (hidden !== Boolean(state.tabBarHidden)) {
-        this.cyl_update({ tabBarHidden: hidden });
+        this.cylUpdate({ tabBarHidden: hidden });
       }
     },
 
     /**
-     * [EN] Item 37: the ◀︎ / ▶︎ arrows call cyl_switchToAdjacentTab(-1 / 1); the row shows the result (YES / NO).
-     * [CN] 第 37 项：◀︎ / ▶︎ 箭头调用 cyl_switchToAdjacentTab(-1 / 1)；该行显示结果（YES / NO）。
+     * [EN] Item 37: the ◀︎ / ▶︎ arrows call cylSwitchToAdjacentTab(-1 / 1); the row shows the result (YES / NO).
+     * [CN] 第 37 项：◀︎ / ▶︎ 箭头调用 cylSwitchToAdjacentTab(-1 / 1)；该行显示结果（YES / NO）。
      */
     cyl_onArrow(event) {
       const bar = this.cyl_tabBar();
-      const result = bar ? bar.cyl_switchToAdjacentTab(Number(event.currentTarget.dataset.step)) : false;
-      this.cyl_update({ adjacentResult: result ? 'YES' : 'NO' });
+      const result = bar ? bar.cylSwitchToAdjacentTab(Number(event.currentTarget.dataset.step)) : false;
+      this.cylUpdate({ adjacentResult: result ? 'YES' : 'NO' });
     },
 
     /**
@@ -532,7 +532,7 @@ Component({
     },
 
     // [EN] A tap on a switch stays on the switch (its change event acts). [CN] 点击开关不传给所在行（由其 change 事件处理）。
-    cyl_noop() {},
+    cylNoop() {},
 
     // [EN] A switch was flipped: the same as tapping its row. [CN] 拨动开关：与点击该行相同。
     cyl_onSwitch(event) {

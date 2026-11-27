@@ -27,7 +27,10 @@ import kotlin.math.abs
  *      TabBar 的手势（点击、双击、长按、滑动）。
  */
 @android.annotation.SuppressLint("ViewConstructor") // [EN] Made by the tab bar for an item, never inflated. [CN] 由 TabBar 为 item 创建，不从 XML 加载。
-class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: Int) : com.cyl.animateditem.CYLAnimatedItemView(context) {
+class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: Int) : com.cyl.animateditem.CYLAnimatedItemView(context), CYLBadgeHosting {
+    /** [EN] The button itself hosts its badge. [CN] 按钮自身承载其角标。 */
+    override val cylBadgeAnchorView: ViewGroup get() = this
+
 
     /**
      * [EN] The view of `setTabBarItemIconViewProvider`, laid out in place of the icon. [CN] `setTabBarItemIconViewProvider` 提供的视图，代替图标布局。

@@ -37,16 +37,16 @@ function cylRuntime() {
       setData(patch, callback) {
         const before = this.data.cylSlots
         Object.assign(this.data, patch)
-        if (observed.some((key) => key in patch)) this.cyl_render()
+        if (observed.some((key) => key in patch)) this.cylRender()
         if (this.data.cylSlots !== before) this.frames.push(this.data.cylSlots.map((slot) => Boolean(slot.selected)).indexOf(true))
         if (callback) callback()
       },
       ...definition.methods,
     }
-    bar.cyl_syncLottie = () => {}
-    bar.cyl_playTapAnimation = () => {}
-    bar.cyl_playTabButtonTapFeedback = () => {}
-    bar.cyl_recordTap = () => {}
+    bar.cylSyncLottie = () => {}
+    bar.cylPlayTapAnimation = () => {}
+    bar.cylPlayTabButtonTapFeedback = () => {}
+    bar.cylRecordTap = () => {}
     bar.cylLongPressed = false
     definition.lifetimes.attached.call(bar)
     return bar
@@ -54,7 +54,7 @@ function cylRuntime() {
   return { definition, mount }
 }
 
-const tap = (bar, position) => bar.cyl_onTap({ type: 'tap', currentTarget: { dataset: { key: bar.data.cylSlots[position].key } } })
+const tap = (bar, position) => bar.cylOnTap({ type: 'tap', currentTarget: { dataset: { key: bar.data.cylSlots[position].key } } })
 
 test('a new page bar (first visit) that starts with an empty configuration still draws the tapped tab first', () => {
   const { mount } = cylRuntime()
@@ -80,7 +80,7 @@ test('no bar draws the previous tab after a tap: cached bar, new bar, parent re-
   // [CN] 父组件以自己过期的选中项重新渲染（custom-tab-bar 绑定了 selected-identifier）。
   ;[first, cached, fresh].forEach((bar) => bar.setData({ selectedIdentifier: '' }))
   ;[first, cached, fresh].forEach((bar) => bar.setData({ configuration: { ...CYL_GLASS } }))
-  ;[first, cached, fresh].forEach((bar) => assert.equal(bar.cyl_selectPage('message'), true))
+  ;[first, cached, fresh].forEach((bar) => assert.equal(bar.cylSelectPage('message'), true))
   assert.deepEqual(first.frames.slice(afterTap[0]).concat(cached.frames.slice(afterTap[1]), fresh.frames).filter((position) => position !== 1 && position !== -1), [],
     'every frame after the tap selects the tapped tab (-1: no tabs yet, nothing drawn)')
   assert.deepEqual([first, cached, fresh].map((bar) => bar.data.selectedIndex), [1, 1, 1])
@@ -100,7 +100,7 @@ test('a page is selected by position, even with repeated titles and no identifie
   const bar = mount({ configuration: { CYLTabBarControllerTabBarItemsAttributes: [
     { CYLTabBarItemImage: 'a.png', CYLTabBarItemPageIdentifier: 'one' },
     { CYLTabBarItemImage: 'b.png', CYLTabBarItemPageIdentifier: 'two' } ] } })
-  assert.equal(bar.cyl_selectPage('two'), true)
+  assert.equal(bar.cylSelectPage('two'), true)
   assert.equal(bar.data.selectedIndex, 1)
-  assert.equal(bar.cyl_selectPage('unknown'), false)
+  assert.equal(bar.cylSelectPage('unknown'), false)
 })

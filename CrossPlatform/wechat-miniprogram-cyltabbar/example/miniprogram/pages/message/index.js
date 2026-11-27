@@ -50,14 +50,14 @@ Component({
     },
 
     /**
-     * [EN] Hides this page's bar only (cyl-tab-bar cyl_setTabBarHidden, iOS -setTabBarHidden:).
-     * [CN] 只隐藏本页面的 TabBar（cyl-tab-bar 的 cyl_setTabBarHidden，iOS -setTabBarHidden:）。
+     * [EN] Hides this page's bar only (cyl-tab-bar cylSetTabBarHidden, iOS -setTabBarHidden:).
+     * [CN] 只隐藏本页面的 TabBar（cyl-tab-bar 的 cylSetTabBarHidden，iOS -setTabBarHidden:）。
      */
     cyl_hideTabBar(event) {
       const hidden = Boolean(event.detail.value);
       this.setData({ tabBarHidden: hidden });
       if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-        this.getTabBar().cyl_setTabBarHidden(hidden);
+        this.getTabBar().cylSetTabBarHidden(hidden);
       }
     },
 
