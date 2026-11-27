@@ -856,7 +856,7 @@ extension UIView {
      *      `bounds` 而不是 `frame`：宿主上的 transform（如 Tab 图片动画）不应移动角标。
      */
     @objc(cyl_layoutBadgeAtTopRightCorner)
-    dynamic func cylLayoutBadgeAtTopRightCorner() {
+    public dynamic func cylLayoutBadgeAtTopRightCorner() {
         guard let badge = cyl_badge else {
             return
         }
