@@ -13,6 +13,12 @@
 // docs-binding:end
 
 import UIKit
+// [EN] CYLBadge is the layer below this component (docs/Animated-Item-Badge.md): the badge API of the item exists once the pod or
+//      target is linked. Not compiled yet: written statically on Linux.
+// [CN] CYLBadge 是本组件下面的一层（docs/Animated-Item-Badge.md）：链接该 pod 或 target 后，item 的角标 API 才可用。尚未编译：在 Linux 上静态编写。
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 #if SWIFT_PACKAGE
 // [EN] Swift Package Manager builds the Objective-C half (the engine, the keys, the resource bundle lookup) as its own
 //      module and re-exports it, so `import CYLAnimatedItemViews` is enough; CocoaPods and the Xcode framework compile
@@ -1630,10 +1636,14 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
      */
     private var cylIconFootprint: CGSize {
         let slot = currentIconSize
+        // [EN] `reservesBadgeSpace` (D6): the badge's overhang is reserved on both sides, so a tight host does not clip it.
+        // [CN] `reservesBadgeSpace`（D6）：在两侧都预留角标伸出的部分，使紧凑的宿主不会裁剪它。
+        let reserve = cylBadgeReserve
         let insets = cylIconAlignmentInsets
-        guard insets != .zero else { return slot }
+        guard insets != .zero else { return CGSize(width: slot.width + 2 * reserve, height: slot.height + 2 * reserve) }
         let core = CGSize(width: max(0, slot.width - insets.left - insets.right), height: max(0, slot.height - insets.top - insets.bottom))
-        return CGSize(width: core.width + 2 * max(insets.left, insets.right), height: core.height + 2 * max(insets.top, insets.bottom))
+        return CGSize(width: core.width + 2 * max(insets.left, insets.right) + 2 * reserve,
+                      height: core.height + 2 * max(insets.top, insets.bottom) + 2 * reserve)
     }
 
     /**
@@ -1766,6 +1776,7 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         let offset = currentItemStateAppearance?.titlePositionAdjustment ?? .zero
         titleLabel.frame = titleFrame.offsetBy(dx: offset.horizontal, dy: offset.vertical)
         layoutAccessory(in: rect, iconFrame: glyphFrame, rightToLeft: rtl)
+        layoutBadgeAnchor(glyphFrame: glyphFrame)
     }
 
     private func layoutAccessory(in rect: CGRect, iconFrame: CGRect, rightToLeft rtl: Bool) {
@@ -2975,6 +2986,120 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         center.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
     }
 
+    // MARK: - Badge 角标
+
+    /**
+     [EN] nil: no badge (default); "": a dot; otherwise the text (a number above the maximum shows "99+"). Sets the badge on
+          `badgeAnchorView` through CYLBadge; `cyl_showBadgeValue(_:animationType:)` on the item reaches the same view.
+     [CN] nil：没有角标（默认）；""：红点；否则为文字（超过最大值的数字显示 "99+"）。通过 CYLBadge 在 `badgeAnchorView` 上设置角标；在 item
+          上调用 `cyl_showBadgeValue(_:animationType:)` 落在同一个视图。
+     */
+    @objc public dynamic var badgeValue: String? { didSet { if badgeValue != oldValue { updateBadge() } } }
+
+    /**
+     [EN] Badge style, keys `CYLBadgeAttributeKey`. nil: CYLBadge's defaults (`CYLBadgeAppearance`).
+     [CN] 角标样式，键为 `CYLBadgeAttributeKey`。nil：CYLBadge 的默认值（`CYLBadgeAppearance`）。
+     */
+    @objc public dynamic var badgeAttributes: [String: Any]? { didSet { updateBadge() } }
+
+    /**
+     [EN] NO (default): the badge is not measured. YES: measuring reserves its overhang on both sides (D6).
+     [CN] NO（默认）：测量时不计入角标。YES：测量时在两侧预留角标伸出的部分（D6）。
+     */
+    @objc public dynamic var reservesBadgeSpace = false { didSet { if reservesBadgeSpace != oldValue { contentDidChange() } } }
+
+    /** [EN] True while a badge is shown. [CN] 显示角标时为 true。 */
+    @objc public var isShowingBadge: Bool {
+        guard let anchor = storedBadgeAnchor else { return false }
+        #if canImport(CYLBadge)
+        return anchor.cyl_isShowBadge()
+        #else
+        return false
+        #endif
+    }
+
+    private var storedBadgeAnchor: UIView?
+    private var ownAccessibilityValue: String?
+
+    /**
+     [EN] A transparent view kept on the icon itself (the image minus its `alignmentRectInsets`, or the animation) at every
+          layout, above the icon and the animation view. Created once, never replaced, so an image / animation switch never
+          hides the badge. Not measured, not touchable, hidden from accessibility. A subclass that overrides
+          `layoutContent(in:)` calls `super`, or sets this view's frame itself.
+     [CN] 在每次布局时保持在图标本身（图片减去其 `alignmentRectInsets`，或动画）之上的透明视图，位于图标与动画视图上方。只创建一次、从不替换，
+          因此切换图片 / 动画不会隐藏角标。不参与测量、不可点击、对无障碍隐藏。重写 `layoutContent(in:)` 的子类应调用 `super`，或自己设置它的 frame。
+     */
+    @objc public var badgeAnchorView: UIView {
+        if let anchor = storedBadgeAnchor { return anchor }
+        let anchor = UIView()
+        anchor.isUserInteractionEnabled = false
+        anchor.isAccessibilityElement = false
+        anchor.accessibilityElementsHidden = true
+        anchor.clipsToBounds = false
+        anchor.backgroundColor = .clear
+        addSubview(anchor)
+        storedBadgeAnchor = anchor
+        return anchor
+    }
+
+    /** [EN] The room reserved for the badge when `reservesBadgeSpace` is on. [CN] 开启 `reservesBadgeSpace` 时为角标预留的空间。 */
+    private var cylBadgeReserve: CGFloat {
+        guard reservesBadgeSpace, badgeValue != nil, let anchor = storedBadgeAnchor else { return 0 }
+        #if canImport(CYLBadge)
+        return max(0, anchor.cyl_badgeRadius)
+        #else
+        return 0
+        #endif
+    }
+
+    private func layoutBadgeAnchor(glyphFrame: CGRect) {
+        guard let anchor = storedBadgeAnchor else { return }
+        anchor.frame = glyphFrame
+        anchor.isHidden = cylIsDivider || isIconHidden || !cylShowsIcon
+        bringSubviewToFront(anchor)
+    }
+
+    private func updateBadge() {
+        #if canImport(CYLBadge)
+        guard let value = badgeValue else {
+            storedBadgeAnchor?.cyl_clearBadge()
+            contentDidChange()
+            return
+        }
+        let anchor = badgeAnchorView
+        let attributes = badgeAttributes ?? [:]
+        anchor.cylApplyBadgeAttributes(attributes)
+        let animationValue = attributes[CYLBadgeAttributeKey.animation]
+        let animation = CYLBadgeAnimationType(attributeValue: animationValue) ?? .none
+        anchor.cyl_showBadgeValue(value, animationType: animation)
+        // [EN] The border is a property of the badge view, which exists only now. [CN] 边框是角标视图的属性，它到现在才存在。
+        anchor.cylApplyBadgeAttributes(attributes)
+        if let custom = animationValue as? CAAnimation {
+            anchor.cyl_badge?.layer.add(custom, forKey: "cyl.badge.custom")
+        }
+        contentDidChange()
+        setNeedsLayout()
+        #endif
+    }
+
+    /**
+     [EN] The value the app (or a subclass) set; while a badge shows, the badge description ("N new items" / "New", localized by
+          CYLUtils) is added after it, and clearing the badge restores the own value. The badge view is hidden from accessibility.
+     [CN] App（或子类）设置的值；显示角标时，角标描述（"N 条新消息" / "新"，由 CYLUtils 本地化）附加在其后，清除角标后恢复自己的值。
+          角标视图对无障碍隐藏。
+     */
+    open override var accessibilityValue: String? {
+        get {
+            #if canImport(CYLBadge)
+            if let value = badgeValue, let text = cylBadgeAccessibilityDescriptionEntryPoint(value as NSString) as String? {
+                return [ownAccessibilityValue, text].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: ", ")
+            }
+            #endif
+            return ownAccessibilityValue
+        }
+        set { ownAccessibilityValue = newValue }
+    }
+
     // MARK: - Accessibility 无障碍
 
     /**
@@ -3051,5 +3176,12 @@ extension CYLAnimatedItemView: CYLTabBarItemAnimationFailureHandling {
         contentDidChange()
         onAnimationFailed?()
     }
+}
+#endif
+
+#if canImport(CYLBadge)
+/// [EN] The item hands its badge to `badgeAnchorView` (a view kept on the icon), so `item.cyl_showBadgeValue(...)` and `item.badgeValue` are the same badge. [CN] item 把角标交给 `badgeAnchorView`（保持在图标上的视图），因此 `item.cyl_showBadgeValue(...)` 与 `item.badgeValue` 是同一个角标。
+extension CYLAnimatedItemView: CYLBadgeHosting {
+    @objc public var cylBadgeAnchorView: UIView { badgeAnchorView }
 }
 #endif

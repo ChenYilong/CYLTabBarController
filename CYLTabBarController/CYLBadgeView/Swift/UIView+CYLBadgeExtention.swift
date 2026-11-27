@@ -623,6 +623,10 @@ extension UIView {
 
     @objc(cyl_animatedItemBadgeHost)
     public func cylAnimatedItemBadgeHost() -> UIView? {
+        // [EN] A view that adopts `CYLBadgeHosting` names its badge view itself (step 11, docs/Animated-Item-Badge.md); the class-name
+        //      lookup below stays for older component versions. [CN] 遵守 `CYLBadgeHosting` 的视图自己给出角标视图（第 11 步）；下面按类名
+        //      查找的做法保留给旧版本组件。
+        if let host = self as? CYLBadgeHosting { return host.cylBadgeAnchorView }
         guard let componentClass = NSClassFromString("CYLAnimatedItemView"), isKind(of: componentClass) else {
             return nil
         }
