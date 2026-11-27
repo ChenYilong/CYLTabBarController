@@ -434,6 +434,7 @@ docs/
 │   ├── ios-27.2-iphone-18-pro-example-rive-tint-page-light-9d2b9e7b-2026-11-26-2158.png
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-b30-badge-tags-icon-with-badge-465f857f-2026-11-27.png
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-badge-samples-fold-light-dark-c738ca8a-2026-11-26-1615.png
+│   ├── ios-27.2-iphone-18-pro-example-swift-04-badge-tag-icon-centered-d5f1b436-2026-11-27.png
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-badge-tag-list-light-dark-c738ca8a-2026-11-26-1542.png
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-plus-title-light-dark-a59ecb55-2026-11-26-1419.png
 │   ├── ios-27.2-iphone-18-pro-example-swift-04-tag-roles-dark-light-4d0e00ae-2026-11-26-1917.png
@@ -450,6 +451,7 @@ docs/
 │   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-dark-to-light-bar-stays-dark-9d2b9e7b-2026-11-26-2240.png
 │   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-flat-selected-icon-tint-dark-9d2b9e7b-2026-11-26-2122.png
 │   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-flat-selected-icon-tint-light-9d2b9e7b-2026-11-26-2122.png
+│   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-normal-title-dark-d5f1b436-2026-11-27.png
 │   ├── ios-27.2-iphone-18-pro-swiftmanager-flatdesign-tint-optin-9d2b9e7b-2026-11-26-2240.png
 │   ├── ios-animated-item-engine-api.png
 │   ├── ios-badge-breathe-not-under-icon.png

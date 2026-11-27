@@ -172,7 +172,13 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
     private static func iconWithBadge(_ iconView: UIImageView, traits: UITraitCollection, hidingBadge: Bool) -> UIImage? {
         iconView.superview?.layoutIfNeeded()
         guard let badge = iconView.cyl_badge, !badge.isHidden, !iconView.bounds.isEmpty else { return nil }
-        let rect = iconView.bounds.union(badge.convert(badge.bounds, to: iconView)).integral
+        // [EN] Symmetric around the icon: the badge sticks out at one corner only, and the tag centers the image, so the icon stays on the tag's
+        //      center line. [CN] 以图标为中心对称扩展：角标只从一个角伸出，而 Tag 按图片居中，这样图标保持在 Tag 的中线上。
+        let icon = iconView.bounds
+        let badgeFrame = badge.convert(badge.bounds, to: iconView)
+        let dx = max(0, icon.minX - badgeFrame.minX, badgeFrame.maxX - icon.maxX)
+        let dy = max(0, icon.minY - badgeFrame.minY, badgeFrame.maxY - icon.maxY)
+        let rect = icon.insetBy(dx: -dx, dy: -dy).integral
         let format = UIGraphicsImageRendererFormat(for: traits)
         format.opaque = false
         badge.isHidden = hidingBadge
