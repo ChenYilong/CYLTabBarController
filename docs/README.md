@@ -500,6 +500,21 @@ docs/
 │   ├── wechat-miniprogram-two-icon-layers-user-2-devtools.jpg
 │   └── wechat-miniprogram-visibility-hidden-identifiers-devtools-sdk3.17.6-49df44f.png
 ├── commit-readiness-2026-11-09.md
+├── instructions/
+│   ├── accessibility-i18n.md
+│   ├── ci-testing-screenshots.md
+│   ├── code-rules.md
+│   ├── commands.md
+│   ├── dependencies.md
+│   ├── docs-lookup.md
+│   ├── examples.md
+│   ├── git-workflow.md
+│   ├── harmonyos.md
+│   ├── localization.md
+│   ├── naming-and-comments.md
+│   ├── reply-greeting.md
+│   ├── skills-and-docs.md
+│   └── xcode-project-setup.md
 └── instructions.md
 ```
 
