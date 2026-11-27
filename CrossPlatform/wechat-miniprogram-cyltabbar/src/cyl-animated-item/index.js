@@ -24,7 +24,7 @@ const { cylGIFColorKind } = require('./cyl_one_color_detector')
 const cylGIFColorKindCache = {}
 const { CYLAnimatedItemPlayer } = require('./cyl_animated_item_player')
 const { CYLAnimatedItemCountdown, CYL_COUNTDOWN_TICK_INTERVAL } = require('./cyl_animated_item_countdown')
-const { LifecycleController } = require('../cyl-dealloc-block-executor/index')
+const { LifecycleController } = require('../cyl-utils/index')
 const {
   cylAnimationDidStart, cylAnimationDidStop, cylForgetAnimation, cylPauseAnimation, cylResumeAnimation,
 } = require('./cyl_animation_events')

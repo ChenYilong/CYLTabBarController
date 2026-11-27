@@ -15,7 +15,7 @@ const { cylReadConfiguration } = require('./cyl_configuration');
 const { cylBadgeAnimationClass } = require('./cyl_debug');
 const { cylTabBarItemStyle, cylTabBarItemStyleForStyleType, cylGlassLensStyle } = require('./cyl_tab_bar_item_style');
 // Pending: replace the vendored copy with the npm package after the library is published (owner's OK): see ../cyl-dealloc-block-executor/VENDORED.md.
-const { LifecycleController, BadgeEvents } = require('../cyl-dealloc-block-executor/index');
+const { LifecycleController, BadgeEvents } = require('../cyl-utils/index');
 
 /**
  * [EN] Heights in px from the stylesheets: the bar (index.wxss `.cyl-tab`, Liquid Glass `.cyl-style-liquidGlass .cyl-tab`),
