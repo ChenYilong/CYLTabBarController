@@ -168,6 +168,15 @@ Component({
     accessoryPlacement: { type: String, value: 'trailing' },
     dragEnabled: { type: Boolean, value: false },
     accessibilityLabel: { type: String, value: '' },
+    // [EN] The item's badge, the iOS names: `badgeValue` null (the default) no badge, '' a dot, otherwise the text; `badgeAttributes`
+    //      the style keys of iOS' `CYLBadgeAttributeKey`; `reservesBadgeSpace` reserves the badge's overhang when measuring;
+    //      `badgeAccessibilityLabel` the localized description read after the label. See cyl-badge/cyl_badge_model.js.
+    // [CN] item 的角标，使用 iOS 的名称：`badgeValue` 为 null（默认）无角标、'' 红点，其余为文字；`badgeAttributes` 为 iOS `CYLBadgeAttributeKey` 的样式键；
+    //      `reservesBadgeSpace` 在测量时预留角标伸出的部分；`badgeAccessibilityLabel` 为在标签之后朗读的本地化描述。见 cyl-badge/cyl_badge_model.js。
+    badgeValue: { type: null, value: null },
+    badgeAttributes: { type: Object, value: null },
+    reservesBadgeSpace: { type: Boolean, value: false },
+    badgeAccessibilityLabel: { type: String, value: '' },
     // [EN] For a host that draws the icon with this component (the tab bar item): Lottie / Rive colors (keypath -> color),
     //      autoplay, a tint for the static image, a non-square icon, the embedded layout and hiding it from screen
     //      readers (the host is the accessibility element). [CN] 供用本组件绘制图标的宿主（TabBar Item）使用：Lottie / Rive
@@ -413,7 +422,7 @@ Component({
       // [EN] A file of no known type has no engine to report anything: it cannot be decoded. [CN] 不属于任何已知类型的文件没有引擎可以报告：无法解码。
       if (animationUrl && this.data.m && !this.data.m.animationType) this.cylReportResourceMissing('decode failed')
     },
-    'title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, selectedIconTint, animationTint, animationDarkTint, animationIconTint, animationSelectedIconTint, animationRenderingMode, builtInSelectedColor, animationColorKind, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing, cylInternalDivider, cylDividerColor, cylDividerLength, cylDividerVertical': function () {
+    'badgeValue, badgeAttributes, reservesBadgeSpace, badgeAccessibilityLabel, title, image, selectedImage, placeholderImage, embedded, enabled, axis, iconSize, accessoryImage, accessoryText, accessoryAccessibilityLabel, accessoryPlacement, accessibilityLabel, gifFirstFrame, gifLastFrame, iconWidth, iconHeight, iconTint, selectedIconTint, animationTint, animationDarkTint, animationIconTint, animationSelectedIconTint, animationRenderingMode, builtInSelectedColor, animationColorKind, titleColor, titleFontSize, titleFontWeight, titleDarkColor, userInterfaceStyle, titleLines, titleLineHeight, titleSpacing, cylInternalDivider, cylDividerColor, cylDividerLength, cylDividerVertical': function () {
       this.cylUpdate()
     },
     // [EN] The subclass, inherited and built-in color levels and the options that change the model. [CN] 子类、继承与内置颜色层级，以及改变模型的选项。

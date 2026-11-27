@@ -1,6 +1,8 @@
 {
   "component": true,
-  "usingComponents": {},
+  "usingComponents": {
+    "cyl-badge": "../cyl-badge/index"
+  },
   "componentGenerics": {
     "cyl-lottie-view": {
       "default": "../cyl-animation-placeholder/index"

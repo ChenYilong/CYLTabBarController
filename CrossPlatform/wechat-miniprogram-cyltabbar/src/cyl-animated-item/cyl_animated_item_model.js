@@ -1,5 +1,6 @@
 const { cylIsGIFImagePath } = require('./cyl_gif_image')
 const { cylCountdownText } = require('./cyl_animated_item_countdown')
+const { cylBadgeViewModel, cylBadgeParseAttributes } = require('../cyl-badge/cyl_badge_model')
 const { cylAnimatedItemContrastLift, cylAnimatedItemContrastLiftToReference, cylAnimatedItemFlatReferenceLuminance, CYL_ICON_MINIMUM_CONTRAST, CYL_TITLE_MINIMUM_CONTRAST, CYL_ADAPTED_KIND_ICON, CYL_ADAPTED_KIND_TEXT, CYL_ADAPTED_KIND_TITLE } = require('./cyl_animated_item_contrast')
 /**
  * [EN] The render model of cyl-animated-item, the mini program counterpart of iOS `CYLAnimatedItemView` (the
@@ -786,7 +787,15 @@ function cylAnimatedItemModel(input) {
   const iconWidth = cylAnimatedItemDimension(p.iconWidth, iconSize)
   const iconHeight = cylAnimatedItemDimension(p.iconHeight, iconSize)
   const title = p.title || ''
-  const label = p.accessibilityLabel || title
+  // [EN] The badge (iOS `badgeValue` / `badgeAttributes` / `reservesBadgeSpace`): drawn by cyl-badge on an anchor at the icon's
+  //      top-trailing corner, never measured unless `reservesBadgeSpace` is on; read after the item's own label. The description
+  //      text comes from the host (`badgeAccessibilityLabel`, localized by the app); without it the badge text is read, a dot adds nothing.
+  // [CN] 角标（iOS `badgeValue` / `badgeAttributes` / `reservesBadgeSpace`）：由 cyl-badge 画在图标右上角的锚点上，除非开启 `reservesBadgeSpace`
+  //      否则不参与测量；在 item 自身的标签之后朗读。描述文字由宿主给出（`badgeAccessibilityLabel`，由 App 本地化）；没有时朗读角标文字，红点不追加内容。
+  const badge = cylBadgeViewModel(p.badgeValue, p.badgeAttributes)
+  const badgeReserve = p.reservesBadgeSpace === true && badge.showsBadge ? (cylBadgeParseAttributes(p.badgeAttributes).radius || 8) : 0
+  const badgeDescription = badge.showsBadge ? (p.badgeAccessibilityLabel || badge.text) : ''
+  const label = [p.accessibilityLabel || title, badgeDescription].filter(Boolean).join(', ')
   // [EN] Title look: color, font size (px) and line count (1: one line with an ellipsis, the default; 0: no limit;
   //      n > 1: up to n lines, then an ellipsis). [CN] 标题外观：颜色、字号（px）与行数（1：单行省略，默认；0：不限；n > 1：最多 n 行后省略）。
   const titleLines = cylAnimatedItemTitleLines(p.titleLines)
@@ -819,7 +828,9 @@ function cylAnimatedItemModel(input) {
     gifImage: cylGIFImageOf(p, hasSource, fallbackImage),
     gifImageStill: cylGIFImageStillShows(p, hasSource, fallbackImage),
     showsIcon: !!(fallbackImage || usesEngine || gifShows),
-    iconStyle: `width: ${iconWidth}px; height: ${iconHeight}px;`,
+    iconStyle: `width: ${iconWidth}px; height: ${iconHeight}px;` + (badgeReserve ? ` margin: ${badgeReserve}px;` : ''),
+    badgeShows: badge.showsBadge,
+    badgeAnchorStyle: `transform: translate(calc(50% + ${badge.offset.x}px), calc(-50% + ${badge.offset.y}px));`,
     // [EN] `itemDisabledAnimationAlpha` (0...1; -1 = not set = 1): the alpha of the animation (engine, GIF) while disabled. [CN] `itemDisabledAnimationAlpha`（0...1；-1 为未设置，即 1）：禁用时动画（引擎、GIF）的透明度。
     animationStyle: cylAnimatedItemDisabledAnimationStyle(p),
     // [EN] A tint applies to the static image only; an animation keeps its own colors. [CN] 着色只作用于静态图片。

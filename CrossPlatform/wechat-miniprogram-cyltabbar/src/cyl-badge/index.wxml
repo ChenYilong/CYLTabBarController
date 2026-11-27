@@ -1,0 +1,3 @@
+<!-- [EN] The badge: hidden from accessibility, the host item reads its description. [CN] 角标：对无障碍隐藏，由宿主 item 朗读其描述。 -->
+<text wx:if="{{m.showsBadge && !m.isDot}}" class="cyl-badge-text {{m.className}}" style="{{m.style}}" aria-hidden="true">{{m.text}}</text>
+<view wx:if="{{m.showsBadge && m.isDot}}" class="cyl-badge-dot {{m.className}}" style="{{m.style}}" aria-hidden="true"></view>

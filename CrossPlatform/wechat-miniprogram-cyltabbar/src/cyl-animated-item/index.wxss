@@ -45,6 +45,15 @@
   position: relative;
   flex: none;
 }
+/* [EN] The badge anchor: top trailing corner of the icon, out of the layout, never clipped (the icon box does not clip). [CN] 角标锚点：图标的右上角，不参与布局，不会被裁剪（图标盒子不裁剪）。 */
+.cyl-animated-item-badge-anchor {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: visible;
+}
 .cyl-animated-item-image,
 .cyl-animated-item-animation {
   position: absolute;
