@@ -13,7 +13,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 状态：**设计第 2 版，待负责人确认，尚未实现**。CYLBadge **目前尚未抽离**：它仍是 `CYLTabBarController/CYLBadgeView` 子库（见"现状"）。负责人同意后再写代码。 | Status: **design version 2, waiting for the owner's approval, not implemented**. CYLBadge is **not extracted yet**: it is still the `CYLTabBarController/CYLBadgeView` subspec (see "What exists today"). Code follows only after the owner agrees. |
+| 状态：**设计第 2 版，负责人已批准（2026-11-27），尚未实现**。CYLBadge **目前尚未抽离**：它仍是 `CYLTabBarController/CYLBadgeView` 子库（见"现状"）。决定见"负责人的决定"。 | Status: **design version 2, approved by the owner (2026-11-27), not implemented**. CYLBadge is **not extracted yet**: it is still the `CYLTabBarController/CYLBadgeView` subspec (see "What exists today"). Decisions: "Owner decisions". |
 
 ## [CN]目录
 ## [EN]Contents
@@ -34,7 +34,8 @@
 | [实施步骤（同意后）](#cn实施步骤同意后) | [Steps (after approval)](#ensteps-after-approval) |
 | [其他平台（同名）](#cn其他平台同名) | [Other platforms (same names)](#enother-platforms-same-names) |
 | [与 6cba553b 的关系](#cn与-6cba553b-的关系) | [Relation to 6cba553b](#enrelation-to-6cba553b) |
-| [待负责人决定](#cn待负责人决定) | [Questions for the owner](#enquestions-for-the-owner) |
+| [负责人的决定](#cn负责人的决定) | [Owner decisions](#enowner-decisions) |
+| [待负责人决定（已决定，见上）](#cn待负责人决定已决定见上) | [Questions for the owner (decided, see above)](#enquestions-for-the-owner-decided-see-above) |
 
 <!-- navigation:end -->
 
@@ -43,7 +44,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 用户原话（第 2 版）："更新方案将CYLBadge模仿CYLAnimatedItemView抽离CYLtabBarViewController变成一个独立的库，创建类似CYLAnimatedItemView一样的spec文件，CYLtabBarViewController 以及CYLAnimatedItemView他们的core核心代码依赖CYLBadge。如果CYLBadge目前已经完成该抽离，组件化，则文档说明该特性。" 本条按英文记录（见右列）。 | TODO, design v2 30 / 100 (2026-11-27, branch `feat/harmony-animated-item-engines`, PR #824, cloud session without a Mac). The owner asks to extract CYLBadge from CYLTabBarController into an independent library with its own podspec, like `CYLAnimatedItem.podspec`, and to make the core of both CYLTabBarController and CYLAnimatedItemView depend on it; if already extracted, document it. Checked: it is not extracted (the subspec depends on `CYLTabBarController/CYLUtils`, which depends on `CYLAnimatedItem`, the opposite direction). This version replaces v1's renderer registry with a direct dependency. **Rubric (100)**: design v2 here 20; owner approval 10; `CYLBadge.podspec` + SwiftPM product + Carthage target, `pod lib lint` passes 20; CYLTabBarController and CYLAnimatedItem depend on it, old subspec, imports and selectors unchanged for apps 10; `CYLAnimatedItemView.badgeValue` / `badgeAnchorView` 10; TagList keys and the demo without snapshots 10; unit tests and a simulator pixel check 10; other platforms 10. **Pass (60)**: through the item API, with lint. Now: design only (20) plus v1's analysis (10). |
+| 用户原话（第 2 版）："更新方案将CYLBadge模仿CYLAnimatedItemView抽离CYLtabBarViewController变成一个独立的库，创建类似CYLAnimatedItemView一样的spec文件，CYLtabBarViewController 以及CYLAnimatedItemView他们的core核心代码依赖CYLBadge。如果CYLBadge目前已经完成该抽离，组件化，则文档说明该特性。" 本条按英文记录（见右列）。 | TODO, design v2 approved, 40 / 100 (approval on 2026-11-27: "i agree with all of the part of Questions for you (also at the end of the doc): following your recommend.update docs"; all six recommendations accepted, see "Owner decisions"). Earlier: design v2 30 / 100 (2026-11-27, branch `feat/harmony-animated-item-engines`, PR #824, cloud session without a Mac). The owner asks to extract CYLBadge from CYLTabBarController into an independent library with its own podspec, like `CYLAnimatedItem.podspec`, and to make the core of both CYLTabBarController and CYLAnimatedItemView depend on it; if already extracted, document it. Checked: it is not extracted (the subspec depends on `CYLTabBarController/CYLUtils`, which depends on `CYLAnimatedItem`, the opposite direction). This version replaces v1's renderer registry with a direct dependency. **Rubric (100)**: design v2 here 20; owner approval 10; `CYLBadge.podspec` + SwiftPM product + Carthage target, `pod lib lint` passes 20; CYLTabBarController and CYLAnimatedItem depend on it, old subspec, imports and selectors unchanged for apps 10; `CYLAnimatedItemView.badgeValue` / `badgeAnchorView` 10; TagList keys and the demo without snapshots 10; unit tests and a simulator pixel check 10; other platforms 10. **Pass (60)**: through the item API, with lint. Now: design only (20) plus v1's analysis (10). |
 | 用户原话（第 1 版）："以上为最近几次修复的截图，修复前与临时方案修复后效果，你应该创建或者更新badge相关文档，为cylbadge增加 cylanimateditemview支持，cylanimateditemview 直接调用badge新增接口来增加badge，而非用户先找到icon再加badge，你先设计api，先别急着实现。文档创建好后发我https 指向分支的文档地址。我同意后再代码实现。" 本条按英文记录（见右列）。 | Superseded by v2 (2026-11-27, commit e5153fad): v1 kept CYLBadge inside CYLTabBarController and let `CYLAnimatedItem` reach it through a renderer protocol and registry. |
 
 ## [CN]问题
@@ -151,6 +152,8 @@ extension CYLAnimatedItemView: CYLBadgeHosting {
     @objc public var badgeAnchorView: UIView { get }
     /** True while a badge is shown. */
     @objc public var isShowingBadge: Bool { get }
+    /** NO (default): the badge is not measured. YES: measuring reserves its overhang on both sides (D6). */
+    @objc public dynamic var reservesBadgeSpace: Bool
     // CYLBadgeHosting
     @objc public var cylBadgeAnchorView: UIView { badgeAnchorView }
 }
@@ -203,8 +206,21 @@ item.badgeValue = nil     // cleared; the icon does not move or shrink
 |:---|:---|
 | 按 `alignmentRectInsets` 对齐保留（通用规则，对没有内边距的图片无影响）。尚未发布的 `UIView.cylBadgeSnapshotImage(hidingBadge:traitCollection:)` 有了本 API 后不再需要，建议发布前删除（问题 3）。 | Aligning by `alignmentRectInsets` stays (a general rule, no effect on images without insets). The unreleased `UIView.cylBadgeSnapshotImage(hidingBadge:traitCollection:)` becomes unnecessary; the proposal is to remove it before release (question 3). |
 
-## [CN]待负责人决定
-## [EN]Questions for the owner
+## [CN]负责人的决定
+## [EN]Owner decisions
+
+| 中文 | English |
+|:---|:---|
+| 负责人原话（2026-11-27）："i agree with all of the part of Questions for you (also at the end of the doc): following your recommend.update docs"。下面 6 个问题全部按建议执行。 | Owner's words (2026-11-27): "i agree with all of the part of Questions for you (also at the end of the doc): following your recommend.update docs". All six questions below follow the recommendation. |
+| D1. pod 与模块名为 `CYLBadge`；头文件与类名（`CYLBadgeView`、`CYLBadgeAppearance` 等）不变；源码留在 `CYLTabBarController/CYLBadgeView/`，不移动文件。 | D1. Pod and module `CYLBadge`; headers and class names (`CYLBadgeView`, `CYLBadgeAppearance`…) unchanged; sources stay in `CYLTabBarController/CYLBadgeView/`, no file moves. |
+| D2. Liquid Glass 规则下移到 CYLBadge 的 `CYLBadgeAppearance.isLiquidGlassActive()`（含 `liquidGlassActiveOverride`）；`CYLAnimatedItemView.isLiquidGlassActive()` 与 `CYLUtils.isLiquidGlassActive()` 转发给它，仍只有一份规则。 | D2. The Liquid Glass rule moves down into CYLBadge as `CYLBadgeAppearance.isLiquidGlassActive()` (with `liquidGlassActiveOverride`); `CYLAnimatedItemView.isLiquidGlassActive()` and `CYLUtils.isLiquidGlassActive()` forward to it, so there is still one rule. |
+| D3. 发布前删除尚未发布的 `UIView.cylBadgeSnapshotImage(hidingBadge:traitCollection:)`（6cba553b），示例改用 `badgeValue`；按 `alignmentRectInsets` 对齐保留。 | D3. The unreleased `UIView.cylBadgeSnapshotImage(hidingBadge:traitCollection:)` (6cba553b) is removed before release, and the demo moves to `badgeValue`; aligning by `alignmentRectInsets` stays. |
+| D4. 接受：只用 `CYLAnimatedItem` 的库（CollectionViewClassifyMenu、CYLTableViewPlaceHolder）同时带入 CYLBadge 与 `CYLDeallocBlockExecutor`。 | D4. Accepted: libraries that use only `CYLAnimatedItem` (CollectionViewClassifyMenu, CYLTableViewPlaceHolder) also bring CYLBadge and `CYLDeallocBlockExecutor`. |
+| D5. TagList 的 `CYLTagItemKey.badgeValue` / `badgeAttributes` 在 CollectionViewClassifyMenu 仓库实现：本会话获得该仓库权限后由本会话提交，否则由负责人合并；本仓库示例在该提交发布后更新 pin。 | D5. The TagList keys `CYLTagItemKey.badgeValue` / `badgeAttributes` are implemented in the CollectionViewClassifyMenu repository: by this session once it has access to that repository, otherwise merged by the owner; this repository's demo updates its pin after that commit. |
+| D6. 增加 `CYLAnimatedItemView.reservesBadgeSpace`（默认 NO）：为 YES 时测量在两侧为角标的伸出部分留出空间，紧凑的宿主不会裁剪角标；为 NO 时角标不参与测量。 | D6. Add `CYLAnimatedItemView.reservesBadgeSpace` (default NO): when YES, measuring reserves the badge's overhang on both sides, so a tight host does not clip it; when NO, the badge is not measured. |
+
+## [CN]待负责人决定（已决定，见上）
+## [EN]Questions for the owner (decided, see above)
 
 | 中文 | English |
 |:---|:---|
