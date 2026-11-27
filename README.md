@@ -170,7 +170,7 @@ Analyst.ai [App Store Link](https://itunes.apple.com/us/app/analyst-ai/id1345754
 | [Android 版 CYLTabBarController](docs/Android-Library.md) | [CYLTabBarController for Android](docs/Android-Library.md) |
 | [Android 液态玻璃](docs/Android-Liquid-Glass.md) | [Android Liquid Glass](docs/Android-Liquid-Glass.md) |
 | [Android 库与 QMUI_Android、XUI 的 Tab 对比](docs/Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's and XUI's tabs](docs/Android-QMUI-Comparison.md) |
-| [动效 item 角标：CYLAnimatedItemView 直接显示角标（API 设计）](docs/Animated-Item-Badge.md) | [Animated item badges: CYLAnimatedItemView shows its own badge (API design)](docs/Animated-Item-Badge.md) |
+| [CYLBadge 独立组件与动效 item 角标（API 设计）](docs/Animated-Item-Badge.md) | [CYLBadge as an independent component, and animated item badges (API design)](docs/Animated-Item-Badge.md) |
 | [动效 icon + title 共用组件：CYLAnimatedItem](docs/Animated-Item.md) | [The shared animated icon + title component: CYLAnimatedItem](docs/Animated-Item.md) |
 | [角标调试](docs/Badge-Debugging.md) | [Badge debugging](docs/Badge-Debugging.md) |
 | [中英文双语文档](docs/Bilingual-Documentation.md) | [Bilingual Documentation](docs/Bilingual-Documentation.md) |

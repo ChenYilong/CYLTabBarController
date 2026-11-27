@@ -1,5 +1,5 @@
-# [CN]动效 item 角标：CYLAnimatedItemView 直接显示角标（API 设计）
-# [EN]Animated item badges: CYLAnimatedItemView shows its own badge (API design)
+# [CN]CYLBadge 独立组件与动效 item 角标（API 设计）
+# [EN]CYLBadge as an independent component, and animated item badges (API design)
 
 <!-- bound-classes: CYLAnimatedItemView -->
 <!-- binding:start -->
@@ -13,7 +13,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 状态：**API 设计，待负责人确认，尚未实现**。负责人同意后再写代码。 | Status: **API design, waiting for the owner's approval, not implemented**. Code follows only after the owner agrees. |
+| 状态：**设计第 2 版，待负责人确认，尚未实现**。CYLBadge **目前尚未抽离**：它仍是 `CYLTabBarController/CYLBadgeView` 子库（见"现状"）。负责人同意后再写代码。 | Status: **design version 2, waiting for the owner's approval, not implemented**. CYLBadge is **not extracted yet**: it is still the `CYLTabBarController/CYLBadgeView` subspec (see "What exists today"). Code follows only after the owner agrees. |
 
 ## [CN]目录
 ## [EN]Contents
@@ -27,8 +27,11 @@
 | [问题](#cn问题) | [Problem](#enproblem) |
 | [现状](#cn现状) | [What exists today](#enwhat-exists-today) |
 | [目标](#cn目标) | [Goals](#engoals) |
+| [打包：CYLBadge.podspec](#cn打包cylbadgepodspec) | [Packaging: CYLBadge.podspec](#enpackaging-cylbadgepodspec) |
+| [切断对 CYLUtils 的依赖](#cn切断对-cylutils-的依赖) | [Cutting the dependency on CYLUtils](#encutting-the-dependency-on-cylutils) |
 | [API 设计（iOS）](#cnapi-设计ios) | [API design (iOS)](#enapi-design-ios) |
 | [用法](#cn用法) | [Usage](#enusage) |
+| [实施步骤（同意后）](#cn实施步骤同意后) | [Steps (after approval)](#ensteps-after-approval) |
 | [其他平台（同名）](#cn其他平台同名) | [Other platforms (same names)](#enother-platforms-same-names) |
 | [与 6cba553b 的关系](#cn与-6cba553b-的关系) | [Relation to 6cba553b](#enrelation-to-6cba553b) |
 | [待负责人决定](#cn待负责人决定) | [Questions for the owner](#enquestions-for-the-owner) |
@@ -40,14 +43,15 @@
 
 | 中文 | English |
 |:---|:---|
-| 用户原话："以上为最近几次修复的截图，修复前与临时方案修复后效果，你应该创建或者更新badge相关文档，为cylbadge增加 cylanimateditemview支持，cylanimateditemview 直接调用badge新增接口来增加badge，而非用户先找到icon再加badge，你先设计api，先别急着实现。文档创建好后发我https 指向分支的文档地址。我同意后再代码实现。" 本条按英文记录（见右列）。 | TODO, design 60 / 100 (2026-11-27, branch `feat/harmony-animated-item-engines`, PR #824, cloud session without a Mac). The owner asks for badge support on `CYLAnimatedItemView`: the item shows a badge through a new API, the app never looks up the icon first. Design first, code only after approval. **Rubric (100)**: the API is designed and documented here 30; the owner approves it 10; iOS implemented (CYLAnimatedItem, Core renderer, the existing `cyl_showBadge…` path) 20; TagList keys and the demo use it, no snapshot 10; unit tests pass 10; simulator pixel check (icon centred, badge at the icon's corner, during and after an animation) 10; Android, HarmonyOS, mini program, React Native and Flutter 10. **Pass (60)**: the design, approved, plus iOS with tests. Now: the design only (30), with the problem shots and open questions; the rest waits for approval. |
+| 用户原话（第 2 版）："更新方案将CYLBadge模仿CYLAnimatedItemView抽离CYLtabBarViewController变成一个独立的库，创建类似CYLAnimatedItemView一样的spec文件，CYLtabBarViewController 以及CYLAnimatedItemView他们的core核心代码依赖CYLBadge。如果CYLBadge目前已经完成该抽离，组件化，则文档说明该特性。" 本条按英文记录（见右列）。 | TODO, design v2 30 / 100 (2026-11-27, branch `feat/harmony-animated-item-engines`, PR #824, cloud session without a Mac). The owner asks to extract CYLBadge from CYLTabBarController into an independent library with its own podspec, like `CYLAnimatedItem.podspec`, and to make the core of both CYLTabBarController and CYLAnimatedItemView depend on it; if already extracted, document it. Checked: it is not extracted (the subspec depends on `CYLTabBarController/CYLUtils`, which depends on `CYLAnimatedItem`, the opposite direction). This version replaces v1's renderer registry with a direct dependency. **Rubric (100)**: design v2 here 20; owner approval 10; `CYLBadge.podspec` + SwiftPM product + Carthage target, `pod lib lint` passes 20; CYLTabBarController and CYLAnimatedItem depend on it, old subspec, imports and selectors unchanged for apps 10; `CYLAnimatedItemView.badgeValue` / `badgeAnchorView` 10; TagList keys and the demo without snapshots 10; unit tests and a simulator pixel check 10; other platforms 10. **Pass (60)**: through the item API, with lint. Now: design only (20) plus v1's analysis (10). |
+| 用户原话（第 1 版）："以上为最近几次修复的截图，修复前与临时方案修复后效果，你应该创建或者更新badge相关文档，为cylbadge增加 cylanimateditemview支持，cylanimateditemview 直接调用badge新增接口来增加badge，而非用户先找到icon再加badge，你先设计api，先别急着实现。文档创建好后发我https 指向分支的文档地址。我同意后再代码实现。" 本条按英文记录（见右列）。 | Superseded by v2 (2026-11-27, commit e5153fad): v1 kept CYLBadge inside CYLTabBarController and let `CYLAnimatedItem` reach it through a renderer protocol and registry. |
 
 ## [CN]问题
 ## [EN]Problem
 
 | 中文 | English |
 |:---|:---|
-| 示例中的 Badge Tag（`CYLAnimatedItemView` 子类）只能接收图片，所以示例先找到行的图标，再把"图标 + 角标"渲染成一张图片交给 Tag。结果：(1) Tag 让整张图片居中，图标偏离中线；(2) 角标清除后图片变小，图标跟着缩小（上图第 2 个 Tag）；(3) 角标是图片的一部分，没有动画；(4) 每个接入方都要自己处理几何。6baaf74e 在示例中把图片对称扩展，6cba553b 让核心按 `alignmentRectInsets` 对齐，都只是绕过问题。 | The demo's badge tags (a `CYLAnimatedItemView` subclass) take only an image, so the demo first finds the row's icon and then renders "icon + badge" into one image for the tag. Results: (1) the tag centres the whole image, so the icon is off the centre line; (2) a cleared badge makes the image smaller, so the icon shrinks (tag 2 in the first shot); (3) the badge is part of a picture, so it cannot animate; (4) every adopter does the geometry itself. 6baaf74e padded the image in the example, and 6cba553b made the core align by `alignmentRectInsets`: both work around the problem. |
+| 示例中的 Badge Tag（`CYLAnimatedItemView` 子类）只能接收图片，所以示例先找到行的图标，再把"图标 + 角标"渲染成一张图片交给 Tag：(1) Tag 让整张图片居中，图标偏离中线；(2) 角标清除后图片变小，图标跟着缩小（上图第 2 个 Tag）；(3) 角标是图片，不能动画；(4) 每个接入方都要自己处理几何。6baaf74e（示例）与 6cba553b（核心按 `alignmentRectInsets` 对齐）都只是绕过问题。根本原因：`CYLAnimatedItem` 不能依赖角标组件，因为角标组件在 CYLTabBarController 里。 | The demo's badge tags (a `CYLAnimatedItemView` subclass) take only an image, so the demo finds the row's icon and renders "icon + badge" into one image: (1) the tag centres the whole image, so the icon is off the centre line; (2) a cleared badge makes the image smaller and the icon shrinks (tag 2 in the first shot); (3) a badge in a picture cannot animate; (4) every adopter does the geometry. 6baaf74e (example) and 6cba553b (core aligns by `alignmentRectInsets`) work around it. Root cause: `CYLAnimatedItem` cannot depend on the badge component, because that component lives inside CYLTabBarController. |
 | ![修复前与示例层临时方案](assets/ios-animated-item-badge-tags-before-after-6baaf74e.png) | ![Before, and the example-only workaround](assets/ios-animated-item-badge-tags-before-after-6baaf74e.png) |
 
 ## [CN]现状
@@ -55,102 +59,153 @@
 
 | 中文 | English |
 |:---|:---|
-| 发给 `CYLAnimatedItemView` 的 `-cyl_showBadgeValue:…` 已经会转发给图标（`UIView.cylAnimatedItemBadgeHost()`，按类名与 KVC 查找 `animationView` / `imageView`）。不足：(1) 动画开始时 `imageView` 被隐藏，挂在它上面的角标一起消失，只有 TabBar 会用 `-cyl_moveBadgeToView:` 搬角标；(2) 换文件、换图片时宿主视图被替换；(3) 只依赖 `CYLAnimatedItem` 的库（CollectionViewClassifyMenu 的 TagList）看不到角标组件，无法调用；(4) 角标描述没有进入 item 的无障碍值。 | `-cyl_showBadgeValue:…` sent to a `CYLAnimatedItemView` is already forwarded to its icon (`UIView.cylAnimatedItemBadgeHost()`, which finds `animationView` / `imageView` by class name and KVC). Gaps: (1) when an animation starts, `imageView` is hidden and the badge on it disappears with it; only the tab bar moves badges with `-cyl_moveBadgeToView:`; (2) a new file or image replaces the host view; (3) a library that depends only on `CYLAnimatedItem` (CollectionViewClassifyMenu's TagList) cannot see the badge component, so it cannot call it; (4) the badge description does not reach the item's accessibility value. |
+| **尚未抽离。** CocoaPods：`CYLTabBarController/CYLBadgeView` 子库（源码 `CYLTabBarController/CYLBadgeView/`），依赖 `CYLTabBarController/CYLUtils` 与 `CYLDeallocBlockExecutor`；`CYLUtils` 又依赖 `CYLAnimatedItem/Core`。SwiftPM：角标的 Swift 源码编译在 `CYLTabBarController` target 内，没有单独的产品。角标对 CYLUtils 的实际依赖很少：关联对象键 `CYLUtilsKeys.key`（27 处）、`CYLUtils.isLiquidGlassActive`（6 处）、本地化 `CYLLocalizedString`（无障碍描述）与资源包、`cylIsInvisiable()`（1 处）。对 TabBar 类（`CYLTabBar`、`CYLPlusButton`、`CYLFlatDesignTabBar`、`CYLAnimatedItemView`）只按类名查找，没有编译依赖。发给 `CYLAnimatedItemView` 的 `-cyl_showBadgeValue:…` 已转发给图标（`cylAnimatedItemBadgeHost()`，按类名与 KVC），但动画开始时 `imageView` 隐藏，角标随之消失。 | **Not extracted.** CocoaPods: the `CYLTabBarController/CYLBadgeView` subspec (sources in `CYLTabBarController/CYLBadgeView/`), depending on `CYLTabBarController/CYLUtils` and `CYLDeallocBlockExecutor`; `CYLUtils` depends on `CYLAnimatedItem/Core`. SwiftPM: the badge's Swift sources compile inside the `CYLTabBarController` target, with no product of their own. What the badge really takes from CYLUtils is small: associated-object keys `CYLUtilsKeys.key` (27 uses), `CYLUtils.isLiquidGlassActive` (6), localization `CYLLocalizedString` (the accessibility description) and the resource bundle, `cylIsInvisiable()` (1). Tab bar classes (`CYLTabBar`, `CYLPlusButton`, `CYLFlatDesignTabBar`, `CYLAnimatedItemView`) are found by class name only, with no compile dependency. `-cyl_showBadgeValue:…` sent to a `CYLAnimatedItemView` is already forwarded to its icon (`cylAnimatedItemBadgeHost()`, by class name and KVC), but when an animation starts `imageView` hides and the badge disappears with it. |
 
 ## [CN]目标
 ## [EN]Goals
 
 | 中文 | English |
 |:---|:---|
-| 1. 一行代码：在 item 上设置角标，不找图标。2. 角标是覆盖层：不参与测量，不改变图标对齐，图标始终以自身居中。3. 角标贴在图标（不含角标的图标本身）的右上角，随布局（横向 / 纵向、从右到左）、图片与动画切换移动，动画播放时不消失。4. 只链接 `CYLAnimatedItem` 也能用（TagList）；链接 CYLTabBarController 时使用完整的 CYLBadgeView（样式、动画、减弱动态效果）。5. 无障碍：item 的无障碍值包含角标描述。6. 不删除、不修改任何公开 API；`CYLAnimatedItem` 仍不依赖 CYLTabBarController。 | 1. One line: set the badge on the item, never look up its icon. 2. The badge is an overlay: it is not measured and never changes the icon's alignment; the icon is always centred by itself. 3. The badge sits at the top-trailing corner of the icon (the icon itself, without a badge part), and follows it through layouts (horizontal / vertical, right-to-left), image and animation changes; it stays visible while an animation plays. 4. It works with `CYLAnimatedItem` alone (TagList); with CYLTabBarController linked, it uses the full CYLBadgeView (styles, animations, Reduce Motion). 5. Accessibility: the item's accessibility value includes the badge description. 6. No public API is removed or changed; `CYLAnimatedItem` still does not depend on CYLTabBarController. |
+| 1. CYLBadge 成为独立的库（pod、SwiftPM 产品、Carthage framework），与 `CYLAnimatedItem` 的做法相同，不依赖本仓库的其他库。2. 依赖方向：`CYLDeallocBlockExecutor` ← **CYLBadge** ← `CYLAnimatedItem/Core` ← CYLTabBarController（CYLUtils、Core）。CYLTabBarController 与 CYLAnimatedItemView 的核心代码都依赖 CYLBadge。3. 对 App 不变：`pod 'CYLTabBarController'`、`pod 'CYLTabBarController/CYLBadgeView'`、`import CYLTabBarController`、`#import <CYLTabBarController/CYLBadgeView.h>`、所有 `cyl_badge…` selector 照常可用。4. item 一行代码显示角标，不找图标；角标是覆盖层，不改变图标对齐与测量，随图标移动，动画播放时不消失。5. 无障碍：item 的无障碍值包含角标描述。 | 1. CYLBadge becomes an independent library (pod, SwiftPM product, Carthage framework), done the same way as `CYLAnimatedItem`, depending on no other library of this repository. 2. Dependency direction: `CYLDeallocBlockExecutor` ← **CYLBadge** ← `CYLAnimatedItem/Core` ← CYLTabBarController (CYLUtils, Core). The core of CYLTabBarController and of CYLAnimatedItemView both depend on CYLBadge. 3. Nothing changes for apps: `pod 'CYLTabBarController'`, `pod 'CYLTabBarController/CYLBadgeView'`, `import CYLTabBarController`, `#import <CYLTabBarController/CYLBadgeView.h>` and every `cyl_badge…` selector keep working. 4. An item shows a badge in one line, without looking up its icon; the badge is an overlay that never changes the icon's alignment or size, follows the icon, and stays visible while an animation plays. 5. Accessibility: the item's accessibility value includes the badge description. |
+
+## [CN]打包：CYLBadge.podspec
+## [EN]Packaging: CYLBadge.podspec
+
+| 中文 | English |
+|:---|:---|
+| 仿照 `CYLAnimatedItem.podspec`：同一仓库、同一 tag、同一版本；源码留在原目录 `CYLTabBarController/CYLBadgeView/`（不移动文件，历史与链接不变）；`DEFINES_MODULE`，模块名 `CYLBadge`；资源包 `CYLBadge.bundle`（角标的本地化字符串 33 种语言、`LICENSE`）。 | Modelled on `CYLAnimatedItem.podspec`: same repository, tag and version; sources stay in `CYLTabBarController/CYLBadgeView/` (no file moves, history and links unchanged); `DEFINES_MODULE`, module `CYLBadge`; resource bundle `CYLBadge.bundle` (the badge's localized strings in 33 languages, `LICENSE`). |
+
+```ruby
+# CYLBadge.podspec (sketch)
+Pod::Spec.new do |s|
+  s.name             = "CYLBadge"
+  s.version          = "1.100.0"           # same as CYLTabBarController and CYLAnimatedItem
+  s.summary          = "Animated badges for any UIView, UIControl, UIBarButtonItem and UITabBarItem"
+  s.license          = { :type => 'MIT', :file => 'LICENSE' }
+  s.platform         = :ios, '15.0'
+  s.swift_versions   = ['5.0']
+  s.source           = { :git => "https://github.com/ChenYilong/CYLTabBarController.git", :tag => s.version.to_s }
+  s.static_framework = true
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
+  s.source_files        = 'CYLTabBarController/CYLBadgeView/**/*.{h,m,swift}'
+  s.public_header_files = 'CYLTabBarController/CYLBadgeView/**/*.h'
+  s.private_header_files = 'CYLTabBarController/CYLBadgeView/CYLBadgeViewDefines.h'
+  s.resources        = ['CYLTabBarController/CYLBadgeView/Resources/CYLBadge.bundle']
+  s.dependency 'CYLDeallocBlockExecutor', '~> 1.4'
+  s.frameworks       = 'UIKit', 'QuartzCore'
+end
+```
+
+```ruby
+# CYLAnimatedItem.podspec, subspec Core: one new line
+core.dependency 'CYLBadge', s.version.to_s
+
+# CYLTabBarController.podspec: the old subspec stays as a name (as `CYLTabBarController/CYLAnimatedItem` does)
+s.subspec 'CYLBadgeView' do |badge|
+  badge.dependency 'CYLBadge', s.version.to_s
+end
+# CYLUtils already depends on CYLAnimatedItem/Core, so it gets CYLBadge; Core keeps `core.dependency 'CYLTabBarController/CYLBadgeView'`.
+```
+
+| 中文 | English |
+|:---|:---|
+| **SwiftPM**：新 target `CYLBadge`（Swift 源码 `CYLBadgeView/Swift`，Objective-C 头文件经 `include/module.modulemap`），新产品 `.library(name: "CYLBadge")`；`CYLAnimatedItem` 与 `CYLTabBarController` target 依赖它，并从 `CYLTabBarController` 的 `sources` 中移除 `CYLBadgeView/Swift`。**Carthage**：在 `CYLTabBarController.xcodeproj` 中增加共享 scheme 的 `CYLBadge` framework target（与 `CYLAnimatedItem` 相同）。**示例 Podfile**：17 个按路径引入 `CYLAnimatedItem` 的 Podfile 同样加一行 `pod 'CYLBadge', :path => …`（两者发布到 trunk 之前）。 | **SwiftPM**: a new target `CYLBadge` (Swift sources `CYLBadgeView/Swift`, Objective-C headers through `include/module.modulemap`) and a new product `.library(name: "CYLBadge")`; the `CYLAnimatedItem` and `CYLTabBarController` targets depend on it, and `CYLBadgeView/Swift` leaves the `CYLTabBarController` target's `sources`. **Carthage**: a `CYLBadge` framework target with a shared scheme in `CYLTabBarController.xcodeproj` (as `CYLAnimatedItem` has). **Example Podfiles**: the 17 Podfiles that take `CYLAnimatedItem` by path add `pod 'CYLBadge', :path => …` the same way (until both are on the trunk). |
+
+## [CN]切断对 CYLUtils 的依赖
+## [EN]Cutting the dependency on CYLUtils
+
+| 中文 | English |
+|:---|:---|
+| 1. 关联对象键：`CYLUtilsKeys.key(…)` → CYLBadge 内部的 `CYLBadgeKeys.key(…)`（相同的键字符串，已有数据不受影响）。2. `cylIsInvisiable()`：在 CYLBadge 中复制为内部函数。3. 本地化：角标的字符串移到 `CYLBadge.bundle`，新宏 `CYLBadgeLocalizedString`（每层一个宏，加入 `scripts/check-localization-macros.py`）；`CYLTabBarController.bundle` 中保留原键，兼容旧调用。4. Liquid Glass 判断：规则目前在 `CYLAnimatedItemView.isLiquidGlassActive()`，但 CYLBadge 在它下面，不能调用它。方案：规则下移到 CYLBadge 的 `CYLBadgeAppearance.isLiquidGlassActive()`（含 `liquidGlassActiveOverride`），`CYLAnimatedItemView.isLiquidGlassActive()` 与 `CYLUtils.isLiquidGlassActive()` 转发给它：仍是唯一一份规则（见问题 2）。5. 按类名查找 TabBar 类的代码保留（无编译依赖）；`cylAnimatedItemBadgeHost()` 改为协议（见下）。6. `@_exported import CYLBadge` 放在 CYLUtils 中，`import CYLTabBarController` 仍能看到全部角标 API；`CYLTabBarController/CYLBadgeView.h` 等头文件改为转发 `<CYLBadge/…>`（`__has_include` 兜底）。 | 1. Associated-object keys: `CYLUtilsKeys.key(…)` → an internal `CYLBadgeKeys.key(…)` in CYLBadge (same key strings, so stored values are unaffected). 2. `cylIsInvisiable()`: copied into CYLBadge as an internal function. 3. Localization: the badge's strings move to `CYLBadge.bundle` with a new macro `CYLBadgeLocalizedString` (one macro per layer, added to `scripts/check-localization-macros.py`); `CYLTabBarController.bundle` keeps the old keys for old callers. 4. The Liquid Glass check: the rule lives in `CYLAnimatedItemView.isLiquidGlassActive()` today, but CYLBadge sits below it and cannot call it. Proposal: move the rule down into CYLBadge as `CYLBadgeAppearance.isLiquidGlassActive()` (with `liquidGlassActiveOverride`); `CYLAnimatedItemView.isLiquidGlassActive()` and `CYLUtils.isLiquidGlassActive()` forward to it, so there is still one rule (question 2). 5. The class-name lookups of tab bar classes stay (no compile dependency); `cylAnimatedItemBadgeHost()` becomes a protocol (below). 6. `@_exported import CYLBadge` in CYLUtils, so `import CYLTabBarController` still sees every badge API; `CYLTabBarController/CYLBadgeView.h` and the other headers forward to `<CYLBadge/…>` (with a `__has_include` fallback). |
 
 ## [CN]API 设计（iOS）
 ## [EN]API design (iOS)
 
 | 中文 | English |
 |:---|:---|
-| **A. 组件 `CYLAnimatedItem`（无依赖）**：`CYLAnimatedItemView` 新增 `badgeValue`（nil 无角标，"" 红点，其他为文字或数字）、`badgeAttributes`（样式字典，键见 C）、只读的 `badgeAnchorView` 与 `isShowingBadge`，以及类属性 `badgeRenderer`（绘制角标的对象，见 B）。 | **A. The component `CYLAnimatedItem` (no dependency)**: `CYLAnimatedItemView` gets `badgeValue` (nil: no badge, "": a dot, otherwise text or a number), `badgeAttributes` (a style dictionary, keys in C), the read-only `badgeAnchorView` and `isShowingBadge`, and the class property `badgeRenderer` (the object that draws badges, see B). |
+| **A. CYLBadge：宿主协议 `CYLBadgeHosting`**。任何视图都可以把角标交给自己的某个子视图（图标）。角标组件在宿主遵守该协议时，把 `cyl_showBadge…` / `cyl_clearBadge` 等消息发给 `cylBadgeAnchorView`，无障碍描述写到 `cylBadgeAccessibilityHost`。它取代按类名查找的 `cylAnimatedItemBadgeHost()`（该方法保留，改为返回协议给出的视图）。 | **A. CYLBadge: the host protocol `CYLBadgeHosting`**. Any view can hand its badge to one of its subviews (its icon). When a host adopts it, the badge component sends `cyl_showBadge…` / `cyl_clearBadge` and the rest to `cylBadgeAnchorView`, and writes the accessibility description to `cylBadgeAccessibilityHost`. It replaces the class-name lookup `cylAnimatedItemBadgeHost()` (kept, now returning the protocol's view). |
 
 ```swift
-// CYLAnimatedItem: CYLAnimatedItemView (new members only)
-extension CYLAnimatedItemView {
-    /** nil: no badge (default); "": a dot; otherwise the text, a number above `maximumNumber` shows "99+". */
+// CYLBadge
+@objc public protocol CYLBadgeHosting: NSObjectProtocol {
+    /** The view the badge is added to (e.g. a view kept on the icon). */
+    @objc var cylBadgeAnchorView: UIView { get }
+    /** The element whose accessibilityValue gets the badge description; the host itself when not implemented. */
+    @objc optional var cylBadgeAccessibilityHost: NSObject { get }
+}
+```
+
+| 中文 | English |
+|:---|:---|
+| **B. CYLAnimatedItem：`CYLAnimatedItemView` 新增成员**（直接 `import CYLBadge`，没有渲染器协议，也没有注册表）。 | **B. CYLAnimatedItem: new members of `CYLAnimatedItemView`** (it imports CYLBadge directly: no renderer protocol, no registry). |
+
+```swift
+// CYLAnimatedItem: CYLAnimatedItemView adopts CYLBadgeHosting
+extension CYLAnimatedItemView: CYLBadgeHosting {
+    /** nil: no badge (default); "": a dot; otherwise the text (a number above the maximum shows "99+"). */
     @objc public dynamic var badgeValue: String?
-    /** Style of the badge; keys `CYLAnimatedItemBadgeKey` (C). nil: the renderer's defaults. */
+    /** Badge style; keys `CYLBadgeAttributeKey` (C). nil: CYLBadge's defaults (`CYLBadgeAppearance`). */
     @objc public dynamic var badgeAttributes: [String: Any]?
     /** A transparent view kept on the icon itself (the image minus its `alignmentRectInsets`, or the animation) at every
-        layout; never hidden by an image / animation switch; not measured, not touchable, hidden from accessibility.
-        Badges live here. Read-only. */
+        layout; never hidden by an image / animation switch; not measured, not touchable, hidden from accessibility. */
     @objc public var badgeAnchorView: UIView { get }
     /** True while a badge is shown. */
     @objc public var isShowingBadge: Bool { get }
-    /** Draws badges for every item. nil (default): the built-in basic badge (a red capsule, no animation).
-        CYLTabBarController's Core sets its CYLBadgeView renderer at launch. */
-    @objc public class var badgeRenderer: CYLAnimatedItemBadgeRendering? { get set }
-}
-```
-
-```objc
-// Objective-C (generated names)
-item.badgeValue = @"3";
-item.badgeAttributes = @{ CYLAnimatedItemBadgeKeyAnimation: @"scale" };
-```
-
-| 中文 | English |
-|:---|:---|
-| **B. 绘制协议**（在 `CYLAnimatedItem` 中声明，Swift 协议只含要求）：item 的角标变化时调用渲染器；渲染器只在 `anchor` 上加角标，因此角标随图标移动。可选的描述方法供无障碍使用。 | **B. Rendering protocol** (declared in `CYLAnimatedItem`; a Swift protocol holds requirements only): the item calls the renderer when its badge changes; the renderer adds the badge on `anchor` only, so the badge moves with the icon. The optional description method feeds accessibility. |
-
-```swift
-@objc public protocol CYLAnimatedItemBadgeRendering: NSObjectProtocol {
-    func animatedItem(_ item: CYLAnimatedItemView, showBadgeValue value: String,
-                      attributes: [String: Any], on anchor: UIView)
-    func animatedItem(_ item: CYLAnimatedItemView, clearBadgeOn anchor: UIView)
-    @objc optional func animatedItem(_ item: CYLAnimatedItemView,
-                                     accessibilityDescriptionForBadgeValue value: String) -> String?
+    // CYLBadgeHosting
+    @objc public var cylBadgeAnchorView: UIView { badgeAnchorView }
 }
 ```
 
 | 中文 | English |
 |:---|:---|
-| **C. 样式键 `CYLAnimatedItemBadgeKey`**：与 `CYLTabBarHostView.badgeAttributes`（React Native、Flutter）相同的字符串，并补充几个：`color`（背景色）、`animation`（`none`、`scale`、`shake`、`bounce`、`breathe`、`rotation`、`spring` 等，与 `CYLBadgeAnimationType` 同名）、`radius`（红点半径）、`centerOffset`（相对图标右上角）、`textColor`、`font`、`borderColor`、`borderWidth`、`maximumNumber`、`respectsReduceMotion`。值可以是对象或字符串（`#RRGGBB`、`{x, y}`），便于配置文件使用。 | **C. Style keys `CYLAnimatedItemBadgeKey`**: the same strings as `CYLTabBarHostView.badgeAttributes` (React Native, Flutter), plus a few: `color` (background), `animation` (`none`, `scale`, `shake`, `bounce`, `breathe`, `rotation`, `spring`…, named as `CYLBadgeAnimationType`), `radius` (dot radius), `centerOffset` (from the icon's top-trailing corner), `textColor`, `font`, `borderColor`, `borderWidth`, `maximumNumber`, `respectsReduceMotion`. Values are objects or strings (`#RRGGBB`, `{x, y}`), so configuration files can use them. |
-| **D. CYLTabBarController Core**：新增内部渲染器 `CYLAnimatedItemBadgeViewRenderer`，启动时设为 `CYLAnimatedItemView.badgeRenderer`；它在 `anchor` 上调用现有的 `-cyl_showBadgeValue:animationTypeValue:` 与 `cyl_badge…` 样式属性，所以外观、动画、减弱动态效果与其他角标完全一致。`UIView.cylAnimatedItemBadgeHost()` 在 item 有 `badgeAnchorView` 时返回它（按 selector 判断，不加依赖），因此 `item.cyl_showBadgeValue("3", animationType: .scale)` 与 `item.badgeValue = "3"` 落在同一个视图上，旧代码不变也得到修复。 | **D. CYLTabBarController Core**: a new internal renderer `CYLAnimatedItemBadgeViewRenderer`, set as `CYLAnimatedItemView.badgeRenderer` at launch; it calls the existing `-cyl_showBadgeValue:animationTypeValue:` and the `cyl_badge…` style properties on `anchor`, so look, animations and Reduce Motion match every other badge. `UIView.cylAnimatedItemBadgeHost()` returns `badgeAnchorView` when the item has one (checked by selector, no new dependency), so `item.cyl_showBadgeValue("3", animationType: .scale)` and `item.badgeValue = "3"` land on the same view, and old code gets the fix unchanged. |
-| **E. 布局规则**：`badgeAnchorView` 位于图标与动画视图之上；每次 `layoutContent(in:)` 后其 frame 等于图标本身（6cba553b 的 glyph frame）；分割线或隐藏图标时隐藏；item 裁剪（`clipsToBounds`）时沿用角标组件现有的浮层。角标不参与 `contentSizeThatFits`。子类重写 `layoutContent(in:)` 时，调用 `super` 或自行设置 `badgeAnchorView.frame`。 | **E. Layout rules**: `badgeAnchorView` sits above the icon and the animation view; after every `layoutContent(in:)` its frame is the icon itself (the glyph frame of 6cba553b); it hides for a divider or a hidden icon; when the item clips (`clipsToBounds`), the badge component's existing overlay is used. The badge is not part of `contentSizeThatFits`. A subclass that overrides `layoutContent(in:)` calls `super` or sets `badgeAnchorView.frame` itself. |
-| **F. 无障碍**：显示角标时，item 的 `accessibilityValue` 为原值加角标描述（渲染器的描述，或组件包内的本地化文字 "N 条新消息" / "新消息"），清除时恢复原值；角标视图本身对无障碍隐藏。 | **F. Accessibility**: while a badge shows, the item's `accessibilityValue` is its own value plus the badge description (the renderer's, or the component bundle's localized "N new items" / "New"), restored when cleared; the badge view itself is hidden from accessibility. |
-| **G. TagList（CollectionViewClassifyMenu，另一个仓库）**：新增 `CYLTagItemKey.badgeValue` 与 `CYLTagItemKey.badgeAttributes`，Tag 按钮把它们设置到 `badgeValue` / `badgeAttributes`；Tag 宽度不变。示例的 `badgeItem` 只传这两个键，删除快照代码与 `CYLMenuStyleKey.imageSize`。 | **G. TagList (CollectionViewClassifyMenu, another repository)**: new keys `CYLTagItemKey.badgeValue` and `CYLTagItemKey.badgeAttributes`; the tag button sets them as `badgeValue` / `badgeAttributes`; tag widths do not change. The demo's `badgeItem` passes only these two keys; the snapshot code and the `CYLMenuStyleKey.imageSize` override go away. |
+| 设置 `badgeValue` 等于在 `badgeAnchorView` 上调用 `cyl_showBadgeValue(_:animationType:)`（或 `cyl_clearBadge()`），并按 `badgeAttributes` 设置 `cyl_badge…` 样式；`item.cyl_showBadgeValue("3", animationType: .scale)` 通过协议落在同一个视图上，两种写法等价。 | Setting `badgeValue` calls `cyl_showBadgeValue(_:animationType:)` (or `cyl_clearBadge()`) on `badgeAnchorView` and applies `badgeAttributes` through the `cyl_badge…` style properties; `item.cyl_showBadgeValue("3", animationType: .scale)` reaches the same view through the protocol, so both spellings are the same badge. |
+| **C. 样式键 `CYLBadgeAttributeKey`（CYLBadge）**：与 `CYLTabBarHostView.badgeAttributes`（React Native、Flutter）相同的字符串，并补充：`value`、`color`、`animation`（与 `CYLBadgeAnimationType` 同名：`none`、`scale`、`shake`、`bounce`、`breathe`、`rotation`、`spring`…）、`radius`、`centerOffset`（相对图标右上角）、`textColor`、`font`、`borderColor`、`borderWidth`、`maximumNumber`、`respectsReduceMotion`。值可为对象或字符串（`#RRGGBB`、`{x, y}`）。同一个解析函数 `UIView.cylApplyBadgeAttributes(_:)` 供 item、`CYLTabBarHostView` 与配置文件共用，`cylTabBarHostBadge…` 常量保留并等于这些键。 | **C. Style keys `CYLBadgeAttributeKey` (CYLBadge)**: the same strings as `CYLTabBarHostView.badgeAttributes` (React Native, Flutter), plus more: `value`, `color`, `animation` (named as `CYLBadgeAnimationType`: `none`, `scale`, `shake`, `bounce`, `breathe`, `rotation`, `spring`…), `radius`, `centerOffset` (from the icon's top-trailing corner), `textColor`, `font`, `borderColor`, `borderWidth`, `maximumNumber`, `respectsReduceMotion`. Values are objects or strings (`#RRGGBB`, `{x, y}`). One parser, `UIView.cylApplyBadgeAttributes(_:)`, serves the item, `CYLTabBarHostView` and configuration files; the `cylTabBarHostBadge…` constants stay and equal these keys. |
+| **D. 布局规则**：`badgeAnchorView` 位于图标与动画视图之上；每次 `layoutContent(in:)` 后其 frame 为图标本身（6cba553b 的 glyph frame）；分割线或隐藏图标时隐藏；item 裁剪时使用 CYLBadge 现有的浮层。角标不参与 `contentSizeThatFits`。子类重写 `layoutContent(in:)` 时调用 `super`，或自行设置 `badgeAnchorView.frame`。 | **D. Layout rules**: `badgeAnchorView` sits above the icon and the animation view; after every `layoutContent(in:)` its frame is the icon itself (the glyph frame of 6cba553b); it hides for a divider or a hidden icon; when the item clips, CYLBadge's existing overlay is used. The badge is not part of `contentSizeThatFits`. A subclass that overrides `layoutContent(in:)` calls `super` or sets `badgeAnchorView.frame` itself. |
+| **E. 无障碍**：显示角标时，item 的 `accessibilityValue` 为原值加 CYLBadge 的描述（"N 条新消息" / "新消息"，`CYLBadge.bundle`），清除时恢复；角标视图对无障碍隐藏。 | **E. Accessibility**: while a badge shows, the item's `accessibilityValue` is its own value plus CYLBadge's description ("N new items" / "New", from `CYLBadge.bundle`), restored when cleared; the badge view is hidden from accessibility. |
+| **F. TagList（CollectionViewClassifyMenu，另一个仓库）**：新增 `CYLTagItemKey.badgeValue` 与 `CYLTagItemKey.badgeAttributes`，Tag 按钮设置到 `badgeValue` / `badgeAttributes`（它已依赖 `CYLAnimatedItem`，因此自动得到 CYLBadge）。示例的 `badgeItem` 只传这两个键，删除快照与 `imageSize` 覆盖。 | **F. TagList (CollectionViewClassifyMenu, another repository)**: new keys `CYLTagItemKey.badgeValue` and `CYLTagItemKey.badgeAttributes`, set on the tag button's `badgeValue` / `badgeAttributes` (it already depends on `CYLAnimatedItem`, so it gets CYLBadge). The demo's `badgeItem` passes only these keys; the snapshot and the `imageSize` override go away. |
 
 ## [CN]用法
 ## [EN]Usage
 
 ```swift
+// Badges alone, no tab bar:  pod 'CYLBadge'   /   import CYLBadge
+avatarView.cyl_showBadgeValue("3", animationType: .scale)
+
 // Any animated item (a tag, a chip, a FlatDesign tab button)
 item.badgeValue = "3"
-item.badgeAttributes = [CYLAnimatedItemBadgeKey.animation: "scale",
-                        CYLAnimatedItemBadgeKey.color: "#FF3B30"]
+item.badgeAttributes = [CYLBadgeAttributeKey.animation: "scale", CYLBadgeAttributeKey.color: "#FF3B30"]
 item.badgeValue = ""      // a dot
 item.badgeValue = nil     // cleared; the icon does not move or shrink
 
-// TagList item (after G)
+// TagList item (after F)
 [CYLTagItemKey.title: "1. Scale", CYLTagItemKey.image: icon,
- CYLTagItemKey.badgeValue: "3", CYLTagItemKey.badgeAttributes: [CYLAnimatedItemBadgeKey.animation: "scale"]]
+ CYLTagItemKey.badgeValue: "3", CYLTagItemKey.badgeAttributes: [CYLBadgeAttributeKey.animation: "scale"]]
 ```
+
+## [CN]实施步骤（同意后）
+## [EN]Steps (after approval)
+
+| 中文 | English |
+|:---|:---|
+| 1. `CYLBadge.podspec`、`CYLBadge.bundle`（本地化 + `LICENSE`），`CYLBadgeKeys`、`CYLBadgeLocalizedString`，Liquid Glass 规则下移；`pod lib lint CYLBadge.podspec --quick`。2. `CYLAnimatedItem/Core` 与 `CYLTabBarController/CYLBadgeView` 依赖 `CYLBadge`；`@_exported import`、转发头文件；SwiftPM 与 Carthage target；检查脚本（`check-license-notices.py`、`check-localization-macros.py`）与 `docs/License-Notices.md`。3. `CYLBadgeHosting`、`CYLBadgeAttributeKey`、`cylApplyBadgeAttributes`；`CYLAnimatedItemView` 的 `badgeValue`、`badgeAttributes`、`badgeAnchorView`。4. 单元测试（图标居中不受角标影响、动画期间角标可见、清除后图标不缩小、无障碍值），17 个示例 Podfile，示例改用新 API，模拟器像素检查。5. CollectionViewClassifyMenu 的两个键。6. Android、鸿蒙、小程序、React Native、Flutter 同名 API（Win 会话）。 | 1. `CYLBadge.podspec`, `CYLBadge.bundle` (localization + `LICENSE`), `CYLBadgeKeys`, `CYLBadgeLocalizedString`, the Liquid Glass rule moved down; `pod lib lint CYLBadge.podspec --quick`. 2. `CYLAnimatedItem/Core` and `CYLTabBarController/CYLBadgeView` depend on `CYLBadge`; `@_exported import`, forwarding headers; SwiftPM and Carthage targets; the check scripts (`check-license-notices.py`, `check-localization-macros.py`) and `docs/License-Notices.md`. 3. `CYLBadgeHosting`, `CYLBadgeAttributeKey`, `cylApplyBadgeAttributes`; `CYLAnimatedItemView`'s `badgeValue`, `badgeAttributes`, `badgeAnchorView`. 4. Unit tests (the icon stays centred with a badge, the badge stays visible during an animation, a cleared badge does not shrink the icon, the accessibility value), the 17 example Podfiles, the demo on the new API, a simulator pixel check. 5. The two CollectionViewClassifyMenu keys. 6. The same API on Android, HarmonyOS, mini program, React Native and Flutter (a Win session). |
 
 ## [CN]其他平台（同名）
 ## [EN]Other platforms (same names)
 
 | 中文 | English |
 |:---|:---|
-| Android `CYLAnimatedItemView.badgeValue: String?`、`badgeAttributes: Map<String, Any>?`、`badgeAnchorView`、`CYLAnimatedItemView.badgeRenderer`（`:cyltabbar` 注册其角标）；鸿蒙 `cylanimateditem` 的 `badgeValue` / `badgeAttributes` 属性；小程序 `cyl-animated-item` 的 `badge-value` / `badge-attributes`；React Native 与 Flutter 的 `CYLAnimationView` 增加 `badgeValue` / `badgeAttributes`。iOS 先实现，其余平台随后（Win 会话）。 | Android `CYLAnimatedItemView.badgeValue: String?`, `badgeAttributes: Map<String, Any>?`, `badgeAnchorView`, `CYLAnimatedItemView.badgeRenderer` (`:cyltabbar` registers its badge); HarmonyOS `cylanimateditem` properties `badgeValue` / `badgeAttributes`; mini program `cyl-animated-item` `badge-value` / `badge-attributes`; React Native and Flutter `CYLAnimationView` get `badgeValue` / `badgeAttributes`. iOS first, the other platforms after it (a Win session). |
+| 同样的分层：Android 新模块 `:cylbadge`（`:cylanimateditem` 与 `:cyltabbar` 依赖它），`CYLAnimatedItemView.badgeValue` / `badgeAttributes` / `badgeAnchorView`；鸿蒙新模块 `cylbadge`（ohpm），`cylanimateditem` 的 `badgeValue` / `badgeAttributes`；小程序 `cyl-badge` 组件，`cyl-animated-item` 的 `badge-value` / `badge-attributes`；React Native 与 Flutter 的 `CYLAnimationView` 增加 `badgeValue` / `badgeAttributes`。 | The same layering: Android, a new module `:cylbadge` (`:cylanimateditem` and `:cyltabbar` depend on it), `CYLAnimatedItemView.badgeValue` / `badgeAttributes` / `badgeAnchorView`; HarmonyOS, a new module `cylbadge` (ohpm), `cylanimateditem`'s `badgeValue` / `badgeAttributes`; mini program, a `cyl-badge` component and `cyl-animated-item`'s `badge-value` / `badge-attributes`; React Native and Flutter `CYLAnimationView` get `badgeValue` / `badgeAttributes`. |
 
 ## [CN]与 6cba553b 的关系
 ## [EN]Relation to 6cba553b
 
 | 中文 | English |
 |:---|:---|
-| 按 `alignmentRectInsets` 对齐保留：它是通用的图片规则，对没有内边距的图片没有影响。`UIView.cylBadgeSnapshotImage(hidingBadge:traitCollection:)` 尚未发布，有了本 API 就不再需要：建议在发布前删除（见问题 2）。 | Aligning by `alignmentRectInsets` stays: it is a general image rule and changes nothing for images without insets. `UIView.cylBadgeSnapshotImage(hidingBadge:traitCollection:)` is not released yet and this API makes it unnecessary: the proposal is to remove it before release (question 2). |
+| 按 `alignmentRectInsets` 对齐保留（通用规则，对没有内边距的图片无影响）。尚未发布的 `UIView.cylBadgeSnapshotImage(hidingBadge:traitCollection:)` 有了本 API 后不再需要，建议发布前删除（问题 3）。 | Aligning by `alignmentRectInsets` stays (a general rule, no effect on images without insets). The unreleased `UIView.cylBadgeSnapshotImage(hidingBadge:traitCollection:)` becomes unnecessary; the proposal is to remove it before release (question 3). |
 
 ## [CN]待负责人决定
 ## [EN]Questions for the owner
 
 | 中文 | English |
 |:---|:---|
-| 1. 只链接 `CYLAnimatedItem`、没有 CYLTabBarController 时：显示内置的基础角标（红色胶囊、无动画，建议），还是不显示并打印警告？ 2. 删除尚未发布的 `cylBadgeSnapshotImage`（建议），还是保留给只接收图片的控件？ 3. 是否需要 `reservesBadgeSpace`（默认 NO：测量时为角标留出空间，避免紧凑宿主裁剪）？ 4. TagList 的两个键要改 CollectionViewClassifyMenu 仓库：本会话需要把该仓库加入权限，或由你在那里合并。 5. 顺序：先 iOS，再 Android、鸿蒙、小程序、RN、Flutter，可以吗？ | 1. With `CYLAnimatedItem` alone, no CYLTabBarController: show the built-in basic badge (a red capsule, no animation; recommended), or nothing plus a warning? 2. Remove the unreleased `cylBadgeSnapshotImage` (recommended), or keep it for controls that only take an image? 3. Add `reservesBadgeSpace` (default NO: reserve the badge's room when measuring, so a tight host does not clip it)? 4. The two TagList keys change the CollectionViewClassifyMenu repository: this session needs access to it, or you merge them there. 5. Order: iOS first, then Android, HarmonyOS, mini program, React Native, Flutter. Is that fine? |
+| 1. 名称：pod 与模块叫 `CYLBadge`（建议；头文件与类名 `CYLBadgeView`、`CYLBadgeAppearance` 不变），源码留在 `CYLTabBarController/CYLBadgeView/`（建议，不移动文件）？ 2. Liquid Glass 规则下移到 CYLBadge，`CYLAnimatedItemView` 与 `CYLUtils` 转发（建议），还是 CYLBadge 保留一份自己的判断？ 3. 删除尚未发布的 `cylBadgeSnapshotImage`（建议）？ 4. 只用 `CYLAnimatedItem` 的库（CollectionViewClassifyMenu、CYLTableViewPlaceHolder）会多带入 CYLBadge 与 `CYLDeallocBlockExecutor`，可以接受吗？ 5. TagList 的两个键要改 CollectionViewClassifyMenu 仓库：需要本会话获得该仓库权限，或由你合并。 6. 是否需要 `reservesBadgeSpace`（默认 NO，测量时为角标留空间）？ | 1. Names: pod and module `CYLBadge` (recommended; headers and classes such as `CYLBadgeView`, `CYLBadgeAppearance` keep their names), sources staying in `CYLTabBarController/CYLBadgeView/` (recommended, no file moves)? 2. Move the Liquid Glass rule down into CYLBadge, with `CYLAnimatedItemView` and `CYLUtils` forwarding to it (recommended), or keep a separate check in CYLBadge? 3. Remove the unreleased `cylBadgeSnapshotImage` (recommended)? 4. Libraries that use only `CYLAnimatedItem` (CollectionViewClassifyMenu, CYLTableViewPlaceHolder) will also pull CYLBadge and `CYLDeallocBlockExecutor`. Acceptable? 5. The TagList keys change the CollectionViewClassifyMenu repository: this session needs access to it, or you merge them. 6. Add `reservesBadgeSpace` (default NO: reserve the badge's room when measuring)? |

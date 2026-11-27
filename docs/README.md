@@ -20,7 +20,7 @@
 | [Android 版 CYLTabBarController](Android-Library.md) | [CYLTabBarController for Android](Android-Library.md) |
 | [Android 液态玻璃](Android-Liquid-Glass.md) | [Android Liquid Glass](Android-Liquid-Glass.md) |
 | [Android 库与 QMUI_Android、XUI 的 Tab 对比](Android-QMUI-Comparison.md) | [The Android library compared with QMUI_Android's and XUI's tabs](Android-QMUI-Comparison.md) |
-| [动效 item 角标：CYLAnimatedItemView 直接显示角标（API 设计）](Animated-Item-Badge.md) | [Animated item badges: CYLAnimatedItemView shows its own badge (API design)](Animated-Item-Badge.md) |
+| [CYLBadge 独立组件与动效 item 角标（API 设计）](Animated-Item-Badge.md) | [CYLBadge as an independent component, and animated item badges (API design)](Animated-Item-Badge.md) |
 | [动效 icon + title 共用组件：CYLAnimatedItem](Animated-Item.md) | [The shared animated icon + title component: CYLAnimatedItem](Animated-Item.md) |
 | [角标调试](Badge-Debugging.md) | [Badge debugging](Badge-Debugging.md) |
 | [中英文双语文档](Bilingual-Documentation.md) | [Bilingual Documentation](Bilingual-Documentation.md) |
