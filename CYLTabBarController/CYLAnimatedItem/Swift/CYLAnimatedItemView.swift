@@ -1603,6 +1603,40 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
     }
 
     /**
+     [EN] The image's `alignmentRectInsets`, scaled to the icon slot: the part of the image that is not the icon itself (e.g. a
+          badge that sticks out at one corner). Zero for an animation, a symbol image (its small baseline insets are not an
+          overhang) and an image without insets, so those keep their layout.
+     [CN] 图片的 `alignmentRectInsets`，按图标位缩放：图片中不属于图标本身的部分（例如从一角伸出的角标）。动画、符号图片（其很小的
+          基线内边距不是伸出部分）以及没有内边距的图片为零，布局保持不变。
+     */
+    private var cylIconAlignmentInsets: UIEdgeInsets {
+        guard animationView == nil, let image = imageView.image, !image.isSymbolImage,
+              image.size.width > 0, image.size.height > 0 else { return .zero }
+        let insets = image.alignmentRectInsets
+        guard insets != .zero else { return .zero }
+        let slot = currentIconSize
+        let scaleX = slot.width / image.size.width
+        let scaleY = slot.height / image.size.height
+        return UIEdgeInsets(top: max(0, insets.top * scaleY), left: max(0, insets.left * scaleX),
+                            bottom: max(0, insets.bottom * scaleY), right: max(0, insets.right * scaleX))
+    }
+
+    /**
+     [EN] The room the icon takes in the layout: the icon itself (the slot minus `cylIconAlignmentInsets`) grown evenly on both
+          sides by the larger overhang, so the icon, not the icon plus its badge, sits on the center line. Equal to
+          `currentIconSize` when the image has no insets.
+     [CN] 图标在布局中占用的空间：图标本身（图标位减去 `cylIconAlignmentInsets`）按较大的伸出量在两侧均匀扩展，使位于中线上的是图标，
+          而不是图标加角标。图片没有内边距时等于 `currentIconSize`。
+     */
+    private var cylIconFootprint: CGSize {
+        let slot = currentIconSize
+        let insets = cylIconAlignmentInsets
+        guard insets != .zero else { return slot }
+        let core = CGSize(width: max(0, slot.width - insets.left - insets.right), height: max(0, slot.height - insets.top - insets.bottom))
+        return CGSize(width: core.width + 2 * max(insets.left, insets.right), height: core.height + 2 * max(insets.top, insets.bottom))
+    }
+
+    /**
      [EN] Subclass hook: the content's natural size (without `contentInsets`) for a width limit. Override together with
           `layoutContent(in:)` for another arrangement.
      [CN] 子类钩子：给定宽度上限时内容的自然尺寸（不含 `contentInsets`）。需要其他排列时与 `layoutContent(in:)` 一起重写。
@@ -1611,7 +1645,8 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         if cylIsDivider {
             return cylDividerIsVertical ? CGSize(width: 1, height: cylDividerLength) : CGSize(width: cylDividerLength, height: 1)
         }
-        let icon = currentIconSize
+        // [EN] The icon's room, not the image's: a badge part of the image is reserved on both sides. [CN] 图标的空间而非图片的：图片中的角标部分在两侧都预留。
+        let icon = cylIconFootprint
         let showsIcon = cylShowsIcon
         let showsTitle = cylShowsTitle
         let gap = (showsIcon && showsTitle) ? spacing : 0
@@ -1694,7 +1729,9 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             content.size.width = max(0, content.width - reserved)
             if leading != rtl { content.origin.x += reserved }
         }
-        let icon = currentIconSize
+        // [EN] Aligned by the icon itself: the badge part of the image (its `alignmentRectInsets`) never moves the icon off the
+        //      center line. [CN] 以图标本身对齐：图片中的角标部分（其 `alignmentRectInsets`）不会让图标偏离中线。
+        let icon = cylIconFootprint
         let gap = (showsIcon && showsTitle) ? spacing : 0
         let titleLimit = axis == .horizontal ? max(0, content.width - icon.width - gap) : content.width
         var titleSize = showsTitle ? titleLabel.sizeThatFits(CGSize(width: titleLimit, height: content.height)) : .zero
@@ -1719,12 +1756,16 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
             iconFrame = CGRect(x: iconX, y: top, width: icon.width, height: icon.height)
             titleFrame = CGRect(x: titleX, y: top + icon.height + gap, width: titleSize.width, height: titleSize.height)
         }
-        imageView.frame = iconFrame
+        let overhang = cylIconAlignmentInsets
+        let glyphFrame = iconFrame.insetBy(dx: (icon.width - (currentIconSize.width - overhang.left - overhang.right)) / 2,
+                                           dy: (icon.height - (currentIconSize.height - overhang.top - overhang.bottom)) / 2)
+        imageView.frame = glyphFrame.inset(by: UIEdgeInsets(top: -overhang.top, left: -overhang.left,
+                                                            bottom: -overhang.bottom, right: -overhang.right))
         animationView?.frame = iconFrame
         // [EN] The appearance's title offset (`titlePositionAdjustment`). [CN] 外观的标题偏移（`titlePositionAdjustment`）。
         let offset = currentItemStateAppearance?.titlePositionAdjustment ?? .zero
         titleLabel.frame = titleFrame.offsetBy(dx: offset.horizontal, dy: offset.vertical)
-        layoutAccessory(in: rect, iconFrame: iconFrame, rightToLeft: rtl)
+        layoutAccessory(in: rect, iconFrame: glyphFrame, rightToLeft: rtl)
     }
 
     private func layoutAccessory(in rect: CGRect, iconFrame: CGRect, rightToLeft rtl: Bool) {
