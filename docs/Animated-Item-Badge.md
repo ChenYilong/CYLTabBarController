@@ -13,7 +13,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 状态：**设计第 2 版，负责人已批准（2026-11-27），尚未实现**。CYLBadge **目前尚未抽离**：它仍是 `CYLTabBarController/CYLBadgeView` 子库（见"现状"）。决定见"负责人的决定"。 | Status: **design version 2, approved by the owner (2026-11-27), not implemented**. CYLBadge is **not extracted yet**: it is still the `CYLTabBarController/CYLBadgeView` subspec (see "What exists today"). Decisions: "Owner decisions". |
+| 状态：**设计第 3 版（2026-11-27）：角标继续使用 CYLUtils，CYLUtils 也抽成独立 pod 放在最底层（D7）；尚未实现**。CYLBadge 与 CYLUtils **目前都尚未抽离**（见"现状"）。决定见"负责人的决定"。 | Status: **design version 3 (2026-11-27): the badge keeps using CYLUtils, and CYLUtils becomes an independent pod at the bottom too (D7); not implemented**. CYLBadge and CYLUtils are **both not extracted yet** (see "What exists today"). Decisions: "Owner decisions". |
 
 ## [CN]目录
 ## [EN]Contents
@@ -27,20 +27,20 @@
 | [问题](#cn问题) | [Problem](#enproblem) |
 | [现状](#cn现状) | [What exists today](#enwhat-exists-today) |
 | [目标](#cn目标) | [Goals](#engoals) |
-| [打包：CYLBadge.podspec](#cn打包cylbadgepodspec) | [Packaging: CYLBadge.podspec](#enpackaging-cylbadgepodspec) |
-| [切断对 CYLUtils 的依赖](#cn切断对-cylutils-的依赖) | [Cutting the dependency on CYLUtils](#encutting-the-dependency-on-cylutils) |
+| [打包：CYLUtils.podspec 与 CYLBadge.podspec](#cn打包cylutilspodspec-与-cylbadgepodspec) | [Packaging: CYLUtils.podspec and CYLBadge.podspec](#enpackaging-cylutilspodspec-and-cylbadgepodspec) |
+| [CYLUtils 放到最底层：切断它对 CYLAnimatedItem 的依赖](#cncylutils-放到最底层切断它对-cylanimateditem-的依赖) | [CYLUtils at the bottom: cutting its dependency on CYLAnimatedItem](#encylutils-at-the-bottom-cutting-its-dependency-on-cylanimateditem) |
 | [API 设计（iOS）](#cnapi-设计ios) | [API design (iOS)](#enapi-design-ios) |
 | [用法](#cn用法) | [Usage](#enusage) |
 | [实施步骤概要（详见下方实施指南）](#cn实施步骤概要详见下方实施指南) | [Steps in short (details in the implementation guide below)](#ensteps-in-short-details-in-the-implementation-guide-below) |
 | [实施指南（给负责写代码的开发者）](#cn实施指南给负责写代码的开发者) | [Implementation guide (for the developer who writes the code)](#enimplementation-guide-for-the-developer-who-writes-the-code) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 0：开始之前](#cn步骤-0开始之前) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 0: Before you start](#enstep-0-before-you-start) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 1：先记录基线](#cn步骤-1先记录基线) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 1: Record a baseline](#enstep-1-record-a-baseline) |
-| &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 2：列出角标对外部的全部依赖](#cn步骤-2列出角标对外部的全部依赖) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 2: List everything the badge takes from outside](#enstep-2-list-everything-the-badge-takes-from-outside) |
-| &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 3：角标自带的内部工具（键与可见性）](#cn步骤-3角标自带的内部工具键与可见性) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 3: The badge's own internal helpers (keys and visibility)](#enstep-3-the-badges-own-internal-helpers-keys-and-visibility) |
-| &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 4：去掉编译期对 Core 的判断](#cn步骤-4去掉编译期对-core-的判断) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 4: Remove the compile-time check for Core](#enstep-4-remove-the-compile-time-check-for-core) |
-| &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 5：Liquid Glass 规则下移（D2）](#cn步骤-5liquid-glass-规则下移d2) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 5: Move the Liquid Glass rule down (D2)](#enstep-5-move-the-liquid-glass-rule-down-d2) |
-| &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 6：角标自己的资源包与本地化](#cn步骤-6角标自己的资源包与本地化) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 6: The badge's own resource bundle and localization](#enstep-6-the-badges-own-resource-bundle-and-localization) |
-| &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 7：CYLBadge.podspec，单独校验](#cn步骤-7cylbadgepodspec单独校验) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 7: CYLBadge.podspec, linted on its own](#enstep-7-cylbadgepodspec-linted-on-its-own) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 2：列出两类依赖](#cn步骤-2列出两类依赖) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 2: List two kinds of dependencies](#enstep-2-list-two-kinds-of-dependencies) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 3：CYLUtils 不再依赖 CYLAnimatedItem](#cn步骤-3cylutils-不再依赖-cylanimateditem) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 3: CYLUtils stops depending on CYLAnimatedItem](#enstep-3-cylutils-stops-depending-on-cylanimateditem) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 4：去掉角标头文件对 Core 的判断](#cn步骤-4去掉角标头文件对-core-的判断) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 4: Remove the badge headers' check for Core](#enstep-4-remove-the-badge-headers-check-for-core) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 5：Liquid Glass 规则移到 CYLUtils（D2）](#cn步骤-5liquid-glass-规则移到-cylutilsd2) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 5: Move the Liquid Glass rule to CYLUtils (D2)](#enstep-5-move-the-liquid-glass-rule-to-cylutils-d2) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 6：许可证与检查脚本](#cn步骤-6许可证与检查脚本) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 6: License files and check scripts](#enstep-6-license-files-and-check-scripts) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 7：两个 podspec，自下而上校验](#cn步骤-7两个-podspec自下而上校验) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 7: The two podspecs, linted bottom up](#enstep-7-the-two-podspecs-linted-bottom-up) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 8：CocoaPods 中接上依赖方](#cn步骤-8cocoapods-中接上依赖方) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 8: Connect the dependents in CocoaPods](#enstep-8-connect-the-dependents-in-cocoapods) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 9：SwiftPM](#cn步骤-9swiftpm) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 9: SwiftPM](#enstep-9-swiftpm) |
 | &nbsp;&nbsp;&nbsp;&nbsp;↳ [步骤 10：Carthage（Xcode framework）](#cn步骤-10carthagexcode-framework) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Step 10: Carthage (Xcode framework)](#enstep-10-carthage-xcode-framework) |
@@ -65,6 +65,7 @@
 
 | 中文 | English |
 |:---|:---|
+| 用户原话（第 3 版）："更新文档角标不需要要脱离 CYLUtils"。追问（角标依赖 CYLUtils 会造成循环）后负责人选择："Extract CYLUtils too (Recommended)"。本条按英文记录（见右列）。 | TODO, design v3, 40 / 100 (2026-11-27, branch `feat/harmony-animated-item-engines`, PR #824). The owner says the badge does not need to leave CYLUtils. Kept as is, that gives a cycle: CYLAnimatedItem → CYLBadge (approved) → CYLUtils (a CYLTabBarController subspec) → CYLAnimatedItem, and `animation.md` forbids CYLAnimatedItem depending on CYLUtils. Asked; the owner chose to extract CYLUtils too, as the bottom pod: CYLUtils ← CYLBadge ← CYLAnimatedItem ← CYLTabBarController (D7). Changed in this version: "Packaging" (two podspecs), "CYLUtils at the bottom" (replaces "Cutting the dependency on CYLUtils"), D2 and D4 amended, D7 and question 7 added, guide steps 2–10 rewritten, `animation.md` rule updated. Same rubric; packaging now covers both pods. |
 | 用户原话（第 2 版）："更新方案将CYLBadge模仿CYLAnimatedItemView抽离CYLtabBarViewController变成一个独立的库，创建类似CYLAnimatedItemView一样的spec文件，CYLtabBarViewController 以及CYLAnimatedItemView他们的core核心代码依赖CYLBadge。如果CYLBadge目前已经完成该抽离，组件化，则文档说明该特性。" 本条按英文记录（见右列）。 | TODO, design v2 approved, 40 / 100 (approval on 2026-11-27: "i agree with all of the part of Questions for you (also at the end of the doc): following your recommend.update docs"; all six recommendations accepted, see "Owner decisions"). Earlier: design v2 30 / 100 (2026-11-27, branch `feat/harmony-animated-item-engines`, PR #824, cloud session without a Mac). The owner asks to extract CYLBadge from CYLTabBarController into an independent library with its own podspec, like `CYLAnimatedItem.podspec`, and to make the core of both CYLTabBarController and CYLAnimatedItemView depend on it; if already extracted, document it. Checked: it is not extracted (the subspec depends on `CYLTabBarController/CYLUtils`, which depends on `CYLAnimatedItem`, the opposite direction). This version replaces v1's renderer registry with a direct dependency. **Rubric (100)**: design v2 here 20; owner approval 10; `CYLBadge.podspec` + SwiftPM product + Carthage target, `pod lib lint` passes 20; CYLTabBarController and CYLAnimatedItem depend on it, old subspec, imports and selectors unchanged for apps 10; `CYLAnimatedItemView.badgeValue` / `badgeAnchorView` 10; TagList keys and the demo without snapshots 10; unit tests and a simulator pixel check 10; other platforms 10. **Pass (60)**: through the item API, with lint. Now: design only (20) plus v1's analysis (10). |
 | 用户原话（第 1 版）："以上为最近几次修复的截图，修复前与临时方案修复后效果，你应该创建或者更新badge相关文档，为cylbadge增加 cylanimateditemview支持，cylanimateditemview 直接调用badge新增接口来增加badge，而非用户先找到icon再加badge，你先设计api，先别急着实现。文档创建好后发我https 指向分支的文档地址。我同意后再代码实现。" 本条按英文记录（见右列）。 | Superseded by v2 (2026-11-27, commit e5153fad): v1 kept CYLBadge inside CYLTabBarController and let `CYLAnimatedItem` reach it through a renderer protocol and registry. |
 
@@ -88,31 +89,50 @@
 
 | 中文 | English |
 |:---|:---|
-| 1. CYLBadge 成为独立的库（pod、SwiftPM 产品、Carthage framework），与 `CYLAnimatedItem` 的做法相同，不依赖本仓库的其他库。2. 依赖方向：`CYLDeallocBlockExecutor` ← **CYLBadge** ← `CYLAnimatedItem/Core` ← CYLTabBarController（CYLUtils、Core）。CYLTabBarController 与 CYLAnimatedItemView 的核心代码都依赖 CYLBadge。3. 对 App 不变：`pod 'CYLTabBarController'`、`pod 'CYLTabBarController/CYLBadgeView'`、`import CYLTabBarController`、`#import <CYLTabBarController/CYLBadgeView.h>`、所有 `cyl_badge…` selector 照常可用。4. item 一行代码显示角标，不找图标；角标是覆盖层，不改变图标对齐与测量，随图标移动，动画播放时不消失。5. 无障碍：item 的无障碍值包含角标描述。 | 1. CYLBadge becomes an independent library (pod, SwiftPM product, Carthage framework), done the same way as `CYLAnimatedItem`, depending on no other library of this repository. 2. Dependency direction: `CYLDeallocBlockExecutor` ← **CYLBadge** ← `CYLAnimatedItem/Core` ← CYLTabBarController (CYLUtils, Core). The core of CYLTabBarController and of CYLAnimatedItemView both depend on CYLBadge. 3. Nothing changes for apps: `pod 'CYLTabBarController'`, `pod 'CYLTabBarController/CYLBadgeView'`, `import CYLTabBarController`, `#import <CYLTabBarController/CYLBadgeView.h>` and every `cyl_badge…` selector keep working. 4. An item shows a badge in one line, without looking up its icon; the badge is an overlay that never changes the icon's alignment or size, follows the icon, and stays visible while an animation plays. 5. Accessibility: the item's accessibility value includes the badge description. |
+| 1. CYLBadge 与 CYLUtils 都成为独立的库（pod、SwiftPM 产品、Carthage framework），与 `CYLAnimatedItem` 的做法相同；CYLUtils 不依赖本仓库的任何库，CYLBadge 只依赖 CYLUtils。2. 依赖方向（D7）：**CYLUtils** ← **CYLBadge** ← `CYLAnimatedItem/Core` ← CYLTabBarController（Core）。CYLTabBarController 与 CYLAnimatedItemView 的核心代码都依赖 CYLBadge；CYLBadge 继续使用 CYLUtils。3. 对 App 不变：`pod 'CYLTabBarController'`、`pod 'CYLTabBarController/CYLBadgeView'`、`pod 'CYLTabBarController/CYLUtils'`、`import CYLTabBarController`、`#import <CYLTabBarController/CYLBadgeView.h>`、所有 `cyl_badge…` selector 照常可用。4. item 一行代码显示角标，不找图标；角标是覆盖层，不改变图标对齐与测量，随图标移动，动画播放时不消失。5. 无障碍：item 的无障碍值包含角标描述。 | 1. CYLBadge and CYLUtils both become independent libraries (pod, SwiftPM product, Carthage framework), done the same way as `CYLAnimatedItem`; CYLUtils depends on no library of this repository, CYLBadge only on CYLUtils. 2. Dependency direction (D7): **CYLUtils** ← **CYLBadge** ← `CYLAnimatedItem/Core` ← CYLTabBarController (Core). The core of CYLTabBarController and of CYLAnimatedItemView both depend on CYLBadge; CYLBadge keeps using CYLUtils. 3. Nothing changes for apps: `pod 'CYLTabBarController'`, `pod 'CYLTabBarController/CYLBadgeView'`, `pod 'CYLTabBarController/CYLUtils'`, `import CYLTabBarController`, `#import <CYLTabBarController/CYLBadgeView.h>` and every `cyl_badge…` selector keep working. 4. An item shows a badge in one line, without looking up its icon; the badge is an overlay that never changes the icon's alignment or size, follows the icon, and stays visible while an animation plays. 5. Accessibility: the item's accessibility value includes the badge description. |
 
-## [CN]打包：CYLBadge.podspec
-## [EN]Packaging: CYLBadge.podspec
+## [CN]打包：CYLUtils.podspec 与 CYLBadge.podspec
+## [EN]Packaging: CYLUtils.podspec and CYLBadge.podspec
 
 | 中文 | English |
 |:---|:---|
-| 仿照 `CYLAnimatedItem.podspec`：同一仓库、同一 tag、同一版本；源码留在原目录 `CYLTabBarController/CYLBadgeView/`（不移动文件，历史与链接不变）；`DEFINES_MODULE`，模块名 `CYLBadge`；资源包 `CYLBadge.bundle`（角标的本地化字符串 33 种语言、`LICENSE`）。 | Modelled on `CYLAnimatedItem.podspec`: same repository, tag and version; sources stay in `CYLTabBarController/CYLBadgeView/` (no file moves, history and links unchanged); `DEFINES_MODULE`, module `CYLBadge`; resource bundle `CYLBadge.bundle` (the badge's localized strings in 33 languages, `LICENSE`). |
+| 两个新 podspec 都仿照 `CYLAnimatedItem.podspec`：同一仓库、同一 tag、同一版本；源码留在原目录（不移动文件）；`DEFINES_MODULE`。**CYLUtils**：源码 `CYLTabBarController/CYLUtils/`（不含已属于 CYLAnimatedItem 的动画 key 文件），资源包仍是 `CYLTabBarController.bundle`（整个库的本地化字符串、`LICENSE`），因此角标继续用 `cylLocalizedString`，无需自己的字符串。模块名见问题 7（建议 `CYLUtilsKit`：模块与其中的类 `CYLUtils` 同名会让 Swift 的名字查找与 `.swiftinterface` 出错）。**CYLBadge**：源码 `CYLTabBarController/CYLBadgeView/`，依赖 CYLUtils 与 `CYLDeallocBlockExecutor`；资源包 `CYLBadge.bundle` 只放 `LICENSE`（许可证规则要求每个发布的包都带它）。 | Both new podspecs follow `CYLAnimatedItem.podspec`: same repository, tag and version; sources stay where they are (no file moves); `DEFINES_MODULE`. **CYLUtils**: sources `CYLTabBarController/CYLUtils/` (without the animation key files, which already belong to CYLAnimatedItem); its resource bundle stays `CYLTabBarController.bundle` (the localized strings of the whole library, `LICENSE`), so the badge keeps using `cylLocalizedString` and needs no strings of its own. Module name: question 7 (recommended `CYLUtilsKit`: a module with the same name as its class `CYLUtils` breaks Swift name lookup and `.swiftinterface` files). **CYLBadge**: sources `CYLTabBarController/CYLBadgeView/`, depending on CYLUtils and `CYLDeallocBlockExecutor`; its resource bundle `CYLBadge.bundle` holds only `LICENSE` (the license rule requires one in every published package). |
 
 ```ruby
-# CYLBadge.podspec (sketch)
+# CYLUtils.podspec (sketch): the bottom pod, no dependency on any pod of this repository
 Pod::Spec.new do |s|
-  s.name             = "CYLBadge"
-  s.version          = "1.100.0"           # same as CYLTabBarController and CYLAnimatedItem
-  s.summary          = "Animated badges for any UIView, UIControl, UIBarButtonItem and UITabBarItem"
+  s.name             = "CYLUtils"
+  s.module_name      = "CYLUtilsKit"           # question 7
+  s.version          = "1.100.0"               # same as CYLTabBarController, CYLAnimatedItem and CYLBadge
+  s.summary          = "Shared helpers of CYLTabBarController's libraries: macros, view helpers, themes, localization"
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.platform         = :ios, '15.0'
   s.swift_versions   = ['5.0']
   s.source           = { :git => "https://github.com/ChenYilong/CYLTabBarController.git", :tag => s.version.to_s }
   s.static_framework = true
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
+  s.source_files     = 'CYLTabBarController/CYLUtils/**/*.{h,m,swift}'
+  s.exclude_files    = 'CYLTabBarController/CYLUtils/CYLAnimationKeys.{h,m}',
+                       'CYLTabBarController/CYLUtils/Swift/CYLAnimationURLOptions.swift',
+                       'CYLTabBarController/CYLUtils/Swift/CYLAnimationKeyLookup.swift'
+  s.public_header_files = 'CYLTabBarController/CYLUtils/**/*.h'
+  s.resources        = ['CYLTabBarController/Resources/CYLTabBarController.bundle']
+  s.frameworks       = 'UIKit'
+end
+```
+
+```ruby
+# CYLBadge.podspec (sketch)
+Pod::Spec.new do |s|
+  s.name             = "CYLBadge"
+  s.version          = "1.100.0"
+  s.summary          = "Animated badges for any UIView, UIControl, UIBarButtonItem and UITabBarItem"
+  # license, platform, swift_versions, source, static_framework, DEFINES_MODULE: as CYLUtils above
   s.source_files        = 'CYLTabBarController/CYLBadgeView/**/*.{h,m,swift}'
   s.public_header_files = 'CYLTabBarController/CYLBadgeView/**/*.h'
   s.private_header_files = 'CYLTabBarController/CYLBadgeView/CYLBadgeViewDefines.h'
-  s.resources        = ['CYLTabBarController/CYLBadgeView/Resources/CYLBadge.bundle']
+  s.resources        = ['CYLTabBarController/CYLBadgeView/Resources/CYLBadge.bundle']   # LICENSE only
+  s.dependency 'CYLUtils', s.version.to_s
   s.dependency 'CYLDeallocBlockExecutor', '~> 1.4'
   s.frameworks       = 'UIKit', 'QuartzCore'
 end
@@ -120,25 +140,34 @@ end
 
 ```ruby
 # CYLAnimatedItem.podspec, subspec Core: one new line
-core.dependency 'CYLBadge', s.version.to_s
+core.dependency 'CYLBadge', s.version.to_s          # brings CYLUtils too
 
-# CYLTabBarController.podspec: the old subspec stays as a name (as `CYLTabBarController/CYLAnimatedItem` does)
+# CYLTabBarController.podspec: both old subspecs stay as names (as `CYLTabBarController/CYLAnimatedItem` does)
+s.subspec 'CYLUtils' do |utils|
+  utils.dependency 'CYLUtils', s.version.to_s
+  utils.dependency 'CYLAnimatedItem/Core', s.version.to_s   # keeps what `pod 'CYLTabBarController/CYLUtils'` brought before
+end
 s.subspec 'CYLBadgeView' do |badge|
   badge.dependency 'CYLBadge', s.version.to_s
 end
-# CYLUtils already depends on CYLAnimatedItem/Core, so it gets CYLBadge; Core keeps `core.dependency 'CYLTabBarController/CYLBadgeView'`.
 ```
 
 | 中文 | English |
 |:---|:---|
-| **SwiftPM**：新 target `CYLBadge`（Swift 源码 `CYLBadgeView/Swift`，Objective-C 头文件经 `include/module.modulemap`），新产品 `.library(name: "CYLBadge")`；`CYLAnimatedItem` 与 `CYLTabBarController` target 依赖它，并从 `CYLTabBarController` 的 `sources` 中移除 `CYLBadgeView/Swift`。**Carthage**：在 `CYLTabBarController.xcodeproj` 中增加共享 scheme 的 `CYLBadge` framework target（与 `CYLAnimatedItem` 相同）。**示例 Podfile**：17 个按路径引入 `CYLAnimatedItem` 的 Podfile 同样加一行 `pod 'CYLBadge', :path => …`（两者发布到 trunk 之前）。 | **SwiftPM**: a new target `CYLBadge` (Swift sources `CYLBadgeView/Swift`, Objective-C headers through `include/module.modulemap`) and a new product `.library(name: "CYLBadge")`; the `CYLAnimatedItem` and `CYLTabBarController` targets depend on it, and `CYLBadgeView/Swift` leaves the `CYLTabBarController` target's `sources`. **Carthage**: a `CYLBadge` framework target with a shared scheme in `CYLTabBarController.xcodeproj` (as `CYLAnimatedItem` has). **Example Podfiles**: the 17 Podfiles that take `CYLAnimatedItem` by path add `pod 'CYLBadge', :path => …` the same way (until both are on the trunk). |
+| **SwiftPM**：新 target 与产品 `CYLUtilsKit`（`CYLUtils/Swift`）与 `CYLBadge`（`CYLBadgeView/Swift`）；`CYLBadge` 依赖 `CYLUtilsKit`，`CYLAnimatedItemViews` 与 `CYLTabBarController` 依赖 `CYLBadge`；两个目录从 `CYLTabBarController` target 的 `sources` 中移除。**Carthage**：在 `CYLTabBarController.xcodeproj` 中增加 `CYLUtilsKit` 与 `CYLBadge` 两个带共享 scheme 的 framework target。**示例 Podfile**：17 个按路径引入 `CYLAnimatedItem` 的 Podfile 同样加上 `pod 'CYLUtils', :path => …` 与 `pod 'CYLBadge', :path => …`（发布到 trunk 之前）。 | **SwiftPM**: new targets and products `CYLUtilsKit` (`CYLUtils/Swift`) and `CYLBadge` (`CYLBadgeView/Swift`); `CYLBadge` depends on `CYLUtilsKit`, and `CYLAnimatedItemViews` and `CYLTabBarController` depend on `CYLBadge`; both folders leave the `CYLTabBarController` target's `sources`. **Carthage**: two framework targets with shared schemes, `CYLUtilsKit` and `CYLBadge`, in `CYLTabBarController.xcodeproj`. **Example Podfiles**: the 17 Podfiles that take `CYLAnimatedItem` by path add `pod 'CYLUtils', :path => …` and `pod 'CYLBadge', :path => …` the same way (until they are on the trunk). |
 
-## [CN]切断对 CYLUtils 的依赖
-## [EN]Cutting the dependency on CYLUtils
+## [CN]CYLUtils 放到最底层：切断它对 CYLAnimatedItem 的依赖
+## [EN]CYLUtils at the bottom: cutting its dependency on CYLAnimatedItem
 
 | 中文 | English |
 |:---|:---|
-| 1. 关联对象键：`CYLUtilsKeys.key(…)` → CYLBadge 内部的 `CYLBadgeKeys.key(…)`（相同的键字符串，已有数据不受影响）。2. `cylIsInvisiable()`：在 CYLBadge 中复制为内部函数。3. 本地化：角标的字符串移到 `CYLBadge.bundle`，新宏 `CYLBadgeLocalizedString`（每层一个宏，加入 `scripts/check-localization-macros.py`）；`CYLTabBarController.bundle` 中保留原键，兼容旧调用。4. Liquid Glass 判断：规则目前在 `CYLAnimatedItemView.isLiquidGlassActive()`，但 CYLBadge 在它下面，不能调用它。方案：规则下移到 CYLBadge 的 `CYLBadgeAppearance.isLiquidGlassActive()`（含 `liquidGlassActiveOverride`），`CYLAnimatedItemView.isLiquidGlassActive()` 与 `CYLUtils.isLiquidGlassActive()` 转发给它：仍是唯一一份规则（见问题 2）。5. 按类名查找 TabBar 类的代码保留（无编译依赖）；`cylAnimatedItemBadgeHost()` 改为协议（见下）。6. `@_exported import CYLBadge` 放在 CYLUtils 中，`import CYLTabBarController` 仍能看到全部角标 API；`CYLTabBarController/CYLBadgeView.h` 等头文件改为转发 `<CYLBadge/…>`（`__has_include` 兜底）。 | 1. Associated-object keys: `CYLUtilsKeys.key(…)` → an internal `CYLBadgeKeys.key(…)` in CYLBadge (same key strings, so stored values are unaffected). 2. `cylIsInvisiable()`: copied into CYLBadge as an internal function. 3. Localization: the badge's strings move to `CYLBadge.bundle` with a new macro `CYLBadgeLocalizedString` (one macro per layer, added to `scripts/check-localization-macros.py`); `CYLTabBarController.bundle` keeps the old keys for old callers. 4. The Liquid Glass check: the rule lives in `CYLAnimatedItemView.isLiquidGlassActive()` today, but CYLBadge sits below it and cannot call it. Proposal: move the rule down into CYLBadge as `CYLBadgeAppearance.isLiquidGlassActive()` (with `liquidGlassActiveOverride`); `CYLAnimatedItemView.isLiquidGlassActive()` and `CYLUtils.isLiquidGlassActive()` forward to it, so there is still one rule (question 2). 5. The class-name lookups of tab bar classes stay (no compile dependency); `cylAnimatedItemBadgeHost()` becomes a protocol (below). 6. `@_exported import CYLBadge` in CYLUtils, so `import CYLTabBarController` still sees every badge API; `CYLTabBarController/CYLBadgeView.h` and the other headers forward to `<CYLBadge/…>` (with a `__has_include` fallback). |
+| 角标**不再**脱离 CYLUtils（第 2 版的 `CYLBadgeKeys`、复制 `cylIsInvisiable`、角标自己的字符串都取消）：它继续使用 `CYLUtilsKeys.key`、`cylIsInvisiable()`、`cylLocalizedString`、`CYLUtils.isLiquidGlassActive()`。要做的是让 CYLUtils 不再向上依赖 CYLAnimatedItem。目前有 5 处（2026-11-27 查得）： | The badge **no longer** leaves CYLUtils (v2's `CYLBadgeKeys`, copied `cylIsInvisiable` and badge-owned strings are dropped): it keeps using `CYLUtilsKeys.key`, `cylIsInvisiable()`, `cylLocalizedString` and `CYLUtils.isLiquidGlassActive()`. The work is to stop CYLUtils depending upward on CYLAnimatedItem. There are 5 places today (checked 2026-11-27): |
+| 1. `CYLUtilsMacros.h` 导入 `CYLAnimatedItemMacros.h`（取 `CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS` 等共用宏）→ 反过来：共用宏的唯一定义移到 `CYLUtilsMacros.h`，`CYLAnimatedItemMacros.h` 导入它。 | 1. `CYLUtilsMacros.h` imports `CYLAnimatedItemMacros.h` (for shared macros such as `CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS`) → the other way round: the single definition of the shared macros moves to `CYLUtilsMacros.h`, and `CYLAnimatedItemMacros.h` imports it. |
+| 2. `CYLUtils.h` 重新导出 `CYLAnimationKeys.h` → 移到 Core 的总头文件 `CYLTabBarController.h`，`#import <CYLTabBarController/CYLTabBarController.h>` 仍能看到动画 key。 | 2. `CYLUtils.h` re-exports `CYLAnimationKeys.h` → moved to Core's umbrella `CYLTabBarController.h`, so `#import <CYLTabBarController/CYLTabBarController.h>` still sees the animation keys. |
+| 3. `CYLSwiftInterface.h` 导入 `CYLAnimatedItemView.h` 与 `CYLTabBarItemAnimationPlayableView.h`（为 FlatDesign 的 Swift 声明）→ 这部分移到 Core 的一个头文件（例如 `CYLTabBarControllerSwiftInterface.h`），CYLUtils 的版本只留自己的内容。 | 3. `CYLSwiftInterface.h` imports `CYLAnimatedItemView.h` and `CYLTabBarItemAnimationPlayableView.h` (for FlatDesign's Swift declarations) → that part moves to a Core header (e.g. `CYLTabBarControllerSwiftInterface.h`); CYLUtils' version keeps only its own content. |
+| 4. `CYLUtils.swift` 的 `@_exported import CYLAnimatedItem` → 移到 Core（`Swift/CYLTabBarControllerObjCImport.swift`），`import CYLTabBarController` 仍导出动效组件；Core 同时 `@_exported import CYLBadge` 与 CYLUtils 模块。 | 4. `@_exported import CYLAnimatedItem` in `CYLUtils.swift` → moved to Core (`Swift/CYLTabBarControllerObjCImport.swift`), so `import CYLTabBarController` still exports the component; Core also does `@_exported import CYLBadge` and the CYLUtils module. |
+| 5. Liquid Glass 规则：现在 `CYLUtils.isLiquidGlassActive()` 转发给 `CYLAnimatedItemView` → 规则（`CYLLiquidGlass`）下移到 CYLUtils，成为唯一的一份；`CYLAnimatedItemView.isLiquidGlassActive()` 与 `liquidGlassActiveOverride` 改为转发给 CYLUtils（D2 已据此修改）。 | 5. The Liquid Glass rule: `CYLUtils.isLiquidGlassActive()` forwards to `CYLAnimatedItemView` today → the rule (`CYLLiquidGlass`) moves down into CYLUtils as the one copy; `CYLAnimatedItemView.isLiquidGlassActive()` and `liquidGlassActiveOverride` forward to CYLUtils (D2 amended accordingly). |
+| 其余：CYLUtils 中提到 `CYLTabBarController` 的地方只是注释与废弃名字的字符串，没有编译依赖；`cyl_tabButton` 等方法保留。角标头文件中 `CYLBadgeViewDefines.h` 对 `CYLTabBarController.h` 的 `__has_include` 仍须去掉（否则 CYLBadge ↔ CYLTabBarController 循环），对 `CYLUtils.h` 的导入保留。规则 `animation.md`（"CYLAnimatedItem 不依赖 CYLUtils"）已改为：可以依赖独立的 CYLUtils 与 CYLBadge pod，仍不依赖 CYLTabBarController 本身。 | Otherwise: CYLUtils mentions `CYLTabBarController` only in comments and deprecated-name strings, with no compile dependency; methods such as `cyl_tabButton` stay. In the badge headers, `CYLBadgeViewDefines.h`'s `__has_include` of `CYLTabBarController.h` must still go (else CYLBadge ↔ CYLTabBarController is a cycle); its import of `CYLUtils.h` stays. The rule in `animation.md` ("CYLAnimatedItem does not depend on CYLUtils") now reads: it may depend on the independent CYLUtils and CYLBadge pods, and still never on CYLTabBarController itself. |
 
 ## [CN]API 设计（iOS）
 ## [EN]API design (iOS)
@@ -185,7 +214,7 @@ extension CYLAnimatedItemView: CYLBadgeHosting {
 | 设置 `badgeValue` 等于在 `badgeAnchorView` 上调用 `cyl_showBadgeValue(_:animationType:)`（或 `cyl_clearBadge()`），并按 `badgeAttributes` 设置 `cyl_badge…` 样式；`item.cyl_showBadgeValue("3", animationType: .scale)` 通过协议落在同一个视图上，两种写法等价。 | Setting `badgeValue` calls `cyl_showBadgeValue(_:animationType:)` (or `cyl_clearBadge()`) on `badgeAnchorView` and applies `badgeAttributes` through the `cyl_badge…` style properties; `item.cyl_showBadgeValue("3", animationType: .scale)` reaches the same view through the protocol, so both spellings are the same badge. |
 | **C. 样式键 `CYLBadgeAttributeKey`（CYLBadge）**：与 `CYLTabBarHostView.badgeAttributes`（React Native、Flutter）相同的字符串，并补充：`value`、`color`、`animation`（与 `CYLBadgeAnimationType` 同名：`none`、`scale`、`shake`、`bounce`、`breathe`、`rotation`、`spring`…）、`radius`、`centerOffset`（相对图标右上角）、`textColor`、`font`、`borderColor`、`borderWidth`、`maximumNumber`、`respectsReduceMotion`。值可为对象或字符串（`#RRGGBB`、`{x, y}`）。同一个解析函数 `UIView.cylApplyBadgeAttributes(_:)` 供 item、`CYLTabBarHostView` 与配置文件共用，`cylTabBarHostBadge…` 常量保留并等于这些键。 | **C. Style keys `CYLBadgeAttributeKey` (CYLBadge)**: the same strings as `CYLTabBarHostView.badgeAttributes` (React Native, Flutter), plus more: `value`, `color`, `animation` (named as `CYLBadgeAnimationType`: `none`, `scale`, `shake`, `bounce`, `breathe`, `rotation`, `spring`…), `radius`, `centerOffset` (from the icon's top-trailing corner), `textColor`, `font`, `borderColor`, `borderWidth`, `maximumNumber`, `respectsReduceMotion`. Values are objects or strings (`#RRGGBB`, `{x, y}`). One parser, `UIView.cylApplyBadgeAttributes(_:)`, serves the item, `CYLTabBarHostView` and configuration files; the `cylTabBarHostBadge…` constants stay and equal these keys. |
 | **D. 布局规则**：`badgeAnchorView` 位于图标与动画视图之上；每次 `layoutContent(in:)` 后其 frame 为图标本身（6cba553b 的 glyph frame）；分割线或隐藏图标时隐藏；item 裁剪时使用 CYLBadge 现有的浮层。角标不参与 `contentSizeThatFits`。子类重写 `layoutContent(in:)` 时调用 `super`，或自行设置 `badgeAnchorView.frame`。 | **D. Layout rules**: `badgeAnchorView` sits above the icon and the animation view; after every `layoutContent(in:)` its frame is the icon itself (the glyph frame of 6cba553b); it hides for a divider or a hidden icon; when the item clips, CYLBadge's existing overlay is used. The badge is not part of `contentSizeThatFits`. A subclass that overrides `layoutContent(in:)` calls `super` or sets `badgeAnchorView.frame` itself. |
-| **E. 无障碍**：显示角标时，item 的 `accessibilityValue` 为原值加 CYLBadge 的描述（"N 条新消息" / "新消息"，`CYLBadge.bundle`），清除时恢复；角标视图对无障碍隐藏。 | **E. Accessibility**: while a badge shows, the item's `accessibilityValue` is its own value plus CYLBadge's description ("N new items" / "New", from `CYLBadge.bundle`), restored when cleared; the badge view is hidden from accessibility. |
+| **E. 无障碍**：显示角标时，item 的 `accessibilityValue` 为原值加 CYLBadge 的描述（"N 条新消息" / "新消息"，来自 CYLUtils 的 `CYLTabBarController.bundle`），清除时恢复；角标视图对无障碍隐藏。 | **E. Accessibility**: while a badge shows, the item's `accessibilityValue` is its own value plus CYLBadge's description ("N new items" / "New", from CYLUtils' `CYLTabBarController.bundle`), restored when cleared; the badge view is hidden from accessibility. |
 | **F. TagList（CollectionViewClassifyMenu，另一个仓库）**：新增 `CYLTagItemKey.badgeValue` 与 `CYLTagItemKey.badgeAttributes`，Tag 按钮设置到 `badgeValue` / `badgeAttributes`（它已依赖 `CYLAnimatedItem`，因此自动得到 CYLBadge）。示例的 `badgeItem` 只传这两个键，删除快照与 `imageSize` 覆盖。 | **F. TagList (CollectionViewClassifyMenu, another repository)**: new keys `CYLTagItemKey.badgeValue` and `CYLTagItemKey.badgeAttributes`, set on the tag button's `badgeValue` / `badgeAttributes` (it already depends on `CYLAnimatedItem`, so it gets CYLBadge). The demo's `badgeItem` passes only these keys; the snapshot and the `imageSize` override go away. |
 
 ## [CN]用法
@@ -211,7 +240,7 @@ item.badgeValue = nil     // cleared; the icon does not move or shrink
 
 | 中文 | English |
 |:---|:---|
-| 1. `CYLBadge.podspec`、`CYLBadge.bundle`（本地化 + `LICENSE`），`CYLBadgeKeys`、`CYLBadgeLocalizedString`，Liquid Glass 规则下移；`pod lib lint CYLBadge.podspec --quick`。2. `CYLAnimatedItem/Core` 与 `CYLTabBarController/CYLBadgeView` 依赖 `CYLBadge`；`@_exported import`、转发头文件；SwiftPM 与 Carthage target；检查脚本（`check-license-notices.py`、`check-localization-macros.py`）与 `docs/License-Notices.md`。3. `CYLBadgeHosting`、`CYLBadgeAttributeKey`、`cylApplyBadgeAttributes`；`CYLAnimatedItemView` 的 `badgeValue`、`badgeAttributes`、`badgeAnchorView`。4. 单元测试（图标居中不受角标影响、动画期间角标可见、清除后图标不缩小、无障碍值），17 个示例 Podfile，示例改用新 API，模拟器像素检查。5. CollectionViewClassifyMenu 的两个键。6. Android、鸿蒙、小程序、React Native、Flutter 同名 API（Win 会话）。 | 1. `CYLBadge.podspec`, `CYLBadge.bundle` (localization + `LICENSE`), `CYLBadgeKeys`, `CYLBadgeLocalizedString`, the Liquid Glass rule moved down; `pod lib lint CYLBadge.podspec --quick`. 2. `CYLAnimatedItem/Core` and `CYLTabBarController/CYLBadgeView` depend on `CYLBadge`; `@_exported import`, forwarding headers; SwiftPM and Carthage targets; the check scripts (`check-license-notices.py`, `check-localization-macros.py`) and `docs/License-Notices.md`. 3. `CYLBadgeHosting`, `CYLBadgeAttributeKey`, `cylApplyBadgeAttributes`; `CYLAnimatedItemView`'s `badgeValue`, `badgeAttributes`, `badgeAnchorView`. 4. Unit tests (the icon stays centred with a badge, the badge stays visible during an animation, a cleared badge does not shrink the icon, the accessibility value), the 17 example Podfiles, the demo on the new API, a simulator pixel check. 5. The two CollectionViewClassifyMenu keys. 6. The same API on Android, HarmonyOS, mini program, React Native and Flutter (a Win session). |
+| 1. 基线。2. 列出 CYLUtils 对上层的依赖与角标对 Core 的依赖。3. CYLUtils 不再依赖 CYLAnimatedItem（5 处）。4. 去掉角标头文件对 Core 的 `__has_include`。5. Liquid Glass 规则移到 CYLUtils。6. `CYLBadge.bundle`（`LICENSE`）与检查脚本。7. 两个 podspec，自下而上逐个校验。8. CocoaPods 依赖方与旧子库名。9. SwiftPM。10. Carthage。11–14. `CYLBadgeHosting` 与 item API、无障碍。15–18. 示例、测试、模拟器、文档与提交。 | 1. Baseline. 2. List CYLUtils' upward dependencies and the badge's dependencies on Core. 3. CYLUtils stops depending on CYLAnimatedItem (5 places). 4. Remove the badge headers' `__has_include` of Core. 5. The Liquid Glass rule moves to CYLUtils. 6. `CYLBadge.bundle` (`LICENSE`) and the check scripts. 7. The two podspecs, linted bottom up one by one. 8. CocoaPods dependents and the old subspec names. 9. SwiftPM. 10. Carthage. 11–14. `CYLBadgeHosting`, the item API, accessibility. 15–18. Demo, tests, simulator, docs and commits. |
 
 ## [CN]实施指南（给负责写代码的开发者）
 ## [EN]Implementation guide (for the developer who writes the code)
@@ -247,66 +276,73 @@ xcodebuild test -project CYLTabBarController.xcodeproj -scheme CYLTabBarControll
 |:---|:---|
 | **避免**：在已经失败的基线上开工（之后分不清是谁弄坏的）；复用旧的 derived data（`macos.md` 要求每次清理）。 | **Avoid**: starting on a baseline that already fails (later you cannot tell who broke what); reusing old derived data (`macos.md` requires a clean build every time). |
 
-### [CN]步骤 2：列出角标对外部的全部依赖
-### [EN]Step 2: List everything the badge takes from outside
+### [CN]步骤 2：列出两类依赖
+### [EN]Step 2: List two kinds of dependencies
 
 | 中文 | English |
 |:---|:---|
-| 角标要脱离 CYLUtils 与 Core，必须先知道它用了什么。Swift 和 Objective-C 头文件都要查。把结果贴进本文的任务记录。 | To cut the badge loose from CYLUtils and Core you must first know what it uses. Check the Swift sources and the Objective-C headers. Paste the result into this document's task log. |
+| (a) CYLUtils 对 CYLAnimatedItem 的依赖（要切断）；(b) 角标对 Core（TabBar）的依赖（要切断）。角标对 CYLUtils 的依赖**保留**，不用列。Swift 和 Objective-C 头文件都要查，结果贴进本文的任务记录。 | (a) CYLUtils' dependencies on CYLAnimatedItem (to cut); (b) the badge's dependencies on Core, the tab bar (to cut). The badge's use of CYLUtils **stays**; no need to list it. Check the Swift sources and the Objective-C headers, and paste the result into this document's task log. |
 
 ```sh
-B=CYLTabBarController/CYLBadgeView
-grep -rnoE "CYLUtilsKeys\.[a-zA-Z]+|CYLUtils\.[a-zA-Z]+|cylLocalizedString|cylIsInvisiable|CYLLifecycleCenter" $B | sort | uniq -c
-grep -rn "#import\|@import\|^import" $B          # every import of every file
-grep -rn "NSClassFromString" $B                    # tab bar classes found by name (allowed, no compile dependency)
+U=CYLTabBarController/CYLUtils; B=CYLTabBarController/CYLBadgeView
+grep -rnE "CYLAnimatedItem|CYLAnimationKey|CYLLiquidGlass|CYLTabBarItemAnimation" $U   # (a)
+grep -rnE "CYLTabBarController\.h|CYL_BADGE_CORE_AVAILABLE|import CYLTabBarController" $B   # (b)
+grep -rn "NSClassFromString" $B          # class-name lookups: allowed, no compile dependency
 ```
 
 | 中文 | English |
 |:---|:---|
-| 已知结果（2026-11-27）：Swift 中 `CYLUtilsKeys.key`（27）、`CYLUtils.isLiquidGlassActive`（6）、`cylLocalizedString`（4）、`cylIsInvisiable`（1）；头文件中 `CYLBadgeViewDefines.h` 导入 `CYLUtils.h`，并通过 `__has_include` 导入 `CYLTabBarController.h`（定义 `CYL_BADGE_CORE_AVAILABLE`）；`UIView+CYLBadgeExtention.h` 导入 `UIView+CYLUtils.h` 与 `CYLSwiftInterface.h`。**避免**：只查 Swift 不查头文件，头文件里的导入才是模块循环的来源。 | Known result (2026-11-27): in Swift, `CYLUtilsKeys.key` (27), `CYLUtils.isLiquidGlassActive` (6), `cylLocalizedString` (4), `cylIsInvisiable` (1); in the headers, `CYLBadgeViewDefines.h` imports `CYLUtils.h` and, through `__has_include`, `CYLTabBarController.h` (defining `CYL_BADGE_CORE_AVAILABLE`); `UIView+CYLBadgeExtention.h` imports `UIView+CYLUtils.h` and `CYLSwiftInterface.h`. **Avoid**: checking only Swift. The header imports are what create module cycles. |
+| 已知结果（2026-11-27）：(a) 5 处，见"CYLUtils 放到最底层"；(b) `CYLBadgeViewDefines.h` 对 `CYLTabBarController.h` 的 `__has_include`（定义 `CYL_BADGE_CORE_AVAILABLE`）。**避免**：只查 Swift 不查头文件：头文件里的导入才是模块循环的来源。 | Known result (2026-11-27): (a) the 5 places in "CYLUtils at the bottom"; (b) `CYLBadgeViewDefines.h`'s `__has_include` of `CYLTabBarController.h` (defining `CYL_BADGE_CORE_AVAILABLE`). **Avoid**: checking only Swift. The header imports are what create module cycles. |
 
-### [CN]步骤 3：角标自带的内部工具（键与可见性）
-### [EN]Step 3: The badge's own internal helpers (keys and visibility)
-
-| 中文 | English |
-|:---|:---|
-| 新建 `CYLBadgeView/Swift/CYLBadgeInternal.swift`，内部（`internal`）类型，替换 `CYLUtilsKeys.key` 与 `cylIsInvisiable()`。键必须与原来**完全相同**：`CYLUtilsKeys.key` 用 `sel_registerName(name)` 的指针作键，名字相同指针就相同，已存的角标数据不会丢。 | Create `CYLBadgeView/Swift/CYLBadgeInternal.swift` with `internal` types that replace `CYLUtilsKeys.key` and `cylIsInvisiable()`. Keys must be **exactly the same**: `CYLUtilsKeys.key` uses the pointer of `sel_registerName(name)`, so the same name gives the same pointer and badge data already stored is not lost. |
-
-```swift
-// CYLBadgeView/Swift/CYLBadgeInternal.swift
-import UIKit
-
-/** [EN] Associated-object keys of the badge, the same pointers as CYLUtilsKeys.key (same names). [CN] …(write both) */
-enum CYLBadgeKeys {
-    static func key(_ selectorName: String) -> UnsafeRawPointer {
-        unsafeBitCast(sel_registerName(selectorName), to: UnsafeRawPointer.self)
-    }
-}
-
-extension UIView {
-    /** [EN] Hidden, transparent, detached or empty, as CYLUtils' cylIsInvisiable(). [CN] … */
-    var cylBadgeIsInvisible: Bool {
-        isHidden || alpha <= 0.01 || superview == nil || frame.size == .zero
-    }
-}
-```
+### [CN]步骤 3：CYLUtils 不再依赖 CYLAnimatedItem
+### [EN]Step 3: CYLUtils stops depending on CYLAnimatedItem
 
 | 中文 | English |
 |:---|:---|
-| 然后把 `CYLBadgeViewKeys` 里的 `CYLUtilsKeys.key(` 全部换成 `CYLBadgeKeys.key(`（名字字符串一个都不改），把 `cylIsInvisiable()` 换成 `cylBadgeIsInvisible`。**避免**：(1) 改键名或改成 `"cyl_badge".hashValue` 之类的新键：会让旧数据失效且难以发现；(2) 把新工具设为 `public`：它们不是 API；(3) 删除 CYLUtils 里的原函数：Core 仍在用。 | Then replace every `CYLUtilsKeys.key(` in `CYLBadgeViewKeys` with `CYLBadgeKeys.key(` (do not change a single name string), and `cylIsInvisiable()` with `cylBadgeIsInvisible`. **Avoid**: (1) renaming keys or inventing new ones such as `"cyl_badge".hashValue`: old data stops working and nobody notices; (2) making the helpers `public`: they are not API; (3) deleting the originals in CYLUtils: Core still uses them. |
-
-### [CN]步骤 4：去掉编译期对 Core 的判断
-### [EN]Step 4: Remove the compile-time check for Core
-
-| 中文 | English |
-|:---|:---|
-| `CYLBadgeViewDefines.h` 用 `__has_include(<CYLTabBarController/CYLTabBarController.h>)` 导入 Core。CYLBadge 成为独立模块后，一个同时装了两个 pod 的 App 里这个判断为真，CYLBadge 就会导入 CYLTabBarController，而 CYLTabBarController 依赖 CYLBadge：**模块循环，编译失败**。改为运行时判断：按类名查找（已有的做法）或步骤 11 的 `CYLBadgeHosting` 协议。 | `CYLBadgeViewDefines.h` imports Core through `__has_include(<CYLTabBarController/CYLTabBarController.h>)`. Once CYLBadge is its own module, that check is true in an app with both pods, so CYLBadge would import CYLTabBarController, which depends on CYLBadge: **a module cycle, the build fails**. Decide at run time instead: look the class up by name (as the code already does elsewhere) or use the `CYLBadgeHosting` protocol of step 11. |
+| 按"CYLUtils 放到最底层"中的 1–4 逐条改（第 5 条在步骤 5）。每改一条就编译一次。下面是第 1 条与第 4 条的样子。 | Change items 1–4 of "CYLUtils at the bottom" one by one (item 5 is step 5). Build after each. Items 1 and 4 look like this. |
 
 ```objc
-// CYLBadgeViewDefines.h after the change: no import of CYLUtils or CYLTabBarController
+// 1. CYLUtilsMacros.h: the single definition of the shared macros now lives here
+#ifndef CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
+#define CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(code) /* moved verbatim from CYLAnimatedItemMacros.h */
+#endif
+// (the old `#import <CYLAnimatedItem/CYLAnimatedItemMacros.h>` block is deleted)
+
+// CYLAnimatedItemMacros.h: imports it instead of defining its own
+#if __has_include(<CYLUtilsKit/CYLUtilsMacros.h>)
+#import <CYLUtilsKit/CYLUtilsMacros.h>
+#else
+#import "CYLUtilsMacros.h"
+#endif
+```
+
+```swift
+// 4. CYLUtils/Swift/CYLUtils.swift: delete `@_exported import CYLAnimatedItem` and `import CYLAnimatedItemViews`
+// Swift/CYLTabBarControllerObjCImport.swift (Core) gains:
+#if canImport(CYLAnimatedItem)
+@_exported import CYLAnimatedItem
+#endif
+@_exported import CYLBadge
+@_exported import CYLUtilsKit
+```
+
+| 中文 | English |
+|:---|:---|
+| **避免**：(1) 两个头文件各自定义同一个宏（CocoaPods 下每个 pod 是一个模块，定义不同就报 "ambiguous expansion"；`CYLUtilsMacros.h` 中的注释记录过这个问题）；(2) 删掉 Core 里的重新导出：`import CYLTabBarController` 的用户会突然看不到 `CYLAnimatedItemView`；(3) 动 `cyl_tabButton` 等方法：它们只按名字查找，没有编译依赖，保持原样。 | **Avoid**: (1) both headers defining the same macro (under CocoaPods each pod is a module, and different definitions give "ambiguous expansion"; the comment in `CYLUtilsMacros.h` records this); (2) dropping the re-export in Core: users of `import CYLTabBarController` would suddenly lose `CYLAnimatedItemView`; (3) touching `cyl_tabButton` and the like: they look things up by name with no compile dependency; leave them. |
+
+### [CN]步骤 4：去掉角标头文件对 Core 的判断
+### [EN]Step 4: Remove the badge headers' check for Core
+
+| 中文 | English |
+|:---|:---|
+| `CYLBadgeViewDefines.h` 用 `__has_include(<CYLTabBarController/CYLTabBarController.h>)` 导入 Core。CYLBadge 成为独立模块后，在装了两个 pod 的 App 里这个判断为真，CYLBadge 就会导入依赖它的 CYLTabBarController：**模块循环，编译失败**。删掉这段，改为运行时判断；对 `CYLUtils.h` 的导入**保留**。 | `CYLBadgeViewDefines.h` imports Core through `__has_include(<CYLTabBarController/CYLTabBarController.h>)`. Once CYLBadge is its own module, that check is true in an app with both pods, so CYLBadge would import CYLTabBarController, which depends on it: **a module cycle, the build fails**. Delete that block and decide at run time; the import of `CYLUtils.h` **stays**. |
+
+```objc
+// CYLBadgeViewDefines.h after the change
 #ifndef CYLBadgeViewDefines_h
 #define CYLBadgeViewDefines_h
 #import <UIKit/UIKit.h>
+#import "CYLUtils.h"          // kept: the badge uses CYLUtils
 #endif
 ```
 
@@ -317,80 +353,78 @@ let coreIsLinked = NSClassFromString("CYLTabBarController") != nil
 
 | 中文 | English |
 |:---|:---|
-| 同样处理 `UIView+CYLBadgeExtention.h` 对 `UIView+CYLUtils.h`、`CYLSwiftInterface.h` 的导入：只保留角标自己的声明；角标头文件需要的宏（如 `CYL_NOEXCEPT`）在头文件里自己定义（已有 `#ifndef` 保护）。**避免**：(1) 用 `#if CYL_BADGE_CORE_AVAILABLE` 留着"以防万一"：只要宏还在，就有人会再用它；(2) 在 CYLBadge 中 `import CYLTabBarController` 或 `import CYLAnimatedItem`：依赖方向只能向下。 | Do the same with `UIView+CYLBadgeExtention.h`'s imports of `UIView+CYLUtils.h` and `CYLSwiftInterface.h`: keep only the badge's own declarations; define any macro the badge headers need (such as `CYL_NOEXCEPT`) in the header itself (the `#ifndef` guard is already there). **Avoid**: (1) keeping `#if CYL_BADGE_CORE_AVAILABLE` "just in case": while the macro exists, someone will use it again; (2) `import CYLTabBarController` or `import CYLAnimatedItem` inside CYLBadge: dependencies only point down. |
+| **避免**：(1) 把 `#if CYL_BADGE_CORE_AVAILABLE` 留着"以防万一"；(2) 在 CYLBadge 中 `import CYLTabBarController` 或 `import CYLAnimatedItem`：依赖只能向下（CYLBadge 只能看到 CYLUtils）。 | **Avoid**: (1) keeping `#if CYL_BADGE_CORE_AVAILABLE` "just in case"; (2) `import CYLTabBarController` or `import CYLAnimatedItem` in CYLBadge: dependencies only point down (CYLBadge sees only CYLUtils). |
 
-### [CN]步骤 5：Liquid Glass 规则下移（D2）
-### [EN]Step 5: Move the Liquid Glass rule down (D2)
+### [CN]步骤 5：Liquid Glass 规则移到 CYLUtils（D2）
+### [EN]Step 5: Move the Liquid Glass rule to CYLUtils (D2)
 
 | 中文 | English |
 |:---|:---|
-| 把 `CYLAnimatedItem/Swift/CYLLiquidGlass.swift` 的规则移到 CYLBadge，作为 `CYLBadgeAppearance.isLiquidGlassActive()` 与 `liquidGlassActiveOverride`。原来的两个入口改为转发，仍然只有一份规则、一个缓存。 | Move the rule of `CYLAnimatedItem/Swift/CYLLiquidGlass.swift` into CYLBadge as `CYLBadgeAppearance.isLiquidGlassActive()` and `liquidGlassActiveOverride`. The two existing entry points forward to it, so there is still one rule and one cache. |
+| 把 `CYLAnimatedItem/Swift/CYLLiquidGlass.swift` 移到 CYLUtils（`git mv`，保留历史），`CYLUtils.isLiquidGlassActive()` 直接调用它，并新增 `CYLUtils.liquidGlassActiveOverride`。`CYLAnimatedItemView` 的两个公开成员改为转发。角标里的 6 处调用不用改。 | Move `CYLAnimatedItem/Swift/CYLLiquidGlass.swift` into CYLUtils (`git mv`, keeping history); `CYLUtils.isLiquidGlassActive()` calls it directly, and `CYLUtils.liquidGlassActiveOverride` is added. `CYLAnimatedItemView`'s two public members forward. The badge's 6 calls need no change. |
 
 ```swift
-// CYLBadge: CYLBadgeAppearance.swift (new members)
-@objc public class func isLiquidGlassActive() -> Bool { CYLBadgeLiquidGlass.isActive() }
+// CYLUtils: CYLUtils.swift
+@objc public class func isLiquidGlassActive() -> Bool { CYLLiquidGlass.isActive() }
 public nonisolated(unsafe) static var liquidGlassActiveOverride: Bool? {
-    get { CYLBadgeLiquidGlass.activeOverride }
-    set { CYLBadgeLiquidGlass.activeOverride = newValue }
+    get { CYLLiquidGlass.activeOverride }
+    set { CYLLiquidGlass.activeOverride = newValue }
 }
 
-// CYLAnimatedItem: CYLAnimatedItemView.swift (unchanged signatures, now forwarding)
-public static func isLiquidGlassActive() -> Bool { CYLBadgeAppearance.isLiquidGlassActive() }
+// CYLAnimatedItem: CYLAnimatedItemView.swift (same signatures, now forwarding)
+public static func isLiquidGlassActive() -> Bool { CYLUtils.isLiquidGlassActive() }
 public nonisolated(unsafe) static var liquidGlassActiveOverride: Bool? {
-    get { CYLBadgeAppearance.liquidGlassActiveOverride }
-    set { CYLBadgeAppearance.liquidGlassActiveOverride = newValue }
-}
-// CYLUtils.isLiquidGlassActive() keeps forwarding to CYLAnimatedItemView: no change needed.
-```
-
-| 中文 | English |
-|:---|:---|
-| 把角标中 6 处 `CYLUtils.isLiquidGlassActive()` 换成 `CYLBadgeAppearance.isLiquidGlassActive()`。**避免**：(1) 复制一份规则而不是移动：两个缓存会给出不同答案（测试改了一个 override，另一个不变）；(2) 改变公开签名：`CYLAnimatedItemView.isLiquidGlassActive()` 与 `liquidGlassActiveOverride` 是已发布 API；(3) 忘记搜索测试中设置 override 的地方，确认它们仍然生效。 | Replace the badge's 6 calls of `CYLUtils.isLiquidGlassActive()` with `CYLBadgeAppearance.isLiquidGlassActive()`. **Avoid**: (1) copying the rule instead of moving it: two caches give different answers (a test sets one override and the other stays); (2) changing a public signature: `CYLAnimatedItemView.isLiquidGlassActive()` and `liquidGlassActiveOverride` are released API; (3) forgetting to search the tests that set the override and check they still work. |
-
-### [CN]步骤 6：角标自己的资源包与本地化
-### [EN]Step 6: The badge's own resource bundle and localization
-
-| 中文 | English |
-|:---|:---|
-| 新建 `CYLBadgeView/Resources/CYLBadge.bundle`：放入根目录 `LICENSE`，以及 33 种语言的 `<lang>.lproj/CYLBadge.strings`，只含角标用到的键（`有新内容`、`%@ 条新消息`、`new` 等，从 `CYLTabBarController.bundle` 复制译文）。新增内部函数 `cylBadgeLocalizedString(_:)`，查找方式照抄 CYLAnimatedItem 查找自己资源包的代码（CocoaPods、SwiftPM 的 `Bundle.module`、Carthage framework 三种情况）。 | Create `CYLBadgeView/Resources/CYLBadge.bundle`: the root `LICENSE`, and `<lang>.lproj/CYLBadge.strings` in 33 languages holding only the keys the badge uses (`有新内容`, `%@ 条新消息`, `new`…, translations copied from `CYLTabBarController.bundle`). Add an internal `cylBadgeLocalizedString(_:)` whose lookup copies how CYLAnimatedItem finds its own bundle (CocoaPods, SwiftPM `Bundle.module`, Carthage framework). |
-
-```swift
-// CYLBadge: one function for the whole layer (the "one macro per layer" rule)
-func cylBadgeLocalizedString(_ key: String) -> String {
-    guard let bundle = CYLBadgeResources.bundle else { return key }
-    return bundle.localizedString(forKey: key, value: key, table: "CYLBadge")
+    get { CYLUtils.liquidGlassActiveOverride }
+    set { CYLUtils.liquidGlassActiveOverride = newValue }
 }
 ```
 
 | 中文 | English |
 |:---|:---|
-| 再把 `cylBadgeLocalizedString` 登记到 `scripts/check-localization-macros.py`（"一个 owner 一个包，一层一个宏"），把 `CYLBadge.bundle/LICENSE` 登记到 `scripts/check-license-notices.py` 与 `docs/License-Notices.md`。**避免**：(1) 删除 `CYLTabBarController.bundle` 中的这些键：旧调用和其他代码可能仍在用；(2) 在代码里写新的中文字面量（规则禁止）：只把已有的键传给本地化函数；(3) 只测 CocoaPods：SwiftPM 的资源包路径不同，三种集成都要能找到包。 | Then register `cylBadgeLocalizedString` in `scripts/check-localization-macros.py` ("one bundle per owner, one macro per layer"), and `CYLBadge.bundle/LICENSE` in `scripts/check-license-notices.py` and `docs/License-Notices.md`. **Avoid**: (1) deleting those keys from `CYLTabBarController.bundle`: old callers and other code may still use them; (2) writing new Chinese literals in code (the rules forbid it): pass existing keys to the localization function only; (3) testing CocoaPods only: SwiftPM puts resources elsewhere; the bundle must be found in all three integrations. |
+| **避免**：(1) 复制规则而不是移动：两个缓存会给出不同答案；(2) 改变 `CYLAnimatedItemView.isLiquidGlassActive()` / `liquidGlassActiveOverride` 的签名（已发布 API）；(3) 留下 `CYLUtils` → `CYLAnimatedItemView` 的旧转发：那就是循环；(4) 忘记检查测试中设置 override 的地方。 | **Avoid**: (1) copying the rule instead of moving it: two caches give different answers; (2) changing the signatures of `CYLAnimatedItemView.isLiquidGlassActive()` / `liquidGlassActiveOverride` (released API); (3) leaving the old `CYLUtils` → `CYLAnimatedItemView` forward: that is the cycle; (4) forgetting the tests that set the override. |
 
-### [CN]步骤 7：CYLBadge.podspec，单独校验
-### [EN]Step 7: CYLBadge.podspec, linted on its own
+### [CN]步骤 6：许可证与检查脚本
+### [EN]Step 6: License files and check scripts
 
 | 中文 | English |
 |:---|:---|
-| 用上文"打包"一节的 podspec 草稿，逐行对照 `CYLAnimatedItem.podspec`（注释要双语，写清楚为什么）。到这一步 CYLBadge 必须能**单独**通过校验，这证明它已不依赖本仓库的其他库。 | Use the podspec sketch in "Packaging" and compare it line by line with `CYLAnimatedItem.podspec` (bilingual comments that say why). At this step CYLBadge must lint **on its own**: that proves it no longer depends on any other library of this repository. |
+| 本地化不变：角标继续用 CYLUtils 的 `cylLocalizedString` 与 `CYLTabBarController.bundle`（该包随 CYLUtils pod 发布）。新增 `CYLBadgeView/Resources/CYLBadge.bundle/LICENSE`（复制根目录 `LICENSE`）。更新 `scripts/check-license-notices.py`、`docs/License-Notices.md`（两个新包），以及 `scripts/check-localization-macros.py` 的配置：`CYLTabBarController.bundle` 的 owner 现在是 CYLUtils pod，角标属于使用它的层。 | Localization stays: the badge keeps CYLUtils' `cylLocalizedString` and `CYLTabBarController.bundle` (shipped with the CYLUtils pod). Add `CYLBadgeView/Resources/CYLBadge.bundle/LICENSE` (a copy of the root `LICENSE`). Update `scripts/check-license-notices.py` and `docs/License-Notices.md` (two new packages), and the configuration of `scripts/check-localization-macros.py`: the owner of `CYLTabBarController.bundle` is now the CYLUtils pod, and the badge is a layer that uses it. |
 
 ```sh
-pod lib lint CYLBadge.podspec --quick --allow-warnings
-pod lib lint CYLBadge.podspec --allow-warnings     # full build, no other pod of this repository
+python3 scripts/check-license-notices.py
+python3 scripts/check-localization-macros.py
 ```
 
 | 中文 | English |
 |:---|:---|
-| **避免**：(1) 版本号与 CYLTabBarController 不同（三个 pod 同一 tag、同一版本）；(2) 忘记 `DEFINES_MODULE`：没有 `use_frameworks!` 的 App 里 `import CYLBadge` 会失败；(3) 用 `--skip-import-validation` 或 `--no-clean` 掩盖错误；(4) 漏掉 `Deprecated/` 目录：旧名字的转发也要编进来。 | **Avoid**: (1) a version different from CYLTabBarController (all three pods share one tag and version); (2) forgetting `DEFINES_MODULE`: `import CYLBadge` fails in apps without `use_frameworks!`; (3) hiding errors with `--skip-import-validation` or `--no-clean`; (4) leaving out the `Deprecated/` folder: the old-name forwards must compile too. |
+| **避免**：(1) 给角标另建字符串表（第 2 版的做法，已取消）；(2) 把 `CYLTabBarController.bundle` 同时放进两个 pod 的 `resources`：App 里会出现两份同名资源包；(3) 只加 podspec 不加许可证文件：许可证规则会失败。 | **Avoid**: (1) a separate string table for the badge (v2's plan, dropped); (2) listing `CYLTabBarController.bundle` in the `resources` of two pods: the app gets two bundles with the same name; (3) adding a podspec without its license file: the license check fails. |
+
+### [CN]步骤 7：两个 podspec，自下而上校验
+### [EN]Step 7: The two podspecs, linted bottom up
+
+| 中文 | English |
+|:---|:---|
+| 按"打包"一节写 `CYLUtils.podspec` 与 `CYLBadge.podspec`（注释双语，写清原因）。从最底层开始，每层单独通过后再做上一层；本地还没发布的下层 pod 用 `--include-podspecs` 提供。 | Write `CYLUtils.podspec` and `CYLBadge.podspec` from "Packaging" (bilingual comments that say why). Start at the bottom and only move up once a layer passes on its own; lower pods not yet published are supplied with `--include-podspecs`. |
+
+```sh
+pod lib lint CYLUtils.podspec --allow-warnings
+pod lib lint CYLBadge.podspec --allow-warnings --include-podspecs='CYLUtils.podspec'
+pod lib lint CYLAnimatedItem.podspec --allow-warnings --include-podspecs='{CYLUtils,CYLBadge}.podspec'
+pod lib lint CYLTabBarController.podspec --allow-warnings --include-podspecs='{CYLUtils,CYLBadge,CYLAnimatedItem}.podspec'
+```
+
+| 中文 | English |
+|:---|:---|
+| `CYLUtils.podspec` 单独通过，就证明 CYLUtils 已不依赖本仓库的任何库。**避免**：(1) 四个 pod 版本不同（同一 tag、同一版本）；(2) 忘记 `DEFINES_MODULE` 或 `module_name`；(3) 用 `--skip-import-validation`、`--no-clean` 掩盖错误；(4) 漏掉 `Deprecated/` 目录；(5) 跳过某一层直接校验最上层：出错时不知道是哪一层。 | `CYLUtils.podspec` passing on its own proves CYLUtils no longer depends on any library of this repository. **Avoid**: (1) different versions across the four pods (one tag, one version); (2) forgetting `DEFINES_MODULE` or `module_name`; (3) hiding errors with `--skip-import-validation` or `--no-clean`; (4) leaving out the `Deprecated/` folders; (5) skipping a layer and linting only the top: when it fails you do not know which layer broke. |
 
 ### [CN]步骤 8：CocoaPods 中接上依赖方
 ### [EN]Step 8: Connect the dependents in CocoaPods
 
 | 中文 | English |
 |:---|:---|
-| (1) `CYLAnimatedItem.podspec` 的 `Core` 加 `core.dependency 'CYLBadge', s.version.to_s`。(2) `CYLTabBarController.podspec` 的 `CYLBadgeView` 子库只留 `badge.dependency 'CYLBadge', s.version.to_s`（删掉 `source_files` 等）；Core 的 `exclude_files` 里那一行保留（源码已归 CYLBadge）。(3) 在 `CYLUtils/Swift/CYLUtils.swift` 加 `@_exported import CYLBadge`，在 `CYLAnimatedItemView.swift` 加 `import CYLBadge`。(4) 旧的 Objective-C 导入路径：`CYLTabBarController/CYLBadgeView.h` 由新的转发头文件提供。(5) 17 个按路径引入 `CYLAnimatedItem` 的示例 Podfile 都加一行。 | (1) `CYLAnimatedItem.podspec`, subspec `Core`: add `core.dependency 'CYLBadge', s.version.to_s`. (2) `CYLTabBarController.podspec`, subspec `CYLBadgeView`: keep only `badge.dependency 'CYLBadge', s.version.to_s` (remove `source_files` and the rest); keep the line in Core's `exclude_files` (the sources now belong to CYLBadge). (3) Add `@_exported import CYLBadge` to `CYLUtils/Swift/CYLUtils.swift` and `import CYLBadge` to `CYLAnimatedItemView.swift`. (4) The old Objective-C import path: `CYLTabBarController/CYLBadgeView.h` comes from a new forwarding header. (5) Add one line to each of the 17 example Podfiles that take `CYLAnimatedItem` by path. |
+| (1) `CYLAnimatedItem.podspec` 的 `Core` 加 `core.dependency 'CYLBadge', s.version.to_s`。(2) `CYLTabBarController.podspec` 的 `CYLUtils` 与 `CYLBadgeView` 子库只留依赖（见"打包"），Core 的 `exclude_files` 保留这两个目录。(3) 旧 Objective-C 导入路径 `<CYLTabBarController/CYLUtils.h>`、`<CYLTabBarController/CYLBadgeView.h>` 由 Core 中的转发头文件提供。(4) 17 个示例 Podfile 各加两行。 | (1) `CYLAnimatedItem.podspec`, subspec `Core`: add `core.dependency 'CYLBadge', s.version.to_s`. (2) `CYLTabBarController.podspec`: the `CYLUtils` and `CYLBadgeView` subspecs keep only dependencies (see "Packaging"); Core's `exclude_files` keeps both folders. (3) The old Objective-C import paths `<CYLTabBarController/CYLUtils.h>` and `<CYLTabBarController/CYLBadgeView.h>` come from forwarding headers in Core. (4) Two lines in each of the 17 example Podfiles. |
 
 ```objc
-// CYLTabBarController/CYLBadgeViewForwarding/CYLBadgeView.h (Core's public headers, keeps the old path)
+// Core: CYLTabBarController/Forwarding/CYLBadgeView.h (keeps the old path; CYLUtils.h is done the same way)
 #if __has_include(<CYLBadge/CYLBadgeView.h>)
 #import <CYLBadge/CYLBadgeView.h>
 #else
@@ -399,46 +433,48 @@ pod lib lint CYLBadge.podspec --allow-warnings     # full build, no other pod of
 ```
 
 ```sh
-# The Podfiles to update, then add next to each `pod 'CYLAnimatedItem', :path => X`:  pod 'CYLBadge', :path => X
+# The Podfiles to update; next to each `pod 'CYLAnimatedItem', :path => X` add
+#   pod 'CYLUtils', :path => X
+#   pod 'CYLBadge', :path => X
 grep -rln "pod 'CYLAnimatedItem'" --include=Podfile .
 ```
 
 | 中文 | English |
 |:---|:---|
-| **避免**：(1) 删除 `CYLTabBarController/CYLBadgeView` 子库名：已有 Podfile 会失败（公开 API 规则）；(2) 只给一部分 Podfile 加 `CYLBadge`：按路径引入时 CocoaPods 会去 trunk 找它，找不到就失败；(3) 转发头文件与原头文件同名放在同一个搜索路径：会自己导入自己；(4) 提交 `Podfile.lock`（`*.lock` 不提交）。 | **Avoid**: (1) deleting the `CYLTabBarController/CYLBadgeView` subspec name: existing Podfiles fail (public API rule); (2) adding `CYLBadge` to only some Podfiles: with path pods, CocoaPods looks for it on the trunk and fails; (3) putting the forwarding header next to the real one in the same search path: it imports itself; (4) committing `Podfile.lock` (`*.lock` is never committed). |
+| **避免**：(1) 删除 `CYLTabBarController/CYLUtils` 或 `CYLTabBarController/CYLBadgeView` 子库名（公开 API 规则）；(2) 只给部分 Podfile 加这两行：按路径引入时 CocoaPods 会去 trunk 找，找不到就失败；(3) 转发头文件与原头文件放在同一个搜索路径：会自己导入自己；(4) 提交 `Podfile.lock`。 | **Avoid**: (1) deleting the `CYLTabBarController/CYLUtils` or `CYLTabBarController/CYLBadgeView` subspec names (public API rule); (2) adding the lines to only some Podfiles: with path pods, CocoaPods looks on the trunk and fails; (3) a forwarding header in the same search path as the real one: it imports itself; (4) committing `Podfile.lock`. |
 
 ### [CN]步骤 9：SwiftPM
 ### [EN]Step 9: SwiftPM
 
 | 中文 | English |
 |:---|:---|
-| 在 `Package.swift` 中新增 `CYLBadge` target 与产品；`CYLAnimatedItemViews`（编译 `CYLAnimatedItemView.swift` 与 `CYLLiquidGlass.swift` 的 Swift target）与 `CYLTabBarController` 依赖它；从 `CYLTabBarController` 的 `sources` 中删除 `"CYLBadgeView/Swift"`。`Package/ObjC/include` 中指向角标头文件的符号链接移到 `CYLBadgeView/include`。 | In `Package.swift`, add a `CYLBadge` target and product; `CYLAnimatedItemViews` (the Swift target that compiles `CYLAnimatedItemView.swift` and `CYLLiquidGlass.swift`) and `CYLTabBarController` depend on it; remove `"CYLBadgeView/Swift"` from the `CYLTabBarController` target's `sources`. The symlinks to the badge headers in `Package/ObjC/include` move to `CYLBadgeView/include`. |
+| 新增 `CYLUtilsKit` 与 `CYLBadge` 两个 Swift target 与产品；`CYLBadge` 依赖 `CYLUtilsKit`；`CYLAnimatedItemViews`（编译 `CYLAnimatedItemView.swift` 的 target）与 `CYLTabBarController` 依赖 `CYLBadge`；从 `CYLTabBarController` 的 `sources` 中删除 `"CYLUtils/Swift"` 与 `"CYLBadgeView/Swift"`。CYLUtils 若有 Swift 需要的 Objective-C 声明，放进它自己的小 C target（参照 `CYLTabBarControllerObjC` 的做法）。 | Add two Swift targets and products, `CYLUtilsKit` and `CYLBadge`; `CYLBadge` depends on `CYLUtilsKit`; `CYLAnimatedItemViews` (the target that compiles `CYLAnimatedItemView.swift`) and `CYLTabBarController` depend on `CYLBadge`; remove `"CYLUtils/Swift"` and `"CYLBadgeView/Swift"` from the `CYLTabBarController` target's `sources`. If CYLUtils has Objective-C declarations its Swift needs, put them in a small C target of its own (as `CYLTabBarControllerObjC` does). |
 
 ```swift
 // Package.swift (new)
+.library(name: "CYLUtilsKit", targets: ["CYLUtilsKit"]),
 .library(name: "CYLBadge", targets: ["CYLBadge"]),
 // …
-.target(
-    name: "CYLBadge",
-    dependencies: [.product(name: "CYLDeallocBlockExecutor", package: "CYLDeallocBlockExecutor")],
-    path: "CYLTabBarController/CYLBadgeView",
-    exclude: ["include"],          // Objective-C headers are for CocoaPods / Carthage callers
-    sources: ["Swift"],
-    resources: [.copy("Resources/CYLBadge.bundle")]
-),
+.target(name: "CYLUtilsKit", path: "CYLTabBarController/CYLUtils",
+        exclude: ["Swift/CYLAnimationURLOptions.swift", "Swift/CYLAnimationKeyLookup.swift"],
+        sources: ["Swift"], resources: [.copy("../Resources/CYLTabBarController.bundle")]),
+.target(name: "CYLBadge",
+        dependencies: ["CYLUtilsKit", .product(name: "CYLDeallocBlockExecutor", package: "CYLDeallocBlockExecutor")],
+        path: "CYLTabBarController/CYLBadgeView", sources: ["Swift"],
+        resources: [.copy("Resources/CYLBadge.bundle")]),
 // and: "CYLBadge" in the dependencies of "CYLAnimatedItemViews" and "CYLTabBarController"
 ```
 
 | 中文 | English |
 |:---|:---|
-| 检查：`xcodebuild -scheme CYLTabBarController -destination 'generic/platform=iOS Simulator' build`（在仓库根目录，Xcode 直接打开 Package.swift）。**避免**：(1) 在一个 SwiftPM target 中混用 Swift 与 Objective-C（不支持）；(2) 让 `CYLBadge` 依赖任何 `CYLAnimatedItem*` target；(3) 用 `swift build` 判断成败：它为 macOS 编译，UIKit 代码一定失败。 | Check: `xcodebuild -scheme CYLTabBarController -destination 'generic/platform=iOS Simulator' build` (in the repository root; Xcode opens Package.swift directly). **Avoid**: (1) mixing Swift and Objective-C in one SwiftPM target (not supported); (2) letting `CYLBadge` depend on any `CYLAnimatedItem*` target; (3) judging by `swift build`: it builds for macOS, and UIKit code always fails there. |
+| 检查：`xcodebuild -scheme CYLTabBarController -destination 'generic/platform=iOS Simulator' build`（仓库根目录）。资源路径以 SwiftPM 的实际要求为准（资源必须在 target 目录内时，改为符号链接或调整 `path`）。**避免**：(1) 在一个 SwiftPM target 中混用 Swift 与 Objective-C；(2) `CYLUtilsKit` 依赖任何 `CYLAnimatedItem*` target；(3) 用 `swift build` 判断成败（它为 macOS 编译）。 | Check: `xcodebuild -scheme CYLTabBarController -destination 'generic/platform=iOS Simulator' build` (repository root). Follow SwiftPM's real rules for resource paths (if resources must sit inside the target folder, use a symlink or adjust `path`). **Avoid**: (1) mixing Swift and Objective-C in one SwiftPM target; (2) `CYLUtilsKit` depending on any `CYLAnimatedItem*` target; (3) judging by `swift build` (it builds for macOS). |
 
 ### [CN]步骤 10：Carthage（Xcode framework）
 ### [EN]Step 10: Carthage (Xcode framework)
 
 | 中文 | English |
 |:---|:---|
-| 在 `CYLTabBarController.xcodeproj` 中照 `CYLAnimatedItem` framework target 新建 `CYLBadge` framework target：同样的 build settings、`DEFINES_MODULE`、资源包、共享 scheme `CYLBadge.xcscheme`；`CYLAnimatedItem` 与 `CYLTabBarController` framework 链接并依赖它；从 `CYLTabBarController` target 的编译源中移除角标文件。 | In `CYLTabBarController.xcodeproj`, create a `CYLBadge` framework target modelled on the `CYLAnimatedItem` framework target: same build settings, `DEFINES_MODULE`, the resource bundle, a shared scheme `CYLBadge.xcscheme`; the `CYLAnimatedItem` and `CYLTabBarController` frameworks link and depend on it; the badge files leave the `CYLTabBarController` target's sources. |
+| 在 `CYLTabBarController.xcodeproj` 中照 `CYLAnimatedItem` framework target 新建 `CYLUtilsKit` 与 `CYLBadge` 两个 framework target（共享 scheme、`DEFINES_MODULE`、资源包）；依赖顺序 `CYLUtilsKit` ← `CYLBadge` ← `CYLAnimatedItem` ← `CYLTabBarController`；从 `CYLTabBarController` target 的编译源中移除这两个目录的文件。 | In `CYLTabBarController.xcodeproj`, create two framework targets modelled on the `CYLAnimatedItem` framework target, `CYLUtilsKit` and `CYLBadge` (shared schemes, `DEFINES_MODULE`, resource bundles); dependency order `CYLUtilsKit` ← `CYLBadge` ← `CYLAnimatedItem` ← `CYLTabBarController`; the files of both folders leave the `CYLTabBarController` target's sources. |
 
 ```sh
 carthage build --no-skip-current --use-xcframeworks --platform iOS
@@ -446,7 +482,7 @@ carthage build --no-skip-current --use-xcframeworks --platform iOS
 
 | 中文 | English |
 |:---|:---|
-| **避免**：(1) 用新版 Xcode 保存工程后 `objectVersion` 变了（必须保持 46，见 `macos.md`）；(2) 手写的对象 ID 重复（用 `grep -c` 确认每个新 ID 只出现在应有的位置）；(3) 忘记把 scheme 设为共享：Carthage 只构建共享 scheme；(4) 同一个文件同时属于两个 target：符号重复。 | **Avoid**: (1) letting a newer Xcode raise `objectVersion` when saving (it must stay 46, see `macos.md`); (2) duplicate hand-written object IDs (check each new ID with `grep -c`); (3) forgetting to share the scheme: Carthage builds shared schemes only; (4) one file in two targets: duplicate symbols. |
+| **避免**：(1) 保存工程后 `objectVersion` 变了（必须保持 46）；(2) 手写的对象 ID 重复；(3) scheme 没设为共享（Carthage 只构建共享 scheme）；(4) 同一个文件属于两个 target（符号重复）；(5) framework 依赖顺序反了（链接错误）。 | **Avoid**: (1) `objectVersion` changing when the project is saved (it must stay 46); (2) duplicate hand-written object IDs; (3) unshared schemes (Carthage builds shared schemes only); (4) one file in two targets (duplicate symbols); (5) a reversed framework dependency order (link errors). |
 
 ### [CN]步骤 11：宿主协议 CYLBadgeHosting
 ### [EN]Step 11: The host protocol CYLBadgeHosting
@@ -644,7 +680,7 @@ python3 scripts/check-screenshot-labels.py
 
 | 中文 | English |
 |:---|:---|
-| 更新：本文（状态改为已实现，任务记录写分数与证据）、`docs/Animated-Item.md`、`README.md`（安装一节加 `pod 'CYLBadge'` 与 SwiftPM 产品）、`cyl-api-map` 行、`docs/License-Notices.md`、`docs/Swift-Migration.md`（如有影响）。然后运行全部检查，最后按 `git.md` 提交与推送。 | Update: this document (status implemented, score and evidence in the task log), `docs/Animated-Item.md`, `README.md` (the install section gains `pod 'CYLBadge'` and the SwiftPM product), the `cyl-api-map` row, `docs/License-Notices.md`, `docs/Swift-Migration.md` if affected. Then run every check, and commit and push as `git.md` says. |
+| 更新：本文（状态改为已实现，任务记录写分数与证据）、`docs/Animated-Item.md`、`README.md`（安装一节加 `pod 'CYLBadge'`、`pod 'CYLUtils'` 与 SwiftPM 产品）、`cyl-api-map` 行、`docs/License-Notices.md`、`docs/Swift-Migration.md`（如有影响）。然后运行全部检查，最后按 `git.md` 提交与推送。 | Update: this document (status implemented, score and evidence in the task log), `docs/Animated-Item.md`, `README.md` (the install section gains `pod 'CYLBadge'`, `pod 'CYLUtils'` and the SwiftPM products), the `cyl-api-map` row, `docs/License-Notices.md`, `docs/Swift-Migration.md` if affected. Then run every check, and commit and push as `git.md` says. |
 
 ```sh
 python3 scripts/update-docs-navigation.py
@@ -653,23 +689,24 @@ python3 scripts/check-localization-macros.py
 python3 scripts/check-license-notices.py
 python3 scripts/check-public-api-comments.py
 python3 scripts/check-screenshot-labels.py
-pod lib lint CYLBadge.podspec --quick --allow-warnings
-pod lib lint CYLAnimatedItem.podspec --quick --allow-warnings
-pod lib lint CYLTabBarController.podspec --quick --allow-warnings
+pod lib lint CYLUtils.podspec --quick --allow-warnings
+pod lib lint CYLBadge.podspec --quick --allow-warnings --include-podspecs='CYLUtils.podspec'
+pod lib lint CYLAnimatedItem.podspec --quick --allow-warnings --include-podspecs='{CYLUtils,CYLBadge}.podspec'
+pod lib lint CYLTabBarController.podspec --quick --allow-warnings --include-podspecs='{CYLUtils,CYLBadge,CYLAnimatedItem}.podspec'
 touch .git/hooks/NO_AUTO_SYNC
 git log -1 --format=%B | python3 -c "import re,sys; sys.exit(1 if re.search('[一-鿿]', sys.stdin.read()) else 0)"
 ```
 
 | 中文 | English |
 |:---|:---|
-| 建议分几个提交，每个都能编译：(a) 步骤 2–6 角标内部独立；(b) 步骤 7–10 打包；(c) 步骤 11–14 item API；(d) 步骤 15–17 示例、测试、截图；(e) 文档。**避免**：一个巨大的提交（无法回退、无法审查）；提交信息中有中文或缺少作者行 `By  @ChenYilong <luohanchenyilong@163.com>`；提交 `._*` 或 `*.lock` 文件；推送没有通过 lint 的代码。 | Suggested commits, each one building: (a) steps 2–6, the badge independent inside; (b) steps 7–10, packaging; (c) steps 11–14, the item API; (d) steps 15–17, demo, tests, screenshots; (e) docs. **Avoid**: one huge commit (cannot be reverted or reviewed); Chinese in the commit message or a missing author line `By  @ChenYilong <luohanchenyilong@163.com>`; committing `._*` or `*.lock` files; pushing code that has not passed lint. |
+| 建议分几个提交，每个都能编译：(a) 步骤 2–6 CYLUtils 与角标去掉向上的依赖；(b) 步骤 7–10 打包；(c) 步骤 11–14 item API；(d) 步骤 15–17 示例、测试、截图；(e) 文档。**避免**：一个巨大的提交（无法回退、无法审查）；提交信息中有中文或缺少作者行 `By  @ChenYilong <luohanchenyilong@163.com>`；提交 `._*` 或 `*.lock` 文件；推送没有通过 lint 的代码。 | Suggested commits, each one building: (a) steps 2–6, CYLUtils and the badge lose their upward dependencies; (b) steps 7–10, packaging; (c) steps 11–14, the item API; (d) steps 15–17, demo, tests, screenshots; (e) docs. **Avoid**: one huge commit (cannot be reverted or reviewed); Chinese in the commit message or a missing author line `By  @ChenYilong <luohanchenyilong@163.com>`; committing `._*` or `*.lock` files; pushing code that has not passed lint. |
 
 ### [CN]常见错误速查
 ### [EN]Common mistakes at a glance
 
 | 中文 | English |
 |:---|:---|
-| 1. 模块循环：CYLBadge 中出现 `import CYLAnimatedItem`、`import CYLTabBarController` 或对它们的 `__has_include`。2. 键字符串变了，旧角标数据丢失。3. Liquid Glass 规则复制成两份。4. 角标挂在 `imageView` / `animationView` 上而不是锚点。5. 锚点参与测量或可交互。6. 删除或改名已发布的 API（`cylAnimatedItemBadgeHost()`、`CYLTabBarController/CYLBadgeView` 子库、`cylTabBarHostBadge…`）。7. 协议里写函数体。8. 只测 CocoaPods，不测 SwiftPM 与 Carthage。9. 资源包只在一种集成方式下找得到。10. 提交时角标动画开关为开，或提交了锁文件。 | 1. A module cycle: `import CYLAnimatedItem`, `import CYLTabBarController` or a `__has_include` of them inside CYLBadge. 2. Changed key strings, so old badge data is lost. 3. Two copies of the Liquid Glass rule. 4. The badge on `imageView` / `animationView` instead of the anchor. 5. The anchor measured or interactive. 6. Deleting or renaming released API (`cylAnimatedItemBadgeHost()`, the `CYLTabBarController/CYLBadgeView` subspec, `cylTabBarHostBadge…`). 7. Function bodies in a protocol. 8. Testing CocoaPods only, not SwiftPM and Carthage. 9. A resource bundle found in one integration only. 10. Committing with the badge-animation switch on, or committing a lock file. |
+| 1. 模块循环：CYLUtils 中仍有对 CYLAnimatedItem 的导入，或 CYLBadge 中出现 `import CYLAnimatedItem`、`import CYLTabBarController` 或对它们的 `__has_include`。2. 共用宏在两个头文件中各定义一份。3. Liquid Glass 规则复制成两份，或留下 CYLUtils → CYLAnimatedItemView 的旧转发。4. 角标挂在 `imageView` / `animationView` 上而不是锚点。5. 锚点参与测量或可交互。6. 删除或改名已发布的 API（`cylAnimatedItemBadgeHost()`、`CYLTabBarController/CYLUtils` 与 `CYLTabBarController/CYLBadgeView` 子库、`cylTabBarHostBadge…`）。7. 协议里写函数体。8. 只测 CocoaPods，不测 SwiftPM 与 Carthage；或不自下而上逐层校验。9. `CYLTabBarController.bundle` 出现在两个 pod 的资源中。10. 提交时角标动画开关为开，或提交了锁文件。 | 1. A module cycle: CYLUtils still importing CYLAnimatedItem, or `import CYLAnimatedItem`, `import CYLTabBarController` or a `__has_include` of them inside CYLBadge. 2. A shared macro defined in two headers. 3. Two copies of the Liquid Glass rule, or the old CYLUtils → CYLAnimatedItemView forward left in place. 4. The badge on `imageView` / `animationView` instead of the anchor. 5. The anchor measured or interactive. 6. Deleting or renaming released API (`cylAnimatedItemBadgeHost()`, the `CYLTabBarController/CYLUtils` and `CYLTabBarController/CYLBadgeView` subspecs, `cylTabBarHostBadge…`). 7. Function bodies in a protocol. 8. Testing CocoaPods only, not SwiftPM and Carthage, or not linting bottom up layer by layer. 9. `CYLTabBarController.bundle` in the resources of two pods. 10. Committing with the badge-animation switch on, or committing a lock file. |
 
 
 ## [CN]其他平台（同名）
@@ -693,11 +730,13 @@ git log -1 --format=%B | python3 -c "import re,sys; sys.exit(1 if re.search('[�
 |:---|:---|
 | 负责人原话（2026-11-27）："i agree with all of the part of Questions for you (also at the end of the doc): following your recommend.update docs"。下面 6 个问题全部按建议执行。 | Owner's words (2026-11-27): "i agree with all of the part of Questions for you (also at the end of the doc): following your recommend.update docs". All six questions below follow the recommendation. |
 | D1. pod 与模块名为 `CYLBadge`；头文件与类名（`CYLBadgeView`、`CYLBadgeAppearance` 等）不变；源码留在 `CYLTabBarController/CYLBadgeView/`，不移动文件。 | D1. Pod and module `CYLBadge`; headers and class names (`CYLBadgeView`, `CYLBadgeAppearance`…) unchanged; sources stay in `CYLTabBarController/CYLBadgeView/`, no file moves. |
-| D2. Liquid Glass 规则下移到 CYLBadge 的 `CYLBadgeAppearance.isLiquidGlassActive()`（含 `liquidGlassActiveOverride`）；`CYLAnimatedItemView.isLiquidGlassActive()` 与 `CYLUtils.isLiquidGlassActive()` 转发给它，仍只有一份规则。 | D2. The Liquid Glass rule moves down into CYLBadge as `CYLBadgeAppearance.isLiquidGlassActive()` (with `liquidGlassActiveOverride`); `CYLAnimatedItemView.isLiquidGlassActive()` and `CYLUtils.isLiquidGlassActive()` forward to it, so there is still one rule. |
+| D2（第 3 版修改，因 D7）. Liquid Glass 规则下移到最底层的 CYLUtils（`CYLUtils.isLiquidGlassActive()` 与新的 `CYLUtils.liquidGlassActiveOverride`）；`CYLAnimatedItemView.isLiquidGlassActive()` 与 `liquidGlassActiveOverride` 转发给它，CYLBadge 直接调用它，仍只有一份规则。原文：规则下移到 CYLBadge 的 `CYLBadgeAppearance`。 | D2 (amended in v3, because of D7). The Liquid Glass rule moves down to CYLUtils at the bottom (`CYLUtils.isLiquidGlassActive()` and a new `CYLUtils.liquidGlassActiveOverride`); `CYLAnimatedItemView.isLiquidGlassActive()` and `liquidGlassActiveOverride` forward to it, and CYLBadge calls it directly, so there is still one rule. Was: the rule moves into CYLBadge's `CYLBadgeAppearance`. |
 | D3. 发布前删除尚未发布的 `UIView.cylBadgeSnapshotImage(hidingBadge:traitCollection:)`（6cba553b），示例改用 `badgeValue`；按 `alignmentRectInsets` 对齐保留。 | D3. The unreleased `UIView.cylBadgeSnapshotImage(hidingBadge:traitCollection:)` (6cba553b) is removed before release, and the demo moves to `badgeValue`; aligning by `alignmentRectInsets` stays. |
-| D4. 接受：只用 `CYLAnimatedItem` 的库（CollectionViewClassifyMenu、CYLTableViewPlaceHolder）同时带入 CYLBadge 与 `CYLDeallocBlockExecutor`。 | D4. Accepted: libraries that use only `CYLAnimatedItem` (CollectionViewClassifyMenu, CYLTableViewPlaceHolder) also bring CYLBadge and `CYLDeallocBlockExecutor`. |
+| D4（第 3 版补充）. 接受：只用 `CYLAnimatedItem` 的库（CollectionViewClassifyMenu、CYLTableViewPlaceHolder）同时带入 CYLBadge、CYLUtils（含主题、视图工具与 `CYLTabBarController.bundle`）与 `CYLDeallocBlockExecutor`；带入 CYLUtils 是 D7 时负责人已知的代价。 | D4 (extended in v3). Accepted: libraries that use only `CYLAnimatedItem` (CollectionViewClassifyMenu, CYLTableViewPlaceHolder) also bring CYLBadge, CYLUtils (with themes, view helpers and `CYLTabBarController.bundle`) and `CYLDeallocBlockExecutor`; bringing CYLUtils was a known cost when the owner chose D7. |
 | D5. TagList 的 `CYLTagItemKey.badgeValue` / `badgeAttributes` 在 CollectionViewClassifyMenu 仓库实现：本会话获得该仓库权限后由本会话提交，否则由负责人合并；本仓库示例在该提交发布后更新 pin。 | D5. The TagList keys `CYLTagItemKey.badgeValue` / `badgeAttributes` are implemented in the CollectionViewClassifyMenu repository: by this session once it has access to that repository, otherwise merged by the owner; this repository's demo updates its pin after that commit. |
 | D6. 增加 `CYLAnimatedItemView.reservesBadgeSpace`（默认 NO）：为 YES 时测量在两侧为角标的伸出部分留出空间，紧凑的宿主不会裁剪角标；为 NO 时角标不参与测量。 | D6. Add `CYLAnimatedItemView.reservesBadgeSpace` (default NO): when YES, measuring reserves the badge's overhang on both sides, so a tight host does not clip it; when NO, the badge is not measured. |
+| D7（2026-11-27，第 3 版）. 负责人原话："更新文档角标不需要要脱离 CYLUtils"；追问循环问题后选择 "Extract CYLUtils too (Recommended)"。角标继续使用 CYLUtils；CYLUtils 也抽成独立 pod，放在最底层：CYLUtils ← CYLBadge ← CYLAnimatedItem ← CYLTabBarController。CYLUtils 不再依赖 CYLAnimatedItem（5 处，见"CYLUtils 放到最底层"）。`animation.md` 的规则随之修改。 | D7 (2026-11-27, v3). Owner's words: "更新文档角标不需要要脱离 CYLUtils" (the badge does not need to leave CYLUtils); asked about the cycle, the owner chose "Extract CYLUtils too (Recommended)". The badge keeps using CYLUtils; CYLUtils becomes an independent pod at the bottom too: CYLUtils ← CYLBadge ← CYLAnimatedItem ← CYLTabBarController. CYLUtils stops depending on CYLAnimatedItem (5 places, see "CYLUtils at the bottom"). The `animation.md` rule changes with it. |
+| 待确认 Q7. CYLUtils pod 的模块名：建议 pod 名 `CYLUtils`、模块名 `CYLUtilsKit`（SwiftPM target 同名）。原因：模块与其中的类 `CYLUtils` 同名时，`CYLUtils.Foo` 这样的模块限定写法会被当成类型成员，生成 `.swiftinterface`（Carthage xcframework）也会出错。负责人确认前按建议实现。 | To confirm, Q7. The CYLUtils pod's module name: recommended pod `CYLUtils`, module `CYLUtilsKit` (the SwiftPM target too). Why: when a module has the same name as its class `CYLUtils`, a module-qualified name such as `CYLUtils.Foo` is read as a member of the type, and generating `.swiftinterface` files (Carthage xcframeworks) fails. Implement the recommendation unless the owner says otherwise. |
 
 ## [CN]待负责人决定（已决定，见上）
 ## [EN]Questions for the owner (decided, see above)

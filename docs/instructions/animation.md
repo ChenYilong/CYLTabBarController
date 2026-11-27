@@ -7,7 +7,7 @@ by tag and kept under 200 lines: see [instructions.md](instructions.md)).
 - **`CYLAnimatedItemView` does not depend on CYLTabBarController (added 2026-11-17)**: the animated item component
   (iOS: the `CYLAnimatedItem` pod, `CYLAnimatedItem.podspec`; Android: `:cylanimateditem`, package
   `com.cyl.animateditem`) never imports, calls or depends on CYLTabBarController's code, subspecs, module or resources
-  (no CYLUtils, no `CYLTabBarController-Swift.h`, no `:cyltabbar`); CYLTabBarController depends on it, never the other
+  (no `CYLTabBarController-Swift.h`, no `:cyltabbar`; CYLUtils only as the independent `CYLUtils` pod, see the 2026-11-27 note below); CYLTabBarController depends on it, never the other
   way round. Code that is only for tests may depend on CYLTabBarController. Details:
   [docs/Animated-Item.md](docs/Animated-Item.md#enstructure).
 - **Optional components are isolated with guards**:
@@ -24,3 +24,8 @@ by tag and kept under 200 lines: see [instructions.md](instructions.md)).
     `CYL_SVGA_AVAILABLE` (that type's engine subspec, found by its animator header through the header search paths,
     plus its library). Each animator header imports that file, and the animator itself sits inside its switch. CYLTabBarController's Core and CYLUtils define no library switch. The released Lottie keys stay defined and are marked
     `CYL_LOTTIE_REQUIRED` (a compile warning without Lottie). See docs/Tab-Bar-Item-Animation.md.
+- **Amended 2026-11-27 (owner decision D7, [docs/Animated-Item-Badge.md](../Animated-Item-Badge.md#enowner-decisions))**: CYLUtils
+  and CYLBadge become independent pods below the component: CYLUtils ← CYLBadge ← CYLAnimatedItem ← CYLTabBarController.
+  The component may depend on those two pods (until they are extracted, the no-CYLUtils rule above still holds), and
+  still never on CYLTabBarController itself, its Core or its other subspecs. CYLUtils and CYLBadge never depend on the
+  component or on the tab bar.
