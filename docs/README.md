@@ -421,6 +421,7 @@ docs/
 │   ├── image-only-tabs-gallery-3-3-ios17.png
 │   ├── image-only-tabs-ios.png
 │   ├── inset-grouped-sections-demo-ios.png
+│   ├── ios-27.2-iphone-18-pro-d3-unset-bar-background-light-dark-5167f13c-2026-11-27.png
 │   ├── ios-27.2-iphone-18-pro-example-rive-b27-flat-tint-title-99a45dd4-2026-11-27.png
 │   ├── ios-27.2-iphone-18-pro-example-rive-fixed-tint-glass-vs-flat-dark-9d2b9e7b-2026-11-26-2158.png
 │   ├── ios-27.2-iphone-18-pro-example-rive-fixed-tint-glass-vs-flat-light-9d2b9e7b-2026-11-26-2158.png
