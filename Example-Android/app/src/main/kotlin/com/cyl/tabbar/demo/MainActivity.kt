@@ -12,7 +12,7 @@ import com.cyl.tabbar.CYLTabBarController
 import com.cyl.tabbar.CYLTabBarIndicator
 import com.cyl.tabbar.CYLTabBarScrollMode
 import com.cyl.tabbar.cyl_navigationTitleFollowsTabBarItemTitle
-import com.cyl.tabbar.cyl_showBadgeValue
+import com.cyl.tabbar.cylShowBadgeValue
 
 /**
  * [EN] The iOS library's own sample file (shared as an asset) creates a `CYLTabBarController`: the tabs for Android and
@@ -66,8 +66,8 @@ class MainActivity : AppCompatActivity() {
         //      PlusButton 的页面跟随 PlusButton 的标题。
         controller.viewControllers.forEach { it.cyl_navigationTitleFollowsTabBarItemTitle = true }
         DemoPlusButton.Provider.plusChildViewController().cyl_navigationTitleFollowsTabBarItemTitle = true
-        controller.tabBar.tabBarButtonArray.getOrNull(1)?.cyl_showBadgeValue("12")
-        controller.tabBar.tabBarButtonArray.getOrNull(3)?.cyl_showBadgeValue("")
+        controller.tabBar.tabBarButtonArray.getOrNull(1)?.cylShowBadgeValue("12")
+        controller.tabBar.tabBarButtonArray.getOrNull(3)?.cylShowBadgeValue("")
         applyAndroidExtras(controller)
     }
 

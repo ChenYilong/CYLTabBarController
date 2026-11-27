@@ -70,7 +70,7 @@ class CYLTabBarMoreListFragment : Fragment() {
     private fun row(button: CYLTabBarItemButton, controller: CYLTabBarController, dp: (Int) -> Int): View {
         val context = button.context
         val item = button.item
-        val badge = button.cyl_badgeState.badge?.takeIf { button.cyl_isShowBadge() }
+        val badge = button.cylBadgeState.badge?.takeIf { button.cylIsShowBadge() }
         val selectable = TypedValue().also { context.theme.resolveAttribute(android.R.attr.selectableItemBackground, it, true) }
         return LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL

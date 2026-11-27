@@ -11,7 +11,7 @@ import com.cyl.tabbar.CYLEnums
 import com.cyl.tabbar.CYLPlusButton
 import com.cyl.tabbar.CYLTabBarController
 import com.cyl.tabbar.CYLTabBarItemButton
-import com.cyl.tabbar.cyl_showBadgeValue
+import com.cyl.tabbar.cylShowBadgeValue
 
 /**
  * [EN] The tab bar style of a demo, chosen from the action bar as in the iOS examples, which have a "Liquid Glass" and a
@@ -84,7 +84,7 @@ object DemoPlusButtonBadge {
         val count = counts[controller] ?: 0
         if (!addingOne && count > 0) return
         counts[controller] = count + 1
-        plusButton.cyl_showBadgeValue((count + 1).toString(), CYLEnums.CYLBadgeAnimationType.Bounce)
+        plusButton.cylShowBadgeValue((count + 1).toString(), CYLEnums.CYLBadgeAnimationType.Bounce)
     }
 
     private fun setUpInteractions(controller: CYLTabBarController) {

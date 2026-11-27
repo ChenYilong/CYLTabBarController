@@ -163,36 +163,36 @@
 | `CYLBadgeStyle` | `CYLEnums.CYLBadgeStyle` | done |  |
 | `CYLBadgeAnimationType` | `CYLEnums.CYLBadgeAnimationType` | done |  |
 | `CYLBadgeProtocol` | `View extensions in CYLBadge.kt` | done |  |
-| `CYLBadgeProtocol` `cyl_badgeFont` | `View.cyl_badgeFont` | done |  |
-| `CYLBadgeProtocol` `cyl_badgeBackgroundColor` | `View.cyl_badgeBackgroundColor` | done |  |
-| `CYLBadgeProtocol` `cyl_badgeTextColor` | `View.cyl_badgeTextColor` | done |  |
-| `CYLBadgeProtocol` `cyl_badgeFrame` | `View.cyl_badgeFrame` | done |  |
-| `CYLBadgeProtocol` `cyl_badgeFrameValue` | `View.cyl_badgeFrame` | done | the NSValue twin of the typed property |
-| `CYLBadgeProtocol` `cyl_badgeCenterOffset` | `View.cyl_badgeCenterOffset` | done |  |
-| `CYLBadgeProtocol` `cyl_badgeCenterOffsetValue` | `View.cyl_badgeCenterOffset` | done | the NSValue twin of the typed property |
-| `CYLBadgeProtocol` `cyl_badgeAnimationType` | `View.cyl_badgeAnimationType` | done |  |
-| `CYLBadgeProtocol` `cyl_badgeAnimationTypeValue` | `View.cyl_badgeAnimationType` | done | the NSValue twin of the typed property |
-| `CYLBadgeProtocol` `cyl_badgeMaximumBadgeNumber` | `View.cyl_badgeMaximumBadgeNumber` | done |  |
-| `CYLBadgeProtocol` `cyl_badgeMaximumBadgeNumberValue` | `View.cyl_badgeMaximumBadgeNumber` | done | the NSValue twin of the typed property |
-| `CYLBadgeProtocol` `cyl_badgeRadius` | `View.cyl_badgeRadius` | done |  |
-| `CYLBadgeProtocol` `cyl_badgeRadiusValue` | `View.cyl_badgeRadius` | done | the NSValue twin of the typed property |
-| `CYLBadgeProtocol` `cyl_badgeMargin` | `View.cyl_badgeMargin` | done |  |
-| `CYLBadgeProtocol` `cyl_badgeMarginValue` | `View.cyl_badgeMargin` | done | the NSValue twin of the typed property |
-| `CYLBadgeProtocol` `cyl_badgeCornerRadius` | `View.cyl_badgeCornerRadius` | done |  |
-| `CYLBadgeProtocol` `cyl_badgeCornerRadiusValue` | `View.cyl_badgeCornerRadius` | done | the NSValue twin of the typed property |
-| `CYLBadgeProtocol` `cyl_delayIfNeededForSeconds` | `View.cyl_delayIfNeededForSeconds` | done |  |
-| `CYLBadgeProtocol` `-cyl_isShowBadge` | `View.cyl_isShowBadge()` | done |  |
-| `CYLBadgeProtocol` `-cyl_showBadge` | `View.cyl_showBadge()` | done |  |
-| `CYLBadgeProtocol` `-cyl_showBadgeValue:animationType:` | `View.cyl_showBadgeValue()` | done |  |
-| `CYLBadgeProtocol` `-cyl_clearBadge` | `View.cyl_clearBadge()` | done |  |
-| `CYLBadgeProtocol` `-cyl_resumeBadge` | `View.cyl_resumeBadge()` | done |  |
-| `CYLBadgeProtocol` `-cyl_isPauseBadge` | `View.cyl_isPauseBadge()` | done |  |
-| `CYLBadgeProtocol` `-cyl_getActualBadgeSuperView` | `View.cyl_getActualBadgeSuperView()` | done |  |
-| `CYLBadgeProtocol` `-cyl_isReady` | `View.cyl_isReady()` | done |  |
+| `CYLBadgeProtocol` `cylBadgeFont` | `View.cylBadgeFont` | done |  |
+| `CYLBadgeProtocol` `cylBadgeBackgroundColor` | `View.cylBadgeBackgroundColor` | done |  |
+| `CYLBadgeProtocol` `cylBadgeTextColor` | `View.cylBadgeTextColor` | done |  |
+| `CYLBadgeProtocol` `cylBadgeFrame` | `View.cylBadgeFrame` | done |  |
+| `CYLBadgeProtocol` `cyl_badgeFrameValue` | `View.cylBadgeFrame` | done | the NSValue twin of the typed property |
+| `CYLBadgeProtocol` `cylBadgeCenterOffset` | `View.cylBadgeCenterOffset` | done |  |
+| `CYLBadgeProtocol` `cyl_badgeCenterOffsetValue` | `View.cylBadgeCenterOffset` | done | the NSValue twin of the typed property |
+| `CYLBadgeProtocol` `cylBadgeAnimationType` | `View.cylBadgeAnimationType` | done |  |
+| `CYLBadgeProtocol` `cyl_badgeAnimationTypeValue` | `View.cylBadgeAnimationType` | done | the NSValue twin of the typed property |
+| `CYLBadgeProtocol` `cylBadgeMaximumBadgeNumber` | `View.cylBadgeMaximumBadgeNumber` | done |  |
+| `CYLBadgeProtocol` `cyl_badgeMaximumBadgeNumberValue` | `View.cylBadgeMaximumBadgeNumber` | done | the NSValue twin of the typed property |
+| `CYLBadgeProtocol` `cylBadgeRadius` | `View.cylBadgeRadius` | done |  |
+| `CYLBadgeProtocol` `cyl_badgeRadiusValue` | `View.cylBadgeRadius` | done | the NSValue twin of the typed property |
+| `CYLBadgeProtocol` `cylBadgeMargin` | `View.cylBadgeMargin` | done |  |
+| `CYLBadgeProtocol` `cyl_badgeMarginValue` | `View.cylBadgeMargin` | done | the NSValue twin of the typed property |
+| `CYLBadgeProtocol` `cylBadgeCornerRadius` | `View.cylBadgeCornerRadius` | done |  |
+| `CYLBadgeProtocol` `cyl_badgeCornerRadiusValue` | `View.cylBadgeCornerRadius` | done | the NSValue twin of the typed property |
+| `CYLBadgeProtocol` `cylDelayIfNeededForSeconds` | `View.cylDelayIfNeededForSeconds` | done |  |
+| `CYLBadgeProtocol` `-cylIsShowBadge` | `View.cylIsShowBadge()` | done |  |
+| `CYLBadgeProtocol` `-cylShowBadge` | `View.cylShowBadge()` | done |  |
+| `CYLBadgeProtocol` `-cylShowBadgeValue:animationType:` | `View.cylShowBadgeValue()` | done |  |
+| `CYLBadgeProtocol` `-cylClearBadge` | `View.cylClearBadge()` | done |  |
+| `CYLBadgeProtocol` `-cylResumeBadge` | `View.cylResumeBadge()` | done |  |
+| `CYLBadgeProtocol` `-cylIsPauseBadge` | `View.cylIsPauseBadge()` | done |  |
+| `CYLBadgeProtocol` `-cylGetActualBadgeSuperView` | `View.cylGetActualBadgeSuperView()` | done |  |
+| `CYLBadgeProtocol` `-cylIsReady` | `View.cylIsReady()` | done |  |
 | `CYLBadgeProtocol` `-cyl_performSelector:` | — | n/a | Objective-C runtime |
 | `CYLBadgeProtocol` `-cyl_performSelector:withObject:` | — | n/a | Objective-C runtime |
 | `CYLBadgeProtocol` `-cyl_performSelector:withObject:withObject:` | — | n/a | Objective-C runtime |
-| `CYLBadgeProtocol` `cyl_delayIfNeededForSecondsValue` | `View.cyl_delayIfNeededForSeconds` | done | the NSValue twin of the typed property |
+| `CYLBadgeProtocol` `cyl_delayIfNeededForSecondsValue` | `View.cylDelayIfNeededForSeconds` | done | the NSValue twin of the typed property |
 
 ## `CYLBadgeView/CYLTabBarBadgeView.h`
 
@@ -203,7 +203,7 @@
 | `CYLBadgeTextDisplaying` `font` | `CYLBadgeTextDisplaying.font` | done |  |
 | `CYLBadgeTextDisplaying` `textColor` | `CYLBadgeTextDisplaying.textColor` | done |  |
 | `CYLBadgeTextDisplaying` `textAlignment` | `CYLBadgeTextDisplaying.textGravity` | done | a horizontal Gravity |
-| `UILabel(CYLBadgeTextDisplaying)` | `TextView.cyl_badgeTextDisplaying() / CYLTextViewBadgeTextDisplaying` | done |  |
+| `UILabel(CYLBadgeTextDisplaying)` | `TextView.cylBadgeTextDisplaying() / CYLTextViewBadgeTextDisplaying` | done |  |
 | `CYLTabBarBadgeView` | `CYLTabBarBadgeView` | done |  |
 | `CYLTabBarBadgeView` `badgeContentInset` | `CYLTabBarBadgeView.badgeContentInset` | done |  |
 | `CYLTabBarBadgeView` `badgeLabel` | `CYLTabBarBadgeView.badgeLabel` | done |  |
@@ -217,37 +217,37 @@
 | iOS API | Android API | 状态 Status | 说明 / Note |
 |:---|:---|:---|:---|
 | `UIBarButtonItem(CYLBadgeExtention)` | `MenuItem extensions (toolbar items)` | done | the item's view in a visible toolbar, found after layout |
-| `UIBarButtonItem(CYLBadgeExtention)` `-cyl_isShowBadge` | `MenuItem.cyl_isShowBadge` | done |  |
-| `UIBarButtonItem(CYLBadgeExtention)` `-cyl_showBadge` | `MenuItem.cyl_showBadge` | done |  |
-| `UIBarButtonItem(CYLBadgeExtention)` `-cyl_showBadgeValue:animationType:` | `MenuItem.cyl_showBadgeValue` | done |  |
-| `UIBarButtonItem(CYLBadgeExtention)` `-cyl_showBadgeValue:animationType:backgroundColor:` | `MenuItem.cyl_showBadgeValue` | done |  |
-| `UIBarButtonItem(CYLBadgeExtention)` `-cyl_clearBadge` | `MenuItem.cyl_clearBadge` | done |  |
-| `UIBarButtonItem(CYLBadgeExtention)` `-cyl_resumeBadge` | `MenuItem.cyl_resumeBadge` | done |  |
-| `UIBarButtonItem(CYLBadgeExtention)` `-cyl_isPauseBadge` | `MenuItem.cyl_isPauseBadge` | done |  |
+| `UIBarButtonItem(CYLBadgeExtention)` `-cylIsShowBadge` | `MenuItem.cylIsShowBadge` | done |  |
+| `UIBarButtonItem(CYLBadgeExtention)` `-cylShowBadge` | `MenuItem.cylShowBadge` | done |  |
+| `UIBarButtonItem(CYLBadgeExtention)` `-cylShowBadgeValue:animationType:` | `MenuItem.cylShowBadgeValue` | done |  |
+| `UIBarButtonItem(CYLBadgeExtention)` `-cylShowBadgeValue:animationType:backgroundColor:` | `MenuItem.cylShowBadgeValue` | done |  |
+| `UIBarButtonItem(CYLBadgeExtention)` `-cylClearBadge` | `MenuItem.cylClearBadge` | done |  |
+| `UIBarButtonItem(CYLBadgeExtention)` `-cylResumeBadge` | `MenuItem.cylResumeBadge` | done |  |
+| `UIBarButtonItem(CYLBadgeExtention)` `-cylIsPauseBadge` | `MenuItem.cylIsPauseBadge` | done |  |
 
 ## `CYLBadgeView/UIControl+CYLBadgeExtention.h`
 
 | iOS API | Android API | 状态 Status | 说明 / Note |
 |:---|:---|:---|:---|
 | `UIControl(CYLBadgeExtention)` | `View badge extensions` | done | Android controls are views: the View extensions of CYLBadge.kt |
-| `UIControl(CYLBadgeExtention)` `-cyl_isShowBadge` | `View.cyl_isShowBadge` | done |  |
-| `UIControl(CYLBadgeExtention)` `-cyl_showBadge` | `View.cyl_showBadge` | done |  |
-| `UIControl(CYLBadgeExtention)` `-cyl_showBadgeValue:animationType:` | `View.cyl_showBadgeValue` | done |  |
-| `UIControl(CYLBadgeExtention)` `-cyl_clearBadge` | `View.cyl_clearBadge` | done |  |
-| `UIControl(CYLBadgeExtention)` `-cyl_resumeBadge` | `View.cyl_resumeBadge` | done |  |
-| `UIControl(CYLBadgeExtention)` `-cyl_isPauseBadge` | `View.cyl_isPauseBadge` | done |  |
+| `UIControl(CYLBadgeExtention)` `-cylIsShowBadge` | `View.cylIsShowBadge` | done |  |
+| `UIControl(CYLBadgeExtention)` `-cylShowBadge` | `View.cylShowBadge` | done |  |
+| `UIControl(CYLBadgeExtention)` `-cylShowBadgeValue:animationType:` | `View.cylShowBadgeValue` | done |  |
+| `UIControl(CYLBadgeExtention)` `-cylClearBadge` | `View.cylClearBadge` | done |  |
+| `UIControl(CYLBadgeExtention)` `-cylResumeBadge` | `View.cylResumeBadge` | done |  |
+| `UIControl(CYLBadgeExtention)` `-cylIsPauseBadge` | `View.cylIsPauseBadge` | done |  |
 
 ## `CYLBadgeView/UITabBarItem+CYLBadgeExtention.h`
 
 | iOS API | Android API | 状态 Status | 说明 / Note |
 |:---|:---|:---|:---|
 | `UITabBarItem(CYLBadgeExtention)` | `CYLTabBarItem badge extensions` | done |  |
-| `UITabBarItem(CYLBadgeExtention)` `-cyl_isShowBadge` | `CYLTabBarItem.cyl_isShowBadge` | done |  |
-| `UITabBarItem(CYLBadgeExtention)` `-cyl_showBadge` | `CYLTabBarItem.cyl_showBadge` | done |  |
-| `UITabBarItem(CYLBadgeExtention)` `-cyl_showBadgeValue:animationType:` | `CYLTabBarItem.cyl_showBadgeValue` | done |  |
-| `UITabBarItem(CYLBadgeExtention)` `-cyl_clearBadge` | `CYLTabBarItem.cyl_clearBadge` | done |  |
-| `UITabBarItem(CYLBadgeExtention)` `-cyl_resumeBadge` | `CYLTabBarItem.cyl_resumeBadge` | done |  |
-| `UITabBarItem(CYLBadgeExtention)` `-cyl_isPauseBadge` | `CYLTabBarItem.cyl_isPauseBadge` | done |  |
+| `UITabBarItem(CYLBadgeExtention)` `-cylIsShowBadge` | `CYLTabBarItem.cylIsShowBadge` | done |  |
+| `UITabBarItem(CYLBadgeExtention)` `-cylShowBadge` | `CYLTabBarItem.cylShowBadge` | done |  |
+| `UITabBarItem(CYLBadgeExtention)` `-cylShowBadgeValue:animationType:` | `CYLTabBarItem.cylShowBadgeValue` | done |  |
+| `UITabBarItem(CYLBadgeExtention)` `-cylClearBadge` | `CYLTabBarItem.cylClearBadge` | done |  |
+| `UITabBarItem(CYLBadgeExtention)` `-cylResumeBadge` | `CYLTabBarItem.cylResumeBadge` | done |  |
+| `UITabBarItem(CYLBadgeExtention)` `-cylIsPauseBadge` | `CYLTabBarItem.cylIsPauseBadge` | done |  |
 | `UITabBarItem(CYLBadgeExtention)` `-cyl_moveBadgeToCurrentTabButtonIfNeeded` | — | n/a | UIKit workaround: the classic UITabBar rebuilds its tab buttons and the badge has to follow; Android tab buttons are the library's own views and keep their badge |
 
 ## `CYLBadgeView/UIView+CYLBadgeExtention.h`
@@ -256,23 +256,23 @@
 |:---|:---|:---|:---|
 | `CYLBadgeAccessibilityDescription()` | `CYLBadgeAccessibilityDescription(context, value)` | done | in CYLLocalization.language |
 | `UIView(CYLBadgeExtention)` | `View.cyl_* extensions (CYLBadge.kt)` | done |  |
-| `UIView(CYLBadgeExtention)` `cyl_badge` | `View.cyl_badge` | done |  |
-| `UIView(CYLBadgeExtention)` `-cyl_isShowBadge` | `View.cyl_isShowBadge()` | done |  |
-| `UIView(CYLBadgeExtention)` `-cyl_showBadge` | `View.cyl_showBadge()` | done |  |
-| `UIView(CYLBadgeExtention)` `-cyl_showBadgeValue:animationType:` | `View.cyl_showBadgeValue()` | done |  |
-| `UIView(CYLBadgeExtention)` `-cyl_showBadgeValue:` | `View.cyl_showBadgeValue()` | done |  |
-| `UIView(CYLBadgeExtention)` `-cyl_clearBadge` | `View.cyl_clearBadge()` | done |  |
-| `UIView(CYLBadgeExtention)` `-cyl_resumeBadge` | `View.cyl_resumeBadge()` | done |  |
-| `UIView(CYLBadgeExtention)` `-cyl_isPauseBadge` | `View.cyl_isPauseBadge()` | done |  |
-| `UIView(CYLBadgeExtention)` `-cyl_isHidden` | `View.cyl_isHidden()` | done |  |
-| `UIView(CYLBadgeExtention)` `-cyl_findBarButtonContentView` | `View.cyl_findBarButtonContentView()` | done |  |
-| `UIView(CYLBadgeExtention)` `cyl_keepShowingPlusButtonLabel` | `View.cyl_keepShowingPlusButtonLabel` | done |  |
-| `UIView(CYLBadgeExtention)` `cyl_badgeBorderColor` | `View.cyl_badgeBorderColor` | done |  |
-| `UIView(CYLBadgeExtention)` `cyl_badgeBorderWidth` | `View.cyl_badgeBorderWidth` | done |  |
-| `UIView(CYLBadgeExtention)` `cyl_badgeRespectsReduceMotion` | `View.cyl_badgeRespectsReduceMotion` | done |  |
-| `UIView(CYLBadgeExtention)` `-cyl_refreshBadge` | `View.cyl_refreshBadge()` | done |  |
-| `UIView(CYLBadgeExtention)` `cyl_badgeHostReplacedByIconView` | `View.cyl_badgeHostReplacedByIconView` | done |  |
-| `UIView(CYLBadgeExtention)` `-cyl_resetBadgeAppearance` | `View.cyl_resetBadgeAppearance()` | done |  |
+| `UIView(CYLBadgeExtention)` `cylBadge` | `View.cylBadge` | done |  |
+| `UIView(CYLBadgeExtention)` `-cylIsShowBadge` | `View.cylIsShowBadge()` | done |  |
+| `UIView(CYLBadgeExtention)` `-cylShowBadge` | `View.cylShowBadge()` | done |  |
+| `UIView(CYLBadgeExtention)` `-cylShowBadgeValue:animationType:` | `View.cylShowBadgeValue()` | done |  |
+| `UIView(CYLBadgeExtention)` `-cylShowBadgeValue:` | `View.cylShowBadgeValue()` | done |  |
+| `UIView(CYLBadgeExtention)` `-cylClearBadge` | `View.cylClearBadge()` | done |  |
+| `UIView(CYLBadgeExtention)` `-cylResumeBadge` | `View.cylResumeBadge()` | done |  |
+| `UIView(CYLBadgeExtention)` `-cylIsPauseBadge` | `View.cylIsPauseBadge()` | done |  |
+| `UIView(CYLBadgeExtention)` `-cylIsHidden` | `View.cylIsHidden()` | done |  |
+| `UIView(CYLBadgeExtention)` `-cylFindBarButtonContentView` | `View.cylFindBarButtonContentView()` | done |  |
+| `UIView(CYLBadgeExtention)` `cylKeepShowingPlusButtonLabel` | `View.cylKeepShowingPlusButtonLabel` | done |  |
+| `UIView(CYLBadgeExtention)` `cylBadgeBorderColor` | `View.cylBadgeBorderColor` | done |  |
+| `UIView(CYLBadgeExtention)` `cylBadgeBorderWidth` | `View.cylBadgeBorderWidth` | done |  |
+| `UIView(CYLBadgeExtention)` `cylBadgeRespectsReduceMotion` | `View.cylBadgeRespectsReduceMotion` | done |  |
+| `UIView(CYLBadgeExtention)` `-cylRefreshBadge` | `View.cylRefreshBadge()` | done |  |
+| `UIView(CYLBadgeExtention)` `cylBadgeHostReplacedByIconView` | `View.cylBadgeHostReplacedByIconView` | done |  |
+| `UIView(CYLBadgeExtention)` `-cylResetBadgeAppearance` | `View.cylResetBadgeAppearance()` | done |  |
 
 ## `CYLBaseNavigationController.h`
 
@@ -356,7 +356,7 @@
 | `CYLFlatDesignTabBarButton` `tabBarItem` | `CYLTabBarItemButton.item` | done |  |
 | `CYLFlatDesignTabBarButton` `imageView` | `CYLTabBarItemButton.iconView` | done |  |
 | `CYLFlatDesignTabBarButton` `titleLabel` | `CYLTabBarItemButton.titleLabel` | done |  |
-| `CYLFlatDesignTabBarButton` `-actualBadgeSuperView` | `View.cyl_getActualBadgeSuperView()` | done |  |
+| `CYLFlatDesignTabBarButton` `-actualBadgeSuperView` | `View.cylGetActualBadgeSuperView()` | done |  |
 
 ## `CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBar/CYLFlatDesignTabBarHideTabBar.h`
 
@@ -381,7 +381,7 @@
 | `CYLFlatDesignTabBarItem` `selectedImage` | `CYLTabBarItem.selectedImage` | done |  |
 | `CYLFlatDesignTabBarItem` `childViewController` | — | n/a | FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`) |
 | `CYLFlatDesignTabBarItem` `badgeValue` | `CYLTabBarItem.badgeValue` | done |  |
-| `CYLFlatDesignTabBarItem` `badgeColor` | `View.cyl_badgeBackgroundColor` | partial | on the tab button |
+| `CYLFlatDesignTabBarItem` `badgeColor` | `View.cylBadgeBackgroundColor` | partial | on the tab button |
 | `CYLFlatDesignTabBarItem` `cylflatdesign_tabBarController` | — | n/a | FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`) |
 | `CYLFlatDesignTabBarItem` `titlePositionAdjustment` | `CYLTabBarItem.titlePositionAdjustment` | done |  |
 | `CYLFlatDesignTabBarItem` `0` | — | n/a | FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`) |
@@ -400,7 +400,7 @@
 | `CYLFlatDesignTabBarItem` `lottieURL` | `CYLTabBarItem.cyl_lottieURL` | done |  |
 | `CYLFlatDesignTabBarItem` `lottieFilePath` | — | n/a | FlatDesign: the iOS-only KVC tab bar; Android has one tab bar layout (`CYLTabBar`) |
 | `CYLFlatDesignTabBarItem` `lottieSizeValue` | `CYLTabBarItem.cyl_lottieSizeValue` | done |  |
-| `CYLFlatDesignTabBarItem` `-actualBadgeSuperView` | `View.cyl_getActualBadgeSuperView()` | done |  |
+| `CYLFlatDesignTabBarItem` `-actualBadgeSuperView` | `View.cylGetActualBadgeSuperView()` | done |  |
 
 ## `CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/CYLFlatDesignTabBarPrivate/UINavigationController+CYLFlatDesignTabBarPrivate.h`
 
@@ -1670,11 +1670,11 @@
 | `UIControl(CYLTabBarControllerExtention)` `-cyl_coverVisiableTabImageViewOrTabButton:contentNewView:seclectContentNewView:offset:show:delayIfNeededForSeconds:completion:` | — | n/a | UIKit view / control / color / image / navigation helpers |
 | `UIControl(CYLTabBarControllerExtention)` `-cyl_hideControl` | — | n/a | UIKit view / control / color / image / navigation helpers |
 | `UIControl(CYLTabBarControllerExtentionDeprecated)` | `View deprecated badge members` | done |  |
-| `UIControl(CYLTabBarControllerExtentionDeprecated)` `cyl_tabBadgePointView` | `View.cyl_tabBadgePointView` | done | deprecated, forwards to the badge API as on iOS |
-| `UIControl(CYLTabBarControllerExtentionDeprecated)` `cyl_tabBadgePointViewOffset` | `View.cyl_tabBadgePointViewOffset` | done | deprecated, forwards to the badge API as on iOS |
-| `UIControl(CYLTabBarControllerExtentionDeprecated)` `-cyl_showTabBadgePoint` | `View.cyl_showTabBadgePoint` | done | forwards to the badge API, as on iOS |
-| `UIControl(CYLTabBarControllerExtentionDeprecated)` `-cyl_removeTabBadgePoint` | `View.cyl_removeTabBadgePoint` | done | forwards to the badge API, as on iOS |
-| `UIControl(CYLTabBarControllerExtentionDeprecated)` `-cyl_isShowTabBadgePoint` | `View.cyl_isShowTabBadgePoint` | done | forwards to the badge API, as on iOS |
+| `UIControl(CYLTabBarControllerExtentionDeprecated)` `cylTabBadgePointView` | `View.cylTabBadgePointView` | done | deprecated, forwards to the badge API as on iOS |
+| `UIControl(CYLTabBarControllerExtentionDeprecated)` `cylTabBadgePointViewOffset` | `View.cylTabBadgePointViewOffset` | done | deprecated, forwards to the badge API as on iOS |
+| `UIControl(CYLTabBarControllerExtentionDeprecated)` `-cylShowTabBadgePoint` | `View.cylShowTabBadgePoint` | done | forwards to the badge API, as on iOS |
+| `UIControl(CYLTabBarControllerExtentionDeprecated)` `-cylRemoveTabBadgePoint` | `View.cylRemoveTabBadgePoint` | done | forwards to the badge API, as on iOS |
+| `UIControl(CYLTabBarControllerExtentionDeprecated)` `-cylIsShowTabBadgePoint` | `View.cylIsShowTabBadgePoint` | done | forwards to the badge API, as on iOS |
 | `UIControl(CYLTabBarItemAnimation)` | `View extensions (CYLTabBarItemAnimationHost.kt)` | done | Android controls are views |
 | `UIControl(CYLTabBarItemAnimation)` `-cyl_tabBarItemAnimationView` | `View.cyl_tabBarItemAnimationView` | done |  |
 | `UIControl(CYLTabBarItemAnimation)` `-cyl_isTabBarItemAnimationReady` | `View.cyl_isTabBarItemAnimationReady` | done |  |
@@ -1753,17 +1753,17 @@
 |:---|:---|:---|:---|
 | `CYLBadgeRowHeight` | `CYLBadgeRowHeight (dp)` | done |  |
 | `UITableViewCell(CYLBadgeExtention)` | `badge sample rows (ListView rows)` | done |  |
-| `UITableViewCell(CYLBadgeExtention)` `-cyl_showBadgeForRow:` | `ImageView.cyl_showBadgeForRow` | done |  |
-| `UITableViewCell(CYLBadgeExtention)` `+cyl_badgeTitleForRow:` | `cyl_badgeTitleForRow()` | done | English titles |
-| `UITableViewCell(CYLBadgeExtention)` `+cyl_badgeStyleCount` | `cyl_badgeStyleCount()` | done |  |
+| `UITableViewCell(CYLBadgeExtention)` `-cylShowBadgeForRow:` | `ImageView.cylShowBadgeForRow` | done |  |
+| `UITableViewCell(CYLBadgeExtention)` `+cylBadgeTitleForRow:` | `cylBadgeTitleForRow()` | done | English titles |
+| `UITableViewCell(CYLBadgeExtention)` `+cylBadgeStyleCount` | `cylBadgeStyleCount()` | done |  |
 | `UITableViewCell(CYLBadgeExtention)` `-cyl_wrapsTextLabels` | `View.cyl_wrapsTextLabels` | done |  |
 | `UITableViewCell(CYLBadgeExtention)` `+cyl_setUpAutomaticRowHeightForTableView:` | `cyl_setUpAutomaticRowHeightForTableView(AbsListView)` | done |  |
 | `UIViewController(CYLNavigationBadge)` | `Fragment extension` | done |  |
-| `UIViewController(CYLNavigationBadge)` `-cyl_showNavigationBadgeValue:animationType:backgroundColor:` | `Fragment.cyl_showNavigationBadgeValue` | done | the activity toolbar's last item, or a bell item added |
+| `UIViewController(CYLNavigationBadge)` `-cylShowNavigationBadgeValue:animationType:backgroundColor:` | `Fragment.cylShowNavigationBadgeValue` | done | the activity toolbar's last item, or a bell item added |
 | `CYLBadgeHelperTableViewController` | `CYLBadgeHelperTableViewController (Fragment with a ListView)` | done |  |
 | `CYLBadgeHelperTableViewController` `didSelectRowHandler` | `CYLBadgeHelperTableViewController.didSelectRowHandler` | done | (section, row) instead of an NSIndexPath |
 | `UIViewController(CYLBadgeExtention)` | `Fragment extension` | done |  |
-| `UIViewController(CYLBadgeExtention)` `-cyl_addBadgeHelperTable` | `Fragment.cyl_addBadgeHelperTable` | done |  |
+| `UIViewController(CYLBadgeExtention)` `-cylAddBadgeHelperTable` | `Fragment.cylAddBadgeHelperTable` | done |  |
 
 ## `UIView+CYLTabBarControllerExtention.h`
 
@@ -1907,12 +1907,12 @@
 | `UIViewController(CYLTabBarControllerExtention)` `cyl_tabBarItemIdentifier` | `Fragment.cyl_tabBarItemIdentifier` | done |  |
 | `UIViewController(CYLTabBarControllerExtention)` `cyl_tabButton` | `Fragment.cyl_tabButton` | done |  |
 | `UIViewController(CYLTabBarControllerExtention)` `cyl_plusViewControllerEverAdded` | `CYLPlusButton.cyl_plusViewControllerEverAdded` | done |  |
-| `UIViewController(CYLTabBarControllerExtention)` `-cyl_isShowBadge` | `Fragment.cyl_isShowBadge()` | done |  |
-| `UIViewController(CYLTabBarControllerExtention)` `-cyl_showBadge` | `Fragment.cyl_showBadge()` | done |  |
-| `UIViewController(CYLTabBarControllerExtention)` `-cyl_showBadgeValue:animationType:` | `Fragment.cyl_showBadgeValue(value, animationType)` | done |  |
-| `UIViewController(CYLTabBarControllerExtention)` `-cyl_clearBadge` | `Fragment.cyl_clearBadge()` | done |  |
-| `UIViewController(CYLTabBarControllerExtention)` `-cyl_resumeBadge` | `Fragment.cyl_resumeBadge()` | done |  |
-| `UIViewController(CYLTabBarControllerExtention)` `-cyl_isPauseBadge` | `Fragment.cyl_isPauseBadge()` | done |  |
+| `UIViewController(CYLTabBarControllerExtention)` `-cylIsShowBadge` | `Fragment.cylIsShowBadge()` | done |  |
+| `UIViewController(CYLTabBarControllerExtention)` `-cylShowBadge` | `Fragment.cylShowBadge()` | done |  |
+| `UIViewController(CYLTabBarControllerExtention)` `-cylShowBadgeValue:animationType:` | `Fragment.cylShowBadgeValue(value, animationType)` | done |  |
+| `UIViewController(CYLTabBarControllerExtention)` `-cylClearBadge` | `Fragment.cylClearBadge()` | done |  |
+| `UIViewController(CYLTabBarControllerExtention)` `-cylResumeBadge` | `Fragment.cylResumeBadge()` | done |  |
+| `UIViewController(CYLTabBarControllerExtention)` `-cylIsPauseBadge` | `Fragment.cylIsPauseBadge()` | done |  |
 | `UIViewController(CYLTabBarControllerExtention)` `-cyl_popSelectTabBarChildViewControllerAtIndex:` | `Fragment.cyl_popSelectTabBarChildViewControllerAtIndex(index, animated, block)` | done |  |
 | `UIViewController(CYLTabBarControllerExtention)` `-cyl_popSelectTabBarChildViewControllerAtIndex:animated:` | `Fragment.cyl_popSelectTabBarChildViewControllerAtIndex(index, animated, block)` | done |  |
 | `UIViewController(CYLTabBarControllerExtention)` `-cyl_popSelectTabBarChildViewControllerAtIndex:completion:` | `Fragment.cyl_popSelectTabBarChildViewControllerAtIndex(index, animated, block)` | done |  |
@@ -1930,11 +1930,11 @@
 | `UIViewController(CYLTabBarControllerExtention)` `-cyl_isEqualToViewController:` | `Fragment.cyl_isEqualToViewController(compared)` | done |  |
 | `UIViewController(CYLTabBarControllerExtention)` `-cyl_addChildViewController:` | `Fragment.cyl_addChildViewController(child)` | done |  |
 | `UIViewController(CYLTabBarControllerExtentionDeprecated)` | `Fragment deprecated badge members` | done |  |
-| `UIViewController(CYLTabBarControllerExtentionDeprecated)` `-cyl_showTabBadgePoint` | `Fragment.cyl_showTabBadgePoint` | done | forwards to the badge API, as on iOS |
-| `UIViewController(CYLTabBarControllerExtentionDeprecated)` `-cyl_removeTabBadgePoint` | `Fragment.cyl_removeTabBadgePoint` | done | forwards to the badge API, as on iOS |
-| `UIViewController(CYLTabBarControllerExtentionDeprecated)` `-cyl_isShowTabBadgePoint` | `Fragment.cyl_isShowTabBadgePoint` | done | forwards to the badge API, as on iOS |
-| `UIViewController(CYLTabBarControllerExtentionDeprecated)` `cyl_tabBadgePointView` | `Fragment.cyl_tabBadgePointView` | done | deprecated, forwards to the badge API as on iOS |
-| `UIViewController(CYLTabBarControllerExtentionDeprecated)` `cyl_tabBadgePointViewOffset` | `Fragment.cyl_tabBadgePointViewOffset` | done | deprecated, forwards to the badge API as on iOS |
+| `UIViewController(CYLTabBarControllerExtentionDeprecated)` `-cylShowTabBadgePoint` | `Fragment.cylShowTabBadgePoint` | done | forwards to the badge API, as on iOS |
+| `UIViewController(CYLTabBarControllerExtentionDeprecated)` `-cylRemoveTabBadgePoint` | `Fragment.cylRemoveTabBadgePoint` | done | forwards to the badge API, as on iOS |
+| `UIViewController(CYLTabBarControllerExtentionDeprecated)` `-cylIsShowTabBadgePoint` | `Fragment.cylIsShowTabBadgePoint` | done | forwards to the badge API, as on iOS |
+| `UIViewController(CYLTabBarControllerExtentionDeprecated)` `cylTabBadgePointView` | `Fragment.cylTabBadgePointView` | done | deprecated, forwards to the badge API as on iOS |
+| `UIViewController(CYLTabBarControllerExtentionDeprecated)` `cylTabBadgePointViewOffset` | `Fragment.cylTabBadgePointViewOffset` | done | deprecated, forwards to the badge API as on iOS |
 | `UIViewController(CYLTabBarControllerExtentionDeprecated)` `cyl_tabBarSpacingInViewCoordinator` | — | n/a | a UIKit layout value |
 
 ## `UIViewController+CYLTabBarItemUpdate.h`

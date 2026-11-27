@@ -57,13 +57,13 @@ fun Fragment.cyl_isFlatDesignStyleTabBar(): Boolean = cyl_tabBarController?.tabB
 
 // MARK: - Badges on the page's tab 页面 Tab 的角标
 
-fun Fragment.cyl_isShowBadge(): Boolean = cyl_tabButton?.cyl_isShowBadge() ?: false
-fun Fragment.cyl_showBadge() { cyl_tabButton?.cyl_showBadge() }
-fun Fragment.cyl_showBadgeValue(value: String) { cyl_tabButton?.cyl_showBadgeValue(value) }
-fun Fragment.cyl_showBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnimationType) { cyl_tabButton?.cyl_showBadgeValue(value, animationType) }
-fun Fragment.cyl_clearBadge() { cyl_tabButton?.cyl_clearBadge() }
-fun Fragment.cyl_resumeBadge() { cyl_tabButton?.cyl_resumeBadge() }
-fun Fragment.cyl_isPauseBadge(): Boolean = cyl_tabButton?.cyl_isPauseBadge() ?: false
+fun Fragment.cylIsShowBadge(): Boolean = cyl_tabButton?.cylIsShowBadge() ?: false
+fun Fragment.cylShowBadge() { cyl_tabButton?.cylShowBadge() }
+fun Fragment.cylShowBadgeValue(value: String) { cyl_tabButton?.cylShowBadgeValue(value) }
+fun Fragment.cylShowBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnimationType) { cyl_tabButton?.cylShowBadgeValue(value, animationType) }
+fun Fragment.cylClearBadge() { cyl_tabButton?.cylClearBadge() }
+fun Fragment.cylResumeBadge() { cyl_tabButton?.cylResumeBadge() }
+fun Fragment.cylIsPauseBadge(): Boolean = cyl_tabButton?.cylIsPauseBadge() ?: false
 
 // MARK: - Selecting tabs 选中 Tab
 

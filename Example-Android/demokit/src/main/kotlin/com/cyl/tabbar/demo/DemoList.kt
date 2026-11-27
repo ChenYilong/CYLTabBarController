@@ -20,7 +20,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import com.cyl.tabbar.CYLTabBarController
 import com.cyl.tabbar.cyl_setUpAutomaticRowHeightForTableView
-import com.cyl.tabbar.cyl_showBadgeForRow
+import com.cyl.tabbar.cylShowBadgeForRow
 import com.cyl.tabbar.cyl_tabBarController
 import com.cyl.tabbar.cyl_wrapsTextLabels
 import com.cyl.tabbar.cyl_pushViewController
@@ -207,7 +207,7 @@ class DemoListFragment : Fragment() {
                 is DemoRow -> ((convertView as? LinearLayout) ?: row(context)).also { view ->
                     val icon = view.getChildAt(0) as ImageView
                     icon.visibility = if (item.badgeRow >= 0) View.VISIBLE else View.GONE
-                    if (item.badgeRow >= 0) icon.cyl_showBadgeForRow(item.badgeRow)
+                    if (item.badgeRow >= 0) icon.cylShowBadgeForRow(item.badgeRow)
                     val texts = view.getChildAt(1) as LinearLayout
                     (texts.getChildAt(0) as TextView).text = item.title
                     val subtitle = item.subtitle?.invoke(this@DemoListFragment)

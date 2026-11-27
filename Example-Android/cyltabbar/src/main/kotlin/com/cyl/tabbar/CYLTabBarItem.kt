@@ -37,7 +37,7 @@ class CYLTabBarItem(attributes: Map<String, Any?> = emptyMap()) {
             val changed = value != field
             field = value
             val button = cyl_visiableTabButton ?: return
-            if (value == null) button.cyl_clearBadge() else button.cyl_showBadgeValue(value)
+            if (value == null) button.cylClearBadge() else button.cylShowBadgeValue(value)
             if (changed && value != null) (button.parent as? CYLTabBar)?.tabBarController()?.cyl_tabBarItemBadgeValueDidChange(this)
         }
     var accessibilityIdentifier: String? = attributes[CYLConstants.CYLTabBarItemAccessibilityIdentifier] as? String

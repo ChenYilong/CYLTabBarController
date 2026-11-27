@@ -174,7 +174,7 @@ class CYLTabBarHostViewTest {
         assertNull(controller.viewControllers[2].view)
         // [EN] Unloading pages keeps the tab badges. [CN] 卸载页面不影响 Tab 角标。
         assertSame(controller, host.tabBarController)
-        assertEquals("8", controller.tabBar.cyl_tabBarButtonWithTabIndex(1)?.cyl_badge?.text)
+        assertEquals("8", controller.tabBar.cyl_tabBarButtonWithTabIndex(1)?.cylBadge?.text)
     }
 
     @Test
@@ -192,9 +192,9 @@ class CYLTabBarHostViewTest {
         host.badgeValues = listOf("", "")
         tabBar.cyl_tabBarButtonWithTabIndex(1)?.let { it.layout(0, 0, 100, 100) }
         host.badgeValues = listOf("", "8")
-        assertEquals("8", tabBar.cyl_tabBarButtonWithTabIndex(1)?.cyl_badge?.text)
+        assertEquals("8", tabBar.cyl_tabBarButtonWithTabIndex(1)?.cylBadge?.text)
         tabBar.viewTreeObserver.dispatchOnGlobalLayout()
-        assertEquals("8", tabBar.cyl_tabBarButtonWithTabIndex(1)?.cyl_badge?.text)
+        assertEquals("8", tabBar.cyl_tabBarButtonWithTabIndex(1)?.cylBadge?.text)
     }
 
     @Test
@@ -478,8 +478,8 @@ class CYLTabBarHostViewTest {
             CYLConstants.CYLPlusButtonBackgroundImage to drawable), null, "host-test-badge-offset")
         val plus = CYLPlusButton.plusButtonForTabBarContext("host-test-badge-offset", activity)!!
         val density = activity.resources.displayMetrics.density
-        assertEquals(CYLOffset(-(drawable.intrinsicWidth - visible.right) / density, visible.top / density), plus.cyl_badgeCenterOffset)
-        assertTrue(plus.cyl_badgeCenterOffset.horizontal < 0 && plus.cyl_badgeCenterOffset.vertical > 0)
+        assertEquals(CYLOffset(-(drawable.intrinsicWidth - visible.right) / density, visible.top / density), plus.cylBadgeCenterOffset)
+        assertTrue(plus.cylBadgeCenterOffset.horizontal < 0 && plus.cylBadgeCenterOffset.vertical > 0)
         assertNull(CYLConfigurationPlusButton.opaqueBounds(BitmapDrawable(activity.resources, Bitmap.createBitmap(8, 8, Bitmap.Config.ARGB_8888))))
     }
 

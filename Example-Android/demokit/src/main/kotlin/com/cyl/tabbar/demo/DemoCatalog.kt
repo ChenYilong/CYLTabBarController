@@ -18,9 +18,9 @@ import com.cyl.tabbar.CYLOffset
 import com.cyl.tabbar.CYLPlusButton
 import com.cyl.tabbar.CYLPlusButtonSubclassing
 import com.cyl.tabbar.CYLTabBarController
-import com.cyl.tabbar.cyl_badgeStyleCount
-import com.cyl.tabbar.cyl_badgeTitleForRow
-import com.cyl.tabbar.cyl_showBadgeValue
+import com.cyl.tabbar.cylBadgeStyleCount
+import com.cyl.tabbar.cylBadgeTitleForRow
+import com.cyl.tabbar.cylShowBadgeValue
 import com.cyl.tabbar.cyl_simulateMemoryWarningAndShowResult
 import com.cyl.tabbar.demokit.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -78,15 +78,15 @@ object DemoCatalog {
                 sections += DemoSection(cylDemoText("Content inset"), listOf(DemoRow(cylDemoText("Content inset"), { cylDemoText("itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected") }) {
                     startActivity(android.content.Intent(requireContext(), DemoContentInsetActivity::class.java))
                 }))
-                sections += DemoSection(cylDemoText("Badges"), badgeRows(page, maxOf(30, cyl_badgeStyleCount())))
+                sections += DemoSection(cylDemoText("Badges"), badgeRows(page, maxOf(30, cylBadgeStyleCount())))
             }
             MESSAGE -> {
                 // [EN] Not on the first tab (AGENTS.md "Demo table rows"). [CN] 不放在第一个 Tab（AGENTS.md「Demo table rows」）。
                 sections += playbackSection()
-                sections += DemoSection(cylDemoText("Badges"), messageRows() + badgeRows(page, maxOf(15, cyl_badgeStyleCount())).drop(2))
+                sections += DemoSection(cylDemoText("Badges"), messageRows() + badgeRows(page, maxOf(15, cylBadgeStyleCount())).drop(2))
             }
-            DISCOVER -> sections += DemoSection(cylDemoText("Badges"), badgeRows(page, maxOf(15, cyl_badgeStyleCount())))
-            else -> sections += DemoSection(cylDemoText("Badges"), badgeRows(page, maxOf(30, cyl_badgeStyleCount())))
+            DISCOVER -> sections += DemoSection(cylDemoText("Badges"), badgeRows(page, maxOf(15, cylBadgeStyleCount())))
+            else -> sections += DemoSection(cylDemoText("Badges"), badgeRows(page, maxOf(30, cylBadgeStyleCount())))
         }
         return sections
     }
@@ -306,7 +306,7 @@ object DemoCatalog {
     // MARK: - Page rows 页面自己的行
 
     private fun messageRows() = listOf(
-        DemoRow(cylDemoText("Push a TabBarController of the same context (the same PlusButton class)"), { cyl_badgeTitleForRow(0) }, 0) {
+        DemoRow(cylDemoText("Push a TabBarController of the same context (the same PlusButton class)"), { cylBadgeTitleForRow(0) }, 0) {
             val context = tabBarController?.context ?: PLUS_CONTEXT
             DemoHostActivity.openTabBar(requireContext(), cylDemoText("Same context")) { activity -> DemoTabs.controller(activity, context, null) }
         },
@@ -317,7 +317,7 @@ object DemoCatalog {
     )
 
     private fun badgeRows(page: DemoListFragment, count: Int): List<DemoRow> = (0 until count).map { row ->
-        DemoRow(cyl_badgeTitleForRow(row), { cylDemoText("%@ CYLTabBarController on Android %@", pageTitle(page.page), Build.VERSION.RELEASE) }, row) {
+        DemoRow(cylBadgeTitleForRow(row), { cylDemoText("%@ CYLTabBarController on Android %@", pageTitle(page.page), Build.VERSION.RELEASE) }, row) {
             when (page.page) {
                 HOME -> {
                     activity?.title = "Home($row)"
@@ -326,7 +326,7 @@ object DemoCatalog {
                 MESSAGE -> DemoHostActivity.openTabBar(requireContext(), cylDemoText("Alternate plus button")) { activity -> DemoTabs.controller(activity, SQUARE_PLUS_CONTEXT, squarePlus) }
                 DISCOVER -> pushText("CYLDetailsViewController (navigation bar hidden)", Color.rgb(90, 200, 250))
                 else -> {
-                    tabBarController?.tabBar?.tabBarButtonArray?.getOrNull(3)?.cyl_showBadgeValue(row.toString(), CYLEnums.CYLBadgeAnimationType.None)
+                    tabBarController?.tabBar?.tabBarButtonArray?.getOrNull(3)?.cylShowBadgeValue(row.toString(), CYLEnums.CYLBadgeAnimationType.None)
                     pushText("testPush", Color.RED)
                 }
             }

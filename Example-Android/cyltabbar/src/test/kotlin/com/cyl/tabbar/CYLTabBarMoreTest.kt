@@ -102,7 +102,7 @@ class CYLTabBarMoreTest {
     @Test
     fun aRowSelectsTheHiddenTabWithMoreHighlighted() = withActivity { activity ->
         val controller = controller(activity, *sevenTitles)
-        controller.tabBar.tabBarButtonArray[5].cyl_showBadgeValue("3")
+        controller.tabBar.tabBarButtonArray[5].cylShowBadgeValue("3")
         controller.tabBar.cyl_moreButton!!.performClick()
         idle()
         val rows = moreRows(controller)

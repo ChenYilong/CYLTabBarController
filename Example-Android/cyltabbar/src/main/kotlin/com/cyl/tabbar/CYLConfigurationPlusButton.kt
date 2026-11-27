@@ -106,7 +106,7 @@ class CYLConfigurationPlusButton(context: Context, private val action: ((CYLPlus
                 // [CN] 角标位于图片可见部分的右上角，而不是透明边距上，与 iOS 相同。
                 opaqueBounds(backgroundImage)?.let { visible ->
                     val density = resources.displayMetrics.density
-                    cyl_badgeCenterOffset = CYLOffset(-(backgroundImage.intrinsicWidth - visible.right) / density, visible.top / density)
+                    cylBadgeCenterOffset = CYLOffset(-(backgroundImage.intrinsicWidth - visible.right) / density, visible.top / density)
                 }
             } else if (image != null) {
                 setImageDrawable(fitted(image.constantState?.newDrawable()?.mutate() ?: image))

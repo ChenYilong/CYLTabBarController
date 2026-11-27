@@ -69,7 +69,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
             cyl_customIconView?.alpha = if (covered) 0f else 1f
             cyl_tabBarItemAnimationView?.alpha = if (covered) 0f else 1f
             titleLabel.alpha = if (covered) 0f else 1f
-            if (covered) cyl_clearBadge() else cyl_resumeBadge()
+            if (covered) cylClearBadge() else cylResumeBadge()
             requestLayout()
         }
     /**
@@ -254,9 +254,9 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         for (child in 0 until childCount) {
             val badge = getChildAt(child) as? CYLBadgeView ?: continue
             badge.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)
-            val state = cyl_badgeState
+            val state = cylBadgeState
             val anchor = cyl_badgeAnchorRect()
-            val (badgeLeft, badgeTop) = cyl_badgeOrigin(anchor.right, anchor.top, badge, state.centerOffset, density)
+            val (badgeLeft, badgeTop) = cylBadgeOrigin(anchor.right, anchor.top, badge, state.centerOffset, density)
             badge.layout(badgeLeft, badgeTop, badgeLeft + badge.measuredWidth, badgeTop + badge.measuredHeight)
         }
         item.cyl_viewDidLayoutSubviewsBlock?.let { block -> tabBar?.let { block(it, item, index) } }
@@ -1218,7 +1218,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         for (child in 0 until childCount) {
             // [EN] Badges of the plus button (or any direct child) follow their host after a layout. [CN] PlusButton（或任何直接子视图）的角标在布局后跟随宿主。
             val badge = getChildAt(child) as? CYLBadgeView ?: continue
-            badge.host?.cyl_refreshBadge()
+            badge.host?.cylRefreshBadge()
         }
         updateGlobals()
         didLayoutSubViewsBlock?.invoke(this)

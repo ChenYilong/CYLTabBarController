@@ -32,8 +32,8 @@ class CYLBadgeEventsTest : CYLRobolectricTestCase() {
         LifecycleRegistry.of(item).addCustomCallback<Any>(BadgeEvents.didClear) { _, _, _ -> heard += "item clear" }
         LifecycleRegistry.of(button).addCustomCallback<Any>(BadgeEvents.didShow) { _, _, _ -> heard += "button show" }
         LifecycleCenter.addCustomCallback<Any>(BadgeEvents.didShow) { owner, _, _ -> heard += "global show ${owner === button}" }
-        item.cyl_showBadgeValue("3", CYLEnums.CYLBadgeAnimationType.None)
-        item.cyl_clearBadge()
+        item.cylShowBadgeValue("3", CYLEnums.CYLBadgeAnimationType.None)
+        item.cylClearBadge()
         assertEquals(listOf("button show", "item show 3", "global show true", "item clear"), heard)
     }
 
@@ -46,8 +46,8 @@ class CYLBadgeEventsTest : CYLRobolectricTestCase() {
         val heard = ArrayList<String>()
         LifecycleRegistry.of(button).addCustomCallback<Any>(BadgeEvents.animationDidStart) { _, _, info -> heard += "start ${info.userInfo?.get("animationType")}" }
         LifecycleRegistry.of(button).addCustomCallback<Any>(BadgeEvents.animationDidStop) { _, _, info -> heard += "stop finished=${info.userInfo?.get("finished")}" }
-        button.cyl_showBadgeValue("1", CYLEnums.CYLBadgeAnimationType.Shake)
-        button.cyl_clearBadge()
+        button.cylShowBadgeValue("1", CYLEnums.CYLBadgeAnimationType.Shake)
+        button.cylClearBadge()
         assertEquals(listOf("start Shake", "stop finished=false"), heard)
     }
 }

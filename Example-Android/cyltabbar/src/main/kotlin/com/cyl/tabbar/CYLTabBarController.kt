@@ -748,7 +748,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         commitPages()
         cyl_trackSelectedPageScrollView()
         if (cyl_hidesBadgeOfSelectedTab) {
-            tabBar.tabBarButtonArray.forEachIndexed { index, button -> if (index == selectedIndex) button.cyl_pauseBadge() else if (button.cyl_isPauseBadge()) button.cyl_resumeBadge() }
+            tabBar.tabBarButtonArray.forEachIndexed { index, button -> if (index == selectedIndex) button.cylPauseBadge() else if (button.cylIsPauseBadge()) button.cylResumeBadge() }
         }
     }
 
@@ -1620,7 +1620,7 @@ open class CYLTabBarController(val activity: FragmentActivity) {
         val control = item.cyl_visiableTabButton ?: return
         val animation = animationForTabControl(control)
         if (!animation.cyl_implements(CYLTabButtonAnimationStep.BadgeChanged)) return
-        control.post { animation!!.cyl_play(CYLTabButtonAnimationStep.BadgeChanged, control, control.iconView, null, control.cyl_badge) }
+        control.post { animation!!.cyl_play(CYLTabButtonAnimationStep.BadgeChanged, control, control.iconView, null, control.cylBadge) }
     }
 
     /**

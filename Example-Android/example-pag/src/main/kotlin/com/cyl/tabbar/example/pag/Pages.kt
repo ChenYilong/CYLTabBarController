@@ -21,9 +21,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import com.cyl.tabbar.CYLEnums
 import com.cyl.tabbar.demo.DemoAssets
-import com.cyl.tabbar.cyl_addBadgeHelperTable
+import com.cyl.tabbar.cylAddBadgeHelperTable
 import com.cyl.tabbar.cyl_pushViewController
-import com.cyl.tabbar.cyl_showNavigationBadgeValue
+import com.cyl.tabbar.cylShowNavigationBadgeValue
 import kotlin.random.Random
 
 /**
@@ -77,21 +77,21 @@ class ColorPage : NavigationPage(0) {
 }
 
 /**
- * [EN] iOS `HomeVC`: a page with the default background and the badge helper table (`cyl_addBadgeHelperTable`), a "Full screen" action item with
- *      a shaking dot badge of a random color (`cyl_showNavigationBadgeValue`) that pushes `ChildPage`.
- * [CN] iOS `HomeVC`：默认背景色、带角标帮助列表（`cyl_addBadgeHelperTable`）的页面，"全屏" 菜单项上有随机颜色、抖动的红点角标
- *      （`cyl_showNavigationBadgeValue`），点击 push `ChildPage`。
+ * [EN] iOS `HomeVC`: a page with the default background and the badge helper table (`cylAddBadgeHelperTable`), a "Full screen" action item with
+ *      a shaking dot badge of a random color (`cylShowNavigationBadgeValue`) that pushes `ChildPage`.
+ * [CN] iOS `HomeVC`：默认背景色、带角标帮助列表（`cylAddBadgeHelperTable`）的页面，"全屏" 菜单项上有随机颜色、抖动的红点角标
+ *      （`cylShowNavigationBadgeValue`），点击 push `ChildPage`。
  */
 class HomePage : NavigationPage(R.string.tab_home) {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         FrameLayout(inflater.context)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        cyl_addBadgeHelperTable()
+        cylAddBadgeHelperTable()
         requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menu.add(Menu.NONE, R.id.full_screen, Menu.NONE, R.string.full_screen).setIcon(DemoAssets.drawable(requireContext(), "屏幕全屏")).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                view.post { cyl_showNavigationBadgeValue("", CYLEnums.CYLBadgeAnimationType.Shake, Color.rgb(Random.nextInt(256), Random.nextInt(256), Random.nextInt(256))) }
+                view.post { cylShowNavigationBadgeValue("", CYLEnums.CYLBadgeAnimationType.Shake, Color.rgb(Random.nextInt(256), Random.nextInt(256), Random.nextInt(256))) }
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
