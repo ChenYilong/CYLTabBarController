@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The login settings of a tab bar controller (issue #19), kept in one object that is attached to it: the login state
  *      provider, the identifiers and the block that tell which tabs need login, and the handler that shows the login screen.

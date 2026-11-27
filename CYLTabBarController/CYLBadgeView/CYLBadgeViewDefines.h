@@ -10,10 +10,7 @@
  * [EN] Shared by the CYLBadgeView sources only; not part of the public API.
  *      Everything CYLBadgeView and Core both use (macros, `-cyl_setHidden:`, `-cyl_valueForKey:`, `-cyl_tabButton`,
  *      `CYLLocalizedString()`, `+[CYLUtils isLiquidGlassActive]`...) comes from CYLUtils, which both depend on.
- *      `CYL_BADGE_CORE_AVAILABLE` is only for what exists in Core alone, the tab bar: with Core, a tab button's badge
- *      goes on its icon or Lottie view and is mirrored to the Liquid Glass platter; on its own
- *      (`pod 'CYLTabBarController/CYLBadgeView'`) the badge goes on the control or the tab icon. Like the Lottie
- *      guards, it is set with `__has_include`.
+ *      Whether a tab bar exists is asked at run time by class name (the badge never imports Core).
  * [CN] 仅供 CYLBadgeView 源文件内部使用，不属于公开 API。
  *      CYLBadgeView 与 Core 共同使用的内容（宏、`-cyl_setHidden:`、`-cyl_valueForKey:`、`-cyl_tabButton`、`CYLLocalizedString()`、
  *      `+[CYLUtils isLiquidGlassActive]` 等）都来自二者共同依赖的 CYLUtils。
@@ -28,15 +25,12 @@
 #import <UIKit/UIKit.h>
 #import "CYLUtils.h"
 
-#if __has_include(<CYLTabBarController/CYLTabBarController.h>)
-#define CYL_BADGE_CORE_AVAILABLE 1
-#import <CYLTabBarController/CYLTabBarController.h>
-#elif __has_include("CYLTabBarController.h")
-#define CYL_BADGE_CORE_AVAILABLE 1
-#import "CYLTabBarController.h"
-#else
-#define CYL_BADGE_CORE_AVAILABLE 0
-#endif
+// [EN] D7 (docs/Animated-Item-Badge.md, step 4): CYLBadge sees only CYLUtils below it, so there is no `CYL_BADGE_CORE_AVAILABLE` and no import of
+//      CYLTabBarController.h (that would be a module cycle). What needs the tab bar is decided at run time by class name
+//      (`NSClassFromString(@"CYLTabBarController")`), as the badge's host lookups already do.
+// [CN] D7（docs/Animated-Item-Badge.md，第 4 步）：CYLBadge 只看得到下面的 CYLUtils，因此没有 `CYL_BADGE_CORE_AVAILABLE`，也不导入
+//      CYLTabBarController.h（那会形成模块循环）。需要 TabBar 的部分在运行时按类名判断（`NSClassFromString(@"CYLTabBarController")`），
+//      与角标已有的宿主查找方式相同。
 
 #import "CYLBadgeProtocol.h"
 

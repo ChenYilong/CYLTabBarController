@@ -6,7 +6,7 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 #import <UIKit/UIKit.h>
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

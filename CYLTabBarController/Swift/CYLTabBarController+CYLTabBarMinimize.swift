@@ -6,6 +6,12 @@
 //
 
 import QuartzCore
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 import UIKit
 
 // [EN] Minimize or hide the tab bar on scroll (issue #13). One API, three isolated paths, chosen by `CYLTabBarMinimizeMode.mode(for:)`;

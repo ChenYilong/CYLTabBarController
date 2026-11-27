@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The FlatDesign side of the in-place update, implemented in the FlatDesign subspec
  *      (CYLFlatDesignTabBar-ObjectiveC/Swift/CYLTabBarController+CYLFlatDesign.swift). Optional: without that subspec nothing

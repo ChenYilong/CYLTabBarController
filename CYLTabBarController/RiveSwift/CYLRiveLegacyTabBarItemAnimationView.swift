@@ -17,6 +17,12 @@
 //      警告，且没有其他代码直接引用它（按其 Objective-C 名称解析）。仅在引入 Rive 运行时时编译。
 #if canImport(RiveRuntime)
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 import RiveRuntime
 
 @available(*, deprecated, message: "Wraps Rive's legacy API for .riv files without a view model; created only through CYLTabBarItemAnimationViewProviding.")

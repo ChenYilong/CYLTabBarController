@@ -23,7 +23,7 @@
 
 
 
-#import "CYLSwiftInterface.h"
+#import "CYLBadgeSwiftInterface.h"
 
 /*!
  * `noexcept` in C++: the declarations of CYLTabBarController-Swift.h (functions implemented in Swift with @_cdecl) carry

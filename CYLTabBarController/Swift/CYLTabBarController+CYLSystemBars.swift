@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /// [EN] Storage implemented in CYLTabBarController.m. [CN] 实现于 CYLTabBarController.m 的存储。
 @objc protocol CYLSystemBarsStorage {
     @objc(cyl_setAllowsVerticalBarStorage:) func cylSetAllowsVerticalBarStorage(_ allowsVerticalBar: Bool)

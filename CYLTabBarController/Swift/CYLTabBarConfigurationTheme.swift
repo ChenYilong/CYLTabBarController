@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] Phase 3 of the class switch (docs/Swift-Migration.md): what CYLTabBarController+CYLConfiguration.m and the declarations of
 //      `CYLTabBarTheme` / `CYLTabBarConfigurationTheme` in CYLTabBarController.h held, now that CYLTabBarController is a Swift
 //      class: the theme protocol, the skins of a configuration file, and the initializers and class factories that build a tab

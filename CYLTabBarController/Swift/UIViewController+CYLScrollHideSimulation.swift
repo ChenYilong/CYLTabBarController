@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * FIX: issue #13
  * [EN] Scroll hiding: rows that simulate the interruptions the tab bar must come back from. Each row turns scroll hiding on

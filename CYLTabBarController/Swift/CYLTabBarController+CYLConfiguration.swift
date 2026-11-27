@@ -6,6 +6,12 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 #if SWIFT_PACKAGE
 import CYLAnimatedItemSwift // [EN] `cylTabBarAnimationURLWithOptionsEntryPoint`. [CN] 提供 `cylTabBarAnimationURLWithOptionsEntryPoint`。
 #endif

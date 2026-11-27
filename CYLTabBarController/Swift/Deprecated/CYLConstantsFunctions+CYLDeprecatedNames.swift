@@ -6,6 +6,12 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 import ObjectiveC
 
 // [EN] Deprecated Swift names, kept for source compatibility: each forwards to its lowerCamelCase replacement (the

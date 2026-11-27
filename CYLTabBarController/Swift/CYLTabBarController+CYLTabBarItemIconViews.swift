@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The associated object keys of the views shown in place of a tab's icon.
  * [CN] 替换 Tab 图标显示的视图所用的关联对象 key。

@@ -8,6 +8,12 @@
 import AudioToolbox
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The long press of the tab buttons. Its own class: CYLTabBar treats every `UILongPressGestureRecognizer` added to it as the
  *      Liquid Glass one, and this one is added to the tab bar controller's view anyway.

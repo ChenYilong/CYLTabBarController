@@ -13,6 +13,9 @@
 // docs-binding:end
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 // [EN] CYLBadge is the layer below this component (docs/Animated-Item-Badge.md): the badge API of the item exists once the pod or
 //      target is linked. Not compiled yet: written statically on Linux.
 // [CN] CYLBadge 是本组件下面的一层（docs/Animated-Item-Badge.md）：链接该 pod 或 target 后，item 的角标 API 才可用。尚未编译：在 Linux 上静态编写。

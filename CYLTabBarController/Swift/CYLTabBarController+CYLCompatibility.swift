@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The deprecated Lottie names kept for compatibility (they forward to the neutral animation API) and `-rootWindow`,
  *      declared in `CYLTabBarController (CYLTabBarControllerDeprecated)` and `CYLTabBarController (CYLRootWindow)`. Internal

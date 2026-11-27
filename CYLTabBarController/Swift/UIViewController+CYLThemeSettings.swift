@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] A demo theme: its colors and, for a holiday skin, its icons (Fluent Emoji, MIT License, Microsoft; see
  *      `cyl_theme_icons_LICENSE.txt`), or for the network skin, icons downloaded from the network and a title prefix.

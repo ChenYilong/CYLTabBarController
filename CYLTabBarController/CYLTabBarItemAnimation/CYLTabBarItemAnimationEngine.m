@@ -27,9 +27,9 @@
 //      generated Swift interface, which this file must import itself (CI built it without any other header importing it).
 // [CN] 这三个函数是 `@_cdecl` 的 Swift 函数（第 118 步）：由生成的 Swift 接口声明，本文件必须自己导入它（CI 构建时没有其他头文件导入它）。
 #if __has_include("../CYLUtils/CYLSwiftInterface.h")
-#import "../CYLUtils/CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"
 #else
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"
 #endif
 #if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimatorRegistry.h>)
 #import <CYLAnimatedItem/CYLTabBarItemAnimatorRegistry.h>

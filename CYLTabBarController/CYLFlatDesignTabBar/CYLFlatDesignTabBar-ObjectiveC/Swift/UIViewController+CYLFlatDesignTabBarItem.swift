@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The FlatDesign item of a page, moved from `UIViewController (CYLTabBarControllerExtention)` into the FlatDesign
  *      subspec, so Core builds without FlatDesign (docs/Swift-Migration.md, step 27). Selectors kept.

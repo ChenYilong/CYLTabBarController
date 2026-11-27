@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The private methods and state of `CYLTabBarController` (still Objective-C, FlatDesign only) that this file calls.
  *      Selectors only; the class implements them under `CYL_FLATDESIGN_AVAILABLE`.

@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"
 
 // FIX: issue #535 — CYLLocalizedString(), CYLResourceBundle(), CYLSetLocalizationLanguage() and the rest of the string
 // table live in CYLUtils, shared with CYLBadgeView. 字符串表相关函数位于 CYLUtils，与 CYLBadgeView 共用。

@@ -102,6 +102,14 @@
 #else
 #import "CYLUtils.h"
 #endif
+// [EN] D7: the animation keys moved here from `CYLUtils.h` (CYLUtils sees nothing above it). [CN] D7：动画 key 从 `CYLUtils.h` 移到这里（CYLUtils 看不到上面的任何层）。
+#if __has_feature(modules) && __has_include(<CYLAnimatedItem/CYLAnimatedItem-umbrella.h>)
+#pragma clang module import CYLAnimatedItem
+#elif __has_include(<CYLAnimatedItem/CYLAnimationKeys.h>)
+#import <CYLAnimatedItem/CYLAnimationKeys.h>
+#elif __has_include("CYLAnimationKeys.h")
+#import "CYLAnimationKeys.h"
+#endif
 // [CN] 动画视图协议（Swift 迁移后为公开头文件）：框架的伞头文件需要包含它，否则 Xcode 警告 "umbrella header ... does not
 //      include header"；CocoaPods 不带动画子模块时没有该文件。
 // [EN] The animation view protocols (a public header since the Swift migration): the framework's umbrella header must

@@ -6,6 +6,12 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 internal import CYLDeallocBlockExecutor
 
 /// [EN] The associated object key of `cyl_keepsLoadedTabBarItemIdentifiers` (selector-based, as in CYLTabBarController.m before).

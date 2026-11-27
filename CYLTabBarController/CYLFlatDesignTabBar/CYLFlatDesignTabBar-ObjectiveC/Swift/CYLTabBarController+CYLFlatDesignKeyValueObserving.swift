@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] The FlatDesign part of the controller's key-value observing (docs/Swift-Migration.md, step 127), called by the core through
 //      `CYLFlatDesignKeyValueObserving`. FlatDesign subspec only.
 // [CN] 控制器 KVO 的扁平样式部分（第 127 步），核心通过 `CYLFlatDesignKeyValueObserving` 调用。仅属于扁平样式子库。

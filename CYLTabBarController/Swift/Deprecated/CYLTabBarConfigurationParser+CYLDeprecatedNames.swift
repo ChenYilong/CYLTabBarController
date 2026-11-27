@@ -7,6 +7,12 @@
 
 import Foundation
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] Deprecated Swift names, kept for source compatibility: each forwards to its lowerCamelCase replacement (the
 //      Objective-C selectors never changed). Removed at the next major version; SonarCloud skips this folder
 //      (.sonarcloud.properties, docs/Swift-Coding-Style.md).

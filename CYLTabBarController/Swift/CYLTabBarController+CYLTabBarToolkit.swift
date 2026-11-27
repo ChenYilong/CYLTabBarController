@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The associated object keys of the tab bar customization toolkit. [CN] TabBar 自定义工具集的关联对象 key。
  */

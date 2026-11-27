@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] The FlatDesign parts of the `cyl_tabBar` and `tabBarHeight` accessors (docs/Swift-Migration.md, step 128), called by the
 //      core through `CYLFlatDesignTabBarAccessors`. FlatDesign subspec only.
 // [CN] `cyl_tabBar` 与 `tabBarHeight` 访问器的扁平样式部分（第 128 步），核心通过 `CYLFlatDesignTabBarAccessors` 调用。仅属于扁平样式子库。

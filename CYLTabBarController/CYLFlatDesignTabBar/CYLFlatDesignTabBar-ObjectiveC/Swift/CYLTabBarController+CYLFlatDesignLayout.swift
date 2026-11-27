@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] The FlatDesign part of `-viewDidLayoutSubviews` (docs/Swift-Migration.md, step 132), called by the core through
 //      `CYLFlatDesignLayout`. FlatDesign subspec only.
 // [CN] `-viewDidLayoutSubviews` 的扁平样式部分（第 132 步），核心通过 `CYLFlatDesignLayout` 调用。仅属于扁平样式子库。

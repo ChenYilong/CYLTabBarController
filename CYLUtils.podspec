@@ -3,13 +3,12 @@
 #      It depends only on the lifecycle library and is its only direct user (D8: every other pod gets it through here).
 #      Layering: CYLUtils <- CYLBadge <- CYLAnimatedItem <- CYLTabBarController. Same repository, tag and version as the others.
 #      Module name `CYLUtilsKit`: a module with the same name as its class `CYLUtils` breaks Swift name lookup and
-#      `.swiftinterface` files. Written statically, not linted yet; the sources still import CYLAnimatedItem in places
-#      (step 3 of the guide), so this pod is not wired into the other podspecs yet.
+#      `.swiftinterface` files. Written statically, linted by `pod ipc spec` only.
 # [CN] CYLUtils：本仓库最底层的 pod（docs/Animated-Item-Badge.md，D7 与 D8）。宏、视图辅助方法、主题（换肤）、本地化（`CYLLocalizedString`）
 #      以及整个库的资源包 `CYLTabBarController.bundle`。它只依赖生命周期库，并且是其唯一的直接使用者（D8：其他 pod 都经由它获得）。
 #      分层：CYLUtils <- CYLBadge <- CYLAnimatedItem <- CYLTabBarController。与其他 pod 同一仓库、同一 tag、同一版本。
 #      模块名 `CYLUtilsKit`：与其类 `CYLUtils` 同名的模块会破坏 Swift 名称查找与 `.swiftinterface` 文件。静态编写，尚未 lint；
-#      源码中仍有处导入 CYLAnimatedItem（指南第 3 步），因此本 pod 尚未接入其他 podspec。
+#      静态编写，只用 `pod ipc spec` 检查过。
 Pod::Spec.new do |s|
   s.name         = "CYLUtils"
   s.module_name  = "CYLUtilsKit"

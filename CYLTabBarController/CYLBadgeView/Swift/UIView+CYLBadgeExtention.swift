@@ -7,6 +7,9 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 internal import CYLDeallocBlockExecutor
 
 /**

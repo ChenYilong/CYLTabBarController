@@ -23,15 +23,8 @@
 
 #import <UIKit/UIKit.h>
 #import "CYLUtilsMacros.h"
-#if __has_feature(modules) && __has_include(<CYLAnimatedItem/CYLAnimatedItem-umbrella.h>)
-#pragma clang module import CYLAnimatedItem
-#else
-#if __has_include(<CYLAnimatedItem/CYLAnimationKeys.h>)
-#import <CYLAnimatedItem/CYLAnimationKeys.h>
-#else
-#import "CYLAnimationKeys.h"
-#endif
-#endif
+// [EN] D7: the animation keys (`CYLAnimationKeys.h`) are imported by Core's umbrella `CYLTabBarController.h`, not here: CYLUtils sees nothing above it.
+// [CN] D7：动画 key（`CYLAnimationKeys.h`）由 Core 的总头文件 `CYLTabBarController.h` 导入，而不是这里：CYLUtils 看不到上面的任何层。
 #import "CYLLocalizedString.h"
 #import "CYLResourceRoute.h"
 #import "NSObject+CYLUtils.h"

@@ -6,6 +6,12 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 import ObjectiveC
 
 // [EN] The inline helper functions of CYLConstants.h, translated from Objective-C (docs/Swift-Migration.md, step 133). Same C names

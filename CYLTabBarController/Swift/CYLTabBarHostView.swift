@@ -10,6 +10,12 @@ internal import CYLDeallocBlockExecutor
 import ObjectiveC
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] Helpers of `CYLTabBarHostView`: colors, badge animations, and what the host view shows as a badge. Translated from
  *      Objective-C (docs/Swift-Migration.md, step 36).

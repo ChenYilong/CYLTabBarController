@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] Phase 3 of the class switch (docs/Swift-Migration.md): the enums of CYLConstants.h and the protocol of CYLPlusButton.h in Swift,
 //      with the Objective-C names and the Swift names apps see. They could not move before: CYLTabBarController.h used them while
 //      it declared the class. [CN] 类切换第 3 阶段：CYLConstants.h 的枚举与 CYLPlusButton.h 的协议改为 Swift，Objective-C 名称与 App 看到的

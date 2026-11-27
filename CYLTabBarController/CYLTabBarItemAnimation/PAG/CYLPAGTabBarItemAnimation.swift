@@ -15,6 +15,9 @@
 
 #if canImport(libpag)
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 import libpag
 
 /**

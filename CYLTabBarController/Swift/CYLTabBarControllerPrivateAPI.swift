@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The methods that only `CYLTabBarController+CYLPrivate.h` declares (it is not part of the module, so Swift cannot see it),
  *      listed once with their Objective-C selectors. Swift code of the library reaches them through `cylPrivate`. An entry goes

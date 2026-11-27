@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] Context, forced orientation, the topmost view controller, dismissing everything, gesture recognizer kinds and the
  *      plus page check. Translated from Objective-C (docs/Swift-Migration.md, branch swift-core); the two KVO-safe

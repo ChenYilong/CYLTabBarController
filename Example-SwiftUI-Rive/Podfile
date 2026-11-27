@@ -14,6 +14,8 @@ target 'AnimatedApp' do
   pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => '4276a6dab5a428ccc3a5f3f347eab991881fb97c' # TODO: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md)
   # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
   # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
+  pod 'CYLUtils', :path => '../'
+  pod 'CYLBadge', :path => '../'
   pod 'CYLAnimatedItem', :path => '../'
   # FIX: issue #415 — SVGA tab icons (SVGAPlayer), one for one with the Rive ones, chosen on the Bell page.
   # SVGA Tab 图标（SVGAPlayer），与 Rive 图标一一对应，在 Bell 页面选择。

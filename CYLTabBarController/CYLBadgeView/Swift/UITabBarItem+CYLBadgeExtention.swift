@@ -8,6 +8,9 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 /**
  * [EN] Badges on a tab bar item (`UITabBarItem (CYLBadgeExtention)`): the item is not a view, so every badge call goes to
  *      the badge host of its tab button, in both Liquid Glass layers. Translated from Objective-C (docs/Swift-Migration.md,

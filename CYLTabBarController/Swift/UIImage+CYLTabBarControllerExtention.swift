@@ -13,6 +13,12 @@
 // docs-binding:end
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 import ImageIO
 import CryptoKit
 

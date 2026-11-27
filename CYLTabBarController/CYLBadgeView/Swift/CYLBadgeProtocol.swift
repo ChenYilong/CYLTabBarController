@@ -7,6 +7,9 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 // [EN] Swift since docs/Swift-Migration.md step 115 (phase ③, group A of docs/Swift-Migration-Phase3.md): the badge enums and
 //      `CYLBadgeProtocol` were declared in CYLBadgeProtocol.h, which now keeps only the animation key macros. Objective-C sees
 //      them through the generated Swift interface, with the same names (`CYLBadgeAnimationTypeShake`, `-cyl_showBadge` …).

@@ -9,6 +9,12 @@
 
 import Foundation
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 import Lottie
 import UIKit
 

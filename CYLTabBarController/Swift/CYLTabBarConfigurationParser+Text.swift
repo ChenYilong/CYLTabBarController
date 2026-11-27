@@ -7,6 +7,12 @@
 
 import Foundation
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The shared helpers of the configuration parsers: errors, nesting checks, text decoding, scalars, quoted strings,
  *      dotted paths and JSON5. Translated from Objective-C (docs/Swift-Migration.md) with the same rules: text is read as

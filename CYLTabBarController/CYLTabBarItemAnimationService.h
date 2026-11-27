@@ -13,7 +13,7 @@
  *      Objective-C 声明；`CYLTabBarItemAnimationIsAvailable()` 是基于 `CYLTabBarItemAnimationGetService()` 的宏。
  */
 #import <UIKit/UIKit.h>
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"
 
 /*!
  * `noexcept` in C++: the declarations of CYLTabBarController-Swift.h (functions implemented in Swift with @_cdecl) carry

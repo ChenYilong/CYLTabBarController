@@ -14,6 +14,12 @@
 //      声明为 public 只是为了让生成的头文件把它导出给那个 Objective-C 文件。
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 #if SWIFT_PACKAGE
 import CYLAnimatedItem
 #endif

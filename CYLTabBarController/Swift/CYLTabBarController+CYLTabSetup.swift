@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /// [EN] Private: the reason of a left-out tab; the same key as in CYLTabBarController.m and the configuration.
 /// [CN] 私有：被排除的 Tab 的原因；与 CYLTabBarController.m 及配置中的键相同。
 private let cylTabBarItemExclusionReasonKey = "_CYLTabBarItemExclusionReason"

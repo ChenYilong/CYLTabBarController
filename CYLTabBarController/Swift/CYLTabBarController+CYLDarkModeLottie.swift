@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * FIX: issue #442
  * [EN] Light / dark switches: the animation tints are applied again, the themes follow the new trait collection, and the

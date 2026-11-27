@@ -7,6 +7,12 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 #if canImport(CYLAnimatedItem)
 import CYLAnimatedItem
 internal import CYLDeallocBlockExecutor

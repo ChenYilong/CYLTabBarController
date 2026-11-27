@@ -8,6 +8,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  [EN] A view controller that applies its navigation settings (`cyl_navigationBarHidden`, `cyl_disablePopGestureRecognizer`, …)
       as it appears and disappears. An `open` Swift class since docs/Swift-Migration.md step 113 (phase ②): subclasses are

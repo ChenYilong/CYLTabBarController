@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] Seam (docs/Swift-Migration.md): the members of `CYLTabBarController` (still Objective-C) that the memory warning
  *      demo reads. `CYLTabBarController` adopts it in `CYLTabBarController.m`; not meant for apps. Removed when

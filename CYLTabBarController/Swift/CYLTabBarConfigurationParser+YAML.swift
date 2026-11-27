@@ -7,6 +7,12 @@
 
 import Foundation
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] One meaningful YAML line: its indentation, its text without comment, and its line number (1-based).
  * [CN] 一行有效的 YAML：缩进、去掉注释后的文字以及行号（从 1 开始）。

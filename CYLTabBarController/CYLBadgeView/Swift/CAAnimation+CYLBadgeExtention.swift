@@ -7,6 +7,9 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 /**
  * [EN] A rotation axis. Translated from Objective-C (docs/Swift-Migration.md); Objective-C sees `CYLAxisX` … through
  *      `CYLSwiftInterface.h`.

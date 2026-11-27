@@ -82,4 +82,4 @@ NS_ASSUME_NONNULL_END
  *      block 类型保留在这里（CYLTabBarController.h 使用它们）；`CYLTabBarPageSource` 现在是普通字符串类型，四个取值为宏（原为 typed enum
  *      的 extern 常量，名称与值不变）（docs/Swift-Migration.md，第 35 步）。
  */
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"

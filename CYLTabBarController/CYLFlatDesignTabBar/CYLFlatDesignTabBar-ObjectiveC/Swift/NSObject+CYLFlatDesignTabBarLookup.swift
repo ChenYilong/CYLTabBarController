@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] Flat design side of the tab bar controller lookup (`NSObject+CYLTabBarControllerLookup`, docs/Swift-Migration.md, step 40):
  *      `-cylflatdesign_setTabBarController:` and `-cylflatdesign_tabBarController` (declared in `CYLTabBarController.h` under

@@ -7,6 +7,9 @@
 
 import Foundation
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 /**
  * [EN] The end rule of one pass of a Rive state machine input, as a pure function. `CYLRiveLegacyTabBarItemAnimationView` (the
  *      `Rive` subspec, compiled only with RiveRuntime) asks it when the input's `activeDuration` has elapsed; it lives in the

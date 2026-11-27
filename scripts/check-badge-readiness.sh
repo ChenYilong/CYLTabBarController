@@ -28,13 +28,15 @@ else note "pod not installed (gem install cocoapods): podspecs unchecked"; fi
 # 2. Layering greps ("Common mistakes" of the iOS document).
 U=CYLTabBarController/CYLUtils; B=CYLTabBarController/CYLBadgeView
 if [ -f CYLUtils.podspec ]; then
-  ! grep -rnE "import CYLAnimatedItem|import CYLTabBarController|<CYLAnimatedItem/|<CYLTabBarController/" "$U" "$B" --include=*.swift --include=*.h --include=*.m | grep -v '^\S*:[0-9]*:\s*\(//\|\*\)' \
+  # [EN] Only real imports count: comments, `__has_include` feature checks and the animation key files (built by CYLAnimatedItem) do not.
+  # [CN] 只有真正的导入才算：注释、`__has_include` 功能检测与动画 key 文件（由 CYLAnimatedItem 编译）不算。
+  ! grep -rnE "^\s*(#\s*import|@import|import|@_exported import)\s.*(CYLAnimatedItem|CYLTabBarController)" "$U" "$B" --include=*.swift --include=*.h --include=*.m | grep -v "CYLAnimationKeys\." \
     && ok "CYLUtils and CYLBadge import nothing above them" || bad "CYLUtils or CYLBadge imports a higher layer"
 else note "layering grep waits for CYLUtils.podspec"; fi
 n=$(grep -rn "cylBadgeSnapshotImage" CYLTabBarController Example-Shared Example --include=*.swift --include=*.h --include=*.m 2>/dev/null | wc -l)
 [ "$n" -eq 0 ] && ok "no cylBadgeSnapshotImage" || note "cylBadgeSnapshotImage still used ($n hits; removed after D5)"
 if [ -f CYLUtils.podspec ]; then
-  d=$(grep -ln "CYLDeallocBlockExecutor" CYLUtils.podspec CYLBadge.podspec CYLAnimatedItem.podspec CYLTabBarController.podspec 2>/dev/null | tr '\n' ' ')
+  d=$(grep -ln "^[^#]*dependency 'CYLDeallocBlockExecutor'" CYLUtils.podspec CYLBadge.podspec CYLAnimatedItem.podspec CYLTabBarController.podspec 2>/dev/null | tr '\n' ' ')
   [ "$d" = "CYLUtils.podspec " ] && ok "only CYLUtils depends on the lifecycle library" || bad "lifecycle dependency in: $d"
 fi
 # every Podfile that takes CYLAnimatedItem by path also lists CYLUtils and CYLBadge (once the pods exist)

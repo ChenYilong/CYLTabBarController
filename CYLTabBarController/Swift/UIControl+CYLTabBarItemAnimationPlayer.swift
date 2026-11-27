@@ -13,6 +13,12 @@
 //      Swift Package Manager 也定义了它。
 #if CYL_ANIMATION_ENGINE_AVAILABLE
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 #if canImport(CYLAnimatedItem)
 import CYLAnimatedItem
 #endif

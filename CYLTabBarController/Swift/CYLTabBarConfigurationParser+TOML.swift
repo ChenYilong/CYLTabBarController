@@ -7,6 +7,12 @@
 
 import Foundation
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The TOML subset of configuration files: tables, arrays of tables, dotted and quoted keys, strings (basic, literal,
  *      multi-line), numbers, booleans, arrays and inline tables; nesting limited to `CYLTabBarConfigurationMaximumDepth`.

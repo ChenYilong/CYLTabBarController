@@ -8,6 +8,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] The implementation of `CYLPlusButton`, translated from Objective-C (docs/Swift-Migration.md, step 52), like `CYLTabBar`
 //      in step 51. The class stays declared in Objective-C: apps subclass it in Objective-C, and `CYLTabBarController.h`
 //      names it. CYLPlusButton.m keeps the C globals of CYLTabBarController.h, the overrides and the public methods, each a

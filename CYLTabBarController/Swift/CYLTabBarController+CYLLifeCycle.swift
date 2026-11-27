@@ -6,6 +6,12 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] Internal: CYLTabBarController's public interface does not expose the library. [CN] internal：公开接口不暴露该库。
 internal import CYLDeallocBlockExecutor
 

@@ -7,6 +7,12 @@
 
 import Foundation
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The INI, .properties / .env and XML (not property list) configuration readers. Translated from Objective-C
  *      (docs/Swift-Migration.md) with the same rules and messages. Each returns the parsed value or nil with `error` set.

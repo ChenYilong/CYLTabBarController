@@ -78,31 +78,12 @@
 #define CYL_SYSTEM_VERSION_LESS_THAN(v)                 ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
 #define CYL_SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
 
-// [EN] CYL_ANIMATION_ENGINE_AVAILABLE, CYL_LOTTIE_AVAILABLE, CYL_LOTTIE_REQUIRED and CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS come
-//      from the CYLAnimatedItem pod. Its CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS is the only one: with CocoaPods each pod is a
-//      module, and a second, different definition here made every use an "ambiguous expansion of macro" warning. The
-//      definition below is only a fallback for a build without the component.
-// [CN] CYL_ANIMATION_ENGINE_AVAILABLE、CYL_LOTTIE_AVAILABLE、CYL_LOTTIE_REQUIRED 与 CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS 来自
-//      CYLAnimatedItem pod。后者以组件的定义为唯一定义：使用 CocoaPods 时每个 pod 是一个 module，这里再定义一个不同的版本会让每处使用都产生
-//      "ambiguous expansion of macro" 警告。下面的定义只是没有组件时的后备。
-// [CN] CocoaPods（存在 `CYLAnimatedItem-umbrella.h`）中按模块导入 CYLAnimatedItem（`@import`），本库的公开头文件都这样做：
-//      `#import <CYLAnimatedItem/…>` 在静态库 App 中仍可能把组件头文件按文本编进 CYLTabBarController 模块，Swift 客户端随后报
-//      "modularization issue on 'CYLAnimatedItemView' … expected in 'CYLAnimatedItem' but found in 'CYLTabBarController'"。
-// [EN] Under CocoaPods (where `CYLAnimatedItem-umbrella.h` exists) CYLAnimatedItem is imported as a module (`@import`), as in
-//      every public header of this library: `#import <CYLAnimatedItem/…>` could still compile the component's headers into
-//      the CYLTabBarController module as text in a static-library app, and Swift clients then failed with "modularization
-//      issue on 'CYLAnimatedItemView' … expected in 'CYLAnimatedItem' but found in 'CYLTabBarController'".
-#if __has_feature(modules) && __has_include(<CYLAnimatedItem/CYLAnimatedItem-umbrella.h>)
-#pragma clang module import CYLAnimatedItem
-#else
-#if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
-#import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
-#elif __has_include("../CYLAnimatedItem/CYLAnimatedItemMacros.h")
-#import "../CYLAnimatedItem/CYLAnimatedItemMacros.h"
-#else
-#import "CYLAnimatedItemMacros.h"
-#endif
-#endif
+// [EN] D7 (docs/Animated-Item-Badge.md): CYLUtils is the bottom pod and sees nothing above it, so this header no longer imports CYLAnimatedItem.
+//      `CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS` has its one definition below; `CYLAnimatedItemMacros.h` imports this file instead of
+//      defining its own. The engine switches (`CYL_ANIMATION_ENGINE_AVAILABLE`, `CYL_LOTTIE_*`) belong to CYLAnimatedItem alone.
+// [CN] D7（docs/Animated-Item-Badge.md）：CYLUtils 是最底层的 pod，看不到上面的任何层，因此本头文件不再导入 CYLAnimatedItem。
+//      `CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS` 的唯一定义在下面；`CYLAnimatedItemMacros.h` 导入本文件而不再自己定义。引擎开关
+//      （`CYL_ANIMATION_ENGINE_AVAILABLE`、`CYL_LOTTIE_*`）只属于 CYLAnimatedItem。
 
 #ifndef CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
 #define CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(Stuff) do { _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Warc-performSelector-leaks\"") @try { Stuff; } @catch (NSException *exception) { NSLog(CYLLocalizedString(@"🔴类名与方法名：%@（在第%@行）, 描述：%@"), @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason); } _Pragma("clang diagnostic pop") } while (0);

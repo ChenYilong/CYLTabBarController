@@ -15,6 +15,9 @@
 
 #if CYL_ANIMATION_ENGINE_AVAILABLE
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 import ImageIO
 #if SWIFT_PACKAGE
 import CYLAnimatedItem

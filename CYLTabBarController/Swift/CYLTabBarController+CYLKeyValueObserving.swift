@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /// [EN] The KVO contexts of the controller: stable addresses for the life of the app. [CN] 控制器的 KVO context：在 App 生命周期内地址不变。
 private enum CYLKVOContexts {
     static let tabImageViewDefaultOffset = UnsafeMutableRawPointer.allocate(byteCount: 1, alignment: 1)

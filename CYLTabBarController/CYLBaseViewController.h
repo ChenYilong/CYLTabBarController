@@ -22,4 +22,4 @@
  * [CN] 自第 113 步起 `CYLBaseViewController` 是 `open` 的 Swift 类（`Swift/CYLBaseViewController.swift`）：Objective-C 通过此处导入的生成的 Swift 接口看到它，类名不变。
  *      子类用 Swift 编写（docs/Subclassing-In-Swift.md）。
  */
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"

@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] Row height that leaves room around the icon for its badge (the Objective-C header has a macro of the same name).
  * [CN] 行高：为图标四周的角标留出空间（Objective-C 头文件中有同名宏）。

@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The associated object keys of the per-tab colors and of the selected tab's badge.
  * [CN] 单个 Tab 颜色与选中 Tab 角标所用的关联对象 key。

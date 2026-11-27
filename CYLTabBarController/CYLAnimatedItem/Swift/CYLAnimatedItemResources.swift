@@ -12,6 +12,9 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 /**
  * [EN] Looks for `CYLAnimatedItem.bundle` where each package manager puts it: next to the component's code (CocoaPods, a
  *      framework), in the app, and inside Swift Package Manager's resource bundle of the CYLAnimatedItemSwift target (before

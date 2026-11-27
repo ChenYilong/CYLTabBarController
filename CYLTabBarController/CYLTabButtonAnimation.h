@@ -52,4 +52,4 @@ typedef void (^CYLTabButtonBadgeAnimationBlock)(UIControl *button, UIView *iconV
 
 NS_ASSUME_NONNULL_END
 
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"

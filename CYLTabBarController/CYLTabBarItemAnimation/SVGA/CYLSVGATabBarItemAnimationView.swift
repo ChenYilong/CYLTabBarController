@@ -24,6 +24,9 @@
 
 #if canImport(SVGAPlayerLite) || canImport(SVGAPlayer)
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 #if canImport(SVGAPlayerLite)
 import SVGAPlayerLite
 #else

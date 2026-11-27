@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] Which tab bar controllers a lookup accepts; nil accepts any CYLTabBarController. [CN] 查找时接受哪些 TabBarController；nil 表示接受任意 CYLTabBarController。
  */

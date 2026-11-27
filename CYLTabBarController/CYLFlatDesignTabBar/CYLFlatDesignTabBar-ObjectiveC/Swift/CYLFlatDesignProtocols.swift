@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] Phase 3 of the class switch (docs/Swift-Migration.md): the FlatDesign protocols of CYLConstants.h and CYLFlatDesignTabBar.h in
 //      Swift, with the same Objective-C names and selectors. FlatDesign subspec only. The header had no nullability for the
 //      show / hide callbacks, so their parameters stay implicitly unwrapped, as apps see them today.

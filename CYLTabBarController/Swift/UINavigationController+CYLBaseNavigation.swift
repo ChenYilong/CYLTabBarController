@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  [EN] The logic of `CYLBaseNavigationController` (docs/Swift-Migration.md step 102): the tab bar hides for every pushed page but
       the root, through `cyl_hidesBottomBarWhenPushed`. The Objective-C class stays as a shell, since apps subclass it in

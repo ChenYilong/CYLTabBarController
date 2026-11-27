@@ -6,6 +6,9 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 #if SWIFT_PACKAGE
 // [EN] Swift Package Manager builds the Objective-C half (CYLAnimatedItemView) as its own module; CocoaPods and the Xcode
 //      framework compile this file into that module.

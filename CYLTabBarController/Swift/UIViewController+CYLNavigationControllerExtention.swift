@@ -8,6 +8,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] `UIViewController (CYLNavigationControllerExtention)`: per page navigation settings (hidden navigation bar, hidden
  *      separator, disabled pop gesture, hidden outer navigation bars), applied by CYLBaseViewController /

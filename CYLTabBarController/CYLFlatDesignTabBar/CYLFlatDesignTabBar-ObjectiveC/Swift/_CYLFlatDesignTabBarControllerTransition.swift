@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] A minimal transition context for the FlatDesign tab bar controller: no interaction, frames are the container's
  *      bounds, `completionBlock` runs on completion. Internal helper of FlatDesign (not used by the library today, kept

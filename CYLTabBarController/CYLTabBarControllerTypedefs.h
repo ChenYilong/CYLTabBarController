@@ -17,6 +17,14 @@
 #else
 #import "CYLUtilsMacros.h"
 #endif
+// [EN] D7: `CYL_LOTTIE_REQUIRED` and the other engine macros come from CYLAnimatedItem, no longer through CYLUtilsMacros.h. [CN] D7：`CYL_LOTTIE_REQUIRED` 等引擎宏来自 CYLAnimatedItem，不再经由 CYLUtilsMacros.h。
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
+#elif __has_include("CYLAnimatedItem/CYLAnimatedItemMacros.h")
+#import "CYLAnimatedItem/CYLAnimatedItemMacros.h"
+#elif __has_include("CYLAnimatedItemMacros.h")
+#import "CYLAnimatedItemMacros.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 

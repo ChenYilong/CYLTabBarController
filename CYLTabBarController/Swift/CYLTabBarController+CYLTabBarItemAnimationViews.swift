@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  [EN] A tab button that is not in a system tab bar and knows its controller (the FlatDesign button).
  [CN] 不在系统 TabBar 中、但知道其控制器的 Tab 按钮（扁平样式按钮）。

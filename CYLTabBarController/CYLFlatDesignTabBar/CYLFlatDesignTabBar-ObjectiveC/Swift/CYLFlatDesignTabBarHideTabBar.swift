@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] Two FlatDesign views with UIKit-only interfaces, translated from Objective-C (docs/Swift-Migration.md, step 47):
 //      `CYLFlatDesignTabBarHideTabBar` (the system tab bar that always stays hidden) and `_CYLFlatDesignTabBarParallaxOverlayView`
 //      (the view that carries the FlatDesign tab bar during push / pop). Objective-C callers get them from the generated

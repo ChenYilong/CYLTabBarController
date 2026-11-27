@@ -8,6 +8,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  [EN] The table view controller counterpart of `CYLBaseViewController`. An `open` Swift class since docs/Swift-Migration.md
       step 113 (phase ②).

@@ -13,4 +13,4 @@
  * [CN] `CYLTabBarItemUpdateRow` 与 `UIViewController (CYLTabBarItemUpdate)` 在 Swift 中实现（`Swift/UIViewController+CYLTabBarItemUpdate.swift`，
  *      所有名称与 selector 不变），由下面导入的 Swift 生成接口（`CYLSwiftInterface.h`）声明（docs/Swift-Migration.md，第 29 步）。
  */
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"

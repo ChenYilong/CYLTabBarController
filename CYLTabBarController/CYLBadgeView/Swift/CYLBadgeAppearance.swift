@@ -7,6 +7,9 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 /**
  * [EN] The default look of badges (global, or per badge host). Invalid numbers fall back to safe values. Translated
  *      from Objective-C (docs/Swift-Migration.md); Objective-C callers get this class from `CYLSwiftInterface.h`; the

@@ -7,6 +7,9 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 // [EN] FIX: issue #415 — the playable view protocols of the `CYLTabBarItemAnimation` subspec, translated from Objective-C
 //      (CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h; docs/Swift-Migration.md). It lives with the engine (subspec
 //      CYLAnimationEngine), not in Core, so the engine builds without Core. Their Objective-C names,

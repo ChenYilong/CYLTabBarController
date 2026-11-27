@@ -12,6 +12,9 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 /**
  [EN] The dark-glass contrast rule of an item: an EXPLICIT, static title or icon color that is too dark for dark Liquid Glass is lifted,
       keeping hue, saturation and alpha, until it has the minimum contrast against the glass (title text `titleMinimumContrast` 4.5, icon

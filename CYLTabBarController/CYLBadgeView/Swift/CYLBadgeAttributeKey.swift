@@ -10,6 +10,9 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 /**
  [EN] Keys of a badge style dictionary: the same strings as `CYLTabBarHostView.badgeAttributes` (React Native, Flutter),
       plus more. Values are objects or strings (`#RRGGBB` colors, `{x, y}` offsets). One parser,

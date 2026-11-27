@@ -12,6 +12,9 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 
 /**
  * [EN] Whether the system draws Liquid Glass, the one rule every CYLTabBarController component asks (the tab bar's
@@ -21,18 +24,34 @@ import UIKit
  *      CollectionViewClassifyMenu 的标签也是）：iOS 27 及以上总是；iOS 26 上 App 未在 Info.plist 中设置
  *      `UIDesignRequiresCompatibility` 时。只读取一次。
  */
+#if canImport(CYLUtilsKit)
 final class CYLLiquidGlass {
 
     /**
-     * [EN] For tests: replaces the system check of `isActive()` (`nil`, the default, asks the system).
-     * [CN] 供测试使用：替代 `isActive()` 对系统的检查（默认 `nil`，询问系统）。
+     * [EN] For tests: forwards to `CYLUtils.liquidGlassActiveOverride`, the one copy of the rule (D2).
+     * [CN] 供测试使用：转发到 `CYLUtils.liquidGlassActiveOverride`，规则的唯一一份（D2）。
      */
-    nonisolated(unsafe) static var activeOverride: Bool?
+    nonisolated(unsafe) static var activeOverride: Bool? {
+        get { CYLUtils.liquidGlassActiveOverride }
+        set { CYLUtils.liquidGlassActiveOverride = newValue }
+    }
 
     /**
-     * [EN] Whether Liquid Glass is in use (see the class comment).
-     * [CN] 是否使用液态玻璃（见类注释）。
+     * [EN] Whether Liquid Glass is in use: asks `CYLUtils.isLiquidGlassActive()`.
+     * [CN] 是否使用液态玻璃：询问 `CYLUtils.isLiquidGlassActive()`。
      */
+    class func isActive() -> Bool {
+        CYLUtils.isLiquidGlassActive()
+    }
+}
+#else
+// [EN] TODO (docs/Animated-Item-Badge.md, step 9): SwiftPM still builds CYLUtils inside the CYLTabBarController target, above this one, so
+//      until `CYLUtilsKit` is a SwiftPM target this target keeps its own copy of the rule (two caches, one answer). Delete this branch with step 9.
+// [CN] TODO（docs/Animated-Item-Badge.md，第 9 步）：SwiftPM 仍把 CYLUtils 编进本 target 之上的 CYLTabBarController target，因此在 `CYLUtilsKit`
+//      成为 SwiftPM target 之前，本 target 保留自己的一份规则（两份缓存，同一个答案）。第 9 步完成时删除此分支。
+final class CYLLiquidGlass {
+    nonisolated(unsafe) static var activeOverride: Bool?
+
     class func isActive() -> Bool {
         activeOverride ?? systemDrawsLiquidGlass
     }
@@ -48,6 +67,7 @@ final class CYLLiquidGlass {
         return false
     }()
 }
+#endif
 
 /**
  * [EN] A Liquid Glass background for any view: a `UIVisualEffectView` with a `UIGlassEffect`, tinted with

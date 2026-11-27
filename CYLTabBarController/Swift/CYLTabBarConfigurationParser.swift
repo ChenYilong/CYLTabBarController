@@ -7,6 +7,12 @@
 
 import Foundation
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The error domain of configuration files (`CYLTabBarConfigurationErrorCode`).
  * [CN] 配置文件的错误域（`CYLTabBarConfigurationErrorCode`）。

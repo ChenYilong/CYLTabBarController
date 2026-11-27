@@ -18,6 +18,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] FIX: issue #535 — tap animations of tab buttons and the plus button, translated from Objective-C (docs/Swift-Migration.md,
 //      step 46). The protocol and the classes keep their Objective-C names and selectors, and their Swift names (the
 //      underscored `cyl_play…` names are the ones Swift imported from the header; apps' conformances stay valid).

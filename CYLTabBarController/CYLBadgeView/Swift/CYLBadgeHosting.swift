@@ -10,6 +10,9 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 /**
  [EN] A view that hands its badge to one of its subviews (for example an animated item, whose badge sits on a view kept on
       its icon). The badge component sends `cyl_showBadge…`, `cyl_clearBadge` and the other messages to `cylBadgeAnchorView`,

@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The demo rows of the settings section (`UIViewController+CYLSettingsSection.swift`), part 1: title offset,
  *      `standardAppearance` themes, login state, plus button touchable area, `selectedIndex`, tap animation, long press and
