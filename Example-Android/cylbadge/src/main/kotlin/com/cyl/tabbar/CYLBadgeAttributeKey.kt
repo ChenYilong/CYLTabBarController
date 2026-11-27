@@ -45,6 +45,7 @@ object CYLBadgeAttributeKey {
         val value = attributes?.get(ANIMATION)
         val all = CYLEnums.CYLBadgeAnimationType.values()
         return when (value) {
+            is CYLEnums.CYLBadgeAnimationType -> value
             is Number -> all.firstOrNull { it.rawValue == value.toInt() }
             is String -> all.firstOrNull { it.name.equals(value.trim(), ignoreCase = true) }
             else -> null
@@ -76,6 +77,12 @@ object CYLBadgeAttributeKey {
 
     internal fun point(value: Any?): CYLOffset? {
         if (value is CYLOffset) return value
+        // [EN] `[x, y]` in dp, as the tab bar host view takes it. [CN] 以 dp 表示的 `[x, y]`，与 TabBar 宿主视图的写法相同。
+        if (value is List<*> && value.size == 2) {
+            val x = (value[0] as? Number)?.toFloat() ?: return null
+            val y = (value[1] as? Number)?.toFloat() ?: return null
+            return CYLOffset(x, y)
+        }
         val text = (value as? String)?.trim() ?: return null
         val match = Regex("""^\{\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*}$""").find(text) ?: return null
         val x = match.groupValues[1].toFloatOrNull() ?: return null

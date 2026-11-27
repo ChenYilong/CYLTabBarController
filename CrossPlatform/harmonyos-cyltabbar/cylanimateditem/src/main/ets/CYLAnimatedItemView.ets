@@ -5,7 +5,7 @@ import { CYLAnimatedItemContrast, CYLAnimatedItemContrastKindIcon } from './CYLA
 import { CYLAnimatedItemColorInput, CYLAnimatedItemColorResolver } from './CYLAnimatedItemColorResolver';
 import { LifecycleCenter, LifecycleController } from 'cylutils';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
-import { CYLBadge, CYLBadgeView, cylApplyBadgeAttributes, cylBadgeAnimationType } from 'cylbadge';
+import { CYLBadge, CYLBadgeView, cylApplyBadgeAttributes, cylBadgeAnimationType, cylBadgeAccessibilityText } from 'cylbadge';
 import {
   CYLAnimatedItemCountdown, CYLAnimatedItemCountdownListener, CYLAnimatedItemCountdownStorage, CYLCountdownRunning, CYLCountdownFinished,
   CYLCountdownTickIntervalMillis, cylCountdownText, cylCountdownTitleWidth
@@ -1533,8 +1533,8 @@ export struct CYLAnimatedItemView {
   cylAccessibilityText(): string {
     const own: string = this.itemAccessibilityText.length > 0 ? this.itemAccessibilityText : this.cylTitleText();
     // [EN] The badge is read after the item's own text; a dot adds nothing without a description (the app supplies the localized one). [CN] 角标在 item 自身文字之后朗读；没有描述时红点不追加内容（本地化描述由 App 提供）。
-    const value: string | null = this.cylBadge.value;
-    const badgeText: string = value === null ? '' : (this.badgeAccessibilityLabel.length > 0 ? this.badgeAccessibilityLabel : value);
+    const badgeText: string = this.badgeAccessibilityLabel.length > 0 && this.cylBadge.value !== null ?
+      this.badgeAccessibilityLabel : cylBadgeAccessibilityText(this.cylBadge);
     return [own, badgeText].filter((part: string) => part.length > 0).join(', ');
   }
 

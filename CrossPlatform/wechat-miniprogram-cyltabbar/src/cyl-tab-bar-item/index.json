@@ -2,7 +2,8 @@
   "component": true,
   "usingComponents": {
     "cyl-glass-lens": "../cyl-glass-lens/index",
-    "cyl-animated-item": "../cyl-animated-item/index"
+    "cyl-animated-item": "../cyl-animated-item/index",
+    "cyl-badge": "../cyl-badge/index"
   },
   "componentGenerics": {
     "cyl-lottie-view": {

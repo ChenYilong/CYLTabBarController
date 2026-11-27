@@ -117,14 +117,25 @@ function cylTitleStyle(offset, titleAttributes, appearance) {
  *      text attributes. [CN] 角标样式：内容边距、偏移（用外边距：角标动画使用 transform）、尺寸、颜色与文本属性。
  */
 function cylBadgeStyle(p, appearance, badge) {
+  const parts = cylBadgeStyleParts(p, appearance, badge);
+  return parts.padding + parts.host + parts.size + parts.look;
+}
+
+/**
+ * [EN] The badge's style in two places (cyl-badge, docs/Animated-Item-Badge-CrossPlatform.md, phase 1): `host` is the offset (margins), which stays on the node
+ *      the item positions; `look` (padding, size, color, text) goes to cyl-badge as `style-text`. Their concatenation is `cylBadgeStyle`, unchanged.
+ * [CN] 角标样式分在两个位置（cyl-badge，docs/Animated-Item-Badge-CrossPlatform.md，阶段 1）：`host` 是偏移（外边距），留在 item 定位的节点上；
+ *      `look`（内边距、尺寸、颜色、文字）作为 `style-text` 交给 cyl-badge。它们连起来就是 `cylBadgeStyle`，没有改变。
+ */
+function cylBadgeStyleParts(p, appearance, badge) {
   const { inset, offset, size, attributes } = badge;
-  return `padding: ${inset.top}px ${inset.right}px ${inset.bottom}px ${inset.left}px;`
-    + (offset.horizontal || offset.vertical
-      ? ` margin-left: ${offset.horizontal}px; margin-top: ${offset.vertical}px;` : '')
-    + (size ? ` width: ${size.width}px; height: ${size.height}px; min-width: 0; padding: 0;` : '')
-    + (reader.cylColor(appearance.badgeBackgroundColor || p.badgeColor)
-      ? ` background-color: ${reader.cylColor(appearance.badgeBackgroundColor || p.badgeColor)};` : '')
+  const padding = `padding: ${inset.top}px ${inset.right}px ${inset.bottom}px ${inset.left}px;`;
+  const host = offset.horizontal || offset.vertical ? ` margin-left: ${offset.horizontal}px; margin-top: ${offset.vertical}px;` : '';
+  const sizeStyle = size ? ` width: ${size.width}px; height: ${size.height}px; min-width: 0; padding: 0;` : '';
+  const look = (reader.cylColor(appearance.badgeBackgroundColor || p.badgeColor)
+    ? ` background-color: ${reader.cylColor(appearance.badgeBackgroundColor || p.badgeColor)};` : '')
     + cylTextStyle(attributes) + cylTextStyle(appearance.badgeTextAttributes);
+  return { padding, host, size: sizeStyle, look };
 }
 
 /**
@@ -222,6 +233,8 @@ function cylItemModel(p) {
     badgeClass: /^(breathe|scale|shake|bounce|scaleOnce)$/.test(String(p.badgeAnimation || ''))
       ? cylBadgeAnimationClass(p.badgeAnimation) : '',
     badgeStyle: cylBadgeStyle(p, appearance, { inset: badgeInset, offset: badgeOffset, size: badgeSize, attributes: badgeAttributes }),
+    badgeHostStyle: cylBadgeStyleParts(p, appearance, { inset: badgeInset, offset: badgeOffset, size: badgeSize, attributes: badgeAttributes }).host,
+    badgeLookStyle: (() => { const parts = cylBadgeStyleParts(p, appearance, { inset: badgeInset, offset: badgeOffset, size: badgeSize, attributes: badgeAttributes }); return parts.padding + parts.size + parts.look; })(),
     accessibilityLabel: String(p.label || title || '') + (badgeValue && badgeValue !== '•' ? `, ${badgeValue}` : ''),
   };
 }

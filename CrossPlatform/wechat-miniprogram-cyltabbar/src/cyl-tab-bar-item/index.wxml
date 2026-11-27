@@ -41,8 +41,9 @@
       generic:cyl-rive-view="cyl-rive-view"
       generic:cyl-svga-view="cyl-svga-view"
     />
-    <text wx:if="{{m.showsBadge && !m.badgeIsDot}}" class="cyl-item-badge {{m.badgeClass}}" style="{{m.badgeStyle}}">{{m.badgeText}}</text>
-    <view wx:if="{{m.showsBadge && m.badgeIsDot}}" class="cyl-item-badge-dot {{m.badgeClass}}" style="{{m.badgeStyle}}"></view>
+    <!-- [EN] The badge is cyl-badge (phase 1); the item keeps the position (top / left, the margins of the offset) on the host node. [CN] 角标是 cyl-badge（阶段 1）；item 在宿主节点上保留位置（top / left，偏移的外边距）。 -->
+    <cyl-badge wx:if="{{m.showsBadge}}" class="{{m.badgeIsDot ? 'cyl-item-badge-host-dot' : 'cyl-item-badge-host'}}" style="{{m.badgeHostStyle}}"
+               variant="tab" dot="{{m.badgeIsDot}}" value-text="{{m.badgeText}}" style-text="{{m.badgeLookStyle}}" class-text="{{m.badgeClass}}" aria-hidden="true" />
   </view>
   <text wx:if="{{m.title}}" class="cyl-item-title" style="{{m.titleStyle}}">{{m.title}}</text>
 </view>

@@ -115,3 +115,31 @@ export function cylApplyBadgeAttributes(badge: CYLBadge, attributes: Record<stri
     badge.respectsReduceMotion = respects;
   }
 }
+
+/**
+ * [EN] The localized description of a badge value (TalkBack-like: "New content" for a dot, "N new messages" for a number). `cylbadge` has no string
+ *      table of its own (the strings are cyltabbar's `CYLLocalization`), so a host that localizes installs `CYLBadgeAccessibility.textProvider`
+ *      once (`cyltabbar` does when it loads); without one the badge text itself is read and a dot adds nothing.
+ * [CN] 角标值的本地化描述（类似 TalkBack：红点为 "有新内容"，数字为 "N 条新消息"）。`cylbadge` 没有自己的字符串表（字符串是 cyltabbar 的
+ *      `CYLLocalization`），因此做本地化的宿主只需安装一次 `CYLBadgeAccessibility.textProvider`（`cyltabbar` 加载时会安装）；没有时朗读角标文字本身，红点不追加内容。
+ */
+export class CYLBadgeAccessibility {
+  /** `text` is null for a dot, otherwise the badge's display text; returns the description. */
+  static textProvider?: (text: string | null) => string;
+}
+
+/**
+ * [EN] What a screen reader says for `badge` (read as part of its host); '' when no badge is shown.
+ * [CN] 屏幕阅读器为 `badge` 读出的内容（作为宿主的一部分读出）；没有角标时为 ''。
+ */
+export function cylBadgeAccessibilityText(badge: CYLBadge | undefined): string {
+  if (badge === undefined || !badge.isShowBadge()) {
+    return '';
+  }
+  const text: string | null = badge.displayText();
+  const provider = CYLBadgeAccessibility.textProvider;
+  if (provider !== undefined) {
+    return provider(text);
+  }
+  return text === null ? '' : text;
+}

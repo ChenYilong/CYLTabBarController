@@ -721,29 +721,15 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
      */
     private fun showBadge(target: View, style: Map<String, Any?>, fallback: CYLEnums.CYLBadgeAnimationType) {
         val text = when (val value = style[BADGE_VALUE]) { is String -> value; is Number -> value.toString(); else -> "" }
-        when (val color = style[BADGE_COLOR]) {
-            is Int -> target.cylBadgeBackgroundColor = color
-            is String -> CYLTabBarConfiguration.colorValue(color)?.let { target.cylBadgeBackgroundColor = it }
-        }
-        (style[BADGE_RADIUS] as? Number)?.let { target.cylBadgeRadius = it.toFloat() }
-        (style[BADGE_CENTER_OFFSET] as? List<*>)?.takeIf { it.size == 2 }?.let { offset ->
-            val x = (offset[0] as? Number)?.toFloat(); val y = (offset[1] as? Number)?.toFloat()
-            if (x != null && y != null) target.cylBadgeCenterOffset = CYLOffset(x, y)
-        }
-        val animation = badgeAnimation(style[BADGE_ANIMATION]) ?: fallback
+        // [EN] The one parser of `:cylbadge` (S7): colors, radius, offset, font, border and the rest. [CN] `:cylbadge` 唯一的解析函数（S7）：颜色、半径、偏移、字体、边框等。
+        target.cylApplyBadgeAttributes(style)
+        val animation = if (style[BADGE_ANIMATION] != null) CYLBadgeAttributeKey.animationType(style) else fallback
         when (text) {
             "" -> target.cylClearBadge()
             // [EN] A dot animates only with an animation of its own, as on iOS. [CN] 红点仅在自身指定动画时播放，与 iOS 相同。
             "dot" -> if (style[BADGE_ANIMATION] == null) target.cylShowBadge() else target.cylShowBadgeValue("", animation)
             else -> target.cylShowBadgeValue(text, animation)
         }
-    }
-
-    private fun badgeAnimation(value: Any?): CYLEnums.CYLBadgeAnimationType? = when (value) {
-        is CYLEnums.CYLBadgeAnimationType -> value
-        is Number -> CYLEnums.CYLBadgeAnimationType.entries.firstOrNull { it.rawValue == value.toInt() }
-        is String -> CYLEnums.CYLBadgeAnimationType.entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
-        else -> null
     }
 
     /**

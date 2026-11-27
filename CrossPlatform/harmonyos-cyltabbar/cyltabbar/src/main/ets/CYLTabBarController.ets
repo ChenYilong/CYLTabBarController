@@ -4,7 +4,7 @@ import { CYLLiquidGlassTokens, CYLLiquidGlassCapsuleModifier, CYLLiquidGlassCont
 import { curves, window, KeyboardAvoidMode } from '@kit.ArkUI';
 import { CYLTabBarItemAttributes, CYLTitleOffset } from './CYLTabBarItem';
 import { CYLPlusButton, cyl_liquidGlassContentDy } from './CYLPlusButton';
-import { CYLBadge, CYLBadgeView } from 'cylbadge';
+import { CYLBadge, CYLBadgeView, CYLBadgeAccessibility, cylBadgeAccessibilityText } from 'cylbadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLSVGAView } from './svga/CYLSVGAView';
 import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint } from './CYLRiveTabBarItemAnimator';
@@ -30,10 +30,11 @@ import { CYLGIFImagePlayback, CYLGIFImageState, cylIsGIFImagePath, cylGIFDuratio
  * [CN] 屏幕阅读器读出的角标内容（作为宿主的一部分读出）；无角标时为 ''。
  */
 export function badgeAccessibilityText(badge: CYLBadge | undefined): string {
-  if (badge === undefined || !badge.isShowBadge()) {
-    return '';
-  }
-  const text = badge.displayText();
+  return cylBadgeAccessibilityText(badge);
+}
+
+// [EN] The localized description of a badge, installed once for every `cylbadge` user in this app (the animated item reads it too). [CN] 角标的本地化描述，为本应用中所有 `cylbadge` 的使用者安装一次（动效 item 也读取它）。
+CYLBadgeAccessibility.textProvider = (text: string | null): string => {
   if (text === null) {
     return CYLLocalizedString('有新内容');
   }
@@ -41,7 +42,7 @@ export function badgeAccessibilityText(badge: CYLBadge | undefined): string {
     return CYLLocalizedString('%@ 条新消息', text);
   }
   return CYLLocalizedString('Badge: %@', text);
-}
+};
 
 /**
  * [EN] CYLTabBarMinimizeBehavior (issue #13): how the tab bar reacts when the current page scrolls.
