@@ -112,6 +112,14 @@ Component({
     },
 
     cyl_isLiquidGlass() {
+      // [EN] The bar's resolved style first (it also knows a style set with cyl_setItemStyle and a numeric style type): the example's own reading missed
+      //      them, so on Liquid Glass a tap cleared the badge instead of turning it into a dot (DevTools UI run on 2b99043f, launch sequence, item 55).
+      // [CN] 先取 TabBar 解析后的样式（它也知道 cyl_setItemStyle 设置的样式与数字样式类型）：示例自己的判断漏掉了它们，因此液态玻璃下点击清除了角标而不是变成红点
+      //      （2b99043f 上的 DevTools UI 运行，启动流程，第 55 项）。
+      const bar = this.selectComponent('#cyl-tab-bar');
+      if (bar && bar.data && bar.data.cylStyleType) {
+        return bar.data.cylStyleType === 'liquidGlass';
+      }
       return this.data.itemStyle === 'liquidGlass'
         || (!this.data.itemStyle && this.data.configuration.CYLTabBarControllerStyleType === 'liquidGlass');
     },

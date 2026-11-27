@@ -119,6 +119,10 @@ export class CYLAnimatedItemColorResolver {
    */
   static builtInLevelColor(input: CYLAnimatedItemColorInput): ResourceColor {
     const role: string = !input.enabled ? 'disabled' : (input.selected ? 'selected' : 'normal');
+    // [EN] The subclass's own disabled look (since 2026-11-27): used as it is, never adapted. [CN] 子类自己的禁用外观（2026-11-27 起）：原样使用，从不适配。
+    if (!input.enabled && CYLAnimatedItemColorResolver.isSet(input.subclassBuiltIn.disabled)) {
+      return input.subclassBuiltIn.disabled;
+    }
     if (input.enabled) {
       const subclass: ResourceColor = CYLAnimatedItemColorResolver.pick(input.subclassBuiltIn, input.selected, true, true);
       if (CYLAnimatedItemColorResolver.isSet(subclass)) {
@@ -138,6 +142,31 @@ export class CYLAnimatedItemColorResolver {
   private static resolved(input: CYLAnimatedItemColorInput): ResourceColor {
     const explicit: ResourceColor = CYLAnimatedItemColorResolver.explicitColor(input);
     return CYLAnimatedItemColorResolver.isSet(explicit) ? explicit : CYLAnimatedItemColorResolver.builtInLevelColor(input);
+  }
+
+  /**
+   * [EN] THE resolver of a host-declared colour role (HarmonyOS equivalent of iOS / Android `register` + `setSubclassColor` + `applyBuiltInColor`: an ArkUI struct
+   *      cannot be subclassed, so a host such as ClassifyMenu's tag resolves its own elements, a delete label, a cross, editing icons, with this pure function).
+   *      Precedence of the current state: `input.subclassExplicit` (a missing selected colour falls back to the normal one) > `input.subclassBuiltIn` (the same
+   *      fallback; its `disabled` is the subclass's disabled look) > `componentBuiltIn` of the state. Then ONE contrast step by `input.kind` (drawn dark glass or a
+   *      static flat fill, `input.flatFill`), never for the disabled look of a built-in level. The item's own `own` and `stack` levels are not used. '' when nothing
+   *      is set. [CN] 宿主声明的颜色角色的唯一解析器（鸿蒙上对应 iOS / Android 的 `register` + `setSubclassColor` + `applyBuiltInColor`：ArkUI 结构体不能被继承，
+   *      所以 ClassifyMenu 标签这类宿主用这个纯函数解析自己的元素，删除标签、叉号、编辑图标）。当前状态的优先级：`input.subclassExplicit`（缺少选中值时回退到普通值）>
+   *      `input.subclassBuiltIn`（同样回退；其 `disabled` 为子类的禁用外观）> 该状态的 `componentBuiltIn`。然后按 `input.kind` 做唯一一次对比度调整（绘制的深色玻璃
+   *      或静态扁平填充 `input.flatFill`），内置层的禁用外观从不调整。不使用条目自己的 `own` 与 `stack` 层。都未设置时为 ''。
+   */
+  static resolvedRoleColor(input: CYLAnimatedItemColorInput, componentBuiltIn: CYLAnimatedItemColorStates): ResourceColor {
+    const explicit: ResourceColor = CYLAnimatedItemColorResolver.pick(input.subclassExplicit, input.selected, input.enabled, true);
+    if (CYLAnimatedItemColorResolver.isSet(explicit)) {
+      return CYLAnimatedItemColorResolver.adapt(explicit, input);
+    }
+    const subclass: ResourceColor = CYLAnimatedItemColorResolver.pick(input.subclassBuiltIn, input.selected, input.enabled, true);
+    const builtIn: ResourceColor = CYLAnimatedItemColorResolver.isSet(subclass) ? subclass :
+      CYLAnimatedItemColorResolver.pick(componentBuiltIn, input.selected, input.enabled, true);
+    if (!CYLAnimatedItemColorResolver.isSet(builtIn)) {
+      return '';
+    }
+    return input.enabled ? CYLAnimatedItemColorResolver.adapt(builtIn, input) : builtIn;
   }
 
   /** [EN] The effective TITLE colour (4.5:1 on drawn dark glass). [CN] 生效的标题颜色（深色绘制玻璃上 4.5:1）。 */

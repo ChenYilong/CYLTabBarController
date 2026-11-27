@@ -92,7 +92,23 @@ if [[ "$OHOS_TEST" = 1 ]]; then
     fi
     # [EN] MSYS_NO_PATHCONV: Git Bash must not turn /data/... into a Windows path for hdc. [CN] MSYS_NO_PATHCONV：Git Bash 不得把 /data/... 转成 Windows 路径。
     export MSYS_NO_PATHCONV=1
-    "$HDC_BIN" ${HDC_ARGS[@]+"${HDC_ARGS[@]}"} install -r "$TEST_HAP" || exit 1
+    # [EN] B22: install from the build folder with RELATIVE paths: with MSYS_NO_PATHCONV a /c/... path reached hdc unconverted and was read relative to the
+    #      current folder (C:\w\hm\/c/w/hm/...); hdc exits 0 even when an install fails, so its output is checked, else the OLD test HAP on the device ran
+    #      and the run "passed". The app HAP goes first (the test HAP needs the matching app), then the app is started before `aa test`.
+    # [CN] B22：在构建目录中用「相对」路径安装：设置 MSYS_NO_PATHCONV 后 /c/... 路径未经转换传给 hdc，被当作相对当前目录的路径（C:\w\hm\/c/w/hm/...）；
+    #      hdc 安装失败时退出码仍为 0，所以检查其输出，否则设备上「旧的」测试 HAP 会运行并「通过」。先装应用 HAP（测试 HAP 需要对应的应用），在 `aa test` 前启动应用。
+    cyl_hdc_install() {
+      local out
+      out="$(cd "$DST" && "$HDC_BIN" ${HDC_ARGS[@]+"${HDC_ARGS[@]}"} install -r "$1" 2>&1)"
+      echo "$out"
+      echo "$out" | grep -q "install bundle successfully" || exit 1
+    }
+    APP_HAP="$(cd "$DST" && find entry/build -path "*outputs/emulator*" -name "entry-*.hap" | head -1)"
+    if [[ -n "$APP_HAP" ]]; then
+      cyl_hdc_install "$APP_HAP"
+    fi
+    cyl_hdc_install "${TEST_HAP#"$DST"/}"
+    "$HDC_BIN" ${HDC_ARGS[@]+"${HDC_ARGS[@]}"} shell aa start -b com.cyl.tabbar.harmony -a EntryAbility
     RESULT="$("$HDC_BIN" ${HDC_ARGS[@]+"${HDC_ARGS[@]}"} shell aa test -b com.cyl.tabbar.harmony -m entry_test -s unittest OpenHarmonyTestRunner -s timeout 15000 2>&1)"
     echo "$RESULT"
     # [EN] hypium prints "Tests run: N, Failure: F, Error: E, Pass: P, Ignore: I"; the run passes with no failure and no error.

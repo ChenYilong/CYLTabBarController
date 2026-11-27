@@ -17,7 +17,7 @@
 | 中文 | English |
 |:---|:---|
 | iOS 库的每个公开符号（公开头文件中的类、协议、方法、属性、常量、枚举、函数）及其 Android 版本（`Example-Android/cyltabbar`，Kotlin 与 Java）。状态：done 行为相同；partial 部分行为（见说明）；planned 尚未移植；n/a 仅 iOS（UIKit、扁平样式、液态玻璃、Core Animation 等），不计入完成率。 | Every public symbol of the iOS library (classes, protocols, methods, properties, constants, enums and functions of the public headers) with its Android version (`Example-Android/cyltabbar`, Kotlin and Java). Status: done, the same behavior; partial, part of it (see the note); planned, not ported yet; n/a, iOS only (UIKit, FlatDesign, Liquid Glass, Core Animation...), left out of the score. |
-| **迁移完成率：97 / 100**（done + 0.5 × partial，共 1093 个计入的符号；done 1062、partial 6、planned 25、n/a 387）。 | **Migration score: 97 / 100** (done + 0.5 × partial over 1093 counted symbols; done 1062, partial 6, planned 25, n/a 387). |
+| **迁移完成率：99 / 100**（done + 0.5 × partial，共 1093 个计入的符号；done 1071、partial 21、planned 1、n/a 387）。 | **Migration score: 99 / 100** (done + 0.5 × partial over 1093 counted symbols; done 1071, partial 21, planned 1, n/a 387). |
 
 ## 目录 / Contents
 
@@ -992,9 +992,9 @@
 
 | iOS API | Android API | 状态 Status | 说明 / Note |
 |:---|:---|:---|:---|
-| `CYLTabBarItemAnimationColorKind` | — | planned |  |
-| `CYLTabBarItemAnimationColorKindOfData()` | — | planned |  |
-| `CYLTabBarItemAnimationColorKindOfURL()` | — | planned |  |
+| `CYLTabBarItemAnimationColorKind` | `CYLAnimationColorCount.Kind` | done |  |
+| `CYLTabBarItemAnimationColorKindOfData()` | `CYLAnimationColorCount.kind(extension, bytes)` | done |  |
+| `CYLTabBarItemAnimationColorKindOfURL()` | `CYLAnimationColorCount.kindOfSource(context, url)` | done |  |
 
 ## `CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.h`
 
@@ -1052,31 +1052,31 @@
 | `CYLTabBarItemAnimationBasePlayer` `+new` | `CYLTabBarItemAnimationBasePlayer (constructor)` | done | unavailable on iOS too: use the designated constructor |
 | `CYLTabBarItemAnimationBasePlayer` `animationView` | `CYLTabBarItemAnimationBasePlayer.animationView` | done |  |
 | `CYLTabBarItemAnimationPlayer` `loops` | `CYLTabBarItemAnimationPlayer.loops` | done | Lottie (repeat count) and PAG; the other libraries ignore it |
-| `CYLTabBarItemAnimationPlayer` `supportsSpeed` | — | planned |  |
-| `CYLTabBarItemAnimationPlayer` `supportsLoops` | — | planned |  |
-| `CYLTabBarItemAnimationPlayer` `supportsProgress` | — | planned |  |
-| `CYLTabBarItemAnimationPlayer` `supportsColors` | — | planned |  |
-| `CYLTabBarItemAnimationPlayer` `playing` | — | planned |  |
-| `CYLTabBarItemAnimationPlayer` `speed` | — | planned |  |
-| `CYLTabBarItemAnimationPlayer` `onEnded` | — | planned |  |
-| `CYLTabBarItemAnimationPlayer` `-applyColors:` | — | planned |  |
-| `CYLTabBarItemAnimationBasePlayer` `onEnded` | — | planned |  |
-| `CYLTabBarItemAnimationBasePlayer` `-notifyPlaybackEnded` | — | planned |  |
+| `CYLTabBarItemAnimationPlayer` `supportsSpeed` | `CYLAnimatedItemPlayer.supportsSpeed` | partial | on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer` |
+| `CYLTabBarItemAnimationPlayer` `supportsLoops` | `CYLAnimatedItemPlayer.supportsLoops` | partial | on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer` |
+| `CYLTabBarItemAnimationPlayer` `supportsProgress` | `CYLAnimatedItemPlayer.supportsProgress` | partial | on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer` |
+| `CYLTabBarItemAnimationPlayer` `supportsColors` | `CYLAnimatedItemPlayer.supportsColors` | partial | on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer` |
+| `CYLTabBarItemAnimationPlayer` `playing` | `CYLAnimatedItemPlayer.isPlaying` | partial | on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer` |
+| `CYLTabBarItemAnimationPlayer` `speed` | `CYLTabBarItemAnimationPlayer.animationSpeed; CYLAnimatedItemPlayer.speed` | partial | on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer` |
+| `CYLTabBarItemAnimationPlayer` `onEnded` | `CYLAnimatedItemPlayer.onEnded` | partial | on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer` |
+| `CYLTabBarItemAnimationPlayer` `-applyColors:` | `CYLAnimatedItemPlayer.applyColors(colors)` | partial | on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer` |
+| `CYLTabBarItemAnimationBasePlayer` `onEnded` | `CYLAnimatedItemPlayer.onEnded` | partial | on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer` |
+| `CYLTabBarItemAnimationBasePlayer` `-notifyPlaybackEnded` | `CYLAnimatedItemView animationEndListener (the item reports the end)` | partial | on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer` |
 
 ## `CYLTabBarItemAnimation/CYLTabBarItemAnimationTint.h`
 
 | iOS API | Android API | 状态 Status | 说明 / Note |
 |:---|:---|:---|:---|
-| `CYLTabBarItemAnimationPrepareTint()` | — | planned |  |
-| `CYLTabBarItemAnimationPrepareTabTint()` | — | planned |  |
-| `CYLTabBarItemAnimationResetTint()` | — | planned |  |
-| `CYLTabBarItemAnimationPrepareItemTint()` | — | planned |  |
-| `CYLTabBarItemAnimationRenderingMode` | — | planned |  |
-| `CYLTabBarItemAnimationRenderingModeFromString()` | — | planned |  |
-| `CYLTabBarItemAnimationTabFlowRenderingMode()` | — | planned |  |
-| `CYLTabBarItemAnimationResolveTint()` | — | planned |  |
-| `CYLTabBarItemAnimationResolveTintWithRenderingMode()` | — | planned |  |
-| `CYLTabBarItemAnimationItemTintColor()` | — | planned |  |
+| `CYLTabBarItemAnimationPrepareTint()` | `CYLTabBarItemAnimationTint.applyToAnimationView(view, color)` | partial | the item resolves the colour first (CYLAnimatedItemView.refreshAnimationTint) |
+| `CYLTabBarItemAnimationPrepareTabTint()` | `CYLTabBarItemButton (an item) refreshAnimationTint with the host title colours` | partial | internal to the tab button |
+| `CYLTabBarItemAnimationResetTint()` | `CYLTabBarItemAnimationTint.applyToAnimationView(view, null)` | done |  |
+| `CYLTabBarItemAnimationPrepareItemTint()` | `CYLAnimatedItemView.refreshAnimationTint()` | partial | the item resolves and applies the tint itself |
+| `CYLTabBarItemAnimationRenderingMode` | `CYLAnimationRenderingMode` | done |  |
+| `CYLTabBarItemAnimationRenderingModeFromString()` | `CYLAnimationRenderingMode.parse(text)` | done |  |
+| `CYLTabBarItemAnimationTabFlowRenderingMode()` | `CYLTabBarItemButton.cyl_setTabBarItemAnimationView (internal)` | partial | since 2026-11-27 the tab flow forces no mode: the item's automatic applies |
+| `CYLTabBarItemAnimationResolveTint()` | `CYLTabBarItemAnimationTint.resolve` | done |  |
+| `CYLTabBarItemAnimationResolveTintWithRenderingMode()` | `CYLTabBarItemAnimationTint.resolveItem` | done |  |
+| `CYLTabBarItemAnimationItemTintColor()` | `CYLAnimatedItemView.refreshAnimationTint()` | partial | computed inside the item, not a separate function |
 
 ## `CYLTabBarItemAnimation/CYLTabBarItemAnimator.h`
 
@@ -1370,7 +1370,7 @@
 
 | iOS API | Android API | 状态 Status | 说明 / Note |
 |:---|:---|:---|:---|
-| `CYLTabBarAnimationOptionsFromURL()` | — | planned |  |
+| `CYLTabBarAnimationOptionsFromURL()` | `CYLTabBarAnimationFileAndOptions(url).second` | done |  |
 | `CYLTabBarAnimationOptionRiveNumberInput` | `CYLConstants.CYLTabBarAnimationOptionRiveNumberInput` | done | played when libpag / rive-android is in the app |
 | `CYLTabBarAnimationOptionRiveNumberValues` | `CYLConstants.CYLTabBarAnimationOptionRiveNumberValues` | done | played when libpag / rive-android is in the app |
 | `CYLTabBarAnimationOptionTint` | `CYLConstants.CYLTabBarAnimationOptionTint` | done |  |

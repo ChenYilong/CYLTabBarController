@@ -702,6 +702,13 @@ export struct CYLAnimatedItemView {
   @Prop @Watch('cylTintDidChange') builtInIconColor: ResourceColor | undefined = undefined;
   @Prop @Watch('cylTintDidChange') builtInSelectedIconColor: ResourceColor | undefined = undefined;
   /**
+   * [EN] The subclass built-in colour of the DISABLED look (title / icon); undefined (default) uses the component's disabled colour. Never adapted (the disabled
+   *      look is not), like the component's. Requested by CollectionViewClassifyMenu for its tags (2026-11-27).
+   * [CN] 禁用外观的子类内置颜色（标题 / 图标）；undefined（默认）使用组件的禁用颜色。与组件的一样从不适配（禁用外观不适配）。CollectionViewClassifyMenu 为其标签请求（2026-11-27）。
+   */
+  @Prop @Watch('cylTintDidChange') builtInDisabledTitleColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') builtInDisabledIconColor: ResourceColor | undefined = undefined;
+  /**
    * [EN] The background while the item is pressed and enabled (iOS `itemHighlightedBackgroundColor`); undefined (default) = no pressed look. A flat item
    *      draws it as the fill, a drawn Liquid Glass as its tint.
    * [CN] 条目被按下且可用时的背景（iOS `itemHighlightedBackgroundColor`）；undefined（默认）表示没有按下外观。扁平条目作为填充色，绘制的液态玻璃作为着色。
@@ -724,6 +731,16 @@ export struct CYLAnimatedItemView {
    * [CN] true：只有条目选中且可用时才显示 `selectedImage`（iOS `disabledWinsImage`）；默认关闭（选中优先）。
    */
   @Prop disabledWinsImage: boolean = false;
+  /**
+   * [EN] iOS `showsOutlineWhenIncreaseContrast` / `respectsReduceMotion` (default false), kept for API parity so a host (ClassifyMenu's tags) can turn them on.
+   *      No effect on HarmonyOS today: the SDK has no public API to READ the system high-contrast setting (`text.setTextHighContrast` only sets the app's own
+   *      rendering), and the only animation-scale signal, `settings.display.ANIMATOR_DURATION_SCALE`, is deprecated since API 21. Like Android below API 34.
+   * [CN] iOS 的 `showsOutlineWhenIncreaseContrast` / `respectsReduceMotion`（默认 false），为 API 一致性保留，宿主（ClassifyMenu 的标签）可以打开。目前在鸿蒙上不起作用：
+   *      SDK 没有「读取」系统高对比度设置的公开 API（`text.setTextHighContrast` 只设置应用自己的渲染），唯一的动画缩放信号 `settings.display.ANIMATOR_DURATION_SCALE`
+   *      自 API 21 起已弃用。与 Android API 34 以下相同。
+   */
+  @Prop showsOutlineWhenIncreaseContrast: boolean = false;
+  @Prop respectsReduceMotion: boolean = false;
   /** [EN] The item is being pressed (only tracked with `itemHighlightedBackgroundColor`). [CN] 条目正被按下（仅在设置了 `itemHighlightedBackgroundColor` 时跟踪）。 */
   @State private cylPressed: boolean = false;
   /**
@@ -1327,6 +1344,7 @@ export struct CYLAnimatedItemView {
       input.subclassExplicit.disabled = value(this.subclassDisabledIconColor);
       input.subclassBuiltIn.normal = value(this.builtInIconColor);
       input.subclassBuiltIn.selected = value(this.builtInSelectedIconColor);
+      input.subclassBuiltIn.disabled = value(this.builtInDisabledIconColor);
     } else {
       input.own.normal = this.titleColor;
       input.own.selected = this.selectedTitleColor;
@@ -1337,6 +1355,7 @@ export struct CYLAnimatedItemView {
       input.subclassExplicit.disabled = value(this.subclassDisabledTitleColor);
       input.subclassBuiltIn.normal = value(this.builtInTitleColor);
       input.subclassBuiltIn.selected = value(this.builtInSelectedTitleColor);
+      input.subclassBuiltIn.disabled = value(this.builtInDisabledTitleColor);
     }
     input.selected = this.isItemSelected;
     input.enabled = this.isItemEnabled;

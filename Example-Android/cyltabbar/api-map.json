@@ -6009,5 +6009,116 @@
  "CYLAnimationWarnMissingEngine()": {
   "status": "done",
   "android": "CYLAnimationEngines.warnMissingEngine"
+ },
+ "CYLTabBarItemAnimationColorKind": {
+  "status": "done",
+  "android": "CYLAnimationColorCount.Kind"
+ },
+ "CYLTabBarItemAnimationColorKindOfData()": {
+  "status": "done",
+  "android": "CYLAnimationColorCount.kind(extension, bytes)"
+ },
+ "CYLTabBarItemAnimationColorKindOfURL()": {
+  "status": "done",
+  "android": "CYLAnimationColorCount.kindOfSource(context, url)"
+ },
+ "CYLTabBarItemAnimationRenderingMode": {
+  "status": "done",
+  "android": "CYLAnimationRenderingMode"
+ },
+ "CYLTabBarItemAnimationRenderingModeFromString()": {
+  "status": "done",
+  "android": "CYLAnimationRenderingMode.parse(text)"
+ },
+ "CYLTabBarItemAnimationResolveTint()": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimationTint.resolve"
+ },
+ "CYLTabBarItemAnimationResolveTintWithRenderingMode()": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimationTint.resolveItem"
+ },
+ "CYLTabBarAnimationOptionsFromURL()": {
+  "status": "done",
+  "android": "CYLTabBarAnimationFileAndOptions(url).second"
+ },
+ "CYLTabBarItemAnimationResetTint()": {
+  "status": "done",
+  "android": "CYLTabBarItemAnimationTint.applyToAnimationView(view, null)"
+ },
+ "CYLTabBarItemAnimationPrepareTint()": {
+  "status": "partial",
+  "android": "CYLTabBarItemAnimationTint.applyToAnimationView(view, color)",
+  "note": "the item resolves the colour first (CYLAnimatedItemView.refreshAnimationTint)"
+ },
+ "CYLTabBarItemAnimationPrepareItemTint()": {
+  "status": "partial",
+  "android": "CYLAnimatedItemView.refreshAnimationTint()",
+  "note": "the item resolves and applies the tint itself"
+ },
+ "CYLTabBarItemAnimationPrepareTabTint()": {
+  "status": "partial",
+  "android": "CYLTabBarItemButton (an item) refreshAnimationTint with the host title colours",
+  "note": "internal to the tab button"
+ },
+ "CYLTabBarItemAnimationTabFlowRenderingMode()": {
+  "status": "partial",
+  "android": "CYLTabBarItemButton.cyl_setTabBarItemAnimationView (internal)",
+  "note": "since 2026-11-27 the tab flow forces no mode: the item's automatic applies"
+ },
+ "CYLTabBarItemAnimationItemTintColor()": {
+  "status": "partial",
+  "android": "CYLAnimatedItemView.refreshAnimationTint()",
+  "note": "computed inside the item, not a separate function"
+ },
+ "CYLTabBarItemAnimationPlayer supportsSpeed": {
+  "status": "partial",
+  "android": "CYLAnimatedItemPlayer.supportsSpeed",
+  "note": "on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer`"
+ },
+ "CYLTabBarItemAnimationPlayer supportsLoops": {
+  "status": "partial",
+  "android": "CYLAnimatedItemPlayer.supportsLoops",
+  "note": "on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer`"
+ },
+ "CYLTabBarItemAnimationPlayer supportsProgress": {
+  "status": "partial",
+  "android": "CYLAnimatedItemPlayer.supportsProgress",
+  "note": "on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer`"
+ },
+ "CYLTabBarItemAnimationPlayer supportsColors": {
+  "status": "partial",
+  "android": "CYLAnimatedItemPlayer.supportsColors",
+  "note": "on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer`"
+ },
+ "CYLTabBarItemAnimationPlayer playing": {
+  "status": "partial",
+  "android": "CYLAnimatedItemPlayer.isPlaying",
+  "note": "on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer`"
+ },
+ "CYLTabBarItemAnimationPlayer speed": {
+  "status": "partial",
+  "android": "CYLTabBarItemAnimationPlayer.animationSpeed; CYLAnimatedItemPlayer.speed",
+  "note": "on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer`"
+ },
+ "CYLTabBarItemAnimationPlayer onEnded": {
+  "status": "partial",
+  "android": "CYLAnimatedItemPlayer.onEnded",
+  "note": "on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer`"
+ },
+ "CYLTabBarItemAnimationPlayer -applyColors:": {
+  "status": "partial",
+  "android": "CYLAnimatedItemPlayer.applyColors(colors)",
+  "note": "on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer`"
+ },
+ "CYLTabBarItemAnimationBasePlayer onEnded": {
+  "status": "partial",
+  "android": "CYLAnimatedItemPlayer.onEnded",
+  "note": "on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer`"
+ },
+ "CYLTabBarItemAnimationBasePlayer -notifyPlaybackEnded": {
+  "status": "partial",
+  "android": "CYLAnimatedItemView animationEndListener (the item reports the end)",
+  "note": "on the item: a tab button is a CYLAnimatedItemView, so `button.animatedItemPlayer`"
  }
 }

@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@ohos/hypium';
 import {
-  CYLAnimatedItemColorInput, CYLAnimatedItemColorResolver, CYLAnimatedItemContrast, CYLAnimatedItemContrastKindIcon, CYLAnimatedItemContrastKindText,
+  CYLAnimatedItemColorInput, CYLAnimatedItemColorResolver, CYLAnimatedItemColorStates, CYLAnimatedItemContrast, CYLAnimatedItemContrastKindIcon, CYLAnimatedItemContrastKindText,
   CYLAnimatedItemContrastRGBA
 } from 'cylanimateditem';
 
@@ -86,6 +86,33 @@ export default function cylAnimatedItemFlatContrastTest() {
       input.enabled = false;
       const disabled: ResourceColor = CYLAnimatedItemColorResolver.resolvedTitleColor(input);
       expect(disabled).assertEqual(CYLAnimatedItemColorResolver.builtInColor('disabled', true));
+    });
+
+    it('a host role: explicit > subclass built-in > component built-in, adapted by its kind; the disabled built-in is not adapted', 0, () => {
+      const input: CYLAnimatedItemColorInput = flatTitleInput(DARK_FILL, true);
+      input.own.normal = '';
+      const component: CYLAnimatedItemColorStates = new CYLAnimatedItemColorStates();
+      expect(CYLAnimatedItemColorResolver.resolvedRoleColor(input, component)).assertEqual('');
+      component.normal = GREY;
+      component.disabled = GREY;
+      expect(contrastOn(CYLAnimatedItemColorResolver.resolvedRoleColor(input, component), DARK_FILL) >= TEXT - 0.01).assertTrue();
+      input.subclassBuiltIn.normal = MID_GREY;
+      expect(CYLAnimatedItemColorResolver.resolvedRoleColor(input, component) === GREY).assertFalse();
+      input.subclassExplicit.normal = '#FFFFFFFF';
+      expect(CYLAnimatedItemColorResolver.resolvedRoleColor(input, component)).assertEqual('#FFFFFFFF');
+      input.subclassExplicit.normal = '';
+      input.enabled = false;
+      expect(CYLAnimatedItemColorResolver.resolvedRoleColor(input, component)).assertEqual(GREY);
+      input.subclassBuiltIn.disabled = MID_GREY;
+      expect(CYLAnimatedItemColorResolver.resolvedRoleColor(input, component)).assertEqual(MID_GREY);
+    });
+
+    it('the subclass disabled built-in replaces the component disabled colour of the item title', 0, () => {
+      const input: CYLAnimatedItemColorInput = flatTitleInput(DARK_FILL, true);
+      input.own.normal = '';
+      input.enabled = false;
+      input.subclassBuiltIn.disabled = MID_GREY;
+      expect(CYLAnimatedItemColorResolver.resolvedTitleColor(input)).assertEqual(MID_GREY);
     });
 
     it('glass keeps the glass reference (the flat fill is ignored)', 0, () => {

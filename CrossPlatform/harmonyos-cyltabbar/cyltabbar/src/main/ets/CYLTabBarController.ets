@@ -10,7 +10,7 @@ import { CYLSVGAView } from './svga/CYLSVGAView';
 import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint } from './CYLRiveTabBarItemAnimator';
 import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines, CYLAnimatedItemSVGA, cylSetPausesWhileUserScrolls,
   CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint, cylAnimatedItemEffectiveRenderingMode,
-  CYL_RENDERING_MODE_AUTOMATIC, CYLLiquidGlass } from 'cylanimateditem';
+  CYL_RENDERING_MODE_AUTOMATIC, CYLLiquidGlass, cylAnimatedItemDetectColorKind, CYLAnimatedItemSource, CYL_COLOR_COUNT_UNKNOWN } from 'cylanimateditem';
 import { CYLAnimatedItemLottie } from 'cylanimateditem_lottie';
 // TODO: replace the file: dependency (cyltabbar/oh-package.json5, a vendored copy) with the ohpm package after the library is published (owner's OK).
 import { LifecycleController } from 'cyldeallocblockexecutor';
@@ -426,6 +426,9 @@ export struct CYLTabBarController {
   private cylGIFLoading: Set<string> = new Set();
   private cylGIFDescriptors: Map<number, CYLGIFImageDescriptor> = new Map();
   @State private cylGIFRevision: number = 0;
+  /** [EN] The one-colour detection of each GIF tab file (the item's detection, cached per file); the revision re-renders when a result arrives. [CN] 每个 GIF Tab 文件的单色检测结果（与条目相同的检测，按文件缓存）；结果到达时通过 revision 重新渲染。 */
+  private cylGifColorKinds: Map<string, string> = new Map<string, string>();
+  @State private cylGifColorKindRevision: number = 0;
   /**
    * [EN] -cyl_coverVisiableTabImageViewOrTabButton:...: an image covering a whole tab button (index -> image), as the
    *      Example's Taobao-style Home cover; undefined: none.
@@ -1586,6 +1589,28 @@ export struct CYLTabBarController {
    *      与其他引擎的 SRC_IN 着色层（`CYLAnimatedItemView.animationTint`）相同，由同一个 `cylAnimatedItemResolveTint` 解析，因为 GIF 由 Image 绘制而不是引擎视图。没有着色（或颜色
    *      不是 "#RRGGBB" / "#AARRGGBB"）时为单位矩阵：GIF 保持自身颜色。
    */
+  /**
+   * [EN] The detected kind of a GIF tab file (`CYL_COLOR_COUNT_ONE`, `..._MULTI`, `..._UNKNOWN`), detected once per file in the background; unknown until the
+   *      result arrives (the GIF keeps its colors meanwhile), then the bar re-renders. [CN] GIF Tab 文件的检测结果，每个文件在后台检测一次；结果到达前为 unknown
+   *      （此时 GIF 保持自身颜色），之后 TabBar 重新渲染。
+   */
+  private cylGifColorKindOf(path: string | undefined): string {
+    if (path === undefined || path === '' || this.cylGifColorKindRevision < 0) {
+      return CYL_COLOR_COUNT_UNKNOWN;
+    }
+    const file: string = path.split('#')[0].split('?')[0];
+    const known: string | undefined = this.cylGifColorKinds.get(file);
+    if (known !== undefined) {
+      return known;
+    }
+    this.cylGifColorKinds.set(file, CYL_COLOR_COUNT_UNKNOWN);
+    cylAnimatedItemDetectColorKind(CYLAnimatedItemSource.parse(path), this.getUIContext().getHostContext()).then((kind: string) => {
+      this.cylGifColorKinds.set(file, kind);
+      this.cylGifColorKindRevision++;
+    });
+    return CYL_COLOR_COUNT_UNKNOWN;
+  }
+
   cylGifColorFilter(index: number): ColorFilter {
     // [EN] A GIF is an Image, not an animated item: the component's resolver, with the same inputs the item gets. [CN] GIF 是 Image 而不是
     //      动效条目：使用组件的解析函数，输入与条目相同。
@@ -1596,8 +1621,10 @@ export struct CYLTabBarController {
     input.selected = this.selectedIndex === index;
     input.dark = this.colorMode === 'dark';
     input.hasSelectedIconColor = true;
-    // [EN] No option: automatic (owner decision 2026-11-27). [CN] 没有选项：automatic（负责人决定，2026-11-27）。
+    // [EN] No option: automatic (owner decision 2026-11-27), so a ONE-colour GIF follows the tab color: the file's kind is detected like the item's.
+    // [CN] 没有选项：automatic（负责人决定，2026-11-27），因此「单色」GIF 跟随 Tab 颜色：文件类型的检测与条目相同。
     input.renderingMode = cylAnimatedItemEffectiveRenderingMode(this.cylTabRenderingMode(path), this.cylTabTintOption(path, 'renderingMode'), '');
+    input.colorKind = this.cylGifColorKindOf(path);
     const result: CYLAnimatedItemTintResult = cylAnimatedItemResolveTint(input);
     if (result.kind === 'icon') {
       return cylTintColorFilter(this.selectedIndex === index ? this.cylTabSelectedIconColor(index) : this.cylTabNormalIconColor(index));

@@ -284,6 +284,11 @@ Component({
      * [CN] 禁用优先于图片（iOS 的 `disabledWinsImage`）：`selectedImage` 仅在选中且可用时显示；默认关闭。
      */
     disabledWinsImage: { type: Boolean, value: false },
+    // [EN] iOS `showsOutlineWhenIncreaseContrast` / `respectsReduceMotion` (default false), kept for API parity so a host can turn them on. No effect in a mini
+    //      program: the base library exposes no Increase Contrast or Reduce Motion setting. [CN] iOS 的 `showsOutlineWhenIncreaseContrast` / `respectsReduceMotion`
+    //      （默认 false），为 API 一致性保留，宿主可以打开。在小程序中不起作用：基础库没有提供「增强对比度」或「减弱动态效果」设置。
+    showsOutlineWhenIncreaseContrast: { type: Boolean, value: false },
+    respectsReduceMotion: { type: Boolean, value: false },
     /**
      * [EN] The title's color (any CSS color); '' keeps the inherited color.
      * [CN] 标题颜色（任意 CSS 颜色）；'' 时沿用继承的颜色。

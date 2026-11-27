@@ -53,6 +53,7 @@ export {
   cylAnimatedItemLottieColorCount, cylAnimatedItemLottieColorKind, cylAnimatedItemGifColorKind, CYL_COLOR_COUNT_ONE, CYL_COLOR_COUNT_MULTI,
   CYL_COLOR_COUNT_UNKNOWN, CYLAnimatedItemColorCountCache
 } from './src/main/ets/CYLAnimatedItemColorCount';
+export { cylAnimatedItemDetectColorKind } from './src/main/ets/CYLAnimatedItemColorCountLoader';
 export {
   CYLSVGALayout, CYLSVGATransform, CYLSVGAColor, CYLSVGAStyle, CYLSVGARect, CYLSVGAEllipse, CYLSVGAShape, CYLSVGAFrame,
   CYLSVGASprite, CYLSVGAMovie, cylLoadSVGAMovie, cylDecodeSVGAMovie

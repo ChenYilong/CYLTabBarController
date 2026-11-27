@@ -228,6 +228,15 @@ function cylKeyOfIdentifier(model, identifier) {
 /**
  * [EN] The bar's style type: the item style decides the glass capsule too. [CN] TabBar 的样式类型：Item 样式同时决定玻璃胶囊。
  */
+/**
+ * [EN] The unselected static icon tint of a tab: its own icon color; in FlatDesign without one (and not 'original'), the unselected title color
+ *      (owner decision D2, 2026-11-27). [CN] Tab 未选中静态图标的着色：自己的图标颜色；扁平样式下没有时（且不是 'original'）取未选中标题颜色（负责人决定 D2，2026-11-27）。
+ */
+function cylFlatUnselectedIconTint(item, styleType) {
+  if (item.iconTint || styleType !== 'flatDesign' || item.iconRenderingMode === 'original') return item.iconTint;
+  return item.titleColor || '#8E8E93';
+}
+
 function cylBarStyleType(itemStyle, styleType) {
   if (itemStyle === 'liquidGlass') {
     return 'liquidGlass';
@@ -647,6 +656,10 @@ Component({
       const color = selected ? item.selectedTitleColor : item.titleColor;
       const lottie = item.lottie;
       const isDarkBar = this.cylModel ? this.cylModel.isDark : false;
+      // [EN] FlatDesign (owner decision D2, 2026-11-27, as iOS, Android and HarmonyOS): an unselected static icon without an icon color takes the
+      //      unselected title color; 'original' never tints; the selected icon keeps its own colors.
+      // [CN] 扁平样式（负责人决定 D2，2026-11-27，与 iOS、Android、鸿蒙一致）：没有图标颜色的未选中静态图标取未选中标题颜色；'original' 从不着色；选中图标保持自身颜色。
+      const iconTint = cylFlatUnselectedIconTint(item, this.cylModel && this.cylModel.styleType);
       // [EN] The tab is drawn by cyl-tab-bar-item, with the iOS CYLFlatDesignTabBarItem property names.
       // [CN] Tab 由 cyl-tab-bar-item 绘制，使用 iOS CYLFlatDesignTabBarItem 的属性名。
       const itemProperties = {
@@ -659,7 +672,7 @@ Component({
         imageSize: item.imageSize ? `{${item.imageSize.width}, ${item.imageSize.height}}` : null,
         imageInsets: item.imageInsets,
         titlePositionAdjustment: item.titleOffset,
-        iconTint: item.iconTint,
+        iconTint,
         selectedIconTint: item.selectedIconTint,
         backgroundColor: item.backgroundColor,
         selectedBackgroundColor: item.selectedBackgroundColor,
@@ -677,7 +690,7 @@ Component({
         image: cylSlotImage(item, selected),
         imageStyle: item.imageStyle,
         imageSizeStyle: item.imageSize ? `width: ${item.imageSize.width}px; height: ${item.imageSize.height}px;` : '',
-        tint: selected ? item.selectedIconTint : item.iconTint,
+        tint: selected ? item.selectedIconTint : iconTint,
         titleStyle: `${item.titleStyle}${cylDeclaration('color', color)}${selected ? item.selectedTitleFontStyle : item.titleFontStyle}`,
         // [EN] cyl-tab-bar-item draws the background. [CN] 背景由 cyl-tab-bar-item 绘制。
         itemStyle: '',
