@@ -11,6 +11,7 @@ import com.chenyilong.cyldeallocblockexecutor.LifecycleCenter
 import com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
@@ -793,6 +794,48 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     internal var stackSelectedIconColor: Int? = null
         set(value) { field = value; applyIconColor() }
     private var appliesIconColor = false
+    private var appliedIconFilter: android.graphics.ColorFilter? = null
+    private var staticImageKinds: java.util.WeakHashMap<Drawable, CYLAnimationColorCount.Kind>? = null
+
+    /**
+     * [EN] Whether the static image follows the rendering mode as an animation does (2026-11-28; the owner asked why a ClassifyMenu tag, also a
+     *      CYLAnimatedItemView, did not follow the tint rule). With no explicit icon colour, `animationRenderingMode` (else the stack's, else `Automatic`)
+     *      decides: `Automatic` tints an image detected as one colour (`CYLAnimationColorCount.drawableKind`, the GIF counter) with `resolvedIconColor`
+     *      (built-ins included) through the contrast rule; `AlwaysTemplate` tints any image; `AlwaysOriginal` never. A multi-colour image keeps its colours.
+     *      A colour filter the host set on `iconView` itself is never replaced by this path. An explicit `iconColor` tints the image whole, as before.
+     *      True by default; a subclass that tints its own icon (the tab bar's button) returns false.
+     * [CN] 静态图片是否像动画一样遵循渲染方式（2026-11-28；所有者询问同为 CYLAnimatedItemView 的 ClassifyMenu 标签为何没有遵循着色规则）。没有显式图标颜色时由
+     *      `animationRenderingMode`（其次堆叠的，最后 `Automatic`）决定：`Automatic` 对检测为单色的图片（`CYLAnimationColorCount.drawableKind`，与 GIF 相同的计数）按
+     *      `resolvedIconColor`（含内置值）着色并经过对比度规则；`AlwaysTemplate` 对任何图片着色；`AlwaysOriginal` 从不着色。多色图片保持原色。宿主自己在 `iconView`
+     *      上设置的颜色滤镜不会被此路径替换。显式 `iconColor` 仍整体着色。默认为 true；自行为图标着色的子类（TabBar 的按钮）返回 false。
+     */
+    protected open val tintsStaticImageAutomatically: Boolean get() = true
+
+    /**
+     * [EN] The kind of the static image `drawable`, cached per drawable. [CN] 静态图片 `drawable` 的类型，按 drawable 缓存。
+     */
+    internal fun staticImageKind(drawable: Drawable): CYLAnimationColorCount.Kind {
+        val kinds = staticImageKinds ?: java.util.WeakHashMap<Drawable, CYLAnimationColorCount.Kind>().also { staticImageKinds = it }
+        return kinds.getOrPut(drawable) { CYLAnimationColorCount.drawableKind(drawable) }
+    }
+
+    /**
+     * [EN] The colour the rendering mode gives the shown static image when no explicit icon colour is set, or null (see [tintsStaticImageAutomatically]).
+     * [CN] 没有显式图标颜色时渲染方式给显示中的静态图片的颜色，没有时为 null（见 [tintsStaticImageAutomatically]）。
+     */
+    internal fun staticImageRenderingColor(configuration: Configuration = resources.configuration): Int? {
+        if (!tintsStaticImageAutomatically) return null
+        val shown = iconView.drawable ?: return null
+        val tints = when (animationRenderingMode ?: stackAnimationRenderingMode ?: CYLAnimationRenderingMode.Automatic) {
+            CYLAnimationRenderingMode.AlwaysOriginal -> false
+            CYLAnimationRenderingMode.AlwaysTemplate -> true
+            CYLAnimationRenderingMode.Automatic -> staticImageKind(shown) == CYLAnimationColorCount.Kind.OneColor
+        }
+        if (!tints) return null
+        val (color, level) = iconResolution(configuration) ?: return null
+        // [EN] The disabled look is never adapted, as for the animation. [CN] 与动画相同，禁用外观从不调整。
+        return if (level == ColorLevel.DisabledBuiltIn) color else adaptedIconColor(color, configuration)
+    }
 
     /**
      * [EN] The title color (iOS `itemAppearance.normal.titleColor`); null (default) keeps the text view's own color, or uses the
@@ -879,8 +922,9 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     }
 
     /**
-     * [EN] The built-in icon colour of a subclass (twin of [applyTitleTintColor]); it tints the animation (not the static image, tint spec v2).
-     * [CN] 子类的内置图标颜色（[applyTitleTintColor] 的对应项）；用于动画着色（不用于静态图片，着色规范 v2）。
+     * [EN] The built-in icon colour of a subclass (twin of [applyTitleTintColor]); it tints the animation and, since 2026-11-28, a one-colour static image
+     *      under `Automatic` ([tintsStaticImageAutomatically]).
+     * [CN] 子类的内置图标颜色（[applyTitleTintColor] 的对应项）；用于动画着色，自 2026-11-28 起也用于 `Automatic` 下的单色静态图片（[tintsStaticImageAutomatically]）。
      */
     protected fun applyIconTintColor(color: Int?) {
         subclassBuiltInIcon = color
@@ -1091,13 +1135,20 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     }
 
         private fun applyIconColor(configuration: Configuration = resources.configuration) {
+        // [EN] Explicit colour first (tints any image whole); else the rendering mode, unless the host put its own filter on the icon.
+        // [CN] 先用显式颜色（整体着色任何图片）；否则按渲染方式，除非宿主在图标上设置了自己的滤镜。
+        val foreignFilter = iconView.colorFilter != null && iconView.colorFilter !== appliedIconFilter
         val color = effectiveIconColor?.let { adaptedIconColor(it, configuration) }
+            ?: if (foreignFilter) null else staticImageRenderingColor(configuration)
         if (color != null) {
-            iconView.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+            val filter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
+            iconView.colorFilter = filter
+            appliedIconFilter = filter
             appliesIconColor = true
         } else if (appliesIconColor) {
-            // [EN] Only a filter this view set is cleared (a tab button sets its own). [CN] 只清除本视图设置的滤镜（Tab 按钮会设置自己的）。
-            iconView.clearColorFilter()
+            // [EN] Only a filter this view set is cleared (a tab button or a host sets its own). [CN] 只清除本视图设置的滤镜（Tab 按钮或宿主会设置自己的）。
+            if (!foreignFilter) iconView.clearColorFilter()
+            appliedIconFilter = null
             appliesIconColor = false
         }
         refreshAnimationTint(configuration)
@@ -1387,6 +1438,9 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val shown = countdownImage.takeIf { running } ?: selectedImage.takeIf { isSelected && !(disabledWinsImage && !isEnabled) } ?: image
         iconView.setImageDrawable(shown ?: placeholderIfNeeded())
         iconView.visibility = if (animationShows()) View.INVISIBLE else View.VISIBLE
+        // [EN] The shown image decides the static rendering mode (one colour or not), so a new image re-applies the icon colour.
+        // [CN] 显示的图片决定静态渲染方式（是否单色），所以换图后重新应用图标颜色。
+        if (tintsStaticImageAutomatically) applyIconColor()
     }
 
     // MARK: - Animation 动画

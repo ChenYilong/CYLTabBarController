@@ -137,6 +137,12 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
     override fun updateIcon() { /* [EN] See apply. [CN] 见 apply。 */ }
 
     /**
+     * [EN] The tab tints its own icon (`apply`, D2), so the component's static rendering mode stays off.
+     * [CN] Tab 自行为图标着色（`apply`，D2），所以组件的静态渲染方式关闭。
+     */
+    override val tintsStaticImageAutomatically: Boolean get() = false
+
+    /**
      * [EN] The tab bar makes the tab's animation view (`cyl_addTabBarItemAnimationWithURL`) and hands it to the component:
      *      `animationView` is `cyl_tabBarItemAnimationView` (docs/Animated-Item.md, task 4). Called with null when the
      *      animation is removed.

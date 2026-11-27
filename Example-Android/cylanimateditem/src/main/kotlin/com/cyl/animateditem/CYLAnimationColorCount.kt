@@ -1,6 +1,9 @@
 package com.cyl.animateditem
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
@@ -182,6 +185,44 @@ object CYLAnimationColorCount {
         for (count in buckets) if (count > largest) largest = count
         return if (largest >= GIF_ONE_COLOR_SHARE * visible) Kind.OneColor else Kind.MultiColor
     }
+
+    // MARK: - Static images 静态图片
+
+    /**
+     * [EN] The kind of a static image (2026-11-28, tint parity with the animations): `drawable` drawn into a bitmap of at most
+     *      [DRAWABLE_SCAN_SIZE] px on the longer side, then counted like a GIF frame ([gifKind]). A drawable without an intrinsic size
+     *      (a plain `ColorDrawable`) is undetectable. Draws a copy (`constantState.newDrawable()`) so the shown drawable keeps its bounds.
+     * [CN] 静态图片的类型（2026-11-28，与动画的着色规则一致）：把 `drawable` 绘制到长边最多 [DRAWABLE_SCAN_SIZE] px 的位图中，再按 GIF 帧的方式计数（[gifKind]）。
+     *      没有固有尺寸的 drawable（普通 `ColorDrawable`）无法检测。在副本（`constantState.newDrawable()`）上绘制，显示中的 drawable 保持原有边界。
+     */
+    @JvmStatic
+    fun drawableKind(drawable: Drawable): Kind {
+        val width = drawable.intrinsicWidth
+        val height = drawable.intrinsicHeight
+        if (width <= 0 || height <= 0) return Kind.Undetectable
+        val scale = minOf(1f, DRAWABLE_SCAN_SIZE.toFloat() / maxOf(width, height))
+        val w = maxOf(1, (width * scale).toInt())
+        val h = maxOf(1, (height * scale).toInt())
+        val copy = drawable.constantState?.newDrawable()?.mutate() ?: drawable
+        val saved = copy.copyBounds()
+        @Suppress("TooGenericExceptionCaught")
+        return try {
+            val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+            copy.setBounds(0, 0, w, h)
+            copy.draw(Canvas(bitmap))
+            val pixels = IntArray(w * h)
+            bitmap.getPixels(pixels, 0, w, 0, 0, w, h)
+            bitmap.recycle()
+            gifKind(pixels)
+        } catch (error: Exception) {
+            Kind.Undetectable
+        } finally {
+            if (copy === drawable) copy.bounds = saved
+        }
+    }
+
+    /** [EN] The longer side, in px, a static image is scanned at. [CN] 扫描静态图片时长边的像素数。 */
+    const val DRAWABLE_SCAN_SIZE: Int = 48
 
     // MARK: - Files 文件
 
