@@ -1,8 +1,8 @@
 /**
  * [EN] The example's playback controls (example/miniprogram/utils/cyl_item_players.js): Play all, Restart, speed and loop go
- *      through `cyl_player()` of each tab icon, with fake players on a fake tab bar. Run: `npm test`.
+ *      through `cylAnimatedItemPlayer()` of each tab icon, with fake players on a fake tab bar. Run: `npm test`.
  * [CN] 示例的播放控件（example/miniprogram/utils/cyl_item_players.js）：全部播放、重新播放、速度与循环都通过每个 Tab 图标的
- *      `cyl_player()`，在伪造的 TabBar 上使用伪造的播放器。运行：`npm test`。
+ *      `cylAnimatedItemPlayer()`，在伪造的 TabBar 上使用伪造的播放器。运行：`npm test`。
  */
 const test = require('node:test')
 const assert = require('node:assert/strict')
@@ -28,7 +28,7 @@ function fakeTabBar(specs, log) {
   const icons = {}
   const slots = specs.map(({ key, type, selected, item = true }) => {
     if (type !== undefined) {
-      icons[key] = { data: { selected }, cyl_player: (() => { const p = fakePlayer(type, log, key); return () => p })() }
+      icons[key] = { data: { selected }, cylAnimatedItemPlayer: (() => { const p = fakePlayer(type, log, key); return () => p })() }
     }
     return { key, item }
   })

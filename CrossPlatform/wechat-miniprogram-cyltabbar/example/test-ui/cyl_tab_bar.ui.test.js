@@ -217,7 +217,7 @@ test('the playback controls reach the bar: speed, loop, Play all', async () => {
       const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
       bar.cylSetAnimationSpeed(2);
       bar.cylSetAnimationLoop(true);
-      bar.cyl_playAll();
+      bar.cylTabBarPlayAll();
       setTimeout(() => resolve({
         speed: bar.data.animationSpeed,
         loop: bar.data.animationLoop,
@@ -362,7 +362,7 @@ test('looping icons stay one layer and keep playing during a page scroll (WeChat
     const pages = getCurrentPages();
     const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
     bar.cylSetAnimationLoop(true);
-    bar.cyl_playAll();
+    bar.cylTabBarPlayAll();
   });
   try {
     await miniProgram.evaluate(() => { wx.pageScrollTo({ scrollTop: 1380, duration: 3000 }); });

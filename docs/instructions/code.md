@@ -73,7 +73,11 @@ by tag and kept under 200 lines: see [instructions.md](instructions.md)).
       prefix.
     - Public methods of a WeChat Mini Program component instance: keep a prefix, spelled `cylFoo` (they share the
       instance namespace with the framework's own methods and behaviours, so a same-named method silently shadows
-      them).
+      them). **When `cylFoo` is already taken (owner, 2026-11-28, N4): `cyl` + module name + the original method name**,
+      so the module name is inserted and the clash goes away: `cylBadgeFoo`, `cylAnimatedItemPlayer`,
+      `cylTabBarPlayAll`. The module is the component or library that owns the method (`Badge`, `AnimatedItem`,
+      `TabBar`, `Lottie`). Apply the same style on any platform where a prefixed name clashes, and never add a suffix
+      or a digit to dodge a clash.
     - No prefix: members of our own types on every platform, ArkTS APIs (ArkTS cannot extend system components or
       prototypes), TypeScript / React Native props and ES module members, Dart library members. Global names keep a
       prefix (Android resources, channel and native module names, component tags, CSS classes, event names, storage

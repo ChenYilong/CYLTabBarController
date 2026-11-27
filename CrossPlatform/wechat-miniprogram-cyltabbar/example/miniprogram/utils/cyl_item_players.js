@@ -1,9 +1,9 @@
 /**
  * [EN] The playback controls of the example (Play all, Restart, speed, loop) go through the engine API of every tab icon,
- *      `cyl_player()` of its cyl-animated-item (docs/Animated-Item.md, "Engine API across platforms"), the mini program
+ *      `cylAnimatedItemPlayer()` of its cyl-animated-item (docs/Animated-Item.md, "Engine API across platforms"), the mini program
  *      counterpart of the HarmonyOS `CYLAnimatedItemPlayer`: no control reaches into an engine component. A player that
  *      cannot do something (`supportsSpeed`, `supportsLoops`) ignores the call, so GIF icons keep their own speed.
- * [CN] 示例的播放控件（全部播放、重新播放、速度、循环）都通过每个 Tab 图标的引擎 API，即其 cyl-animated-item 的 `cyl_player()`
+ * [CN] 示例的播放控件（全部播放、重新播放、速度、循环）都通过每个 Tab 图标的引擎 API，即其 cyl-animated-item 的 `cylAnimatedItemPlayer()`
  *      （docs/Animated-Item.md「Engine API across platforms」），对应鸿蒙的 `CYLAnimatedItemPlayer`：任何控件都不直接操作引擎组件。
  *      做不到某件事的播放器会忽略该调用，因此 GIF 图标保持自己的速度。
  */
@@ -18,8 +18,8 @@ function cylItemPlayers(tabBar) {
   slots.forEach((slot) => {
     const tabItem = slot.item ? tabBar.selectComponent(`#cyl-item-${slot.key}`) : null;
     const icon = tabItem && typeof tabItem.selectComponent === 'function' ? tabItem.selectComponent('#cyl-item-icon') : null;
-    if (icon && typeof icon.cyl_player === 'function') {
-      entries.push({ key: slot.key, selected: Boolean(icon.data?.selected), player: icon.cyl_player() });
+    if (icon && typeof icon.cylAnimatedItemPlayer === 'function') {
+      entries.push({ key: slot.key, selected: Boolean(icon.data?.selected), player: icon.cylAnimatedItemPlayer() });
     }
   });
   return entries;

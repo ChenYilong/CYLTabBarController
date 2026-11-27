@@ -21,10 +21,10 @@
     <view class="cyl-row {{icons === 'images' ? 'cyl-row-selected' : ''}}" bindtap="cyl_icons" data-value="images" aria-role="button" aria-selected="{{icons === 'images'}}" aria-label="{{texts['Images']}}"><text aria-hidden="true">{{texts['Images']}}</text></view>
   </view>
 
-  <!-- [EN] Playback controls through cyl_player(): Play all, Restart, speed, loop; they combine and apply live. [CN] 播放控件（通过 cyl_player()）：全部播放、重新播放、速度、循环；组合使用，实时生效。 -->
+  <!-- [EN] Playback controls through cylAnimatedItemPlayer(): Play all, Restart, speed, loop; they combine and apply live. [CN] 播放控件（通过 cylAnimatedItemPlayer()）：全部播放、重新播放、速度、循环；组合使用，实时生效。 -->
   <text class="cyl-section-title" aria-role="heading">{{texts['Playback']}}</text>
   <view class="cyl-section">
-    <view class="cyl-row cyl-row-action" bindtap="cyl_playAll" aria-role="button" aria-label="{{texts['Play all']}}"><text aria-hidden="true">{{texts['Play all']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cylTabBarPlayAll" aria-role="button" aria-label="{{texts['Play all']}}"><text aria-hidden="true">{{texts['Play all']}}</text></view>
     <view class="cyl-row cyl-row-action" bindtap="cyl_restart" aria-role="button" aria-label="{{texts['Restart']}}"><text aria-hidden="true">{{texts['Restart']}}</text></view>
     <view class="cyl-row cyl-row-slider">
       <text aria-hidden="true">{{texts['Speed']}}</text>
@@ -53,7 +53,7 @@
 
   <text class="cyl-section-title" aria-role="heading">{{texts['Item style']}}</text>
   <view class="cyl-section">
-    <view wx:for="{{itemStyles}}" wx:key="*this" class="cyl-row {{currentItemStyle === item ? 'cyl-row-selected' : ''}}" bindtap="cyl_itemStyle" data-value="{{item}}" aria-role="button" aria-selected="{{currentItemStyle === item}}" aria-label="{{item ? item : texts['Follow the style']}}">
+    <view wx:for="{{itemStyles}}" wx:key="*this" class="cyl-row {{currentItemStyle === item ? 'cyl-row-selected' : ''}}" bindtap="cylTabBarItemStyle" data-value="{{item}}" aria-role="button" aria-selected="{{currentItemStyle === item}}" aria-label="{{item ? item : texts['Follow the style']}}">
       <text aria-hidden="true">{{item ? item : texts['Follow the style']}}</text>
     </view>
   </view>

@@ -1,11 +1,11 @@
 /**
  * [EN] The engine contract of HarmonyOS in the mini program (docs/Animated-Item.md, "Engine API across platforms"): the player
- *      (`cyl_animated_item_player.js`, a pure class) with a fake host, then `cyl_player()` of cyl-animated-item over fake engine
+ *      (`cyl_animated_item_player.js`, a pure class) with a fake host, then `cylAnimatedItemPlayer()` of cyl-animated-item over fake engine
  *      components in a small fake of the mini program `Component()` runtime: the members, host-driven mode
  *      (`drivesAnimationPlayback` false applies none of the default rules) and `restartToken`. Run: `npm test`.
  * [CN] 鸿蒙的引擎约定在小程序中的实现（docs/Animated-Item.md「Engine API across platforms」）：先用模拟宿主测试播放器
  *      （`cyl_animated_item_player.js`，纯类），再在模拟的小程序 `Component()` 运行时中，用模拟的引擎组件测试 cyl-animated-item 的
- *      `cyl_player()`：各成员、宿主驱动模式（`drivesAnimationPlayback` 为 false 时不应用任何默认规则）与 `restartToken`。运行：`npm test`。
+ *      `cylAnimatedItemPlayer()`：各成员、宿主驱动模式（`drivesAnimationPlayback` 为 false 时不应用任何默认规则）与 `restartToken`。运行：`npm test`。
  */
 const test = require('node:test')
 const assert = require('node:assert/strict')
@@ -164,11 +164,11 @@ function cylEngine(names) {
 
 const cylSeekEngine = () => cylEngine(['cylPlayFromStart', 'cylPause', 'cylSetProgress', 'cylStop', 'cylSetSpeed'])
 
-test('cyl_player() is one object per item and plays through the engine once ready', () => {
+test('cylAnimatedItemPlayer() is one object per item and plays through the engine once ready', () => {
   const engine = cylSeekEngine()
   const { item } = cylMount({ animationUrl: 'a.svga', autoplay: false, selected: false }, engine)
-  const player = item.cyl_player()
-  assert.equal(item.cyl_player(), player)
+  const player = item.cylAnimatedItemPlayer()
+  assert.equal(item.cylAnimatedItemPlayer(), player)
   assert.equal(player.type, 'svga')
   player.play()
   assert.equal(player.isPlaying, true, 'a play waiting for the file counts')
@@ -181,7 +181,7 @@ test('stopAtProgress pauses first, then seeks, and isPlaying turns false (SVGA a
   const engine = cylSeekEngine()
   const { item } = cylMount({ animationUrl: 'a.pag', autoplay: false }, engine)
   item.cylOnAnimationReady()
-  const player = item.cyl_player()
+  const player = item.cylAnimatedItemPlayer()
   player.play()
   engine.calls.length = 0
   player.stopAtProgress(0.5)
@@ -192,24 +192,24 @@ test('stopAtProgress pauses first, then seeks, and isPlaying turns false (SVGA a
 
 test('Lottie seeks through cylGoToAndStop, Rive rests through cylStop', () => {
   const lottie = cylEngine(['cylPause', 'cylGoToAndStop'])
-  lottie.cyl_animation = () => ({ totalFrames: 11 })
+  lottie.cylLottieAnimation = () => ({ totalFrames: 11 })
   const a = cylMount({ animationData: { v: '5', layers: [] }, autoplay: false }, lottie)
   a.item.cylOnAnimationReady()
   lottie.calls.length = 0
-  a.item.cyl_player().stopAtProgress(0.3)
+  a.item.cylAnimatedItemPlayer().stopAtProgress(0.3)
   assert.deepEqual(lottie.calls, [['pause'], ['goToAndStop', 3, true]])
   const rive = cylEngine(['cylPause', 'cylStop'])
   const b = cylMount({ animationUrl: 'a.riv', autoplay: false }, rive)
   b.item.cylOnAnimationReady()
   rive.calls.length = 0
-  assert.equal(b.item.cyl_player().supportsProgress, false)
-  b.item.cyl_player().stopAtProgress(0.3)
+  assert.equal(b.item.cylAnimatedItemPlayer().supportsProgress, false)
+  b.item.cylAnimatedItemPlayer().stopAtProgress(0.3)
   assert.deepEqual(rive.calls, [['pause'], ['stop']])
 })
 
 test('speed, loops and colors go to the item properties that the engine receives', () => {
   const { item } = cylMount({ animationUrl: 'a.json', autoplay: false }, cylSeekEngine())
-  const player = item.cyl_player()
+  const player = item.cylAnimatedItemPlayer()
   player.speed = 2
   player.loops = true
   player.applyColors(new Map([['k', '#112233']]))
@@ -226,7 +226,7 @@ test('onEnded runs when a play-once pass completes, with animationcomplete still
   const engine = cylSeekEngine()
   const { item } = cylMount({ animationUrl: 'a.svga', autoplay: false }, engine)
   item.cylOnAnimationReady()
-  const player = item.cyl_player()
+  const player = item.cylAnimatedItemPlayer()
   let ended = 0
   player.onEnded(() => { ended++ })
   player.play()
@@ -243,7 +243,7 @@ test('onEnded runs when a play-once pass completes, with animationcomplete still
 
 test('a timed GIF pass ends through the player too, and a GIF has no speed', () => {
   const { item } = cylMount({ animationUrl: 'a.gif', gifFirstFrame: 'f.png', gifLastFrame: 'l.png', gifDuration: 10, autoplay: false }, null)
-  const player = item.cyl_player()
+  const player = item.cylAnimatedItemPlayer()
   assert.equal(player.type, 'gif')
   assert.equal(player.supportsSpeed, false)
   assert.equal(player.supportsLoops, true)
@@ -316,7 +316,7 @@ test('host-driven: a selection change, the ready of the engine and restartToken 
 test('host-driven: loop and speed from the host reach the engine, play and stop work, and a pending play is kept', () => {
   const engine = cylSeekEngine()
   const { item } = cylMount({ animationUrl: 'a.svga', autoplay: true, drivesAnimationPlayback: false, selected: true }, engine)
-  const player = item.cyl_player()
+  const player = item.cylAnimatedItemPlayer()
   player.play()
   item.cylOnAnimationReady()
   assert.deepEqual(engine.calls, [['playFromStart']], 'the host\'s own play waited for the file and ran; nothing else did')
@@ -348,7 +348,7 @@ test('detach drops the onEnded callback', () => {
   const { item, detach } = cylMount({ animationUrl: 'a.svga', autoplay: false }, engine)
   item.cylOnAnimationReady()
   let ended = 0
-  item.cyl_player().onEnded(() => { ended++ })
+  item.cylAnimatedItemPlayer().onEnded(() => { ended++ })
   detach()
   item.cylOnAnimationComplete({})
   assert.equal(ended, 0)

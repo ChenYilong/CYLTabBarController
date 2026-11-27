@@ -48,7 +48,7 @@ Component({
     cylSetProgress: cylNothing,
     cylSetSpeed: cylNothing,
     /** [EN] Always null: no animation. [CN] 始终为 null：没有动画。 */
-    cyl_animation() {
+    cylLottieAnimation() {
       return null
     },
   },

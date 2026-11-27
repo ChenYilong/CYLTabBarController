@@ -1,5 +1,5 @@
 /**
- * [EN] The player of one cyl-animated-item (`item.cyl_player()`): the mini program counterpart of HarmonyOS
+ * [EN] The player of one cyl-animated-item (`item.cylAnimatedItemPlayer()`): the mini program counterpart of HarmonyOS
  *      `CYLAnimatedItemPlayer` (`cylanimateditem/src/main/ets/CYLAnimatedItemPlayer.ts`, the reference of the engine contract
  *      in docs/Animated-Item.md, "Engine API across platforms"). A host that drives playback itself (a tag's resting
  *      progress, Play all) sets `drivesAnimationPlayback` to false and plays through it. Pure JavaScript without any wx API,
@@ -11,7 +11,7 @@
  *      It is built over what the engine components already expose: `cylPlayFromStart`, `cylPause`, `cylSetProgress`
  *      (Lottie: `cylGoToAndStop`), `cylStop` and `cylSetSpeed` (through the item: `playAnimation()`, `cylStopAtProgress()`,
  *      and the item's `speed`, `loop` and `colors` properties, which the item hands to the engine).
- * [CN] 一个 cyl-animated-item 的播放器（`item.cyl_player()`）：对应鸿蒙的 `CYLAnimatedItemPlayer`
+ * [CN] 一个 cyl-animated-item 的播放器（`item.cylAnimatedItemPlayer()`）：对应鸿蒙的 `CYLAnimatedItemPlayer`
  *      （`cylanimateditem/src/main/ets/CYLAnimatedItemPlayer.ts`，docs/Animated-Item.md「Engine API across platforms」中引擎约定的基准）。
  *      自行驱动播放的宿主（标签的静止进度、全部播放）把 `drivesAnimationPlayback` 设为 false，并通过它播放。纯 JavaScript，不使用任何
  *      wx API，在 Node 中测试（test/cyl_animated_item_player.test.js）。

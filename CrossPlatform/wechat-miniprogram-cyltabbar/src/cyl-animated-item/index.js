@@ -119,12 +119,12 @@ Component({
     /**
      * [EN] Whether the item applies the default playback rules (HarmonyOS `drivesAnimationPlayback`, default true): selected plays
      *      once from the start, unselected rests, `restartToken` plays again, `autoplay` plays on ready. false: the host drives
-     *      playback itself (resting progress, Play all) through `cyl_player()`; the item only hands out the player and applies
+     *      playback itself (resting progress, Play all) through `cylAnimatedItemPlayer()`; the item only hands out the player and applies
      *      none of those rules (a selection change touches no engine, the engine never autoplays, `restartToken` is ignored).
      *      `playAnimation()`, `restartAnimation()` and `stopAnimation()` still do what they are called for. Set it when the
      *      item is created.
      * [CN] 条目是否应用默认播放规则（鸿蒙的 `drivesAnimationPlayback`，默认 true）：选中时从头播放一次，未选中时静止，`restartToken`
-     *      再次播放，`autoplay` 在就绪时播放。false：宿主通过 `cyl_player()` 自行驱动播放（静止进度、全部播放）；条目只交出播放器，
+     *      再次播放，`autoplay` 在就绪时播放。false：宿主通过 `cylAnimatedItemPlayer()` 自行驱动播放（静止进度、全部播放）；条目只交出播放器，
      *      不应用上述任何规则（选中状态变化不触及引擎，引擎不自动播放，忽略 `restartToken`）。`playAnimation()`、`restartAnimation()`、
      *      `stopAnimation()` 仍按调用执行。请在创建条目时设置。
      */
@@ -425,7 +425,7 @@ Component({
       this.cylUpdate()
     },
     'countdownCacheKey, itemStyle': function (key, itemStyle) {
-      if (itemStyle === 'countdown') this.cyl_countdown().setCacheKey(key)
+      if (itemStyle === 'countdown') this.cylAnimatedItemCountdown().setCacheKey(key)
     },
     'showsImageWhenAnimationEnds': function (shows) {
       if (!shows) this.cylShowAnimationAgain()
@@ -500,7 +500,7 @@ Component({
       }
       if (typeof wx !== 'undefined' && typeof wx.onThemeChange === 'function') wx.onThemeChange(this.cylThemeListener)
       // [EN] A countdown kept before a restart continues. [CN] 重启之前保存的倒计时继续。
-      if (this.data.itemStyle === 'countdown') this.cyl_countdown().setCacheKey(this.data.countdownCacheKey)
+      if (this.data.itemStyle === 'countdown') this.cylAnimatedItemCountdown().setCacheKey(this.data.countdownCacheKey)
       this.cylRestartToken = this.data.restartToken
       this.cylAnimationRestartToken = this.data.animationRestartToken
       this.cylUpdate()
@@ -566,7 +566,7 @@ Component({
      * [EN] The countdown state machine of this item, made on first use with the local clock and the mini program storage.
      * [CN] 本条目的倒计时状态机，首次使用时以本地时钟与小程序存储创建。
      */
-    cyl_countdown() {
+    cylAnimatedItemCountdown() {
       if (this.cylCountdown) return this.cylCountdown
       const storage = typeof wx !== 'undefined' && typeof wx.getStorageSync === 'function' ? {
         get: (name) => { try { return wx.getStorageSync(name) } catch { return null } },
@@ -596,7 +596,7 @@ Component({
 
     cylStartCountdownTimer() {
       if (this.cylCountdownTimer) return
-      this.cylCountdownTimer = setInterval(() => this.cyl_countdown().refresh(), CYL_COUNTDOWN_TICK_INTERVAL)
+      this.cylCountdownTimer = setInterval(() => this.cylAnimatedItemCountdown().refresh(), CYL_COUNTDOWN_TICK_INTERVAL)
     },
 
     cylStopCountdownTimer() {
@@ -612,19 +612,19 @@ Component({
     startCountdown(seconds) {
       if (this.data.itemStyle !== 'countdown') {
         this.setData({ itemStyle: 'countdown' })
-        this.cyl_countdown().setCacheKey(this.data.countdownCacheKey)
+        this.cylAnimatedItemCountdown().setCacheKey(this.data.countdownCacheKey)
       }
-      this.cyl_countdown().startFor(Number(seconds) > 0 ? Number(seconds) : this.data.countdownDuration)
+      this.cylAnimatedItemCountdown().startFor(Number(seconds) > 0 ? Number(seconds) : this.data.countdownDuration)
     },
 
     /** [EN] Stops and goes idle, with no finish event. [CN] 停止并回到待机，不触发结束事件。 */
     resetCountdown() {
-      this.cyl_countdown().reset()
+      this.cylAnimatedItemCountdown().reset()
     },
 
     /** [EN] Reads the clock now (done by the item itself). [CN] 立即读取时钟（条目自己会做）。 */
     refreshCountdown() {
-      this.cyl_countdown().refresh()
+      this.cylAnimatedItemCountdown().refresh()
     },
 
     cylUpdate() {
@@ -883,8 +883,8 @@ Component({
       if (!engine) return
       if (typeof engine.cylSetProgress === 'function') {
         engine.cylSetProgress(progress)
-      } else if (typeof engine.cylGoToAndStop === 'function' && typeof engine.cyl_animation === 'function') {
-        const player = engine.cyl_animation()
+      } else if (typeof engine.cylGoToAndStop === 'function' && typeof engine.cylLottieAnimation === 'function') {
+        const player = engine.cylLottieAnimation()
         const last = Math.max(0, (player?.totalFrames || 1) - 1)
         engine.cylGoToAndStop(Math.round(last * progress), true)
       } else if (typeof engine.cylRest === 'function') {
@@ -1030,7 +1030,7 @@ Component({
      *      `supportsSpeed` / `supportsLoops` / `supportsProgress`、`isPlaying`、`onEnded(cb)`、`supportsColors` / `applyColors(colors)`。
      *      播放 `drivesAnimationPlayback` 关闭的条目的方式；开启时也可用（默认规则通过同一个条目播放）。`animationready` 表示引擎已就绪。
      */
-    cyl_player() {
+    cylAnimatedItemPlayer() {
       if (this.cylPlayer) return this.cylPlayer
       this.cylPlayer = new CYLAnimatedItemPlayer({
         engine: () => this.cylAnimationView(),

@@ -533,7 +533,7 @@ Component({
       const slots = model.items.map((item) => this.cylSlot(item, selected));
       if (model.plusButton) {
         slots.splice(model.plusButton.index, 0, this.cylPlusSlot(model.plusButton, selected,
-          this.cyl_itemStyle(model) === 'liquidGlass' ? CYL_LIQUID_GLASS_BAR_HEIGHT : cylBarHeight(this.data.tabBarHeight),
+          this.cylTabBarItemStyle(model) === 'liquidGlass' ? CYL_LIQUID_GLASS_BAR_HEIGHT : cylBarHeight(this.data.tabBarHeight),
           cylTitleLine(slots)));
       }
       slots.forEach((slot, index) => {
@@ -543,7 +543,7 @@ Component({
       });
       // [EN] One enum for the bar and its items: the item style decides the glass capsule too.
       // [CN] TabBar 与 Item 共用一个枚举：Item 样式同时决定玻璃胶囊。
-      const itemStyle = this.cyl_itemStyle(model);
+      const itemStyle = this.cylTabBarItemStyle(model);
       const styleType = cylBarStyleType(itemStyle, model.styleType);
       this.cylWriteData({
         ...this.cylSelectionMirror(model, selected),
@@ -949,7 +949,7 @@ Component({
         return;
       }
       clearTimeout(this.cylAnimationTimer);
-      const fireworks = model.playsFireworks && !item?.tapAnimation ? this.cyl_fireworks(key) : null;
+      const fireworks = model.playsFireworks && !item?.tapAnimation ? this.cylTabBarFireworks(key) : null;
       this.setData({ cylAnimatingIdentifier: '', cylFireworks: null }, () => {
         this.setData({ cylAnimatingIdentifier: key, cylAnimatingName: name, cylFireworks: fireworks });
         this.cylAnimationTimer = setTimeout(() => this.setData({ cylAnimatingIdentifier: '', cylFireworks: null }),
@@ -977,7 +977,7 @@ Component({
      *      fireworks image) that gather on the icon after the animation, then burst out.
      * [CN] CYLTabButtonAnimation 的烟花（playsFireworks）：10 个使用图标选中颜色（或烟花图片）的粒子，动画后聚到图标上，然后散开。
      */
-    cyl_fireworks(key) {
+    cylTabBarFireworks(key) {
       const model = this.cylModel;
       const plus = model.plusButton;
       const item = plus && key === plus.key ? plus : model.items.find((candidate) => candidate.key === key);
@@ -1242,7 +1242,7 @@ Component({
      * [CN] 当前使用的 Item 样式：cylSetItemStyle() 设置的，否则为 `itemStyle` 属性，否则由 CYLTabBarControllerStyleType
      *      推出。
      */
-    cyl_itemStyle(model) {
+    cylTabBarItemStyle(model) {
       const requested = this.cylRequestedItemStyle !== undefined ? this.cylRequestedItemStyle : this.data.itemStyle;
       if (requested !== '' && requested !== null && requested !== undefined) {
         return cylTabBarItemStyle(requested);
@@ -1255,7 +1255,7 @@ Component({
      *      controls of the examples call it ("Play all").
      * [CN] 让所有 Tab 图标动画从进度 0 播放一次（开启 `animationLoop` 时重复）。示例的播放控件调用它（"Play all"）。
      */
-    cyl_playAll() {
+    cylTabBarPlayAll() {
       (this.data.cylSlots || []).forEach((slot) => {
         const item = slot.item ? this.selectComponent(`#cyl-item-${slot.key}`) : null;
         if (item && typeof item.cylPlayAnimation === 'function') {

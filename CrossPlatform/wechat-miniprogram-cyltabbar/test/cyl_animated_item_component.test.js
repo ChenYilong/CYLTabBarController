@@ -69,7 +69,7 @@ test('without autoplay the engine rests at restingProgress, and at 1 while selec
 })
 
 test('Lottie rests through cylGoToAndStop on its frames, and plays its own copy of the data', () => {
-  const engine = cylEngine((r) => ({ cylGoToAndStop: r('goToAndStop'), cyl_animation: () => ({ totalFrames: 11 }) }))
+  const engine = cylEngine((r) => ({ cylGoToAndStop: r('goToAndStop'), cylLottieAnimation: () => ({ totalFrames: 11 }) }))
   const data = { v: '5.7', layers: [] }
   const { item } = cylMount({ animationData: data, autoplay: false, restingProgress: 0.3 }, engine)
   assert.notEqual(item.data.lottieData, data)
@@ -234,7 +234,7 @@ test('a GIF image reports the end of its pass (animationcomplete, the player onE
   }) }
   const query = { select: () => query, fields: () => query, exec: (callback) => callback([{ node: canvas }]) }
   const { item, detach } = cylMount({ image: '/shared/tab_fire.gif', drivesAnimationPlayback: false }, null, { createSelectorQuery: () => query })
-  const player = item.cyl_player()
+  const player = item.cylAnimatedItemPlayer()
   let ended = 0
   player.onEnded(() => { ended += 1 })
   assert.equal(player.supportsLoops, true)
