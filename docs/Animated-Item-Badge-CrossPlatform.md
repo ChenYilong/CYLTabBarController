@@ -1,5 +1,5 @@
-# [CN]动效 item 角标：其他平台（实施指南）
-# [EN]Animated item badges: the other platforms (implementation guide)
+# [CN]CYLBadge 抽离与动效 item 角标：其他平台（实施指南）
+# [EN]Extracting CYLBadge and badging animated items: the other platforms (implementation guide)
 
 <!-- bound-classes: none -->
 <!-- binding:start -->
@@ -13,7 +13,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 状态：**设计，尚未实现**。本文把 iOS 设计（[Animated-Item-Badge.md](Animated-Item-Badge.md)）迁移到 Android、鸿蒙、微信小程序、React Native 与 Flutter，并给每个平台的初级开发者写出实施步骤。**API、处理策略与验收标准以 iOS 文档为准**；两份文档不一致时，以 iOS 文档为准，并在同一次修改中更正本文。 | Status: **design, not implemented**. This document moves the iOS design ([Animated-Item-Badge.md](Animated-Item-Badge.md)) to Android, HarmonyOS, the WeChat Mini Program, React Native and Flutter, with implementation steps for a junior developer on each platform. **The API, the strategy and the acceptance criteria come from the iOS document**; when the two disagree, the iOS document wins, and this one is corrected in the same change. |
+| 状态：**设计，尚未实现**。本任务分两个阶段：**阶段 1：抽离 CYLBadge**（主要任务）；**阶段 2：CYLAnimatedItemView 支持角标**。所有平台都已有角标代码，大多已有 CYLBadge：本任务**不是从零实现角标**。每个平台先查看现有实现，再按"决策规则"选择路径。API、处理策略与验收标准以 iOS 文档（[Animated-Item-Badge.md](Animated-Item-Badge.md)）为准；两份文档不一致时以 iOS 为准，并在同一次修改中更正本文。 | Status: **design, not implemented**. The task has two phases: **phase 1, extract CYLBadge** (the main task); **phase 2, CYLAnimatedItemView supports badges**. Every platform already has badge code, most already have a CYLBadge: this task **does not implement badges from scratch**. On each platform, read the existing implementation first, then pick the path from the "Decision rule". The API, strategy and acceptance criteria come from the iOS document ([Animated-Item-Badge.md](Animated-Item-Badge.md)); when the two disagree, iOS wins, and this one is corrected in the same change. |
 
 ## [CN]目录
 ## [EN]Contents
@@ -24,18 +24,29 @@
 | 中文 | English |
 |:---|:---|
 | [任务记录](#cn任务记录) | [Task log](#entask-log) |
+| [决策规则](#cn决策规则) | [Decision rule](#endecision-rule) |
+| [各平台现状（2026-11-27 查得）](#cn各平台现状2026-11-27-查得) | [What each platform has today (checked 2026-11-27)](#enwhat-each-platform-has-today-checked-2026-11-27) |
+| [对齐的目标：iOS 角标 API](#cn对齐的目标ios-角标-api) | [What to align with: the iOS badge API](#enwhat-to-align-with-the-ios-badge-api) |
+| [与 iOS 的差异（第 0 步更新）](#cn与-ios-的差异第-0-步更新) | [Differences from iOS (updated in step 0)](#endifferences-from-ios-updated-in-step-0) |
 | [规则：每个平台一样](#cn规则每个平台一样) | [Rules: the same on every platform](#enrules-the-same-on-every-platform) |
-| [统一 API](#cn统一-api) | [The common API](#enthe-common-api) |
+| [阶段 1 验收标准（抽离）](#cn阶段-1-验收标准抽离) | [Phase 1 acceptance criteria (extraction)](#enphase-1-acceptance-criteria-extraction) |
+| [统一 API（阶段 2 新增部分）](#cn统一-api阶段-2-新增部分) | [The common API (what phase 2 adds)](#enthe-common-api-what-phase-2-adds) |
 | [统一策略](#cn统一策略) | [The common strategy](#enthe-common-strategy) |
 | [各平台的分层](#cn各平台的分层) | [Layering per platform](#enlayering-per-platform) |
-| [验收标准](#cn验收标准) | [Acceptance criteria](#enacceptance-criteria) |
-| [Android 实施指南](#cnandroid-实施指南) | [Android implementation guide](#enandroid-implementation-guide) |
-| [鸿蒙实施指南](#cn鸿蒙实施指南) | [HarmonyOS implementation guide](#enharmonyos-implementation-guide) |
-| [微信小程序实施指南](#cn微信小程序实施指南) | [WeChat Mini Program implementation guide](#enwechat-mini-program-implementation-guide) |
-| [React Native 实施指南](#cnreact-native-实施指南) | [React Native implementation guide](#enreact-native-implementation-guide) |
-| [Flutter 实施指南](#cnflutter-实施指南) | [Flutter implementation guide](#enflutter-implementation-guide) |
+| [阶段 2 验收标准（item 支持）](#cn阶段-2-验收标准item-支持) | [Phase 2 acceptance criteria (item support)](#enphase-2-acceptance-criteria-item-support) |
+| [Android 实施指南（路径 A：先对齐，再抽离）](#cnandroid-实施指南路径-a先对齐再抽离) | [Android implementation guide (path A: align, then extract)](#enandroid-implementation-guide-path-a-align-then-extract) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [阶段 1：抽离 CYLBadge](#cn阶段-1抽离-cylbadge) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Phase 1: extract CYLBadge](#enphase-1-extract-cylbadge) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [阶段 2：CYLAnimatedItemView 支持](#cn阶段-2cylanimateditemview-支持) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Phase 2: CYLAnimatedItemView support](#enphase-2-cylanimateditemview-support) |
+| [鸿蒙实施指南（路径 A：先对齐，再抽离）](#cn鸿蒙实施指南路径-a先对齐再抽离) | [HarmonyOS implementation guide (path A: align, then extract)](#enharmonyos-implementation-guide-path-a-align-then-extract) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [阶段 1：抽离 CYLBadge](#cn阶段-1抽离-cylbadge-1) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Phase 1: extract CYLBadge](#enphase-1-extract-cylbadge-1) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [阶段 2：CYLAnimatedItemView 支持](#cn阶段-2cylanimateditemview-支持-1) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Phase 2: CYLAnimatedItemView support](#enphase-2-cylanimateditemview-support-1) |
+| [微信小程序实施指南（路径 B：先抽离，再对齐）](#cn微信小程序实施指南路径-b先抽离再对齐) | [WeChat Mini Program implementation guide (path B: extract, then align)](#enwechat-mini-program-implementation-guide-path-b-extract-then-align) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [阶段 1：抽离旧的角标实现，再对齐 iOS](#cn阶段-1抽离旧的角标实现再对齐-ios) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Phase 1: extract the old badge implementation, then align with iOS](#enphase-1-extract-the-old-badge-implementation-then-align-with-ios) |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ [阶段 2：cyl-animated-item 支持](#cn阶段-2cyl-animated-item-支持) | &nbsp;&nbsp;&nbsp;&nbsp;↳ [Phase 2: cyl-animated-item support](#enphase-2-cyl-animated-item-support) |
+| [React Native 实施指南（只有阶段 2）](#cnreact-native-实施指南只有阶段-2) | [React Native implementation guide (phase 2 only)](#enreact-native-implementation-guide-phase-2-only) |
+| [Flutter 实施指南（只有阶段 2）](#cnflutter-实施指南只有阶段-2) | [Flutter implementation guide (phase 2 only)](#enflutter-implementation-guide-phase-2-only) |
 | [顺序与分工](#cn顺序与分工) | [Order and who does what](#enorder-and-who-does-what) |
-| [平台差异](#cn平台差异) | [Platform differences](#enplatform-differences) |
+| [平台差异（待负责人同意）](#cn平台差异待负责人同意) | [Platform differences (waiting for the owner)](#enplatform-differences-waiting-for-the-owner) |
 | [平台验收记录](#cn平台验收记录) | [Platform acceptance log](#enplatform-acceptance-log) |
 | [所有平台的常见错误](#cn所有平台的常见错误) | [Common mistakes on every platform](#encommon-mistakes-on-every-platform) |
 
@@ -46,17 +57,82 @@
 
 | 中文 | English |
 |:---|:---|
-| 用户原话："为本文档增加验收标准，达到和临时方案截图一致的效果，但使用的是新的api。并新建文档，保留原名基础上后缀加crossplatform，将本次文档改造为，增加其他项目平台的初级程序员实现指导，api以及处理策略以本文档为准后迁移到其他平台。注意每个平台里的cylbadge 遵循一样的api设计及验收标准。" 本条按英文记录（见右列）。 | TODO, 20 / 100 (2026-11-27, branch `feat/harmony-animated-item-engines`, PR #824). The owner asks for a cross-platform version of the badge design: a junior developer's guide per platform, with the API and strategy of the iOS document moved over, and every platform's CYLBadge following the same API design and acceptance criteria. **Rubric (100)**: this guide 20; per platform, implemented and passing AC1–AC13 with evidence: Android 20, HarmonyOS 20, mini program 15, React Native 10, Flutter 10; the platform-differences table empty or approved by the owner 5. **Pass (60)**: the guide plus Android and HarmonyOS. Now: the guide only (20); iOS goes first ([Animated-Item-Badge.md](Animated-Item-Badge.md)). |
+| 用户原话（第 2 版）："更新你的文档，crossplatform 文档应遵循新的准则，本次主要任务是抽离cylbadge ，第二步骤支持cylanimateditemview。所有平台大部分已经存在旧的cylbadge，本次任务并不是从零开始实现cylbadge，先查看所在平台cylbadge现有实现。我们已知所有平台均有badge相关代码，大部分已经有了cylbadge。如果有了，cylbadge则先对齐Ios平台api后就抽离。如果没有cylbadge，就先抽离旧有的badge实现，之后再对齐iOS平台接口。之后为抽离的cylbadge完成cylanimateditemview相关api支持。" 本条按英文记录（见右列）。 | TODO, 20 / 100 (2026-11-27, branch `feat/harmony-animated-item-engines`, PR #824). Restructured into two phases with a per-platform decision rule. Existing implementations were checked (see "What each platform has today"): Android and HarmonyOS have a CYLBadge (path A: align with iOS, then extract); the mini program has badge code but no CYLBadge (path B: extract, then align); React Native and Flutter use the native badge (no extraction; phase 2 props only). Also fixed: the `animation` key values are the 10 `CYLBadgeAnimationType` names (v1 wrongly listed `rotation` / `spring`). **Rubric (100)**: this guide 20; phase 1 (extracted, aligned, P1 acceptance passed): Android 15, HarmonyOS 15, mini program 10; phase 2 (AC1–AC13 passed): Android 10, HarmonyOS 10, mini program 5, React Native 5, Flutter 5; platform differences approved 5. **Pass (60)**: the guide plus phase 1 on all three platforms and phase 2 on one. |
+| 用户原话（第 1 版）："为本文档增加验收标准，达到和临时方案截图一致的效果，但使用的是新的api。并新建文档，保留原名基础上后缀加crossplatform，将本次文档改造为，增加其他项目平台的初级程序员实现指导，api以及处理策略以本文档为准后迁移到其他平台。注意每个平台里的cylbadge 遵循一样的api设计及验收标准。" 本条按英文记录（见右列）。 | Superseded by version 2 (2026-11-27, commit 80ed54dd): it treated the work as new code per platform. |
+
+## [CN]决策规则
+## [EN]Decision rule
+
+| 中文 | English |
+|:---|:---|
+| **第 0 步（每个平台都做）**：查看该平台现有的角标实现：文件、公开 API、谁在用它、构建开关。把结果写进"各平台现状"并更新"与 iOS 的差异"表。**不要先写新代码。** | **Step 0 (every platform)**: read the platform's existing badge implementation: files, public API, who uses it, build switches. Write the result into "What each platform has today" and update the "Differences from iOS" table. **Do not write new code first.** |
+| **路径 A：已有 CYLBadge** → (A1) 在原位置**对齐 iOS API**（只加缺的、改语义不同的；已发布的名字保留，必要时加别名）→ (A2) 跑通现有测试 → (A3) **抽离**成独立模块 → (A4) 阶段 1 验收。先对齐再抽离：对齐时代码还在原模块，出错容易定位；抽离只是搬家，不再改行为。 | **Path A: a CYLBadge exists** → (A1) **align it with the iOS API** where it is (add what is missing, fix what means something else; released names stay, with aliases if needed) → (A2) existing tests pass → (A3) **extract** it into its own module → (A4) phase 1 acceptance. Align first, extract second: while aligning, the code is still in its old module and failures are easy to place; extracting is then only a move, with no behaviour change. |
+| **路径 B：没有 CYLBadge，只有散落的角标代码** → (B1) 把现有实现**原样抽离**成 CYLBadge 模块（行为不变，旧入口转发到新模块）→ (B2) 跑通现有测试与截图对比 → (B3) **对齐 iOS API** → (B4) 阶段 1 验收。先抽离再对齐：先把散落的代码集中起来，对齐时只需改一处。 | **Path B: no CYLBadge, only scattered badge code** → (B1) **extract** the existing implementation **as it is** into a CYLBadge module (same behaviour, old entry points forward to it) → (B2) existing tests and a screenshot comparison pass → (B3) **align it with the iOS API** → (B4) phase 1 acceptance. Extract first, align second: the scattered code is gathered first, so aligning changes one place only. |
+| **阶段 2（两条路径都在阶段 1 验收后）**：为抽离出的 CYLBadge 增加 CYLAnimatedItemView 支持（`badgeValue`、`badgeAttributes`、锚点、`reservesBadgeSpace`），按 AC1–AC13 验收。React Native 与 Flutter 没有自己的角标，只做阶段 2 的属性。 | **Phase 2 (both paths, after phase 1 is accepted)**: add CYLAnimatedItemView support to the extracted CYLBadge (`badgeValue`, `badgeAttributes`, the anchor, `reservesBadgeSpace`), accepted against AC1–AC13. React Native and Flutter have no badge of their own; they only do phase 2's props. |
+
+## [CN]各平台现状（2026-11-27 查得）
+## [EN]What each platform has today (checked 2026-11-27)
+
+| 平台 / Platform | 现有实现 / Existing implementation | 有 CYLBadge？/ CYLBadge? | 路径 / Path |
+|:---|:---|:---|:---|
+| iOS（参考 / reference） | subspec `CYLTabBarController/CYLBadgeView`: `UIView` / `UIBarButtonItem` / `UITabBarItem` `cyl_*` extensions, `CYLBadgeAppearance`, `CYLBadgeAnimationType` | yes | extraction designed in [Animated-Item-Badge.md](Animated-Item-Badge.md) |
+| Android | `:cyltabbar` `com/cyl/tabbar/CYLBadge.kt` (`CYLBadgeView`, `CYLBadgeState`, `View.cyl_*`), `CYLBadgeExtensions.kt` (`CYLTabBarItem`, `MenuItem`, `TextView` extensions, samples); uses `CYLEnums`, `CYLFont`, `CYLOffset`, `CYLEdgeInsets`, `CYLLocalization`, `CYLReflection` of `:cyltabbar`; build switch `-PcylBadgeAnimationDisabled` | yes, close to iOS | **A** |
+| HarmonyOS | `cyltabbar/src/main/ets/CYLBadge.ets`: `CYLBadgeAnimationType`, `CYLBadgeAppearance.globalAppearance`, `@Observed class CYLBadge` (state + `cyl_showBadge`, `cyl_showBadgeValue`, `cyl_clearBadge`, `cyl_pauseBadge`, `cyl_resumeBadge`, `cyl_isShowBadge`…), `struct CYLBadgeView`; samples in `CYLBadgeSamples.ets`; imports only `BuildProfile` and `curves`; switch in `cyltabbar/build-profile.json5` | yes, close to iOS | **A** |
+| 小程序 / Mini Program | no CYLBadge: `cyl-tab-bar/index.js` (`cyl_showBadgeValue`, `cyl_showBadgeDot`, `cyl_removeBadge`, `cylBadgeText`, `cyl_badgeItem`, `cyl_plusBadge`), `cyl-tab-bar-item` (properties `badgeValue` with "•" for a dot and "" hidden, `badgeColor`, `badgeSize`, `badgeContentInset`, `badgePositionAdjustment`, `badgeAnimation`; markup in `index.wxml`), `cyl-tab-bar/cyl_badge_animations.wxss`, switch in `cyl-tab-bar/cyl_debug.js` | **no** | **B** |
+| React Native | no badge code of its own; the host's `badgeValues` / `badgeStyles` / `plusButtonBadgeValue` go to the native host view | uses native | phase 2 only |
+| Flutter | no badge code of its own; `CYLTabBarBadge` / `CYLTabBarBadgeAnimation` go to the native host view | uses native | phase 2 only |
+
+## [CN]对齐的目标：iOS 角标 API
+## [EN]What to align with: the iOS badge API
+
+| 中文 | English |
+|:---|:---|
+| 对齐指：同样的方法名（按语言习惯）、同样的语义、同样的枚举值与默认值。iOS 的公开 API（`UIView+CYLBadgeExtention`、`CYLBadgeProtocol`、`CYLBadgeAppearance`）中需要每个平台都有的部分如下；平台特有的额外 API 可以保留。 | Aligning means: the same method names (in the language's style), the same meaning, the same enum values and defaults. The part of the iOS public API (`UIView+CYLBadgeExtention`, `CYLBadgeProtocol`, `CYLBadgeAppearance`) every platform must have is below; extra platform APIs may stay. |
+
+| 类别 / Kind | iOS | 语义 / Meaning |
+|:---|:---|:---|
+| 显示 / show | `cyl_showBadge()`, `cyl_showBadgeValue(_:)`, `cyl_showBadgeValue(_:animationType:)` | `cyl_showBadge` = a dot; value "" = a dot, a number (above the maximum shows "99+", ≤ 0 clears), "new" / "NEW" localized, other text as is |
+| 清除与暂停 / clear, pause | `cyl_clearBadge()`, `cyl_resumeBadge()`, `cyl_isShowBadge()`, `cyl_isPauseBadge()` | clear removes the badge; resume replays a paused badge |
+| 外观 / appearance | `cyl_badgeFont`, `cyl_badgeBackgroundColor`, `cyl_badgeTextColor`, `cyl_badgeBorderColor`, `cyl_badgeBorderWidth`, `cyl_badgeCenterOffset`, `cyl_badgeCornerRadius`, `cyl_badgeRadius`, `cyl_badgeMargin`, `cyl_badgeMaximumBadgeNumber`, `cyl_badgeRespectsReduceMotion`, `cyl_badgeAnimationType`, `cyl_resetBadgeAppearance()` | unset values follow `CYLBadgeAppearance.globalAppearance` |
+| 动画 / animation | `CYLBadgeAnimationType`: `none`, `scale`, `shake`, `bounce`, `breathe`, `leftRightOnce`, `rightLeftOnce`, `fadeInOnce`, `rollingOnce`, `scaleOnce` | same order and raw values (0…9) |
+| 全局 / global | `CYLBadgeAppearance.globalAppearance` | one shared default appearance |
+| 事件 / events | `cyl.badge.*` through CYLDeallocBlockExecutor | the same event names |
+| 阶段 2 / phase 2 | `CYLBadgeAttributeKey`, the attributes parser, `CYLBadgeHosting` | see "Phase 2" |
+
+## [CN]与 iOS 的差异（第 0 步更新）
+## [EN]Differences from iOS (updated in step 0)
+
+| 平台 / Platform | 已知差异 / Known difference | 处理 / What to do |
+|:---|:---|:---|
+| Android | `View.cyl_badgeFrame` is read-only (iOS can set it); extras `cyl_pauseBadge`, `cyl_attachBadge`, `cyl_detachBadge`, tab badge point | add the setter; keep the extras |
+| Android | no host protocol (`CYLBadgeHosting`), no `cyl_moveBadgeToView` | add in phase 2 (only what the item needs) |
+| HarmonyOS | a state object (`CYLBadge`) with unprefixed fields (`backgroundColor`, `fontSize`…) instead of `cyl_badge…` properties; extra `cyl_showNewBadge` | keep the object model (natural for ArkUI); record each field ↔ iOS property in this table; consider `font` next to `fontSize` |
+| 小程序 / Mini Program | `cyl-tab-bar-item`'s internal `badgeValue` uses "•" for a dot and "" for hidden; the tab bar's `cyl_showBadgeDot` / `cyl_removeBadge` instead of `cyl_showBadge` / `cyl_clearBadge` | the new `cyl-badge` follows iOS (null none, "" dot); the released tab bar methods stay and forward; add `cyl_showBadge` / `cyl_clearBadge` aliases |
+| React Native, Flutter | the host's `badgeValues` uses "" for none and "dot" for a dot | released, stays; the new item props follow iOS |
 
 ## [CN]规则：每个平台一样
 ## [EN]Rules: the same on every platform
 
 | 中文 | English |
 |:---|:---|
-| 1. **同名**：每个平台使用下表中的名字（只按语言的命名习惯改大小写或连字符，例如小程序属性 `badge-value`）。2. **同语义**：`badgeValue` 为空值（nil / null / undefined）表示没有角标，空字符串表示红点，其他为文字；不要照搬 TabBar 宿主旧的 `badgeValues` 约定（那里 "" 表示没有、"dot" 表示红点，已发布，保持不变，但新 API 不用它）。3. **同样的键**：`badgeAttributes` 的键字符串与 iOS `CYLBadgeAttributeKey` 完全相同。4. **同样的策略**（见下节）。5. **同样的验收标准**：iOS 文档的 AC1–AC13，编号不变，各平台的测法见"验收标准"。6. **差异先记录再问**：某个平台做不到时，写进"平台差异"表，说明原因与替代做法，负责人同意后才能合并。7. **不删除、不修改已发布的公开 API**（各平台的 `cyl_showBadge…`、`CYLBadge`、宿主的 `badgeValues` 等）。 | 1. **Same names**: every platform uses the names in the table below (only the language's casing or hyphen convention changes, e.g. the mini program attribute `badge-value`). 2. **Same meaning**: an empty value (nil / null / undefined) for `badgeValue` means no badge, an empty string a dot, anything else the text; do not copy the tab bar host's older `badgeValues` convention (there "" means none and "dot" a dot; it is released and stays, but the new API does not use it). 3. **Same keys**: the key strings of `badgeAttributes` are exactly those of iOS `CYLBadgeAttributeKey`. 4. **Same strategy** (next section). 5. **Same acceptance criteria**: AC1–AC13 of the iOS document, same numbers; each platform's way to measure is in "Acceptance criteria". 6. **Record a difference, then ask**: when a platform cannot do something, add it to "Platform differences" with the reason and the alternative; merge only after the owner agrees. 7. **Never remove or change a released public API** (each platform's `cyl_showBadge…`, `CYLBadge`, the host's `badgeValues`…). |
+| 1. **同名**：每个平台使用"统一 API"表中的名字（只按语言习惯改大小写或连字符）。2. **同语义**：空值（nil / null / undefined）表示没有角标，空字符串表示红点，其他为文字。3. **同样的键**：`badgeAttributes` 的键字符串与 iOS `CYLBadgeAttributeKey` 完全相同；`animation` 的值是 10 个 `CYLBadgeAnimationType` 名字之一，或平台自己的动画对象（iOS `CAAnimation`、Android `Animator`、鸿蒙 `customAnimation` 名字），用于示例的 Rotation、Spring、×3 等行。4. **同样的策略**（"统一策略"）。5. **同样的验收标准**：阶段 1 的 P1-1–P1-8，阶段 2 的 AC1–AC13。6. **差异先记录再问**：写进"与 iOS 的差异"或"平台差异"，负责人同意后才能合并。7. **不删除、不修改已发布的公开 API**：抽离后旧的导入路径与方法照常可用（转发或重新导出）。 | 1. **Same names**: every platform uses the names in "The common API" (only casing or hyphens follow the language). 2. **Same meaning**: an empty value (nil / null / undefined) means no badge, an empty string a dot, anything else the text. 3. **Same keys**: the key strings of `badgeAttributes` are exactly iOS `CYLBadgeAttributeKey`'s; the `animation` value is one of the 10 `CYLBadgeAnimationType` names, or the platform's own animation object (iOS `CAAnimation`, Android `Animator`, a HarmonyOS `customAnimation` name), used by the demo's Rotation, Spring and ×3 rows. 4. **Same strategy** ("The common strategy"). 5. **Same acceptance criteria**: P1-1–P1-8 for phase 1, AC1–AC13 for phase 2. 6. **Record a difference, then ask**: in "Differences from iOS" or "Platform differences"; merge only after the owner agrees. 7. **Never remove or change a released public API**: after extraction, old import paths and methods keep working (forwarding or re-exporting). |
 
-## [CN]统一 API
-## [EN]The common API
+## [CN]阶段 1 验收标准（抽离）
+## [EN]Phase 1 acceptance criteria (extraction)
+
+| 编号 | 中文 | English |
+|:---|:---|:---|
+| P1-1 | 第 0 步的现状与差异表已写进本文。 | Step 0's findings and the differences table are in this document. |
+| P1-2 | 角标模块**单独**构建与测试通过，不依赖 TabBar 模块与 item 模块（Android `./gradlew :cylbadge:test`；鸿蒙 `cylbadge` 的 `assembleHar`；小程序 `cyl-badge` 的 node 测试）。 | The badge module builds and tests **on its own**, without the tab bar or item modules (Android `./gradlew :cylbadge:test`; HarmonyOS `assembleHar` of `cylbadge`; mini program node tests of `cyl-badge`). |
+| P1-3 | 依赖方向正确：TabBar 依赖角标模块；角标模块中没有导入 TabBar 或 item 的代码（用 `grep` 证明）。 | Dependency direction: the tab bar depends on the badge module; the badge module imports nothing from the tab bar or the item (proved with `grep`). |
+| P1-4 | 对齐：上面"iOS 角标 API"表的每一行在该平台都有对应，或在差异表中有负责人同意的说明。 | Aligned: every row of "the iOS badge API" table has a counterpart on the platform, or an owner-approved entry in the differences table. |
+| P1-5 | 旧用法不变：抽离前已有的所有角标测试原样通过；旧的导入路径与方法仍可用。 | Old usage unchanged: every badge test that existed before passes unchanged; old import paths and methods still work. |
+| P1-6 | 外观不变：TabBar、加号按钮与角标示例页在抽离前后截图逐像素比较，角标区域没有差异（`CYL_BADGE_ANIMATION_DISABLED` 打开）。 | Same look: screenshots of the tab bar, the plus button and the badge sample page before and after extraction show no difference in the badge areas (with `CYL_BADGE_ANIMATION_DISABLED` on). |
+| P1-7 | 构建开关跟随角标模块，`docs/instructions/badges.md` 与 `docs/Badge-Debugging.md` 中的路径已更新，默认关闭。 | The build switch moved with the badge module; the paths in `docs/instructions/badges.md` and `docs/Badge-Debugging.md` are updated; default off. |
+| P1-8 | 新模块带许可证（`scripts/check-license-notices.py` 通过），发布配置包含它。 | The new module ships the license (`scripts/check-license-notices.py` passes), and the publishing setup includes it. |
+
+## [CN]统一 API（阶段 2 新增部分）
+## [EN]The common API (what phase 2 adds)
 
 | 概念 / Concept | iOS（参考 / reference） | Android | HarmonyOS | 小程序 / Mini Program | React Native | Flutter |
 |:---|:---|:---|:---|:---|:---|:---|
@@ -71,7 +147,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 键（与 iOS 相同的字符串）：`value`、`color`、`animation`（`none`、`scale`、`shake`、`bounce`、`breathe`、`rotation`、`spring`… 与 `CYLBadgeAnimationType` 同名）、`radius`、`centerOffset`、`textColor`、`font`、`borderColor`、`borderWidth`、`maximumNumber`、`respectsReduceMotion`。值接受原生对象，也接受字符串（`#RRGGBB` / `#RRGGBBAA`、`{x, y}`、数字字符串）；空值与未知类型忽略并打印一次调试日志，绝不崩溃。 | Keys (the same strings as iOS): `value`, `color`, `animation` (`none`, `scale`, `shake`, `bounce`, `breathe`, `rotation`, `spring`…, named as `CYLBadgeAnimationType`), `radius`, `centerOffset`, `textColor`, `font`, `borderColor`, `borderWidth`, `maximumNumber`, `respectsReduceMotion`. Values accept native objects and strings (`#RRGGBB` / `#RRGGBBAA`, `{x, y}`, numeric strings); null and unknown types are ignored with one debug log, never a crash. |
+| 键（与 iOS 相同的字符串）：`value`、`color`、`animation`（10 个 `CYLBadgeAnimationType` 名字：`none`、`scale`、`shake`、`bounce`、`breathe`、`leftRightOnce`、`rightLeftOnce`、`fadeInOnce`、`rollingOnce`、`scaleOnce`，或平台的动画对象）、`radius`、`centerOffset`、`textColor`、`font`、`borderColor`、`borderWidth`、`maximumNumber`、`respectsReduceMotion`。值接受原生对象，也接受字符串（`#RRGGBB` / `#RRGGBBAA`、`{x, y}`、数字字符串）；空值与未知类型忽略并打印一次调试日志，绝不崩溃。 | Keys (the same strings as iOS): `value`, `color`, `animation` (one of the 10 `CYLBadgeAnimationType` names: `none`, `scale`, `shake`, `bounce`, `breathe`, `leftRightOnce`, `rightLeftOnce`, `fadeInOnce`, `rollingOnce`, `scaleOnce`, or the platform's animation object), `radius`, `centerOffset`, `textColor`, `font`, `borderColor`, `borderWidth`, `maximumNumber`, `respectsReduceMotion`. Values accept native objects and strings (`#RRGGBB` / `#RRGGBBAA`, `{x, y}`, numeric strings); null and unknown types are ignored with one debug log, never a crash. |
 
 ## [CN]统一策略
 ## [EN]The common strategy
@@ -89,15 +165,15 @@
 | Android | `CYLBadge.kt`, `CYLBadgeExtensions.kt` in `:cyltabbar`; they use `CYLEnums`, `CYLFont`, `CYLOffset`, `CYLLocalization` of `:cyltabbar` | `:cylutils` ← `:cylbadge` ← `:cylanimateditem` ← `:cyltabbar` (mirrors D7: the shared types the badge needs move to `:cylutils`) |
 | HarmonyOS | `CYLBadge.ets` in `cyltabbar` (self-contained: imports only `BuildProfile` and `curves`) | `cylbadge` ← `cylanimateditem` ← `cyltabbar`; no `cylutils` module while the badge needs no shared code (record it in "Platform differences" if that changes) |
 | 小程序 / Mini Program | badge markup, JS and `cyl_badge_animations.wxss` inside `cyl-tab-bar` | `cyl-badge` component ← `cyl-animated-item` ← `cyl-tab-bar` |
-| React Native | `CYLAnimationView` wraps the native `CYLAnimatedItemView` | new props passed to the native item (iOS and Android) |
-| Flutter | `CYLAnimationView` wraps the native view | new parameters passed to the native item (iOS and Android) |
+| React Native | `CYLAnimationView` wraps the native `CYLAnimatedItemView` | phase 2 only: new props passed to the native item (iOS and Android) |
+| Flutter | `CYLAnimationView` wraps the native view | phase 2 only: new parameters passed to the native item (iOS and Android) |
 
-## [CN]验收标准
-## [EN]Acceptance criteria
+## [CN]阶段 2 验收标准（item 支持）
+## [EN]Phase 2 acceptance criteria (item support)
 
 | 中文 | English |
 |:---|:---|
-| 每个平台都按 iOS 文档的 AC1–AC13 验收（[验收标准](Animated-Item-Badge.md#enacceptance-criteria)），编号与含义不变：效果与临时方案截图一致（图标居中、尺寸一致、角标在图标右上角、动画、清除后不变、从右到左、浅色与深色、无障碍），且只用新 API。下表是各平台的测法。量位置时打开该平台的 `CYL_BADGE_ANIMATION_DISABLED`（`docs/instructions/badges.md`），提交前关掉。 | Every platform is accepted against AC1–AC13 of the iOS document ([acceptance criteria](Animated-Item-Badge.md#enacceptance-criteria)), same numbers and meaning: the result matches the temporary fix's shot (icon centred, same size, badge at the icon's top-right, animations, unchanged after clearing, right-to-left, light and dark, accessibility), using only the new API. The table gives each platform's way to measure. When measuring positions, turn on that platform's `CYL_BADGE_ANIMATION_DISABLED` (`docs/instructions/badges.md`), and off again before committing. |
+| 每个平台都按 iOS 文档的 AC1–AC13 验收（[验收标准](Animated-Item-Badge.md#enacceptance-criteria)），编号与含义不变：效果与临时方案截图一致（图标居中、尺寸一致、角标在图标右上角、动画、清除后不变、从右到左、浅色与深色、无障碍），且只用新 API。下表是各平台的测法。量位置时打开该平台的 `CYL_BADGE_ANIMATION_DISABLED`，提交前关掉。 | Every platform is accepted against AC1–AC13 of the iOS document ([acceptance criteria](Animated-Item-Badge.md#enacceptance-criteria)), same numbers and meaning: the result matches the temporary fix's shot (icon centred, same size, badge at the icon's top-right, animations, unchanged after clearing, right-to-left, light and dark, accessibility), using only the new API. The table gives each platform's way to measure. When measuring positions, turn on that platform's `CYL_BADGE_ANIMATION_DISABLED`, and off again before committing. |
 
 | AC | Android | HarmonyOS | 小程序 / Mini Program | React Native | Flutter |
 |:---|:---|:---|:---|:---|:---|
@@ -111,26 +187,54 @@
 | AC12 (build) | `./gradlew :cylutils:test :cylbadge:test :cylanimateditem:test :cyltabbar:test assembleDebug` | `hvigorw assembleHar` for each module, `assembleHap` for `entry` | `npm test` (node), DevTools compile | `yarn test`, iOS and Android builds of the example | `flutter test`, `flutter build ios --no-codesign`, `flutter build apk` |
 | AC13 (screenshots) | `scripts/stitch-screenshots.py`, next to the iOS reference shot | same | same | same | same |
 
-## [CN]Android 实施指南
-## [EN]Android implementation guide
+## [CN]Android 实施指南（路径 A：先对齐，再抽离）
+## [EN]Android implementation guide (path A: align, then extract)
 
 | 中文 | English |
 |:---|:---|
 | 目标分层 `:cylutils` ← `:cylbadge` ← `:cylanimateditem` ← `:cyltabbar`。先读 `docs/instructions/cross-platform.md`、`windows-harmonyos.md`、`docs/Android-API-Map.md`。 | Target layering `:cylutils` ← `:cylbadge` ← `:cylanimateditem` ← `:cyltabbar`. Read `docs/instructions/cross-platform.md`, `windows-harmonyos.md` and `docs/Android-API-Map.md` first. |
 
+### [CN]阶段 1：抽离 CYLBadge
+### [EN]Phase 1: extract CYLBadge
+
 | 步骤 / Step | 中文 | English |
 |:---|:---|:---|
-| A1 | 基线：`./gradlew test assembleDebug` 通过并记下测试数。 | Baseline: `./gradlew test assembleDebug` passes; write down the test count. |
-| A2 | 列出依赖：`CYLBadge.kt` 与 `CYLBadgeExtensions.kt` 用到的 `:cyltabbar` 类型（已知：`CYLEnums`、`CYLFont`、`CYLOffset`、`CYLEdgeInsets`、`CYLLocalization`、`CYLReflection`，以及 `CYLTabBarItem`、`CYLPlusButton`、`CYLTabBarItemButton`、`MenuItem` 扩展）。 | List the dependencies: the `:cyltabbar` types used by `CYLBadge.kt` and `CYLBadgeExtensions.kt` (known: `CYLEnums`, `CYLFont`, `CYLOffset`, `CYLEdgeInsets`, `CYLLocalization`, `CYLReflection`, plus the `CYLTabBarItem`, `CYLPlusButton`, `CYLTabBarItemButton` and `MenuItem` extensions). |
-| A3 | 新建 `:cylutils`，把共享类型移进去，**包名保持 `com.cyl.tabbar`**（Android 允许同一个包分布在多个模块），这样公开 API 一个字都不变。`CYLEnums` 若只含枚举就整体移动；若引用了 TabBar 类型，先停下来问。 | Create `:cylutils` and move the shared types into it, **keeping the package `com.cyl.tabbar`** (Android allows one package across modules), so not one character of the public API changes. Move `CYLEnums` whole if it only holds enums; if it references tab bar types, stop and ask. |
-| A4 | 新建 `:cylbadge`（依赖 `:cylutils` 与 `cyldeallocblockexecutor`），移入 `CYLBadge.kt` 与与 TabBar 无关的扩展；`CYLTabBarItem`、`CYLPlusButton`、`MenuItem` 的扩展留在 `:cyltabbar`（它们依赖 TabBar 类型）。资源：`cyl_badge_*` 字符串移到 `:cylbadge`（或 `:cylutils`）的 `res/values*/`。许可证放在 `src/main/resources/META-INF/cylbadge/LICENSE`。 | Create `:cylbadge` (depending on `:cylutils` and `cyldeallocblockexecutor`), move `CYLBadge.kt` and the extensions that have nothing to do with the tab bar into it; the `CYLTabBarItem`, `CYLPlusButton` and `MenuItem` extensions stay in `:cyltabbar` (they use tab bar types). Resources: the `cyl_badge_*` strings move to `res/values*/` of `:cylbadge` (or `:cylutils`). License at `src/main/resources/META-INF/cylbadge/LICENSE`. |
-| A5 | 接上依赖：`:cylanimateditem` 加 `api(project(":cylbadge"))`；`:cyltabbar` 加 `api(project(":cylbadge"))`；`settings.gradle.kts` 两个 `include` 列表**都**加上新模块（其中一个是被 CollectionViewClassifyMenu 包含时用的）；Maven 发布配置与 `scripts/check-license-notices.py` 同步。 | Wire the dependencies: `:cylanimateditem` gets `api(project(":cylbadge"))`; `:cyltabbar` gets `api(project(":cylbadge"))`; add the new modules to **both** `include` lists of `settings.gradle.kts` (one is used when CollectionViewClassifyMenu includes this build); keep the Maven publishing setup and `scripts/check-license-notices.py` in step. |
-| A6 | Liquid Glass 规则：Android 的规则在 `:cylanimateditem` 的 `CYLLiquidGlass.kt`。若角标需要它，按 iOS D2 移到 `:cylutils`，`:cylanimateditem` 转发；不需要就不动。 | The Liquid Glass rule: on Android it is `CYLLiquidGlass.kt` in `:cylanimateditem`. If the badge needs it, move it to `:cylutils` as iOS D2 does, with `:cylanimateditem` forwarding; otherwise leave it. |
-| A7 | 锚点：`CYLAnimatedItemView` 是 `FrameLayout`，新增 `badgeAnchorView`（一个 `FrameLayout`，`clipChildren = false`），在 `onLayout` 中放到图标本身。 | The anchor: `CYLAnimatedItemView` is a `FrameLayout`; add `badgeAnchorView` (a `FrameLayout` with `clipChildren = false`) and place it on the icon itself in `onLayout`. |
-| A8 | 属性 `badgeValue`、`badgeAttributes`、`isShowingBadge`、`reservesBadgeSpace`，以及 `CYLBadgeAttributeKey` 与解析函数（在 `:cylbadge`）；`CYLTabBarHostView` 的 `badgeStyles` 解析改用同一个函数。 | Properties `badgeValue`, `badgeAttributes`, `isShowingBadge`, `reservesBadgeSpace`, plus `CYLBadgeAttributeKey` and the parser (in `:cylbadge`); the parsing of `CYLTabBarHostView`'s `badgeStyles` switches to the same function. |
-| A9 | 无障碍：`stateDescription`（API 30+）或 `contentDescription` 末尾加角标描述，清除时恢复；锚点 `importantForAccessibility = NO_HIDE_DESCENDANTS`。 | Accessibility: append the badge description to `stateDescription` (API 30+) or `contentDescription`, restore on clear; the anchor gets `importantForAccessibility = NO_HIDE_DESCENDANTS`. |
-| A10 | 示例：demo 的 Badge Tag 页改用 `badgeValue`，删除合成位图的代码。Robolectric 测试覆盖 AC1–AC3、AC6、AC7、AC10。 | Demo: the Badge tag page uses `badgeValue`, and the bitmap composition code goes. Robolectric tests cover AC1–AC3, AC6, AC7, AC10. |
-| A11 | 模拟器验收 AC1–AC13（`-PcylBadgeAnimationDisabled=true` 量位置，然后关掉再看一次），截图拼接，更新 `docs/Android-API-Map.md`、本文与 `cyl-api-map`。 | Accept AC1–AC13 on the emulator (measure positions with `-PcylBadgeAnimationDisabled=true`, then look again with it off), stitch the screenshots, update `docs/Android-API-Map.md`, this document and `cyl-api-map`. |
+| A0 | 查看现有实现：读 `CYLBadge.kt` 与 `CYLBadgeExtensions.kt`，列出全部 `View.cyl_*` 成员、它们用到的 `:cyltabbar` 类型、谁调用它们（`grep -rn "cyl_showBadge" Example-Android`），更新"与 iOS 的差异"表。 | Read the existing implementation: `CYLBadge.kt` and `CYLBadgeExtensions.kt`; list every `View.cyl_*` member, the `:cyltabbar` types they use, and their callers (`grep -rn "cyl_showBadge" Example-Android`); update "Differences from iOS". |
+| A1 | 基线：`./gradlew test assembleDebug` 通过，记下测试数；为 P1-6 截下 TabBar、加号按钮与角标示例页（`-PcylBadgeAnimationDisabled=true`）。 | Baseline: `./gradlew test assembleDebug` passes, write down the test count; for P1-6, take shots of the tab bar, the plus button and the badge sample page (`-PcylBadgeAnimationDisabled=true`). |
+| A2 | **对齐**（仍在 `:cyltabbar` 中）：按差异表补齐，例如 `cyl_badgeFrame` 加 setter；核对 `CYLBadgeAnimationType` 的顺序与 iOS 相同（0…9）；核对 `cyl_showBadgeValue` 的语义（"" 红点、≤ 0 清除、超过最大值 "99+"、"new" 本地化）。每补一项加一个单元测试。 | **Align** (still inside `:cyltabbar`): close the gaps in the differences table, e.g. a setter for `cyl_badgeFrame`; check `CYLBadgeAnimationType`'s order matches iOS (0…9); check `cyl_showBadgeValue`'s meaning ("" a dot, ≤ 0 clears, above the maximum "99+", "new" localized). Add one unit test per fix. |
+| A3 | `./gradlew :cyltabbar:test` 通过，提交"对齐"这一步。 | `./gradlew :cyltabbar:test` passes; commit the alignment step. |
+| A4 | 新建 `:cylutils`，移入角标需要的共享类型（`CYLEnums`、`CYLFont`、`CYLOffset`、`CYLEdgeInsets`、`CYLLocalization` 及其字符串资源、`CYLReflection`），**包名保持 `com.cyl.tabbar`**（同一个包可以分布在多个模块），公开 API 一个字都不变。`CYLEnums` 若引用了 TabBar 类型，先停下来问。 | Create `:cylutils` and move the shared types the badge needs (`CYLEnums`, `CYLFont`, `CYLOffset`, `CYLEdgeInsets`, `CYLLocalization` with its string resources, `CYLReflection`), **keeping the package `com.cyl.tabbar`** (one package may span modules), so not one character of the public API changes. If `CYLEnums` references tab bar types, stop and ask. |
+| A5 | 新建 `:cylbadge`（依赖 `:cylutils` 与 `cyldeallocblockexecutor`），用 `git mv` 移入 `CYLBadge.kt` 与和 TabBar 无关的扩展（`View`、`TextView`）；`CYLTabBarItem`、`CYLPlusButton`、`MenuItem` 的扩展与示例数据留在 `:cyltabbar`。构建开关 `cylBadgeAnimationDisabled` / `BuildConfig.CYL_BADGE_ANIMATION_DISABLED` 移到 `:cylbadge`。许可证：`src/main/resources/META-INF/cylbadge/LICENSE`。 | Create `:cylbadge` (depending on `:cylutils` and `cyldeallocblockexecutor`) and `git mv` `CYLBadge.kt` and the extensions unrelated to the tab bar (`View`, `TextView`) into it; the `CYLTabBarItem`, `CYLPlusButton` and `MenuItem` extensions and the samples stay in `:cyltabbar`. The build switch `cylBadgeAnimationDisabled` / `BuildConfig.CYL_BADGE_ANIMATION_DISABLED` moves to `:cylbadge`. License: `src/main/resources/META-INF/cylbadge/LICENSE`. |
+| A6 | 接上依赖：`:cyltabbar` 加 `api(project(":cylbadge"))`；`settings.gradle.kts` 两个 `include` 列表**都**加上新模块；Maven 发布与 `scripts/check-license-notices.py` 同步。 | Wire the dependencies: `:cyltabbar` gets `api(project(":cylbadge"))`; add the new modules to **both** `include` lists of `settings.gradle.kts`; keep Maven publishing and `scripts/check-license-notices.py` in step. |
+| A7 | 阶段 1 验收 P1-1–P1-8（截图与 A1 的逐像素比较），提交"抽离"这一步。 | Phase 1 acceptance P1-1–P1-8 (screenshots compared pixel by pixel with A1's), commit the extraction step. |
+
+```kotlin
+// :cylbadge/build.gradle.kts (sketch)
+plugins { id("com.android.library"); kotlin("android") }
+android {
+    namespace = "com.cyl.badge"          // the R class namespace only; Kotlin packages stay com.cyl.tabbar
+    buildFeatures { buildConfig = true }
+    defaultConfig {
+        val disabled = (project.findProperty("cylBadgeAnimationDisabled") as String?) == "true"
+        buildConfigField("boolean", "CYL_BADGE_ANIMATION_DISABLED", disabled.toString())   // default false
+    }
+}
+dependencies {
+    api(project(":cylutils"))
+    implementation(libs.cyldeallocblockexecutor)
+}
+```
+
+### [CN]阶段 2：CYLAnimatedItemView 支持
+### [EN]Phase 2: CYLAnimatedItemView support
+
+| 步骤 / Step | 中文 | English |
+|:---|:---|:---|
+| A8 | `:cylanimateditem` 加 `api(project(":cylbadge"))`。Liquid Glass 规则在 `:cylanimateditem` 的 `CYLLiquidGlass.kt`：若角标需要它，按 iOS D2 移到 `:cylutils`，`:cylanimateditem` 转发；不需要就不动。 | `:cylanimateditem` gets `api(project(":cylbadge"))`. The Liquid Glass rule is `CYLLiquidGlass.kt` in `:cylanimateditem`: if the badge needs it, move it to `:cylutils` as iOS D2 does, with `:cylanimateditem` forwarding; otherwise leave it. |
+| A9 | 锚点：`CYLAnimatedItemView` 是 `FrameLayout`，新增 `badgeAnchorView`（`FrameLayout`，`clipChildren = false`），在 `onLayout` 中放到图标本身。 | The anchor: `CYLAnimatedItemView` is a `FrameLayout`; add `badgeAnchorView` (a `FrameLayout` with `clipChildren = false`) and place it on the icon itself in `onLayout`. |
+| A10 | 属性 `badgeValue`、`badgeAttributes`、`isShowingBadge`、`reservesBadgeSpace`；`CYLBadgeAttributeKey` 与解析函数放在 `:cylbadge`，`CYLTabBarHostView` 的 `badgeStyles` 解析改用它。 | Properties `badgeValue`, `badgeAttributes`, `isShowingBadge`, `reservesBadgeSpace`; `CYLBadgeAttributeKey` and the parser live in `:cylbadge`, and `CYLTabBarHostView`'s `badgeStyles` parsing switches to it. |
+| A11 | 无障碍：`stateDescription`（API 30+）或 `contentDescription` 末尾加角标描述，清除时恢复；锚点 `importantForAccessibility = NO_HIDE_DESCENDANTS`。 | Accessibility: append the badge description to `stateDescription` (API 30+) or `contentDescription`, restore on clear; the anchor gets `importantForAccessibility = NO_HIDE_DESCENDANTS`. |
+| A12 | 示例改用 `badgeValue`，删除合成位图的代码；Robolectric 测试覆盖 AC1–AC3、AC6、AC7、AC10；模拟器验收 AC1–AC13 并截图；更新 `docs/Android-API-Map.md`、本文与 `cyl-api-map`。 | The demo uses `badgeValue`, with the bitmap composition removed; Robolectric tests cover AC1–AC3, AC6, AC7, AC10; accept AC1–AC13 on the emulator with screenshots; update `docs/Android-API-Map.md`, this document and `cyl-api-map`. |
 
 ```kotlin
 // :cylanimateditem — CYLAnimatedItemView.kt (new members only)
@@ -166,27 +270,42 @@ badgeAnchorView.bringToFront()
 
 | 中文 | English |
 |:---|:---|
-| **Android 要避免**：(1) 改包名（会破坏所有 import，违反公开 API 规则）；(2) `ViewGroup` 默认 `clipChildren = true`：item、Tag、RecyclerView 单元都要检查，否则角标被裁（AC3）；(3) 把锚点做成普通 `View`：角标会进父视图的 overlay，位置与裁剪都不同；(4) 只改一个 `include` 列表；(5) 用 `implementation` 而不是 `api`：使用 `:cylanimateditem` 的 App 看不到角标类型；(6) 在 `onLayout` 里调用 `requestLayout()`（循环布局）。 | **Android, avoid**: (1) changing package names (breaks every import, against the public API rule); (2) `ViewGroup`'s default `clipChildren = true`: check the item, the tag and the RecyclerView cell, or the badge gets clipped (AC3); (3) a plain `View` as the anchor: the badge then goes into the parent's overlay, with different position and clipping; (4) changing only one `include` list; (5) `implementation` instead of `api`: apps using `:cylanimateditem` would not see the badge types; (6) calling `requestLayout()` inside `onLayout` (a layout loop). |
+| **Android 要避免**：(1) 先抽离再对齐（路径 A 要先对齐）；(2) 抽离时改行为（抽离只是搬家）；(3) 改包名（违反公开 API 规则）；(4) `ViewGroup` 默认 `clipChildren = true`：item、Tag、RecyclerView 单元都要检查（AC3）；(5) 锚点用普通 `View`：角标会进父视图的 overlay；(6) 只改一个 `include` 列表；(7) 用 `implementation` 而不是 `api`；(8) 在 `onLayout` 里调用 `requestLayout()`。 | **Android, avoid**: (1) extracting before aligning (path A aligns first); (2) changing behaviour while extracting (extraction is only a move); (3) changing package names (against the public API rule); (4) `ViewGroup`'s default `clipChildren = true`: check the item, the tag and the RecyclerView cell (AC3); (5) a plain `View` as the anchor: the badge goes into the parent's overlay; (6) changing only one `include` list; (7) `implementation` instead of `api`; (8) calling `requestLayout()` inside `onLayout`. |
 
-## [CN]鸿蒙实施指南
-## [EN]HarmonyOS implementation guide
+## [CN]鸿蒙实施指南（路径 A：先对齐，再抽离）
+## [EN]HarmonyOS implementation guide (path A: align, then extract)
 
 | 中文 | English |
 |:---|:---|
-| 目标分层 `cylbadge` ← `cylanimateditem` ← `cyltabbar`。先读 `windows-harmonyos.md` 与 `cyl-harmonyos-a11y-l10n` skill；从 ASCII 路径构建（例如 `C:\cyl-hm`）。 | Target layering `cylbadge` ← `cylanimateditem` ← `cyltabbar`. Read `windows-harmonyos.md` and the `cyl-harmonyos-a11y-l10n` skill first; build from an ASCII path (e.g. `C:\cyl-hm`). |
+| 目标分层 `cylbadge` ← `cylanimateditem` ← `cyltabbar`。先读 `windows-harmonyos.md` 与 `cyl-harmonyos-a11y-l10n` skill；从 ASCII 路径构建（例如 `C:\cyl-hm`）；每一步都构建 `entry`（`cyltabbar` 与 `cylanimateditem` 必须始终可构建）。 | Target layering `cylbadge` ← `cylanimateditem` ← `cyltabbar`. Read `windows-harmonyos.md` and the `cyl-harmonyos-a11y-l10n` skill first; build from an ASCII path (e.g. `C:\cyl-hm`); build `entry` after every step (`cyltabbar` and `cylanimateditem` must always build). |
+
+### [CN]阶段 1：抽离 CYLBadge
+### [EN]Phase 1: extract CYLBadge
 
 | 步骤 / Step | 中文 | English |
 |:---|:---|:---|
-| H1 | 基线：各模块 `assembleHar`、`entry` 的 `assembleHap` 与现有测试通过。 | Baseline: `assembleHar` of each module, `assembleHap` of `entry` and the existing tests pass. |
-| H2 | 新建 HAR 模块 `cylbadge`（`oh-package.json5` 只依赖 `cyldeallocblockexecutor`，若需要），把 `cyltabbar/src/main/ets/CYLBadge.ets` 移过去（`git mv`）；`CYLBadgeSamples.ets` 是示例数据，留在 `cyltabbar` 或移到 `entry`。 | Create the HAR module `cylbadge` (its `oh-package.json5` depends only on `cyldeallocblockexecutor`, if needed) and move `cyltabbar/src/main/ets/CYLBadge.ets` into it (`git mv`); `CYLBadgeSamples.ets` is sample data and stays in `cyltabbar` or moves to `entry`. |
-| H3 | 构建开关：`CYL_BADGE_ANIMATION_DISABLED` 从 `cyltabbar/build-profile.json5` 移到 `cylbadge/build-profile.json5`（`CYLBadge.ets` 读的是本模块的 `BuildProfile`）；同步改 `docs/instructions/badges.md` 与 `docs/Badge-Debugging.md` 中的路径。 | The build switch: `CYL_BADGE_ANIMATION_DISABLED` moves from `cyltabbar/build-profile.json5` to `cylbadge/build-profile.json5` (`CYLBadge.ets` reads its own module's `BuildProfile`); update the path in `docs/instructions/badges.md` and `docs/Badge-Debugging.md` too. |
-| H4 | `cyltabbar` 的 `Index.ets` 重新导出 `cylbadge` 的全部公开符号，旧的 `import { CYLBadge } from 'cyltabbar'` 照常可用。`cylanimateditem` 与 `cyltabbar` 的 `oh-package.json5` 加 `"cylbadge": "file:../cylbadge"`；`entry` 与项目根 `build-profile.json5` 的 `modules` 加上新模块。 | `cyltabbar`'s `Index.ets` re-exports every public symbol of `cylbadge`, so the old `import { CYLBadge } from 'cyltabbar'` still works. Add `"cylbadge": "file:../cylbadge"` to the `oh-package.json5` of `cylanimateditem` and `cyltabbar`; add the module to `modules` in the root `build-profile.json5`. |
-| H5 | `CYLAnimatedItemView` 新增 `@Prop badgeValue?: string`、`@Prop badgeAttributes?: CYLBadgeAttributes`、`@Prop reservesBadgeSpace: boolean = false`，在图标节点上用 `.overlay()` 放 `CYLBadgeView`（overlay 不参与测量，等同 iOS 的锚点）。 | `CYLAnimatedItemView` gets `@Prop badgeValue?: string`, `@Prop badgeAttributes?: CYLBadgeAttributes` and `@Prop reservesBadgeSpace: boolean = false`, and puts a `CYLBadgeView` on the icon node with `.overlay()` (an overlay is not measured: the counterpart of the iOS anchor). |
-| H6 | `CYLBadgeAttributes` 是一个 interface，字段名就是统一的键（ArkTS 严格模式不允许 `any` 与无类型对象字面量）；解析函数放在 `cylbadge`，`cyltabbar` 的宿主配置也用它。 | `CYLBadgeAttributes` is an interface whose field names are the common keys (ArkTS strict mode allows no `any` and no untyped object literals); the parser lives in `cylbadge`, and the tab bar host's configuration uses it too. |
-| H7 | 无障碍：item 的 `accessibilityText` / `accessibilityDescription` 加角标描述；角标节点 `accessibilityLevel('no')`；文字用 `scripts/harmonyos-l10n.py` 管理。 | Accessibility: the item's `accessibilityText` / `accessibilityDescription` gains the badge description; the badge node gets `accessibilityLevel('no')`; texts are managed with `scripts/harmonyos-l10n.py`. |
-| H8 | 示例页（`entry`）的 Badge Tag 改用 `badgeValue`，删除 `componentSnapshot` / `PixelMap` 合成。ohosTest 覆盖 AC1–AC3、AC6、AC7、AC10。 | The demo page (`entry`) badge tags use `badgeValue`; the `componentSnapshot` / `PixelMap` composition goes. ohosTest covers AC1–AC3, AC6, AC7, AC10. |
-| H9 | 模拟器验收 AC1–AC13（本地模拟器是 x86_64：Rive 与 PAG 图标显示静态图，AC6 用 Lottie 或 GIF 测），截图拼接，更新本文、`cylanimateditem/README.md` 与 `cyl-api-map`。 | Accept AC1–AC13 on the emulator (the local emulator is x86_64: Rive and PAG icons show still images, so test AC6 with Lottie or GIF), stitch the screenshots, update this document, `cylanimateditem/README.md` and `cyl-api-map`. |
-| H10 | `cyltabbar` 与 `cylanimateditem` 必须始终可构建（`windows-harmonyos.md`）：每一步都构建 `entry`。 | `cyltabbar` and `cylanimateditem` must always build (`windows-harmonyos.md`): build `entry` after every step. |
+| H0 | 查看现有实现：读 `CYLBadge.ets`（`CYLBadgeAnimationType`、`CYLBadgeAppearance`、`CYLBadge`、`CYLBadgeView`）与 `CYLBadgeSamples.ets`，列出谁在用它们（`grep -rn "CYLBadge" CrossPlatform/harmonyos-cyltabbar --include=*.ets`），更新差异表（每个字段 ↔ iOS 属性）。 | Read the existing implementation: `CYLBadge.ets` (`CYLBadgeAnimationType`, `CYLBadgeAppearance`, `CYLBadge`, `CYLBadgeView`) and `CYLBadgeSamples.ets`; list their users (`grep -rn "CYLBadge" CrossPlatform/harmonyos-cyltabbar --include=*.ets`); update the differences table (each field ↔ iOS property). |
+| H1 | 基线：各模块 `assembleHar`、`entry` 的 `assembleHap`、`cyltabbar/test` 通过；为 P1-6 截图（`CYL_BADGE_ANIMATION_DISABLED: true`）。 | Baseline: `assembleHar` of each module, `assembleHap` of `entry` and `cyltabbar/test` pass; shots for P1-6 (`CYL_BADGE_ANIMATION_DISABLED: true`). |
+| H2 | **对齐**（仍在 `cyltabbar` 中）：对照 iOS 表补齐缺的方法与语义（例如考虑在 `fontSize` 旁加 `font`；确认 `cyl_showBadgeValue` 对 ≤ 0、超过最大值、"new" 的处理与 iOS 相同；确认枚举顺序 0…9）。每项加测试。 | **Align** (still inside `cyltabbar`): close the gaps against the iOS table (e.g. consider `font` next to `fontSize`; check `cyl_showBadgeValue` handles ≤ 0, above-maximum and "new" as iOS does; check the enum order 0…9). One test per fix. |
+| H3 | 新建 HAR 模块 `cylbadge`（`oh-package.json5` 只依赖需要的 `cyldeallocblockexecutor`），`git mv` `CYLBadge.ets`；`CYLBadgeSamples.ets` 是示例数据，留在 `cyltabbar` 或移到 `entry`。许可证放在模块根目录。 | Create the HAR module `cylbadge` (its `oh-package.json5` depends only on `cyldeallocblockexecutor` if needed) and `git mv` `CYLBadge.ets`; `CYLBadgeSamples.ets` is sample data and stays in `cyltabbar` or moves to `entry`. License at the module root. |
+| H4 | 构建开关 `CYL_BADGE_ANIMATION_DISABLED` 从 `cyltabbar/build-profile.json5` 移到 `cylbadge/build-profile.json5`（`CYLBadge.ets` 读本模块的 `BuildProfile`）；更新 `badges.md` 与 `Badge-Debugging.md` 中的路径。 | Move the build switch `CYL_BADGE_ANIMATION_DISABLED` from `cyltabbar/build-profile.json5` to `cylbadge/build-profile.json5` (`CYLBadge.ets` reads its own module's `BuildProfile`); update the paths in `badges.md` and `Badge-Debugging.md`. |
+| H5 | `cyltabbar/Index.ets` 重新导出 `cylbadge` 的全部公开符号，旧的 `import { CYLBadge } from 'cyltabbar'` 照常可用；`cyltabbar` 的 `oh-package.json5` 加 `"cylbadge": "file:../cylbadge"`；根 `build-profile.json5` 的 `modules` 加上新模块。 | `cyltabbar/Index.ets` re-exports every public symbol of `cylbadge`, so the old `import { CYLBadge } from 'cyltabbar'` still works; `cyltabbar`'s `oh-package.json5` gets `"cylbadge": "file:../cylbadge"`; add the module to `modules` in the root `build-profile.json5`. |
+| H6 | 阶段 1 验收 P1-1–P1-8（截图与 H1 比较）。 | Phase 1 acceptance P1-1–P1-8 (shots compared with H1's). |
+
+```typescript
+// cyltabbar/Index.ets: keep every old import working
+export * from 'cylbadge';
+```
+
+### [CN]阶段 2：CYLAnimatedItemView 支持
+### [EN]Phase 2: CYLAnimatedItemView support
+
+| 步骤 / Step | 中文 | English |
+|:---|:---|:---|
+| H7 | `cylanimateditem` 的 `oh-package.json5` 加 `"cylbadge": "file:../cylbadge"`；`CYLAnimatedItemView` 新增 `@Prop badgeValue?: string`、`@Prop badgeAttributes?: CYLBadgeAttributes`、`@Prop reservesBadgeSpace: boolean = false`，在图标节点上用 `.overlay()` 放 `CYLBadgeView`（overlay 不参与测量，等同 iOS 的锚点）。 | `cylanimateditem`'s `oh-package.json5` gets `"cylbadge": "file:../cylbadge"`; `CYLAnimatedItemView` gets `@Prop badgeValue?: string`, `@Prop badgeAttributes?: CYLBadgeAttributes` and `@Prop reservesBadgeSpace: boolean = false`, and puts a `CYLBadgeView` on the icon node with `.overlay()` (an overlay is not measured: the counterpart of the iOS anchor). |
+| H8 | `CYLBadgeAttributes`（interface，字段名即统一的键；ArkTS 严格模式不允许 `any`）与解析函数放在 `cylbadge`，`cyltabbar` 的宿主配置也用它。 | `CYLBadgeAttributes` (an interface whose field names are the common keys; ArkTS strict mode allows no `any`) and the parser live in `cylbadge`; the tab bar host's configuration uses it too. |
+| H9 | 无障碍：item 的 `accessibilityText` / `accessibilityDescription` 加角标描述；角标节点 `accessibilityLevel('no')`；文字用 `scripts/harmonyos-l10n.py` 管理。 | Accessibility: the item's `accessibilityText` / `accessibilityDescription` gains the badge description; the badge node gets `accessibilityLevel('no')`; texts via `scripts/harmonyos-l10n.py`. |
+| H10 | 示例页改用 `badgeValue`，删除 `componentSnapshot` / `PixelMap` 合成；ohosTest 覆盖 AC1–AC3、AC6、AC7、AC10；模拟器验收 AC1–AC13（本地模拟器是 x86_64，Rive 与 PAG 显示静态图，AC6 用 Lottie 或 GIF 测）；更新本文、`cylanimateditem/README.md` 与 `cyl-api-map`。 | The demo page uses `badgeValue`, with the `componentSnapshot` / `PixelMap` composition removed; ohosTest covers AC1–AC3, AC6, AC7, AC10; accept AC1–AC13 on the emulator (the local emulator is x86_64: Rive and PAG show still images, so test AC6 with Lottie or GIF); update this document, `cylanimateditem/README.md` and `cyl-api-map`. |
 
 ```typescript
 // cylbadge — CYLBadgeAttributes.ets
@@ -219,20 +338,41 @@ export interface CYLBadgeAttributes {
 
 | 中文 | English |
 |:---|:---|
-| **鸿蒙要避免**：(1) 把角标放进图标的 `Stack` 并让它参与布局（图标会被挤开）；(2) Tag 背景用了 `.clip(true)`：overlay 会被裁（AC3）；(3) 只移动文件不改 `Index.ets` 的导出：示例与下游的 import 全部失败；(4) 忘记移动 `buildProfileFields`：`BuildProfile.CYL_BADGE_ANIMATION_DISABLED` 在新模块里不存在，编译失败；(5) 在 `build()` 中直接修改状态（ArkUI 报错）；(6) 从非 ASCII 路径构建。 | **HarmonyOS, avoid**: (1) putting the badge into the icon's `Stack` so it takes part in layout (the icon gets pushed); (2) a tag background with `.clip(true)`: the overlay is clipped (AC3); (3) moving the file without updating `Index.ets`'s exports: every import in the demo and downstream fails; (4) forgetting to move `buildProfileFields`: `BuildProfile.CYL_BADGE_ANIMATION_DISABLED` does not exist in the new module and the build fails; (5) changing state inside `build()` (ArkUI rejects it); (6) building from a non-ASCII path. |
+| **鸿蒙要避免**：(1) 先抽离再对齐；(2) 抽离时改行为；(3) 只移动文件不改 `Index.ets` 的导出（旧 import 全部失败）；(4) 忘记移动 `buildProfileFields`（新模块里没有 `BuildProfile.CYL_BADGE_ANIMATION_DISABLED`，编译失败）；(5) 把角标放进图标的 `Stack` 并参与布局；(6) Tag 背景 `.clip(true)` 裁掉 overlay（AC3）；(7) 在 `build()` 中修改状态；(8) 从非 ASCII 路径构建。 | **HarmonyOS, avoid**: (1) extracting before aligning; (2) changing behaviour while extracting; (3) moving the file without updating `Index.ets`'s exports (every old import fails); (4) forgetting to move `buildProfileFields` (the new module has no `BuildProfile.CYL_BADGE_ANIMATION_DISABLED`, the build fails); (5) putting the badge in the icon's `Stack` so it takes part in layout; (6) a tag background with `.clip(true)` clipping the overlay (AC3); (7) changing state inside `build()`; (8) building from a non-ASCII path. |
 
-## [CN]微信小程序实施指南
-## [EN]WeChat Mini Program implementation guide
+## [CN]微信小程序实施指南（路径 B：先抽离，再对齐）
+## [EN]WeChat Mini Program implementation guide (path B: extract, then align)
+
+### [CN]阶段 1：抽离旧的角标实现，再对齐 iOS
+### [EN]Phase 1: extract the old badge implementation, then align with iOS
 
 | 步骤 / Step | 中文 | English |
 |:---|:---|:---|
-| W1 | 基线：`npm test` 通过；DevTools 编译示例无报错。 | Baseline: `npm test` passes; the example compiles in DevTools without errors. |
-| W2 | 新建组件 `src/cyl-badge`（`index.js/json/wxml/wxss` + `cyl_badge_model.js`），把 `cyl-tab-bar` 中角标的模板、逻辑与 `cyl_badge_animations.wxss` 移进去；`cyl-tab-bar` 改为使用 `<cyl-badge>`。 | Create the component `src/cyl-badge` (`index.js/json/wxml/wxss` plus `cyl_badge_model.js`) and move the badge's template, logic and `cyl_badge_animations.wxss` out of `cyl-tab-bar` into it; `cyl-tab-bar` then uses `<cyl-badge>`. |
-| W3 | 构建开关：`CYL_BADGE_ANIMATION_DISABLED` 从 `cyl-tab-bar/cyl_debug.js` 移到 `cyl-badge/cyl_debug.js`，`cyl-tab-bar` 的旧文件重新导出它；同步改 `badges.md` 与 `Badge-Debugging.md`。 | The build switch: `CYL_BADGE_ANIMATION_DISABLED` moves from `cyl-tab-bar/cyl_debug.js` to `cyl-badge/cyl_debug.js`, and the old file re-exports it; update `badges.md` and `Badge-Debugging.md`. |
-| W4 | `cyl-animated-item` 新增属性 `badgeValue`（类型 `null`/`String`，默认 `null`）、`badgeAttributes`、`reservesBadgeSpace`，在图标外包一层 `position: relative` 的节点，`<cyl-badge>` 绝对定位在右上角（绝对定位不参与布局）。 | `cyl-animated-item` gets the properties `badgeValue` (type `null`/`String`, default `null`), `badgeAttributes` and `reservesBadgeSpace`; wrap the icon in a `position: relative` node and place `<cyl-badge>` absolutely at its top-right (absolute positioning is not part of layout). |
-| W5 | 解析函数 `cylBadgeParseAttributes` 放在 `cyl-badge/cyl_badge_model.js`，宿主与 item 共用；颜色与 `{x, y}` 字符串规则同 iOS。 | The parser `cylBadgeParseAttributes` lives in `cyl-badge/cyl_badge_model.js`, shared by the host and the item; colour and `{x, y}` string rules as on iOS. |
-| W6 | 无障碍：item 的 `aria-label` 末尾加角标描述；角标节点 `aria-hidden="true"`。 | Accessibility: the item's `aria-label` gains the badge description; the badge node gets `aria-hidden="true"`. |
-| W7 | 示例页改用 `badge-value`，删除 canvas 合成；node 测试覆盖模型（AC2、AC6、AC7、AC10 的逻辑部分）；`npm run setup` 后在 DevTools 验收 AC1–AC13 并截图。 | The example page uses `badge-value`, with no canvas composition; node tests cover the model (the logic parts of AC2, AC6, AC7, AC10); after `npm run setup`, accept AC1–AC13 in DevTools and take screenshots. |
+| W0 | 查看现有实现：`cyl-tab-bar/index.js` 中的 `cylBadgeText`、`cyl_showBadgeValue`、`cyl_showBadgeDot`、`cyl_removeBadge`、`cyl_badgeItem`、`cyl_plusBadge`；`cyl-tab-bar-item` 的角标属性、`cyl_tab_bar_item_model.js` 中的角标计算与 `index.wxml` 第 44–45 行的标记；`cyl_badge_animations.wxss`；`cyl_debug.js`。更新差异表。 | Read the existing implementation: `cylBadgeText`, `cyl_showBadgeValue`, `cyl_showBadgeDot`, `cyl_removeBadge`, `cyl_badgeItem` and `cyl_plusBadge` in `cyl-tab-bar/index.js`; `cyl-tab-bar-item`'s badge properties, the badge computation in `cyl_tab_bar_item_model.js` and the markup on lines 44–45 of `index.wxml`; `cyl_badge_animations.wxss`; `cyl_debug.js`. Update the differences table. |
+| W1 | 基线：`npm test` 通过；DevTools 中为 P1-6 截下 TabBar 与加号按钮的角标（`CYL_BADGE_ANIMATION_DISABLED = true`）。 | Baseline: `npm test` passes; in DevTools, shots of the tab bar and plus button badges for P1-6 (`CYL_BADGE_ANIMATION_DISABLED = true`). |
+| W2 | **原样抽离**：新建 `src/cyl-badge`：`cyl_badge_model.js`（移入 `cylBadgeText` 等纯函数与样式计算）、组件 `index.js/json/wxml/wxss`（移入两行标记与 `cyl_badge_animations.wxss` 的 `@keyframes`）、`cyl_debug.js`（移入开关）。旧位置改为调用或重新导出新模块：行为、类名、动画名一个都不改。 | **Extract as it is**: create `src/cyl-badge`: `cyl_badge_model.js` (move in the pure functions such as `cylBadgeText` and the style computation), the component `index.js/json/wxml/wxss` (move in the two markup lines and the `@keyframes` of `cyl_badge_animations.wxss`), `cyl_debug.js` (move in the switch). The old places call or re-export the new module: no behaviour, class name or animation name changes. |
+| W3 | `cyl-tab-bar-item` 用 `<cyl-badge>` 替换原来的两行标记（`usingComponents` 注册）；`npm test` 通过，DevTools 截图与 W1 逐像素比较（P1-6）。提交"抽离"这一步。 | `cyl-tab-bar-item` replaces its two markup lines with `<cyl-badge>` (registered in `usingComponents`); `npm test` passes, and DevTools shots match W1's pixel by pixel (P1-6). Commit the extraction step. |
+| W4 | **对齐 iOS**：`cyl-badge` 的公开属性 `value` 用 iOS 语义（`null` 无角标、`""` 红点）；`cyl-tab-bar-item` 内部仍用旧约定（"•" 红点、"" 隐藏），在传给 `cyl-badge` 时转换一次；`cyl-tab-bar` 增加 `cyl_showBadge` / `cyl_clearBadge` 别名（`cyl_showBadgeDot` / `cyl_removeBadge` 保留并转发）；动画名使用 10 个 `CYLBadgeAnimationType` 名字；外观字段对齐 iOS（颜色、文字颜色、边框、偏移、最大值、减弱动态效果），全局默认值 `cylBadgeGlobalAppearance`。 | **Align with iOS**: `cyl-badge`'s public property `value` uses iOS meaning (`null` none, `""` a dot); `cyl-tab-bar-item` keeps its old convention internally ("•" a dot, "" hidden) and converts once when passing to `cyl-badge`; `cyl-tab-bar` gains the aliases `cyl_showBadge` / `cyl_clearBadge` (`cyl_showBadgeDot` / `cyl_removeBadge` stay and forward); animation names are the 10 `CYLBadgeAnimationType` names; appearance fields match iOS (colour, text colour, border, offset, maximum, Reduce Motion), with global defaults in `cylBadgeGlobalAppearance`. |
+| W5 | 更新 `badges.md` 与 `Badge-Debugging.md` 中开关的路径（旧的 `cyl-tab-bar/cyl_debug.js` 重新导出新开关）。阶段 1 验收 P1-1–P1-8。 | Update the switch's path in `badges.md` and `Badge-Debugging.md` (the old `cyl-tab-bar/cyl_debug.js` re-exports the new switch). Phase 1 acceptance P1-1–P1-8. |
+
+```javascript
+// cyl-tab-bar-item: the old internal convention converted once for cyl-badge
+// "" hidden -> null, "•" dot -> "", anything else unchanged
+function cylBadgeValueForComponent(itemBadgeValue) {
+  if (!itemBadgeValue) return null;
+  return itemBadgeValue === '•' ? '' : itemBadgeValue;
+}
+```
+
+### [CN]阶段 2：cyl-animated-item 支持
+### [EN]Phase 2: cyl-animated-item support
+
+| 步骤 / Step | 中文 | English |
+|:---|:---|:---|
+| W6 | `cyl-animated-item` 新增属性 `badgeValue`（类型 `null`/`String`，默认 `null`）、`badgeAttributes`、`reservesBadgeSpace`；图标外包一层 `position: relative` 的节点，`<cyl-badge>` 绝对定位在右上角（不参与布局）。 | `cyl-animated-item` gets the properties `badgeValue` (type `null`/`String`, default `null`), `badgeAttributes` and `reservesBadgeSpace`; wrap the icon in a `position: relative` node and place `<cyl-badge>` absolutely at its top-right (not part of layout). |
+| W7 | 解析函数 `cylBadgeParseAttributes` 在 `cyl-badge/cyl_badge_model.js`，宿主与 item 共用。 | The parser `cylBadgeParseAttributes` lives in `cyl-badge/cyl_badge_model.js`, shared by the host and the item. |
+| W8 | 无障碍：item 的 `aria-label` 末尾加角标描述；角标节点 `aria-hidden="true"`。 | Accessibility: the item's `aria-label` gains the badge description; the badge node gets `aria-hidden="true"`. |
+| W9 | 示例页改用 `badge-value`，删除 canvas 合成；node 测试覆盖模型；`npm run setup` 后在 DevTools 验收 AC1–AC13 并截图。 | The example page uses `badge-value`, with no canvas composition; node tests cover the model; after `npm run setup`, accept AC1–AC13 in DevTools with screenshots. |
 
 ```html
 <!-- cyl-animated-item/index.wxml (excerpt) -->
@@ -251,14 +391,14 @@ export interface CYLBadgeAttributes {
 
 | 中文 | English |
 |:---|:---|
-| **小程序要避免**：(1) 动画 `@keyframes` 留在 `cyl-tab-bar` 的 wxss 里：组件样式隔离，`cyl-badge` 看不到它们，动画不播放（AC5）；(2) 属性默认值写成 `''`：会显示红点，应为 `null`；(3) item 或 Tag 上有 `overflow: hidden`（AC3）；(4) 用 `observers` 改同一个属性造成循环 `setData`；(5) 忘记在 `index.json` 的 `usingComponents` 中注册 `cyl-badge`。 | **Mini program, avoid**: (1) leaving the animation `@keyframes` in `cyl-tab-bar`'s wxss: component styles are isolated, `cyl-badge` cannot see them and nothing animates (AC5); (2) a default of `''`: that shows a dot; it must be `null`; (3) `overflow: hidden` on the item or the tag (AC3); (4) `observers` that set the same property and loop `setData`; (5) forgetting to register `cyl-badge` in `usingComponents` of `index.json`. |
+| **小程序要避免**：(1) 抽离时就改语义（路径 B 先原样搬家，W4 再对齐）；(2) `@keyframes` 留在 `cyl-tab-bar` 的 wxss：组件样式隔离，`cyl-badge` 看不到，动画不播放（AC5）；(3) `cyl-badge` 的默认值写成 `''`（会显示红点，应为 `null`）；(4) item 或 Tag 上有 `overflow: hidden`（AC3）；(5) `observers` 里改同一个属性造成循环 `setData`；(6) 忘记在 `usingComponents` 注册 `cyl-badge`；(7) 删除已发布的 `cyl_showBadgeDot` / `cyl_removeBadge`。 | **Mini program, avoid**: (1) changing meaning while extracting (path B moves first; W4 aligns); (2) leaving the `@keyframes` in `cyl-tab-bar`'s wxss: component styles are isolated, `cyl-badge` cannot see them and nothing animates (AC5); (3) a default of `''` in `cyl-badge` (that shows a dot; it must be `null`); (4) `overflow: hidden` on the item or the tag (AC3); (5) `observers` that set the same property and loop `setData`; (6) forgetting to register `cyl-badge` in `usingComponents`; (7) deleting the released `cyl_showBadgeDot` / `cyl_removeBadge`. |
 
-## [CN]React Native 实施指南
-## [EN]React Native implementation guide
+## [CN]React Native 实施指南（只有阶段 2）
+## [EN]React Native implementation guide (phase 2 only)
 
 | 步骤 / Step | 中文 | English |
 |:---|:---|:---|
-| R1 | 前提：iOS 与 Android 的原生 `CYLAnimatedItemView` 已实现 `badgeValue` 等成员（iOS 文档与上面的 Android 指南）。RN 只做薄封装（`cross-platform.md`）。 | Prerequisite: the native `CYLAnimatedItemView` on iOS and Android has `badgeValue` and the rest (the iOS document and the Android guide above). React Native is a thin wrapper only (`cross-platform.md`). |
+| R1 | 阶段 1 无事可做（没有自己的角标；宿主的 `badgeStyles` 键已与 iOS 相同）。前提：iOS 与 Android 的原生 `CYLAnimatedItemView` 已实现 `badgeValue` 等成员（iOS 文档与上面的 Android 指南）。RN 只做薄封装（`cross-platform.md`）。 | Prerequisite: the native `CYLAnimatedItemView` on iOS and Android has `badgeValue` and the rest (the iOS document and the Android guide above). React Native is a thin wrapper only (`cross-platform.md`). |
 | R2 | 公开 props（`CYLAnimationView.native.tsx` 的 `CYLAnimationViewProps`）：`badgeValue?: string \| null`、`badgeAttributes?: CYLBadgeAttributes`、`reservesBadgeSpace?: boolean`；导出 `CYLBadgeAttributeKey` 常量。 | Public props (`CYLAnimationViewProps` in `CYLAnimationView.native.tsx`): `badgeValue?: string \| null`, `badgeAttributes?: CYLBadgeAttributes`, `reservesBadgeSpace?: boolean`; export the `CYLBadgeAttributeKey` constants. |
 | R3 | Codegen（`CyltabbarAnimationViewNativeComponent.ts`）不能表达 `string \| null` 与任意对象：内部用 `badgeValue: string` + `badgeHidden: boolean`，以及 `badgeAttributesJSON: string`（与宿主的 `badgeStyles` 相同做法）。转换只在 JS 封装中做一次。 | Codegen (`CyltabbarAnimationViewNativeComponent.ts`) cannot express `string \| null` or arbitrary objects: internally use `badgeValue: string` + `badgeHidden: boolean` and `badgeAttributesJSON: string` (as the host's `badgeStyles` does). Convert once, in the JS wrapper. |
 | R4 | 原生：iOS `CyltabbarAnimationView.mm` 与 Android view manager 把它们设到 item 的 `badgeValue` / `badgeAttributes` / `reservesBadgeSpace`，不自己画角标。 | Native: iOS `CyltabbarAnimationView.mm` and the Android view manager set them on the item's `badgeValue` / `badgeAttributes` / `reservesBadgeSpace`, and draw no badge themselves. |
@@ -282,8 +422,8 @@ export function CYLAnimationView({ badgeValue = null, badgeAttributes, ...rest }
 |:---|:---|
 | **RN 要避免**：(1) 用 `""` 表示没有角标（与统一语义相反，"" 是红点）；(2) 在 JS 或原生封装层画角标（违反"薄封装"）；(3) 改 Codegen 规格后忘记重新生成并提交生成的文件。 | **React Native, avoid**: (1) `""` for no badge (the common meaning is the opposite: "" is a dot); (2) drawing the badge in JS or in the native wrapper (breaks "thin wrapper"); (3) changing the Codegen spec without regenerating and committing the generated files. |
 
-## [CN]Flutter 实施指南
-## [EN]Flutter implementation guide
+## [CN]Flutter 实施指南（只有阶段 2）
+## [EN]Flutter implementation guide (phase 2 only)
 
 | 步骤 / Step | 中文 | English |
 |:---|:---|:---|
@@ -320,32 +460,34 @@ void didUpdateWidget(CYLAnimationView old) {
 
 | 中文 | English |
 |:---|:---|
-| 1. iOS 先完成并通过 AC1–AC13（`Mac*` 会话，[Animated-Item-Badge.md](Animated-Item-Badge.md)），API 定稿。2. Android 与鸿蒙（`Win*` 会话），可并行。3. 小程序。4. React Native 与 Flutter（依赖 iOS 与 Android 原生实现）。每个平台在本文"平台验收记录"中写一行：提交、AC1–AC13 逐条结果、截图。 | 1. iOS first, passing AC1–AC13 (a `Mac*` session, [Animated-Item-Badge.md](Animated-Item-Badge.md)); the API is then final. 2. Android and HarmonyOS (`Win*` sessions), in parallel. 3. The mini program. 4. React Native and Flutter (they need the iOS and Android native parts). Each platform adds one row to "Platform acceptance log" below: commits, the result of each of AC1–AC13, screenshots. |
+| 1. iOS 阶段 1 与阶段 2（`Mac*` 会话，[Animated-Item-Badge.md](Animated-Item-Badge.md)），API 定稿。2. Android 与鸿蒙的阶段 1（`Win*` 会话，可并行），然后小程序的阶段 1。3. 各平台阶段 2（Android、鸿蒙、小程序）。4. React Native 与 Flutter（依赖 iOS 与 Android 的阶段 2）。每完成一个阶段，在"平台验收记录"中填一格：提交、P1 或 AC 逐条结果、截图。 | 1. iOS phases 1 and 2 (a `Mac*` session, [Animated-Item-Badge.md](Animated-Item-Badge.md)); the API is then final. 2. Phase 1 on Android and HarmonyOS (`Win*` sessions, in parallel), then on the mini program. 3. Phase 2 on each platform (Android, HarmonyOS, mini program). 4. React Native and Flutter (they need phase 2 on iOS and Android). After each phase, fill one cell of "Platform acceptance log": commits, the result of each P1 or AC item, screenshots. |
 
-## [CN]平台差异
-## [EN]Platform differences
+## [CN]平台差异（待负责人同意）
+## [EN]Platform differences (waiting for the owner)
 
 | 平台 / Platform | 差异 / Difference | 原因 / Reason | 负责人同意 / Owner approved |
 |:---|:---|:---|:---|
 | HarmonyOS | No `cylutils` module (iOS has CYLUtils) | `CYLBadge.ets` uses no shared code today | pending |
-| HarmonyOS, mini program | No public anchor view (an overlay / an absolutely positioned node instead) | The UI frameworks are declarative; the overlay gives the same behaviour (S2, S3) | pending |
+| HarmonyOS | A state object (`CYLBadge`) with unprefixed fields instead of `cyl_badge…` properties | The existing, released ArkUI design; method names already match iOS | pending |
+| HarmonyOS, mini program | No public anchor view (an overlay / an absolutely positioned node instead) | Declarative UI frameworks; the overlay gives the same behaviour (S2, S3) | pending |
+| 小程序 / Mini Program | The tab bar keeps its released badge convention ("" none, "•" dot) internally | Released API; converted once into `cyl-badge`'s iOS meaning | pending |
 | React Native | Internal Codegen props `badgeHidden`, `badgeAttributesJSON` | Codegen cannot express `string \| null` or arbitrary objects; the public props are the common ones | pending |
 
 ## [CN]平台验收记录
 ## [EN]Platform acceptance log
 
-| 平台 / Platform | 提交 / Commits | AC1–AC13 | 截图 / Screenshots |
-|:---|:---|:---|:---|
-| iOS | — | not started | — |
-| Android | — | not started | — |
-| HarmonyOS | — | not started | — |
-| 小程序 / Mini Program | — | not started | — |
-| React Native | — | not started | — |
-| Flutter | — | not started | — |
+| 平台 / Platform | 路径 / Path | 阶段 1（P1-1–P1-8）/ Phase 1 | 阶段 2（AC1–AC13）/ Phase 2 | 提交与截图 / Commits, screenshots |
+|:---|:---|:---|:---|:---|
+| iOS | — | not started | not started | — |
+| Android | A | not started | not started | — |
+| HarmonyOS | A | not started | not started | — |
+| 小程序 / Mini Program | B | not started | not started | — |
+| React Native | — | n/a | not started | — |
+| Flutter | — | n/a | not started | — |
 
 ## [CN]所有平台的常见错误
 ## [EN]Common mistakes on every platform
 
 | 中文 | English |
 |:---|:---|
-| 1. 又把图标和角标合成一张图片。2. 角标挂在会隐藏或被替换的节点上。3. 角标参与布局，图标被推开或缩小。4. 被父节点裁剪。5. 空字符串与空值的含义弄反。6. 键名与 iOS 不同（例如 `bgColor`）。7. 解析写了两份（宿主一份、item 一份）。8. 改了已发布 API 的名字或包名。9. 没有把新模块加入发布与许可证检查。10. 提交时角标动画开关仍为开。 | 1. Rendering icon and badge into one image again. 2. The badge on a node that hides or gets replaced. 3. The badge taking part in layout, pushing or shrinking the icon. 4. Clipped by a parent node. 5. Swapping the meaning of an empty string and an empty value. 6. Key names different from iOS (e.g. `bgColor`). 7. Two parsers (one in the host, one in the item). 8. Renaming a released API or package. 9. New modules missing from publishing and the license check. 10. Committing with the badge-animation switch still on. |
+| 1. 不看现有实现就从零写一个新的角标。2. 路径 A 先抽离再对齐，或路径 B 先对齐再抽离。3. 抽离时改了行为（抽离只是搬家，P1-6 截图必须一致）。4. 抽离后旧的导入路径或方法不可用。5. 构建开关没有跟着角标模块走。6. 又把图标和角标合成一张图片（阶段 2）。7. 角标挂在会隐藏或被替换的节点上，或参与布局、被父节点裁剪。8. 空字符串与空值的含义弄反。9. 键名或动画名与 iOS 不同。10. 新模块没有加入发布与许可证检查；提交时角标动画开关仍为开。 | 1. Writing a new badge from scratch without reading the existing one. 2. On path A extracting before aligning, or on path B aligning before extracting. 3. Changing behaviour while extracting (extraction is only a move; the P1-6 shots must match). 4. Old import paths or methods broken after extraction. 5. The build switch not moving with the badge module. 6. Rendering icon and badge into one image again (phase 2). 7. The badge on a node that hides or gets replaced, taking part in layout, or clipped by a parent. 8. Swapping the meaning of an empty string and an empty value. 9. Key or animation names different from iOS. 10. New modules missing from publishing and the license check; committing with the badge-animation switch on. |
