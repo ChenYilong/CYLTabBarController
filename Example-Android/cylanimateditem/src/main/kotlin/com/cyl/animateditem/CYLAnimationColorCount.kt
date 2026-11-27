@@ -220,7 +220,12 @@ object CYLAnimationColorCount {
         val extension = CYLTabBarAnimationFileExtension(file)
         if (extension != "json" && extension != "gif") return Kind.Undetectable
         cache[file]?.let { return it }
-        val bytes = try { CYLTabBarItemAnimationFiles.readBytes(context, file) } catch (error: java.io.IOException) { null }
+        // [EN] Any read failure is undetectable, not a crash: a content provider can throw `SecurityException`, `IllegalArgumentException` or
+        //      `UnsupportedOperationException`, not only `IOException` (tab animations read the file since `automatic` became their default, 2026-11-27).
+        // [CN] 任何读取失败都视为无法检测，而不是崩溃：内容提供者可能抛出 `SecurityException`、`IllegalArgumentException` 或 `UnsupportedOperationException`，
+        //      不只是 `IOException`（自 2026-11-27 `automatic` 成为 Tab 动画默认值起，Tab 动画也会读取文件）。
+        @Suppress("TooGenericExceptionCaught")
+        val bytes = try { CYLTabBarItemAnimationFiles.readBytes(context, file) } catch (error: Exception) { null }
             ?: return Kind.Undetectable
         return kind(extension, bytes).also { cache[file] = it }
     }

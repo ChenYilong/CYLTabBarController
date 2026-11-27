@@ -517,4 +517,11 @@ class CYLAnimatedItemTintV2Test {
         assertNull("no explicit icon color reaches the item: the artwork stays (the red dot)",
             CYLTabBarItemAnimationTint.resolveItem(null, null, CYLAnimationRenderingMode.Automatic, one, true, true, CYLTabBarItemAnimationTint.IconColors(null, null)))
     }
+
+    /** [EN] A provider that refuses to read (Robolectric's unregistered content stream) is undetectable, not a crash (DemoMigrationTest on CI, 2026-11-27). [CN] 拒绝读取的内容提供者（Robolectric 未注册的内容流）为无法检测，而不是崩溃。 */
+    @Test
+    fun anUnreadableContentUriIsUndetectableNotACrash() {
+        CYLAnimationColorCount.clearCache()
+        assertEquals(CYLAnimationColorCount.Kind.Undetectable, CYLAnimationColorCount.kindOfSource(context, "content://com.cyl.missing/tab.json"))
+    }
 }
