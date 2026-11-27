@@ -4,6 +4,8 @@
 package com.cyl.tabbar
 
 import android.animation.ObjectAnimator
+import com.cyl.badge.BuildConfig
+import com.cyl.badge.R
 import com.chenyilong.cyldeallocblockexecutor.BadgeEvents
 import com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry
 import android.animation.PropertyValuesHolder
@@ -421,6 +423,15 @@ fun View.cylGetActualBadgeSuperView(): ViewGroup? = (this as? CYLBadgeHosting)?.
 interface CYLBadgeHosting {
     /** [EN] The view the badge is added to. [CN] 角标所加到的视图。 */
     val cylBadgeAnchorView: ViewGroup
+
+    /** [EN] The view the badge is placed against, the icon; default the host itself. [CN] 角标对齐的视图，即图标；默认是宿主自身。 */
+    val cylBadgeIconView: View get() = cylBadgeAnchorView
+
+    /**
+     * [EN] true: the host places its badge itself in its own layout (the plus button), so the badge gets no margins; default false.
+     * [CN] true：宿主在自己的布局中放置角标（加号按钮），因此角标没有外边距；默认 false。
+     */
+    val cylBadgePlacesBadge: Boolean get() = false
 }
 
 /**
@@ -499,14 +510,14 @@ fun View.cylRefreshBadge() {
         return
     }
     val host = badge.parent as? ViewGroup ?: return
-    val anchor = when (this) { is CYLTabBarItemButton -> iconView; is CYLPlusButton -> imageView; else -> this }
+    val anchor = (this as? CYLBadgeHosting)?.cylBadgeIconView ?: this
     val anchorRight = if (host === this) anchor.right else right
     val anchorTop = if (host === this) anchor.top else top
-    // [EN] The plus button places its badge itself (`CYLPlusButton.onLayout`), with no margins: margins make the FrameLayout
+    // [EN] The plus button places its badge itself (the host's own layout, `cylBadgePlacesBadge`), with no margins: margins make the FrameLayout
     //      measure itself around the badge, so each new badge value widened the button by half a badge and stretched its image.
     // [CN] PlusButton 自己放置角标（`CYLPlusButton.onLayout`），不使用 margin：margin 会让 FrameLayout 把角标计入自身尺寸，每次角标变化都会把按钮
     //      加宽半个角标并拉伸图片。
-    if (host is CYLPlusButton) {
+    if (host is CYLBadgeHosting && host.cylBadgePlacesBadge) {
         (badge.layoutParams as? ViewGroup.MarginLayoutParams)?.let { params -> params.setMargins(0, 0, 0, 0); badge.layoutParams = params }
         host.requestLayout()
         badge.bringToFront()

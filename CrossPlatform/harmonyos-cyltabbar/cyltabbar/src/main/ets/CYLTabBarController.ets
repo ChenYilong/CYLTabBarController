@@ -4,7 +4,7 @@ import { CYLLiquidGlassTokens, CYLLiquidGlassCapsuleModifier, CYLLiquidGlassCont
 import { curves, window, KeyboardAvoidMode } from '@kit.ArkUI';
 import { CYLTabBarItemAttributes, CYLTitleOffset } from './CYLTabBarItem';
 import { CYLPlusButton, cyl_liquidGlassContentDy } from './CYLPlusButton';
-import { CYLBadge, CYLBadgeView } from './CYLBadge';
+import { CYLBadge, CYLBadgeView } from 'cylbadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLSVGAView } from './svga/CYLSVGAView';
 import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint } from './CYLRiveTabBarItemAnimator';
@@ -13,7 +13,7 @@ import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEn
   CYL_RENDERING_MODE_AUTOMATIC, CYLLiquidGlass, cylAnimatedItemDetectColorKind, CYLAnimatedItemSource, CYL_COLOR_COUNT_UNKNOWN } from 'cylanimateditem';
 import { CYLAnimatedItemLottie } from 'cylanimateditem_lottie';
 // TODO: replace the file: dependency (cyltabbar/oh-package.json5, a vendored copy) with the ohpm package after the library is published (owner's OK).
-import { LifecycleController } from 'cyldeallocblockexecutor';
+import { LifecycleController } from 'cylutils';
 import { CYLLocalizedString, cyl_textOf } from './CYLLocalization';
 import { CYLTabButtonAnimation, CYLTabButtonProperty, CYLTabButtonView, CYLTabButtonViewImpl } from './CYLTabButtonAnimation';
 

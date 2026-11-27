@@ -11,6 +11,7 @@
     "cylanimateditem": "file:../cylanimateditem",
     "cylanimateditem_lottie": "file:../cylanimateditem_lottie",
     "cylanimateditemrive": "file:../cylanimateditemrive",
-    "cyldeallocblockexecutor": "file:../cyldeallocblockexecutor"
+    "cylbadge": "file:../cylbadge",
+    "cylutils": "file:../cylutils"
   }
 }

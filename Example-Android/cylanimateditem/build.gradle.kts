@@ -40,9 +40,9 @@ android {
 
 dependencies {
     implementation(libs.androidx.appcompat)
-    // [EN] The animated item posts `cyl.animation.didStart` / `didPause` / `didResume` / `didStop` through CYLDeallocBlockExecutor (docs/Lifecycle-Library.md).
-    // [CN] 动效 item 通过 CYLDeallocBlockExecutor 发出 `cyl.animation.didStart` / `didPause` / `didResume` / `didStop`（docs/Lifecycle-Library.md）。
-    implementation(libs.cyldeallocblockexecutor)
+    // [EN] D7 and D8: the badge sits below the item (`:cylbadge`, which brings `:cylutils` and the lifecycle library).
+    // [CN] D7 与 D8：角标位于 item 之下（`:cylbadge`，带入 `:cylutils` 与生命周期库）。
+    api(project(":cylbadge"))
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)

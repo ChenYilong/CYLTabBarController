@@ -14,7 +14,7 @@ import lottie, { AnimationItem } from '@ohos/lottie';
 import { image } from '@kit.ImageKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { util } from '@kit.ArkTS';
-import { LifecycleController } from 'cyldeallocblockexecutor';
+import { LifecycleController } from 'cylutils';
 import {
   CYLAnimatedItemEngineBinding, CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemPlayer,
   CYLAnimatedItemSource, cylAnimatedItemParseHexColor,

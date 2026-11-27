@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "cylutils",
+    "type": "har",
+    "deviceTypes": [
+      "phone",
+      "tablet"
+    ]
+  }
+}

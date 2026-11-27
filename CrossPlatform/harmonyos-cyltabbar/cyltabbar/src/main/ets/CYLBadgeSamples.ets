@@ -1,4 +1,4 @@
-import { CYLBadge, CYLBadgeAnimationType } from './CYLBadge';
+import { CYLBadge, CYLBadgeAnimationType } from 'cylbadge';
 import { CYLLocalizedString, cyl_localizationKey } from './CYLLocalization';
 
 /**

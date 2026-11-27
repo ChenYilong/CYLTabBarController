@@ -31,7 +31,7 @@ export { CYLRiveLoopPolicy, CYLRiveAnimationBuilder, cylRegisterRiveEngine } fro
 export { CYLSVGAView } from './src/main/ets/svga/CYLSVGAView';
 export { CYLSVGAMovie, cylLoadSVGAMovie, cylDecodeSVGAMovie } from './src/main/ets/svga/CYLSVGAMovie';
 export { cylDrawSVGAFrame, cylParseSVGAPath } from './src/main/ets/svga/CYLSVGARenderer';
-export { CYLBadge, CYLBadgeView, CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset } from './src/main/ets/CYLBadge';
+export { CYLBadge, CYLBadgeView, CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset } from 'cylbadge';
 export {
   CYLTabBarConfigurationParser, CYLTabBarConfigurationFormat, CYLTabBarConfigurationErrorCode, CYLTabBarConfigurationError,
   CYLTabBarConfigurationErrorDomain, CYLTabBarConfigurationMaximumLength, CYLTabBarConfigurationMaximumDepth

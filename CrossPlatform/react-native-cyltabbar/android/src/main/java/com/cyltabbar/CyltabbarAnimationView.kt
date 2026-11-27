@@ -116,6 +116,28 @@ class CyltabbarAnimationView(context: Context) : FrameLayout(context) {
   /** `itemBorderColor` as an ARGB int; null clears it. */
   fun applyItemBorderColor(value: Int?) { item.itemBorderColor = value }
 
+  private var badgeHidden = true
+  private var badgeValue = ""
+  private var badgeAttributesJSON = ""
+
+  /**
+   * The badge (docs/Animated-Item-Badge-CrossPlatform.md, phase 2): the item draws it, nothing here does. `badgeHidden` (the default) is no badge,
+   * `badgeValue` "" a dot; the style keys arrive as JSON. The item is touched only when the result changes, so the animation does not replay.
+   * Written statically, not compiled yet.
+   */
+  private fun applyBadge() {
+    val value = if (badgeHidden) null else badgeValue
+    if (item.badgeValue != value) item.badgeValue = value
+    val attributes = badgeAttributesJSON.takeIf { it.isNotEmpty() }?.let { runCatching { org.json.JSONObject(it) }.getOrNull() }
+      ?.let { json -> json.keys().asSequence().associateWith { key -> json.opt(key).takeIf { it !== org.json.JSONObject.NULL } } }
+    if (item.badgeAttributes != attributes) item.badgeAttributes = attributes
+  }
+
+  fun applyBadgeValue(value: String?) { badgeValue = value ?: ""; applyBadge() }
+  fun applyBadgeHidden(value: Boolean) { badgeHidden = value; applyBadge() }
+  fun applyBadgeAttributesJSON(value: String?) { badgeAttributesJSON = value ?: ""; applyBadge() }
+  fun applyReservesBadgeSpace(value: Boolean) { item.reservesBadgeSpace = value }
+
   fun play() = item.animatedItemPlayer.play()
 
   fun stopAtProgress(progress: Float) = item.animatedItemPlayer.stopAtProgress(progress)

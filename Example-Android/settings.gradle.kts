@@ -43,8 +43,8 @@ if (standalone) {
     }
 }
 if (standalone) {
-    include(":tabpages", ":cylanimateditem", ":classifymenu", ":cyltabbar", ":demokit", ":app", ":example-gif", ":example-pag", ":example-rive")
+    include(":tabpages", ":cylutils", ":cylbadge", ":cylanimateditem", ":classifymenu", ":cyltabbar", ":demokit", ":app", ":example-gif", ":example-pag", ":example-rive")
     project(":classifymenu").projectDir = file("cylclassifymenu")
 } else {
-    include(":tabpages", ":cylanimateditem", ":cyltabbar")
+    include(":tabpages", ":cylutils", ":cylbadge", ":cylanimateditem", ":cyltabbar")
 }

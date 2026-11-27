@@ -14,14 +14,6 @@ android {
     defaultConfig {
         minSdk = 23
         consumerProguardFiles("consumer-rules.pro")
-        // [EN] Badge debugging build option (docs/Badge-Debugging.md): `-PcylBadgeAnimationDisabled=true` turns badge animations off.
-        // [CN] 角标调试编译选项（docs/Badge-Debugging.md）：`-PcylBadgeAnimationDisabled=true` 关闭角标动画。
-        buildConfigField("boolean", "CYL_BADGE_ANIMATION_DISABLED",
-            (project.findProperty("cylBadgeAnimationDisabled")?.toString() == "true").toString())
-    }
-
-    buildFeatures {
-        buildConfig = true
     }
 
     compileOptions {
@@ -49,16 +41,13 @@ dependencies {
     // The page registry and the configuration rules (pure Kotlin). 页面注册表与配置规则（纯 Kotlin）。
     api(project(":tabpages"))
     api(project(":cylanimateditem"))
+    // [EN] The badge (and, below it, the utils and the lifecycle library) comes through `:cylanimateditem`; named here as the tab bar uses it directly.
+    // [CN] 角标（以及其下的 utils 与生命周期库）经由 `:cylanimateditem` 得到；这里写出是因为 TabBar 直接使用它。
+    api(project(":cylbadge"))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.fragment.ktx)
-    // [EN] The callback registry of the layout block, the same logic as iOS (CYLDeallocBlockExecutor), from JitPack, pinned to a commit.
-    //      TODO: replace the commit pin with a release once the library is published to Maven Central. This core is published as
-    //      io.github.chenyilong:cyltabbarcontroller, and its POM must not reference an unpublished artifact: the next Android release
-    //      waits for that (it needs the owner's OK).
-    // [CN] 布局 block 的回调注册表，与 iOS 逻辑相同（CYLDeallocBlockExecutor），来自 JitPack，固定到某次提交。
-    //      TODO：库发布到 Maven Central 后，把提交固定改为正式版本。本核心发布为 io.github.chenyilong:cyltabbarcontroller，其 POM 不能引用
-    //      尚未发布的构件：下一次 Android 发布要等它（需要所有者同意）。
-    implementation(libs.cyldeallocblockexecutor)
+    // [EN] D8: the lifecycle library (CYLDeallocBlockExecutor) comes through `:cylutils`, the only module that declares it.
+    // [CN] D8：生命周期库（CYLDeallocBlockExecutor）经由 `:cylutils` 得到，只有它声明该库。
     // [EN] Only for `cyl_setupWithViewPager2`: an app that uses it adds ViewPager2 itself. [CN] 仅用于 `cyl_setupWithViewPager2`：使用它的 App 自行添加 ViewPager2。
     compileOnly(libs.androidx.viewpager2)
     testImplementation(libs.androidx.viewpager2)

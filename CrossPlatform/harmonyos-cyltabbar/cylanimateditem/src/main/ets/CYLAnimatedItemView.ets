@@ -3,8 +3,9 @@ import { CYLLiquidGlass } from './CYLLiquidGlass';
 import { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier } from './CYLAnimatedItemBackground';
 import { CYLAnimatedItemContrast, CYLAnimatedItemContrastKindIcon } from './CYLAnimatedItemContrast';
 import { CYLAnimatedItemColorInput, CYLAnimatedItemColorResolver } from './CYLAnimatedItemColorResolver';
-import { LifecycleCenter, LifecycleController } from 'cyldeallocblockexecutor';
+import { LifecycleCenter, LifecycleController } from 'cylutils';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
+import { CYLBadge, CYLBadgeView, cylApplyBadgeAttributes, cylBadgeAnimationType } from 'cylbadge';
 import {
   CYLAnimatedItemCountdown, CYLAnimatedItemCountdownListener, CYLAnimatedItemCountdownStorage, CYLCountdownRunning, CYLCountdownFinished,
   CYLCountdownTickIntervalMillis, cylCountdownText, cylCountdownTitleWidth
@@ -543,6 +544,18 @@ export struct CYLAnimatedItemView {
   private cylSetRestartHandler: (handler: () => void) => void = (handler: () => void) => {
     this.cylRestartHandler = handler;
   };
+  // [EN] The item's badge (docs/Animated-Item-Badge-CrossPlatform.md, HarmonyOS phase 2), the iOS names: `badgeValue` undefined (the default) no badge, '' a
+  //      dot, otherwise the text; `badgeAttributes` the style keys of `CYLBadgeAttributeKey`; `reservesBadgeSpace` reserves the badge's overhang when
+  //      measuring (default false: the badge is not measured); `badgeAccessibilityLabel` the localized description read after the label. The badge is
+  //      drawn by `CYLBadgeView` in the icon's own stack, never merged into an image. Written statically, not built in DevEco yet.
+  // [CN] item 的角标（docs/Animated-Item-Badge-CrossPlatform.md，鸿蒙阶段 2），使用 iOS 的名称：`badgeValue` 为 undefined（默认）无角标、'' 红点，其余为文字；
+  //      `badgeAttributes` 为 `CYLBadgeAttributeKey` 的样式键；`reservesBadgeSpace` 在测量时预留角标伸出的部分（默认 false：不计入角标）；
+  //      `badgeAccessibilityLabel` 为在标签之后朗读的本地化描述。角标由图标自己的 Stack 中的 `CYLBadgeView` 绘制，从不合成进图片。静态编写，尚未在 DevEco 中构建。
+  @Prop @Watch('cylBadgeDidChange') badgeValue: string | undefined = undefined;
+  @Prop @Watch('cylBadgeDidChange') badgeAttributes: Record<string, Object> | undefined = undefined;
+  @Prop reservesBadgeSpace: boolean = false;
+  @Prop badgeAccessibilityLabel: string = '';
+  @State cylBadge: CYLBadge = new CYLBadge();
   @Prop isItemEnabled: boolean = true;
   @Prop axis: CYLAnimatedItemAxis = CYLAnimatedItemAxis.Horizontal;
   @Prop iconSize: number = 24;
@@ -961,6 +974,8 @@ export struct CYLAnimatedItemView {
 
   aboutToAppear(): void {
     CYLLiquidGlass.trackSystemColorMode();
+    // [EN] A badge set at creation: @Watch does not fire for the first value. [CN] 创建时设置的角标：@Watch 对第一个值不会触发。
+    this.cylBadgeDidChange();
     this.cylLifecycle = new LifecycleController<CYLAnimatedItemView>(this);
     this.cylLifecycle.registry.addDeallocCallback<CYLAnimatedItemView>((owner: CYLAnimatedItemView) => owner.cylTeardown(), { key: 'cyl.animatedItem.teardown' });
     this.cylLifecycle.aboutToAppear();
@@ -1516,7 +1531,30 @@ export struct CYLAnimatedItemView {
   }
 
   cylAccessibilityText(): string {
-    return this.itemAccessibilityText.length > 0 ? this.itemAccessibilityText : this.cylTitleText();
+    const own: string = this.itemAccessibilityText.length > 0 ? this.itemAccessibilityText : this.cylTitleText();
+    // [EN] The badge is read after the item's own text; a dot adds nothing without a description (the app supplies the localized one). [CN] 角标在 item 自身文字之后朗读；没有描述时红点不追加内容（本地化描述由 App 提供）。
+    const value: string | null = this.cylBadge.value;
+    const badgeText: string = value === null ? '' : (this.badgeAccessibilityLabel.length > 0 ? this.badgeAccessibilityLabel : value);
+    return [own, badgeText].filter((part: string) => part.length > 0).join(', ');
+  }
+
+  /**
+   * [EN] Hands `badgeValue` and `badgeAttributes` to the badge: undefined clears it, a string shows it. Only a change reaches here (@Watch), so the animation
+   *      does not replay.
+   * [CN] 把 `badgeValue` 与 `badgeAttributes` 交给角标：undefined 清除，字符串显示。只有变化才会到这里（@Watch），因此动画不会重播。
+   */
+  cylBadgeDidChange(): void {
+    if (this.badgeValue === undefined) {
+      this.cylBadge.clearBadge();
+      return;
+    }
+    cylApplyBadgeAttributes(this.cylBadge, this.badgeAttributes);
+    this.cylBadge.showBadgeValue(this.badgeValue, cylBadgeAnimationType(this.badgeAttributes));
+  }
+
+  /** [EN] The room `reservesBadgeSpace` asks for: the badge's radius on each side. [CN] `reservesBadgeSpace` 要求的空间：每侧一个角标半径。 */
+  cylBadgeReserve(): number {
+    return this.reservesBadgeSpace && this.cylBadge.value !== null ? (this.cylBadge.radius ?? 4) : 0;
   }
 
   @Builder
@@ -1584,11 +1622,19 @@ export struct CYLAnimatedItemView {
         .opacity(this.animationLoaded && !this.cylShowsImageAfterEnd ? this.cylAnimationAlpha() : 0)
         .accessibilityLevel('no')
       }
+      // [EN] The badge, last but one in the stack so it is above the icon and the animation: not measured (an overlay), not touchable, hidden from accessibility.
+      // [CN] 角标，位于 Stack 的倒数第二层，在图标与动画之上：不参与测量（浮层）、不可点击、对无障碍隐藏。
+      if (this.cylBadge.value !== null) {
+        CYLBadgeView({ badge: this.cylBadge, anchorWidth: this.iconSize })
+          .hitTestBehavior(HitTestMode.None)
+          .accessibilityLevel('no-hide-descendants')
+      }
       if (this.accessoryPlacement === CYLAnimatedItemAccessoryPlacement.TopTrailing) {
         this.cylAccessory()
       }
     }
     .alignContent(Alignment.TopEnd)
+    .margin(this.cylBadgeReserve())
   }
 
   @Builder

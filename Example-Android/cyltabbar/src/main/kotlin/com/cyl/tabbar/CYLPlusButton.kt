@@ -98,6 +98,8 @@ interface CYLPlusButtonSubclassing {
 open class CYLPlusButton(context: Context) : FrameLayout(context), CYLBadgeHosting {
     /** [EN] The button itself hosts its badge. [CN] 按钮自身承载其角标。 */
     override val cylBadgeAnchorView: ViewGroup get() = this
+    override val cylBadgeIconView: View get() = imageView
+    override val cylBadgePlacesBadge: Boolean get() = true
 
 
     /**

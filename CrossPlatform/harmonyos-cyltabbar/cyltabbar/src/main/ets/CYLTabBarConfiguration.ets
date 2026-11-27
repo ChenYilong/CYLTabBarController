@@ -2,7 +2,7 @@ import { util } from '@kit.ArkTS';
 import { i18n } from '@kit.LocalizationKit';
 import { CYLLocalizationLanguage } from './CYLLocalization';
 import { CYLTabBarItemAttributes } from './CYLTabBarItem';
-import { CYLOffset } from './CYLBadge';
+import { CYLOffset } from 'cylbadge';
 import { CYLPlusButton } from './CYLPlusButton';
 import {
   CYLTabBarConfigurationParser, CYLTabBarConfigurationFormat, CYLTabBarConfigurationError, CYLTabBarConfigurationErrorCode

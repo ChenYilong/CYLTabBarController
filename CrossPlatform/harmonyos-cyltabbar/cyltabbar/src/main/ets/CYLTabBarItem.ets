@@ -1,4 +1,4 @@
-import { CYLOffset } from './CYLBadge';
+import { CYLOffset } from 'cylbadge';
 
 /**
  * [EN] The attributes of one tab, the CYLTabBarItem* keys of the iOS library (CYLTabBarController.h) as typed fields:

@@ -123,6 +123,26 @@ class CyltabbarAnimationViewManager : SimpleViewManager<CyltabbarAnimationView>(
     view?.applyItemBorderWidth(value)
   }
 
+  @ReactProp(name = "badgeValue")
+  override fun setBadgeValue(view: CyltabbarAnimationView?, value: String?) {
+    view?.applyBadgeValue(value)
+  }
+
+  @ReactProp(name = "badgeHidden", defaultBoolean = true)
+  override fun setBadgeHidden(view: CyltabbarAnimationView?, value: Boolean) {
+    view?.applyBadgeHidden(value)
+  }
+
+  @ReactProp(name = "badgeAttributesJSON")
+  override fun setBadgeAttributesJSON(view: CyltabbarAnimationView?, value: String?) {
+    view?.applyBadgeAttributesJSON(value)
+  }
+
+  @ReactProp(name = "reservesBadgeSpace")
+  override fun setReservesBadgeSpace(view: CyltabbarAnimationView?, value: Boolean) {
+    view?.applyReservesBadgeSpace(value)
+  }
+
   @ReactProp(name = "itemBorderColor", customType = "Color")
   override fun setItemBorderColor(view: CyltabbarAnimationView?, value: Int?) {
     view?.applyItemBorderColor(value)

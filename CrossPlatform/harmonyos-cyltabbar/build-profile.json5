@@ -56,6 +56,14 @@
       "srcPath": "./cylclassifymenu"
     },
     {
+      "name": "cylutils",
+      "srcPath": "./cylutils"
+    },
+    {
+      "name": "cylbadge",
+      "srcPath": "./cylbadge"
+    },
+    {
       "name": "cylanimateditem",
       "srcPath": "./cylanimateditem"
     },

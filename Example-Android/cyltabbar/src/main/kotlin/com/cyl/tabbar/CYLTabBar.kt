@@ -30,6 +30,7 @@ import kotlin.math.abs
 class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: Int) : com.cyl.animateditem.CYLAnimatedItemView(context), CYLBadgeHosting {
     /** [EN] The button itself hosts its badge. [CN] 按钮自身承载其角标。 */
     override val cylBadgeAnchorView: ViewGroup get() = this
+    override val cylBadgeIconView: View get() = iconView
 
 
     /**

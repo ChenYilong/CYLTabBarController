@@ -2,7 +2,7 @@ import { CYLAnimatedItemView, CYLAnimatedItemAxis, CYLAnimatedItemAnimationConte
 import { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier } from './CYLAnimatedItemBackground';
 import { CYLAnimatedItemStackModel, CYLAnimatedItemStackItem, CYLAnimatedItemStackElement } from './CYLAnimatedItemStackModel';
 import { deviceInfo } from '@kit.BasicServicesKit';
-import { LifecycleController } from 'cyldeallocblockexecutor';
+import { LifecycleController } from 'cylutils';
 
 /**
  * [EN] The screen reader role of a stack item: a button when it acts, text otherwise. `accessibilityRole` exists from API 18

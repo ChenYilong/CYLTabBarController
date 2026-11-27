@@ -1,0 +1,11 @@
+{
+  "name": "cylbadge",
+  "version": "1.0.0",
+  "description": "CYLBadge for HarmonyOS NEXT (ArkTS / ArkUI): animated badges for any node, on top of cylutils.",
+  "main": "Index.ets",
+  "author": "ChenYilong",
+  "license": "MIT",
+  "dependencies": {
+    "cylutils": "file:../cylutils"
+  }
+}

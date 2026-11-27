@@ -65,6 +65,9 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
     (arguments["itemContentHorizontalInset"] as? Number)?.let { item.itemContentHorizontalInset = it.toFloat() }
     (arguments["itemBorderWidth"] as? Number)?.let { item.itemBorderWidth = it.toFloat() }
     (arguments["itemBorderColor"] as? Number)?.let { item.itemBorderColor = it.toInt() }
+    // The badge (docs/Animated-Item-Badge-CrossPlatform.md, phase 2): the item draws it. Absent is no badge, "" a dot. Written statically, not compiled yet.
+    applyBadge(arguments["badgeValue"], arguments["badgeAttributes"])
+    (arguments["reservesBadgeSpace"] as? Boolean)?.let { item.reservesBadgeSpace = it }
     (arguments["selected"] as? Boolean)?.let { item.isSelected = it }
     fitIcon()
     (arguments["source"] as? String)?.let { item.animationURL = it }
@@ -124,11 +127,19 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
       "setItemContentHorizontalInset" -> item.itemContentHorizontalInset = (argument as? Number)?.toFloat()
       "setItemBorderWidth" -> item.itemBorderWidth = (argument as? Number)?.toFloat() ?: 0f
       "setItemBorderColor" -> item.itemBorderColor = (argument as? Number)?.toInt()
+      "setBadge" -> (argument as? Map<*, *>)?.let { applyBadge(it["value"], it["attributes"]) }
+      "setReservesBadgeSpace" -> item.reservesBadgeSpace = argument == true
       "play" -> item.animatedItemPlayer.play()
       "stopAtProgress" -> item.animatedItemPlayer.stopAtProgress((argument as? Number)?.toFloat() ?: 0f)
       "restart" -> item.restartAnimation()
       else -> return result.notImplemented()
     }
     result.success(null)
+  }
+
+  /** A string is the badge text ("" a dot), anything else (null) clears it; the style map is set first so the badge appears with its style. */
+  private fun applyBadge(value: Any?, attributes: Any?) {
+    item.badgeAttributes = (attributes as? Map<*, *>)?.entries?.associate { it.key.toString() to it.value }
+    item.badgeValue = value as? String
   }
 }

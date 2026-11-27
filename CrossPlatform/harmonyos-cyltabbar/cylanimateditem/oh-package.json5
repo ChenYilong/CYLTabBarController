@@ -6,6 +6,7 @@
   "author": "ChenYilong",
   "license": "MIT",
   "dependencies": {
-    "cyldeallocblockexecutor": "file:../cyldeallocblockexecutor"
+    "cylbadge": "file:../cylbadge",
+    "cylutils": "file:../cylutils"
   }
 }

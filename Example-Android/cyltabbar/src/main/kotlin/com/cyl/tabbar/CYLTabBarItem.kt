@@ -4,7 +4,6 @@
 
 package com.cyl.tabbar
 
-import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import androidx.annotation.ColorInt
 import androidx.fragment.app.Fragment
@@ -158,45 +157,6 @@ class CYLTabBarItem(attributes: Map<String, Any?> = emptyMap()) {
     override fun toString(): String = "CYLTabBarItem(title=$title, identifier=$cyl_tabBarItemIdentifier)"
 }
 
-
-/**
- * [EN] UIEdgeInsets. [CN] 边距。
- */
-data class CYLEdgeInsets(val top: Float, val left: Float, val bottom: Float, val right: Float) {
-    companion object {
-        @JvmField val zero = CYLEdgeInsets(0f, 0f, 0f, 0f)
-    }
-}
-
-/**
- * [EN] UIFont: a size in sp and an optional typeface. [CN] 字体：字号（sp）与可选的 Typeface。
- */
-data class CYLFont(val size: Float, val typeface: Typeface? = null, val bold: Boolean = false) {
-    companion object {
-        /**
-         * [EN] "15", "bold:15" or "Family-Style:12" as in a configuration file. [CN] 配置文件中的写法。
-         */
-        @JvmStatic
-        fun fromConfigurationValue(value: Any?): CYLFont? {
-            val text = when (value) {
-                is Number -> return CYLFont(value.toFloat()).takeIf { value.toFloat() > 0 }
-                is String -> value.trim()
-                else -> return null
-            }
-            val parts = text.split(':')
-            val size = parts.last().toFloatOrNull() ?: return null
-            if (size <= 0 || size > 200) return null
-            if (parts.size == 1) return CYLFont(size)
-            val name = parts[0].trim()
-            val weights = listOf("ultralight", "thin", "light", "regular", "medium", "semibold", "bold", "heavy", "black")
-            return if (name.lowercase() in weights) {
-                CYLFont(size, bold = name.lowercase() in listOf("semibold", "bold", "heavy", "black"))
-            } else {
-                CYLFont(size, Typeface.create(name.substringBefore('-'), if (name.contains("Bold", true)) Typeface.BOLD else Typeface.NORMAL))
-            }
-        }
-    }
-}
 
 /**
  * [EN] The page of a tab: a Fragment (the iOS `UIViewController`). [CN] Tab 的页面：Fragment（对应 iOS 的 `UIViewController`）。

@@ -8,6 +8,6 @@
   "dependencies": {
     "@ohos/rive": "1.0.4",
     "cylanimateditem": "file:../cylanimateditem",
-    "cyldeallocblockexecutor": "file:../cyldeallocblockexecutor"
+    "cylutils": "file:../cylutils"
   }
 }

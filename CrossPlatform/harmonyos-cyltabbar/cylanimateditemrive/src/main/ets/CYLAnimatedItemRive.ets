@@ -23,7 +23,7 @@
  */
 import { Fit, Loop, RendererType, RiveAnimationView, SMINumber, ViewModelInstance, initializeRive } from '@ohos/rive';
 import { deviceInfo } from '@kit.BasicServicesKit';
-import { LifecycleController } from 'cyldeallocblockexecutor';
+import { LifecycleController } from 'cylutils';
 import {
   CYLAnimatedItemEngineBinding, CYLAnimatedItemEngineState, CYLAnimatedItemEngineViews, CYLAnimatedItemEngines,
   CYLAnimatedItemPlayer, CYLAnimatedItemSource, cylAnimatedItemARGBInteger, cylAnimatedItemParseHexColor,

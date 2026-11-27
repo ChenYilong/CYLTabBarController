@@ -27,6 +27,14 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import com.cyl.tabbar.CYLBadgeAccessibilityDescription
+import com.cyl.tabbar.CYLBadgeAttributeKey
+import com.cyl.tabbar.CYLBadgeHosting
+import com.cyl.tabbar.cylApplyBadgeAttributes
+import com.cyl.tabbar.cylBadgeRadius
+import com.cyl.tabbar.cylClearBadge
+import com.cyl.tabbar.cylIsShowBadge
+import com.cyl.tabbar.cylShowBadgeValue
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.max
@@ -140,7 +148,10 @@ class CYLAnimatedItemColorRole(
 open class CYLAnimatedItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-) : FrameLayout(context, attrs), CYLAnimatedItemContent, CYLAnimatedItemAnimating, CYLTabBarItemAnimationFailureHandling {
+) : FrameLayout(context, attrs), CYLAnimatedItemContent, CYLAnimatedItemAnimating, CYLTabBarItemAnimationFailureHandling, CYLBadgeHosting {
+
+    /** [EN] The badge goes on the anchor, which sits on the icon (`CYLBadgeHosting`). [CN] 角标放在位于图标上的锚点上（`CYLBadgeHosting`）。 */
+    override val cylBadgeAnchorView: ViewGroup get() = badgeAnchorView
 
     /**
      * [EN] Creates the view with its background style: `CYLAnimatedItemView(context, CYLAnimatedItemBackgroundStyle.LiquidGlass)` is all an
@@ -650,12 +661,14 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         }
         val widthLimit = if (MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.UNSPECIFIED) Int.MAX_VALUE / 2 else MeasureSpec.getSize(widthMeasureSpec)
         val (iconW, _) = if (showsIcon()) iconSize() else 0 to 0
-        val inset = 2 * contentInsetPx()
+        // [EN] `reservesBadgeSpace` (D6): the badge's overhang is reserved on both sides, so a tight host does not clip it. [CN] `reservesBadgeSpace`（D6）：在两侧都预留角标伸出的部分，使紧凑的宿主不会裁剪它。
+        val reserve = badgeReservePx()
+        val inset = 2 * contentInsetPx() + 2 * reserve
         val reserved = paddingLeft + paddingRight + inset + (if (accessoryInline()) dp(accessorySizeDp + spacingDp).roundToInt() else 0) +
             (if (axis == CYLAnimatedItemAxis.Horizontal && showsIcon()) iconW + dp(spacingDp).roundToInt() else 0)
         val (contentW, contentH) = measureContent(max(0, widthLimit - reserved))
         val width = resolveSize(contentW + paddingLeft + paddingRight + inset, widthMeasureSpec)
-        val height = resolveSize(contentH + paddingTop + paddingBottom, heightMeasureSpec)
+        val height = resolveSize(contentH + paddingTop + paddingBottom + 2 * reserve, heightMeasureSpec)
         setMeasuredDimension(width, height)
     }
 
@@ -664,8 +677,9 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         applyBuiltInTitleOnce()
         itemBackgroundRenderer.layoutGlass(r - l, b - t)
         if (isDividerMode) return
-        val inset = contentInsetPx()
-        layoutContent(paddingLeft + inset, paddingTop, r - l - paddingRight - inset, b - t - paddingBottom)
+        val reserve = badgeReservePx()
+        val inset = contentInsetPx() + reserve
+        layoutContent(paddingLeft + inset, paddingTop + reserve, r - l - paddingRight - inset, b - t - paddingBottom - reserve)
     }
 
     /**
@@ -733,6 +747,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         animationView?.let {
             it.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
             it.layout(left, top, left + width, top + height)
+        }
+        // [EN] The badge anchor sits on the icon itself, above the icon and the animation view; not measured. [CN] 角标锚点位于图标本身之上、图标与动画视图上方；不参与测量。
+        storedBadgeAnchor?.let {
+            it.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
+            it.layout(left, top, left + width, top + height)
+            it.visibility = if (isDividerMode || !showsIcon()) View.GONE else View.VISIBLE
+            it.bringToFront()
         }
     }
 
@@ -1910,13 +1931,99 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         super.onDetachedFromWindow()
     }
 
+    // MARK: - Badge 角标
+
+    /**
+     * [EN] null: no badge (default); "": a dot; otherwise the text (a number above the maximum shows "99+"). Sets the badge on [badgeAnchorView] through
+     *      `:cylbadge`; `cylShowBadgeValue(...)` on the item reaches the same view. Written statically, not compiled yet.
+     * [CN] null：没有角标（默认）；""：红点；否则为文字（超过最大值的数字显示 "99+"）。通过 `:cylbadge` 在 [badgeAnchorView] 上设置角标；在 item 上调用
+     *      `cylShowBadgeValue(...)` 落在同一个视图。静态编写，尚未编译。
+     */
+    var badgeValue: String? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            updateBadge()
+        }
+
+    /**
+     * [EN] The badge's style, the keys of [CYLBadgeAttributeKey]. null: the defaults of `CYLBadgeAppearance`.
+     * [CN] 角标样式，键为 [CYLBadgeAttributeKey]。null：`CYLBadgeAppearance` 的默认值。
+     */
+    var badgeAttributes: Map<String, Any?>? = null
+        set(value) {
+            field = value
+            updateBadge()
+        }
+
+    /**
+     * [EN] false (default): the badge is not measured. true: measuring reserves its overhang on both sides (D6).
+     * [CN] false（默认）：测量时不计入角标。true：测量时在两侧预留角标伸出的部分（D6）。
+     */
+    var reservesBadgeSpace: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            requestLayout()
+        }
+
+    /** [EN] True while a badge is shown. [CN] 显示角标时为 true。 */
+    val isShowingBadge: Boolean get() = storedBadgeAnchor?.cylIsShowBadge() == true
+
+    private var storedBadgeAnchor: FrameLayout? = null
+
+    /**
+     * [EN] A transparent view kept on the icon itself at every layout, above the icon and the animation view; created once, never replaced, so an image or
+     *      animation switch never hides the badge. Not measured, not clickable, hidden from accessibility. A subclass that overrides [layoutContent] calls
+     *      `placeIcon`, which places it.
+     * [CN] 在每次布局时保持在图标本身之上的透明视图，位于图标与动画视图上方；只创建一次、从不替换，因此切换图片或动画不会隐藏角标。不参与测量、不可点击、对无障碍隐藏。
+     *      重写 [layoutContent] 的子类调用 `placeIcon`，由它放置锚点。
+     */
+    val badgeAnchorView: FrameLayout
+        get() = storedBadgeAnchor ?: FrameLayout(context).apply {
+            clipChildren = false
+            clipToPadding = false
+            isClickable = false
+            isFocusable = false
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+            this@CYLAnimatedItemView.addView(this, LayoutParams(0, 0))
+            storedBadgeAnchor = this
+        }
+
+    private fun updateBadge() {
+        val value = badgeValue
+        if (value == null) {
+            storedBadgeAnchor?.cylClearBadge()
+        } else {
+            val attributes = badgeAttributes.orEmpty()
+            val anchor = badgeAnchorView
+            anchor.cylApplyBadgeAttributes(attributes)
+            anchor.cylShowBadgeValue(value, CYLBadgeAttributeKey.animationType(attributes))
+            // [EN] The border is a property of the badge view, which exists only now. [CN] 边框是角标视图的属性，它到现在才存在。
+            anchor.cylApplyBadgeAttributes(attributes)
+        }
+        clipChildren = false
+        requestLayout()
+        updateAccessibility()
+    }
+
+    /** [EN] The badge description read after the title, from `:cylbadge`. [CN] 在标题之后朗读的角标描述，来自 `:cylbadge`。 */
+    private fun badgeAccessibilityText(): String? = badgeValue?.let { CYLBadgeAccessibilityDescription(context, it) }
+
+    /**
+     * [EN] The extra room [reservesBadgeSpace] asks for when measuring: the badge's radius on each side, in px. Zero when off or without a badge.
+     * [CN] 开启 [reservesBadgeSpace] 时测量要求的额外空间：每侧一个角标半径（px）。关闭或没有角标时为零。
+     */
+    protected fun badgeReservePx(): Int =
+        if (reservesBadgeSpace && badgeValue != null) (storedBadgeAnchor?.cylBadgeRadius ?: 0f).let { dp(it).roundToInt() } else 0
+
     // MARK: - Accessibility 无障碍
 
     /**
      * [EN] What a screen reader says for the item: the title by default. Subclasses add a badge, a count or a state.
      * [CN] 读屏朗读的条目文本：默认为标题。子类可以加入角标、数量或状态。
      */
-    protected open fun accessibilityText(): CharSequence = CYLAnimatedItemAccessibilityText(title, null)
+    protected open fun accessibilityText(): CharSequence = CYLAnimatedItemAccessibilityText(title, badgeAccessibilityText())
 
     /**
      * [EN] Updates the content description after a change the view cannot see (a subclass's badge, for example).

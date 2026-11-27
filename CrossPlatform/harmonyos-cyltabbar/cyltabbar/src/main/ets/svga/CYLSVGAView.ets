@@ -1,5 +1,5 @@
 import { image } from '@kit.ImageKit';
-import { LifecycleController } from 'cyldeallocblockexecutor';
+import { LifecycleController } from 'cylutils';
 import { http } from '@kit.NetworkKit';
 import { CYLSVGAMovie, cylLoadSVGAMovie } from './CYLSVGAMovie';
 import { cylDrawSVGAFrame } from './CYLSVGARenderer';

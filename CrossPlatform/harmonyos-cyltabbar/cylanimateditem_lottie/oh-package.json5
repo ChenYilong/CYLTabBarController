@@ -8,6 +8,6 @@
   "dependencies": {
     "@ohos/lottie": "^2.0.38",
     "cylanimateditem": "file:../cylanimateditem",
-    "cyldeallocblockexecutor": "file:../cyldeallocblockexecutor"
+    "cylutils": "file:../cylutils"
   }
 }
