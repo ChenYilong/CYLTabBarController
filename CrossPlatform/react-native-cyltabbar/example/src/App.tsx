@@ -13,6 +13,7 @@ import { CYLTabBar, type CYLTabBarBadge, type CYLTabBarItem, type CYLTabBarPlusB
 import { SKINS, THEME_ICONS, type CYLSkin } from './CYLSkins';
 import { CYLDemoList, type CYLDemoRow } from './demo/CYLDemoList';
 import { CYLPlaybackControls } from './demo/CYLPlaybackControls';
+import { CYLBadgeTagsPage } from './demo/CYLBadgeTagsPage';
 import { CYL_PICKER_LANGUAGES, CYLDemoLanguage, CYLFlaggedLanguageName, CYLIsRightToLeft, CYLLanguageName, CYLSetDemoLanguage, t, tDevice } from './demo/CYLLocalization';
 
 /** A required image's URL, for the keys the component passes as they are. 被原样传递的键使用 require 图片的 URL。 */
@@ -525,6 +526,7 @@ function CYLMainTabBar({
     return () => clearTimeout(timer);
   }, [skinName, skinPicker.skin.network]);
   const [orangePagePushed, setOrangePagePushed] = useState(false);
+  const [badgeTagsShown, setBadgeTagsShown] = useState(false);
   // The badge samples' subtitle uses the page's `title`; a badge row changes only `navigationItem.title` ("Home (n)").
   // 角标样例副标题使用页面的 `title`；点击角标行只修改 `navigationItem.title`（「Home (n)」）。
   const pageTitle = homePageTitle(selectedIndex, styleType);
@@ -597,6 +599,7 @@ function CYLMainTabBar({
           }
           onRow={(row: CYLDemoRow) => {
             if (row.skin) return skinPicker.choose(row.skin.name);
+            if (row.id === 'badgeTags') return setBadgeTagsShown(true);
             if (row.id === 'skin') return setSkinMenuVisible(true);
             if (row.id === 'flatShowHide') return setTabBarHidden((hidden) => !hidden);
             if (row.id === 'memoryWarning') return setMemoryWarningRequest((request) => request + 1);
@@ -664,6 +667,13 @@ function CYLMainTabBar({
       />
       {/* -[CYLHomeViewController pushToNewViewController]: a full screen orange page without a navigation bar, over the
           tab bar; tap to go back. 覆盖 TabBar 的全屏橙色页面，无导航栏；点击返回。 */}
+      {badgeTagsShown ? (
+        <View style={[styles.orangePage, { backgroundColor: colors.background, paddingTop: insetTop }]}>
+          <View style={styles.container}>
+            <CYLBadgeTagsPage colors={colors} onClose={() => setBadgeTagsShown(false)} />
+          </View>
+        </View>
+      ) : null}
       {orangePagePushed ? (
         <Pressable style={styles.orangePage} accessibilityRole="button" accessibilityLabel="Back" onPress={() => setOrangePagePushed(false)} />
       ) : null}

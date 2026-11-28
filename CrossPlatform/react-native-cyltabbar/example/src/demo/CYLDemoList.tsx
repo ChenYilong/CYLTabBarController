@@ -117,6 +117,12 @@ export function CYLDemoList({ colors, tint, values, switches, currentSkin, badge
     },
   ];
 
+  // [EN] React Native only: the badge tag page (docs/Animated-Item-Badge-CrossPlatform.md, step R5). [CN] 仅 React Native：角标 Tag 页（步骤 R5）。
+  sections[0]!.data = [
+    { id: 'badgeTags', icon: null, title: 'CYLAnimationView badges', subtitle: 'badgeValue · badgeAttributes', accessory: 'chevron' },
+    ...sections[0]!.data,
+  ];
+
   const icon = (row: CYLDemoRow) => {
     if (row.skin) {
       const skin = row.skin;
