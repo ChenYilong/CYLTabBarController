@@ -471,7 +471,7 @@ open class CYLTabBarItemAnimationFactory(val registry: CYLTabBarItemAnimatorRegi
  */
 interface CYLTabBarItemAnimationPlayableView {
     fun cyl_playAnimationView()
-    fun cyl_showAnimationViewLastFrame()
+    fun cylShowAnimationViewLastFrame()
     fun cyl_stopAnimationView()
     /**
      * [EN] Pauses a playing animation where it is (`cyl.animation.didPause` follows from the item); optional, default: keeps playing.
@@ -569,7 +569,7 @@ open class CYLTabBarItemViewAnimator(
         return object : CYLTabBarItemAnimationBasePlayer(view) {
             private var appliedColors: Map<String, Int>? = null
             override fun play() = playable.cyl_playAnimationView()
-            override fun showLastFrame() = playable.cyl_showAnimationViewLastFrame()
+            override fun showLastFrame() = playable.cylShowAnimationViewLastFrame()
             override fun stop() = playable.cyl_stopAnimationView()
             override fun pause() = playable.cyl_pauseAnimationView()
             override fun resume() = playable.cyl_resumeAnimationView()
@@ -1531,7 +1531,7 @@ class CYLRiveTabBarItemAnimationView internal constructor(context: Context, priv
     private fun loopSeconds(machine: String?, trigger: String?): Double =
         if (machine != null && trigger == null && activeDuration > 0) activeDuration + LOOP_PAUSE_SECONDS else LOOP_SECONDS
 
-    override fun cyl_showAnimationViewLastFrame() {
+    override fun cylShowAnimationViewLastFrame() {
         // [EN] The selection is recorded either way, so a theme instance bound later (night mode) keeps it.
         // [CN] 无论哪种情况都记录选中状态，之后绑定的主题实例（深色模式）会保留它。
         if (stateMachine != null) setActive(true) else { isActive = true; CYLReflection.call(rive, "pause") }

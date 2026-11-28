@@ -215,7 +215,7 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
         }
     }
 
-    override fun cyl_showAnimationViewLastFrame() {
+    override fun cylShowAnimationViewLastFrame() {
         cancelPass()
         time = duration - 1
         invalidate()

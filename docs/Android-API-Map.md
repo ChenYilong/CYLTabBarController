@@ -1027,7 +1027,7 @@
 |:---|:---|:---|:---|
 | `CYLTabBarItemAnimationPlayableView` | `CYLTabBarItemAnimationPlayableView` | done |  |
 | `CYLTabBarItemAnimationPlayableView` `-cyl_playAnimationView` | `CYLTabBarItemAnimationPlayableView.cyl_playAnimationView` | done |  |
-| `CYLTabBarItemAnimationPlayableView` `-cyl_showAnimationViewLastFrame` | `CYLTabBarItemAnimationPlayableView.cyl_showAnimationViewLastFrame` | done |  |
+| `CYLTabBarItemAnimationPlayableView` `-cyl_showAnimationViewLastFrame` | `CYLTabBarItemAnimationPlayableView.cylShowAnimationViewLastFrame` | done |  |
 | `CYLTabBarItemAnimationPlayableView` `-cyl_stopAnimationView` | `CYLTabBarItemAnimationPlayableView.cyl_stopAnimationView` | done |  |
 | `CYLTabBarItemAnimationPlayableView` `-cyl_applyAnimationViewColors:` | `CYLTabBarItemAnimationPlayableView.cyl_applyAnimationViewColors` | done |  |
 | `CYLTabBarItemAnimationViewProviding` | `CYLTabBarItemAnimationViewProviding` | done |  |

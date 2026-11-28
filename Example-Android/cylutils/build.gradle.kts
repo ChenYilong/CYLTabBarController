@@ -1,5 +1,5 @@
-// [EN] CYLUtils for Android: the bottom module (geometry types, `CYLFont`, `CYLEnums`, `CYLLocalization`) and the only one that depends on the lifecycle library (D8). Written statically, not built yet (docs/Animated-Item-Badge-CrossPlatform.md, step A3).
-// [CN] Android 版 CYLUtils：最底层模块（几何类型、`CYLFont`、`CYLEnums`、`CYLLocalization`），也是唯一依赖生命周期库的模块（D8）。 静态编写，尚未构建（docs/Animated-Item-Badge-CrossPlatform.md，步骤 A3）。
+// [EN] CYLUtils for Android: the bottom module (geometry types, `CYLFont`, `CYLEnums`, `CYLLocalization`) and the only one that depends on the lifecycle library (D8). See docs/Animated-Item-Badge-CrossPlatform.md, step A3.
+// [CN] Android 版 CYLUtils：最底层模块（几何类型、`CYLFont`、`CYLEnums`、`CYLLocalization`），也是唯一依赖生命周期库的模块（D8）。见 docs/Animated-Item-Badge-CrossPlatform.md，步骤 A3。
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)

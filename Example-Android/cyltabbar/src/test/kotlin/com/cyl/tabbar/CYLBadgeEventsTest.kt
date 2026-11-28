@@ -1,6 +1,5 @@
 package com.cyl.tabbar
 
-import com.chenyilong.cyldeallocblockexecutor.BadgeEvents
 import com.chenyilong.cyldeallocblockexecutor.LifecycleCenter
 import com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry
 import org.junit.After

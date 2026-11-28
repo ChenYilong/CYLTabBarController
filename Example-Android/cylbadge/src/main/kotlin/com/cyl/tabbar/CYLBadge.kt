@@ -7,7 +7,6 @@ import com.cyl.animateditem.CYLOffset
 import android.animation.ObjectAnimator
 import com.cyl.badge.BuildConfig
 import com.cyl.badge.R
-import com.chenyilong.cyldeallocblockexecutor.BadgeEvents
 import com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry
 import android.animation.PropertyValuesHolder
 import android.content.Context

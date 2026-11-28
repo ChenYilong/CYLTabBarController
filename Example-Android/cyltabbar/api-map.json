@@ -2488,7 +2488,7 @@
  },
  "CYLTabBarItemAnimationPlayableView -cyl_showAnimationViewLastFrame": {
   "status": "done",
-  "android": "CYLTabBarItemAnimationPlayableView.cyl_showAnimationViewLastFrame"
+  "android": "CYLTabBarItemAnimationPlayableView.cylShowAnimationViewLastFrame"
  },
  "CYLTabBarItemAnimationPlayableView -cyl_stopAnimationView": {
   "status": "done",

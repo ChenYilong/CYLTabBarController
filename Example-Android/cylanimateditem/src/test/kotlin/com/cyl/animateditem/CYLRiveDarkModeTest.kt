@@ -71,7 +71,7 @@ class CYLRiveDarkModeTest {
             mapOf("viewModelInstance" to "Light", "darkViewModelInstance" to "Dark"))
         view.cyl_bindThemeInstance(configuration(night = false))
         assertEquals("Light", machine.bound?.name)
-        view.cyl_showAnimationViewLastFrame()
+        view.cylShowAnimationViewLastFrame()
         view.cyl_bindThemeInstance(configuration(night = true))
         assertEquals("Dark", machine.bound?.name)
         assertEquals(true, viewModel.created["Dark"]?.active?.value)
