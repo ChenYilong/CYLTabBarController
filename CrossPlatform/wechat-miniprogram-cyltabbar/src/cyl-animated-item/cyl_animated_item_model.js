@@ -1023,18 +1023,21 @@ const cylAnimatedItemDefaultGlassTintDark = `rgba(255,255,255,${cylAnimatedItemD
  * [EN] The style text of the drawn glass: the tint (the default frosted tint without a usable color), blur and highlight.
  * [CN] 绘制的玻璃的样式文本：着色（没有可用颜色时为默认的磨砂着色）、模糊与高光。
  */
-function cylAnimatedItemGlassCss(color, tintAlpha, isDark) {
+function cylAnimatedItemGlassCss(color, tintAlpha, isDark, badged) {
   const tint = (color ? cylAnimatedItemGlassTint(color, tintAlpha) : '') || (isDark ? cylAnimatedItemDefaultGlassTintDark : cylAnimatedItemDefaultGlassTintLight)
   const filter = cylAnimatedItemGlassFilter()
   let css = `background-color:${tint};backdrop-filter:${filter};-webkit-backdrop-filter:${filter};`
-  css += `box-shadow:inset 0 1px 0 rgba(255,255,255,${isDark ? 0.18 : 0.6});overflow:hidden;`
+  css += `box-shadow:inset 0 1px 0 rgba(255,255,255,${isDark ? 0.18 : 0.6});`
+  // [EN] A badge sits on top and may leave the item while it animates, so a badged item is never clipped (the radius still shapes the background).
+  // [CN] 角标位于最上层，动画时可以超出条目，因此带角标的条目不裁剪（圆角仍决定背景形状）。
+  if (!badged) css += 'overflow:hidden;'
   return css
 }
 
 /**
  * @returns {{css: string, glass: boolean}} the inline style of the root view, '' when no `item…` background property is set
  */
-function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, borderColor, isDark, tintAlpha, contentInset) {
+function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, borderColor, isDark, tintAlpha, contentInset, badged) {
   const border = Math.max(0, Number(borderWidth) || 0)
   const explicitInset = cylAnimatedItemExplicitInset(contentInset)
   const used = style === 'liquidGlass' || (color || '') !== '' || Number(cornerRadius) >= 0 || border > 0 || (borderColor || '') !== '' || explicitInset >= 0
@@ -1051,7 +1054,7 @@ function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, bord
   if (inset > 0) css += `--cyl-item-inset:${inset}px;`
   if (border > 0) css += `border:${border}px solid ${borderColor || 'transparent'};box-sizing:border-box;`
   if (glass) {
-    css += cylAnimatedItemGlassCss(color, tintAlpha, isDark)
+    css += cylAnimatedItemGlassCss(color, tintAlpha, isDark, badged)
   } else if (color) {
     css += `background-color:${color};`
   }

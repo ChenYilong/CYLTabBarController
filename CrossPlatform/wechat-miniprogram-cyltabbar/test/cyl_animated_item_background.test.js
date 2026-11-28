@@ -15,6 +15,13 @@ const {
 
 test.afterEach(() => cylAnimatedItemLiquidGlassSetActiveOverride(undefined))
 
+test('a badged Liquid Glass item is not clipped, so its badge can leave it', () => {
+  const css = (badged) => cylAnimatedItemBackground('liquidGlass', '', -1, 0, '', false, -1, -1, badged).css
+  assert.match(css(false), /overflow:hidden/)
+  assert.doesNotMatch(css(true), /overflow:hidden/)
+  assert.match(css(true), new RegExp(`border-radius:${cylAnimatedItemCornerRadiusCapsule}px`))
+})
+
 test('nothing is drawn until an item… background property is set', () => {
   assert.deepEqual(cylAnimatedItemBackground('flat', '', -1, 0, '', false), { css: '', glass: false })
 })

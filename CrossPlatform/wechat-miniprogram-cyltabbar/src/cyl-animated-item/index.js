@@ -25,6 +25,7 @@ const cylGIFColorKindCache = {}
 const { CYLAnimatedItemPlayer } = require('./cyl_animated_item_player')
 const { CYLAnimatedItemCountdown, CYL_COUNTDOWN_TICK_INTERVAL } = require('./cyl_animated_item_countdown')
 const { LifecycleController } = require('../cyl-utils/index')
+const { cylBadgeViewModel } = require('../cyl-badge/cyl_badge_model')
 const {
   cylAnimationDidStart, cylAnimationDidStop, cylForgetAnimation, cylPauseAnimation, cylResumeAnimation,
 } = require('./cyl_animation_events')
@@ -393,7 +394,7 @@ Component({
   },
 
   observers: {
-    'itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha, itemContentHorizontalInset, userInterfaceStyle, itemHighlightedBackgroundColor, enabled': function () {
+    'itemBackgroundStyle, itemBackgroundColor, itemCornerRadius, itemBorderWidth, itemBorderColor, itemGlassTintAlpha, itemContentHorizontalInset, userInterfaceStyle, itemHighlightedBackgroundColor, enabled, badgeValue, badgeAttributes': function () {
       this.cylRefreshBackground()
       // [EN] The colors are judged against the glass: a changed glass changes them. [CN] 颜色是对照玻璃判断的：玻璃变化，颜色也变化。
       this.cylUpdate()
@@ -531,7 +532,8 @@ Component({
     cylRefreshBackground() {
       const d = this.data
       const dark = cylAnimatedItemIsDark({ userInterfaceStyle: d.userInterfaceStyle, systemTheme: d.systemTheme })
-      const background = cylAnimatedItemBackground(d.itemBackgroundStyle, d.itemBackgroundColor, d.itemCornerRadius, d.itemBorderWidth, d.itemBorderColor, dark, d.itemGlassTintAlpha, d.itemContentHorizontalInset)
+      const badged = cylBadgeViewModel(d.badgeValue, d.badgeAttributes).showsBadge
+      const background = cylAnimatedItemBackground(d.itemBackgroundStyle, d.itemBackgroundColor, d.itemCornerRadius, d.itemBorderWidth, d.itemBorderColor, dark, d.itemGlassTintAlpha, d.itemContentHorizontalInset, badged)
       const drawsLiquidGlass = cylAnimatedItemDrawsLiquidGlass(d)
       // [EN] The pressed background (`itemHighlightedBackgroundColor`, while pressed and enabled) replaces the tint. [CN] 按下背景（`itemHighlightedBackgroundColor`，按下且可用时）取代着色。
       const highlight = d.itemPressed && d.enabled !== false ? cylAnimatedItemTintColor(d.itemHighlightedBackgroundColor) : ''

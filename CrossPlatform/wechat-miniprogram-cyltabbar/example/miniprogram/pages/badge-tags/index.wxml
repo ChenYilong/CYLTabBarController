@@ -3,7 +3,7 @@
   <button class="cyl-badge-tags-toggle" size="mini" bindtap="cylToggleBadges">{{shows ? 'badgeValue = null' : 'badgeValue'}}</button>
   <view class="cyl-badge-tags-header" aria-role="heading">Badges</view>
   <view class="cyl-badge-tags-card">
-    <cyl-animated-item wx:for="{{tags}}" wx:key="id" id="{{item.id}}" class="cyl-badge-tags-tag" title="{{item.title}}" image="{{image}}" icon-size="{{30}}" title-spacing="{{16}}" reserves-badge-space="{{true}}" badge-value="{{shows ? item.value : null}}" badge-attributes="{{item.attributes}}" item-background-style="liquidGlass" item-corner-radius="{{999}}" item-content-horizontal-inset="{{10}}" />
-    <cyl-animated-item id="cyl-badge-tag-none" class="cyl-badge-tags-tag" title="badgeValue = null" image="{{image}}" icon-size="{{30}}" title-spacing="{{16}}" item-background-style="liquidGlass" item-corner-radius="{{999}}" item-content-horizontal-inset="{{10}}" />
+    <cyl-animated-item wx:for="{{tags}}" wx:key="id" id="{{item.id}}" class="cyl-badge-tags-tag" title="{{item.title}}" image="{{image}}" icon-size="{{30}}" title-spacing="{{16}}" reserves-badge-space="{{true}}" badge-value="{{shows ? item.value : null}}" badge-attributes="{{item.attributes}}" item-background-style="liquidGlass" item-corner-radius="{{capsule}}" item-content-horizontal-inset="{{10}}" />
+    <cyl-animated-item id="cyl-badge-tag-none" class="cyl-badge-tags-tag" title="badgeValue = null" image="{{image}}" icon-size="{{30}}" title-spacing="{{16}}" item-background-style="liquidGlass" item-corner-radius="{{capsule}}" item-content-horizontal-inset="{{10}}" />
   </view>
 </view>
