@@ -811,12 +811,14 @@ docs/
 │   ├── code.md
 │   ├── cross-platform.md
 │   ├── dependencies.md
+│   ├── docs-lookup.md
 │   ├── documentation.md
 │   ├── examples.md
 │   ├── git.md
 │   ├── instructions.md
 │   ├── macos.md
 │   ├── plus-button.md
+│   ├── reply-greeting.md
 │   ├── screenshots.md
 │   ├── task-workflow.md
 │   ├── testing.md
