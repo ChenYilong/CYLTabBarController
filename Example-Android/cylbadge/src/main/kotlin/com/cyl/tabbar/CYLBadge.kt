@@ -494,7 +494,7 @@ fun cylBadgeOrigin(anchorRight: Int, anchorTop: Int, badge: View, offset: CYLOff
 /**
  * [EN] iOS puts a badge's center 2 pt right of its host's right edge. [CN] iOS 把角标中心放在宿主右边缘右侧 2 pt 处。
  */
-internal const val CYL_BADGE_CORNER_GAP_DP = 2f
+const val CYL_BADGE_CORNER_GAP_DP = 2f
 
 /**
  * [EN] `-cylRefreshBadge`: places the badge at the top-right corner plus `cylBadgeCenterOffset`. [CN] 把角标放到右上角并加上偏移。
