@@ -15,7 +15,7 @@ export {
   cyl_pushViewController, cyl_pushOrPopToViewController, cyl_selectTabBarItemWithIdentifier, cyl_tabBarItemIdentifiers,
   cyl_indexOfTabBarItemWithIdentifier, cyl_simulateMemoryWarning, CYLMemoryWarningStorageKey, cyl_addTabBarControllerDeallocCallback
 } from './src/main/ets/CYLTabBarController';
-export { CYLBadgeSample, cyl_badgeTitleForRow, cyl_badgeStyleCount, cyl_applyBadgeSample } from './src/main/ets/CYLBadgeSamples';
+export { CYLBadgeSample, cylBadgeTitleForRow, cylBadgeStyleCount, cylApplyBadgeSample } from './src/main/ets/CYLBadgeSamples';
 export { CYLLottieIcon } from './src/main/ets/CYLLottieIcon';
 /**
  * [EN] The animated item component, for apps that place one outside the tab bar (they import only cyltabbar).
@@ -44,7 +44,7 @@ export {
 } from './src/main/ets/CYLThemeManager';
 export {
   CYLLocalizedString, cyl_localizationKey, cyl_setLocalizationContext, cyl_textOf, CYLLocalizationLanguage,
-  CYLSetLocalizationLanguage, cyl_addLocalizationLanguageListener, cyl_removeLocalizationLanguageListener, cyl_pickerLanguages
+  CYLSetLocalizationLanguage, cylAddLocalizationLanguageListener, cylRemoveLocalizationLanguageListener, cyl_pickerLanguages
 } from './src/main/ets/CYLLocalization';
 export { badgeAccessibilityText, cylIconRenderingMode, cylStaticIconTintColor, cylIconFillColorOf, cylTabBarBackgroundColor } from './src/main/ets/CYLTabBarController';
 export {

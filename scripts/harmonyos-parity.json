@@ -18,7 +18,7 @@
     "45": "`entry/pages/SystemTabs.ets`: ArkUI `Tabs` (system tab bar) with the same four tabs and a badge on Messages (built; emulator check pending / 已编译，模拟器验证待做)",
     "46": "`entry/pages/SystemTabs.ets` withPlus: a floating plus button stands in (the system bar has none) (built; emulator check pending / 已编译，模拟器验证待做)",
     "47": "`entry/pages/AnotherTabBar.ets`: another CYLTabBarController with a square orange plus button (built; emulator check pending / 已编译，模拟器验证待做)",
-    "50": "`CYLBadgeSamples` / `cyl_applyBadgeSample`: 35 badge samples, one per row, on every tab (built; emulator check pending / 已编译，模拟器验证待做)",
+    "50": "`CYLBadgeSamples` / `cylApplyBadgeSample`: 35 badge samples, one per row, on every tab (built; emulator check pending / 已编译，模拟器验证待做)",
     "51": "`entry/pages/Index.ets` `sections()`: every tab shows the same demo sections and its badge rows (built; emulator check pending / 已编译，模拟器验证待做)",
     "53": "`entry/pages/Index.ets` Home badge row: title becomes 首页(n), pushes the orange `pages/TextPage` (built; emulator check pending / 已编译，模拟器验证待做)",
     "56": "`CYLTabBarController.tabBarHidden` + `tabBarHiddenAnimated` (slide transition), comes back after 2 s (built; emulator check pending / 已编译，模拟器验证待做)",

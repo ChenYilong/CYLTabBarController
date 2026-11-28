@@ -1,7 +1,7 @@
 {
   "name": "cylanimateditem",
   "version": "1.0.0",
-  "description": "CYLAnimatedItem for HarmonyOS NEXT (ArkTS / ArkUI): an icon + title view with an optional animation, accessory and gestures. Depends on the lifecycle library cyldeallocblockexecutor only, and on no animation library.",
+  "description": "CYLAnimatedItem for HarmonyOS NEXT (ArkTS / ArkUI): an icon + title view with an optional animation, accessory and gestures. Depends on cylbadge and cylutils (which brings the lifecycle library), and on no animation library.",
   "main": "Index.ets",
   "author": "ChenYilong",
   "license": "MIT",

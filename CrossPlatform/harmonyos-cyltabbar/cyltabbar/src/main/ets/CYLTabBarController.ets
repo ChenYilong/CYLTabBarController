@@ -1946,10 +1946,10 @@ export struct CYLTabBarController {
     Column() {
       Stack() {
         // [EN] The image and its badge in a box of the image's size: the badge is placed from the image's top-left, as iOS
-        //      places it on the plus button (center at its top-right corner plus cyl_badgeCenterOffset), not from the slot,
+        //      places it on the plus button (center at its top-right corner plus cylBadgeCenterOffset), not from the slot,
         //      which is wider than the image (the badge was 8 to 15 vp inside the image).
         // [CN] 图片与角标放在与图片等大的盒子中：角标以图片左上角为原点定位，与 iOS 在加号按钮上的位置相同（中心位于右上角再加
-        //      cyl_badgeCenterOffset），而不是以比图片更宽的槽位为原点（此前角标落在图片内侧 8 到 15 vp）。
+        //      cylBadgeCenterOffset），而不是以比图片更宽的槽位为原点（此前角标落在图片内侧 8 到 15 vp）。
         Stack() {
           if (this.plusButton?.backgroundImage !== undefined) {
             Image(this.plusButton.backgroundImage)

@@ -1,8 +1,8 @@
 import { promptAction, display } from '@kit.ArkUI';
 import {
   CYLTabBarController, CYLTabBarItemAttributes, CYLPlusButton, CYLPlusButtonPageIndex, CYLBadge, CYLBadgeView,
-  CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset, CYLEdgeInsets, cyl_simulateMemoryWarning, cyl_badgeTitleForRow,
-  cyl_badgeStyleCount, cyl_applyBadgeSample, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle,
+  CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset, CYLEdgeInsets, cyl_simulateMemoryWarning, cylBadgeTitleForRow,
+  cylBadgeStyleCount, cylApplyBadgeSample, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle,
   CYLTabBarMinimizeBehavior, cyl_reportScroll, cyl_reportScrollStarted, cyl_pausesAnimationsWhileUserScrolls, cyl_reportScrollStopped, cyl_pushViewController, CYLThemeManager, CYLThemeManagerCenter,
   cyl_tabBarItemIdentifiers, cyl_indexOfTabBarItemWithIdentifier, cyl_selectTabBarItemWithIdentifier
 } from 'cyltabbar';
@@ -272,11 +272,11 @@ struct Index {
     const known = DEMO_LANGUAGES.indexOf(current);
     this.languageIndex = known >= 0 ? known : DEMO_LANGUAGES.length - 1;
     for (const page of [DEMO_HOME, DEMO_CITY, DEMO_MESSAGE, DEMO_ME]) {
-      const count = Math.max(page === DEMO_HOME || page === DEMO_ME ? 30 : 15, cyl_badgeStyleCount());
+      const count = Math.max(page === DEMO_HOME || page === DEMO_ME ? 30 : 15, cylBadgeStyleCount());
       const badges: CYLBadge[] = [];
       for (let row = 0; row < count; row++) {
         const badge = new CYLBadge();
-        cyl_applyBadgeSample(badge, row, CYL_BADGE_ICON);
+        cylApplyBadgeSample(badge, row, CYL_BADGE_ICON);
         badges.push(badge);
       }
       this.rowBadges.set(page, badges);
@@ -523,7 +523,7 @@ struct Index {
     const badges = this.rowBadges.get(page) ?? [];
     return badges.map((badge: CYLBadge, row: number) => {
       const item: DemoRow = {
-        id: `badge-${row}`, title: cyl_badgeTitleForRow(row), badgeRow: row,
+        id: `badge-${row}`, title: cylBadgeTitleForRow(row), badgeRow: row,
         subtitle: CYLLocalizedString('%@ CYLTabBarController on HarmonyOS', page),
         action: () => this.badgeRowTapped(page, row),
       };

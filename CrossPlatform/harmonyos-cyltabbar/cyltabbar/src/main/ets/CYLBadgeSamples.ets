@@ -36,35 +36,35 @@ export const CYLBadgeSamples: CYLBadgeSample[] = [
   { title: cyl_localizationKey('Breathe (forever)'), api: 'CYLBadgeAnimationTypeBreathe', value: '', animationType: A.Breathe },
   { title: cyl_localizationKey('Shake, stops with Reduce Motion'), api: 'badgeRespectsReduceMotion', value: '3', animationType: A.Shake, reduceMotion: true },
   { title: cyl_localizationKey('Rotation (forever)'), api: 'rotationAnimationWithDuration:', value: 'new', custom: 'rotation' },
-  { title: cyl_localizationKey('Spring (forever)'), api: 'cyl_springAnimationForDuration:', value: '3', animationType: A.ScaleOnce, repeats: -1 },
+  { title: cyl_localizationKey('Spring (forever)'), api: 'cylSpringAnimationForDuration:', value: '3', animationType: A.ScaleOnce, repeats: -1 },
   { title: cyl_localizationKey('Shake ×3 (cyl_shakeAnimationRepeatTimes)'), value: '3', animationType: A.Shake, repeats: 3 },
   { title: cyl_localizationKey('Bounce ×3 (cyl_bounceAnimationRepeatTimes)'), value: '3', animationType: A.Bounce, repeats: 3 },
-  { title: cyl_localizationKey('Scale ×3'), api: 'cyl_scaleAnimationFromScale:', value: '3', animationType: A.Scale, repeats: 3 },
-  { title: cyl_localizationKey('Blink ×3'), api: 'cyl_opacityTimesAnimationRepeatTimes:', value: '', animationType: A.Breathe, repeats: 3 },
+  { title: cyl_localizationKey('Scale ×3'), api: 'cylScaleAnimationFromScale:', value: '3', animationType: A.Scale, repeats: 3 },
+  { title: cyl_localizationKey('Blink ×3'), api: 'cylOpacityTimesAnimationRepeatTimes:', value: '', animationType: A.Breathe, repeats: 3 },
   { title: cyl_localizationKey('Flip ×2'), api: 'rotationAnimationWithDuration:', value: '3', custom: 'flip' },
   { title: cyl_localizationKey('Left to right once'), api: 'CYLBadgeAnimationTypeLeftRightOnce', value: '3', animationType: A.LeftRightOnce },
   { title: cyl_localizationKey('Right to left once'), api: 'CYLBadgeAnimationTypeRightLeftOnce', value: '3', animationType: A.RightLeftOnce },
   { title: cyl_localizationKey('Fade in once'), api: 'CYLBadgeAnimationTypeFadeInOnce', value: '3', animationType: A.FadeInOnce },
   { title: cyl_localizationKey('Rolling once'), api: 'CYLBadgeAnimationTypeRollingOnce', value: '3', animationType: A.RollingOnce },
   { title: cyl_localizationKey('Scale once'), api: 'CYLBadgeAnimationTypeScaleOnce', value: '3', animationType: A.ScaleOnce },
-  { title: cyl_localizationKey('Spring once'), api: 'cyl_springAnimationForDuration:', value: '3', animationType: A.ScaleOnce },
+  { title: cyl_localizationKey('Spring once'), api: 'cylSpringAnimationForDuration:', value: '3', animationType: A.ScaleOnce },
   { title: cyl_localizationKey('Red dot'), api: 'showBadge', value: '' },
   { title: cyl_localizationKey('Number'), api: 'showBadgeValue:', value: '8' },
-  { title: cyl_localizationKey('Number above maximum'), api: 'cyl_badgeMaximumBadgeNumber', value: '100' },
-  { title: cyl_localizationKey('Custom maximum (9)'), api: 'cyl_badgeMaximumBadgeNumber', value: '10', maximum: 9 },
+  { title: cyl_localizationKey('Number above maximum'), api: 'cylBadgeMaximumBadgeNumber', value: '100' },
+  { title: cyl_localizationKey('Custom maximum (9)'), api: 'cylBadgeMaximumBadgeNumber', value: '10', maximum: 9 },
   { title: cyl_localizationKey('New'), api: 'showBadgeValue:@"new"', value: 'new' },
   { title: cyl_localizationKey('NEW'), api: 'showBadgeValue:@"NEW"', value: 'NEW' },
   { title: cyl_localizationKey('Other text'), api: 'showBadgeValue:', value: 'hot' },
-  { title: cyl_localizationKey('Custom colors'), api: 'cyl_badgeBackgroundColor / cyl_badgeTextColor', value: '5', colors: true },
-  { title: cyl_localizationKey('Custom font'), api: 'cyl_badgeFont', value: '5', font: true },
-  { title: cyl_localizationKey('Border'), api: 'cyl_badgeBorderColor / cyl_badgeBorderWidth', value: '5', border: true },
-  { title: cyl_localizationKey('Border following Dark Mode'), api: 'cyl_badgeBorderColor', value: '5', border: true },
-  { title: cyl_localizationKey('Red dot radius'), api: 'cyl_badgeRadius', value: '', radius: 6 },
-  { title: cyl_localizationKey('Margin'), api: 'cyl_badgeMargin', value: '5', margin: 7 },
-  { title: cyl_localizationKey('Corner radius'), api: 'cyl_badgeCornerRadius', value: 'new', cornerRadius: 3 },
-  { title: cyl_localizationKey('Top left'), api: 'cyl_badgeCenterOffset', value: '5', position: 'topLeft' },
-  { title: cyl_localizationKey('Bottom left'), api: 'cyl_badgeCenterOffset', value: '5', position: 'bottomLeft' },
-  { title: cyl_localizationKey('Bottom right'), api: 'cyl_badgeCenterOffset', value: '5', position: 'bottomRight' },
+  { title: cyl_localizationKey('Custom colors'), api: 'cylBadgeBackgroundColor / cylBadgeTextColor', value: '5', colors: true },
+  { title: cyl_localizationKey('Custom font'), api: 'cylBadgeFont', value: '5', font: true },
+  { title: cyl_localizationKey('Border'), api: 'cylBadgeBorderColor / cylBadgeBorderWidth', value: '5', border: true },
+  { title: cyl_localizationKey('Border following Dark Mode'), api: 'cylBadgeBorderColor', value: '5', border: true },
+  { title: cyl_localizationKey('Red dot radius'), api: 'cylBadgeRadius', value: '', radius: 6 },
+  { title: cyl_localizationKey('Margin'), api: 'cylBadgeMargin', value: '5', margin: 7 },
+  { title: cyl_localizationKey('Corner radius'), api: 'cylBadgeCornerRadius', value: 'new', cornerRadius: 3 },
+  { title: cyl_localizationKey('Top left'), api: 'cylBadgeCenterOffset', value: '5', position: 'topLeft' },
+  { title: cyl_localizationKey('Bottom left'), api: 'cylBadgeCenterOffset', value: '5', position: 'bottomLeft' },
+  { title: cyl_localizationKey('Bottom right'), api: 'cylBadgeCenterOffset', value: '5', position: 'bottomRight' },
 ];
 
 function sampleForRow(row: number): CYLBadgeSample {
@@ -72,9 +72,9 @@ function sampleForRow(row: number): CYLBadgeSample {
 }
 
 /**
- * [EN] +cyl_badgeTitleForRow:: "<row + 1>. <title> (<API>)". [CN] 第 row 行样例的标题与核心 API。
+ * [EN] +cylBadgeTitleForRow:: "<row + 1>. <title> (<API>)". [CN] 第 row 行样例的标题与核心 API。
  */
-export function cyl_badgeTitleForRow(row: number): string {
+export function cylBadgeTitleForRow(row: number): string {
   const sample = sampleForRow(row);
   const localized = CYLLocalizedString(sample.title);
   const title = sample.api !== undefined && sample.title.indexOf(sample.api) < 0 ? `${localized} (${sample.api})` : localized;
@@ -82,17 +82,17 @@ export function cyl_badgeTitleForRow(row: number): string {
 }
 
 /**
- * [EN] +cyl_badgeStyleCount: the number of samples. [CN] 样例数量。
+ * [EN] +cylBadgeStyleCount: the number of samples. [CN] 样例数量。
  */
-export function cyl_badgeStyleCount(): number {
+export function cylBadgeStyleCount(): number {
   return CYLBadgeSamples.length;
 }
 
 /**
- * [EN] -cyl_showBadgeSampleForRow: shows the sample of `row` on `badge` (an icon of `iconSize` vp).
+ * [EN] -cylShowBadgeSampleForRow: shows the sample of `row` on `badge` (an icon of `iconSize` vp).
  * [CN] 在 `badge` 上显示第 row 行的样例（图标尺寸 iconSize vp）。
  */
-export function cyl_applyBadgeSample(badge: CYLBadge, row: number, iconSize: number = 30): void {
+export function cylApplyBadgeSample(badge: CYLBadge, row: number, iconSize: number = 30): void {
   const sample = sampleForRow(row);
   badge.resetBadgeAppearance();
   badge.repeatCount = sample.repeats;

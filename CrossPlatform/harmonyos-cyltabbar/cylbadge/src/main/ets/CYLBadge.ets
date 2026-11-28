@@ -1,5 +1,6 @@
 import BuildProfile from '../../../BuildProfile';
 import { curves } from '@kit.ArkUI';
+import { BadgeEvents } from './CYLBadgeEvents';
 
 /**
  * [EN] Badges, ported from the Android sources (CYLBadge.kt, CYLBadgeExtensions.kt) with the iOS names
@@ -157,8 +158,8 @@ export class CYLBadge {
 
   /**
    * [EN] Where badge events go: set it to `(name, info) => controller.registry.postLifecycleEvent(name, info)` and the
-   *      badge posts `cyl.badge.didShow` / `cyl.badge.didClear` (BadgeEvents of the core library).
-   * [CN] 角标事件的去向：设置后角标会发出 `cyl.badge.didShow` / `cyl.badge.didClear`（核心库的 BadgeEvents）。
+   *      badge posts `cyl.badge.didShow` / `cyl.badge.didClear` (BadgeEvents, CYLBadgeEvents.ts).
+   * [CN] 角标事件的去向：设置后角标会发出 `cyl.badge.didShow` / `cyl.badge.didClear`（BadgeEvents，见 CYLBadgeEvents.ts）。
    */
   eventPoster?: (name: string, info: Record<string, Object>) => void;
 
@@ -181,7 +182,7 @@ export class CYLBadge {
     const info: Record<string, Object> = {};
     info['value'] = value;
     info['animationType'] = this.animationType;
-    this.eventPoster?.('cyl.badge.didShow', info);
+    this.eventPoster?.(BadgeEvents.didShow, info);
   }
 
   /** [EN] -showNewBadge: "new" (uppercase: "NEW"). [CN] 显示 "new"。 */
@@ -195,7 +196,7 @@ export class CYLBadge {
     this.value = null;
     this.paused = false;
     if (hadBadge) {
-      this.eventPoster?.('cyl.badge.didClear', {});
+      this.eventPoster?.(BadgeEvents.didClear, {});
     }
   }
 

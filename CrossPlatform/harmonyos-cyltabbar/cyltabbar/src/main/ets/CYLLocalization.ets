@@ -73,11 +73,11 @@ let cylLanguageListeners: ((language: string) => void)[] = [];
 /**
  * [EN] CYLLocalizationLanguageDidChangeNotification: called after CYLSetLocalizationLanguage. [CN] CYLSetLocalizationLanguage 之后调用。
  */
-export function cyl_addLocalizationLanguageListener(listener: (language: string) => void): void {
+export function cylAddLocalizationLanguageListener(listener: (language: string) => void): void {
   cylLanguageListeners.push(listener);
 }
 
-export function cyl_removeLocalizationLanguageListener(listener: (language: string) => void): void {
+export function cylRemoveLocalizationLanguageListener(listener: (language: string) => void): void {
   cylLanguageListeners = cylLanguageListeners.filter((item: (language: string) => void) => item !== listener);
 }
 
