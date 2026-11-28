@@ -145,6 +145,9 @@ Component({
     cyl_tapAnimation(event) {
       this.cyl_override({ CYLTabBarControllerTabButtonTapAnimation: event.currentTarget.dataset.value });
     },
+    cyl_openBadgeTags() {
+      wx.navigateTo({ url: '/pages/badge-tags/index' });
+    },
     cyl_openItemPlayground() {
       wx.navigateTo({ url: '/pages/item/index' });
     },

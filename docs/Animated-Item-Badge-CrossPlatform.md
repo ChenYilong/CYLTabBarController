@@ -620,10 +620,6 @@ void didUpdateWidget(CYLAnimationView old) {
 
 **Other platforms follow iOS: Android** (2026-11-29): `DemoBadgeTagActivity` now has the tag list's default look (wrapping, 10 dp spacing, Liquid Glass capsules, a section card, the gradient plate). It does not use `CYLTagListView`: the pinned Android `CYLTagButton` draws its own badge (`tagBadgeValue`, kept inside the tag) and has no `badgeAttributes`. Frames recorded with animations on: the Scale and Bounce badges leave their tag uncut and stay on top; light, dark and right-to-left are right. `testDebugUnitTest :tabpages:test lintDebug` passes.
 
-**TODO：ClassifyMenu 固定提交分裂**（2026-11-29）：根目录与 `Example-Swift-04` 的 Podfile 固定 `6bb6e2b8`，`classifymenu.pin`（鸿蒙、Android、小程序）固定 `9a4c1908`，两个提交互不包含，违反"所有示例同一个 pin"。待 ClassifyMenu 提供同时包含两者的提交后统一。小程序角标裁剪只做了静态检查（未在开发者工具中查看）：`cyl-animated-item`、`cyl-tab-bar`、`cyl-tab-bar-item` 与 `item` 页中，没有发现包住角标节点的 `overflow: hidden`。
-
-**TODO: split ClassifyMenu pin** (2026-11-29): the root and `Example-Swift-04` Podfiles pin `6bb6e2b8`, while `classifymenu.pin` (HarmonyOS, Android, mini program) pins `9a4c1908`; neither commit contains the other, which breaks the one-pin-for-every-example rule. Unify them when ClassifyMenu has a commit with both. Mini program badge clipping was checked statically only (not seen in the developer tools): no `overflow: hidden` around the badge node was found in `cyl-animated-item`, `cyl-tab-bar`, `cyl-tab-bar-item` or the `item` page.
-
 ![Android badge demo in the tag list look](assets/android-animated-item-badge-tags-taglist-look.png)
 
 **其他平台参照 iOS：Flutter 与 React Native（Android 端）**（2026-11-29）：两个示例页改为同样的 TagList 外观（原生视图只承载图标与角标，胶囊、卡片与背景由框架绘制）。开启动画录屏发现**核心缺陷**：Scale 与 Bounce 角标在封装视图顶部被裁平（此前的验收在关闭动画的情况下进行，未发现）。React Native：`CyltabbarAnimationView` 关闭 `clipChildren` / `clipToPadding`。Flutter：platform view 无法画到自身之外，带角标的 `CYLAnimationView` 的 Android platform view 现在四周各大出 `cylAnimationViewBadgeOverflow`（16），原生端用等量内边距使条目与布局不变。修复后录屏的前 24 帧角标完整；浅色、深色、从右到左正常；`flutter test` 通过，`jest` 19 / 19，`tsc` 无错误。未验证：两者的 iOS 端；超出量大于 16 的自定义动画或大偏移仍会被 Flutter 裁掉。
@@ -643,6 +639,14 @@ void didUpdateWidget(CYLAnimationView old) {
 ![HarmonyOS badges cleared and shown again](assets/harmonyos-animated-item-badge-tags-clear-reshow.png)
 
 ![HarmonyOS Scale badge leaving its tag](assets/harmonyos-animated-item-badge-tags-scale-overflow.png)
+
+**其他平台参照 iOS：小程序**（2026-11-29，**仅静态**）：新增示例页 `pages/badge-tags`（Me → "CYLAnimatedItemView 角标"）：9 个角标示例与一个无角标标签，液态玻璃胶囊、分组卡片、渐变背景板、换行排布；页面只向 `cyl-animated-item` 传 `badge-value` 与 `badge-attributes`。`npm test` 273 / 273；用 Node 运行组件模型，9 个角标都显示。未在开发者工具中查看。差异：RollingOnce 没有 CSS 类（静止）；组件不读取系统的"减弱动态效果"。
+
+**Other platforms follow iOS: mini program** (2026-11-29, **static only**): a new example page `pages/badge-tags` (Me → "CYLAnimatedItemView badges"): nine badge samples and one tag without a badge, Liquid Glass capsules, a section card, the gradient plate, wrapping; the page only passes `badge-value` and `badge-attributes` to `cyl-animated-item`. `npm test` 273 / 273; running the component model in Node, all nine badges show. Not seen in the developer tools. Differences: RollingOnce has no CSS class (it stays still); the component does not read the system's Reduce Motion setting.
+
+**TODO：ClassifyMenu 固定提交分裂**（2026-11-29）：根目录与 `Example-Swift-04` 的 Podfile 固定 `6bb6e2b8`，`classifymenu.pin`（鸿蒙、Android、小程序）固定 `9a4c1908`，两个提交互不包含，违反"所有示例同一个 pin"。待 ClassifyMenu 提供同时包含两者的提交后统一。小程序角标裁剪只做了静态检查（未在开发者工具中查看）：`cyl-animated-item`、`cyl-tab-bar`、`cyl-tab-bar-item` 与 `item` 页中，没有发现包住角标节点的 `overflow: hidden`。
+
+**TODO: split ClassifyMenu pin** (2026-11-29): the root and `Example-Swift-04` Podfiles pin `6bb6e2b8`, while `classifymenu.pin` (HarmonyOS, Android, mini program) pins `9a4c1908`; neither commit contains the other, which breaks the one-pin-for-every-example rule. Unify them when ClassifyMenu has a commit with both. Mini program badge clipping was checked statically only (not seen in the developer tools): no `overflow: hidden` around the badge node was found in `cyl-animated-item`, `cyl-tab-bar`, `cyl-tab-bar-item` or the `item` page.
 
 ## [CN]所有平台的常见错误
 ## [EN]Common mistakes on every platform
