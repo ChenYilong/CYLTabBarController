@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "Android 上 n/a：App 无法发出此系统事件。";
 "Runs every automatic row, one after the other." = "依次运行所有自动行。";
 "Tab bar %@ · page ID \"%@\"" = "TabBar %@ · 页面 ID“%@”";
+"Animated item engine API" = "动画条目引擎 API";
+"Stop at 50%" = "停在 50%";
+"Show image when ended" = "结束时显示图片";
+"Restart token: %@" = "重播令牌：%@";
+"End callback: %@" = "结束回调：%@";
+"none yet" = "尚无";
+"Host-driven playback (drivesAnimationPlayback = false)" = "由宿主驱动播放（drivesAnimationPlayback = false）";
+"Engine API" = "引擎 API";
+"Pause while scrolling" = "滚动时暂停";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "释放 TabBarController（3 秒后）";
+"teardown: not run" = "销毁：未执行";
+"teardown: releasing in %d s" = "销毁：%d 秒后释放";
+"dealloc callbacks ran: %d / %d" = "dealloc 回调已执行：%d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "dealloc 回调已执行：%d / %d (%@)";
+"Tab bar controller released" = "TabBarController 已释放";
+"bridge: pause %d, resume %d" = "桥接：暂停 %d，恢复 %d";
+"last event: -" = "最近事件：-";
+"last event: %@" = "最近事件：%@";
+"Content inset" = "内容边距";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset 未设置：扁平和液态玻璃条目，常规与选中状态";
+"Flat: itemContentHorizontalInset unset" = "扁平：itemContentHorizontalInset 未设置";
+"Normal" = "常规";
+"Liquid Glass: itemContentHorizontalInset unset" = "液态玻璃：itemContentHorizontalInset 未设置";

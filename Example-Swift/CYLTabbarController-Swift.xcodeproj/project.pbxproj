@@ -320,10 +320,12 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/CYLDeallocBlockExecutor/CYLDeallocBlockExecutor.framework",
 				"${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CYLDeallocBlockExecutor.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lottie.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -339,11 +341,13 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CYLTabBarController-Swift/Pods-CYLTabBarController-Swift-resources.sh",
 				"${PODS_ROOT}/../../CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle",
+				"${PODS_ROOT}/../../CYLTabBarController/CYLLiquidGlass/Resources/CYLLiquidGlass.bundle",
 				"${PODS_ROOT}/../../CYLTabBarController/Resources/CYLTabBarController.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLAnimatedItem.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLLiquidGlass.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;

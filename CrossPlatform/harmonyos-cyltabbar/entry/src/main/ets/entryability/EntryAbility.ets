@@ -1,4 +1,4 @@
-import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { Configuration } from '@kit.AbilityKit';
 import { cyl_updateColorMode, cyl_simulateMemoryWarning, cyl_setLocalizationContext, CYLSetLocalizationLanguage } from 'cyltabbar';
@@ -12,7 +12,22 @@ export default class EntryAbility extends UIAbility {
     cyl_updateColorMode(this.context.config.colorMode);
     cyl_setLocalizationContext(this.context);
     this.cylApplyLaunchLanguage(want);
+    this.cylApplyLaunchColorMode(want);
     this.cylStoreLaunchOptions(want);
+  }
+
+  /**
+   * [EN] Launch parameter cylColorMode (`dark` or `light`, as ClassifyMenu's example) sets the app's color mode instead of the system's,
+   *      for dark mode checks and screenshots: `aa start -b com.cyl.tabbar.harmony -a EntryAbility --ps cylColorMode dark`.
+   * [CN] 启动参数 cylColorMode（`dark` 或 `light`，与 ClassifyMenu 示例一致）设置应用的颜色模式而不是系统的，用于深色模式检查与截图。
+   */
+  private cylApplyLaunchColorMode(want: Want): void {
+    const mode = want.parameters?.['cylColorMode'];
+    if (mode === 'dark' || mode === 'light') {
+      this.context.getApplicationContext().setColorMode(mode === 'dark' ? ConfigurationConstant.ColorMode.COLOR_MODE_DARK
+        : ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
+      cyl_updateColorMode(mode === 'dark' ? ConfigurationConstant.ColorMode.COLOR_MODE_DARK : ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
+    }
   }
 
   /** [EN] A relaunch with new launch options while the app runs. [CN] 应用运行时以新的启动参数再次启动。 */

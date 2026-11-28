@@ -36,7 +36,7 @@ CYLAnimatedItemView({
 | `CYLRiveIcon` | The Rive view. Props `path`, `iconSize`, `selected`, `replayToken`, `loops`, `loopPolicy`; callbacks `onLoaded`, `onEnded`, `onLoadError`, `registerReplay`. |
 | `CYLRiveLoopPolicy` | `WhileSelected` (default: loops only while selected, the tab bar) or `WhilePlaying` (tags, placeholders: plays at load and loops until `loops` goes off or the item is stopped); the pure rules `isActive`, `schedulesNextPass`, `updateAction`. |
 | `CYLRiveAnimationBuilder` | `animationBuilder` for `CYLAnimatedItemView`, loop policy `WhilePlaying`. |
-| `cylRegisterRiveEngine(context?)` | Registers `Rive` (needs `arm64-v8a`) with `CYLAnimatedItemEngines`; with a context, debug builds that carry the x86_64 debug engine kit play Rive on the x86_64 emulator. |
+| `cylRegisterRiveEngine(context?)` | Registers `Rive` (needs `arm64-v8a`) with `CYLAnimatedItemEngines`; with a context, a HAP that carries the x86_64 debug engine kit plays Rive on the x86_64 emulator. |
 | `CYLTabBarAnimationOptionRive*`, `cylRiveFileAndOptions`, `cylRiveNextNumber`, `cylRiveRendererType`, `cylEnsureRiveInitialized`, `cylRiveIsSupported` | The option keys and helpers moved from cyltabbar, unchanged. |
 
 ## Tests

@@ -20,6 +20,8 @@ const CYL_PROJECT = path.resolve(__dirname, '..');
 const CYL_CLI = require('../scripts/cyl_devtools_cli').cylDevtoolsCli();
 // [EN] State changes reach the pages on the next turn of the app's event loop. [CN] 状态变化在 App 事件循环的下一轮到达页面。
 const CYL_SETTLE_MS = 800;
+// [EN] A slower settle for the tests that wait for a page switch on a loaded machine (test 15). [CN] 在负载高的机器上等待页面切换的测试（第 15 项）使用更长的等待。
+const CYL_SETTLE_MS_SLOW = 2500;
 
 let miniProgram;
 
@@ -81,7 +83,7 @@ async function cylTap(key) {
     setTimeout(() => {
       const pages = getCurrentPages();
       pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar')
-        .cyl_onTap({ currentTarget: { dataset: { key: identifier } } });
+        .cylOnTap({ currentTarget: { dataset: { key: identifier } } });
     }, 0);
   }, key);
   await cylSleep(CYL_SETTLE_MS * 2);
@@ -213,9 +215,9 @@ test('the playback controls reach the bar: speed, loop, Play all', async () => {
     setTimeout(() => {
       const pages = getCurrentPages();
       const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
-      bar.cyl_setAnimationSpeed(2);
-      bar.cyl_setAnimationLoop(true);
-      bar.cyl_playAll();
+      bar.cylSetAnimationSpeed(2);
+      bar.cylSetAnimationLoop(true);
+      bar.cylTabBarPlayAll();
       setTimeout(() => resolve({
         speed: bar.data.animationSpeed,
         loop: bar.data.animationLoop,
@@ -232,8 +234,8 @@ test('the playback controls reach the bar: speed, loop, Play all', async () => {
   const reset = await miniProgram.evaluate(() => {
     const pages = getCurrentPages();
     const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
-    bar.cyl_setAnimationSpeed(1);
-    bar.cyl_setAnimationLoop(false);
+    bar.cylSetAnimationSpeed(1);
+    bar.cylSetAnimationLoop(false);
     return { speed: bar.data.animationSpeed, loop: bar.data.animationLoop };
   });
   assert.deepEqual(reset, { speed: 1, loop: false });
@@ -359,8 +361,8 @@ test('looping icons stay one layer and keep playing during a page scroll (WeChat
   await miniProgram.evaluate(() => {
     const pages = getCurrentPages();
     const bar = pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar');
-    bar.cyl_setAnimationLoop(true);
-    bar.cyl_playAll();
+    bar.cylSetAnimationLoop(true);
+    bar.cylTabBarPlayAll();
   });
   try {
     await miniProgram.evaluate(() => { wx.pageScrollTo({ scrollTop: 1380, duration: 3000 }); });
@@ -373,7 +375,7 @@ test('looping icons stay one layer and keep playing during a page scroll (WeChat
   } finally {
     await miniProgram.evaluate(() => {
       const pages = getCurrentPages();
-      pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar').cyl_setAnimationLoop(false);
+      pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar').cylSetAnimationLoop(false);
     });
     await cylSleep(2500);
     await miniProgram.pageScrollTo(0);
@@ -400,7 +402,7 @@ test('hiddenIdentifiers leaves a tab out of every bar, and tabBarHidden hides on
     const cylBarHeight = (hidden) => miniProgram.evaluate((value) => new Promise((resolve) => {
       const pages = getCurrentPages();
       const tabBar = pages[pages.length - 1].getTabBar();
-      tabBar.cyl_setTabBarHidden(value);
+      tabBar.cylSetTabBarHidden(value);
       setTimeout(() => {
         tabBar.selectComponent('#cyl-tab-bar').createSelectorQuery().select('.cyl-tab-bar').boundingClientRect()
           .exec((result) => resolve(result[0] ? result[0].height : -1));
@@ -512,7 +514,29 @@ async function cylTapElement(selector, wait = CYL_SETTLE_MS) {
   for (let attempt = 0; ; attempt += 1) {
     try {
       const { page } = await cylCurrentPage();
-      const element = await page.$(selector);
+      let element = await page.$(selector);
+      // [EN] A row of a section shown as a tag list (utils/cyl_demo_tags.js) is a tag of that list: the tag is tapped, the
+      //      section expanded first when the tag is folded away. [CN] 以 TagList 显示的分组中的行是该列表的一个 Tag：点击该 Tag；
+      //      Tag 被折叠时先展开分组。
+      const rowId = /^\.cyl-home-row\[data-id="([^"]+)"\]$/.exec(selector);
+      if (!element && rowId) {
+        const found = await miniProgram.evaluate((id) => {
+          const sections = getCurrentPages().pop().data.sections;
+          const section = sections.find((candidate) => candidate.tagConfiguration && candidate.rows.some((row) => row.id === id));
+          return section ? { section: section.id, index: section.rows.findIndex((row) => row.id === id) } : null;
+        }, rowId[1]);
+        if (found) {
+          const list = await page.$(`#cyl-tags-${found.section}`);
+          element = list && await list.$(`#cyl-item-0-${found.index}`);
+          if (!element && list) {
+            const fold = await list.$('.cyl-fold-header');
+            assert.ok(fold, `no fold control for ${selector}`);
+            await fold.tap();
+            await cylSleep(CYL_SETTLE_MS);
+            element = await list.$(`#cyl-item-0-${found.index}`);
+          }
+        }
+      }
       assert.ok(element, `no element ${selector}`);
       await element.tap();
       break;
@@ -876,7 +900,7 @@ test('the Home rows act with the Objective-C values (docs/ObjC-Example-Parity it
 
 test('the arrows, the touchable area, the replaced tab and the gesture timings (docs/ObjC-Example-Parity items 27, 30, 35, 37)', async () => {
   await miniProgram.reLaunch('/pages/home/index');
-  await cylSleep(CYL_SETTLE_MS * 2);
+  await cylSleep(CYL_SETTLE_MS_SLOW);
   await miniProgram.evaluate(() => { getApp().cyl_rebuildTabBar('liquidGlass'); });
   await cylClearDecoration();
   const row = async (id) => {
@@ -914,7 +938,7 @@ test('the arrows, the touchable area, the replaced tab and the gesture timings (
   // [CN] 第 27 项：同城（首页右侧）变为「替换页 B」并显示粉色页面；再点恢复。
   await cylTapElement('.cyl-home-row[data-id="replaceNeighbors"]');
   assert.equal((await row('replaceNeighbors')).accessory, 'check');
-  await cylTapElement('#cyl-arrow-next', CYL_SETTLE_MS * 2);
+  await cylTapElement('#cyl-arrow-next', CYL_SETTLE_MS_SLOW);
   let current = await cylCurrentPage();
   assert.equal(current.route, 'pages/web/index');
   assert.match(current.data.replaced.title, /Replaced page B|替换页 B|替換頁 B/);
@@ -965,7 +989,7 @@ test('the tap animation and the tap sound and haptics rows cycle as the Objectiv
       // [EN] Played again once the new configuration is in the bar. [CN] 新配置进入 TabBar 后再播放一次。
       await miniProgram.evaluate(() => {
         const pages = getCurrentPages();
-        pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar').cyl_playSelectedTapAnimation();
+        pages[pages.length - 1].getTabBar().selectComponent('#cyl-tab-bar').cylPlaySelectedTapAnimation();
       });
       await cylSleep(200);
       assert.equal((await model()).particles, 10, 'fireworks');

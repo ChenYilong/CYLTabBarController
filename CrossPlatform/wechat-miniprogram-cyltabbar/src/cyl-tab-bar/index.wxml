@@ -7,18 +7,18 @@
     style="{{item.itemStyle}}"
     data-key="{{item.key}}"
     id="{{item.accessibilityIdentifier}}"
-    bindtap="cyl_onTap"
-    bindtouchstart="cyl_onTouchStart"
-    bindtouchend="cyl_onTouchEnd"
-    bindtouchcancel="cyl_onTouchEnd"
-    bindtouchmove="cyl_onTouchEnd"
+    bindtap="cylOnTap"
+    bindtouchstart="cylOnTouchStart"
+    bindtouchend="cylOnTouchEnd"
+    bindtouchcancel="cylOnTouchEnd"
+    bindtouchmove="cylOnTouchEnd"
     aria-role="{{item.isPlusButton ? 'button' : 'tab'}}"
     aria-label="{{item.accessibilityLabel}}"
     aria-selected="{{item.selected}}"
   >
     <block wx:if="{{item.isPlusButton}}">
       <!-- [EN] As iOS (CYLPlusButtonShowsSelection): the selection under the plus button exists on Liquid Glass only; it is the same cyl-glass-lens as a selected tab's. [CN] 与 iOS 一致（CYLPlusButtonShowsSelection）：PlusButton 下方的选中效果只在液态玻璃下出现。 -->
-      <cyl-glass-lens wx:if="{{item.showsSelection && cylStyleType === 'liquidGlass'}}" class="cyl-plus-selection" is-dark="{{cylIsDark}}" lens-style="{{cylGlassLensStyle}}" aria-hidden="true" />
+      <cyl-glass-lens wx:if="{{item.showsSelection && cylStyleType === 'liquidGlass'}}" class="cyl-plus-selection" is-dark="{{cylIsDark}}" lens-style="{{cylGlassLensStyle}}" animated="{{cylLensAnimated}}" aria-hidden="true" />
       <view class="cyl-plus-button {{cylAnimatingIdentifier === item.key ? 'cyl-animate-' + cylAnimatingName + ' cyl-flip-' + cylFlipDirection : ''}}" style="{{item.buttonStyle}} {{cylAnimationStyle}}">
         <view wx:if="{{item.hitStyle}}" class="cyl-plus-hit" style="{{item.hitStyle}}" aria-hidden="true"></view>
         <image wx:if="{{item.backgroundImage}}" class="cyl-plus-background" src="{{item.backgroundImage}}" mode="aspectFit" aria-hidden="true" />
@@ -47,6 +47,8 @@
         animation-size="{{item.item.animationSize}}"
         animation-colors="{{item.item.animationColors}}"
         animation-tint="{{item.item.animationTint}}"
+        animation-dark-tint="{{item.item.animationDarkTint}}"
+        animation-rendering-mode="{{item.item.animationRenderingMode}}"
         loops-when-unselected="{{item.item.loopsWhenUnselected}}"
         image-size="{{item.item.imageSize}}"
         image-insets="{{item.item.imageInsets}}"
@@ -65,6 +67,7 @@
         animation-duration="{{cylAnimationDuration}}"
         item-style="{{cylItemStyle}}"
         glass-lens-style="{{cylGlassLensStyle}}"
+        lens-animated="{{cylLensAnimated}}"
         animation-speed="{{animationSpeed}}"
         animation-loop="{{animationLoop}}"
         is-dark="{{cylIsDark}}"
@@ -77,7 +80,7 @@
           <view wx:else class="cyl-firework" style="{{particle.style}}"></view>
         </block>
       </view>
-      <!-- [EN] cyl_setCoverImage: a decoration over the tab; VoiceOver / TalkBack read the tab, not the cover. [CN] 覆盖在 Tab 上的装饰；读屏朗读 Tab 本身，而不是封面。 -->
+      <!-- [EN] cylSetCoverImage: a decoration over the tab; VoiceOver / TalkBack read the tab, not the cover. [CN] 覆盖在 Tab 上的装饰；读屏朗读 Tab 本身，而不是封面。 -->
       <image wx:if="{{item.cover}}" class="cyl-tab-cover" src="{{item.cover.image}}" style="{{item.cover.style}}" mode="aspectFit" aria-hidden="true" />
     </block>
   </view>

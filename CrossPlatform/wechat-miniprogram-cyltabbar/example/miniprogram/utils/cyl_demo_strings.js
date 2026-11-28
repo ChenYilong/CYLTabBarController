@@ -107,6 +107,7 @@ module.exports = {
     "Speed": "Speed",
     "times": "times",
     "Loop": "Loop",
+    "Restart": "Restart",
     "Visibility": "Visibility",
     "Hide Discover (as for a user role)": "Hide Discover (as for a user role)",
     "Hide the tab bar of this page": "Hide the tab bar of this page",
@@ -169,6 +170,7 @@ module.exports = {
     "Events": "Events",
     "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.": "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.",
     "cyl-tab-bar-item playground": "cyl-tab-bar-item playground",
+    "CYLAnimatedItemView badges": "CYLAnimatedItemView badges",
     "Run the PAG download first": "Run the PAG download first",
     "Nearby": "Nearby",
     "Messages": "Messages",
@@ -232,7 +234,13 @@ module.exports = {
     "Space": "Space",
     "Ocean": "Ocean",
     "Network icons": "Network icons",
-    "Log in to view “{title}”": "Log in to view “{title}”"
+    "Log in to view “{title}”": "Log in to view “{title}”",
+    "Release the tab bar controller (in 3 s)": "Release the tab bar controller (in 3 s)",
+    "teardown: not run": "teardown: not run",
+    "teardown: releasing in %d s": "teardown: releasing in %d s",
+    "dealloc callbacks ran: %d / %d": "dealloc callbacks ran: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc callbacks ran: %d / %d (%@)",
+    "Tab bar controller released": "Tab bar controller released"
   },
   "zh-Hans": {
     "Close button of the plus button": "PlusButton 的关闭按钮",
@@ -337,6 +345,7 @@ module.exports = {
     "Speed": "速度",
     "times": "倍",
     "Loop": "循环",
+    "Restart": "重新播放",
     "Visibility": "可见性",
     "Hide Discover (as for a user role)": "隐藏「发现」（如按用户角色）",
     "Hide the tab bar of this page": "隐藏本页面的 TabBar",
@@ -399,6 +408,7 @@ module.exports = {
     "Events": "事件",
     "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.": "与 iOS 示例一样显示四个 Tab 与 PlusButton：共用配置把 Message 限定为 iOS 与 Android（CYLTabBarItemPlatforms），因此本示例加上了小程序平台。",
     "cyl-tab-bar-item playground": "cyl-tab-bar-item 演示",
+    "CYLAnimatedItemView badges": "CYLAnimatedItemView 角标",
     "Run the PAG download first": "请先下载 PAG 文件",
     "Nearby": "同城",
     "Messages": "消息",
@@ -462,7 +472,13 @@ module.exports = {
     "Space": "太空",
     "Ocean": "海洋",
     "Network icons": "网络图标",
-    "Log in to view “{title}”": "「{title}」需要登录后才能查看"
+    "Log in to view “{title}”": "「{title}」需要登录后才能查看",
+    "Release the tab bar controller (in 3 s)": "释放 TabBarController（3 秒后）",
+    "teardown: not run": "销毁：未执行",
+    "teardown: releasing in %d s": "销毁：%d 秒后释放",
+    "dealloc callbacks ran: %d / %d": "dealloc 回调已执行：%d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc 回调已执行：%d / %d (%@)",
+    "Tab bar controller released": "TabBarController 已释放"
   },
   "zh-Hant": {
     "Close button of the plus button": "PlusButton 的關閉按鈕",
@@ -567,6 +583,7 @@ module.exports = {
     "Speed": "速度",
     "times": "倍",
     "Loop": "循環",
+    "Restart": "重新播放",
     "Visibility": "可見性",
     "Hide Discover (as for a user role)": "隱藏「發現」（如按使用者角色）",
     "Hide the tab bar of this page": "隱藏本頁面的 TabBar",
@@ -629,6 +646,7 @@ module.exports = {
     "Events": "事件",
     "Four tabs and a plus button, as in the iOS example: the shared configuration limits Message to iOS and Android (CYLTabBarItemPlatforms), so this example adds the mini program.": "與 iOS 示例一樣顯示四個 Tab 與 PlusButton：共用設定把 Message 限定為 iOS 與 Android（CYLTabBarItemPlatforms），因此本示例加上了小程式平台。",
     "cyl-tab-bar-item playground": "cyl-tab-bar-item 演示",
+    "CYLAnimatedItemView badges": "CYLAnimatedItemView 角標",
     "Run the PAG download first": "請先下載 PAG 檔案",
     "Nearby": "同城",
     "Messages": "訊息",
@@ -692,6 +710,12 @@ module.exports = {
     "Space": "太空",
     "Ocean": "海洋",
     "Network icons": "網路圖示",
-    "Log in to view “{title}”": "「{title}」需要登入後才能查看"
+    "Log in to view “{title}”": "「{title}」需要登入後才能查看",
+    "Release the tab bar controller (in 3 s)": "釋放 TabBarController（3 秒後）",
+    "teardown: not run": "銷毀：未執行",
+    "teardown: releasing in %d s": "銷毀：%d 秒後釋放",
+    "dealloc callbacks ran: %d / %d": "dealloc 回呼已執行：%d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc 回呼已執行：%d / %d (%@)",
+    "Tab bar controller released": "TabBarController 已釋放"
   }
 };

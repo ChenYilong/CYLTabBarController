@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a trên Android: ứng dụng không thể gửi sự kiện hệ thống này.";
 "Runs every automatic row, one after the other." = "Chạy lần lượt mọi hàng tự động.";
 "Tab bar %@ · page ID \"%@\"" = "Thanh tab %@ · ID trang \"%@\"";
+"Animated item engine API" = "API công cụ của mục hoạt ảnh";
+"Stop at 50%" = "Dừng ở 50%";
+"Show image when ended" = "Hiện ảnh khi kết thúc";
+"Restart token: %@" = "Mã thông báo phát lại: %@";
+"End callback: %@" = "Callback kết thúc: %@";
+"none yet" = "chưa có";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Máy chủ điều khiển phát (drivesAnimationPlayback = false)";
+"Engine API" = "API công cụ";
+"Pause while scrolling" = "Tạm dừng khi cuộn";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Giải phóng bộ điều khiển thanh tab (sau 3 giây)";
+"teardown: not run" = "giải phóng: chưa chạy";
+"teardown: releasing in %d s" = "giải phóng: sau %d giây";
+"dealloc callbacks ran: %d / %d" = "số callback dealloc đã chạy: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "số callback dealloc đã chạy: %d / %d (%@)";
+"Tab bar controller released" = "Đã giải phóng bộ điều khiển thanh tab";
+"bridge: pause %d, resume %d" = "cầu nối: tạm dừng %d, tiếp tục %d";
+"last event: -" = "sự kiện gần nhất: -";
+"last event: %@" = "sự kiện gần nhất: %@";
+"Content inset" = "Lề nội dung";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset chưa đặt: một mục phẳng và một mục Liquid Glass, bình thường và được chọn";
+"Flat: itemContentHorizontalInset unset" = "Phẳng: itemContentHorizontalInset chưa đặt";
+"Normal" = "Bình thường";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset chưa đặt";

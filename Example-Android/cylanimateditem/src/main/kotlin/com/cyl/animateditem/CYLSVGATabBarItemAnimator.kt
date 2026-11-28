@@ -52,7 +52,7 @@ object CYLSVGATabBarItemAnimator : CYLTabBarItemAnimator {
         CYLTabBarItemAnimationFailure.markLoading(view)
         CYLTabBarItemAnimationFiles.localFile(context, url.substringBefore('#')) { file ->
             // [EN] A missing file or a failed download: reported, so the host falls back. [CN] 文件不存在或下载失败：报告失败，宿主回退显示。
-            if (file != null) decode(appContext, file, view, state) else CYLTabBarItemAnimationFailure.reportLater(view)
+            if (file != null) decode(appContext, file, view, state) else CYLTabBarItemAnimationFailure.reportLater(view, CYLResourceMissingReason.NOT_FOUND)
         }
         return view
     }
@@ -113,6 +113,15 @@ object CYLSVGATabBarItemAnimator : CYLTabBarItemAnimator {
         override fun showLastFrame() = perform { view -> CYLReflection.call(view, "stepToPercentage", 1.0, false) }
 
         override fun stop() = perform { view -> CYLReflection.call(view, "stepToFrame", 0, false) }
+
+        // [EN] SVGAImageView.pauseAnimation keeps the frame; resuming steps to the current frame and plays on.
+        // [CN] SVGAImageView.pauseAnimation 保留当前帧；恢复时跳到当前帧并继续播放。
+        override fun pause() = perform { view -> CYLReflection.call(view, "pauseAnimation") }
+
+        override fun resume() = perform { view ->
+            val frame = CYLReflection.call(view, "getCurrentFrame") as? Int ?: 0
+            CYLReflection.call(view, "stepToFrame", frame, true)
+        }
 
         // [EN] SVGAImageView.isAnimating; false before the file is parsed. [CN] SVGAImageView.isAnimating；文件解析前为 false。
         override val isPlaying: Boolean? get() = animationView?.let { CYLReflection.call(it, "isAnimating") as? Boolean }

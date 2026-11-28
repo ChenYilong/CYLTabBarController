@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a di Android: aplikasi tidak dapat mengirim peristiwa sistem ini.";
 "Runs every automatic row, one after the other." = "Menjalankan semua baris otomatis, satu per satu.";
 "Tab bar %@ · page ID \"%@\"" = "Tab bar %@ · ID halaman \"%@\"";
+"Animated item engine API" = "API mesin item animasi";
+"Stop at 50%" = "Berhenti di 50%";
+"Show image when ended" = "Tampilkan gambar saat selesai";
+"Restart token: %@" = "Token mulai ulang: %@";
+"End callback: %@" = "Callback selesai: %@";
+"none yet" = "belum ada";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Pemutaran dikendalikan host (drivesAnimationPlayback = false)";
+"Engine API" = "API mesin";
+"Pause while scrolling" = "Jeda saat menggulir";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Lepaskan tab bar controller (dalam 3 dtk)";
+"teardown: not run" = "teardown: belum dijalankan";
+"teardown: releasing in %d s" = "teardown: dilepas dalam %d dtk";
+"dealloc callbacks ran: %d / %d" = "callback dealloc dijalankan: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "callback dealloc dijalankan: %d / %d (%@)";
+"Tab bar controller released" = "Tab bar controller telah dilepas";
+"bridge: pause %d, resume %d" = "bridge: jeda %d, lanjut %d";
+"last event: -" = "peristiwa terakhir: -";
+"last event: %@" = "peristiwa terakhir: %@";
+"Content inset" = "Inset konten";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset tidak diatur: satu item datar dan satu item Liquid Glass, normal dan terpilih";
+"Flat: itemContentHorizontalInset unset" = "Datar: itemContentHorizontalInset tidak diatur";
+"Normal" = "Normal";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset tidak diatur";

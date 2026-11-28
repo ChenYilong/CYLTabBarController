@@ -23,3 +23,14 @@
 .cyl-stack-row {
   flex-direction: row;
 }
+/* [EN] hugsContent: sized by the items, not by the parent. [CN] hugsContent：大小由条目决定，而不是父视图。 */
+.cyl-stack-hug {
+  display: inline-flex;
+  width: auto;
+  height: auto;
+}
+/* [EN] The built-in divider keeps its fixed size, centered on the cross axis. [CN] 内置分割线保持固定大小，在交叉轴上居中。 */
+.cyl-stack-divider {
+  flex: none;
+  align-self: center;
+}

@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The demo rows of the settings section, part 3: tap sound and haptics, long press and double tap timing, switching to
  *      the adjacent tab, the CYLUtils helpers, minimizing on scroll and the scroll hiding simulations row. Translated from

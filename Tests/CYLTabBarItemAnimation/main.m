@@ -44,6 +44,28 @@ static int CYLChecks = 0;
 
 #pragma mark - Stand-ins
 
+/// [EN] Stands for the animated item component's `CYLAnimationEngines` (Swift, found by the engine at run time): records the calls the
+///      engine makes for a tab's missing resource. [CN] 代表动效组件的 `CYLAnimationEngines`（Swift，引擎在运行时查找）：记录引擎为 Tab 缺失的资源所做的调用。
+@interface CYLAnimationEngines : NSObject
++ (NSMutableArray<NSArray *> *)calls;
++ (void)cyl_reportTabAnimationFailureOfURL:(NSURL *)URL error:(nullable NSError *)error owner:(id)owner;
++ (void)cyl_reportTabAnimationNotMadeForURL:(NSURL *)URL owner:(id)owner;
+@end
+@implementation CYLAnimationEngines
++ (NSMutableArray<NSArray *> *)calls {
+    static NSMutableArray<NSArray *> *calls;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{ calls = [NSMutableArray array]; });
+    return calls;
+}
++ (void)cyl_reportTabAnimationFailureOfURL:(NSURL *)URL error:(NSError *)error owner:(id)owner {
+    [[self calls] addObject:@[ @"failure", URL, error ?: [NSNull null], owner ]];
+}
++ (void)cyl_reportTabAnimationNotMadeForURL:(NSURL *)URL owner:(id)owner {
+    [[self calls] addObject:@[ @"notMade", URL, owner ]];
+}
+@end
+
 /// [EN] Like Lottie: the fallback, takes every file. [CN] 与 Lottie 相同：兜底，接收所有文件。
 @interface CYLTestLottieAnimator : NSObject <CYLTabBarItemAnimator>
 @end
@@ -128,6 +150,12 @@ static CYLTestRiveView *CYLLastRiveView;
 @end
 
 #pragma mark - What Core provides (fakes)
+
+// [EN] `CYLLocalizedString` is Swift (`@_cdecl`, CYLUtils) and not linked here: the stand-in returns the key itself.
+// [CN] `CYLLocalizedString` 是 Swift（`@_cdecl`，CYLUtils），这里不链接：替身直接返回 key。
+NSString *CYLLocalizedString(NSString *key) {
+    return key ?: @"";
+}
 
 /// [EN] Core's service slot, as in Swift/UIControl+CYLTabBarItemAnimation.swift; the real engine fills it in +load.
 /// [CN] Core 的服务槽位，与 Swift/UIControl+CYLTabBarItemAnimation.swift 相同；真正的引擎在 +load 中填入。
@@ -365,6 +393,38 @@ int main(void) {
         [engine addAnimationWithURL:lightFile size:CGSizeZero contentMode:UIViewContentModeScaleAspectFit animationSpeed:0 toControl:plusButton];
         CHECK(plusButton.subviews.count == 0, "the host's plus button gets no animation");
         host.plus = NO;
+
+        printf("\n# A tab's missing resource is reported to CYLAnimationEngines, found at run time\n");
+        NSMutableArray<NSArray *> *engineCalls = [CYLAnimationEngines calls];
+        [engineCalls removeAllObjects];
+        UIControl *missingTab = [[UIControl alloc] init];
+        NSURL *missingFile = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-engine-missing.riv"]];
+        [[NSFileManager defaultManager] removeItemAtURL:missingFile error:NULL];
+        [engine addAnimationWithURL:missingFile size:CGSizeZero contentMode:UIViewContentModeScaleAspectFit animationSpeed:0 toControl:missingTab];
+        CHECK(engineCalls.count == 1 && [engineCalls[0][0] isEqual:@"notMade"] && [engineCalls[0][1] isEqual:missingFile] && engineCalls[0][2] == missingTab,
+              "a local file that is not there is reported for its tab button");
+        [engineCalls removeAllObjects];
+        [engine addAnimationWithURL:nil size:CGSizeZero contentMode:UIViewContentModeScaleAspectFit animationSpeed:0 toControl:missingTab];
+        [engine addAnimationWithURL:[NSURL URLWithString:@"https://example.com/remote.riv"] size:CGSizeZero contentMode:UIViewContentModeScaleAspectFit animationSpeed:0 toControl:missingTab];
+        CHECK(engineCalls.count == 0, "no URL and a remote URL report nothing on the tab path");
+        UIControl *failingTab = [[UIControl alloc] init];
+        [engine addAnimationWithURL:lightFile size:CGSizeZero contentMode:UIViewContentModeScaleAspectFit animationSpeed:0 toControl:failingTab];
+        UIView *failingView = [engine animationViewInControl:failingTab];
+        CHECK(failingView != nil && engineCalls.count == 0, "a made view reports nothing");
+        NSError *parseError = [NSError errorWithDomain:@"CYLTest" code:7 userInfo:nil];
+        CYLTabBarItemAnimationReportFailure(failingView, parseError);
+        [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+        // [EN] Every engine this process made hears the notification (each observes it); the one that finds the tab button reports it for the button,
+        //      another one that cannot reaches the view itself. Every report names the file and the error; at least one is for the tab button.
+        // [CN] 本进程创建的每个引擎都会收到该通知（各自都在观察）；找到 Tab 按钮的引擎为按钮报告，找不到的引擎则为视图本身报告。每次报告都带有文件与错误；至少有一次是为 Tab 按钮。
+        BOOL allForTheTab = engineCalls.count >= 1;
+        BOOL oneForTheButton = NO;
+        for (NSArray *call in engineCalls) {
+            allForTheTab = allForTheTab && [call[0] isEqual:@"failure"] && [call[1] isEqual:lightFile] && call[2] == parseError;
+            oneForTheButton = oneForTheButton || call[3] == failingTab;
+        }
+        allForTheTab = allForTheTab && oneForTheButton;
+        CHECK(allForTheTab, "a late failure reports the file the view was made for, with its error, for its tab button");
 
         printf("\n# Dark Mode through the injected style source (#442)\n");
         styleSource.lightURL = lightFile;

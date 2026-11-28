@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a ב-Android: אפליקציה אינה יכולה לשלוח אירוע מערכת זה.";
 "Runs every automatic row, one after the other." = "מריץ את כל השורות האוטומטיות, אחת אחרי השנייה.";
 "Tab bar %@ · page ID \"%@\"" = "סרגל לשוניות %@ · מזהה עמוד \"%@\"";
+"Animated item engine API" = "API של מנועי הפריט המונפש";
+"Stop at 50%" = "עצור ב-50%";
+"Show image when ended" = "הצג תמונה בסיום";
+"Restart token: %@" = "אסימון הפעלה מחדש: %@";
+"End callback: %@" = "קריאה חוזרת בסיום: %@";
+"none yet" = "עדיין אין";
+"Host-driven playback (drivesAnimationPlayback = false)" = "המארח שולט בהפעלה (drivesAnimationPlayback = false)";
+"Engine API" = "API של מנוע";
+"Pause while scrolling" = "השהה בזמן גלילה";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "שחרר את בקר סרגל הלשוניות (בעוד 3 שנ׳)";
+"teardown: not run" = "פירוק: לא הורץ";
+"teardown: releasing in %d s" = "פירוק: שחרור בעוד %d שנ׳";
+"dealloc callbacks ran: %d / %d" = "קריאות חוזרות של dealloc שהורצו: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "קריאות חוזרות של dealloc שהורצו: %d / %d (%@)";
+"Tab bar controller released" = "בקר סרגל הלשוניות שוחרר";
+"bridge: pause %d, resume %d" = "גשר: השהיה %d, חידוש %d";
+"last event: -" = "אירוע אחרון: -";
+"last event: %@" = "אירוע אחרון: %@";
+"Content inset" = "ריווח פנימי של התוכן";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset לא הוגדר: פריט שטוח ופריט Liquid Glass, במצב רגיל ובמצב נבחר";
+"Flat: itemContentHorizontalInset unset" = "שטוח: itemContentHorizontalInset לא הוגדר";
+"Normal" = "רגיל";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset לא הוגדר";

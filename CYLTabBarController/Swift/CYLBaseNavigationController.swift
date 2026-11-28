@@ -8,6 +8,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  [EN] A navigation controller that hides the tab bar for a pushed page and shows it again at the root
       (`UINavigationController+CYLBaseNavigation.swift`). An `open` Swift class since docs/Swift-Migration.md step 113 (phase ②;

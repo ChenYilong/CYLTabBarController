@@ -8,6 +8,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * FIX: issue #535
  * [EN] `UIControl (CYLBadgeExtention)`: a tab button's badge goes on its icon (image or Lottie view) and is mirrored to the

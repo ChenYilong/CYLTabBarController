@@ -7,7 +7,7 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "CYLSwiftInterface.h"
+#import "CYLBadgeSwiftInterface.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

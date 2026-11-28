@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] Block 2 of the sections handed over by Mac-CYLTabBarController文件夹 (docs/Swift-Migration.md, step 125): the title offset
 //      (issue #475) and image insets (issue #95) of the tabs at run time, the looping Lottie tabs, and the image helper. The
 //      property setters `-setTitlePositionAdjustment:` / `-updateImageInsets:` stay in CYLTabBarController.m (they store the

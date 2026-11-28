@@ -61,4 +61,4 @@ typedef void (^CYLPushOrPopCallback)(NSArray<__kindof UIViewController *> *viewC
 
 NS_ASSUME_NONNULL_END
 
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"

@@ -30,7 +30,7 @@
   </view>
 
   <view wx:if="{{demo.configuration && !demo.heights}}" class="cyl-demo-frame" bindlongpress="cyl_longPress" bindtouchstart="cyl_touchStart" aria-label="cyl-tab-bar">
-    <cyl-tab-bar id="cyl-demo-tab-bar" configuration="{{demo.configuration}}" selected-identifier="{{selectedIdentifier}}" tab-bar-hidden="{{barHidden}}" bind:select="cyl_select" bind:reselect="cyl_select" bind:plustap="cyl_plusTap" />
+    <cyl-tab-bar id="cyl-demo-tab-bar" configuration="{{demo.configuration}}" selected-identifier="{{selectedIdentifier}}" tab-bar-hidden="{{barHidden}}" bind:select="cylSelect" bind:reselect="cylSelect" bind:plustap="cyl_plusTap" />
   </view>
   <view wx:if="{{demo.scroll}}" class="cyl-demo-spacer" aria-hidden="true"></view>
 </view>

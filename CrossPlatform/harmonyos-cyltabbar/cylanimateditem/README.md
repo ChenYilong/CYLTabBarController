@@ -1,9 +1,51 @@
 # cylanimateditem
 
 The animated icon + title component of CYLTabBarController for HarmonyOS NEXT (`CYLAnimatedItemView`,
-`CYLAnimatedItemStackView`, `CYLAnimatedItemEngines`). It depends on no other package and on no animation library.
+`CYLAnimatedItemStackView`, `CYLAnimatedItemEngines`). It depends on the lifecycle library `cyldeallocblockexecutor` (teardown blocks) and on no animation library.
 Guide: [docs/Animated-Item.md](../../../docs/Animated-Item.md) in CYLTabBarController. To play `.riv` files in it with one shared
 Rive view and a working Loop, add the sibling module [cylanimateditemrive](../cylanimateditemrive/README.md).
+
+## Engine views (no `animationBuilder` needed)
+
+[EN] The component carries the engine views, so an app no longer writes its own players. Register the engines once (for
+example in `EntryAbility.onCreate`); every `CYLAnimatedItemView` without an `animationBuilder` then plays files of those
+types by its selection and playback (selected: once from the start; unselected: progress 0; `animationRestartToken` /
+`controller.restartAnimation()`: again; `animationSpeed`, `animationLoops` at once; `onAnimationEnd`).
+[CN] 组件自带引擎视图，App 不再编写自己的播放器。注册一次引擎（例如在 `EntryAbility.onCreate` 中）后，所有未传入 `animationBuilder` 的
+`CYLAnimatedItemView` 都按其选中状态与播放设置播放这些类型的文件。
+
+| Type | Where | Register |
+|:---|:---|:---|
+| GIF | this module (ImageKit, no library; a frame of 10 ms or less shows for 100 ms, as browsers and the iOS / Android engines do) | `CYLAnimatedItemGIF.register()` |
+| SVGA | this module (pure TypeScript decoder and renderer, `svga/`) | `CYLAnimatedItemSVGA.register()` |
+| Lottie | module `cylanimateditem_lottie` (`@ohos/lottie` ^2.0.38) | `CYLAnimatedItemLottie.register()` |
+| PAG | module `cylanimateditem_pag` (`@tencent/libpag` ^4.4.31; an app on another version can pin one with ohpm `overrides`) | `CYLAnimatedItemPAG.register()` |
+| Rive | module `cylanimateditem_rive` (`@ohos/rive` 1.0.4) | `CYLAnimatedItemRive.register()` |
+
+Used by: cyltabbar (Lottie and SVGA tabs through the engine views; `CYLRiveIcon` and `svga/` delegate to the modules),
+CollectionViewClassifyMenu (every tag icon; no players of its own), CYLTableViewPlaceHolder and CYLSearchViewController
+(switching).
+
+- A host that drives playback itself (resting progress, Play all) sets `drivesAnimationPlayback: false` and gets the
+  player in `onAnimationPlayer`: `CYLAnimatedItemPlayer` (`play()`, `stopAtProgress(p)`, `speed`, `loops`,
+  `supportsSpeed` / `supportsLoops` / `supportsProgress`, `isPlaying`, `progress`, `onEnded`, `supportsColors` /
+  `applyColors(colors)`).
+- Writing an engine: a `@Component` that gets `state: CYLAnimatedItemEngineState` (the parsed
+  `CYLAnimatedItemSource` with its `#` options, the size, the playback, the callbacks), makes a player (subclass
+  `CYLAnimatedItemPlayer`, or `CYLAnimatedItemTimedPlayer` for an engine without speed), and calls
+  `CYLAnimatedItemEngineBinding.ready(state, player)` / `failed(state)` / `update(state)` /
+  `release()`, listening with `state.listen(...)` in `aboutToAppear` (and calling the returned function in `aboutToDisappear`); then `CYLAnimatedItemEngineViews.register(type, wrapBuilder(globalBuilder))`. `CYLAnimatedItemGIF.ets` is
+  the smallest example.
+- Engine views are created one at a time, 50 ms apart (a screen full of animated items froze while decoding all of them
+  at once: CollectionViewClassifyMenu Z5).
+- Tests: `node --test test/*.test.mjs` (`CYLAnimatedItemSource`, `CYLAnimatedItemPlayer`, GIF timing).
+- SVGA: `CYLAnimatedItemSVGA.register()` (in this module: `svga/` decoder and renderer, a timed player). Rive: the
+  `cylanimateditem_rive` module, `CYLAnimatedItemRive.register()`; cyltabbar's `CYLRiveIcon` is a thin wrapper over its
+  `CYLAnimatedItemRiveView`. Checked on the x86_64 emulator with the debug engine kit (2026-11-22):
+  ![Rive tabs on cylanimateditem_rive](../../../docs/assets/harmonyos-x86-64-rive-tabs-on-cylanimateditem-rive.png)
+- The SVGA decoder is plain TypeScript (`svga/CYLInflate.ts`, `svga/CYLSVGADecoder.ts`), tested with Node
+  (`test/CYLAnimatedItemSVGADecoder.test.mjs`). SVGA tabs on the x86_64 emulator (2026-11-22):
+  ![SVGA tabs on the pure TypeScript decoder](../../../docs/assets/harmonyos-x86-64-svga-tabs-on-pure-ts-decoder.png)
 
 ## x86_64 emulator
 
@@ -66,7 +108,7 @@ it); `strip <in.hap> [<out.hap>]` only copies the HAP without native libraries. 
 
 | Testable on the x86_64 emulator | Needs an arm64 device |
 |:---|:---|
-| Lottie, SVGA and GIF playback; still images and placeholders; PAG and Rive items on their still images (no crash, no blank item); Rive playback in debug builds with the debug engine kit (section 5); `showsImageWhenAnimationEnds` with Lottie or SVGA; layout, dark mode, accessibility, localization, gestures, countdown, stack view | PAG playback; Rive in release builds; Rive's dispose crash workarounds on a real device |
+| Lottie, SVGA and GIF playback; still images and placeholders; PAG and Rive items on their still images (no crash, no blank item); Rive and PAG playback with the debug engine kit (section 5); `showsImageWhenAnimationEnds` with Lottie or SVGA; layout, dark mode, accessibility, localization, gestures, countdown, stack view | Rive and PAG without the kit; Rive's dispose crash workarounds on a real device |
 
 Device tests (hypium): the cyltabbar example's `entry/src/ohosTest` (`CYLAnimatedItemFallback.test.ets`) checks the
 ABI rules on the device (expectations follow `deviceInfo.abiList`, so it also passes on arm64), a simulated x86_64 and
@@ -98,9 +140,10 @@ licenses in each README; each folder's `kit.json` names its package and version)
   from `ets/modules.abc`; a native library of another version crashed the app, so a mismatch is skipped with a message) (`--x86-engines auto`, the default; `no` / `yes` or
   `CYL_X86_ENGINES=0|1` force it).
 - `CYLAnimatedItemEngines.loadX86_64DebugEngines(context)` (called by `CYLAnimatedItemView` and `CYLTabBarController`)
-  reads the marker **in debug builds only** and lets the engines it names (Rive, PAG) accept `x86_64`; `x86_64DebugEngines()` lists what it turned on.
-  Release builds and debug builds installed without the kit keep the still images.
-- The debug guard stays until the owner approves removing it.
+  reads the marker (debug and release builds) and lets the engines it names (Rive, PAG) accept `x86_64`; `x86_64DebugEngines()` lists what it turned on.
+  A HAP installed without the kit keeps the still images.
+- The debug-build guard was removed with the owner's approval (2026-11-23), after Rive and PAG (4.5.102) played on the
+  x86_64 emulator without crashes; the marker and the device's x86_64 ABI remain the guards.
 
 Checked on the x86_64 emulator (2026-11-22): with the kit the Rive tab icons draw and animate, without it they keep their
 still images, and the hypium suite passes 9 / 9 in both installs; in CollectionViewClassifyMenu the PAG icons play and end

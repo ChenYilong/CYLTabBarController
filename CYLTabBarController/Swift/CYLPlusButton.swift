@@ -7,6 +7,12 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 import ObjectiveC
 
 // MARK: - The legacy globals 旧的全局变量

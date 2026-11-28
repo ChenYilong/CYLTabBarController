@@ -8,6 +8,9 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 /**
  * [EN] Badges on a bar button item (`UIBarButtonItem (CYLBadgeExtention)`). The item is not a view: the badge goes on the
  *      image or title inside its button. Translated from Objective-C (docs/Swift-Migration.md, step 24); every selector is

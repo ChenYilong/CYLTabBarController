@@ -30,10 +30,13 @@
     <string name="cyl_demo_6a69211e0f">Cada escena es una barra de pestañas creada con la API pública: estilos, animaciones, insignias, Lottie y la nueva API de pestañas</string>
     <string name="cyl_demo_7efc907fe3">Elemento animado</string>
     <string name="cyl_demo_9244b5dc65">El componente de icono animado + título por sí solo: GIF, Lottie, un archivo que falta, un accesorio y arrastre</string>
+    <string name="cyl_demo_5dbde9a698">Margen interior del contenido</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset sin definir: un elemento plano y uno de Liquid Glass, normal y seleccionado</string>
     <string name="cyl_demo_185d8ef0ae">Insignias</string>
     <string name="cyl_demo_2db1db0706">Reproducción</string>
     <string name="cyl_demo_34bffc9c7a">Animaciones de iconos de pestaña: reproducir todo, velocidad, bucle</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">Velocidad %@, bucle %@; toca para ver los controles</string>
+    <string name="cyl_demo_2f63c1fff7">Liberar el controlador de la barra de pestañas (en 3 s)</string>
     <string name="cyl_demo_a4fe65264e">Idioma</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">Actual: %@</string>
     <string name="cyl_demo_bbc5e661e1">sistema</string>
@@ -130,6 +133,10 @@
     <string name="cyl_demo_7108183f18">Solicitud cancelada</string>
     <string name="cyl_demo_5fbceaee5f">Solicitud sin URL</string>
     <string name="cyl_demo_4334569b3d">Una página HTML (red)</string>
+    <string name="cyl_demo_e2917c5f0d">Plano: itemContentHorizontalInset sin definir</string>
+    <string name="cyl_demo_a7248eeb45">Normal</string>
+    <string name="cyl_demo_57fd7a0cf3">Seleccionado</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset sin definir</string>
     <string name="cyl_demo_d84eebada9">Foto</string>
     <string name="cyl_demo_d47d7cb0e4">Más</string>
     <string name="cyl_demo_0e35f6e974">Básico</string>
@@ -320,6 +327,7 @@
     <string name="cyl_demo_12e7b8220d">Reproducir todo</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">Velocidad: %@</string>
     <string name="cyl_demo_f2f6a01889">Bucle</string>
+    <string name="cyl_demo_08078d674a">Controlador de la barra de pestañas liberado</string>
     <string name="cyl_demo_44a57b22e0">Alerta</string>
     <string name="cyl_demo_a127ceb079">Hoja de acciones</string>
     <string name="cyl_demo_9329618118">Hoja de página</string>
@@ -338,6 +346,10 @@
     <string name="cyl_demo_1698b890f9">Ejecuta todas las filas automáticas, una tras otra.</string>
     <string name="cyl_demo_afa158bdc8">Sobre el contexto actual</string>
     <string name="cyl_demo_0add8377e7" formatted="false">Pulsado prolongadamente «%@»</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">callbacks de dealloc ejecutados: %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">callbacks de dealloc ejecutados: %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">liberación: se libera en %d s</string>
+    <string name="cyl_demo_c0fd658b68">liberación: no ejecutada</string>
     <string name="cyl_demo_d4f455fa45">Abrir: dos barras de pestañas, un ID de página</string>
     <string name="cyl_demo_5b88804382" formatted="false">Barra de pestañas %@ · ID de página «%@»</string>
 </resources>

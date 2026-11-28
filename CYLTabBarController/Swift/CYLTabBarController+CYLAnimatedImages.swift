@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The associated object keys shared with CYLTabBarController.m (`CYLRestingTabBarItemImage` writes them; selector-based
  *      keys, the same pointer on both sides).
@@ -31,13 +37,15 @@ extension CYLTabBarController {
 
     /**
      * [EN] The color UIKit draws a template tab image in, from the tint the tab bar was set up with: selected, the
-     *      appearance's selected icon color, else `tintColor`; not selected, the appearance's normal icon color, else
+     *      appearance's selected icon color (the tab's own appearance, else the bar's), else `tintColor`; not selected, the appearance's normal icon color, else
      *      `unselectedItemTintColor`, else UIKit's default (the label color with Liquid Glass, system gray before).
-     * [CN] UIKit 绘制模板 Tab 图片所用的颜色，来自 TabBar 设置的 tint：选中时为外观的选中图标颜色，否则为 `tintColor`；未选中时为外观的普通图标颜色，
+     * [CN] UIKit 绘制模板 Tab 图片所用的颜色，来自 TabBar 设置的 tint：选中时为外观的选中图标颜色（先取 Tab 自己的外观，再取 TabBar 的），否则为 `tintColor`；未选中时为外观的普通图标颜色，
      *      否则为 `unselectedItemTintColor`，再否则为 UIKit 的默认值（液态玻璃下为 label 颜色，之前为系统灰色）。
      */
-    private static func cylTemplateTintColor(_ tabBar: UITabBar, selected: Bool) -> UIColor {
-        let layout = tabBar.standardAppearance.stackedLayoutAppearance
+    private static func cylTemplateTintColor(_ tabBar: UITabBar, item: UITabBarItem?, selected: Bool) -> UIColor {
+        // [EN] The tab's own appearance first: it holds `CYLTabBarItemIconColor` / `CYLTabBarItemSelectedIconColor` over a copy of the bar's (B35).
+        // [CN] 先读 Tab 自己的外观：它在 TabBar 外观的副本上带有 `CYLTabBarItemIconColor` / `CYLTabBarItemSelectedIconColor`（B35）。
+        let layout = (item?.standardAppearance ?? tabBar.standardAppearance).stackedLayoutAppearance
         if let iconColor = (selected ? layout.selected : layout.normal).iconColor {
             return iconColor
         }
@@ -178,7 +186,7 @@ extension CYLTabBarController {
                 let item = self.cylTabBarItem(forTabButton: control)
                 let selected = (item != nil && item === self.selectedViewController?.tabBarItem) ||
                     selectedLayer.contains { $0 === control }
-                let color = Self.cylTemplateTintColor(tabBar, selected: selected)
+                let color = Self.cylTemplateTintColor(tabBar, item: item, selected: selected)
                 for view in views {
                     if view.responds(to: tintWithState) {
                         typealias CYLTintWithState = @convention(c) (AnyObject, Selector, UIColor?, Bool) -> Void

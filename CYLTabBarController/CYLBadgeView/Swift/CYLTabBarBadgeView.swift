@@ -7,6 +7,9 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 /**
  * [EN] What a badge's text view offers (a `UILabel` or a `CYLTabBarBadgeView`). Translated from Objective-C
  *      (docs/Swift-Migration.md).

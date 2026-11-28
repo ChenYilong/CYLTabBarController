@@ -1,0 +1,6 @@
+// [EN] The Objective-C declarations of CYLBadge (symbolic links), for Swift Package Manager only.
+// [CN] CYLBadge 的 Objective-C 声明（符号链接），仅用于 Swift Package Manager。
+module CYLBadgeObjC {
+    umbrella "."
+    export *
+}

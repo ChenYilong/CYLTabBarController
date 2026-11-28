@@ -45,6 +45,10 @@
       "value": "Bliknutí ×3"
     },
     {
+      "name": "cyl_l10n_9594eec95be7",
+      "value": "Blue"
+    },
+    {
       "name": "cyl_l10n_070554647306",
       "value": "Okraj"
     },
@@ -95,6 +99,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem: centrováno"
+    },
+    {
+      "name": "cyl_l10n_5adb0dc263ad",
+      "value": "Color: %@"
     },
     {
       "name": "cyl_l10n_f6da70b584ae",
@@ -281,12 +289,20 @@
       "value": "Otevře ovladač, jehož obrázek tlačítka plus se po 2 s změní; rozvržení se nesmí posunout"
     },
     {
+      "name": "cyl_l10n_ee38e4d5dd68",
+      "value": "Red"
+    },
+    {
       "name": "cyl_l10n_c27618b1aa9d",
       "value": "Červená tečka"
     },
     {
       "name": "cyl_l10n_255c00a63f9d",
       "value": "Poloměr červené tečky"
+    },
+    {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "Uvolnit řadič lišty karet (za 3 s)"
     },
     {
       "name": "cyl_l10n_56e8fac7007d",
@@ -303,6 +319,10 @@
     {
       "name": "cyl_l10n_9d01c837b4bc",
       "value": "Rive tab icon: house.riv (number input Rooms)"
+    },
+    {
+      "name": "cyl_l10n_bdd66081cc94",
+      "value": "Rive colors"
     },
     {
       "name": "cyl_l10n_f0c792c049bc",
@@ -373,6 +393,10 @@
       "value": "Still image after the animation ends"
     },
     {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "Řadič lišty karet byl uvolněn"
+    },
+    {
       "name": "cyl_l10n_fee4a478923f",
       "value": "Interakce karet"
     },
@@ -413,6 +437,10 @@
       "value": "Vzhled panelu karet"
     },
     {
+      "name": "cyl_l10n_abf44ef609ef",
+      "value": "The file's colors"
+    },
+    {
       "name": "cyl_l10n_7c4aecba91c3",
       "value": "Obrázek karty této stránky z rawfile aplikace (balíček prostředků v iOS); klepnutím znovu obnovíte"
     },
@@ -427,6 +455,10 @@
     {
       "name": "cyl_l10n_a4d0d101d6a3",
       "value": "Vlevo nahoře"
+    },
+    {
+      "name": "cyl_l10n_e38d6ac40a62",
+      "value": "applyColors: a view model color property of a data-bound .riv"
     },
     {
       "name": "cyl_l10n_2306a585ae00",
@@ -469,6 +501,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; klepnutím vyberte a pak posuňte tento seznam"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "zpětná volání dealloc proběhla: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "zpětná volání dealloc proběhla: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: kapsle karet, vyhledávací koule a hudební lišta nad barevným obsahem; posunutím minimalizujete"
     },
@@ -495,6 +535,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; skrytý, vrátí se po 2 s"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "uvolnění: nespuštěno"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "uvolnění: uvolní se za %d s"
     },
     {
       "name": "cyl_l10n_2a0608059131",

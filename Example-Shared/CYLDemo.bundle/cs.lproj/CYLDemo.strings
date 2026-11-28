@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a na Androidu: aplikace nemůže vyvolat tuto systémovou událost.";
 "Runs every automatic row, one after the other." = "Spustí všechny automatické řádky jeden po druhém.";
 "Tab bar %@ · page ID \"%@\"" = "Panel karet %@ · ID stránky „%@“";
+"Animated item engine API" = "API enginů animované položky";
+"Stop at 50%" = "Zastavit na 50 %";
+"Show image when ended" = "Po skončení zobrazit obrázek";
+"Restart token: %@" = "Token restartu: %@";
+"End callback: %@" = "Callback konce: %@";
+"none yet" = "zatím žádný";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Přehrávání řídí hostitel (drivesAnimationPlayback = false)";
+"Engine API" = "API enginu";
+"Pause while scrolling" = "Pozastavit při posouvání";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Uvolnit řadič lišty karet (za 3 s)";
+"teardown: not run" = "uvolnění: nespuštěno";
+"teardown: releasing in %d s" = "uvolnění: uvolní se za %d s";
+"dealloc callbacks ran: %d / %d" = "zpětná volání dealloc proběhla: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "zpětná volání dealloc proběhla: %d / %d (%@)";
+"Tab bar controller released" = "Řadič lišty karet byl uvolněn";
+"bridge: pause %d, resume %d" = "most: pauza %d, pokračování %d";
+"last event: -" = "poslední událost: -";
+"last event: %@" = "poslední událost: %@";
+"Content inset" = "Odsazení obsahu";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset nenastaveno: plochá položka a položka Liquid Glass, normální a vybraná";
+"Flat: itemContentHorizontalInset unset" = "Ploché: itemContentHorizontalInset nenastaveno";
+"Normal" = "Normální";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset nenastaveno";

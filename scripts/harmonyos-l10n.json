@@ -67,7 +67,19 @@
     "Show the still image when it ends: on": "Show the still image when it ends: on",
     "Show the still image when it ends: off": "Show the still image when it ends: off",
     "Replay": "Replay",
-    "Animation ended: %d": "Animation ended: %d"
+    "Animation ended: %d": "Animation ended: %d",
+    "Release the tab bar controller (in 3 s)": "Release the tab bar controller (in 3 s)",
+    "teardown: not run": "teardown: not run",
+    "teardown: releasing in %d s": "teardown: releasing in %d s",
+    "dealloc callbacks ran: %d / %d": "dealloc callbacks ran: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc callbacks ran: %d / %d (%@)",
+    "Tab bar controller released": "Tab bar controller released",
+    "Rive colors": "Rive colors",
+    "applyColors: a view model color property of a data-bound .riv": "applyColors: a view model color property of a data-bound .riv",
+    "Color: %@": "Color: %@",
+    "The file's colors": "The file's colors",
+    "Red": "Red",
+    "Blue": "Blue"
   },
   "zh-Hans": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一个 Tab（cyl_selectPreviousTab，issue #535）",
@@ -137,7 +149,19 @@
     "Show the still image when it ends: on": "结束后显示静态图片：开",
     "Show the still image when it ends: off": "结束后显示静态图片：关",
     "Replay": "重新播放",
-    "Animation ended: %d": "动画结束次数：%d"
+    "Animation ended: %d": "动画结束次数：%d",
+    "Release the tab bar controller (in 3 s)": "释放 TabBarController（3 秒后）",
+    "teardown: not run": "销毁：未执行",
+    "teardown: releasing in %d s": "销毁：%d 秒后释放",
+    "dealloc callbacks ran: %d / %d": "dealloc 回调已执行：%d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc 回调已执行：%d / %d (%@)",
+    "Tab bar controller released": "TabBarController 已释放",
+    "Rive colors": "Rive 颜色",
+    "applyColors: a view model color property of a data-bound .riv": "applyColors：数据绑定 .riv 的视图模型颜色属性",
+    "Color: %@": "颜色：%@",
+    "The file's colors": "文件自身的颜色",
+    "Red": "红色",
+    "Blue": "蓝色"
   },
   "zh-Hant": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "上一個 Tab（cyl_selectPreviousTab，issue #535）",
@@ -207,7 +231,19 @@
     "Show the still image when it ends: on": "結束後顯示靜態圖片：開",
     "Show the still image when it ends: off": "結束後顯示靜態圖片：關",
     "Replay": "重新播放",
-    "Animation ended: %d": "動畫結束次數：%d"
+    "Animation ended: %d": "動畫結束次數：%d",
+    "Release the tab bar controller (in 3 s)": "釋放 TabBarController（3 秒後）",
+    "teardown: not run": "銷毀：未執行",
+    "teardown: releasing in %d s": "銷毀：%d 秒後釋放",
+    "dealloc callbacks ran: %d / %d": "dealloc 回呼已執行：%d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc 回呼已執行：%d / %d (%@)",
+    "Tab bar controller released": "TabBarController 已釋放",
+    "Rive colors": "Rive 顏色",
+    "applyColors: a view model color property of a data-bound .riv": "applyColors：資料綁定 .riv 的視圖模型顏色屬性",
+    "Color: %@": "顏色：%@",
+    "The file's colors": "檔案自身的顏色",
+    "Red": "紅色",
+    "Blue": "藍色"
   },
   "de": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Vorheriger Tab (cyl_selectPreviousTab, issue #535)",
@@ -265,7 +301,13 @@
     "Search": "Suchen",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: der Durchsicht-Effekt der Referenz",
     "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: Tab-Kapsel, Suchkugel und Musikleiste über farbigem Inhalt; zum Verkleinern scrollen",
-    "循环播放": "Wiederholen"
+    "循环播放": "Wiederholen",
+    "Release the tab bar controller (in 3 s)": "TabBarController freigeben (in 3 s)",
+    "teardown: not run": "Abbau: nicht ausgeführt",
+    "teardown: releasing in %d s": "Abbau: Freigabe in %d s",
+    "dealloc callbacks ran: %d / %d": "dealloc-Callbacks ausgeführt: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc-Callbacks ausgeführt: %d / %d (%@)",
+    "Tab bar controller released": "TabBarController freigegeben"
   },
   "fr": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Onglet précédent (cyl_selectPreviousTab, issue #535)",
@@ -323,7 +365,13 @@
     "Search": "Rechercher",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass : l’effet de transparence de la référence",
     "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar : capsule d’onglets, bulle de recherche et barre musicale sur un contenu coloré ; faire défiler pour réduire",
-    "循环播放": "Boucle"
+    "循环播放": "Boucle",
+    "Release the tab bar controller (in 3 s)": "Libérer le contrôleur de la barre d’onglets (dans 3 s)",
+    "teardown: not run": "libération : non exécutée",
+    "teardown: releasing in %d s": "libération : dans %d s",
+    "dealloc callbacks ran: %d / %d": "callbacks dealloc exécutés : %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "callbacks dealloc exécutés : %d / %d (%@)",
+    "Tab bar controller released": "Contrôleur de la barre d’onglets libéré"
   },
   "es": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Pestaña anterior (cyl_selectPreviousTab, issue #535)",
@@ -381,7 +429,13 @@
     "Search": "Buscar",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: el efecto de transparencia de la referencia",
     "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: cápsula de pestañas, bola de búsqueda y barra de música sobre contenido colorido; desplaza para minimizar",
-    "循环播放": "Repetir"
+    "循环播放": "Repetir",
+    "Release the tab bar controller (in 3 s)": "Liberar el controlador de la barra de pestañas (en 3 s)",
+    "teardown: not run": "liberación: no ejecutada",
+    "teardown: releasing in %d s": "liberación: se libera en %d s",
+    "dealloc callbacks ran: %d / %d": "callbacks de dealloc ejecutados: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "callbacks de dealloc ejecutados: %d / %d (%@)",
+    "Tab bar controller released": "Controlador de la barra de pestañas liberado"
   },
   "it": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Scheda precedente (cyl_selectPreviousTab, issue #535)",
@@ -439,7 +493,13 @@
     "Search": "Cerca",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: l’effetto trasparenza del riferimento",
     "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: capsula delle schede, sfera di ricerca e barra musicale su contenuti colorati; scorri per ridurre",
-    "循环播放": "Ripeti"
+    "循环播放": "Ripeti",
+    "Release the tab bar controller (in 3 s)": "Rilascia il controller della barra delle schede (tra 3 s)",
+    "teardown: not run": "rilascio: non eseguito",
+    "teardown: releasing in %d s": "rilascio: tra %d s",
+    "dealloc callbacks ran: %d / %d": "callback dealloc eseguiti: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "callback dealloc eseguiti: %d / %d (%@)",
+    "Tab bar controller released": "Controller della barra delle schede rilasciato"
   },
   "pt-BR": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Aba anterior (cyl_selectPreviousTab, issue #535)",
@@ -497,7 +557,13 @@
     "Search": "Buscar",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: o efeito de transparência da referência",
     "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: cápsula de abas, bola de busca e barra de música sobre conteúdo colorido; role para minimizar",
-    "循环播放": "Repetir"
+    "循环播放": "Repetir",
+    "Release the tab bar controller (in 3 s)": "Liberar o controlador da barra de abas (em 3 s)",
+    "teardown: not run": "liberação: não executada",
+    "teardown: releasing in %d s": "liberação: em %d s",
+    "dealloc callbacks ran: %d / %d": "callbacks de dealloc executados: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "callbacks de dealloc executados: %d / %d (%@)",
+    "Tab bar controller released": "Controlador da barra de abas liberado"
   },
   "ca": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Pestanya anterior (cyl_selectPreviousTab, issue #535)",
@@ -554,7 +620,13 @@
     "Dark mode": "Mode fosc",
     "Search": "Cerca",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: l’efecte de transparència de la referència",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: càpsula de pestanyes, bola de cerca i barra de música sobre contingut de colors; desplaça per minimitzar"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: càpsula de pestanyes, bola de cerca i barra de música sobre contingut de colors; desplaça per minimitzar",
+    "Release the tab bar controller (in 3 s)": "Allibera el controlador de la barra de pestanyes (en 3 s)",
+    "teardown: not run": "alliberament: no executat",
+    "teardown: releasing in %d s": "alliberament: s’alliberarà en %d s",
+    "dealloc callbacks ran: %d / %d": "callbacks de dealloc executats: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "callbacks de dealloc executats: %d / %d (%@)",
+    "Tab bar controller released": "Controlador de la barra de pestanyes alliberat"
   },
   "nl": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Vorig tabblad (cyl_selectPreviousTab, issue #535)",
@@ -611,7 +683,13 @@
     "Dark mode": "Donkere modus",
     "Search": "Zoeken",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: het doorkijkeffect van de referentie",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: tabcapsule, zoekbal en muziekbalk boven kleurrijke inhoud; scroll om te verkleinen"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: tabcapsule, zoekbal en muziekbalk boven kleurrijke inhoud; scroll om te verkleinen",
+    "Release the tab bar controller (in 3 s)": "Tabbalkcontroller vrijgeven (over 3 s)",
+    "teardown: not run": "afbouw: niet uitgevoerd",
+    "teardown: releasing in %d s": "afbouw: vrijgave over %d s",
+    "dealloc callbacks ran: %d / %d": "dealloc-callbacks uitgevoerd: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc-callbacks uitgevoerd: %d / %d (%@)",
+    "Tab bar controller released": "Tabbalkcontroller vrijgegeven"
   },
   "da": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Forrige fane (cyl_selectPreviousTab, issue #535)",
@@ -668,7 +746,13 @@
     "Dark mode": "Mørk tilstand",
     "Search": "Søg",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: referencens gennemsigtighedseffekt",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: fanekapsel, søgekugle og musiklinje over farverigt indhold; rul for at minimere"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: fanekapsel, søgekugle og musiklinje over farverigt indhold; rul for at minimere",
+    "Release the tab bar controller (in 3 s)": "Frigiv fanebjælke-controlleren (om 3 s)",
+    "teardown: not run": "nedrivning: ikke kørt",
+    "teardown: releasing in %d s": "nedrivning: frigiver om %d s",
+    "dealloc callbacks ran: %d / %d": "dealloc-callbacks kørt: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc-callbacks kørt: %d / %d (%@)",
+    "Tab bar controller released": "Fanebjælke-controlleren er frigivet"
   },
   "sv": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Föregående flik (cyl_selectPreviousTab, issue #535)",
@@ -725,7 +809,13 @@
     "Dark mode": "Mörkt läge",
     "Search": "Sök",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: referensens genomskinlighetseffekt",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: flikkapsel, sökboll och musikfält över färgglatt innehåll; rulla för att minimera"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: flikkapsel, sökboll och musikfält över färgglatt innehåll; rulla för att minimera",
+    "Release the tab bar controller (in 3 s)": "Frigör flikradens controller (om 3 s)",
+    "teardown: not run": "nedmontering: inte körd",
+    "teardown: releasing in %d s": "nedmontering: frigörs om %d s",
+    "dealloc callbacks ran: %d / %d": "dealloc-återanrop körda: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc-återanrop körda: %d / %d (%@)",
+    "Tab bar controller released": "Flikradens controller har frigjorts"
   },
   "nb": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Forrige fane (cyl_selectPreviousTab, issue #535)",
@@ -782,7 +872,13 @@
     "Dark mode": "Mørk modus",
     "Search": "Søk",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: referansens gjennomsiktighetseffekt",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: fanekapsel, søkeball og musikklinje over fargerikt innhold; rull for å minimere"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: fanekapsel, søkeball og musikklinje over fargerikt innhold; rull for å minimere",
+    "Release the tab bar controller (in 3 s)": "Frigi fanelinje-kontrolleren (om 3 s)",
+    "teardown: not run": "nedrigging: ikke kjørt",
+    "teardown: releasing in %d s": "nedrigging: frigjøres om %d s",
+    "dealloc callbacks ran: %d / %d": "dealloc-tilbakekall kjørt: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc-tilbakekall kjørt: %d / %d (%@)",
+    "Tab bar controller released": "Fanelinje-kontrolleren er frigitt"
   },
   "fi": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Edellinen välilehti (cyl_selectPreviousTab, issue #535)",
@@ -839,7 +935,13 @@
     "Dark mode": "Tumma tila",
     "Search": "Haku",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: viitteen läpinäkyvyystehoste",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: välilehtikapseli, hakupallo ja musiikkipalkki värikkään sisällön päällä; vieritä pienentääksesi"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: välilehtikapseli, hakupallo ja musiikkipalkki värikkään sisällön päällä; vieritä pienentääksesi",
+    "Release the tab bar controller (in 3 s)": "Vapauta välilehtipalkin ohjain (3 s kuluttua)",
+    "teardown: not run": "purku: ei suoritettu",
+    "teardown: releasing in %d s": "purku: vapautus %d s kuluttua",
+    "dealloc callbacks ran: %d / %d": "dealloc-takaisinkutsuja suoritettu: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc-takaisinkutsuja suoritettu: %d / %d (%@)",
+    "Tab bar controller released": "Välilehtipalkin ohjain vapautettu"
   },
   "pl": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Poprzednia karta (cyl_selectPreviousTab, issue #535)",
@@ -896,7 +998,13 @@
     "Dark mode": "Tryb ciemny",
     "Search": "Szukaj",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: efekt przezroczystości wzorca",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: kapsuła kart, kula wyszukiwania i pasek muzyki nad kolorową treścią; przewiń, aby zminimalizować"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: kapsuła kart, kula wyszukiwania i pasek muzyki nad kolorową treścią; przewiń, aby zminimalizować",
+    "Release the tab bar controller (in 3 s)": "Zwolnij kontroler paska kart (za 3 s)",
+    "teardown: not run": "zwolnienie: nie uruchomiono",
+    "teardown: releasing in %d s": "zwolnienie: za %d s",
+    "dealloc callbacks ran: %d / %d": "wykonane wywołania zwrotne dealloc: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "wykonane wywołania zwrotne dealloc: %d / %d (%@)",
+    "Tab bar controller released": "Kontroler paska kart został zwolniony"
   },
   "cs": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Předchozí karta (cyl_selectPreviousTab, issue #535)",
@@ -953,7 +1061,13 @@
     "Dark mode": "Tmavý režim",
     "Search": "Hledat",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: efekt průhlednosti vzoru",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: kapsle karet, vyhledávací koule a hudební lišta nad barevným obsahem; posunutím minimalizujete"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: kapsle karet, vyhledávací koule a hudební lišta nad barevným obsahem; posunutím minimalizujete",
+    "Release the tab bar controller (in 3 s)": "Uvolnit řadič lišty karet (za 3 s)",
+    "teardown: not run": "uvolnění: nespuštěno",
+    "teardown: releasing in %d s": "uvolnění: uvolní se za %d s",
+    "dealloc callbacks ran: %d / %d": "zpětná volání dealloc proběhla: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "zpětná volání dealloc proběhla: %d / %d (%@)",
+    "Tab bar controller released": "Řadič lišty karet byl uvolněn"
   },
   "sk": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Predchádzajúca karta (cyl_selectPreviousTab, issue #535)",
@@ -1010,7 +1124,13 @@
     "Dark mode": "Tmavý režim",
     "Search": "Hľadať",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: efekt priehľadnosti vzoru",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: kapsula kariet, vyhľadávacia guľa a hudobná lišta nad farebným obsahom; posunutím minimalizujete"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: kapsula kariet, vyhľadávacia guľa a hudobná lišta nad farebným obsahom; posunutím minimalizujete",
+    "Release the tab bar controller (in 3 s)": "Uvoľniť kontrolér panela kariet (o 3 s)",
+    "teardown: not run": "uvoľnenie: nespustené",
+    "teardown: releasing in %d s": "uvoľnenie: o %d s",
+    "dealloc callbacks ran: %d / %d": "vykonané spätné volania dealloc: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "vykonané spätné volania dealloc: %d / %d (%@)",
+    "Tab bar controller released": "Kontrolér panela kariet bol uvoľnený"
   },
   "hr": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Prethodna kartica (cyl_selectPreviousTab, issue #535)",
@@ -1067,7 +1187,13 @@
     "Dark mode": "Tamni način",
     "Search": "Traži",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: efekt prozirnosti reference",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: kapsula kartica, kugla za pretraživanje i glazbena traka iznad šarenog sadržaja; pomaknite za smanjenje"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: kapsula kartica, kugla za pretraživanje i glazbena traka iznad šarenog sadržaja; pomaknite za smanjenje",
+    "Release the tab bar controller (in 3 s)": "Oslobodi kontroler trake kartica (za 3 s)",
+    "teardown: not run": "rušenje: nije pokrenuto",
+    "teardown: releasing in %d s": "rušenje: oslobađanje za %d s",
+    "dealloc callbacks ran: %d / %d": "dealloc povratni pozivi izvršeni: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc povratni pozivi izvršeni: %d / %d (%@)",
+    "Tab bar controller released": "Kontroler trake kartica je oslobođen"
   },
   "hu": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Előző lap (cyl_selectPreviousTab, issue #535)",
@@ -1124,7 +1250,13 @@
     "Dark mode": "Sötét mód",
     "Search": "Keresés",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: a referencia átlátszó hatása",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: lapkapszula, keresőgömb és zenesáv színes tartalom felett; görgessen a kicsinyítéshez"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: lapkapszula, keresőgömb és zenesáv színes tartalom felett; görgessen a kicsinyítéshez",
+    "Release the tab bar controller (in 3 s)": "A lapfülsáv-vezérlő felszabadítása (3 mp múlva)",
+    "teardown: not run": "lebontás: nem futott",
+    "teardown: releasing in %d s": "lebontás: felszabadítás %d mp múlva",
+    "dealloc callbacks ran: %d / %d": "lefutott dealloc visszahívások: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "lefutott dealloc visszahívások: %d / %d (%@)",
+    "Tab bar controller released": "A lapfülsáv-vezérlő felszabadult"
   },
   "ro": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Fila anterioară (cyl_selectPreviousTab, issue #535)",
@@ -1181,7 +1313,13 @@
     "Dark mode": "Mod întunecat",
     "Search": "Caută",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: efectul de transparență al referinței",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: capsulă de file, bilă de căutare și bară muzicală peste conținut colorat; derulați pentru a minimiza"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: capsulă de file, bilă de căutare și bară muzicală peste conținut colorat; derulați pentru a minimiza",
+    "Release the tab bar controller (in 3 s)": "Eliberează controlerul barei de file (în 3 s)",
+    "teardown: not run": "eliberare: neexecutată",
+    "teardown: releasing in %d s": "eliberare: în %d s",
+    "dealloc callbacks ran: %d / %d": "callback-uri dealloc executate: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "callback-uri dealloc executate: %d / %d (%@)",
+    "Tab bar controller released": "Controlerul barei de file a fost eliberat"
   },
   "ru": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Предыдущая вкладка (cyl_selectPreviousTab, issue #535)",
@@ -1238,7 +1376,13 @@
     "Dark mode": "Тёмный режим",
     "Search": "Поиск",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: эффект прозрачности образца",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: капсула вкладок, шар поиска и музыкальная панель поверх яркого контента; прокрутите, чтобы свернуть"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: капсула вкладок, шар поиска и музыкальная панель поверх яркого контента; прокрутите, чтобы свернуть",
+    "Release the tab bar controller (in 3 s)": "Освободить контроллер панели вкладок (через 3 с)",
+    "teardown: not run": "освобождение: не выполнялось",
+    "teardown: releasing in %d s": "освобождение: через %d с",
+    "dealloc callbacks ran: %d / %d": "выполнено обратных вызовов dealloc: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "выполнено обратных вызовов dealloc: %d / %d (%@)",
+    "Tab bar controller released": "Контроллер панели вкладок освобождён"
   },
   "uk": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Попередня вкладка (cyl_selectPreviousTab, issue #535)",
@@ -1295,7 +1439,13 @@
     "Dark mode": "Темний режим",
     "Search": "Пошук",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: ефект прозорості зразка",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: капсула вкладок, куля пошуку й музична панель над яскравим вмістом; прокрутіть, щоб згорнути"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: капсула вкладок, куля пошуку й музична панель над яскравим вмістом; прокрутіть, щоб згорнути",
+    "Release the tab bar controller (in 3 s)": "Звільнити контролер панелі вкладок (через 3 с)",
+    "teardown: not run": "звільнення: не виконувалось",
+    "teardown: releasing in %d s": "звільнення: через %d с",
+    "dealloc callbacks ran: %d / %d": "виконано зворотних викликів dealloc: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "виконано зворотних викликів dealloc: %d / %d (%@)",
+    "Tab bar controller released": "Контролер панелі вкладок звільнено"
   },
   "el": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Προηγούμενη καρτέλα (cyl_selectPreviousTab, issue #535)",
@@ -1352,7 +1502,13 @@
     "Dark mode": "Σκούρα λειτουργία",
     "Search": "Αναζήτηση",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: το εφέ διαφάνειας της αναφοράς",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: κάψουλα καρτελών, σφαίρα αναζήτησης και μπάρα μουσικής πάνω από πολύχρωμο περιεχόμενο· κάντε κύλιση για σμίκρυνση"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: κάψουλα καρτελών, σφαίρα αναζήτησης και μπάρα μουσικής πάνω από πολύχρωμο περιεχόμενο· κάντε κύλιση για σμίκρυνση",
+    "Release the tab bar controller (in 3 s)": "Αποδέσμευση του tab bar controller (σε 3 δ)",
+    "teardown: not run": "αποδέσμευση: δεν εκτελέστηκε",
+    "teardown: releasing in %d s": "αποδέσμευση: σε %d δ",
+    "dealloc callbacks ran: %d / %d": "εκτελέστηκαν callbacks dealloc: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "εκτελέστηκαν callbacks dealloc: %d / %d (%@)",
+    "Tab bar controller released": "Ο tab bar controller αποδεσμεύτηκε"
   },
   "ja": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "前のタブ（cyl_selectPreviousTab、issue #535）",
@@ -1414,7 +1570,13 @@
     "numberInput=Rooms：每次选中或再次点击时 Rooms 变为下一个值（3、4、5、6）": "numberInput=Rooms：選択または再タップのたびに Rooms が次の値（3、4、5、6）になります",
     "循环播放": "ループ",
     "Tab 图标动画循环播放：开": "タブアイコンのアニメーションをループ：オン",
-    "Tab 图标动画循环播放：关": "タブアイコンのアニメーションをループ：オフ"
+    "Tab 图标动画循环播放：关": "タブアイコンのアニメーションをループ：オフ",
+    "Release the tab bar controller (in 3 s)": "タブバーコントローラを解放（3 秒後）",
+    "teardown: not run": "解放: 未実行",
+    "teardown: releasing in %d s": "解放: %d 秒後に実行",
+    "dealloc callbacks ran: %d / %d": "dealloc コールバック実行数: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc コールバック実行数: %d / %d (%@)",
+    "Tab bar controller released": "タブバーコントローラを解放しました"
   },
   "ko": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "이전 탭 (cyl_selectPreviousTab, issue #535)",
@@ -1473,7 +1635,13 @@
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: 참고 프로젝트의 투명 효과",
     "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: 다채로운 콘텐츠 위의 탭 캡슐, 검색 볼, 음악 바. 스크롤하면 축소",
     "Rive Tab 图标：house.riv（数字输入 Rooms）": "Rive 탭 아이콘: house.riv (숫자 입력 Rooms)",
-    "循环播放": "반복"
+    "循环播放": "반복",
+    "Release the tab bar controller (in 3 s)": "탭 바 컨트롤러 해제 (3초 후)",
+    "teardown: not run": "해제: 실행 안 됨",
+    "teardown: releasing in %d s": "해제: %d초 후",
+    "dealloc callbacks ran: %d / %d": "dealloc 콜백 실행: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc 콜백 실행: %d / %d (%@)",
+    "Tab bar controller released": "탭 바 컨트롤러가 해제되었습니다"
   },
   "ar": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "علامة التبويب السابقة (cyl_selectPreviousTab، issue #535)",
@@ -1530,7 +1698,13 @@
     "Dark mode": "الوضع الداكن",
     "Search": "بحث",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: تأثير الشفافية في المرجع",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: كبسولة علامات التبويب وكرة البحث وشريط الموسيقى فوق محتوى ملوّن؛ مرّر للتصغير"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: كبسولة علامات التبويب وكرة البحث وشريط الموسيقى فوق محتوى ملوّن؛ مرّر للتصغير",
+    "Release the tab bar controller (in 3 s)": "تحرير وحدة التحكم في شريط علامات التبويب (خلال 3 ث)",
+    "teardown: not run": "التفكيك: لم يتم التشغيل",
+    "teardown: releasing in %d s": "التفكيك: التحرير خلال %d ث",
+    "dealloc callbacks ran: %d / %d": "اكتملت استدعاءات dealloc: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "اكتملت استدعاءات dealloc: %d / %d (%@)",
+    "Tab bar controller released": "تم تحرير وحدة التحكم في شريط علامات التبويب"
   },
   "he": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "הכרטיסייה הקודמת (cyl_selectPreviousTab, issue #535)",
@@ -1587,7 +1761,13 @@
     "Dark mode": "מצב כהה",
     "Search": "חיפוש",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: אפקט השקיפות של פרויקט הייחוס",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: קפסולת כרטיסיות, כדור חיפוש וסרגל מוזיקה מעל תוכן צבעוני; גלול כדי לכווץ"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: קפסולת כרטיסיות, כדור חיפוש וסרגל מוזיקה מעל תוכן צבעוני; גלול כדי לכווץ",
+    "Release the tab bar controller (in 3 s)": "שחרר את בקר סרגל הלשוניות (בעוד 3 שנ׳)",
+    "teardown: not run": "פירוק: לא הורץ",
+    "teardown: releasing in %d s": "פירוק: שחרור בעוד %d שנ׳",
+    "dealloc callbacks ran: %d / %d": "קריאות חוזרות של dealloc שהורצו: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "קריאות חוזרות של dealloc שהורצו: %d / %d (%@)",
+    "Tab bar controller released": "בקר סרגל הלשוניות שוחרר"
   },
   "hi": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "पिछला टैब (cyl_selectPreviousTab, issue #535)",
@@ -1644,7 +1824,13 @@
     "Dark mode": "डार्क मोड",
     "Search": "खोजें",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: संदर्भ का पारदर्शी प्रभाव",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: रंगीन सामग्री के ऊपर टैब कैप्सूल, खोज गेंद और संगीत बार; छोटा करने के लिए स्क्रॉल करें"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: रंगीन सामग्री के ऊपर टैब कैप्सूल, खोज गेंद और संगीत बार; छोटा करने के लिए स्क्रॉल करें",
+    "Release the tab bar controller (in 3 s)": "टैब बार कंट्रोलर को रिलीज़ करें (3 सेकंड में)",
+    "teardown: not run": "टियरडाउन: चलाया नहीं गया",
+    "teardown: releasing in %d s": "टियरडाउन: %d सेकंड में रिलीज़",
+    "dealloc callbacks ran: %d / %d": "dealloc कॉलबैक चले: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "dealloc कॉलबैक चले: %d / %d (%@)",
+    "Tab bar controller released": "टैब बार कंट्रोलर रिलीज़ हो गया"
   },
   "th": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "แท็บก่อนหน้า (cyl_selectPreviousTab, issue #535)",
@@ -1701,7 +1887,13 @@
     "Dark mode": "โหมดมืด",
     "Search": "ค้นหา",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: เอฟเฟกต์โปร่งใสของต้นแบบ",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: แคปซูลแท็บ ลูกบอลค้นหา และแถบเพลงเหนือเนื้อหาสีสันสดใส เลื่อนเพื่อย่อ"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: แคปซูลแท็บ ลูกบอลค้นหา และแถบเพลงเหนือเนื้อหาสีสันสดใส เลื่อนเพื่อย่อ",
+    "Release the tab bar controller (in 3 s)": "ปล่อย Tab Bar Controller (ใน 3 วินาที)",
+    "teardown: not run": "การปล่อย: ยังไม่ได้ทำงาน",
+    "teardown: releasing in %d s": "การปล่อย: ใน %d วินาที",
+    "dealloc callbacks ran: %d / %d": "คอลแบ็ก dealloc ที่ทำงานแล้ว: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "คอลแบ็ก dealloc ที่ทำงานแล้ว: %d / %d (%@)",
+    "Tab bar controller released": "ปล่อย Tab Bar Controller แล้ว"
   },
   "tr": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Önceki sekme (cyl_selectPreviousTab, issue #535)",
@@ -1758,7 +1950,13 @@
     "Dark mode": "Karanlık mod",
     "Search": "Ara",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: referansın şeffaflık efekti",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: renkli içeriğin üzerinde sekme kapsülü, arama topu ve müzik çubuğu; küçültmek için kaydırın"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: renkli içeriğin üzerinde sekme kapsülü, arama topu ve müzik çubuğu; küçültmek için kaydırın",
+    "Release the tab bar controller (in 3 s)": "Sekme çubuğu denetleyicisini serbest bırak (3 sn sonra)",
+    "teardown: not run": "serbest bırakma: çalıştırılmadı",
+    "teardown: releasing in %d s": "serbest bırakma: %d sn sonra",
+    "dealloc callbacks ran: %d / %d": "çalışan dealloc geri çağrıları: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "çalışan dealloc geri çağrıları: %d / %d (%@)",
+    "Tab bar controller released": "Sekme çubuğu denetleyicisi serbest bırakıldı"
   },
   "vi": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Tab trước (cyl_selectPreviousTab, issue #535)",
@@ -1815,7 +2013,13 @@
     "Dark mode": "Chế độ tối",
     "Search": "Tìm kiếm",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: hiệu ứng trong suốt của dự án tham chiếu",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: viên nang tab, quả cầu tìm kiếm và thanh nhạc trên nội dung nhiều màu; cuộn để thu nhỏ"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: viên nang tab, quả cầu tìm kiếm và thanh nhạc trên nội dung nhiều màu; cuộn để thu nhỏ",
+    "Release the tab bar controller (in 3 s)": "Giải phóng bộ điều khiển thanh tab (sau 3 giây)",
+    "teardown: not run": "giải phóng: chưa chạy",
+    "teardown: releasing in %d s": "giải phóng: sau %d giây",
+    "dealloc callbacks ran: %d / %d": "số callback dealloc đã chạy: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "số callback dealloc đã chạy: %d / %d (%@)",
+    "Tab bar controller released": "Đã giải phóng bộ điều khiển thanh tab"
   },
   "id": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Tab sebelumnya (cyl_selectPreviousTab, issue #535)",
@@ -1872,7 +2076,13 @@
     "Dark mode": "Mode gelap",
     "Search": "Cari",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: efek tembus pandang dari referensi",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: kapsul tab, bola pencarian, dan bilah musik di atas konten berwarna; gulir untuk mengecilkan"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: kapsul tab, bola pencarian, dan bilah musik di atas konten berwarna; gulir untuk mengecilkan",
+    "Release the tab bar controller (in 3 s)": "Lepaskan tab bar controller (dalam 3 dtk)",
+    "teardown: not run": "teardown: belum dijalankan",
+    "teardown: releasing in %d s": "teardown: dilepas dalam %d dtk",
+    "dealloc callbacks ran: %d / %d": "callback dealloc dijalankan: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "callback dealloc dijalankan: %d / %d (%@)",
+    "Tab bar controller released": "Tab bar controller telah dilepas"
   },
   "ms": {
     "Previous tab (cyl_selectPreviousTab, issue #535)": "Tab sebelumnya (cyl_selectPreviousTab, issue #535)",
@@ -1929,6 +2139,12 @@
     "Dark mode": "Mod gelap",
     "Search": "Cari",
     "Liquid Glass: the see-through effect of the reference": "Liquid Glass: kesan lut sinar projek rujukan",
-    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: kapsul tab, bola carian dan bar muzik di atas kandungan berwarna; tatal untuk mengecilkan"
+    "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize": "harmonyos-liquid-glass-tabbar: kapsul tab, bola carian dan bar muzik di atas kandungan berwarna; tatal untuk mengecilkan",
+    "Release the tab bar controller (in 3 s)": "Lepaskan pengawal bar tab (dalam 3 s)",
+    "teardown: not run": "teardown: belum dijalankan",
+    "teardown: releasing in %d s": "teardown: dilepaskan dalam %d s",
+    "dealloc callbacks ran: %d / %d": "panggilan balik dealloc dijalankan: %d / %d",
+    "dealloc callbacks ran: %d / %d (%@)": "panggilan balik dealloc dijalankan: %d / %d (%@)",
+    "Tab bar controller released": "Pengawal bar tab telah dilepaskan"
   }
 }

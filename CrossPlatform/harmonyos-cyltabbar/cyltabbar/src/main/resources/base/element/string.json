@@ -45,6 +45,10 @@
       "value": "Blink ×3"
     },
     {
+      "name": "cyl_l10n_9594eec95be7",
+      "value": "Blue"
+    },
+    {
       "name": "cyl_l10n_070554647306",
       "value": "Border"
     },
@@ -95,6 +99,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem: centered"
+    },
+    {
+      "name": "cyl_l10n_5adb0dc263ad",
+      "value": "Color: %@"
     },
     {
       "name": "cyl_l10n_f6da70b584ae",
@@ -281,12 +289,20 @@
       "value": "Pushes a tab bar controller whose plus button image changes 2 s later; the layout must not move"
     },
     {
+      "name": "cyl_l10n_ee38e4d5dd68",
+      "value": "Red"
+    },
+    {
       "name": "cyl_l10n_c27618b1aa9d",
       "value": "Red dot"
     },
     {
       "name": "cyl_l10n_255c00a63f9d",
       "value": "Red dot radius"
+    },
+    {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "Release the tab bar controller (in 3 s)"
     },
     {
       "name": "cyl_l10n_56e8fac7007d",
@@ -303,6 +319,10 @@
     {
       "name": "cyl_l10n_9d01c837b4bc",
       "value": "Rive tab icon: house.riv (number input Rooms)"
+    },
+    {
+      "name": "cyl_l10n_bdd66081cc94",
+      "value": "Rive colors"
     },
     {
       "name": "cyl_l10n_f0c792c049bc",
@@ -373,6 +393,10 @@
       "value": "Still image after the animation ends"
     },
     {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "Tab bar controller released"
+    },
+    {
       "name": "cyl_l10n_fee4a478923f",
       "value": "Tab interactions"
     },
@@ -413,6 +437,10 @@
       "value": "Tab bar appearance"
     },
     {
+      "name": "cyl_l10n_abf44ef609ef",
+      "value": "The file's colors"
+    },
+    {
       "name": "cyl_l10n_7c4aecba91c3",
       "value": "The image of this page's tab from the app's rawfile (the resource bundle of iOS); tap again to restore"
     },
@@ -427,6 +455,10 @@
     {
       "name": "cyl_l10n_a4d0d101d6a3",
       "value": "Top left"
+    },
+    {
+      "name": "cyl_l10n_e38d6ac40a62",
+      "value": "applyColors: a view model color property of a data-bound .riv"
     },
     {
       "name": "cyl_l10n_2306a585ae00",
@@ -469,6 +501,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; tap to choose, then scroll this list"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "dealloc callbacks ran: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "dealloc callbacks ran: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize"
     },
@@ -495,6 +535,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; hidden, it comes back after 2 s"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "teardown: not run"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "teardown: releasing in %d s"
     },
     {
       "name": "cyl_l10n_2a0608059131",

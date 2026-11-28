@@ -59,4 +59,4 @@
  *      滚动隐藏模拟位于 `Swift/UIViewController+CYLScrollHideSimulation.swift`。`CYLSettingsSection` 改为宏（原为 extern 常量），名称与值不变
  *      （docs/Swift-Migration.md，第 32、33 步）。
  */
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"

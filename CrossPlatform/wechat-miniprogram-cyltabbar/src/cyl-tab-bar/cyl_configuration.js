@@ -408,7 +408,8 @@ function cylFragmentOptions(fragment) {
  */
 function cylTintOption(value, allowsTitle) {
   const text = String(value === undefined || value === null ? '' : value).trim()
-  if (allowsTitle && text.toLowerCase() === 'title') {
+  // [EN] "title" is case-sensitive, as on every platform. [CN] "title" 区分大小写，各平台相同。
+  if (allowsTitle && text === 'title') {
     return 'title'
   }
   return cylColor(text) || ''
@@ -444,8 +445,11 @@ function cylAnimationIcon(attributes, environment, library, pattern) {
   const tintOptions = cylFragmentOptions(fragment)
   const tint = cylTintOption(tintOptions.tint, true)
   const darkTint = cylTintOption(tintOptions.darkTint, false)
+  // [EN] The `renderingMode` option (automatic | alwaysTemplate | alwaysOriginal, case-insensitive), '' when absent or unknown. [CN] `renderingMode` 选项，缺失或未知时为 ''。
+  const renderingMode = { automatic: 'automatic', alwaystemplate: 'alwaysTemplate', alwaysoriginal: 'alwaysOriginal' }[String(tintOptions.renderingMode || '').trim().toLowerCase()] || ''
   return {
     library: library.toLowerCase(),
+    renderingMode,
     tint,
     darkTint,
     path: library === 'Rive' && fragment ? `${path}#${fragment}` : path,

@@ -80,4 +80,4 @@ NS_ASSUME_NONNULL_END
  */
 #import "NSObject+CYLTabBarControllerExtention.h"
 
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"

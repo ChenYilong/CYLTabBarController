@@ -12,6 +12,9 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 /**
  * [EN] Looks for `CYLAnimatedItem.bundle` where each package manager puts it: next to the component's code (CocoaPods, a
  *      framework), in the app, and inside Swift Package Manager's resource bundle of the CYLAnimatedItemSwift target (before
@@ -36,4 +39,43 @@ private let cylAnimatedItemResourceBundle: Bundle? = {
 @_cdecl("CYLAnimatedItemResourceBundle")
 public func cylAnimatedItemResourceBundleEntryPoint() -> Bundle? {
     cylAnimatedItemResourceBundle
+}
+
+/**
+ * [EN] The animation engines as a whole. `resourceMissingListener` is called on the main queue when an animation file
+ *      cannot be shown, with the file name or path as configured and a short reason: "not found", "unreadable",
+ *      "decode failed" or "engine library missing". Once per resource per view; it is the signal of
+ *      `CYLAnimatedItemView.onResourceMissing` for a host with no view reference (CYLPlaceholder's status bar). Nothing else
+ *      changes: the item shows its static image or the placeholder. Android: `CYLAnimationEngines.resourceMissingListener`.
+ * [CN] 动画引擎的整体入口。动画文件无法显示时在主队列调用 `resourceMissingListener`，参数为按配置给出的文件名或路径与简短原因：
+ *      "not found"、"unreadable"、"decode failed"、"engine library missing"。每个视图每个资源一次；与
+ *      `CYLAnimatedItemView.onResourceMissing` 是同一信号，供没有视图引用的宿主使用（CYLPlaceholder 状态栏）。其他行为不变：条目显示
+ *      静态图片或占位图。
+ */
+@objc(CYLAnimationEngines)
+public final class CYLAnimationEngines: NSObject {
+    /** [EN] See the type's comment. [CN] 见类型说明。 */
+    @objc public static var resourceMissingListener: ((String, String) -> Void)?
+
+    /** [EN] The four reasons, the same strings on every platform. [CN] 四种原因，各平台字符串相同。 */
+    static let reasonNotFound = "not found"
+    static let reasonUnreadable = "unreadable"
+    static let reasonDecodeFailed = "decode failed"
+    static let reasonEngineLibraryMissing = "engine library missing"
+
+    /** [EN] The reason a failure reports: from the error when there is one. [CN] 失败的原因：有错误时由错误决定。 */
+    static func reason(for error: Error?, remote: Bool) -> String {
+        guard let error = error as NSError? else { return remote ? reasonNotFound : reasonDecodeFailed }
+        switch (error.domain, error.code) {
+        case (NSCocoaErrorDomain, NSFileNoSuchFileError), (NSCocoaErrorDomain, NSFileReadNoSuchFileError),
+             (NSURLErrorDomain, NSURLErrorFileDoesNotExist), (NSURLErrorDomain, NSURLErrorBadURL), (NSURLErrorDomain, NSURLErrorUnsupportedURL),
+             (NSURLErrorDomain, NSURLErrorCannotFindHost), (NSURLErrorDomain, NSURLErrorResourceUnavailable):
+            return reasonNotFound
+        case (NSCocoaErrorDomain, NSFileReadNoPermissionError), (NSCocoaErrorDomain, NSFileReadUnknownError),
+             (NSURLErrorDomain, NSURLErrorNoPermissionsToReadFile), (NSURLErrorDomain, NSURLErrorFileIsDirectory):
+            return reasonUnreadable
+        default:
+            return remote && error.domain == NSURLErrorDomain ? reasonNotFound : reasonDecodeFailed
+        }
+    }
 }

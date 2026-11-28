@@ -6,11 +6,12 @@
 //
 
 import UIKit
-// [EN] CocoaPods: the animated item component is its own pod and module, CYLAnimatedItem; re-exported so that
-//      `import CYLTabBarController` keeps giving its keys and classes to Swift callers.
-// [CN] CocoaPods：动效组件是独立的 pod 与模块 CYLAnimatedItem；在此重新导出，使 `import CYLTabBarController` 仍向 Swift 调用方提供其 key 与类。
-#if canImport(CYLAnimatedItem)
-@_exported import CYLAnimatedItem
+// [EN] D7 and D8 (docs/Animated-Item-Badge.md): CYLUtils is the bottom pod; it re-exports the lifecycle library (its only direct user) and
+//      imports nothing of this repository. Core re-exports CYLAnimatedItem (`CYLTabBarControllerObjCImport.swift`).
+// [CN] D7 与 D8（docs/Animated-Item-Badge.md）：CYLUtils 是最底层的 pod；它重新导出生命周期库（其唯一直接使用者），不导入本仓库的任何东西。
+//      Core 重新导出 CYLAnimatedItem（`CYLTabBarControllerObjCImport.swift`）。
+#if canImport(CYLDeallocBlockExecutor)
+@_exported import CYLDeallocBlockExecutor
 #endif
 
 /**
@@ -28,10 +29,18 @@ public class CYLUtils: NSObject {
      * [CN] 是否使用液态玻璃：iOS 27 及以上总是；iOS 26 上 App 未在 Info.plist 中设置 `UIDesignRequiresCompatibility` 时。只读取一次。
      */
     @objc public class func isLiquidGlassActive() -> Bool {
-        isLiquidGlassActiveOnce
+        liquidGlassActiveOverride ?? systemDrawsLiquidGlass
     }
 
-    private static let isLiquidGlassActiveOnce: Bool = {
+    /**
+     * [EN] For tests: replaces the system check of `isLiquidGlassActive()` (nil, the default, asks the system). The one copy of the rule
+     *      (D2): `CYLAnimatedItemView.isLiquidGlassActive()` and `liquidGlassActiveOverride` forward here.
+     * [CN] 供测试使用：替代 `isLiquidGlassActive()` 对系统的检查（默认 nil，询问系统）。规则的唯一一份（D2）：
+     *      `CYLAnimatedItemView.isLiquidGlassActive()` 与 `liquidGlassActiveOverride` 转发到这里。
+     */
+    public nonisolated(unsafe) static var liquidGlassActiveOverride: Bool?
+
+    private static let systemDrawsLiquidGlass: Bool = {
         if #available(iOS 27.0, *) {
             return true
         }
@@ -41,4 +50,20 @@ public class CYLUtils: NSObject {
         }
         return false
     }()
+}
+
+extension CYLUtils {
+
+    /**
+     * [EN] Posts a lifecycle event on `view` through CYLDeallocBlockExecutor. CYLUtils is the only layer that links the lifecycle
+     *      library (D8); CYLBadge calls this instead of importing the library, which its Xcode framework target could not resolve.
+     * [CN] 通过 CYLDeallocBlockExecutor 在 `view` 上发出生命周期事件。CYLUtils 是唯一链接生命周期库的层（D8）；CYLBadge 调用本方法，
+     *      而不再自己导入该库（其 Xcode framework target 无法解析它）。
+     */
+    @nonobjc
+    public class func postLifecycleEvent(_ name: String, userInfo: [String: Any]?, on view: UIView) {
+        #if canImport(CYLDeallocBlockExecutor)
+        view.cylPostLifecycleEvent(name, userInfo: userInfo)
+        #endif
+    }
 }

@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "Android पर n/a: कोई ऐप यह सिस्टम इवेंट नहीं भेज सकता।";
 "Runs every automatic row, one after the other." = "हर स्वचालित पंक्ति को एक के बाद एक चलाता है।";
 "Tab bar %@ · page ID \"%@\"" = "टैब बार %@ · पेज ID \"%@\"";
+"Animated item engine API" = "एनिमेटेड आइटम इंजन API";
+"Stop at 50%" = "50% पर रोकें";
+"Show image when ended" = "समाप्त होने पर छवि दिखाएँ";
+"Restart token: %@" = "पुनः आरंभ टोकन: %@";
+"End callback: %@" = "समाप्ति कॉलबैक: %@";
+"none yet" = "अभी नहीं";
+"Host-driven playback (drivesAnimationPlayback = false)" = "होस्ट प्लेबैक चलाता है (drivesAnimationPlayback = false)";
+"Engine API" = "इंजन API";
+"Pause while scrolling" = "स्क्रॉल करते समय रोकें";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "टैब बार कंट्रोलर को रिलीज़ करें (3 सेकंड में)";
+"teardown: not run" = "टियरडाउन: चलाया नहीं गया";
+"teardown: releasing in %d s" = "टियरडाउन: %d सेकंड में रिलीज़";
+"dealloc callbacks ran: %d / %d" = "dealloc कॉलबैक चले: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "dealloc कॉलबैक चले: %d / %d (%@)";
+"Tab bar controller released" = "टैब बार कंट्रोलर रिलीज़ हो गया";
+"bridge: pause %d, resume %d" = "ब्रिज: विराम %d, पुनः आरंभ %d";
+"last event: -" = "अंतिम इवेंट: -";
+"last event: %@" = "अंतिम इवेंट: %@";
+"Content inset" = "सामग्री इनसेट";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset सेट नहीं: एक फ़्लैट और एक Liquid Glass आइटम, सामान्य और चयनित";
+"Flat: itemContentHorizontalInset unset" = "फ़्लैट: itemContentHorizontalInset सेट नहीं";
+"Normal" = "सामान्य";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset सेट नहीं";

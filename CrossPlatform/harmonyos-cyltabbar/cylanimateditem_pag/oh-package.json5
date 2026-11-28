@@ -1,0 +1,12 @@
+{
+  "name": "cylanimateditem_pag",
+  "version": "1.0.0",
+  "description": "The PAG engine of CYLAnimatedItemView for HarmonyOS NEXT (@tencent/libpag 4.4.31 or later 4.x): CYLAnimatedItemPAG.register() makes every CYLAnimatedItemView play PAG files.",
+  "main": "Index.ets",
+  "author": "ChenYilong",
+  "license": "MIT",
+  "dependencies": {
+    "@tencent/libpag": "^4.4.31",
+    "cylanimateditem": "file:../cylanimateditem"
+  }
+}

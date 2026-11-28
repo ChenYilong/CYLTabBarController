@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a Androidon: egy app nem küldheti el ezt a rendszereseményt.";
 "Runs every automatic row, one after the other." = "Az összes automatikus sort lefuttatja, egymás után.";
 "Tab bar %@ · page ID \"%@\"" = "%@. lapsáv · oldalazonosító: \"%@\"";
+"Animated item engine API" = "Animált elem motor-API-ja";
+"Stop at 50%" = "Megállítás 50%-nál";
+"Show image when ended" = "Kép megjelenítése a végén";
+"Restart token: %@" = "Újraindítási token: %@";
+"End callback: %@" = "Befejezési visszahívás: %@";
+"none yet" = "még nincs";
+"Host-driven playback (drivesAnimationPlayback = false)" = "A lejátszást a gazda vezérli (drivesAnimationPlayback = false)";
+"Engine API" = "Motor-API";
+"Pause while scrolling" = "Szüneteltetés görgetés közben";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "A lapfülsáv-vezérlő felszabadítása (3 mp múlva)";
+"teardown: not run" = "lebontás: nem futott";
+"teardown: releasing in %d s" = "lebontás: felszabadítás %d mp múlva";
+"dealloc callbacks ran: %d / %d" = "lefutott dealloc visszahívások: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "lefutott dealloc visszahívások: %d / %d (%@)";
+"Tab bar controller released" = "A lapfülsáv-vezérlő felszabadult";
+"bridge: pause %d, resume %d" = "híd: szünet %d, folytatás %d";
+"last event: -" = "utolsó esemény: -";
+"last event: %@" = "utolsó esemény: %@";
+"Content inset" = "Tartalom belső margója";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset nincs beállítva: egy lapos és egy Liquid Glass elem, normál és kijelölt";
+"Flat: itemContentHorizontalInset unset" = "Lapos: itemContentHorizontalInset nincs beállítva";
+"Normal" = "Normál";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset nincs beállítva";

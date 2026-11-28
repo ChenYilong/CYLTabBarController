@@ -11,6 +11,8 @@
  *      没有系统玻璃材质，因此玻璃使用模糊加浅色或深色着色、柔和阴影与浅色描边。
  */
 
+import { CYLLiquidGlass } from 'cylanimateditem';
+
 /**
  * [EN] Every Liquid Glass size in one place, measured on iOS 26 (vp = pt). [CN] 液态玻璃的全部尺寸，在 iOS 26 上测得（vp = pt）。
  */
@@ -94,7 +96,10 @@ export class CYLLiquidGlassCapsuleModifier implements AttributeModifier<RowAttri
   applyNormalAttribute(instance: RowAttribute): void {
     // [EN] As iOS 26: near-white glass in a light app, dark grey glass in a dark one, the pages softly blurred behind it.
     // [CN] 与 iOS 26 相同：浅色 App 中为近白色玻璃，深色 App 中为深灰色玻璃，后面的页面被柔和地模糊。
-    instance.backgroundEffect({ radius: 28, saturation: 1.6, brightness: this.dark ? 0.9 : 1.05 });
+    instance.backgroundEffect({
+      radius: CYLLiquidGlass.BLUR_RADIUS, saturation: CYLLiquidGlass.BLUR_SATURATION,
+      brightness: this.dark ? CYLLiquidGlass.DARK_BRIGHTNESS : CYLLiquidGlass.LIGHT_BRIGHTNESS
+    });
     instance.backgroundColor(this.barTintColor ?? (this.dark ? '#C21C1C1E' : '#DBFAFAFC'));
     instance.borderRadius(this.height / 2);
     instance.shadow({ radius: 28, color: this.dark ? '#40000000' : '#1A000000', offsetY: 6 });
@@ -119,5 +124,25 @@ export class CYLLiquidGlassContainerModifier implements AttributeModifier<Column
       instance.position({ left: 0, bottom: 0 });
       instance.hitTestBehavior(HitTestMode.Transparent);
     }
+  }
+}
+
+/**
+ * [EN] The edge light of the glass capsule: the rim and the sheen are `cylanimateditem`'s (`CYLLiquidGlass`), the one definition that tags and section cards
+ *      use too; the capsule keeps no copy of them. The bar tint, the shadow and the geometry stay the capsule's.
+ * [CN] 玻璃胶囊的边缘光：细边与高光来自 `cylanimateditem`（`CYLLiquidGlass`），标签与分组卡片使用的同一份定义；胶囊不保留它们的副本。TabBar 着色、
+ *      阴影与几何尺寸仍属于胶囊。
+ */
+export class CYLLiquidGlassCapsuleEdge {
+  static rim(dark: boolean): EdgeColors {
+    return CYLLiquidGlass.rimEdgeColors(dark);
+  }
+
+  static sheen(dark: boolean): Array<[ResourceColor, number]> {
+    return CYLLiquidGlass.sheenColors(dark);
+  }
+
+  static rimWidth(): number {
+    return CYLLiquidGlass.RIM_WIDTH;
   }
 }

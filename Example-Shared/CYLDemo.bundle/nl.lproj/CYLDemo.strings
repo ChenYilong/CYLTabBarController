@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a op Android: een app kan deze systeemgebeurtenis niet versturen.";
 "Runs every automatic row, one after the other." = "Voert alle automatische rijen uit, de een na de ander.";
 "Tab bar %@ · page ID \"%@\"" = "Tabbalk %@ · pagina-ID ‘%@’";
+"Animated item engine API" = "Engine-API van het geanimeerde item";
+"Stop at 50%" = "Stop op 50%";
+"Show image when ended" = "Afbeelding tonen na afloop";
+"Restart token: %@" = "Herstarttoken: %@";
+"End callback: %@" = "Eindcallback: %@";
+"none yet" = "nog geen";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Afspelen door de host (drivesAnimationPlayback = false)";
+"Engine API" = "Engine-API";
+"Pause while scrolling" = "Pauzeren tijdens scrollen";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Tabbalkcontroller vrijgeven (over 3 s)";
+"teardown: not run" = "afbouw: niet uitgevoerd";
+"teardown: releasing in %d s" = "afbouw: vrijgave over %d s";
+"dealloc callbacks ran: %d / %d" = "dealloc-callbacks uitgevoerd: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "dealloc-callbacks uitgevoerd: %d / %d (%@)";
+"Tab bar controller released" = "Tabbalkcontroller vrijgegeven";
+"bridge: pause %d, resume %d" = "bridge: pauze %d, hervat %d";
+"last event: -" = "laatste gebeurtenis: -";
+"last event: %@" = "laatste gebeurtenis: %@";
+"Content inset" = "Binnenmarge van inhoud";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset niet ingesteld: een plat en een Liquid Glass-item, normaal en geselecteerd";
+"Flat: itemContentHorizontalInset unset" = "Plat: itemContentHorizontalInset niet ingesteld";
+"Normal" = "Normaal";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset niet ingesteld";

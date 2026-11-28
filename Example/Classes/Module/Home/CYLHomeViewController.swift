@@ -30,9 +30,9 @@ class CYLHomeViewController: CYLDemoBadgeTableViewController, UITabBarController
     override var minimumBadgeRowCount: Int { 30 }
 
     /// [EN] The gallery section, then the badge rows. [CN] 图库一组，然后是角标行。
-    override var pageSectionCount: Int { 2 }
+    override var pageSectionCount: Int { 1 }
 
-    private var gallerySection: Int { cyl_demoSectionCount() }
+    private var gallerySection: Int { tagListSectionCount }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)

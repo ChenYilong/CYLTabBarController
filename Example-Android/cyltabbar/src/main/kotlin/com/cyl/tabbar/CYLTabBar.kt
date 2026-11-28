@@ -8,7 +8,6 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.view.GestureDetector
 import android.view.Gravity
@@ -28,7 +27,11 @@ import kotlin.math.abs
  *      TabBar 的手势（点击、双击、长按、滑动）。
  */
 @android.annotation.SuppressLint("ViewConstructor") // [EN] Made by the tab bar for an item, never inflated. [CN] 由 TabBar 为 item 创建，不从 XML 加载。
-class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: Int) : com.cyl.animateditem.CYLAnimatedItemView(context) {
+class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: Int) : com.cyl.animateditem.CYLAnimatedItemView(context), CYLBadgeHosting {
+    /** [EN] The button itself hosts its badge. [CN] 按钮自身承载其角标。 */
+    override val cylBadgeAnchorView: ViewGroup get() = this
+    override val cylBadgeIconView: View get() = iconView
+
 
     /**
      * [EN] The view of `setTabBarItemIconViewProvider`, laid out in place of the icon. [CN] `setTabBarItemIconViewProvider` 提供的视图，代替图标布局。
@@ -70,7 +73,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
             cyl_customIconView?.alpha = if (covered) 0f else 1f
             cyl_tabBarItemAnimationView?.alpha = if (covered) 0f else 1f
             titleLabel.alpha = if (covered) 0f else 1f
-            if (covered) cyl_clearBadge() else cyl_resumeBadge()
+            if (covered) cylClearBadge() else cylResumeBadge()
             requestLayout()
         }
     /**
@@ -113,6 +116,9 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
     }
 
     init {
+        // [EN] The tab bar plays the icons itself (apply, cyl_tabBarItemAnimationPlayer): the component must not also restart
+        //      the animation on every selection (double play). [CN] TabBar 自己播放图标：组件不能在每次选中时再重新播放（重复播放）。
+        drivesAnimationPlayback = false
         // [EN] The component adds the icon and the title; the tab keeps its own look (10 sp titles, icons not scaled up)
         //      and layout. [CN] 组件已添加图标与标题；Tab 保留自己的外观（10 sp 标题、图标不放大）与布局。
         iconView.scaleType = ImageView.ScaleType.CENTER_INSIDE
@@ -135,15 +141,33 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
     override fun updateIcon() { /* [EN] See apply. [CN] 见 apply。 */ }
 
     /**
+     * [EN] The tab tints its own icon (`apply`, D2), so the component's static rendering mode stays off.
+     * [CN] Tab 自行为图标着色（`apply`，D2），所以组件的静态渲染方式关闭。
+     */
+    override val tintsStaticImageAutomatically: Boolean get() = false
+
+    /**
      * [EN] The tab bar makes the tab's animation view (`cyl_addTabBarItemAnimationWithURL`) and hands it to the component:
      *      `animationView` is `cyl_tabBarItemAnimationView` (docs/Animated-Item.md, task 4). Called with null when the
      *      animation is removed.
      * [CN] TabBar 创建 Tab 的动画视图（`cyl_addTabBarItemAnimationWithURL`）并交给组件：`animationView` 即
      *      `cyl_tabBarItemAnimationView`（docs/Animated-Item.md，任务 4）。移除动画时传 null。
      */
-    internal fun cyl_setTabBarItemAnimationView(view: View?) {
+    internal fun cyl_setTabBarItemAnimationView(view: View?, url: String? = null) {
         animationView = view
+        // [EN] Owner decision (2026-11-27, as iOS `465f857f`): a tab URL with no `tint` and no `renderingMode` uses the component's `automatic`: a ONE-colour
+        //      Lottie JSON / GIF follows the tab's title color, every other file keeps its colors. (It was `alwaysOriginal` before.)
+        // [CN] 负责人决定（2026-11-27，与 iOS `465f857f` 一致）：没有 `tint` 也没有 `renderingMode` 的 Tab URL 使用组件的 `automatic`：「单色」Lottie JSON / GIF
+        //      跟随 Tab 的标题颜色，其他文件保持自身颜色。（之前为 `alwaysOriginal`。）
+        if (url != null) animationRenderingMode = null
+        refreshAnimationTint()
     }
+
+    /**
+     * [EN] The tab's own title colors are its icon colors (`cyl_passTitleColorsToAnimation`), so no built-in colors fill in. [CN] Tab 自己的标题颜色就是它的图标颜色
+     *      （`cyl_passTitleColorsToAnimation`），因此不使用内置颜色。
+     */
+    override val usesBuiltInColors: Boolean get() = false
 
     /**
      * [EN] The animation's load and failure go to the tab bar's handlers (the static image, else the placeholder), which
@@ -155,6 +179,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
     }
 
     override fun cyl_animationViewDidFail(animationView: View) {
+        CYLTabBarItemAnimationFailure.missingResource(animationView)?.let { (resource, reason) -> resourceMissing(resource, reason) }
         CYLTabBarItemAnimationFailure.fallbackHandler?.invoke(this)
     }
 
@@ -233,9 +258,9 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         for (child in 0 until childCount) {
             val badge = getChildAt(child) as? CYLBadgeView ?: continue
             badge.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)
-            val state = cyl_badgeState
+            val state = cylBadgeState
             val anchor = cyl_badgeAnchorRect()
-            val (badgeLeft, badgeTop) = cyl_badgeOrigin(anchor.right, anchor.top, badge, state.centerOffset, density)
+            val (badgeLeft, badgeTop) = cylBadgeOrigin(anchor.right, anchor.top, badge, state.centerOffset, density)
             badge.layout(badgeLeft, badgeTop, badgeLeft + badge.measuredWidth, badgeTop + badge.measuredHeight)
         }
         item.cyl_viewDidLayoutSubviewsBlock?.let { block -> tabBar?.let { block(it, item, index) } }
@@ -328,6 +353,24 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         com.cyl.animateditem.CYLAnimationEngines.warnMissingEngine(context, item.attributes, url)
     }
 
+    /**
+     * [EN] Hands the tab's normal and selected title colors to the component (`hostIconColor` / `hostSelectedIconColor`), which resolves
+     *      `tint` "title" and a fixed `tint` from them (`CYLTabBarItemAnimationTint.resolve`). Without a tab bar yet, the label's current
+     *      color stands for the current state.
+     * [CN] 把 Tab 的普通与选中标题颜色交给组件（`hostIconColor` / `hostSelectedIconColor`），由组件据此解析 `tint` 为 "title" 与固定 `tint`
+     *      （`CYLTabBarItemAnimationTint.resolve`）。还没有 TabBar 时，以标题当前颜色代表当前状态。
+     */
+    internal fun cyl_passTitleColorsToAnimation(tabBar: CYLTabBar? = parent as? CYLTabBar) {
+        if (tabBar != null) {
+            hostIconColor = titleColor(false, tabBar)
+            hostSelectedIconColor = titleColor(true, tabBar)
+        } else if (isSelected) {
+            hostSelectedIconColor = titleLabel.currentTextColor
+        } else {
+            hostIconColor = titleLabel.currentTextColor
+        }
+    }
+
     fun apply(selected: Boolean, tabBar: CYLTabBar) {
         val selectionChanged = isSelected != selected
         isSelected = selected
@@ -337,8 +380,8 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         cyl_warnMissingAnimationEngine()
         val controller = tabBar.tabBarController
         titleLabel.setTextColor(titleColor(selected, tabBar))
-        // [EN] The tint of an animation with the `tint` option "title" (bug B12). [CN] `tint` 选项为 "title" 的动画的着色（问题 B12）。
-        cyl_tabBarItemAnimationPlayer?.setTintColor(titleColor(selected, tabBar), selected)
+        // [EN] The title colors go to the component as icon colors; it alone resolves the animation's tint (bug B12). [CN] 标题颜色作为图标颜色交给组件；动画着色只由组件解析（问题 B12）。
+        cyl_passTitleColorsToAnimation(tabBar)
         val font = if (selected) item.cyl_selectedTitleFont ?: controller?.cyl_tabBarItemSelectedTitleFont ?: item.cyl_titleFont ?: controller?.cyl_tabBarItemTitleFont
                    else item.cyl_titleFont ?: controller?.cyl_tabBarItemTitleFont
         if (font != null) {
@@ -346,7 +389,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
             titleLabel.typeface = font.typeface ?: if (font.bold) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
         }
         val iconColor = iconColor(selected, tabBar)
-        if (iconColor != null) iconView.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN) else iconView.clearColorFilter()
+        if (iconColor != null) iconView.colorFilter = CYLTabIconTint.filter(iconView.drawable, iconColor) else iconView.clearColorFilter()
         val background = if (selected) item.cyl_selectedBackgroundColor else item.cyl_backgroundColor
         setBackgroundColor(background ?: Color.TRANSPARENT)
         contentDescription = item.accessibilityLabel ?: titleLabel.text
@@ -374,8 +417,10 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
 
     /**
      * [EN] The icon's tint, or null to draw it as it is. FIX: issue #787 — "original" never tints; "template" always tints,
-     *      with the bar's tint colors when no icon color is set.
+     *      with the bar's tint colors when no icon color is set. FlatDesign (owner decision D2, 2026-11-27): with no mode set, an UNSELECTED icon without an
+     *      icon color takes `unselectedTintColor` (as iOS flat); the selected one keeps its own colors.
      * [CN] 图标的着色；null 表示按原图绘制。FIX: issue #787——"original" 从不着色；"template" 总是着色，没有图标颜色时使用 TabBar 的着色。
+     *      扁平样式（负责人决定 D2，2026-11-27）：未设置模式时，没有图标颜色的未选中图标取 `unselectedTintColor`（与 iOS 扁平样式相同）；选中图标保持自身颜色。
      */
     private fun iconColor(selected: Boolean, tabBar: CYLTabBar): Int? {
         val controller = tabBar.tabBarController
@@ -383,7 +428,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         return when (item.cyl_iconRenderingMode) {
             CYLTabBarConfiguration.ICON_RENDERING_ORIGINAL -> null
             CYLTabBarConfiguration.ICON_RENDERING_TEMPLATE -> color ?: if (selected) tabBar.selectedTintColor else tabBar.unselectedTintColor
-            else -> color
+            else -> color ?: if (!selected && tabBar.styleRenderer is CYLFlatDesignTabBarStyle) tabBar.unselectedTintColor else null
         }
     }
 
@@ -396,7 +441,7 @@ class CYLTabBarItemButton(context: Context, val item: CYLTabBarItem, val index: 
         titleLabel.setTextColor(CYLTabBarIndicator.blend(titleColor(false, tabBar), titleColor(true, tabBar), fraction))
         val normal = iconColor(false, tabBar)
         val selected = iconColor(true, tabBar)
-        if (normal != null && selected != null) iconView.setColorFilter(CYLTabBarIndicator.blend(normal, selected, fraction), PorterDuff.Mode.SRC_IN)
+        if (normal != null && selected != null) iconView.colorFilter = CYLTabIconTint.filter(iconView.drawable, CYLTabBarIndicator.blend(normal, selected, fraction))
     }
 
     /**
@@ -657,6 +702,10 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
             if (cyl_moreButton == null) {
                 val item = CYLTabBarItem(mapOf(CYLConstants.CYLTabBarItemTitle to CYLLocalization.string(context, R.string.cyl_more))).apply {
                     image = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.cyl_tab_more)
+                    // [EN] The library's own glyph is monochrome: a template icon, so it takes the bar's selected / unselected tint like the
+                    //      icons of the tabs (with no mode it stayed black in both states). [CN] 库自带的图标是单色的：作为模板图标，与各 Tab 的图标一样
+                    //      使用 TabBar 的选中 / 未选中着色（没有渲染方式时两种状态都是黑色）。
+                    cyl_iconRenderingMode = CYLTabBarConfiguration.ICON_RENDERING_TEMPLATE
                 }
                 val more = CYLTabBarItemButton(context, item, -1)
                 more.onTap = { controller.cyl_moreButtonTapped(more) }
@@ -861,6 +910,16 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         plusButton?.cyl_reloadTabBarItemAnimationViewForCurrentStyle()
         // [EN] A manager that follows Dark Mode (`identifierForTrait`, e.g. a dark skin of a configuration) switches now, as iOS does. [CN] 跟随深色模式的管理器（`identifierForTrait`，例如配置中的深色皮肤）立即切换，与 iOS 一致。
         newConfig?.let { configuration -> tabBarController?.cyl_themeManager?.takeIf { it.identifierForTrait != null }?.updateThemeForTraitCollection(configuration) }
+        // [EN] A live light / dark switch (the app handles `uiMode` itself, as a Flutter or React Native host does): the style's mode-dependent colors are
+        //      resolved again (the bar background, the default tints that every tab's title and icon color follow) and the bar is repainted. Without it the bar kept the
+        //      old mode's background under the new mode's icon colors (near-white icons on a light bar).
+        // [CN] 运行中切换浅色 / 深色（App 自己处理 `uiMode`，如 Flutter 或 React Native 宿主）：重新解析样式随模式变化的颜色（TabBar 背景、各 Tab 标题与图标颜色所用的
+        //      默认着色），并重绘 TabBar。否则 TabBar 会在新模式的图标颜色下保留旧模式的背景（浅色 TabBar 上近乎白色的图标）。
+        tabBarController?.let { controller ->
+            styleRenderer.applyBackgroundColor(this, controller.cyl_tabBarBackgroundColor)
+            refreshSelection()
+        }
+        invalidate()
     }
 
     /**
@@ -1163,7 +1222,7 @@ class CYLTabBar(context: Context) : ViewGroup(context) {
         for (child in 0 until childCount) {
             // [EN] Badges of the plus button (or any direct child) follow their host after a layout. [CN] PlusButton（或任何直接子视图）的角标在布局后跟随宿主。
             val badge = getChildAt(child) as? CYLBadgeView ?: continue
-            badge.host?.cyl_refreshBadge()
+            badge.host?.cylRefreshBadge()
         }
         updateGlobals()
         didLayoutSubViewsBlock?.invoke(this)

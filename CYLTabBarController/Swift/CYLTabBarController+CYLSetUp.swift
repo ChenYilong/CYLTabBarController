@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The body of the designated initializer and the members that depend on the style, translated from Objective-C
  *      (`-initWithConfiguration:`, `-setTabBarStyleType:`, `-noNeedUIDesignCompatibility`; docs/Swift-Migration.md, the class switch).

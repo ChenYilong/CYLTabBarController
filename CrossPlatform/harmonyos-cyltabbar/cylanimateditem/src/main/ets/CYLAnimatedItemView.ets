@@ -1,5 +1,12 @@
 import { CYLAnimatedItemTypeRegistry } from './CYLAnimatedItemTypes';
+import { CYLLiquidGlass } from './CYLLiquidGlass';
+import { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier } from './CYLAnimatedItemBackground';
+import { CYLAnimatedItemContrast, CYLAnimatedItemContrastKindIcon } from './CYLAnimatedItemContrast';
+import { CYLAnimatedItemColorInput, CYLAnimatedItemColorResolver } from './CYLAnimatedItemColorResolver';
+import { LifecycleCenter, LifecycleController } from 'cylutils';
+import { LengthMetrics } from '@kit.ArkUI';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
+import { CYLBadge, CYLBadgeView, cylApplyBadgeAttributes, cylBadgeAnimationType, cylBadgeAccessibilityText } from 'cylbadge';
 import {
   CYLAnimatedItemCountdown, CYLAnimatedItemCountdownListener, CYLAnimatedItemCountdownStorage, CYLCountdownRunning, CYLCountdownFinished,
   CYLCountdownTickIntervalMillis, cylCountdownText, cylCountdownTitleWidth
@@ -8,9 +15,25 @@ import { preferences } from '@kit.ArkData';
 import { ApplicationStateChangeCallback, common } from '@kit.AbilityKit';
 import BuildProfile from '../../../BuildProfile';
 import { deviceInfo } from '@kit.BasicServicesKit';
+import { CYLAnimatedItemEngineState, CYLAnimatedItemEngineView } from './CYLAnimatedItemEngine';
+import { CYLAnimatedItemPlayer } from './CYLAnimatedItemPlayer';
+import { CYLAnimatedItemSource } from './CYLAnimatedItemSource';
+import {
+  CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint, cylAnimatedItemEffective,
+  CYLAnimatedItemDividerInput, CYLAnimatedItemDividerResult, cylAnimatedItemDividerColor, CYL_ANIMATED_ITEM_DIVIDER_LENGTH,
+  CYL_ANIMATED_ITEM_DIVIDER_ALPHA, cylAnimatedItemEffectiveRenderingMode, CYL_RENDERING_MODE_AUTOMATIC
+} from './CYLAnimatedItemColors';
+import { CYL_COLOR_COUNT_UNKNOWN, CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE, cylAnimatedItemStaticImageTints } from './CYLAnimatedItemColorCount';
+import { cylAnimatedItemDetectColorKind, cylAnimatedItemDetectImageColorKind } from './CYLAnimatedItemColorCountLoader';
+import {
+  CYLAnimatedItemMissingReporter, CYLAnimatedItemResourceMissingCallback, cylAnimatedItemResourceOf, CYL_RESOURCE_DECODE_FAILED,
+  CYL_RESOURCE_ENGINE_LIBRARY_MISSING
+} from './CYLAnimatedItemMissing';
 
 /** [EN] `maxLines` for a title without a line limit (`titleLines` 0). [CN] 标题不限行数（`titleLines` 为 0）时的 `maxLines`。 */
 const CYL_UNLIMITED_LINES: number = 1000;
+/** [EN] The built-in fill of the countdown style (the original SMSCodeButton look). [CN] 倒计时样式的内置填充（最初 SMSCodeButton 的外观）。 */
+const CYL_COUNTDOWN_FILL: string = '#F2F2F7';
 
 /**
  * [EN] Icon beside the title (default) or above it. [CN] 图标在标题旁（默认）或上方。
@@ -29,6 +52,7 @@ export enum CYLAnimatedItemAccessoryPlacement {
   Trailing = 1,
   TopTrailing = 2
 }
+
 
 /**
  * [EN] The look of `CYLAnimatedItemView`: the plain animated icon + title (default), or a countdown button, e.g. for "Get the
@@ -106,7 +130,8 @@ export class CYLAnimatedItemAnimationContext {
   restartToken: number = 0;
   onLoaded: () => void = () => {
   };
-  onFailed: () => void = () => {
+  /** [EN] `reason` is optional: "decode failed" without one. [CN] `reason` 可省略：省略时为 "decode failed"。 */
+  onFailed: (reason?: string) => void = (_reason?: string) => {
   };
   /**
    * [EN] Called by the engine when a play-once pass (`loops` off) reaches its end; the item then shows its still image
@@ -195,6 +220,16 @@ export class CYLAnimatedItemEngines {
   private static warned: string[] = [];
 
   /**
+   * [EN] Called when an animation file cannot be shown, with the file name or path as configured and a short reason ("not
+   *      found", "unreadable", "decode failed", "engine library missing"): once per resource per item. The same call as
+   *      `CYLAnimatedItemView.onResourceMissing`, for a host that holds no item (CYLPlaceholder's status bar). Nothing else
+   *      changes. iOS and Android: `CYLAnimationEngines.resourceMissingListener`.
+   * [CN] 动画文件无法显示时调用，参数为按配置给出的文件名或路径与简短原因：每个条目每个资源一次。与 `CYLAnimatedItemView.onResourceMissing`
+   *      是同一次调用，供不持有条目的宿主使用（CYLPlaceholder 状态栏）。其他行为不变。
+   */
+  static resourceMissingListener: CYLAnimatedItemResourceMissingCallback | undefined = undefined;
+
+  /**
    * [EN] Reads the device's ABIs (`deviceInfo.abiList`) once, so engines whose native library is not built for this device
    *      (PAG and Rive: arm64-v8a only) do not play on the x86_64 emulator: the item shows its still image instead of
    *      loading a missing .so and crashing.
@@ -204,22 +239,22 @@ export class CYLAnimatedItemEngines {
   private static cylX86DebugEngines: string[] | undefined = undefined;
 
   /**
-   * [EN] Debug builds only: turns on the engines of the x86_64 debug engine kit (`x86_64-debug-engines`, e.g. Rive built
+   * [EN] Turns on the engines of the x86_64 debug engine kit (`x86_64-debug-engines`, e.g. Rive built
    *      for x86_64) when `tools/cyl_hap_x86_64.py install` added it to this HAP, which it marks with the rawfile
-   *      `cyl_x86_64_debug_engines.json`; those engines then also accept `x86_64`. Release builds, and debug builds installed
-   *      without the kit, change nothing (PAG and Rive keep their still images on x86_64). Kept once found; returns the engines.
-   *      CYLAnimatedItemView and CYLTabBarController call it. Owner's Plan 1: this debug guard stays until the owner
-   *      approves removing it.
-   * [CN] 仅 debug 构建：当 `tools/cyl_hap_x86_64.py install` 把 x86_64 调试引擎包（`x86_64-debug-engines`，例如为 x86_64 构建的 Rive）
-   *      加入本 HAP（以 rawfile `cyl_x86_64_debug_engines.json` 标记）时，开启该包中的引擎，这些引擎随即也接受 `x86_64`。release 构建以及
-   *      未安装该包的 debug 构建不做任何改变（x86_64 上 PAG 与 Rive 保持静态图片）。找到后保留；返回这些引擎。
+   *      `cyl_x86_64_debug_engines.json`; those engines then also accept `x86_64`, in debug and release builds. A HAP
+   *      installed without the kit changes nothing (PAG and Rive keep their still images on x86_64). Kept once found; returns the engines.
+   *      CYLAnimatedItemView and CYLTabBarController call it. Owner's Plan 1: the debug-build guard was removed with
+   *      the owner's approval (2026-11-23); the marker and the device's x86_64 ABI remain the guards.
+   * [CN] 当 `tools/cyl_hap_x86_64.py install` 把 x86_64 调试引擎包（`x86_64-debug-engines`，例如为 x86_64 构建的 Rive）
+   *      加入本 HAP（以 rawfile `cyl_x86_64_debug_engines.json` 标记）时，开启该包中的引擎，这些引擎随即也接受 `x86_64`。debug 与 release
+   *      构建均适用；未安装该包的 HAP 不做任何改变（x86_64 上 PAG 与 Rive 保持静态图片）。找到后保留；返回这些引擎。
    */
   static loadX86_64DebugEngines(context: common.Context | undefined): string[] {
     if (CYLAnimatedItemEngines.cylX86DebugEngines !== undefined && CYLAnimatedItemEngines.cylX86DebugEngines.length > 0) {
       return CYLAnimatedItemEngines.cylX86DebugEngines.slice();
     }
     let engines: string[] = [];
-    if (BuildProfile.DEBUG && context !== undefined) {
+    if (context !== undefined) {
       try {
         const bytes: Uint8Array = context.resourceManager.getRawFileContentSync('cyl_x86_64_debug_engines.json');
         let text: string = '';
@@ -237,7 +272,7 @@ export class CYLAnimatedItemEngines {
       }
     });
     if (engines.length > 0) {
-      console.warn(`[CYLAnimatedItem] x86_64 debug engine kit active: ${engines.join(', ')} (debug builds only).`);
+      console.warn(`[CYLAnimatedItem] x86_64 debug engine kit active: ${engines.join(', ')}.`);
     }
     CYLAnimatedItemEngines.cylX86DebugEngines = engines;
     return engines.slice();
@@ -403,11 +438,60 @@ export function cylIconColorFilter(color: ResourceColor): number[] {
  *      显示规则与 iOS、Android 相同：已注册的引擎能播放时显示动画；否则在加载期间与失败之后显示静态图片（`image` / `selectedImage`）；只有没有静态图片时
  *      才显示占位图。它是一个无障碍元素：文本为 `itemTitle`（或 `itemAccessibilityText`），描述为 `itemDescription` 加上选中状态。
  */
+/**
+ * [EN] Static helpers of the item as an exported class (an ArkUI struct has no static members; iOS `CYLAnimatedItemView.resolvedContentHorizontalInset` /
+ *      `isAnimationEngineAvailable`): forwarders to what exists, so a host keeps no copy of the rules.
+ * [CN] 条目的静态辅助函数，放在导出类上（ArkUI struct 没有静态成员；对应 iOS 的 `CYLAnimatedItemView.resolvedContentHorizontalInset` / `isAnimationEngineAvailable`）：
+ *      转发到已有的实现，宿主不必保留规则的副本。
+ */
+export class CYLAnimatedItemStatics {
+  /**
+   * [EN] The content inset (vp) an item with `style` really applies for the explicit `itemContentHorizontalInset` (-1 = not set): the set value, else
+   *      `CYLAnimatedItemLiquidGlassContentInset` for the drawn glass and 0 for flat (`CYLAnimatedItemBackgroundModifier.resolvedContentInset`).
+   * [CN] 样式为 `style` 的条目对显式 `itemContentHorizontalInset`（-1 表示未设置）实际应用的内容间距（vp）：设置的值，否则绘制玻璃时为
+   *      `CYLAnimatedItemLiquidGlassContentInset`，扁平时为 0（`CYLAnimatedItemBackgroundModifier.resolvedContentInset`）。
+   */
+  static resolvedContentHorizontalInset(explicit: number, style: CYLAnimatedItemBackgroundStyle): number {
+    return CYLAnimatedItemBackgroundModifier.resolvedContentInset(style, explicit);
+  }
+
+  /**
+   * [EN] Whether any animation engine is registered (`CYLAnimatedItemEngines.registeredTypes()` is not empty): false means every animation file shows
+   *      its still image or the placeholder.
+   * [CN] 是否注册了任何动画引擎（`CYLAnimatedItemEngines.registeredTypes()` 非空）：false 表示所有动画文件都显示静态图片或占位图。
+   */
+  static isAnimationEngineAvailable(): boolean {
+    return CYLAnimatedItemEngines.registeredTypes().length > 0;
+  }
+}
+
+let cylPausesWhileScrolling: boolean = false;
+let cylScrollObserverNumber: number = 0;
+
+/**
+ * [EN] true: every animated item pauses while the user scrolls (the app reports the scrolling with `scrollStarted()` /
+ *      `scrollStopped()` of a LifecycleController, or `cyl_reportScrollStarted()` of cyltabbar) and resumes afterwards. Read when
+ *      an item appears. Module-level, because ArkTS keeps statics off structs. [CN] 为 true 时，用户滚动期间所有动画条目暂停，
+ *      滚动结束后恢复。条目出现时读取。放在模块级，因为 ArkTS 不在 struct 上放静态成员。
+ */
+export function cylSetPausesWhileUserScrolls(enabled: boolean): void {
+  cylPausesWhileScrolling = enabled;
+}
+
+export function cylPausesWhileUserScrolls(): boolean {
+  return cylPausesWhileScrolling;
+}
+
+function cylNextScrollObserverNumber(): number {
+  cylScrollObserverNumber += 1;
+  return cylScrollObserverNumber;
+}
+
 @Component
 export struct CYLAnimatedItemView {
   @Prop itemTitle: string = '';
-  @Prop image: ResourceStr = '';
-  @Prop selectedImage: ResourceStr = '';
+  @Prop @Watch('cylDetectStaticImageKinds') image: ResourceStr = '';
+  @Prop @Watch('cylDetectStaticImageKinds') selectedImage: ResourceStr = '';
   @Prop placeholderImage: ResourceStr = $r('app.media.cyl_animated_item_placeholder');
   @Prop @Watch('cylAnimationDidChange') animationUrl: string = '';
   @Prop @Watch('cylPlaybackDidChange') isItemSelected: boolean = false;
@@ -438,6 +522,17 @@ export struct CYLAnimatedItemView {
    * [EN] Called when a play-once animation ends (iOS / Android `animationEndListener`). [CN] 只播放一次的动画结束时调用。
    */
   onAnimationEnd?: () => void;
+  /**
+   * [EN] Called when the animation file cannot be shown, with the file name or path as configured (`animationUrl` without its
+   *      `#` options) and a short reason: "not found", "unreadable", "decode failed" or "engine library missing". Once per
+   *      resource per item; the item shows its image or the placeholder as before.
+   *      `CYLAnimatedItemEngines.resourceMissingListener` hears the same call. iOS and Android: `onResourceMissing`.
+   * [CN] 动画文件无法显示时调用，参数为按配置给出的文件名或路径（`animationUrl` 去掉 `#` 选项）与简短原因："not found"、"unreadable"、
+   *      "decode failed"、"engine library missing"。每个条目每个资源一次；条目仍显示图片或占位图。
+   *      `CYLAnimatedItemEngines.resourceMissingListener` 收到同一次调用。
+   */
+  onResourceMissing?: CYLAnimatedItemResourceMissingCallback;
+  private cylMissingReporter: CYLAnimatedItemMissingReporter = new CYLAnimatedItemMissingReporter();
   /** [EN] The still image replaces the ended animation. [CN] 静态图片替换了已结束的动画。 */
   @State cylShowsImageAfterEnd: boolean = false;
   private cylLastSelected: boolean = false;
@@ -450,6 +545,18 @@ export struct CYLAnimatedItemView {
   private cylSetRestartHandler: (handler: () => void) => void = (handler: () => void) => {
     this.cylRestartHandler = handler;
   };
+  // [EN] The item's badge (docs/Animated-Item-Badge-CrossPlatform.md, HarmonyOS phase 2), the iOS names: `badgeValue` undefined (the default) no badge, '' a
+  //      dot, otherwise the text; `badgeAttributes` the style keys of `CYLBadgeAttributeKey`; `reservesBadgeSpace` reserves the badge's overhang when
+  //      measuring (default false: the badge is not measured); `badgeAccessibilityLabel` the localized description read after the label. The badge is
+  //      drawn by `CYLBadgeView` in the icon's own stack, never merged into an image. Written statically, not built in DevEco yet.
+  // [CN] item 的角标（docs/Animated-Item-Badge-CrossPlatform.md，鸿蒙阶段 2），使用 iOS 的名称：`badgeValue` 为 undefined（默认）无角标、'' 红点，其余为文字；
+  //      `badgeAttributes` 为 `CYLBadgeAttributeKey` 的样式键；`reservesBadgeSpace` 在测量时预留角标伸出的部分（默认 false：不计入角标）；
+  //      `badgeAccessibilityLabel` 为在标签之后朗读的本地化描述。角标由图标自己的 Stack 中的 `CYLBadgeView` 绘制，从不合成进图片。静态编写，尚未在 DevEco 中构建。
+  @Prop @Watch('cylBadgeDidChange') badgeValue: string | undefined = undefined;
+  @Prop @Watch('cylBadgeDidChange') badgeAttributes: Record<string, Object> | undefined = undefined;
+  @Prop reservesBadgeSpace: boolean = false;
+  @Prop badgeAccessibilityLabel: string = '';
+  @State cylBadge: CYLBadge = new CYLBadge();
   @Prop isItemEnabled: boolean = true;
   @Prop axis: CYLAnimatedItemAxis = CYLAnimatedItemAxis.Horizontal;
   @Prop iconSize: number = 24;
@@ -459,7 +566,97 @@ export struct CYLAnimatedItemView {
    *      keeps the image's own colors. A '#RRGGBB' / '#AARRGGBB' string tints bitmaps too; a resource color tints SVG
    *      only. [CN] 静态图标的颜色（如 iOS 的模板图着色）：SVG 与符号图作为填充色，位图通过保留透明度的颜色滤镜着色；''（默认）保留原色。
    */
-  @Prop iconColor: ResourceColor = '';
+  @Prop @Watch('cylTintDidChange') iconColor: ResourceColor = '';
+  /**
+   * [EN] The icon color while the item is selected (iOS / Android `selectedIconColor`); '' (the default) = not set: the selected item uses
+   *      `iconColor`, as before. Takes part in the animation tint ("title", and a fixed tint on the selected item: see `animationTint`).
+   * [CN] 条目选中时的图标颜色（iOS / Android 的 `selectedIconColor`）；''（默认）表示未设置：选中的条目使用 `iconColor`，与以往相同。
+   *      参与动画着色（"title"，以及选中条目上的固定着色：见 `animationTint`）。
+   */
+  @Prop @Watch('cylTintDidChange') selectedIconColor: ResourceColor = '';
+  /**
+   * [EN] The icon color while the item is disabled (`isItemEnabled` false); '' = not set: the built-in disabled color (the iOS UIButton
+   *      disabled look, as there is no SDK color for it). [CN] 条目不可用（`isItemEnabled` 为 false）时的图标颜色；'' 表示未设置：内置的禁用色
+   *      （iOS UIButton 的禁用外观，SDK 没有对应颜色）。
+   */
+  @Prop @Watch('cylTintDidChange') disabledIconColor: ResourceColor = '';
+  /**
+   * [EN] The title color while selected; '' = not set: the built-in selected color (`sys.color.interactive_active`). `titleColor` ('' by
+   *      default, the built-in label color `sys.color.font_primary`) is the normal one. Precedence of every color: the item's explicit value,
+   *      then the stack's explicit one (`stackIconColor` ... below), then the built-in, evaluated at draw time with the app's color mode.
+   * [CN] 选中时的标题颜色；'' 表示未设置：内置选中色（`sys.color.interactive_active`）。`titleColor`（默认 ''，内置标签色 `sys.color.font_primary`）为普通状态的颜色。
+   *      所有颜色的优先级：条目显式值，其次堆叠的显式值（下面的 `stackIconColor` 等），最后是内置色，在绘制时按 App 的颜色模式求值。
+   */
+  @Prop @Watch('cylTintDidChange') selectedTitleColor: ResourceColor = '';
+  /**
+   * [EN] The animation rendering mode: 'automatic' (the default and "not set"), 'alwaysTemplate', 'alwaysOriginal'. It applies only while no
+   *      animation tint is set: automatic tints a file detected as ONE color with the effective icon color (multi-color and undetectable files,
+   *      and PAG / SVGA / Rive, keep their colors), alwaysTemplate always tints, alwaysOriginal never. Precedence: this property when not
+   *      automatic, then the `renderingMode=` option of `animationUrl`, then the stack's.
+   * [CN] 动画渲染模式：'automatic'（默认，即「未设置」）、'alwaysTemplate'、'alwaysOriginal'。仅在未设置动画着色时生效：automatic 用生效的图标颜色给检测为单色的文件着色
+   *      （多色、无法检测的文件以及 PAG / SVGA / Rive 保持原色），alwaysTemplate 始终着色，alwaysOriginal 从不着色。优先级：本属性（不是 automatic 时），
+   *      其次 `animationUrl` 的 `renderingMode=` 选项，最后是堆叠的。
+   */
+  @Prop @Watch('cylTintDidChange') animationRenderingMode: string = CYL_RENDERING_MODE_AUTOMATIC;
+  /**
+   * [EN] The stack's explicit colors (`CYLAnimatedItemStackView` fills them; a standalone item leaves them ''): used when the item's own is not set.
+   * [CN] 堆叠的显式颜色（由 `CYLAnimatedItemStackView` 填写；独立使用的条目保持 ''）：条目自己的未设置时使用。
+   */
+  @Prop @Watch('cylTintDidChange') stackIconColor: ResourceColor = '';
+  @Prop @Watch('cylTintDidChange') stackSelectedIconColor: ResourceColor = '';
+  @Prop @Watch('cylTintDidChange') stackDisabledIconColor: ResourceColor = '';
+  @Prop @Watch('cylTintDidChange') stackTitleColor: ResourceColor = '';
+  @Prop @Watch('cylTintDidChange') stackSelectedTitleColor: ResourceColor = '';
+  @Prop @Watch('cylTintDidChange') stackAnimationRenderingMode: string = CYL_RENDERING_MODE_AUTOMATIC;
+  /** [EN] The detection of the animation file (one color or not), filled asynchronously. [CN] 动画文件的检测结果（是否单色），异步填写。 */
+  @State cylColorKind: string = CYL_COLOR_COUNT_UNKNOWN;
+  // [EN] Grows when a static image's detection finishes, so the icon is drawn again. [CN] 静态图片检测完成时递增，使图标重新绘制。
+  @State cylStaticKindRevision: number = 0;
+  /**
+   * [EN] Whether the static image follows the rendering mode as an animation does: with no explicit `iconColor`, `automatic` draws a one-color
+   *      resource image in the icon color (visible in Dark Mode), `alwaysTemplate` any image, `alwaysOriginal` never; a multi-color image keeps its
+   *      colors. A host that colors its own icon (the tab bar) passes false.
+   * [CN] 静态图片是否像动画一样遵循渲染方式：没有显式 `iconColor` 时，`automatic` 用图标颜色绘制单色资源图片（深色模式下可见），
+   *      `alwaysTemplate` 绘制任何图片，`alwaysOriginal` 从不；多色图片保持原色。自行为图标着色的宿主（TabBar）传 false。
+   */
+  tintsStaticImageAutomatically: boolean = true;
+  /**
+   * [EN] The background: `flat` (default) fills the view with `itemBackgroundColor`; `liquidGlass` draws Liquid Glass (a blur
+   *      with the tint `itemBackgroundColor`) clipped to `itemCornerRadius`; where `CYLLiquidGlass.isActive()` is false the style
+   *      is ignored and the view stays flat. Setting any `item…` background property makes the view draw its background, corner
+   *      radius and border (the countdown style keeps its own). Same names as iOS and Android.
+   * [CN] 背景：`flat`（默认）用 `itemBackgroundColor` 填充；`liquidGlass` 绘制液态玻璃（带 `itemBackgroundColor` 着色的模糊），按
+   *      `itemCornerRadius` 裁剪；`CYLLiquidGlass.isActive()` 为 false 时忽略该样式，保持扁平。设置任一 `item…` 背景属性后，视图绘制其
+   *      背景、圆角与边框（倒计时样式保持自己的外观）。与 iOS、Android 同名。
+   */
+  @Prop itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = CYLAnimatedItemBackgroundStyle.flat;
+  /** [EN] The solid fill when flat, the glass tint when liquid glass; '' for none. A liquid glass color with alpha 0 ('#00000000', `Color.Transparent`) draws the default frosted tint, as ''. [CN] 扁平时的纯色填充，液态玻璃时的着色；'' 表示无。液态玻璃的颜色透明度为 0（'#00000000'、`Color.Transparent`）时使用默认的磨砂着色，与 '' 相同。 */
+  @Prop itemBackgroundColor: ResourceColor = '';
+  /**
+   * [EN] The corner radius in vp: a larger value than half the height is a capsule (the platform clamps), 0 is square. -1 (the
+   *      default) is not set: the Liquid Glass style is a capsule, so a host gets a capsule without setting anything and customizes
+   *      it by setting this property; the flat style is square.
+   * [CN] 圆角半径（vp）：大于半高的值为胶囊（平台会截断），0 为直角。-1（默认）表示未设置：液态玻璃样式为胶囊，宿主无需设置任何属性即可得到
+   *      胶囊，要自定义时设置此属性即可；扁平样式为直角。
+   */
+  @Prop itemCornerRadius: number = -1;
+  /**
+   * [EN] The space between the outer border and the content on the left and right, in vp, on top of the padding. -1 (the default) is not set:
+   *      the drawn Liquid Glass gets `CYLAnimatedItemLiquidGlassContentInset` (a capsule's round ends take room from the content), flat gets 0 (the
+   *      view looks as before); 0 or more is explicit, also 0 on glass. The partner of `itemCornerRadius`: the same condition decides both.
+   * [CN] 外侧边框与内容之间左右的间距（vp），叠加在 padding 之上。-1（默认）表示未设置：绘制液态玻璃时取 `CYLAnimatedItemLiquidGlassContentInset`
+   *      （胶囊圆端会占去内容空间），扁平为 0（与以往相同）；0 及以上为显式值，玻璃上也可为 0。与 `itemCornerRadius` 一一对应：由同一条件决定两者。
+   */
+  @Prop itemContentHorizontalInset: number = -1;
+  /** [EN] The border width in vp. [CN] 边框宽度（vp）。 */
+  @Prop itemBorderWidth: number = 0;
+  /** [EN] The border color; '' for none. [CN] 边框颜色；'' 表示无。 */
+  @Prop itemBorderColor: ResourceColor = '';
+  /**
+   * [EN] The share of the color's alpha that tints a Liquid Glass: -1 (the default) is 0.75; 1 uses the color as it is (a selected tag keeps its
+   *      full color, still glass). [CN] 颜色透明度中用于给液态玻璃着色的比例：-1（默认）为 0.75；1 表示按原色（选中的标签保持完整颜色，仍是玻璃）。
+   */
+  @Prop itemGlassTintAlpha: number = -1;
   /**
    * [EN] The color the animation is drawn in, as one color, like a tinted template image (iOS / Android
    *      `CYLTabBarAnimationOptionTint`); '' keeps the file's own colors. Any engine: a layer of this color is
@@ -470,6 +667,124 @@ export struct CYLAnimatedItemView {
    *      60% 白色的图标，与 Android 的 SRC_IN 一致；"source atop" 会让白色图标保持白色）。
    */
   @Prop animationTintColor: ResourceColor = '';
+  /**
+   * [EN] The unified animation tint, the same names and values as Rive's `tint` option (iOS `CYLTabBarAnimationOptionTint`): "title" draws
+   *      the animation like a template image in the item's icon color (`selectedIconColor` when selected, else `iconColor`, else no tint);
+   *      "#RRGGBB" / "#RRGGBBAA" (8 digits are always RRGGBBAA) draws it in that fixed color; the selected item takes its `selectedIconColor`
+   *      when it has one; invalid text and '' (the default) are not set. A set value overrides the `tint` option of the animation source
+   *      (`file#tint=title`); unset uses the option, and without one the file keeps its own colors. Without an icon color there is
+   *      nothing to draw "title" in: no automatic recolor. Any engine, through the same layer as `animationTintColor` (which, when set,
+   *      wins as the already resolved color). Reactive: setting or clearing it after the file loaded redraws.
+   * [CN] 统一的动画着色，名称与取值同 Rive 的 `tint` 选项（iOS `CYLTabBarAnimationOptionTint`）："title" 像模板图片一样用条目的图标颜色
+   *      （选中时为 `selectedIconColor`，否则 `iconColor`，都没有则不着色）绘制动画；"#RRGGBB" / "#RRGGBBAA"（8 位始终是 RRGGBBAA）用该固定颜色
+   *      绘制，选中的条目有 `selectedIconColor` 时使用它；无效文本与 ''（默认）表示未设置。设置后覆盖动画来源的 `tint` 选项（`file#tint=title`）；未设置则使用该选项，
+   *      都没有时文件保持自身颜色。没有图标颜色时 "title" 无颜色可用：不自动改色。适用于任何引擎，使用与 `animationTintColor` 相同的着色层
+   *      （后者设置时作为已解析的颜色优先）。响应式：文件加载后设置或清除都会重绘。
+   */
+  @Prop @Watch('cylTintDidChange') animationTint: string = '';
+  /**
+   * [EN] The dark-mode color of a fixed `animationTint` ("#RRGGBB" / "#RRGGBBAA"; Rive's `darkTint` option); not needed for "title". A set
+   *      value overrides the `darkTint` option of the source. The mode is the app's (`cyl_colorMode` in AppStorage, set by cyltabbar's
+   *      `cyl_updateColorMode`; the system dark / light mode when unset).
+   * [CN] 固定 `animationTint` 在深色模式下的颜色（"#RRGGBB" / "#RRGGBBAA"；Rive 的 `darkTint` 选项）；"title" 不需要。设置后覆盖来源的
+   *      `darkTint` 选项。模式取自 App（AppStorage 中的 `cyl_colorMode`，由 cyltabbar 的 `cyl_updateColorMode` 设置；未设置时跟随系统深浅色）。
+   */
+  @Prop @Watch('cylTintDidChange') animationDarkTint: string = '';
+  /** [EN] The app's color mode ('dark' / 'light'), the key cyltabbar's `CYLColorModeStorageKey` names. [CN] App 的颜色模式。 */
+  /**
+   * [EN] The stack defaults (`CYLAnimatedItemStackView` fills them; a standalone item leaves them ''): the effective value is the item's own
+   *      property when set, else this one. Resolved here, so a change of either re-resolves the item.
+   * [CN] 堆叠的默认值（由 `CYLAnimatedItemStackView` 填写；独立使用的条目保持 ''）：生效值为条目自己的属性（已设置时），否则为这里的值。在此解析，
+   *      任一变化都会重新解析。
+   */
+  @Prop @Watch('cylTintDidChange') stackAnimationTint: string = '';
+  @Prop @Watch('cylTintDidChange') stackAnimationDarkTint: string = '';
+  /**
+   * [EN] The SUBCLASS-EXPLICIT colours (iOS `setSubclassTitleColor(_:for:)` / `setSubclassIconColor(_:for:)`; an ArkUI struct cannot be subclassed, so a
+   *      wrapper hands them in here): per state, undefined = not set. They count as explicit (adapted on drawn dark glass: title 4.5:1, icon and animation
+   *      tint 3:1) and are NEVER written into the integrator's own `titleColor` / `iconColor` ... A missing selected value falls back to the normal one;
+   *      the disabled one has no fallback. Precedence: own > subclass-explicit > stack > subclass built-in > component built-in.
+   * [CN] 子类显式颜色（iOS `setSubclassTitleColor(_:for:)` / `setSubclassIconColor(_:for:)`；ArkUI struct 不能被继承，所以由包装组件传入）：按状态，undefined 表示未设置。
+   *      视为显式颜色（深色绘制玻璃上适配：标题 4.5:1，图标与动画着色 3:1），从不写入集成方自己的 `titleColor` / `iconColor` 等。缺少选中值时回退到普通值；
+   *      禁用值没有回退。优先级：自己的 > 子类显式 > 堆叠 > 子类内置 > 组件内置。
+   */
+  @Prop @Watch('cylTintDidChange') subclassTitleColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') subclassSelectedTitleColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') subclassDisabledTitleColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') subclassIconColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') subclassSelectedIconColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') subclassDisabledIconColor: ResourceColor | undefined = undefined;
+  /**
+   * [EN] The SUBCLASS BUILT-IN level (iOS `applyTitleTintColor` / `applyIconTintColor`): the colour a subclass wants when nobody set an explicit one, normal
+   *      and selected (a missing selected one falls back to the normal one); undefined = not set (the component built-in applies). Adapted on drawn dark
+   *      glass like the explicit levels, but not for the disabled look (a disabled item uses the component's disabled colour).
+   * [CN] 子类内置层（iOS `applyTitleTintColor` / `applyIconTintColor`）：没有人设置显式颜色时子类想要的颜色，普通与选中（缺少选中值时回退到普通值）；undefined 表示未设置
+   *      （使用组件内置）。与显式层一样在深色绘制玻璃上适配，但禁用外观除外（禁用的条目使用组件的禁用颜色）。
+   */
+  @Prop @Watch('cylTintDidChange') builtInTitleColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') builtInSelectedTitleColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') builtInIconColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') builtInSelectedIconColor: ResourceColor | undefined = undefined;
+  /**
+   * [EN] The subclass built-in colour of the DISABLED look (title / icon); undefined (default) uses the component's disabled colour. Never adapted (the disabled
+   *      look is not), like the component's. Requested by CollectionViewClassifyMenu for its tags (2026-11-27).
+   * [CN] 禁用外观的子类内置颜色（标题 / 图标）；undefined（默认）使用组件的禁用颜色。与组件的一样从不适配（禁用外观不适配）。CollectionViewClassifyMenu 为其标签请求（2026-11-27）。
+   */
+  @Prop @Watch('cylTintDidChange') builtInDisabledTitleColor: ResourceColor | undefined = undefined;
+  @Prop @Watch('cylTintDidChange') builtInDisabledIconColor: ResourceColor | undefined = undefined;
+  /**
+   * [EN] The background while the item is pressed and enabled (iOS `itemHighlightedBackgroundColor`); undefined (default) = no pressed look. A flat item
+   *      draws it as the fill, a drawn Liquid Glass as its tint.
+   * [CN] 条目被按下且可用时的背景（iOS `itemHighlightedBackgroundColor`）；undefined（默认）表示没有按下外观。扁平条目作为填充色，绘制的液态玻璃作为着色。
+   */
+  @Prop itemHighlightedBackgroundColor: ResourceColor | undefined = undefined;
+  /**
+   * [EN] The alpha of the animation while the item is disabled (iOS `itemDisabledAnimationAlpha`); undefined (default) = 1.
+   * [CN] 条目禁用时动画的透明度（iOS `itemDisabledAnimationAlpha`）；undefined（默认）表示 1。
+   */
+  @Prop itemDisabledAnimationAlpha: number | undefined = undefined;
+  /**
+   * [EN] true: a selected item shows the last frame of its animation instead of playing it (iOS `showsLastFrameWhenSelected`); an explicit restart still plays.
+   *      Off by default. The default engine view applies it (a custom `animationBuilder` reads `CYLAnimatedItemAnimationContext.selected` itself).
+   * [CN] true：选中的条目显示动画的最后一帧而不是播放（iOS `showsLastFrameWhenSelected`）；显式重播仍会播放。默认关闭。默认引擎视图应用它
+   *      （自定义 `animationBuilder` 自己读取 `CYLAnimatedItemAnimationContext.selected`）。
+   */
+  @Prop @Watch('cylPlaybackDidChange') showsLastFrameWhenSelected: boolean = false;
+  /**
+   * [EN] true: `selectedImage` shows only while the item is selected AND enabled (iOS `disabledWinsImage`); off by default (selected wins).
+   * [CN] true：只有条目选中且可用时才显示 `selectedImage`（iOS `disabledWinsImage`）；默认关闭（选中优先）。
+   */
+  @Prop disabledWinsImage: boolean = false;
+  /**
+   * [EN] iOS `showsOutlineWhenIncreaseContrast` / `respectsReduceMotion` (default false), kept for API parity so a host (ClassifyMenu's tags) can turn them on.
+   *      No effect on HarmonyOS today: the SDK has no public API to READ the system high-contrast setting (`text.setTextHighContrast` only sets the app's own
+   *      rendering), and the only animation-scale signal, `settings.display.ANIMATOR_DURATION_SCALE`, is deprecated since API 21. Like Android below API 34.
+   * [CN] iOS 的 `showsOutlineWhenIncreaseContrast` / `respectsReduceMotion`（默认 false），为 API 一致性保留，宿主（ClassifyMenu 的标签）可以打开。目前在鸿蒙上不起作用：
+   *      SDK 没有「读取」系统高对比度设置的公开 API（`text.setTextHighContrast` 只设置应用自己的渲染），唯一的动画缩放信号 `settings.display.ANIMATOR_DURATION_SCALE`
+   *      自 API 21 起已弃用。与 Android API 34 以下相同。
+   */
+  @Prop showsOutlineWhenIncreaseContrast: boolean = false;
+  @Prop respectsReduceMotion: boolean = false;
+  /** [EN] The item is being pressed (only tracked with `itemHighlightedBackgroundColor`). [CN] 条目正被按下（仅在设置了 `itemHighlightedBackgroundColor` 时跟踪）。 */
+  @State private cylPressed: boolean = false;
+  /**
+   * [EN] INTERNAL, not API (a host never sets these; `CYLAnimatedItemStackView` does for the dividers it owns): `cylInternalDivider` makes this
+   *      item view a divider: no icon, title, animation or badge, ONE line 1 vp thick and `cylInternalDividerLength` long (vertical when
+   *      `cylInternalDividerVertical`), centered; no taps, hidden from the screen reader. The color goes through the same pipeline as
+   *      every item: `cylInternalDividerColor` (the stack's `dividerColor`) as it is; else the effective normal `iconColor` at alpha 0.3;
+   *      else the separator color; resolved with the app's color mode (`cyl_colorMode`), so a light / dark switch re-resolves it.
+   * [CN] 内部使用，非 API（宿主从不设置；由 `CYLAnimatedItemStackView` 为其拥有的分隔线设置）：`cylInternalDivider` 使该条目视图成为分隔线：没有图标、
+   *      标题、动画、角标，只画一条粗 1 vp、长 `cylInternalDividerLength` 的线（`cylInternalDividerVertical` 时为竖线），居中；不接收点击，对读屏隐藏。
+   *      颜色走与所有条目相同的流程：`cylInternalDividerColor`（堆叠的 `dividerColor`）原样使用；否则为生效的普通 `iconColor` 加透明度 0.3；再否则为分隔色；
+   *      按 App 的颜色模式（`cyl_colorMode`）解析，深浅色切换时重新解析。
+   */
+  @Prop cylInternalDivider: boolean = false;
+  @Prop cylInternalDividerColor: string = '';
+  @Prop cylInternalDividerLength: number = CYL_ANIMATED_ITEM_DIVIDER_LENGTH;
+  @Prop cylInternalDividerVertical: boolean = false;
+  @StorageProp('cyl_colorMode') @Watch('cylTintDidChange') private cylExplicitColorMode: string = '';
+  @StorageProp('colorMode') @Watch('cylTintDidChange') private cylSystemColorMode: number = ColorMode.LIGHT;
+  private cylTintSource: CYLAnimatedItemSource | undefined = undefined;
   /**
    * [EN] The gap in vp between the icon and the title, and between an inline accessory and the rest (iOS `spacing`,
    *      Android `spacingDp`, the mini program's `titleSpacing`). Bug B21: it was declared but never read.
@@ -482,7 +797,7 @@ export struct CYLAnimatedItemView {
    */
   @Prop titleLines: number = 1;
   @Prop titleFontSize: number = 14;
-  @Prop titleColor: ResourceColor = '#333333';
+  @Prop @Watch('cylTintDidChange') titleColor: ResourceColor = '';
   @Prop accessoryImage: ResourceStr = '';
   @Prop accessoryText: string = '';
   @Prop accessoryAccessibilityText: string = '';
@@ -555,7 +870,31 @@ export struct CYLAnimatedItemView {
   @Prop sizesToContent: boolean = false;
   @State animationLoaded: boolean = false;
   @State animationFailed: boolean = false;
-  @BuilderParam animationBuilder: (context: CYLAnimatedItemAnimationContext) => void = this.cylNoAnimation;
+  /**
+   * [EN] The engine view of the animation. Default: the view an engine registered for the file's type
+   *      (`CYLAnimatedItemEngineViews`: GIF and SVGA in this module, Lottie, PAG and Rive in cylanimateditem_lottie,
+   *      cylanimateditem_pag and cylanimateditem_rive), which plays by the item's selection and playback. An app or library
+   *      with its own engine views passes them here instead.
+   * [CN] 动画的引擎视图。默认：引擎为文件类型注册的视图（`CYLAnimatedItemEngineViews`：本模块的 GIF 与 SVGA，cylanimateditem_lottie、
+   *      cylanimateditem_pag、cylanimateditem_rive 中的 Lottie、PAG 与 Rive），按条目的选中状态与播放设置播放。有自己引擎视图的 App 或库
+   *      在这里传入。
+   */
+  @BuilderParam animationBuilder: (context: CYLAnimatedItemAnimationContext) => void = this.cylEngineAnimation;
+  /**
+   * [EN] true (default): the default engine view plays its animation by the item's selection and playback. false: the host
+   *      drives the player it gets in `onAnimationPlayer` (play, stop at a progress, speed, loop), as
+   *      CollectionViewClassifyMenu's tags do.
+   * [CN] true（默认）：默认引擎视图按条目的选中状态与播放设置播放动画。false：宿主驱动它在 `onAnimationPlayer` 中得到的播放器（播放、停在某进度、
+   *      速度、循环），如 CollectionViewClassifyMenu 的标签。
+   */
+  @Prop @Watch('cylPlaybackDidChange') drivesAnimationPlayback: boolean = true;
+  /**
+   * [EN] The default engine view's player once it plays the file, undefined when it goes away.
+   * [CN] 默认引擎视图播放文件时的播放器，视图消失时为 undefined。
+   */
+  onAnimationPlayer?: (player: CYLAnimatedItemPlayer | undefined) => void;
+  /** [EN] What the default engine view reads, updated in place. [CN] 默认引擎视图读取的内容，原地更新。 */
+  @State private cylEngineState: CYLAnimatedItemEngineState = new CYLAnimatedItemEngineState();
   onItemTap?: () => void;
   onItemLongPress?: () => void;
   onAccessoryTap?: () => void;
@@ -564,7 +903,98 @@ export struct CYLAnimatedItemView {
   onItemDragEnd?: (dx: number, dy: number) => void;
   @State private animationContext: CYLAnimatedItemAnimationContext = new CYLAnimatedItemAnimationContext();
 
+  private cylLifecycle: LifecycleController<CYLAnimatedItemView> | undefined = undefined;
+  private cylScrollPaused: boolean = false;
+  private cylStopScrollObserver: (() => void) | undefined = undefined;
+
+
+  /**
+   * [EN] The resolved dark / light decision (the explicit `cyl_colorMode` wins, else the system mode): the one reader of the two stored values. The system
+   *      mode is read from AppStorage as well (after `CYLLiquidGlass.trackSystemColorMode()`), so an item built before its `@StorageProp` synced, as a detached
+   *      or just-built one, already has the right mode at its first render and needs no later update; the `@StorageProp` reads keep the view reactive.
+   * [CN] 解析后的深浅色（明确的 `cyl_colorMode` 优先，否则取系统模式）：两个存储值的唯一读取处。系统模式同时直接从 AppStorage 读取（在 `CYLLiquidGlass.trackSystemColorMode()` 之后），
+   *      因此在 `@StorageProp` 同步之前构建的条目（未加入窗口或刚构建的）在首次渲染时就有正确的模式，无需后续更新；`@StorageProp` 的读取使视图保持响应式。
+   */
+  private cylIsDark(): boolean {
+    CYLLiquidGlass.trackSystemColorMode();
+    const live: number | undefined = AppStorage.get<number>('colorMode');
+    return CYLLiquidGlass.resolveDark(this.cylExplicitColorMode, live !== undefined ? live : this.cylSystemColorMode);
+  }
+
+  /**
+   * [EN] Whether the Liquid Glass is really drawn: the resolved style is Liquid Glass AND `CYLLiquidGlass.isActive()` (iOS `drawsLiquidGlass`; a method, because an ArkUI struct cannot have accessors: a getter compiles to undefined). Glass that is
+   *      requested but not drawn counts as flat. Not based on a layer or the view's size, which change before layout.
+   * [CN] 液态玻璃是否真正绘制：解析后的样式为液态玻璃且 `CYLLiquidGlass.isActive()`（iOS `drawsLiquidGlass`）。要求了玻璃但没有绘制算作扁平。
+   *      不依赖图层或视图尺寸，它们在布局之前就会变化。
+   */
+  drawsLiquidGlass(): boolean {
+    return CYLAnimatedItemBackgroundModifier.isGlassDrawn(this.itemBackgroundStyle);
+  }
+
+  /** [EN] The opposite of `drawsLiquidGlass` (iOS `drawsFlatBackground`). [CN] `drawsLiquidGlass` 的反面（iOS `drawsFlatBackground`）。 */
+  drawsFlatBackground(): boolean {
+    return !this.drawsLiquidGlass();
+  }
+
+  /**
+   * [EN] The dark-glass rule of this item as a public function (iOS `adaptedOnGlass(_:kind:)`): `color` itself unless the glass is drawn
+   *      (`drawsLiquidGlass`) and the mode is dark; then lifted to 4.5:1 (`CYLAnimatedItemContrastKindText`) or 3:1 (`CYLAnimatedItemContrastKindIcon`) against the
+   *      rendered glass, with the item's own background colour, tint alpha and resolved mode.
+   * [CN] 本条目的深色玻璃规则，公开为函数（iOS `adaptedOnGlass(_:kind:)`）：除非绘制了玻璃（`drawsLiquidGlass`）且为深色模式，否则原值返回；否则对照实际渲染的玻璃提亮到
+   *      4.5:1（`CYLAnimatedItemContrastKindText`）或 3:1（`CYLAnimatedItemContrastKindIcon`），使用条目自己的背景色、着色透明度与解析后的模式。
+   */
+  adaptedOnGlass(color: ResourceColor, kind: string): ResourceColor {
+    return this.adaptedForContrast(color, kind);
+  }
+
+  /**
+   * [EN] The contrast rule of this item (iOS `adaptedForContrast(_:kind:)`, Android `adaptedForContrast`): `color` itself unless the mode is dark AND the item draws glass
+   *      or a static flat fill (`cylFlatFill`: the pressed colour, the countdown fill, else `itemBackgroundColor`); then lifted to 4.5:1 / 3:1 against it. Limits: lift-only
+   *      (light text on a light fill is kept), flat without a fill and a resource fill are not adapted, the floor 0.40 is glass-only. `adaptedOnGlass` forwards here.
+   * [CN] 本条目的对比度规则（对应 iOS `adaptedForContrast(_:kind:)`、Android `adaptedForContrast`）：除非为深色模式且条目绘制玻璃或静态的扁平填充（`cylFlatFill`：按下颜色、
+   *      倒计时填充，否则 `itemBackgroundColor`），否则原值返回；适用时对照它提亮到 4.5:1 / 3:1。限制：只提亮（浅色填充上的浅色文字保持不变），没有填充或资源填充的扁平背景不调整，
+   *      下限 0.40 仅用于玻璃。`adaptedOnGlass` 转发到这里。
+   */
+  adaptedForContrast(color: ResourceColor, kind: string): ResourceColor {
+    return CYLAnimatedItemContrast.adaptedForContrastState(color, kind, this.drawsLiquidGlass(), this.cylIsDark(),
+      this.itemBackgroundColor !== '' ? this.itemBackgroundColor : undefined, this.itemGlassTintAlpha, this.cylFlatFill());
+  }
+
+  /** [EN] A fixed animation tint is adapted on drawn glass only. [CN] 固定的动画着色只在绘制玻璃时调整。 */
+  private cylAdaptedOnGlassOnly(color: ResourceColor): ResourceColor {
+    return CYLAnimatedItemContrast.adaptedOnGlassState(color, CYLAnimatedItemContrastKindIcon, this.drawsLiquidGlass(), this.cylIsDark(),
+      this.itemBackgroundColor !== '' ? this.itemBackgroundColor : undefined, this.itemGlassTintAlpha);
+  }
+
+  /**
+   * [EN] The fill a flat item draws now, undefined while glass is drawn or with none: the pressed colour while pressed and enabled, the countdown's built-in fill, else
+   *      `itemBackgroundColor`. [CN] 扁平条目当前绘制的填充；绘制玻璃或没有填充时为 undefined：按下且可用时为按下颜色，其次倒计时的内置填充，再次 `itemBackgroundColor`。
+   */
+  cylFlatFill(): ResourceColor | undefined {
+    if (this.drawsLiquidGlass()) {
+      return undefined;
+    }
+    if (this.cylPressed && this.cylEnabled() && CYLAnimatedItemColorResolver.isSet(this.itemHighlightedBackgroundColor)) {
+      return this.itemHighlightedBackgroundColor as ResourceColor;
+    }
+    if (this.cylIsCountdown()) {
+      return CYL_COUNTDOWN_FILL;
+    }
+    return this.itemBackgroundColor !== '' ? this.itemBackgroundColor : undefined;
+  }
+
   aboutToAppear(): void {
+    CYLLiquidGlass.trackSystemColorMode();
+    // [EN] A badge set at creation: @Watch does not fire for the first value. [CN] 创建时设置的角标：@Watch 对第一个值不会触发。
+    this.cylBadgeDidChange();
+    this.cylDetectStaticImageKinds();
+    this.cylLifecycle = new LifecycleController<CYLAnimatedItemView>(this);
+    this.cylLifecycle.registry.addDeallocCallback<CYLAnimatedItemView>((owner: CYLAnimatedItemView) => owner.cylTeardown(), { key: 'cyl.animatedItem.teardown' });
+    this.cylLifecycle.aboutToAppear();
+    if (cylPausesWhileUserScrolls()) {
+      this.cylStopScrollObserver = LifecycleCenter.whileUserScrolls(() => this.cylPauseAnimation(), () => this.cylResumeAnimation(),
+        { key: `cyl.animatedItem.scroll.${cylNextScrollObserverNumber()}` });
+    }
     CYLAnimatedItemEngines.loadX86_64DebugEngines(this.getUIContext().getHostContext());
     this.cylLastRestartToken = this.animationRestartToken + this.cylControllerRestarts;
     this.cylLastSelected = this.isItemSelected;
@@ -579,6 +1009,13 @@ export struct CYLAnimatedItemView {
   }
 
   aboutToDisappear(): void {
+    this.cylLifecycle?.aboutToDisappear();
+  }
+
+  // [EN] The teardown block (CYLDeallocBlockExecutor), run by `aboutToDisappear`. [CN] 销毁块（CYLDeallocBlockExecutor），由 `aboutToDisappear` 运行。
+  private cylTeardown(): void {
+    this.cylPostAnimationEvent('cyl.animation.didStop');
+    this.cylStopScrollObserver?.();
     this.cylStopCountdownTimer();
     try {
       this.getUIContext().getHostContext()?.getApplicationContext().off('applicationStateChange', this.cylForegroundCallback);
@@ -694,16 +1131,25 @@ export struct CYLAnimatedItemView {
         this.countdownDuration, this.titleFontSize) : 0;
   }
 
+  /** [EN] The inset really applied (vp). [CN] 实际应用的间距（vp）。 */
+  private cylContentInset(): number {
+    return CYLAnimatedItemBackgroundModifier.resolvedContentInset(this.itemBackgroundStyle, this.itemContentHorizontalInset);
+  }
+
   private cylPadding(): Padding | number {
+    const inset: number = this.cylContentInset();
     if (this.isBare) {
-      return 0;
+      return inset > 0 ? { top: 0, bottom: 0, left: inset, right: inset } : 0;
     }
-    return this.cylIsCountdown() ? { top: 8, bottom: 8, left: 12, right: 12 } : 4;
+    if (this.cylIsCountdown()) {
+      return { top: 8, bottom: 8, left: 12 + inset, right: 12 + inset };
+    }
+    return inset > 0 ? { top: 4, bottom: 4, left: 4 + inset, right: 4 + inset } : 4;
   }
 
   /** [EN] A tap: the callback, then the countdown when `startsCountdownOnTap`. [CN] 点击：先回调，再在 `startsCountdownOnTap` 时开始倒计时。 */
   private cylHandleTap(): void {
-    if (!this.cylEnabled()) {
+    if (this.cylInternalDivider || !this.cylEnabled()) {
       return;
     }
     this.onItemTap?.();
@@ -716,6 +1162,12 @@ export struct CYLAnimatedItemView {
   cylNoAnimation(context: CYLAnimatedItemAnimationContext) {
   }
 
+  /** [EN] The default engine view (see `animationBuilder`). [CN] 默认引擎视图（见 `animationBuilder`）。 */
+  @Builder
+  cylEngineAnimation(context: CYLAnimatedItemAnimationContext) {
+    CYLAnimatedItemEngineView({ state: this.cylEngineState })
+  }
+
   /**
    * [EN] A new file starts over: not loaded, not failed; a type nobody registered says so in debug builds.
    * [CN] 新文件重新开始：未加载、未失败；没有注册的类型在 debug 构建中给出提示。
@@ -725,9 +1177,23 @@ export struct CYLAnimatedItemView {
     this.animationFailed = false;
     this.cylShowsImageAfterEnd = false;
     this.cylUpdateContext();
+    this.cylDetectColorKind();
     if (this.animationUrl.length > 0 && !CYLAnimatedItemEngines.canPlay(this.animationUrl)) {
       CYLAnimatedItemEngines.warnMissingEngine(this.animationUrl);
+      // [EN] A known type without its engine (or its library for this device); a file of no known type cannot be decoded.
+      // [CN] 已知类型缺少引擎（或其库没有为本设备构建）；不属于任何已知类型的文件无法解码。
+      this.cylReportResourceMissing(this.animationUrl,
+        cylAnimatedItemTypeOf(this.animationUrl).length > 0 ? CYL_RESOURCE_ENGINE_LIBRARY_MISSING : CYL_RESOURCE_DECODE_FAILED);
     }
+  }
+
+  /**
+   * [EN] Tells `onResourceMissing` and `CYLAnimatedItemEngines.resourceMissingListener` that the file of `url` cannot be
+   *      shown, once per resource. [CN] 通知 `onResourceMissing` 与 `CYLAnimatedItemEngines.resourceMissingListener`：`url` 的文件无法显示，每个资源一次。
+   */
+  cylReportResourceMissing(url: string, reason: string): void {
+    this.cylMissingReporter.report(cylAnimatedItemResourceOf(url), reason, this.onResourceMissing,
+      CYLAnimatedItemEngines.resourceMissingListener);
   }
 
   /**
@@ -744,8 +1210,41 @@ export struct CYLAnimatedItemView {
     this.cylLastSelected = this.isItemSelected;
     if (token !== this.cylLastRestartToken) {
       this.cylLastRestartToken = token;
+      this.cylPostAnimationEvent('cyl.animation.didStart');
       this.cylRestartHandler?.();
     }
+  }
+
+  /**
+   * [EN] Posts an animation event (AnimationEvents of the core library) to the observers of this item.
+   * [CN] 向本控件的观察者发出动画事件（核心库的 AnimationEvents）。
+   */
+  cylPostAnimationEvent(name: string): void {
+    // [EN] ArkTS: a typed record, not an object literal. [CN] ArkTS：使用带类型的 Record，而不是对象字面量。
+    const info: Record<string, Object> = {};
+    info['url'] = this.animationUrl;
+    info['selected'] = this.isItemSelected;
+    this.cylLifecycle?.registry.postLifecycleEvent(name, info);
+  }
+
+  /** [EN] Scrolling pauses the engine: posts didPause. [CN] 滚动暂停动画：发出 didPause。 */
+  cylPauseAnimation(): void {
+    if (this.cylScrollPaused) {
+      return;
+    }
+    this.cylScrollPaused = true;
+    this.cylUpdateContext();
+    this.cylPostAnimationEvent('cyl.animation.didPause');
+  }
+
+  /** [EN] Scrolling ended: posts didResume. [CN] 滚动结束：发出 didResume。 */
+  cylResumeAnimation(): void {
+    if (!this.cylScrollPaused) {
+      return;
+    }
+    this.cylScrollPaused = false;
+    this.cylUpdateContext();
+    this.cylPostAnimationEvent('cyl.animation.didResume');
   }
 
   private cylUpdateContext(): void {
@@ -753,7 +1252,8 @@ export struct CYLAnimatedItemView {
     context.url = this.animationUrl;
     context.size = this.iconSize;
     context.selected = this.isItemSelected;
-    context.speed = this.animationSpeed;
+    // [EN] Speed 0 while paused by scrolling: every engine already applies the context's speed. [CN] 滚动暂停时速度为 0：各引擎本来就应用 context 的速度。
+    context.speed = this.cylScrollPaused ? 0 : this.animationSpeed;
     context.loops = this.animationLoops;
     context.restartToken = this.animationRestartToken + this.cylControllerRestarts;
     context.setRestartHandler = this.cylSetRestartHandler;
@@ -763,9 +1263,10 @@ export struct CYLAnimatedItemView {
         this.animationLoaded = true;
       }
     };
-    context.onFailed = () => {
+    context.onFailed = (reason?: string) => {
       if (url === this.animationUrl) {
         this.animationFailed = true;
+        this.cylReportResourceMissing(url, reason ?? CYL_RESOURCE_DECODE_FAILED);
       }
     };
     context.onEnded = () => {
@@ -778,6 +1279,258 @@ export struct CYLAnimatedItemView {
       this.onAnimationEnd?.();
     };
     this.animationContext = context;
+    this.cylUpdateEngineState(context);
+  }
+
+  /**
+   * [EN] The color the animation is drawn in, '' for the file's own colors: `animationTintColor` when set; else `animationTint` /
+   *      `animationDarkTint` over the source's `tint` / `darkTint` options (`cylAnimatedItemResolveTint`, with `iconColor`, the selection and
+   *      the color mode). [CN] 动画的绘制颜色，'' 表示文件自身的颜色：设置了 `animationTintColor` 时用它；否则按 `animationTint` /
+   *      `animationDarkTint` 覆盖来源的 `tint` / `darkTint` 选项解析（结合 `iconColor`、选中状态与颜色模式）。
+   */
+  cylAnimationTint(): ResourceColor {
+    if (this.animationTintColor !== '') {
+      return this.cylAdaptedOnGlassOnly(this.animationTintColor);
+    }
+    if (this.animationUrl === '') {
+      return '';
+    }
+    const tint: string = cylAnimatedItemEffective(this.animationTint, this.stackAnimationTint);
+    const darkTint: string = cylAnimatedItemEffective(this.animationDarkTint, this.stackAnimationDarkTint);
+    if (this.cylTintSource === undefined || this.cylTintSource.url !== this.animationUrl) {
+      this.cylTintSource = CYLAnimatedItemSource.parse(this.animationUrl);
+    }
+    const input = new CYLAnimatedItemTintInput();
+    input.propTint = tint;
+    input.propDarkTint = darkTint;
+    input.optionTint = this.cylTintSource.option('tint') ?? '';
+    input.optionDarkTint = this.cylTintSource.option('darkTint') ?? '';
+    input.selected = this.isItemSelected;
+    input.dark = this.cylIsDark();
+    // [EN] Only an EXPLICIT selected icon color (the item's or the stack's) lets a fixed tint yield on a selected item. [CN] 只有显式的选中图标颜色（条目或堆叠的）才让固定着色在选中条目上让位。
+    input.hasSelectedIconColor = CYLAnimatedItemColorResolver.isSet(this.selectedIconColor) || CYLAnimatedItemColorResolver.isSet(this.stackSelectedIconColor) ||
+      CYLAnimatedItemColorResolver.isSet(this.subclassSelectedIconColor);
+    input.renderingMode = cylAnimatedItemEffectiveRenderingMode(this.animationRenderingMode, this.cylTintSource.option('renderingMode') ?? '',
+      this.stackAnimationRenderingMode);
+    input.colorKind = this.cylColorKind;
+    const result: CYLAnimatedItemTintResult = cylAnimatedItemResolveTint(input);
+    if (result.kind === 'icon') {
+      return this.cylEffectiveIconColor();
+    }
+    return result.kind === 'fixed' ? this.cylAdaptedOnGlassOnly(result.color) : '';
+  }
+
+  /**
+   * [EN] Detects whether the animation file is one color (Lottie JSON, GIF first frame; cached per file) and re-resolves the tint when known.
+   * [CN] 检测动画文件是否单色（Lottie JSON、GIF 首帧；按文件缓存），得到结果后重新解析着色。
+   */
+  private cylDetectColorKind(): void {
+    const source: CYLAnimatedItemSource = CYLAnimatedItemSource.parse(this.animationUrl);
+    const key: string = source.inlineJSON !== undefined ? source.inlineJSON : source.path;
+    const cached: string | undefined = key === '' ? CYL_COLOR_COUNT_UNKNOWN : CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE.get(key);
+    if (cached !== undefined) {
+      this.cylColorKind = cached;
+      this.cylTintDidChange();
+      return;
+    }
+    this.cylColorKind = CYL_COLOR_COUNT_UNKNOWN;
+    const url: string = this.animationUrl;
+    cylAnimatedItemDetectColorKind(source, this.getUIContext().getHostContext()).then((kind: string) => {
+      CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE.set(key, kind);
+      if (url === this.animationUrl) {
+        this.cylColorKind = kind;
+        this.cylTintDidChange();
+      }
+    });
+  }
+
+  /** [EN] A built-in color as a resource color (the `sys.color` resource, else the constant). [CN] 内置颜色，作为资源颜色（`sys.color` 资源，否则为常量）。 */
+  private cylBuiltInColor(role: string): ResourceColor {
+    return CYLAnimatedItemColorResolver.builtInColor(role, this.cylIsDark());
+  }
+
+  /**
+   * [EN] The plain input of the ONE colour resolution (`CYLAnimatedItemColorResolver`) for a title (`icon` false) or an icon: the item's own, the
+   *      subclass-explicit, the stack's and the subclass built-in levels, the state and the glass state. Read in `build`, so a just-built item has its
+   *      colours at its first render.
+   * [CN] 唯一的颜色解析（`CYLAnimatedItemColorResolver`）的普通输入，用于标题（`icon` 为 false）或图标：条目自己的、子类显式、堆叠的与子类内置各层，状态与玻璃状态。
+   *      在 `build` 中读取，因此刚构建的条目在首次渲染时就有颜色。
+   */
+  private cylColorInput(icon: boolean): CYLAnimatedItemColorInput {
+    const input = new CYLAnimatedItemColorInput();
+    const value = (color: ResourceColor | undefined): ResourceColor => color === undefined ? '' : color;
+    if (icon) {
+      input.own.normal = this.iconColor;
+      input.own.selected = this.selectedIconColor;
+      input.own.disabled = this.disabledIconColor;
+      input.stack.normal = this.stackIconColor;
+      input.stack.selected = this.stackSelectedIconColor;
+      input.stack.disabled = this.stackDisabledIconColor;
+      input.subclassExplicit.normal = value(this.subclassIconColor);
+      input.subclassExplicit.selected = value(this.subclassSelectedIconColor);
+      input.subclassExplicit.disabled = value(this.subclassDisabledIconColor);
+      input.subclassBuiltIn.normal = value(this.builtInIconColor);
+      input.subclassBuiltIn.selected = value(this.builtInSelectedIconColor);
+      input.subclassBuiltIn.disabled = value(this.builtInDisabledIconColor);
+    } else {
+      input.own.normal = this.titleColor;
+      input.own.selected = this.selectedTitleColor;
+      input.stack.normal = this.stackTitleColor;
+      input.stack.selected = this.stackSelectedTitleColor;
+      input.subclassExplicit.normal = value(this.subclassTitleColor);
+      input.subclassExplicit.selected = value(this.subclassSelectedTitleColor);
+      input.subclassExplicit.disabled = value(this.subclassDisabledTitleColor);
+      input.subclassBuiltIn.normal = value(this.builtInTitleColor);
+      input.subclassBuiltIn.selected = value(this.builtInSelectedTitleColor);
+      input.subclassBuiltIn.disabled = value(this.builtInDisabledTitleColor);
+    }
+    input.selected = this.isItemSelected;
+    input.enabled = this.isItemEnabled;
+    input.dark = this.cylIsDark();
+    input.drawsGlass = this.drawsLiquidGlass();
+    input.glassTint = this.itemBackgroundColor !== '' ? this.itemBackgroundColor : undefined;
+    input.tintAlpha = this.itemGlassTintAlpha;
+    input.flatFill = this.cylFlatFill();
+    return input;
+  }
+
+  /**
+   * [EN] The EXPLICIT icon color of the current state (own, subclass-explicit, then stack; '' when none set), adapted on drawn dark glass: what tints a
+   *      static image. [CN] 当前状态的显式图标颜色（自己的、子类显式、堆叠；都未设置时为 ''），在深色绘制玻璃上已适配：用于静态图片着色。
+   */
+  cylExplicitIconColor(): ResourceColor {
+    const input: CYLAnimatedItemColorInput = this.cylColorInput(true);
+    input.kind = CYLAnimatedItemContrastKindIcon;
+    return CYLAnimatedItemColorResolver.explicitColor(input);
+  }
+
+  /** [EN] The cache key of a static image resource, or '' for what is not detected. [CN] 静态图片资源的缓存键；不检测的内容为 ''。 */
+  private cylStaticImageKey(source: ResourceStr): string {
+    return typeof source === 'object' && !cylIsSymbolResource(source) ?
+      `static:${source.bundleName}:${source.moduleName}:${source.id}:${source.params?.join(',') ?? ''}` : '';
+  }
+
+  /**
+   * [EN] Detects whether the static images are one color (once per resource, cached), the countdown, selected and placeholder images included.
+   * [CN] 检测静态图片是否单色（每个资源一次，带缓存），包括倒计时、选中与占位图片。
+   */
+  cylDetectStaticImageKinds(): void {
+    if (!this.tintsStaticImageAutomatically) {
+      return;
+    }
+    for (const source of [this.image, this.selectedImage, this.countdownImage, this.placeholderImage]) {
+      const key: string = this.cylStaticImageKey(source);
+      if (key === '' || CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE.get(key) !== undefined) {
+        continue;
+      }
+      cylAnimatedItemDetectImageColorKind(source as Resource, this.getUIContext().getHostContext()).then((kind: string) => {
+        CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE.set(key, kind);
+        this.cylStaticKindRevision += 1;
+      });
+    }
+  }
+
+  /**
+   * [EN] What tints the shown static image: the explicit icon color, else the effective icon color when the rendering mode tints it
+   *      (`tintsStaticImageAutomatically`), else '' (its own colors).
+   * [CN] 显示中的静态图片的着色：显式图标颜色；否则当渲染方式要求着色时为生效的图标颜色（`tintsStaticImageAutomatically`）；否则为 ''（原色）。
+   */
+  cylStaticTintColor(): ResourceColor {
+    const explicit: ResourceColor = this.cylExplicitIconColor();
+    if (explicit !== '' || !this.tintsStaticImageAutomatically) {
+      return explicit;
+    }
+    // [EN] Read so a finished detection redraws. [CN] 读取此值，使检测完成后重绘。
+    if (this.cylStaticKindRevision < 0) {
+      return '';
+    }
+    const mode: string = cylAnimatedItemEffectiveRenderingMode(this.animationRenderingMode, '', this.stackAnimationRenderingMode);
+    const kind: string = CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE.get(this.cylStaticImageKey(this.cylFallbackImage())) ?? CYL_COLOR_COUNT_UNKNOWN;
+    return cylAnimatedItemStaticImageTints(mode, kind) ? this.cylEffectiveIconColor() : '';
+  }
+
+  /**
+   * [EN] The EFFECTIVE icon color of the current state: the ONE resolution (`CYLAnimatedItemColorResolver.resolvedIconColor`). [CN] 当前状态生效的图标颜色：唯一的解析。
+   */
+  cylEffectiveIconColor(): ResourceColor {
+    return CYLAnimatedItemColorResolver.resolvedIconColor(this.cylColorInput(true));
+  }
+
+  /** [EN] The title color of the current state: the ONE resolution (`CYLAnimatedItemColorResolver.resolvedTitleColor`). [CN] 当前状态的标题颜色：唯一的解析。 */
+  cylEffectiveTitleColor(): ResourceColor {
+    return CYLAnimatedItemColorResolver.resolvedTitleColor(this.cylColorInput(false));
+  }
+
+  /** [EN] The divider's color and opacity (`cylAnimatedItemDividerColor`). [CN] 分隔线的颜色与透明度。 */
+  private cylDividerStyle(): CYLAnimatedItemDividerResult {
+    const input = new CYLAnimatedItemDividerInput();
+    input.dividerColor = this.cylInternalDividerColor;
+    input.dark = this.cylIsDark();
+    // [EN] The EXPLICIT normal icon color (item, else stack; no built-in): the divider derives from it at alpha 0.6, else it is the built-in
+    //      divider color. [CN] 显式的普通图标颜色（条目，否则堆叠；不含内置色）：分隔线以透明度 0.6 由它推导，否则使用内置分隔色。
+    const icon: ResourceColor = this.iconColor !== '' ? this.iconColor : this.stackIconColor;
+    if (typeof icon === 'string') {
+      input.iconColor = icon;
+    }
+    const result: CYLAnimatedItemDividerResult = cylAnimatedItemDividerColor(input);
+    if (typeof icon !== 'string' && input.dividerColor.trim() === '') {
+      // [EN] A resource / number icon color has no text to convert: draw it as it is at alpha 0.6. [CN] 资源 / 数值图标颜色无文本可转换：原样以透明度 0.6 绘制。
+      result.source = 'icon';
+      result.opacity = CYL_ANIMATED_ITEM_DIVIDER_ALPHA;
+    }
+    return result;
+  }
+
+  /** [EN] The line's fill: the text color, a non-text icon color, or the built-in `sys.color.font_secondary`. [CN] 线的填充：文本颜色、非文本图标颜色，或内置的 `sys.color.font_secondary`。 */
+  private cylDividerFill(): ResourceColor {
+    const style: CYLAnimatedItemDividerResult = this.cylDividerStyle();
+    if (style.source === 'icon' && typeof (this.iconColor !== '' ? this.iconColor : this.stackIconColor) !== 'string') {
+      return this.iconColor !== '' ? this.iconColor : this.stackIconColor;
+    }
+    if (style.source === 'builtin') {
+      return this.cylBuiltInColor('divider');
+    }
+    return style.color;
+  }
+
+  @Builder
+  cylDividerLine() {
+    Row()
+      .width(this.cylInternalDividerVertical ? 1 : this.cylInternalDividerLength)
+      .height(this.cylInternalDividerVertical ? this.cylInternalDividerLength : 1)
+      .backgroundColor(this.cylDividerFill())
+      .opacity(this.cylDividerStyle().opacity)
+  }
+
+  /** [EN] A tint input changed: the engine state follows (the layer itself reads the properties). [CN] 着色输入变化：引擎状态随之更新（着色层本身直接读取属性）。 */
+  cylTintDidChange(): void {
+    this.cylEngineState.tintColor = this.cylAnimationTint();
+  }
+
+  /**
+   * [EN] The default engine view's state, updated in place so the engine view sees each change; a new file gets a new
+   *      source. [CN] 默认引擎视图的 state，原地更新使引擎视图看到每次变化；新文件得到新的 source。
+   */
+  private cylUpdateEngineState(context: CYLAnimatedItemAnimationContext): void {
+    const state = this.cylEngineState;
+    if (state.source.url !== this.animationUrl) {
+      state.source = CYLAnimatedItemSource.parse(this.animationUrl);
+    }
+    state.width = this.iconSize;
+    state.height = this.iconSize;
+    state.speed = context.speed;
+    state.loops = context.loops;
+    state.drivesPlayback = this.drivesAnimationPlayback;
+    state.tintColor = this.cylAnimationTint();
+    state.onLoaded = context.onLoaded;
+    state.onFailed = context.onFailed;
+    state.onEnded = context.onEnded;
+    state.onPlayer = (player: CYLAnimatedItemPlayer | undefined) => this.onAnimationPlayer?.(player);
+    state.showsLastFrameWhenSelected = this.showsLastFrameWhenSelected;
+    // [EN] Last, so the engine view reads the playback above when it reacts. [CN] 最后设置，使引擎视图响应时读到上面的播放设置。
+    state.selected = context.selected;
+    state.restartToken = context.restartToken;
+    state.changed();
   }
 
   /** [EN] Turned off: the animation shows again. [CN] 关闭时重新显示动画。 */
@@ -806,7 +1559,7 @@ export struct CYLAnimatedItemView {
     if (this.cylIsRunning() && !this.cylIsEmpty(this.countdownImage)) {
       return this.countdownImage;
     }
-    if (this.isItemSelected && !this.cylIsEmpty(this.selectedImage)) {
+    if (this.isItemSelected && (!this.disabledWinsImage || this.isItemEnabled) && !this.cylIsEmpty(this.selectedImage)) {
       return this.selectedImage;
     }
     return this.image;
@@ -835,7 +1588,30 @@ export struct CYLAnimatedItemView {
   }
 
   cylAccessibilityText(): string {
-    return this.itemAccessibilityText.length > 0 ? this.itemAccessibilityText : this.cylTitleText();
+    const own: string = this.itemAccessibilityText.length > 0 ? this.itemAccessibilityText : this.cylTitleText();
+    // [EN] The badge is read after the item's own text; a dot adds nothing without a description (the app supplies the localized one). [CN] 角标在 item 自身文字之后朗读；没有描述时红点不追加内容（本地化描述由 App 提供）。
+    const badgeText: string = this.badgeAccessibilityLabel.length > 0 && this.cylBadge.value !== null ?
+      this.badgeAccessibilityLabel : cylBadgeAccessibilityText(this.cylBadge);
+    return [own, badgeText].filter((part: string) => part.length > 0).join(', ');
+  }
+
+  /**
+   * [EN] Hands `badgeValue` and `badgeAttributes` to the badge: undefined clears it, a string shows it. Only a change reaches here (@Watch), so the animation
+   *      does not replay.
+   * [CN] 把 `badgeValue` 与 `badgeAttributes` 交给角标：undefined 清除，字符串显示。只有变化才会到这里（@Watch），因此动画不会重播。
+   */
+  cylBadgeDidChange(): void {
+    if (this.badgeValue === undefined) {
+      this.cylBadge.clearBadge();
+      return;
+    }
+    cylApplyBadgeAttributes(this.cylBadge, this.badgeAttributes);
+    this.cylBadge.showBadgeValue(this.badgeValue, cylBadgeAnimationType(this.badgeAttributes));
+  }
+
+  /** [EN] The room `reservesBadgeSpace` asks for: the badge's radius on each side. [CN] `reservesBadgeSpace` 要求的空间：每侧一个角标半径。 */
+  cylBadgeReserve(): number {
+    return this.reservesBadgeSpace && this.cylBadge.value !== null ? (this.cylBadge.radius ?? 4) : 0;
   }
 
   @Builder
@@ -847,17 +1623,39 @@ export struct CYLAnimatedItemView {
         //      因此用 SymbolGlyph 按 `iconColor` 绘制（没有时为主题主色）。
         SymbolGlyph(this.cylFallbackImage() as Resource)
           .fontSize(this.iconSize)
-          .fontColor([this.iconColor === '' ? $r('sys.color.font_primary') : this.iconColor])
+          .fontColor([this.cylEffectiveIconColor()])
           .width(this.iconSize)
           .height(this.iconSize)
           .opacity(this.cylAnimationShows() ? 0 : 1)
           .accessibilityLevel('no')
+      } else if (!this.cylIsEmpty(this.cylFallbackImage()) && typeof this.cylStaticTintColor() === 'object') {
+        // [EN] A resource color (`$r(...)`): `cylIconColorFilter` reads only hex strings, which left a bitmap icon untinted (a black
+        //      icon on a dark background). The color is painted over the icon's alpha (source in), so ArkUI resolves it for the
+        //      current light / dark mode, as for the animation tint below.
+        // [CN] 资源颜色（`$r(...)`）：`cylIconColorFilter` 只读取十六进制字符串，位图图标因此没有着色（深色背景上出现黑色图标）。这里把颜色绘制在
+        //      图标的透明度之上（source in），由 ArkUI 按当前深浅色解析，与下面的动画着色相同。
+        Stack() {
+          Image(this.cylFallbackImage())
+            .width(this.iconSize)
+            .height(this.iconSize)
+            .objectFit(ImageFit.Contain)
+          Column()
+            .width(this.iconSize)
+            .height(this.iconSize)
+            .backgroundColor(this.cylStaticTintColor())
+            .blendMode(BlendMode.SRC_IN)
+        }
+        .width(this.iconSize)
+        .height(this.iconSize)
+        .blendMode(BlendMode.SRC_OVER, BlendApplyType.OFFSCREEN)
+        .opacity(this.cylAnimationShows() ? 0 : 1)
+        .accessibilityLevel('no')
       } else if (!this.cylIsEmpty(this.cylFallbackImage())) {
         Image(this.cylFallbackImage())
           .width(this.iconSize)
           .height(this.iconSize)
-          .fillColor(this.iconColor === '' ? undefined : this.iconColor)
-          .colorFilter(new ColorFilter(cylIconColorFilter(this.iconColor)))
+          .fillColor(this.cylStaticTintColor() === '' ? undefined : this.cylStaticTintColor())
+          .colorFilter(new ColorFilter(cylIconColorFilter(this.cylStaticTintColor())))
           .objectFit(ImageFit.Contain)
           .opacity(this.cylAnimationShows() ? 0 : 1)
           .accessibilityLevel('no')
@@ -883,13 +1681,13 @@ export struct CYLAnimatedItemView {
         }
         .width(this.iconSize)
         .height(this.iconSize)
-          if (this.animationTintColor !== '') {
+          if (this.cylAnimationTint() !== '') {
             // [EN] The tint: kept only where the animation draws, with the animation's alpha (source in).
             // [CN] 着色：只保留动画绘制的区域，并乘以动画的透明度（source in）。
             Column()
               .width(this.iconSize)
               .height(this.iconSize)
-              .backgroundColor(this.animationTintColor)
+              .backgroundColor(this.cylAnimationTint())
               .blendMode(BlendMode.SRC_IN)
               .hitTestBehavior(HitTestMode.Transparent)
               .id('cyl-animated-item-tint')
@@ -899,15 +1697,24 @@ export struct CYLAnimatedItemView {
         .height(this.iconSize)
         // [EN] An offscreen group, so the tint only meets the animation, never what is behind the item.
         // [CN] 离屏组，使着色只与动画合成，不影响条目背后的内容。
-        .blendMode(this.animationTintColor !== '' ? BlendMode.SRC_OVER : BlendMode.NONE, BlendApplyType.OFFSCREEN)
-        .opacity(this.animationLoaded && !this.cylShowsImageAfterEnd ? 1 : 0)
+        .blendMode(this.cylAnimationTint() !== '' ? BlendMode.SRC_OVER : BlendMode.NONE, BlendApplyType.OFFSCREEN)
+        .opacity(this.animationLoaded && !this.cylShowsImageAfterEnd ? this.cylAnimationAlpha() : 0)
         .accessibilityLevel('no')
+      }
+      // [EN] The badge, last but one in the stack so it is above the icon and the animation: not measured (an overlay), not touchable, hidden from accessibility.
+      // [CN] 角标，位于 Stack 的倒数第二层，在图标与动画之上：不参与测量（浮层）、不可点击、对无障碍隐藏。
+      if (this.cylBadge.value !== null) {
+        // [EN] No modifiers here (see CYLBadgeView): they would move the badge off the icon's corner. [CN] 此处不加修饰符（见 CYLBadgeView）：否则角标会偏离图标角点。
+        CYLBadgeView({ badge: this.cylBadge, anchorWidth: this.iconSize, mirrorsInRightToLeft: true })
       }
       if (this.accessoryPlacement === CYLAnimatedItemAccessoryPlacement.TopTrailing) {
         this.cylAccessory()
       }
     }
     .alignContent(Alignment.TopEnd)
+    .margin(this.cylBadgeReserve())
+    // [EN] The badge overlaps the title's side: the icon is drawn above it. [CN] 角标会伸到标题一侧：图标绘制在标题之上。
+    .zIndex(this.cylBadge.value !== null ? 1 : 0)
   }
 
   @Builder
@@ -917,7 +1724,7 @@ export struct CYLAnimatedItemView {
         if (!this.cylIsEmpty(this.accessoryImage)) {
           Image(this.accessoryImage).width(18).height(18).objectFit(ImageFit.Contain)
         } else {
-          Text(this.accessoryText).fontSize(this.titleFontSize).fontColor(this.titleColor)
+          Text(this.accessoryText).fontSize(this.titleFontSize).fontColor(this.cylEffectiveTitleColor())
         }
       }
       .constraintSize({ minWidth: 44, minHeight: 44 })
@@ -925,7 +1732,7 @@ export struct CYLAnimatedItemView {
       // [EN] An inline accessory keeps `spacing` from the icon and title, as on Android (B21). [CN] 行内附件与图标、标题保持 `spacing`，与 Android 相同（B21）。
       .margin(!this.cylShowsIconOrTitle() ? 0 :
         this.accessoryPlacement === CYLAnimatedItemAccessoryPlacement.Leading ?
-          (this.axis === CYLAnimatedItemAxis.Vertical ? { bottom: this.spacing } : { right: this.spacing }) :
+          (this.axis === CYLAnimatedItemAxis.Vertical ? { bottom: LengthMetrics.vp(this.spacing) } : { end: LengthMetrics.vp(this.spacing) }) :
           this.accessoryPlacement === CYLAnimatedItemAccessoryPlacement.Trailing ? this.cylLeadingGap(this.spacing) : 0)
       .accessibilityGroup(true)
       .accessibilityText(this.accessoryAccessibilityText.length > 0 ? this.accessoryAccessibilityText : this.accessoryText)
@@ -943,7 +1750,7 @@ export struct CYLAnimatedItemView {
     if (this.cylTitleText().length > 0) {
       Text(this.cylTitleText())
         .fontSize(this.titleFontSize)
-        .fontColor(this.cylIsRunning() ? this.countdownRunningTitleColor : this.titleColor)
+        .fontColor(this.cylIsRunning() ? this.countdownRunningTitleColor : this.cylEffectiveTitleColor())
         .constraintSize({ minWidth: this.cylCountdownMinWidth() })
         .maxLines(this.titleLines > 0 ? Math.floor(this.titleLines) : CYL_UNLIMITED_LINES)
         .textOverflow({ overflow: this.titleLines > 0 ? TextOverflow.Ellipsis : TextOverflow.None })
@@ -953,9 +1760,12 @@ export struct CYLAnimatedItemView {
     }
   }
 
-  /** [EN] A gap before a part: above it on the vertical axis, before it on the horizontal one. [CN] 某部分之前的间距：纵向在其上方，横向在其前方。 */
-  private cylLeadingGap(gap: number): Margin {
-    return this.axis === CYLAnimatedItemAxis.Vertical ? { top: gap } : { left: gap };
+  /**
+   * [EN] A gap before a part: above it on the vertical axis, before it on the horizontal one. `start`, not `left`, so it stays between the
+   *      parts in right-to-left. [CN] 某部分之前的间距：纵向在其上方，横向在其前方。使用 `start` 而非 `left`，从右到左时间距仍在两部分之间。
+   */
+  private cylLeadingGap(gap: number): LocalizedMargin {
+    return this.axis === CYLAnimatedItemAxis.Vertical ? { top: LengthMetrics.vp(gap) } : { start: LengthMetrics.vp(gap) };
   }
 
   /** [EN] Whether the icon or the title shows (an inline accessory keeps `spacing` from them). [CN] 是否显示图标或标题（行内附件与它们保持 `spacing`）。 */
@@ -982,38 +1792,123 @@ export struct CYLAnimatedItemView {
     return this.isBare && this.cylTitleText().length === 0 && this.cylIsEmpty(this.accessoryImage) && this.accessoryText.length === 0;
   }
 
+  /**
+   * [EN] Whether any `item…` background property is set. [CN] 是否设置了任一 `item…` 背景属性。
+   */
+  private cylUsesItemBackground(): boolean {
+    return this.itemBackgroundStyle !== CYLAnimatedItemBackgroundStyle.flat || this.itemBackgroundColor !== '' ||
+      this.itemCornerRadius >= 0 || this.itemBorderWidth > 0 || this.itemBorderColor !== '';
+  }
+
+  /**
+   * [EN] Whether the Liquid Glass is drawn: the style asks for it and `CYLLiquidGlass.isActive()`. [CN] 是否绘制液态玻璃：样式要求且 `CYLLiquidGlass.isActive()`。
+   */
+  private cylItemGlassDrawn(): boolean {
+    return this.drawsLiquidGlass();
+  }
+
+  /** [EN] A touch: tracks the pressed look (only with `itemHighlightedBackgroundColor`). [CN] 触摸：跟踪按下外观（仅在设置了 `itemHighlightedBackgroundColor` 时）。 */
+  private cylTouchChanged(type: TouchType): void {
+    if (!CYLAnimatedItemColorResolver.isSet(this.itemHighlightedBackgroundColor)) {
+      return;
+    }
+    if (type === TouchType.Down) {
+      this.cylPressed = true;
+    } else if (type === TouchType.Up || type === TouchType.Cancel) {
+      this.cylPressed = false;
+    }
+  }
+
+  /** [EN] The animation's alpha: `itemDisabledAnimationAlpha` while disabled, else 1. [CN] 动画的透明度：禁用时为 `itemDisabledAnimationAlpha`，否则为 1。 */
+  private cylAnimationAlpha(): number {
+    const alpha: number | undefined = this.itemDisabledAnimationAlpha;
+    return !this.isItemEnabled && alpha !== undefined ? Math.min(1, Math.max(0, alpha)) : 1;
+  }
+
+  /**
+   * [EN] The corner radius: the host's value, else a capsule for the drawn Liquid Glass (the rule `0: automatic, a capsule` that
+   *      CollectionViewClassifyMenu's tags had, moved here) and square for flat. [CN] 圆角：宿主设置的值，否则绘制液态玻璃时为胶囊
+   *      （CollectionViewClassifyMenu 的标签曾有的「0 为自动，即胶囊」规则，移到这里），扁平时为直角。
+   */
+  private cylItemCornerRadius(): number {
+    return CYLAnimatedItemBackgroundModifier.resolvedCornerRadius(this.itemBackgroundStyle, this.itemCornerRadius);
+  }
+
+  /**
+   * [EN] The background color: the tint over the glass blur, else the solid fill, '' meaning transparent. [CN] 背景色：玻璃模糊之上的着色，否则为纯色填充；'' 表示透明。
+   */
+  private cylItemBackgroundColor(): ResourceColor {
+    if (this.cylPressed && this.cylEnabled() && CYLAnimatedItemColorResolver.isSet(this.itemHighlightedBackgroundColor)) {
+      const pressed: ResourceColor = this.itemHighlightedBackgroundColor as ResourceColor;
+      return this.cylItemGlassDrawn() ? CYLAnimatedItemBackgroundModifier.glassTint(pressed, this.itemGlassTintAlpha) : pressed;
+    }
+    // [EN] The glass tint is translucent (and a default frosted tint when none is set): the shared rule of the modifier. [CN] 玻璃着色是半透明的（未设置时为默认磨砂着色）：与修饰器共用同一规则。
+    if (this.cylItemGlassDrawn()) {
+      return CYLAnimatedItemBackgroundModifier.glassTint(this.itemBackgroundColor !== '' ? this.itemBackgroundColor : Color.Transparent, this.itemGlassTintAlpha);
+    }
+    return this.itemBackgroundColor !== '' ? this.itemBackgroundColor : Color.Transparent;
+  }
+
   build() {
     Flex({
       direction: this.axis === CYLAnimatedItemAxis.Vertical ? FlexDirection.Column : FlexDirection.Row,
       alignItems: ItemAlign.Center,
       justifyContent: FlexAlign.Center
     }) {
-      this.cylContent()
+      if (this.cylInternalDivider) {
+        this.cylDividerLine()
+      } else {
+        this.cylContent()
+      }
     }
-    .padding(this.cylPadding())
-    .backgroundColor(this.cylIsCountdown() ? '#F2F2F7' : Color.Transparent)
-    .borderRadius(this.cylIsCountdown() ? 6 : 0)
-    .borderWidth(this.cylIsCountdown() ? 0.5 : 0)
-    .borderColor(this.cylIsRunning() ? '#C7C7CC' : this.countdownBorderColor)
+    .padding(this.cylInternalDivider ? 0 : this.cylPadding())
+    .backgroundEffect(this.cylItemGlassDrawn() ?
+      { radius: CYLLiquidGlass.BLUR_RADIUS, saturation: CYLLiquidGlass.BLUR_SATURATION, brightness: CYLLiquidGlass.LIGHT_BRIGHTNESS } :
+      { radius: 0 })
+    .backgroundColor(this.cylIsCountdown() ? CYL_COUNTDOWN_FILL : this.cylItemBackgroundColor())
+    .borderRadius(this.cylIsCountdown() ? 6 : this.cylItemCornerRadius())
+    .borderWidth(this.cylIsCountdown() ? 0.5 : this.itemBorderWidth)
+    .borderColor(this.cylIsRunning() ? '#C7C7CC' : (this.cylUsesItemBackground() && this.itemBorderColor !== '' ?
+      this.itemBorderColor : this.countdownBorderColor))
+    // [EN] A badged item is not clipped: the badge and its animation may go past the item's bounds (iOS puts it above a host
+    //      that clips). The glass and the fill keep their round corners through `borderRadius`. It is also drawn above its siblings.
+    // [CN] 带角标的条目不裁剪：角标及其动画可以超出条目边界（iOS 把角标放在会裁剪的宿主之上）。玻璃与填充仍由 `borderRadius` 保持圆角。
+    //      它还绘制在同级视图之上。
+    .clip(this.cylItemGlassDrawn() && this.cylBadge.value === null)
+    .zIndex(this.cylBadge.value !== null ? 1 : 0)
     // [EN] A Flex without a size fills its parent. A bare icon (a host's tab icon, no title, no accessory) is exactly the
     //      icon, so a host can place things against its edges: the tab bar puts the badge at the icon's top-right, and an
     //      item as wide as the tab slot moved it to the icon's top-left (HarmonyOS issue list #51). `undefined` keeps the
     //      default size everywhere else.
     // [CN] 未设置尺寸的 Flex 会填满父组件。纯图标（宿主的 Tab 图标，无标题、无附件）的尺寸就是图标尺寸，宿主才能依据其边缘布局：TabBar 把角标放在
     //      图标右上角，而与 Tab 槽位同宽的条目把角标挪到了图标左上角（鸿蒙问题列表 #51）。其他情况为 `undefined`，保持默认尺寸。
-    .width(this.cylIsBareIcon() ? this.iconSize : (this.sizesToContent ? 'auto' : undefined))
-    .height(this.cylIsBareIcon() ? this.iconSize : (this.sizesToContent ? 'auto' : undefined))
+    .width(this.cylInternalDivider ? (this.cylInternalDividerVertical ? 1 : this.cylInternalDividerLength) :
+      (this.cylIsBareIcon() ? this.iconSize : (this.sizesToContent ? 'auto' : undefined)))
+    .height(this.cylInternalDivider ? (this.cylInternalDividerVertical ? this.cylInternalDividerLength : 1) :
+      (this.cylIsBareIcon() ? this.iconSize : (this.sizesToContent ? 'auto' : undefined)))
     .opacity(this.cylEnabled() ? 1 : 0.5)
-    .constraintSize({ minHeight: this.isBare ? 0 : 44 })
-    .hitTestBehavior(this.isBare ? HitTestMode.None : HitTestMode.Default)
-    .accessibilityLevel(this.isBare ? 'no-hide-descendants' : 'auto')
+    .constraintSize({ minHeight: this.isBare || this.cylInternalDivider ? 0 : 44 })
+    .hitTestBehavior(this.isBare || this.cylInternalDivider ? HitTestMode.None : HitTestMode.Default)
+    .accessibilityLevel(this.isBare || this.cylInternalDivider ? 'no-hide-descendants' : 'auto')
     .accessibilityGroup(true)
     .accessibilityText(this.cylAccessibilityText())
     .accessibilityDescription(this.isItemSelected && this.selectedDescription.length > 0 ?
       [this.itemDescription, this.selectedDescription].filter((part: string) => part.length > 0).join(', ') : this.itemDescription)
     .id(this.itemId)
+    .onVisibleAreaChange([0.0, 0.01], (isVisible: boolean) => {
+      this.cylLifecycle?.visibleAreaChanged(isVisible);
+    })
+    .onAttach(() => {
+      this.cylLifecycle?.windowAttached();
+    })
+    .onDetach(() => {
+      this.cylLifecycle?.windowDetached();
+    })
     .onClick(() => {
       this.cylHandleTap();
+    })
+    .onTouch((event: TouchEvent) => {
+      this.cylTouchChanged(event.type);
     })
     .gesture(
       LongPressGesture()

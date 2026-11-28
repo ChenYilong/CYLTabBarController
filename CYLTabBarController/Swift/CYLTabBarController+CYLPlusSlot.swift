@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /// [EN] Marks the tab item attributes inserted for the slot (Liquid Glass, FlatDesign), so a re-assignment can remove them.
 /// [CN] 标记为 slot 插入的 TabBarItem 属性（液态玻璃、扁平样式），重新赋值时据此移除。
 private let cylTabBarItemPlusSlotPlaceholderKey = "CYLTabBarItemPlusSlotPlaceholder"

@@ -45,6 +45,10 @@
       "value": "Nhấp nháy ×3"
     },
     {
+      "name": "cyl_l10n_9594eec95be7",
+      "value": "Blue"
+    },
+    {
       "name": "cyl_l10n_070554647306",
       "value": "Viền"
     },
@@ -95,6 +99,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem căn giữa"
+    },
+    {
+      "name": "cyl_l10n_5adb0dc263ad",
+      "value": "Color: %@"
     },
     {
       "name": "cyl_l10n_f6da70b584ae",
@@ -281,12 +289,20 @@
       "value": "Mở bộ điều khiển có ảnh nút cộng đổi sau 2 giây; bố cục không được dịch chuyển"
     },
     {
+      "name": "cyl_l10n_ee38e4d5dd68",
+      "value": "Red"
+    },
+    {
       "name": "cyl_l10n_c27618b1aa9d",
       "value": "Chấm đỏ"
     },
     {
       "name": "cyl_l10n_255c00a63f9d",
       "value": "Bán kính chấm đỏ"
+    },
+    {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "Giải phóng bộ điều khiển thanh tab (sau 3 giây)"
     },
     {
       "name": "cyl_l10n_56e8fac7007d",
@@ -303,6 +319,10 @@
     {
       "name": "cyl_l10n_9d01c837b4bc",
       "value": "Rive tab icon: house.riv (number input Rooms)"
+    },
+    {
+      "name": "cyl_l10n_bdd66081cc94",
+      "value": "Rive colors"
     },
     {
       "name": "cyl_l10n_f0c792c049bc",
@@ -373,6 +393,10 @@
       "value": "Still image after the animation ends"
     },
     {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "Đã giải phóng bộ điều khiển thanh tab"
+    },
+    {
       "name": "cyl_l10n_fee4a478923f",
       "value": "Tương tác tab"
     },
@@ -413,6 +437,10 @@
       "value": "Giao diện thanh tab"
     },
     {
+      "name": "cyl_l10n_abf44ef609ef",
+      "value": "The file's colors"
+    },
+    {
       "name": "cyl_l10n_7c4aecba91c3",
       "value": "Ảnh của tab trang này lấy từ rawfile của ứng dụng (gói tài nguyên trên iOS); nhấn lại để khôi phục"
     },
@@ -427,6 +455,10 @@
     {
       "name": "cyl_l10n_a4d0d101d6a3",
       "value": "Trên bên trái"
+    },
+    {
+      "name": "cyl_l10n_e38d6ac40a62",
+      "value": "applyColors: a view model color property of a data-bound .riv"
     },
     {
       "name": "cyl_l10n_2306a585ae00",
@@ -469,6 +501,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; nhấn để chọn, rồi cuộn danh sách này"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "số callback dealloc đã chạy: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "số callback dealloc đã chạy: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: viên nang tab, quả cầu tìm kiếm và thanh nhạc trên nội dung nhiều màu; cuộn để thu nhỏ"
     },
@@ -495,6 +535,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; khi ẩn, quay lại sau 2 giây"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "giải phóng: chưa chạy"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "giải phóng: sau %d giây"
     },
     {
       "name": "cyl_l10n_2a0608059131",

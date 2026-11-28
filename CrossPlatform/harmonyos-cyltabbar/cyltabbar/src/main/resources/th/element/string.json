@@ -45,6 +45,10 @@
       "value": "กะพริบ ×3"
     },
     {
+      "name": "cyl_l10n_9594eec95be7",
+      "value": "Blue"
+    },
+    {
       "name": "cyl_l10n_070554647306",
       "value": "เส้นขอบ"
     },
@@ -95,6 +99,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem จัดกึ่งกลาง"
+    },
+    {
+      "name": "cyl_l10n_5adb0dc263ad",
+      "value": "Color: %@"
     },
     {
       "name": "cyl_l10n_f6da70b584ae",
@@ -281,12 +289,20 @@
       "value": "เปิดตัวควบคุมที่รูปปุ่มบวกเปลี่ยนหลัง 2 วินาที เลย์เอาต์ต้องไม่ขยับ"
     },
     {
+      "name": "cyl_l10n_ee38e4d5dd68",
+      "value": "Red"
+    },
+    {
       "name": "cyl_l10n_c27618b1aa9d",
       "value": "จุดสีแดง"
     },
     {
       "name": "cyl_l10n_255c00a63f9d",
       "value": "รัศมีจุดสีแดง"
+    },
+    {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "ปล่อย Tab Bar Controller (ใน 3 วินาที)"
     },
     {
       "name": "cyl_l10n_56e8fac7007d",
@@ -303,6 +319,10 @@
     {
       "name": "cyl_l10n_9d01c837b4bc",
       "value": "Rive tab icon: house.riv (number input Rooms)"
+    },
+    {
+      "name": "cyl_l10n_bdd66081cc94",
+      "value": "Rive colors"
     },
     {
       "name": "cyl_l10n_f0c792c049bc",
@@ -373,6 +393,10 @@
       "value": "Still image after the animation ends"
     },
     {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "ปล่อย Tab Bar Controller แล้ว"
+    },
+    {
       "name": "cyl_l10n_fee4a478923f",
       "value": "การโต้ตอบแท็บ"
     },
@@ -413,6 +437,10 @@
       "value": "รูปลักษณ์แถบแท็บ"
     },
     {
+      "name": "cyl_l10n_abf44ef609ef",
+      "value": "The file's colors"
+    },
+    {
       "name": "cyl_l10n_7c4aecba91c3",
       "value": "รูปภาพของแท็บในหน้านี้จาก rawfile ของแอป (บันเดิลทรัพยากรของ iOS); แตะอีกครั้งเพื่อคืนค่า"
     },
@@ -427,6 +455,10 @@
     {
       "name": "cyl_l10n_a4d0d101d6a3",
       "value": "บนซ้าย"
+    },
+    {
+      "name": "cyl_l10n_e38d6ac40a62",
+      "value": "applyColors: a view model color property of a data-bound .riv"
     },
     {
       "name": "cyl_l10n_2306a585ae00",
@@ -469,6 +501,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; แตะเพื่อเลือก แล้วเลื่อนรายการนี้"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "คอลแบ็ก dealloc ที่ทำงานแล้ว: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "คอลแบ็ก dealloc ที่ทำงานแล้ว: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: แคปซูลแท็บ ลูกบอลค้นหา และแถบเพลงเหนือเนื้อหาสีสันสดใส เลื่อนเพื่อย่อ"
     },
@@ -495,6 +535,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; เมื่อซ่อนจะกลับมาหลัง 2 วินาที"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "การปล่อย: ยังไม่ได้ทำงาน"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "การปล่อย: ใน %d วินาที"
     },
     {
       "name": "cyl_l10n_2a0608059131",

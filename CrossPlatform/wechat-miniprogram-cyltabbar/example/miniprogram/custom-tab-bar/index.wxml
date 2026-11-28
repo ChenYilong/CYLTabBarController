@@ -22,6 +22,6 @@
   bind:reselect="cyl_onReselect"
   bind:plustap="cyl_onPlusTap"
   bind:loginrequired="cyl_onLoginRequired"
-  bind:longpress="cyl_onLongPress"
+  bind:longpress="cylOnLongPress"
 />
 </view>

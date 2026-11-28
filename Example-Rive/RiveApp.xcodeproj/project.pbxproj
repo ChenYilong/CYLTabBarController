@@ -7,15 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		CE3BEF72F47573EDAE53321E /* svga_plus_button@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 12654C4384C93F2798544FCF /* svga_plus_button@3x.png */; };
 		08E79CD10245A663F1BD4123 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 45BFB2F14A25627FEFFEF13E /* Poppins-Bold.ttf */; };
+		0986309E1B479B4CD2B8E6AE /* tab_chat.svga in Resources */ = {isa = PBXBuildFile; fileRef = 383B8EF253785738125A9AFD /* tab_chat.svga */; };
 		167CF5CA65FDB746AE1E47F6 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64CBB7661983D3BF1EC5DDFF /* SignInView.swift */; };
 		19E3EF073616D95A0907ECF0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8E9F1732B1A1048CFEFB23 /* HomeView.swift */; };
+		1AF41289CBEA1AEAB5397A24 /* tab_home.pag in Resources */ = {isa = PBXBuildFile; fileRef = DA1E791FF34B93AF41778024 /* tab_home.pag */; };
 		202DCAF62BA7ED5420B71D1B /* CYLDemoLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECDB16DD646E7F3ACB02BBD5 /* CYLDemoLocalization.swift */; };
+		22B8A4B1E35E11DD5F3B3267 /* green_lottie_tab_home.json in Resources */ = {isa = PBXBuildFile; fileRef = DFD77D3AC06B998BA980061E /* green_lottie_tab_home.json */; };
 		24C9C0A04F6CFE6ADF0916D6 /* TabItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302B7A22BBFEB0B6D2D1F250 /* TabItems.swift */; };
+		275FFB48F62878FE218A71E0 /* tab_search.svga in Resources */ = {isa = PBXBuildFile; fileRef = E0A3CDDBF8DC3697610606B5 /* tab_search.svga */; };
 		344E45B762854B40E287BB6C /* CYLDemo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA3A6EC7AC41D27E62A83CF5 /* CYLDemo.bundle */; };
 		3A951187ACF1CACD03009E33 /* icons.riv in Resources */ = {isa = PBXBuildFile; fileRef = C654F0A882961E70103CCF0B /* icons.riv */; };
 		3C711DA2856AABA0EEB6251B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB104DA902FE6C1FA00D432 /* Foundation.framework */; };
+		3F828B277AF61828EB67FFA4 /* tab_home.svga in Resources */ = {isa = PBXBuildFile; fileRef = 393E61969AA8F3BD62B45DB6 /* tab_home.svga */; };
 		45608F73DF993EBDF7A91512 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD544589DFE95E305AADD727 /* CustomTextField.swift */; };
 		4F8618CF17404F47A6EA1BD2 /* Pods_RiveApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C113115355150D7EF79987B6 /* Pods_RiveApp.framework */; };
 		527C6E5F73574D8296899296 /* Configurations in Resources */ = {isa = PBXBuildFile; fileRef = A5B68C427C284DD38029286A /* Configurations */; };
@@ -23,16 +27,22 @@
 		64BFFC1EF7D8969B5798C270 /* CustomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4832D075A2C5551C835B3AB /* CustomButton.swift */; };
 		64C91DB47B28EFAEC7C9792A /* CustomFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CB5B4CC52C44691B7FCA304 /* CustomFont.swift */; };
 		6501E84D2037A29884A2FDA7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF928D71D024B7F90696E769 /* Assets.xcassets */; };
+		6546E3991CC2A8288E0D9744 /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = E34CA1D66D87291D40EADA12 /* green_lottie_tab_mine.json */; };
 		68E4EE124A24CAC0643AFEF7 /* menu_button.riv in Resources */ = {isa = PBXBuildFile; fileRef = 4B1F9532677D6BA1B23891DE /* menu_button.riv */; };
 		6F041C42C20CAC318EA621F8 /* SVGATabIconDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1A22910B89D5219F01A0D4 /* SVGATabIconDemoView.swift */; };
+		7B9D3A1982299A1C30A8AFC8 /* cyl_tabbar_configuration_svga.json in Resources */ = {isa = PBXBuildFile; fileRef = 978169DC051CE462E5BA871D /* cyl_tabbar_configuration_svga.json */; };
 		7E34E63FA0714A3431376B0B /* tab_profile.svga in Resources */ = {isa = PBXBuildFile; fileRef = 0EB2E0AF97F87F8846E6C211 /* tab_profile.svga */; };
+		7EE90F0CF099741C625B69FA /* tab_list.svga in Resources */ = {isa = PBXBuildFile; fileRef = CC85256786FCAD9604575290 /* tab_list.svga */; };
 		8270F4983C7222D1B11969F9 /* CYLDemoTabBarStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D36FD68AE28A1C6B53E77085 /* CYLDemoTabBarStyle.swift */; };
 		8C7CC7F169DF6D09CFED6CBE /* TabViewControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A94E53C3C2459E59C39BB0 /* TabViewControllers.swift */; };
 		9049620E8B510276C7D44D09 /* RiveAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A17F7195D8D07CB67028570 /* RiveAnimation.swift */; };
+		961F8F3B6EF6FD5B016BEDC7 /* tab_health.pag in Resources */ = {isa = PBXBuildFile; fileRef = 0C0331712E8B1B54A8A7F310 /* tab_health.pag */; };
 		97F5EDDE4D5B47AFC38A08BD /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1E61D8530FAB92D859BBCDFC /* Inter-SemiBold.ttf */; };
 		A1C0FFEE5A1D0F00D0000001 /* RivePlusButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE5A1D0F00D0000002 /* RivePlusButton.swift */; };
 		A1C0FFEE5A1D0F00D0000003 /* CYLPlusButtonBadgeDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE5A1D0F00D0000004 /* CYLPlusButtonBadgeDemo.swift */; };
 		A1C0FFEE5A1D0F00D0000005 /* RiveTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE5A1D0F00D0000006 /* RiveTabBarController.swift */; };
+		A1C0FFEE5A1D0F00D0000A02 /* AnimatedItemEngineAPIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE5A1D0F00D0000A01 /* AnimatedItemEngineAPIViewController.swift */; };
+		A1C0FFEE7A110F00D0000002 /* CYLDemoPlaybackControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE7A110F00D0000001 /* CYLDemoPlaybackControlsView.swift */; };
 		A85B4D667BD72D9C31E30BBC /* CYLSettingsDemoTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D0C069C05195A044437DCC9 /* CYLSettingsDemoTableViewController.swift */; };
 		A905CDB1E98C37058FE447D1 /* SideMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26FF32281E56757A718BBBB4 /* SideMenu.swift */; };
 		AC7015914DF03E3B9C6AFEAF /* check.riv in Resources */ = {isa = PBXBuildFile; fileRef = E8DF93C34F3E7B872BF47F0F /* check.riv */; };
@@ -43,6 +53,8 @@
 		C3D4D7128115A1AC496AE727 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 79CFC0FDE0FE7142C50EE84E /* Inter-Regular.ttf */; };
 		C4F7F8B25F828E7C7B86E306 /* HCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 036951B5B2B073F789932FF8 /* HCard.swift */; };
 		C8BB81F83DEDCBBF770BD1CA /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAA98EA66563772A83BDA88 /* Extensions.swift */; };
+		C9F57F8F75CEF11CA290FA5E /* SVGATabIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CA8A7CB0D29489FB6E0420 /* SVGATabIcons.swift */; };
+		CE3BEF72F47573EDAE53321E /* svga_plus_button@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 12654C4384C93F2798544FCF /* svga_plus_button@3x.png */; };
 		D3CA8AD94703A4D0B9AB2D52 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16027FA884CF141ACF8691AD /* OnboardingView.swift */; };
 		D6CC2F0CF401AE5AA8949682 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8335A27A0F54664A21A04D9D /* LaunchScreen.storyboard */; };
 		D6F45F96F2196AB7B5E9E432 /* RiveMenuButtonDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29242C162EDC3294BE1BC4B0 /* RiveMenuButtonDemoView.swift */; };
@@ -51,19 +63,14 @@
 		F2EA4C27D59FFEFFD097501A /* confetti.riv in Resources */ = {isa = PBXBuildFile; fileRef = C78A77277F5BF044CE896CCF /* confetti.riv */; };
 		F432E9BCEE4F345D5C02A425 /* shapes.riv in Resources */ = {isa = PBXBuildFile; fileRef = 8EEB743298095836BF9377D6 /* shapes.riv */; };
 		F6B77B5916BCCA956213941A /* Course.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699EFCFF1B05220558FC4D31 /* Course.swift */; };
-		7EE90F0CF099741C625B69FA /* tab_list.svga in Resources */ = {isa = PBXBuildFile; fileRef = CC85256786FCAD9604575290 /* tab_list.svga */; };
-		0986309E1B479B4CD2B8E6AE /* tab_chat.svga in Resources */ = {isa = PBXBuildFile; fileRef = 383B8EF253785738125A9AFD /* tab_chat.svga */; };
-		275FFB48F62878FE218A71E0 /* tab_search.svga in Resources */ = {isa = PBXBuildFile; fileRef = E0A3CDDBF8DC3697610606B5 /* tab_search.svga */; };
-		3F828B277AF61828EB67FFA4 /* tab_home.svga in Resources */ = {isa = PBXBuildFile; fileRef = 393E61969AA8F3BD62B45DB6 /* tab_home.svga */; };
-		7B9D3A1982299A1C30A8AFC8 /* cyl_tabbar_configuration_svga.json in Resources */ = {isa = PBXBuildFile; fileRef = 978169DC051CE462E5BA871D /* cyl_tabbar_configuration_svga.json */; };
-		C9F57F8F75CEF11CA290FA5E /* SVGATabIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CA8A7CB0D29489FB6E0420 /* SVGATabIcons.swift */; };
+		A4F3C21A29DFA7451E1BD3CB /* AnimatedItemTintViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E738849D25E3ABCE23CB0DF9 /* AnimatedItemTintViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		DE01AE07C45C366FF14584AB /* NOTICE.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = "NOTICE.md"; sourceTree = "<group>"; };
-		12654C4384C93F2798544FCF /* svga_plus_button@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "svga_plus_button@3x.png"; path = "SVGA/svga_plus_button@3x.png"; sourceTree = "<group>"; };
 		036951B5B2B073F789932FF8 /* HCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HCard.swift; sourceTree = "<group>"; };
+		0C0331712E8B1B54A8A7F310 /* tab_health.pag */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_health.pag; path = "../Example-Shared/PAGResources/tab-icons/tab_health.pag"; sourceTree = SOURCE_ROOT; };
 		0EB2E0AF97F87F8846E6C211 /* tab_profile.svga */ = {isa = PBXFileReference; includeInIndex = 1; path = tab_profile.svga; sourceTree = "<group>"; };
+		12654C4384C93F2798544FCF /* svga_plus_button@3x.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; name = "svga_plus_button@3x.png"; path = "SVGA/svga_plus_button@3x.png"; sourceTree = "<group>"; };
 		16027FA884CF141ACF8691AD /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		1E61D8530FAB92D859BBCDFC /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "Inter-SemiBold.ttf"; sourceTree = "<group>"; };
 		26FF32281E56757A718BBBB4 /* SideMenu.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SideMenu.swift; sourceTree = "<group>"; };
@@ -71,6 +78,8 @@
 		2A1A22910B89D5219F01A0D4 /* SVGATabIconDemoView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SVGATabIconDemoView.swift; sourceTree = "<group>"; };
 		2F6E2E7F0E846E62A03D4491 /* tab_activity.svga */ = {isa = PBXFileReference; includeInIndex = 1; path = tab_activity.svga; sourceTree = "<group>"; };
 		302B7A22BBFEB0B6D2D1F250 /* TabItems.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TabItems.swift; sourceTree = "<group>"; };
+		383B8EF253785738125A9AFD /* tab_chat.svga */ = {isa = PBXFileReference; includeInIndex = 1; path = tab_chat.svga; sourceTree = "<group>"; };
+		393E61969AA8F3BD62B45DB6 /* tab_home.svga */ = {isa = PBXFileReference; includeInIndex = 1; path = tab_home.svga; sourceTree = "<group>"; };
 		45BFB2F14A25627FEFFEF13E /* Poppins-Bold.ttf */ = {isa = PBXFileReference; includeInIndex = 1; path = "Poppins-Bold.ttf"; sourceTree = "<group>"; };
 		484F60C30CA9614BAA11FB7E /* house.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = house.riv; sourceTree = "<group>"; };
 		4B1F9532677D6BA1B23891DE /* menu_button.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = menu_button.riv; sourceTree = "<group>"; };
@@ -87,10 +96,13 @@
 		7CB5B4CC52C44691B7FCA304 /* CustomFont.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CustomFont.swift; sourceTree = "<group>"; };
 		8335A27A0F54664A21A04D9D /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8EEB743298095836BF9377D6 /* shapes.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = shapes.riv; sourceTree = "<group>"; };
+		978169DC051CE462E5BA871D /* cyl_tabbar_configuration_svga.json */ = {isa = PBXFileReference; includeInIndex = 1; name = cyl_tabbar_configuration_svga.json; path = SVGA/cyl_tabbar_configuration_svga.json; sourceTree = "<group>"; };
 		9A25FDF1B50065AB34F5233C /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1C0FFEE5A1D0F00D0000002 /* RivePlusButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RivePlusButton.swift; sourceTree = "<group>"; };
 		A1C0FFEE5A1D0F00D0000004 /* CYLPlusButtonBadgeDemo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLPlusButtonBadgeDemo.swift; path = "../Example-Shared/CYLPlusButtonBadgeDemo.swift"; sourceTree = SOURCE_ROOT; };
 		A1C0FFEE5A1D0F00D0000006 /* RiveTabBarController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RiveTabBarController.swift; sourceTree = "<group>"; };
+		A1C0FFEE5A1D0F00D0000A01 /* AnimatedItemEngineAPIViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AnimatedItemEngineAPIViewController.swift; sourceTree = "<group>"; };
+		A1C0FFEE7A110F00D0000001 /* CYLDemoPlaybackControlsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLDemoPlaybackControlsView.swift; path = "../Example-Shared/CYLDemoPlaybackControlsView.swift"; sourceTree = SOURCE_ROOT; };
 		A5B68C427C284DD38029286A /* Configurations */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Configurations; path = "../Example-Shared/Configurations"; sourceTree = SOURCE_ROOT; };
 		AD544589DFE95E305AADD727 /* CustomTextField.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
 		ADB104DA902FE6C1FA00D432 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -102,19 +114,21 @@
 		C4832D075A2C5551C835B3AB /* CustomButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CustomButton.swift; sourceTree = "<group>"; };
 		C654F0A882961E70103CCF0B /* icons.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = icons.riv; sourceTree = "<group>"; };
 		C78A77277F5BF044CE896CCF /* confetti.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = confetti.riv; sourceTree = "<group>"; };
+		CC85256786FCAD9604575290 /* tab_list.svga */ = {isa = PBXFileReference; includeInIndex = 1; path = tab_list.svga; sourceTree = "<group>"; };
 		CE74468C4779D2C9657DDB0A /* VCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VCard.swift; sourceTree = "<group>"; };
 		D36FD68AE28A1C6B53E77085 /* CYLDemoTabBarStyle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CYLDemoTabBarStyle.swift; path = "../Example-Shared/CYLDemoTabBarStyle.swift"; sourceTree = SOURCE_ROOT; };
+		DA1E791FF34B93AF41778024 /* tab_home.pag */ = {isa = PBXFileReference; includeInIndex = 1; name = tab_home.pag; path = "../Example-Shared/PAGResources/tab-icons/tab_home.pag"; sourceTree = SOURCE_ROOT; };
 		DA3A6EC7AC41D27E62A83CF5 /* CYLDemo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = CYLDemo.bundle; path = "../Example-Shared/CYLDemo.bundle"; sourceTree = SOURCE_ROOT; };
+		DE01AE07C45C366FF14584AB /* NOTICE.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = NOTICE.md; sourceTree = "<group>"; };
+		DFD77D3AC06B998BA980061E /* green_lottie_tab_home.json */ = {isa = PBXFileReference; includeInIndex = 1; name = green_lottie_tab_home.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_home.json; sourceTree = SOURCE_ROOT; };
+		E0A3CDDBF8DC3697610606B5 /* tab_search.svga */ = {isa = PBXFileReference; includeInIndex = 1; path = tab_search.svga; sourceTree = "<group>"; };
 		E2E65C33F57E037E0E98F612 /* button.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = button.riv; sourceTree = "<group>"; };
+		E34CA1D66D87291D40EADA12 /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; includeInIndex = 1; name = green_lottie_tab_mine.json; path = ../Example/Classes/Other/LottieResources/green_lottie_tab_mine.json; sourceTree = SOURCE_ROOT; };
 		E8DF93C34F3E7B872BF47F0F /* check.riv */ = {isa = PBXFileReference; includeInIndex = 1; path = check.riv; sourceTree = "<group>"; };
 		ECDB16DD646E7F3ACB02BBD5 /* CYLDemoLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CYLDemoLocalization.swift; path = "../Example-Shared/CYLDemoLocalization.swift"; sourceTree = SOURCE_ROOT; };
-		FF928D71D024B7F90696E769 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		CC85256786FCAD9604575290 /* tab_list.svga */ = {isa = PBXFileReference; includeInIndex = 1; path = tab_list.svga; sourceTree = "<group>"; };
-		383B8EF253785738125A9AFD /* tab_chat.svga */ = {isa = PBXFileReference; includeInIndex = 1; path = tab_chat.svga; sourceTree = "<group>"; };
-		E0A3CDDBF8DC3697610606B5 /* tab_search.svga */ = {isa = PBXFileReference; includeInIndex = 1; path = tab_search.svga; sourceTree = "<group>"; };
-		393E61969AA8F3BD62B45DB6 /* tab_home.svga */ = {isa = PBXFileReference; includeInIndex = 1; path = tab_home.svga; sourceTree = "<group>"; };
-		978169DC051CE462E5BA871D /* cyl_tabbar_configuration_svga.json */ = {isa = PBXFileReference; includeInIndex = 1; name = "cyl_tabbar_configuration_svga.json"; path = "SVGA/cyl_tabbar_configuration_svga.json"; sourceTree = "<group>"; };
 		F2CA8A7CB0D29489FB6E0420 /* SVGATabIcons.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SVGATabIcons.swift; sourceTree = "<group>"; };
+		FF928D71D024B7F90696E769 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E738849D25E3ABCE23CB0DF9 /* AnimatedItemTintViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedItemTintViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,20 +144,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		DD39867C03F824042458C0C2 /* SVGAAssets */ = {
-			isa = PBXGroup;
-			children = (
-				0EB2E0AF97F87F8846E6C211 /* tab_profile.svga */,
-				2F6E2E7F0E846E62A03D4491 /* tab_activity.svga */,
-				CC85256786FCAD9604575290 /* tab_list.svga */,
-				383B8EF253785738125A9AFD /* tab_chat.svga */,
-				E0A3CDDBF8DC3697610606B5 /* tab_search.svga */,
-				393E61969AA8F3BD62B45DB6 /* tab_home.svga */,
-				DE01AE07C45C366FF14584AB /* NOTICE.md */,
-			);
-			path = SVGAAssets;
-			sourceTree = "<group>";
-		};
 		04DA43D1003ED7CCDAE645A9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -187,6 +187,7 @@
 			isa = PBXGroup;
 			children = (
 				5D0C069C05195A044437DCC9 /* CYLSettingsDemoTableViewController.swift */,
+				A1C0FFEE7A110F00D0000001 /* CYLDemoPlaybackControlsView.swift */,
 				D36FD68AE28A1C6B53E77085 /* CYLDemoTabBarStyle.swift */,
 				A1C0FFEE5A1D0F00D0000004 /* CYLPlusButtonBadgeDemo.swift */,
 			);
@@ -264,10 +265,16 @@
 				C1A5CE4E0000000000000002 /* SceneDelegate.swift */,
 				C0A94E53C3C2459E59C39BB0 /* TabViewControllers.swift */,
 				29242C162EDC3294BE1BC4B0 /* RiveMenuButtonDemoView.swift */,
+				A1C0FFEE5A1D0F00D0000A01 /* AnimatedItemEngineAPIViewController.swift */,
+				E738849D25E3ABCE23CB0DF9 /* AnimatedItemTintViewController.swift */,
 				A1C0FFEE5A1D0F00D0000002 /* RivePlusButton.swift */,
 				A1C0FFEE5A1D0F00D0000006 /* RiveTabBarController.swift */,
 				9A25FDF1B50065AB34F5233C /* Info.plist */,
 				978169DC051CE462E5BA871D /* cyl_tabbar_configuration_svga.json */,
+				DA1E791FF34B93AF41778024 /* tab_home.pag */,
+				0C0331712E8B1B54A8A7F310 /* tab_health.pag */,
+				DFD77D3AC06B998BA980061E /* green_lottie_tab_home.json */,
+				E34CA1D66D87291D40EADA12 /* green_lottie_tab_mine.json */,
 			);
 			name = RiveApp;
 			path = RiveApp;
@@ -308,6 +315,20 @@
 			);
 			name = RiveAssets;
 			path = RiveAssets;
+			sourceTree = "<group>";
+		};
+		DD39867C03F824042458C0C2 /* SVGAAssets */ = {
+			isa = PBXGroup;
+			children = (
+				0EB2E0AF97F87F8846E6C211 /* tab_profile.svga */,
+				2F6E2E7F0E846E62A03D4491 /* tab_activity.svga */,
+				CC85256786FCAD9604575290 /* tab_list.svga */,
+				383B8EF253785738125A9AFD /* tab_chat.svga */,
+				E0A3CDDBF8DC3697610606B5 /* tab_search.svga */,
+				393E61969AA8F3BD62B45DB6 /* tab_home.svga */,
+				DE01AE07C45C366FF14584AB /* NOTICE.md */,
+			);
+			path = SVGAAssets;
 			sourceTree = "<group>";
 		};
 		E2E0164FCF8926D02EE4BD47 /* Components */ = {
@@ -399,6 +420,10 @@
 				275FFB48F62878FE218A71E0 /* tab_search.svga in Resources */,
 				3F828B277AF61828EB67FFA4 /* tab_home.svga in Resources */,
 				7B9D3A1982299A1C30A8AFC8 /* cyl_tabbar_configuration_svga.json in Resources */,
+				1AF41289CBEA1AEAB5397A24 /* tab_home.pag in Resources */,
+				961F8F3B6EF6FD5B016BEDC7 /* tab_health.pag in Resources */,
+				22B8A4B1E35E11DD5F3B3267 /* green_lottie_tab_home.json in Resources */,
+				6546E3991CC2A8288E0D9744 /* green_lottie_tab_mine.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -412,19 +437,23 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-RiveApp/Pods-RiveApp-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/CYLDeallocBlockExecutor/CYLDeallocBlockExecutor.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/SSZipArchive/SSZipArchive.framework",
 				"${BUILT_PRODUCTS_DIR}/SVGAPlayerLite/SVGAPlayerLite.framework",
 				"${BUILT_PRODUCTS_DIR}/lottie-ios/Lottie.framework",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/RiveRuntime/RiveRuntime.framework/RiveRuntime",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/libpag/libpag.framework/libpag",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CYLDeallocBlockExecutor.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SSZipArchive.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SVGAPlayerLite.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Lottie.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RiveRuntime.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libpag.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -438,11 +467,13 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-RiveApp/Pods-RiveApp-resources.sh",
+				"${PODS_ROOT}/../../CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle",
 				"${PODS_ROOT}/../../CYLTabBarController/Resources/CYLTabBarController.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/RiveRuntime/runtime_ios_privacy.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLAnimatedItem.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/runtime_ios_privacy.bundle",
 			);
@@ -485,6 +516,8 @@
 				C1A5CE4E0000000000000001 /* SceneDelegate.swift in Sources */,
 				8C7CC7F169DF6D09CFED6CBE /* TabViewControllers.swift in Sources */,
 				D6F45F96F2196AB7B5E9E432 /* RiveMenuButtonDemoView.swift in Sources */,
+				A1C0FFEE5A1D0F00D0000A02 /* AnimatedItemEngineAPIViewController.swift in Sources */,
+				A4F3C21A29DFA7451E1BD3CB /* AnimatedItemTintViewController.swift in Sources */,
 				A1C0FFEE5A1D0F00D0000001 /* RivePlusButton.swift in Sources */,
 				A1C0FFEE5A1D0F00D0000005 /* RiveTabBarController.swift in Sources */,
 				C4F7F8B25F828E7C7B86E306 /* HCard.swift in Sources */,
@@ -502,6 +535,7 @@
 				A905CDB1E98C37058FE447D1 /* SideMenu.swift in Sources */,
 				24C9C0A04F6CFE6ADF0916D6 /* TabItems.swift in Sources */,
 				A85B4D667BD72D9C31E30BBC /* CYLSettingsDemoTableViewController.swift in Sources */,
+				A1C0FFEE7A110F00D0000002 /* CYLDemoPlaybackControlsView.swift in Sources */,
 				8270F4983C7222D1B11969F9 /* CYLDemoTabBarStyle.swift in Sources */,
 				A1C0FFEE5A1D0F00D0000003 /* CYLPlusButtonBadgeDemo.swift in Sources */,
 				6F041C42C20CAC318EA621F8 /* SVGATabIconDemoView.swift in Sources */,

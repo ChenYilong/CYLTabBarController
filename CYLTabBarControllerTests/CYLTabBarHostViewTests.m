@@ -143,7 +143,7 @@ static void CYLHostTestsTap(CYLPlusButton *plusButton) {
         [UIColor.blueColor setFill];
         [context fillRect:CGRectMake(0, 0, 80, 40)];
     }];
-    [CYLTabBarController tabBarControllerWithConfiguration:@{
+    (void)[CYLTabBarController tabBarControllerWithConfiguration:@{
         CYLTabBarControllerContext : @"host-tests-image-size",
         CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A", CYLTabBarItemIdentifier : @"a" },
                                                       @{ CYLTabBarItemTitle : @"B", CYLTabBarItemIdentifier : @"b" } ],
@@ -629,13 +629,13 @@ static NSString *const CYLHostTestsLoggedInKey = @"CYLTabBarControllerLoggedIn";
         };
     };
     CYLThemeManager *manager = [CYLThemeManagerCenter themeManagerWithName:managerName];
-    [CYLTabBarController tabBarControllerWithConfiguration:configuration(@"Default")];
+    (void)[CYLTabBarController tabBarControllerWithConfiguration:configuration(@"Default")];
     XCTAssertEqualObjects(manager.currentThemeIdentifier, @"Default");
-    [CYLTabBarController tabBarControllerWithConfiguration:configuration(@"Christmas")];
+    (void)[CYLTabBarController tabBarControllerWithConfiguration:configuration(@"Christmas")];
     XCTAssertEqualObjects(manager.currentThemeIdentifier, @"Christmas", @"a skin only an earlier configuration had is not kept");
     [manager addThemeIdentifier:@"App" theme:[[NSObject alloc] init]];
     manager.currentThemeIdentifier = @"App";
-    [CYLTabBarController tabBarControllerWithConfiguration:configuration(@"Ocean")];
+    (void)[CYLTabBarController tabBarControllerWithConfiguration:configuration(@"Ocean")];
     XCTAssertEqualObjects(manager.currentThemeIdentifier, @"App", @"a skin the app chose stays");
 }
 

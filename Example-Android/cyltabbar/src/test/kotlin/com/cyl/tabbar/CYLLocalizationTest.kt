@@ -37,8 +37,8 @@ class CYLLocalizationTest {
         // [EN] The "NEW" token is shown in the language too, as iOS. [CN] 与 iOS 相同，"NEW" 标记也使用该语言显示。
         val tab = android.widget.FrameLayout(context)
         android.widget.FrameLayout(context).addView(tab)
-        tab.cyl_showBadgeValue("NEW")
-        assertEquals("جديد", tab.cyl_badge?.text)
+        tab.cylShowBadgeValue("NEW")
+        assertEquals("جديد", tab.cylBadge?.text)
         CYLLocalization.language = "zh-Hans"
         assertEquals("有新内容", CYLBadgeAccessibilityDescription(context, ""))
         assertEquals("加号按钮", CYLPlusButton(context).contentDescription)

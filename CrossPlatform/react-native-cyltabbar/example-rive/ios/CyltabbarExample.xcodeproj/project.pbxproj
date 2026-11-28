@@ -7,63 +7,93 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		76DFAF956F6B4EB6B0F9290F /* tab_chat.svga in Resources */ = {isa = PBXBuildFile; fileRef = 5C9E3E71719C2AD9B9B4652F /* tab_chat.svga */; };
-		9E83A50342A3C1CB59710F3A /* tab_search.svga in Resources */ = {isa = PBXBuildFile; fileRef = 391D90876FBD0B06DC34F764 /* tab_search.svga */; };
-		DA018439B506FE89B705593B /* tab_activity.svga in Resources */ = {isa = PBXBuildFile; fileRef = 19E028627758C15D4D6F3E1C /* tab_activity.svga */; };
-		E93609A7C8B6A5DAFE920977 /* tab_list.svga in Resources */ = {isa = PBXBuildFile; fileRef = D8C45E6EC22F31F5DE0302B8 /* tab_list.svga */; };
-		12ECA1F8AF8A82ECFD7447AC /* tab_profile.svga in Resources */ = {isa = PBXBuildFile; fileRef = C93E3AC9606624B280DD22D2 /* tab_profile.svga */; };
-		D84C9CE05B2276AC91D1BBFA /* tab_home.svga in Resources */ = {isa = PBXBuildFile; fileRef = 735D4DAE0416298B1623E20E /* tab_home.svga */; };
-		0F32264E7ACDAC014BB08384 /* svga in Resources */ = {isa = PBXBuildFile; fileRef = A2DEEDE5F74CC088715E7EB8 /* svga */; };
 		091FFD36242740ED8D5349A3 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4CB1784706444803A5CCF29C /* Inter-SemiBold.ttf */; };
 		0AC45C5AA8BB4D54BB7CD92E /* menu_button.riv in Resources */ = {isa = PBXBuildFile; fileRef = 870A1328DB234BEDA6A64FB0 /* menu_button.riv */; };
+		0C59B4DB197D53BB194DC95B /* CyltabbarAnimationViewTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C273F8AE7236833CF0192CDF /* CyltabbarAnimationViewTests.mm */; };
 		0C80B921A6F3F58F76C31292 /* libPods-CyltabbarExample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-CyltabbarExample.a */; };
+		0F32264E7ACDAC014BB08384 /* svga in Resources */ = {isa = PBXBuildFile; fileRef = A2DEEDE5F74CC088715E7EB8 /* svga */; };
+		12ECA1F8AF8A82ECFD7447AC /* tab_profile.svga in Resources */ = {isa = PBXBuildFile; fileRef = C93E3AC9606624B280DD22D2 /* tab_profile.svga */; };
 		133130F591F1489DB707BDA7 /* confetti.riv in Resources */ = {isa = PBXBuildFile; fileRef = 3DF31ED183B14BA6B4E0FC37 /* confetti.riv */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		19E541665DCEE199CFD0487D /* libPods-CyltabbarExampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 256A27524845609A291876B8 /* libPods-CyltabbarExampleTests.a */; };
 		37D5CDB16D6C4FEFBC4D2ACF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2D906181ECFC45AEA39758E1 /* Assets.xcassets */; };
+		5E1C0DE5B1D2E3F4A5B6C7D8 /* cyl_still_check.png in Resources */ = {isa = PBXBuildFile; fileRef = 5E1C0DE6B1D2E3F4A5B6C7D8 /* cyl_still_check.png */; };
 		5F71C48B95D34678A88DD1E2 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5611864B62B047AA94EDDA3E /* Poppins-Bold.ttf */; };
 		65558C6784094752977EE53C /* check.riv in Resources */ = {isa = PBXBuildFile; fileRef = 35F4240BAEA4468486EEEE4A /* check.riv */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		761780EF2CA45674006654EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EE2CA45674006654EF /* SceneDelegate.swift */; };
+		76DFAF956F6B4EB6B0F9290F /* tab_chat.svga in Resources */ = {isa = PBXBuildFile; fileRef = 5C9E3E71719C2AD9B9B4652F /* tab_chat.svga */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8A09BEC5C2CB4489A12FE5E5 /* shapes.riv in Resources */ = {isa = PBXBuildFile; fileRef = 824A37227822460EBBB05705 /* shapes.riv */; };
 		8C9A21760F884E3993212C98 /* icons.riv in Resources */ = {isa = PBXBuildFile; fileRef = 633C5047B761428292C0A127 /* icons.riv */; };
 		8E7F05B39AB54ED7B9D4076A /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6E9CF0354B5840858A0AE92F /* Inter-Regular.ttf */; };
 		92AE3D56AA595020E5110757 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		9A58ADCBE9DBA7A89A198B1F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CE2E1C64ED8C06A5D4454B /* Foundation.framework */; };
+		9E83A50342A3C1CB59710F3A /* tab_search.svga in Resources */ = {isa = PBXBuildFile; fileRef = 391D90876FBD0B06DC34F764 /* tab_search.svga */; };
 		CC4D54B0959E4666A4E4868C /* button.riv in Resources */ = {isa = PBXBuildFile; fileRef = 3808A2C819C54B5EBF5F6594 /* button.riv */; };
+		D84C9CE05B2276AC91D1BBFA /* tab_home.svga in Resources */ = {isa = PBXBuildFile; fileRef = 735D4DAE0416298B1623E20E /* tab_home.svga */; };
+		DA018439B506FE89B705593B /* tab_activity.svga in Resources */ = {isa = PBXBuildFile; fileRef = 19E028627758C15D4D6F3E1C /* tab_activity.svga */; };
+		E93609A7C8B6A5DAFE920977 /* tab_list.svga in Resources */ = {isa = PBXBuildFile; fileRef = D8C45E6EC22F31F5DE0302B8 /* tab_list.svga */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		B255666C0E74859483459B6E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
+			remoteInfo = CyltabbarExample;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		5C9E3E71719C2AD9B9B4652F /* tab_chat.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_chat.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_chat.svga"; sourceTree = SOURCE_ROOT; };
-		391D90876FBD0B06DC34F764 /* tab_search.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_search.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_search.svga"; sourceTree = SOURCE_ROOT; };
-		19E028627758C15D4D6F3E1C /* tab_activity.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_activity.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_activity.svga"; sourceTree = SOURCE_ROOT; };
-		D8C45E6EC22F31F5DE0302B8 /* tab_list.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_list.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_list.svga"; sourceTree = SOURCE_ROOT; };
-		C93E3AC9606624B280DD22D2 /* tab_profile.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_profile.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_profile.svga"; sourceTree = SOURCE_ROOT; };
-		735D4DAE0416298B1623E20E /* tab_home.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_home.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_home.svga"; sourceTree = SOURCE_ROOT; };
-		A2DEEDE5F74CC088715E7EB8 /* svga */ = {isa = PBXFileReference; lastKnownFileType = folder; name = svga; path = "../configurations/svga"; sourceTree = SOURCE_ROOT; };
+		00437F41DEEF552D79DEC405 /* Pods-CyltabbarExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CyltabbarExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-CyltabbarExampleTests/Pods-CyltabbarExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		07F82F282911F9CBAFDF3193 /* CyltabbarExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CyltabbarExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07F961A680F5B00A75B9A /* CyltabbarExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CyltabbarExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = CyltabbarExample/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = CyltabbarExample/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = CyltabbarExample/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		19E028627758C15D4D6F3E1C /* tab_activity.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_activity.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_activity.svga"; sourceTree = SOURCE_ROOT; };
+		256A27524845609A291876B8 /* libPods-CyltabbarExampleTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CyltabbarExampleTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D906181ECFC45AEA39758E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/Assets.xcassets"; sourceTree = SOURCE_ROOT; };
 		35F4240BAEA4468486EEEE4A /* check.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = check.riv; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets/check.riv"; sourceTree = SOURCE_ROOT; };
 		3808A2C819C54B5EBF5F6594 /* button.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = button.riv; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets/button.riv"; sourceTree = SOURCE_ROOT; };
+		391D90876FBD0B06DC34F764 /* tab_search.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_search.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_search.svga"; sourceTree = SOURCE_ROOT; };
 		3B4392A12AC88292D35C810B /* Pods-CyltabbarExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CyltabbarExample.debug.xcconfig"; path = "Target Support Files/Pods-CyltabbarExample/Pods-CyltabbarExample.debug.xcconfig"; sourceTree = "<group>"; };
 		3DF31ED183B14BA6B4E0FC37 /* confetti.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = confetti.riv; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets/confetti.riv"; sourceTree = SOURCE_ROOT; };
 		4CB1784706444803A5CCF29C /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-SemiBold.ttf"; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/Fonts/Inter-SemiBold.ttf"; sourceTree = SOURCE_ROOT; };
 		5611864B62B047AA94EDDA3E /* Poppins-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Poppins-Bold.ttf"; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/Fonts/Poppins-Bold.ttf"; sourceTree = SOURCE_ROOT; };
 		5709B34CF0A7D63546082F79 /* Pods-CyltabbarExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CyltabbarExample.release.xcconfig"; path = "Target Support Files/Pods-CyltabbarExample/Pods-CyltabbarExample.release.xcconfig"; sourceTree = "<group>"; };
+		5C9E3E71719C2AD9B9B4652F /* tab_chat.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_chat.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_chat.svga"; sourceTree = SOURCE_ROOT; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-CyltabbarExample.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CyltabbarExample.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5E1C0DE6B1D2E3F4A5B6C7D8 /* cyl_still_check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cyl_still_check.png; path = cyl_still_check.png; sourceTree = SOURCE_ROOT; };
+		60CE2E1C64ED8C06A5D4454B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		633C5047B761428292C0A127 /* icons.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = icons.riv; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets/icons.riv"; sourceTree = SOURCE_ROOT; };
 		6E9CF0354B5840858A0AE92F /* Inter-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Regular.ttf"; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/Fonts/Inter-Regular.ttf"; sourceTree = SOURCE_ROOT; };
+		735D4DAE0416298B1623E20E /* tab_home.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_home.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_home.svga"; sourceTree = SOURCE_ROOT; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = CyltabbarExample/AppDelegate.swift; sourceTree = "<group>"; };
 		761780EE2CA45674006654EF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = ../../example/ios/CyltabbarExample/SceneDelegate.swift; sourceTree = SOURCE_ROOT; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = CyltabbarExample/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		824A37227822460EBBB05705 /* shapes.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = shapes.riv; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets/shapes.riv"; sourceTree = SOURCE_ROOT; };
 		870A1328DB234BEDA6A64FB0 /* menu_button.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = menu_button.riv; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets/menu_button.riv"; sourceTree = SOURCE_ROOT; };
+		A2DEEDE5F74CC088715E7EB8 /* svga */ = {isa = PBXFileReference; lastKnownFileType = folder; name = svga; path = ../configurations/svga; sourceTree = SOURCE_ROOT; };
+		C273F8AE7236833CF0192CDF /* CyltabbarAnimationViewTests.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = CyltabbarAnimationViewTests.mm; sourceTree = "<group>"; };
+		C93E3AC9606624B280DD22D2 /* tab_profile.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_profile.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_profile.svga"; sourceTree = SOURCE_ROOT; };
+		D8C45E6EC22F31F5DE0302B8 /* tab_list.svga */ = {isa = PBXFileReference; lastKnownFileType = file; name = tab_list.svga; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/SVGAAssets/tab_list.svga"; sourceTree = SOURCE_ROOT; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		ED8AE85C2F1596D5ED645866 /* Pods-CyltabbarExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CyltabbarExampleTests.release.xcconfig"; path = "Target Support Files/Pods-CyltabbarExampleTests/Pods-CyltabbarExampleTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		108279752D76A2235F031604 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A58ADCBE9DBA7A89A198B1F /* Foundation.framework in Frameworks */,
+				19E541665DCEE199CFD0487D /* libPods-CyltabbarExampleTests.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		13B07F8C1A680F5B00A75B9A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -93,8 +123,19 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				5DCACB8F33CDC322A6C60F78 /* libPods-CyltabbarExample.a */,
+				92F8914EB5C7B364D33BD163 /* iOS */,
+				256A27524845609A291876B8 /* libPods-CyltabbarExampleTests.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		3272D4CCF9B1995E04D4EF43 /* CyltabbarExampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				C273F8AE7236833CF0192CDF /* CyltabbarAnimationViewTests.mm */,
+			);
+			name = CyltabbarExampleTests;
+			path = CyltabbarExampleTests;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -117,6 +158,7 @@
 				824A37227822460EBBB05705 /* shapes.riv */,
 				870A1328DB234BEDA6A64FB0 /* menu_button.riv */,
 				633C5047B761428292C0A127 /* icons.riv */,
+				5E1C0DE6B1D2E3F4A5B6C7D8 /* cyl_still_check.png */,
 				5C9E3E71719C2AD9B9B4652F /* tab_chat.svga */,
 				391D90876FBD0B06DC34F764 /* tab_search.svga */,
 				19E028627758C15D4D6F3E1C /* tab_activity.svga */,
@@ -129,6 +171,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				3272D4CCF9B1995E04D4EF43 /* CyltabbarExampleTests */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -139,8 +182,17 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* CyltabbarExample.app */,
+				07F82F282911F9CBAFDF3193 /* CyltabbarExampleTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		92F8914EB5C7B364D33BD163 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				60CE2E1C64ED8C06A5D4454B /* Foundation.framework */,
+			);
+			name = iOS;
 			sourceTree = "<group>";
 		};
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
@@ -148,6 +200,8 @@
 			children = (
 				3B4392A12AC88292D35C810B /* Pods-CyltabbarExample.debug.xcconfig */,
 				5709B34CF0A7D63546082F79 /* Pods-CyltabbarExample.release.xcconfig */,
+				ED8AE85C2F1596D5ED645866 /* Pods-CyltabbarExampleTests.release.xcconfig */,
+				00437F41DEEF552D79DEC405 /* Pods-CyltabbarExampleTests.debug.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -176,6 +230,25 @@
 			productReference = 13B07F961A680F5B00A75B9A /* CyltabbarExample.app */;
 			productType = "com.apple.product-type.application";
 		};
+		4230FA9DBF32B7A07619331A /* CyltabbarExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 990A588C746FAFEFB01C3C0D /* Build configuration list for PBXNativeTarget "CyltabbarExampleTests" */;
+			buildPhases = (
+				B09B62F801CF1E7275506C04 /* [CP] Check Pods Manifest.lock */,
+				7459DEFF5FD215BD39C7B07F /* Sources */,
+				108279752D76A2235F031604 /* Frameworks */,
+				3D5527E00E0CEFFD42EEB9D5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8C5B2A953D043FD09AE9D227 /* PBXTargetDependency */,
+			);
+			name = CyltabbarExampleTests;
+			productName = CyltabbarExampleTests;
+			productReference = 07F82F282911F9CBAFDF3193 /* CyltabbarExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -203,6 +276,7 @@
 			projectRoot = "";
 			targets = (
 				13B07F861A680F5B00A75B9A /* CyltabbarExample */,
+				4230FA9DBF32B7A07619331A /* CyltabbarExampleTests */,
 			);
 		};
 /* End PBXProject section */
@@ -229,9 +303,17 @@
 				8A09BEC5C2CB4489A12FE5E5 /* shapes.riv in Resources */,
 				0AC45C5AA8BB4D54BB7CD92E /* menu_button.riv in Resources */,
 				8C9A21760F884E3993212C98 /* icons.riv in Resources */,
+				5E1C0DE5B1D2E3F4A5B6C7D8 /* cyl_still_check.png in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				92AE3D56AA595020E5110757 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3D5527E00E0CEFFD42EEB9D5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -279,6 +361,28 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-CyltabbarExample/Pods-CyltabbarExample-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		B09B62F801CF1E7275506C04 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CyltabbarExampleTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -308,14 +412,18 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-CyltabbarExample/Pods-CyltabbarExample-resources.sh",
+				"${PODS_ROOT}/../../../../../CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle",
 				"${PODS_ROOT}/../../../../../CYLTabBarController/Resources/CYLTabBarController.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/Protobuf/Protobuf_Privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-cxxreact/React-cxxreact_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-timing/React-timing_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/RiveRuntime/runtime_ios_privacy.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLAnimatedItem.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CYLTabBarController.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Protobuf_Privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-cxxreact_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/React-timing_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/runtime_ios_privacy.bundle",
@@ -337,7 +445,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7459DEFF5FD215BD39C7B07F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C59B4DB197D53BB194DC95B /* CyltabbarAnimationViewTests.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8C5B2A953D043FD09AE9D227 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CyltabbarExample;
+			target = 13B07F861A680F5B00A75B9A /* CyltabbarExample */;
+			targetProxy = B255666C0E74859483459B6E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
@@ -542,6 +667,45 @@
 			};
 			name = Release;
 		};
+		B8EA83322C7106975662F50B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = ED8AE85C2F1596D5ED645866 /* Pods-CyltabbarExampleTests.release.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				PRODUCT_BUNDLE_IDENTIFIER = org.cocoapods.CyltabbarExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CyltabbarExample.app/CyltabbarExample";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BCBDAAFE8E66D9E90241CE1B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 00437F41DEEF552D79DEC405 /* Pods-CyltabbarExampleTests.debug.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				PRODUCT_BUNDLE_IDENTIFIER = org.cocoapods.CyltabbarExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CyltabbarExample.app/CyltabbarExample";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -559,6 +723,15 @@
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
 				83CBBA211A601CBA00E9B192 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		990A588C746FAFEFB01C3C0D /* Build configuration list for PBXNativeTarget "CyltabbarExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B8EA83322C7106975662F50B /* Release */,
+				BCBDAAFE8E66D9E90241CE1B /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

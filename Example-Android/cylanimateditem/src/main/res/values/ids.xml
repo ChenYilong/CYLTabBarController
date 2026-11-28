@@ -9,4 +9,8 @@
     <item name="cyl_svga_state" type="id" />
     <!-- [EN] Set while an animation view waits for its file (a download, a copy). [CN] 动画视图等待其文件（下载、复制）期间设置。 -->
     <item name="cyl_tab_bar_item_animation_loading" type="id" />
+    <!-- [EN] The reason, the resource and the once-only flag of a failed animation (CYLTabBarItemAnimationFailure). [CN] 动画失败的原因、资源名与仅报告一次的标记（CYLTabBarItemAnimationFailure）。 -->
+    <item name="cyl_tab_bar_item_animation_failure_reason" type="id" />
+    <item name="cyl_tab_bar_item_animation_resource" type="id" />
+    <item name="cyl_tab_bar_item_animation_missing_reported" type="id" />
 </resources>

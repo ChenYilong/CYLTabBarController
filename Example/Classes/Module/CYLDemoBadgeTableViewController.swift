@@ -26,8 +26,14 @@ class CYLDemoBadgeTableViewController: CYLBaseTableViewController {
     /// [EN] At least this many badge rows (every badge style has one). [CN] 至少这么多角标行（每种角标样式一行）。
     var minimumBadgeRowCount: Int { 15 }
 
-    /// [EN] Sections of this page after the demo sections. [CN] 演示 section 之后本页的 section 数。
-    var pageSectionCount: Int { 1 }
+    /// [EN] This page's own table sections after the tag list section (the badge samples are tags). [CN] TagList 一组之后本页自己的表格 section 数（角标样例是 Tag）。
+    var pageSectionCount: Int { 0 }
+
+    /// [EN] The demo sections are one tag list (`CYLDemoTagList`) in the first section of the table. [CN] 演示 section 是表格第一个 section 中的一个 TagList（`CYLDemoTagList`）。
+    final var tagListSectionCount: Int { 1 }
+
+    /// [EN] The demo sections' tag list. [CN] 演示 section 的 TagList。
+    private var demoTagList: CYLDemoTagList?
 
     init() {
         // [EN] Inset grouped sections with rounded corners, as in the Settings app. [CN] 与系统“设置”相同的圆角分组样式。
@@ -59,6 +65,21 @@ class CYLDemoBadgeTableViewController: CYLBaseTableViewController {
         // [EN] Pull to refresh, empty / no-network placeholders and the offline red bar.
         // [CN] 下拉刷新、无数据 / 无网络占位图与断网红条。
         CYLDemoPlaceholder.install(on: tableView, in: self, animation: placeholderAnimation, refresh: nil)
+        // [EN] The badge samples are tags: a scratch cell supplies each one's title and subtitle, a tap does what tapping the row did. [CN] 角标样例是 Tag：用临时 cell 提供标题与副标题，点击效果与点击原行相同。
+        let badgeSection = tagListSectionCount + pageSectionCount
+        demoTagList = CYLDemoTagList.install(on: tableView, host: self, badgeRowCount: max(minimumBadgeRowCount, UITableViewCell.cylBadgeStyleCount()),
+                                             badgeCell: { [weak self] row in
+            let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
+            self?.configure(cell, for: IndexPath(row: row, section: badgeSection))
+            return cell
+        }, didSelectBadgeRow: { [weak self] row in
+            self?.didSelectPageRow(at: IndexPath(row: row, section: badgeSection))
+        })
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        demoTagList?.reload()
     }
 
     /// [EN] Refreshes the list for a second. [CN] 刷新列表一秒钟。
@@ -93,33 +114,64 @@ class CYLDemoBadgeTableViewController: CYLBaseTableViewController {
     // MARK: - UITableViewDataSource / UITableViewDelegate
 
     override func numberOfSections(in _: UITableView) -> Int {
-        cyl_demoSectionCount() + pageSectionCount
+        tagListSectionCount + pageSectionCount
     }
 
     override func tableView(_ _: UITableView, titleForHeaderInSection section: Int) -> String? {
-        section < cyl_demoSectionCount() ? cyl_demoTitle(forSection: section) : cylDemoLocalizedString("角标")
+        nil
     }
 
     override func tableView(_ _: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section < cyl_demoSectionCount() {
-            return cyl_demoRowCount(inSection: section)
-        }
-        return max(minimumBadgeRowCount, UITableViewCell.cylBadgeStyleCount())
+        section < tagListSectionCount ? 1 : 0
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if indexPath.section < cyl_demoSectionCount() {
-            return cyl_demoCell(for: tableView, indexPath: indexPath)
+        if indexPath.section < tagListSectionCount, let demoTagList {
+            return demoTagList.cell
         }
         return pageCell(for: tableView, at: indexPath)
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.section < cyl_demoSectionCount() {
-            cyl_demoDidSelectRow(at: indexPath, in: tableView)
-            return
-        }
+        guard indexPath.section >= tagListSectionCount else { return }
         tableView.deselectRow(at: indexPath, animated: true)
         didSelectPageRow(at: indexPath)
+    }
+}
+
+/**
+ [EN] The Objective-C example's demo sections (`UIViewController (CYLDemoSections)`, implemented in `CYLFlatDesignTableViewController.m`) as the source of the
+      shared tag list (`Example-Shared/CYLDemoTagList.swift`), which Example-Swift-04 also compiles and so cannot name those Objective-C methods itself.
+ [CN] Objective-C 示例的演示 section（`UIViewController (CYLDemoSections)`，实现在 `CYLFlatDesignTableViewController.m`）作为共用 TagList
+      （`Example-Shared/CYLDemoTagList.swift`）的来源；Example-Swift-04 也编译该文件，因此它自己不能引用这些 Objective-C 方法。
+ */
+private final class CYLDemoObjCSectionSource: NSObject, CYLDemoTagSectionSource {
+    private weak var host: UIViewController?
+
+    init(host: UIViewController) {
+        self.host = host
+    }
+
+    func demoSectionCount() -> Int { host?.cyl_demoSectionCount() ?? 0 }
+    func demoRowCount(inSection section: Int) -> Int { host?.cyl_demoRowCount(inSection: section) ?? 0 }
+    func demoTitle(forSection section: Int) -> String? { host?.cyl_demoTitle(forSection: section) }
+    func demoCell(for tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell {
+        host?.cyl_demoCell(for: tableView, indexPath: indexPath) ?? UITableViewCell()
+    }
+    func demoDidSelectRow(at indexPath: IndexPath, in tableView: UITableView) {
+        host?.cyl_demoDidSelectRow(at: indexPath, in: tableView)
+    }
+}
+
+extension CYLDemoTagList {
+    /// [EN] The Objective-C entry (`CYLFlatDesignTableViewController.m`): the host's `CYLDemoSections` are the source. [CN] Objective-C 入口（`CYLFlatDesignTableViewController.m`）：宿主的 `CYLDemoSections` 为来源。
+    @discardableResult
+    @objc(installOnTableView:host:badgeRowCount:badgeCell:didSelectBadgeRow:)
+    static func install(on tableView: UITableView, host: UIViewController, badgeRowCount: Int, badgeCell: @escaping (Int) -> UITableViewCell,
+                        didSelectBadgeRow: @escaping (Int) -> Void) -> CYLDemoTagList {
+        let source = CYLDemoObjCSectionSource(host: host)
+        let list = install(on: tableView, host: host, source: source, badgeRowCount: badgeRowCount, badgeCell: badgeCell, didSelectBadgeRow: didSelectBadgeRow)
+        list.ownedSource = source
+        return list
     }
 }

@@ -36,7 +36,9 @@
 
 #import <UIKit/UIKit.h>
 // FIX: issue #535 — shared with Core through CYLUtils. 通过 CYLUtils 与 Core 共用。
-#if __has_include("../CYLUtils/CYLUtils.h")
+#if __has_include(<CYLUtilsKit/CYLUtils.h>)
+#import <CYLUtilsKit/CYLUtils.h>
+#elif __has_include("../CYLUtils/CYLUtils.h")
 #import "../CYLUtils/CYLUtils.h"
 #else
 #import "CYLUtils.h"

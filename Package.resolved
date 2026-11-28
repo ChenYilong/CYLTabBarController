@@ -1,6 +1,14 @@
 {
   "pins" : [
     {
+      "identity" : "cyldeallocblockexecutor",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ChenYilong/CYLDeallocBlockExecutor.git",
+      "state" : {
+        "revision" : "4276a6dab5a428ccc3a5f3f347eab991881fb97c"
+      }
+    },
+    {
       "identity" : "lottie-spm",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/airbnb/lottie-spm.git",

@@ -30,10 +30,13 @@
     <string name="cyl_demo_6a69211e0f">हर दृश्य सार्वजनिक API से बना एक टैब बार है: स्टाइल, एनिमेशन, बैज, Lottie और नया टैब API</string>
     <string name="cyl_demo_7efc907fe3">एनिमेटेड आइटम</string>
     <string name="cyl_demo_9244b5dc65">अकेला एनिमेटेड आइकन + शीर्षक कंपोनेंट: GIF, Lottie, गायब फ़ाइल, एक्सेसरी और खींचना</string>
+    <string name="cyl_demo_5dbde9a698">सामग्री इनसेट</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset सेट नहीं: एक फ़्लैट और एक Liquid Glass आइटम, सामान्य और चयनित</string>
     <string name="cyl_demo_185d8ef0ae">बैज</string>
     <string name="cyl_demo_2db1db0706">प्लेबैक</string>
     <string name="cyl_demo_34bffc9c7a">टैब आइकन एनिमेशन: सभी चलाएँ, गति, लूप</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">गति %@, लूप %@; कंट्रोल के लिए टैप करें</string>
+    <string name="cyl_demo_2f63c1fff7">टैब बार कंट्रोलर को रिलीज़ करें (3 सेकंड में)</string>
     <string name="cyl_demo_a4fe65264e">भाषा</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">वर्तमान: %@</string>
     <string name="cyl_demo_bbc5e661e1">सिस्टम</string>
@@ -130,6 +133,10 @@
     <string name="cyl_demo_7108183f18">अनुरोध रद्द किया गया</string>
     <string name="cyl_demo_5fbceaee5f">बिना URL का अनुरोध</string>
     <string name="cyl_demo_4334569b3d">एक HTML पेज (नेटवर्क)</string>
+    <string name="cyl_demo_e2917c5f0d">फ़्लैट: itemContentHorizontalInset सेट नहीं</string>
+    <string name="cyl_demo_a7248eeb45">सामान्य</string>
+    <string name="cyl_demo_57fd7a0cf3">चुना गया</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset सेट नहीं</string>
     <string name="cyl_demo_d84eebada9">फ़ोटो</string>
     <string name="cyl_demo_d47d7cb0e4">अधिक</string>
     <string name="cyl_demo_0e35f6e974">बुनियादी</string>
@@ -320,6 +327,7 @@
     <string name="cyl_demo_12e7b8220d">सभी चलाएँ</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">गति: %@</string>
     <string name="cyl_demo_f2f6a01889">लूप</string>
+    <string name="cyl_demo_08078d674a">टैब बार कंट्रोलर रिलीज़ हो गया</string>
     <string name="cyl_demo_44a57b22e0">अलर्ट</string>
     <string name="cyl_demo_a127ceb079">एक्शन शीट</string>
     <string name="cyl_demo_9329618118">पेज शीट</string>
@@ -338,6 +346,10 @@
     <string name="cyl_demo_1698b890f9">हर स्वचालित पंक्ति को एक के बाद एक चलाता है।</string>
     <string name="cyl_demo_afa158bdc8">वर्तमान context के ऊपर</string>
     <string name="cyl_demo_0add8377e7" formatted="false">\"%@\" को देर तक दबाया</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">dealloc कॉलबैक चले: %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">dealloc कॉलबैक चले: %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">टियरडाउन: %d सेकंड में रिलीज़</string>
+    <string name="cyl_demo_c0fd658b68">टियरडाउन: चलाया नहीं गया</string>
     <string name="cyl_demo_d4f455fa45">खोलें: दो टैब बार, एक पेज ID</string>
     <string name="cyl_demo_5b88804382" formatted="false">टैब बार %@ · पेज ID \"%@\"</string>
 </resources>

@@ -108,14 +108,15 @@ extension CGFloat {
      * [CN] `MAXFLOAT`，最上层的 `zPosition`（与 Objective-C 相同）：`CGFloat.greatestFiniteMagnitude` 是 Double 的最大值，CoreAnimation
      *      不接受（"zPosition should be within (-FLT_MAX, FLT_MAX) range"）。
      */
-    static let cylTopZPosition = CGFloat(Float.greatestFiniteMagnitude)
+    public static let cylTopZPosition = CGFloat(Float.greatestFiniteMagnitude)
 }
 
-enum CYLUtilsKeys {
-    static let isPlaceholder = CYLUtilsKeys.key("cyl_isPlaceholder")
-    static let respondsOutsideSuperviewBounds = CYLUtilsKeys.key("cyl_respondsOutsideSuperviewBounds")
+// [EN] Public since the pod split (docs/Animated-Item-Badge.md, the cross-module audit): Core and CYLBadge read these keys from another module. [CN] 拆 pod 之后改为 public（docs/Animated-Item-Badge.md，跨模块审计）：Core 与 CYLBadge 在另一个模块中读取这些键。
+public enum CYLUtilsKeys {
+    public static let isPlaceholder = CYLUtilsKeys.key("cyl_isPlaceholder")
+    public static let respondsOutsideSuperviewBounds = CYLUtilsKeys.key("cyl_respondsOutsideSuperviewBounds")
 
-    static func key(_ selectorName: String) -> UnsafeRawPointer {
+    public static func key(_ selectorName: String) -> UnsafeRawPointer {
         unsafeBitCast(sel_registerName(selectorName), to: UnsafeRawPointer.self)
     }
 }

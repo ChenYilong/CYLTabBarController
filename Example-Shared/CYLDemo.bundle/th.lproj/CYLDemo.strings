@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a บน Android: แอปไม่สามารถส่งเหตุการณ์ระบบนี้ได้";
 "Runs every automatic row, one after the other." = "เรียกใช้ทุกแถวอัตโนมัติทีละแถว";
 "Tab bar %@ · page ID \"%@\"" = "แท็บบาร์ %@ · ID หน้า \"%@\"";
+"Animated item engine API" = "API เอนจินของรายการแอนิเมชัน";
+"Stop at 50%" = "หยุดที่ 50%";
+"Show image when ended" = "แสดงรูปภาพเมื่อจบ";
+"Restart token: %@" = "โทเคนเริ่มใหม่: %@";
+"End callback: %@" = "คอลแบ็กเมื่อจบ: %@";
+"none yet" = "ยังไม่มี";
+"Host-driven playback (drivesAnimationPlayback = false)" = "โฮสต์ควบคุมการเล่น (drivesAnimationPlayback = false)";
+"Engine API" = "API เอนจิน";
+"Pause while scrolling" = "หยุดชั่วคราวขณะเลื่อน";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "ปล่อย Tab Bar Controller (ใน 3 วินาที)";
+"teardown: not run" = "การปล่อย: ยังไม่ได้ทำงาน";
+"teardown: releasing in %d s" = "การปล่อย: ใน %d วินาที";
+"dealloc callbacks ran: %d / %d" = "คอลแบ็ก dealloc ที่ทำงานแล้ว: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "คอลแบ็ก dealloc ที่ทำงานแล้ว: %d / %d (%@)";
+"Tab bar controller released" = "ปล่อย Tab Bar Controller แล้ว";
+"bridge: pause %d, resume %d" = "บริดจ์: หยุดชั่วคราว %d, เล่นต่อ %d";
+"last event: -" = "เหตุการณ์ล่าสุด: -";
+"last event: %@" = "เหตุการณ์ล่าสุด: %@";
+"Content inset" = "ระยะขอบเนื้อหา";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset ไม่ได้ตั้งค่า: รายการแบบแบนและรายการ Liquid Glass ทั้งสถานะปกติและที่เลือก";
+"Flat: itemContentHorizontalInset unset" = "แบบแบน: itemContentHorizontalInset ไม่ได้ตั้งค่า";
+"Normal" = "ปกติ";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset ไม่ได้ตั้งค่า";

@@ -15,6 +15,9 @@
 
 #if canImport(libpag)
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 import libpag
 
 /**
@@ -28,10 +31,24 @@ public final class CYLPAGTabBarItemAnimationPlayer: CYLTabBarItemAnimationBasePl
         animationView as? PAGView
     }
 
+    /// [EN] Tells `onEnded` when PAG reports the end of the animation (after its repeat count; never with `loops` on).
+    ///      Added to the view on the first `play()`, the only moment an end can follow. [CN] PAG 报告动画结束时（重复次数用完后；`loops`
+    ///      开启时从不）通知 `onEnded`。在第一次 `play()` 时加到视图上，结束只可能出现在此之后。
+    private var endObserver: CYLPAGPassObserver?
+
     public func play() {
+        if endObserver == nil, let pagView {
+            let observer = CYLPAGPassObserver { [weak self] in self?.notifyPlaybackEnded() }
+            pagView.add(observer)
+            endObserver = observer
+        }
         pagView?.stop()
         pagView?.setProgress(0)
         pagView?.play()
+    }
+
+    public var isPlaying: Bool {
+        pagView?.isPlaying() ?? false
     }
 
     public func showLastFrame() {
@@ -60,6 +77,22 @@ public final class CYLPAGTabBarItemAnimationPlayer: CYLTabBarItemAnimationBasePl
     public var loops: Bool {
         get { pagView?.repeatCount() == 0 }
         set { pagView?.setRepeatCount(newValue ? 0 : 1) }
+    }
+}
+
+/**
+ * [EN] Receives the end of a PAG animation for `CYLPAGTabBarItemAnimationPlayer` (not public: the player's header stays free of libpag).
+ * [CN] 为 `CYLPAGTabBarItemAnimationPlayer` 接收 PAG 动画的结束（非 public：播放器的头文件不引入 libpag）。
+ */
+private final class CYLPAGPassObserver: NSObject, PAGViewListener {
+    private let didEnd: () -> Void
+
+    init(didEnd: @escaping () -> Void) {
+        self.didEnd = didEnd
+    }
+
+    func onAnimationEnd(_: PAGView!) {
+        didEnd()
     }
 }
 

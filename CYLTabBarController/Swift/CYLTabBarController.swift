@@ -6,6 +6,19 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
+#if canImport(CYLAnimatedItem)
+import CYLAnimatedItem
+#endif
+#if canImport(CYLAnimatedItemViews)
+// [EN] SwiftPM: CYLAnimatedItemRenderingMode is in the views target. [CN] SwiftPM：CYLAnimatedItemRenderingMode 位于 views target。
+import CYLAnimatedItemViews
+#endif
 
 /// [EN] The block run at the end of `-viewDidLayoutSubviews`. [CN] 在 `-viewDidLayoutSubviews` 末尾执行的 block。
 public typealias CYLViewDidLayoutSubViewsBlock = (CYLTabBarController) -> Void
@@ -98,6 +111,23 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
         }
     }
 
+    /**
+     [EN] The bar-wide default rendering mode of the animated tab icons (flat design, Liquid Glass and classic tab bars). It applies only to a tab that
+          sets nothing itself: a per-tab `animationTint` or URL `tint` wins, then the tab's own `renderingMode` (the URL option), then this, then
+          `automatic`. `.alwaysTemplate` tints with the tab's icon color (an opaque tint turns multi-color art into a one-color silhouette);
+          `.alwaysOriginal` never tints; `.automatic` (default) tints only files detected as one-color (Lottie JSON, GIF); multi-color files, Rive, PAG and
+          SVGA keep their own colors. Static images are not affected (`CYLTabBarControllerIconRenderingMode`).
+     [CN] 动画 Tab 图标（扁平样式、液态玻璃与经典 TabBar）的栏级默认渲染模式。只对自身没有任何设置的 Tab 生效：按 Tab 的 `animationTint` 或 URL `tint`
+          优先，其次是 Tab 自己的 `renderingMode`（URL 选项），然后是本属性，最后是 `automatic`。`.alwaysTemplate` 用 Tab 的图标颜色着色（不透明着色会把
+          多色图形变成单色剪影）；`.alwaysOriginal` 从不着色；`.automatic`（默认）只给检测为单色的文件（Lottie JSON、GIF）着色；多色文件、Rive、PAG 与
+          SVGA 保持自己的颜色。静态图片不受影响（见 `CYLTabBarControllerIconRenderingMode`）。
+     */
+    @objc open var tabBarItemAnimationRenderingMode: CYLAnimatedItemRenderingMode = .automatic {
+        didSet {
+            if oldValue != tabBarItemAnimationRenderingMode { cylApplyTabBarItemAnimationRenderingMode() }
+        }
+    }
+
     /// [EN] The deprecated speed storage. [CN] 已废弃的速度存储。
     private var storedLottieAnimationSpeed: CGFloat = 0
 
@@ -145,6 +175,9 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     /// [EN] Backing flag of `automaticallyAdjustsImageOnlyTabs`, negated so that the default (false) means true (issues #257, #522). [CN] `automaticallyAdjustsImageOnlyTabs` 的存储标记，取反存储。
     @objc(cyl_imageOnlyTabsAdjustmentDisabled) var imageOnlyTabsAdjustmentDisabled = false
     private var invokeOnceViewDidLayoutSubViewsBlockStorage = false
+    /// [EN] The "once" mode the layout block was registered with in CYLDeallocBlockExecutor; nil before the first layout.
+    /// [CN] 布局 block 在 CYLDeallocBlockExecutor 中注册时的“只执行一次”模式；首次布局前为 nil。
+    var cylLayoutBlockRegisteredInvokeOnce: Bool?
     /// [EN] Getter `shouldInvokeOnce…`, setter `setInvokeOnce…:` (the selectors the Objective-C property had). [CN] getter 为 `shouldInvokeOnce…`、setter 为 `setInvokeOnce…:`（与原 Objective-C 属性的 selector 相同）。
     @objc(shouldInvokeOnceViewDidLayoutSubViewsBlock) var invokeOnceViewDidLayoutSubViewsBlock: Bool {
         @objc(shouldInvokeOnceViewDidLayoutSubViewsBlock) get { invokeOnceViewDidLayoutSubViewsBlockStorage }
@@ -370,23 +403,27 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     }
 
     open override func viewWillAppear(_ animated: Bool) {
+        // [EN] The core's work is the keyed `.afterSuper` block `cyl.core.viewWillAppear` (CYLDeallocBlockExecutor), fired inside `super`. [CN] 核心的工作是带 key 的 `.afterSuper` block `cyl.core.viewWillAppear`（CYLDeallocBlockExecutor），在 `super` 内触发。
+        cylRegisterViewWillAppearCallback()
         super.viewWillAppear(animated)
-        cylViewWillAppear(animated)
     }
 
     open override func viewDidAppear(_ animated: Bool) {
+        // [EN] The core's work is the keyed `.afterSuper` block `cyl.core.viewDidAppear` (CYLDeallocBlockExecutor), fired inside `super`. [CN] 核心的工作是带 key 的 `.afterSuper` block `cyl.core.viewDidAppear`（CYLDeallocBlockExecutor），在 `super` 内触发。
+        cylRegisterViewDidAppearCallback()
         super.viewDidAppear(animated)
-        cylViewDidAppear(animated)
     }
 
     open override func viewWillDisappear(_ animated: Bool) {
+        // [EN] The core's work is the keyed `.afterSuper` block `cyl.core.viewWillDisappear` (CYLDeallocBlockExecutor), fired inside `super`. [CN] 核心的工作是带 key 的 `.afterSuper` block `cyl.core.viewWillDisappear`（CYLDeallocBlockExecutor），在 `super` 内触发。
+        cylRegisterViewWillDisappearCallback()
         super.viewWillDisappear(animated)
-        cylViewWillDisappear(animated)
     }
 
     open override func viewDidDisappear(_ animated: Bool) {
+        // [EN] The core's work is the keyed `.afterSuper` block `cyl.core.viewDidDisappear` (CYLDeallocBlockExecutor), fired inside `super`. [CN] 核心的工作是带 key 的 `.afterSuper` block `cyl.core.viewDidDisappear`（CYLDeallocBlockExecutor），在 `super` 内触发。
+        cylRegisterViewDidDisappearCallback()
         super.viewDidDisappear(animated)
-        cylViewDidDisappear(animated)
     }
 
     open override func viewDidLayoutSubviews() {
@@ -400,10 +437,12 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
     }
 
     open override func didReceiveMemoryWarning() {
+        // [EN] The unloading is the keyed `.afterSuper` block `cyl.core.memoryWarning` of CYLDeallocBlockExecutor, fired by the
+        //      library's hook inside `super`: a real warning and `cylSimulateMemoryWarning` (which calls this method) both run it.
+        // [CN] 卸载逻辑是 CYLDeallocBlockExecutor 中带 key 的 `.afterSuper` block `cyl.core.memoryWarning`，由库的 hook 在 `super` 内触发：
+        //      真实的内存警告与 `cylSimulateMemoryWarning`（调用本方法）都会执行它。
+        cylRegisterMemoryWarningCallback()
         super.didReceiveMemoryWarning()
-        if unloadsUnselectedViewsOnMemoryWarning {
-            unloadViewsOfUnselectedViewControllers()
-        }
     }
 
     open override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?,
@@ -507,7 +546,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
 
     @objc open func hasPlusButton() -> Bool { cylContextPlusButton() != nil }
 
-    @objc(cyl_contextPlusButton) func cylContextPlusButton() -> CYLPlusButton? { CYLPlusButton.cylPlusButton(forOwner: self) as? CYLPlusButton }
+    @objc(cyl_contextPlusButton) func cylContextPlusButton() -> CYLPlusButton? { CYLPlusButton.cylPlusButton(forOwner: self) }
 
     @objc(cyl_contextPlusChildViewController) func cylContextPlusChildViewController() -> UIViewController? {
         CYLPlusButton.plusChildViewController(forOwner: self)
@@ -525,7 +564,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
 
     open override var childForStatusBarStyle: UIViewController? { cylChildViewControllerForStatusBarStyle() }
     open override var childForStatusBarHidden: UIViewController? { childForStatusBarStyle }
-    open override var childForScreenEdgesDeferringSystemGestures: UIViewController? { selectedViewController }
+    open override var childForScreenEdgesDeferringSystemGestures: UIViewController? { cylDisplayedViewController() }
     open override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
         childForStatusBarStyle?.preferredStatusBarUpdateAnimation ?? super.preferredStatusBarUpdateAnimation
     }
@@ -536,7 +575,7 @@ open class CYLTabBarController: UITabBarController, CYLTabBarControllerDelegate,
         if let presented = cylPresentedViewControllerForOrientation() {
             return presented.shouldAutorotate
         }
-        var controller = selectedViewController
+        var controller = cylDisplayedViewController()
         if let navigationController = controller as? UINavigationController {
             controller = navigationController.topViewController
         }

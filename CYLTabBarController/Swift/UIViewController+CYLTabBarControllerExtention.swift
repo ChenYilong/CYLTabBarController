@@ -8,6 +8,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] `UIViewController (CYLTabBarControllerExtention)` and `(CYLTabBarControllerExtentionDeprecated)`: what a page knows
  *      about its tab (index, identifier, tab button), selecting another tab with its stack popped, pushing or popping to a

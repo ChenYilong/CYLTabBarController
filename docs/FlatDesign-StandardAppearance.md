@@ -113,7 +113,7 @@ tabBarController.tabBar.standardAppearance = appearance
 | `selectionIndicatorTintColor` | 选中指示图的着色 | Tints the selection indicator |
 | `stackedItemPositioning` | `.centered` 时 Tab 居中排列；`.fill` / `.automatic` 铺满宽度 | `.centered` centers the tabs; `.fill` / `.automatic` fill the width |
 | `stackedItemWidth` / `stackedItemSpacing` | 居中排列时的 Tab 宽度 / 间距；放不下时回退为铺满 | Tab width / spacing when centered; falls back to filling when they do not fit |
-| `stackedLayoutAppearance.{normal, selected, disabled}.titleTextAttributes` | 标题字体、颜色等，覆盖 item 自身的设置 | Title font, color and other attributes; they override the item's own |
+| `stackedLayoutAppearance.{normal, selected, disabled}.titleTextAttributes` | 标题字体、颜色等。字体等属性覆盖 item 自身的设置；前景色例外：item 为当前状态设置的颜色优先（2026-11-26，见 [Animated-Item.md](Animated-Item.md) 的 Tab 着色优先级） | Title font, color and other attributes. The font and other attributes override the item's own; the foreground color is the exception: the color the item sets for the current state wins (2026-11-26, see the tab tint priority in [Animated-Item.md](Animated-Item.md)) |
 | `… .iconColor` | 图标颜色（模板图片） | Icon color (template images) |
 | `… .titlePositionAdjustment` | Tab 没有自身偏移时使用；`CYLTabBarController.titlePositionAdjustment` 优先，与系统 TabBar 一致 | Used when the tab has no offset of its own; `CYLTabBarController.titlePositionAdjustment` wins, as on the system tab bar |
 | `… .badgeBackgroundColor` | 角标背景色 | Badge background color |

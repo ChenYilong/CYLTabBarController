@@ -95,6 +95,7 @@ final Future<List<CYLDemoSection>> demoSections = rootBundle
             ),
         ]),
       );
+      sections.first.rows.insert(0, CYLDemoRow.custom(id: 'badgeTags', title: 'CYLAnimationView badges', subtitle: 'badgeValue · badgeAttributes'));
       return sections;
     });
 
@@ -122,6 +123,7 @@ class CYLDemoList extends StatelessWidget {
     required this.badgeSubtitle,
     required this.onRow,
     required this.onSwitch,
+    this.onScrollingChanged,
   });
 
   final CYLDemoColors colors;
@@ -129,6 +131,10 @@ class CYLDemoList extends StatelessWidget {
   final Map<String, String> values;
   final Map<String, bool> switches;
   final String currentSkin;
+
+  /// The user starts or stops scrolling: the example pauses the tab icon animations meanwhile.
+  /// 用户开始或停止滚动：示例据此暂停 Tab 图标动画。
+  final ValueChanged<bool>? onScrollingChanged;
 
   /// For example "Home (Liquid) CYLTabBarController on iOS 26.5". 例如「Home (Liquid) CYLTabBarController on iOS 26.5」。
   final String badgeSubtitle;
@@ -447,7 +453,16 @@ class CYLDemoList extends StatelessWidget {
       final sections = snapshot.data ?? const [];
       return ColoredBox(
         color: colors.background,
-        child: ListView(
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (notification) {
+            if (notification is ScrollStartNotification && notification.dragDetails != null) {
+              onScrollingChanged?.call(true);
+            } else if (notification is ScrollEndNotification) {
+              onScrollingChanged?.call(false);
+            }
+            return false;
+          },
+          child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
           children: [
             for (final section in sections) ...[
@@ -466,6 +481,7 @@ class CYLDemoList extends StatelessWidget {
                 _row(row, index, section.rows.length),
             ],
           ],
+        ),
         ),
       );
     },

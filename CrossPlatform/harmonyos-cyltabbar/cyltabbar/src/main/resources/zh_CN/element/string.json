@@ -45,6 +45,10 @@
       "value": "闪烁 ×3"
     },
     {
+      "name": "cyl_l10n_9594eec95be7",
+      "value": "蓝色"
+    },
+    {
       "name": "cyl_l10n_070554647306",
       "value": "边框"
     },
@@ -95,6 +99,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem 居中显示"
+    },
+    {
+      "name": "cyl_l10n_5adb0dc263ad",
+      "value": "颜色：%@"
     },
     {
       "name": "cyl_l10n_f6da70b584ae",
@@ -281,12 +289,20 @@
       "value": "Push 一个 TabBarController，其加号按钮图片 2 秒后改变；布局不应移动"
     },
     {
+      "name": "cyl_l10n_ee38e4d5dd68",
+      "value": "红色"
+    },
+    {
       "name": "cyl_l10n_c27618b1aa9d",
       "value": "红点"
     },
     {
       "name": "cyl_l10n_255c00a63f9d",
       "value": "红点半径"
+    },
+    {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "释放 TabBarController（3 秒后）"
     },
     {
       "name": "cyl_l10n_56e8fac7007d",
@@ -303,6 +319,10 @@
     {
       "name": "cyl_l10n_9d01c837b4bc",
       "value": "Rive Tab 图标：house.riv（数字输入 Rooms）"
+    },
+    {
+      "name": "cyl_l10n_bdd66081cc94",
+      "value": "Rive 颜色"
     },
     {
       "name": "cyl_l10n_f0c792c049bc",
@@ -373,6 +393,10 @@
       "value": "动画结束后显示静态图片"
     },
     {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "TabBarController 已释放"
+    },
+    {
       "name": "cyl_l10n_fee4a478923f",
       "value": "Tab 交互"
     },
@@ -413,6 +437,10 @@
       "value": "TabBar 外观"
     },
     {
+      "name": "cyl_l10n_abf44ef609ef",
+      "value": "文件自身的颜色"
+    },
+    {
       "name": "cyl_l10n_7c4aecba91c3",
       "value": "本页面 Tab 的图片来自应用的 rawfile（即 iOS 的资源 bundle）；再次点击恢复"
     },
@@ -427,6 +455,10 @@
     {
       "name": "cyl_l10n_a4d0d101d6a3",
       "value": "左上角"
+    },
+    {
+      "name": "cyl_l10n_e38d6ac40a62",
+      "value": "applyColors：数据绑定 .riv 的视图模型颜色属性"
     },
     {
       "name": "cyl_l10n_2306a585ae00",
@@ -469,6 +501,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@；点击选择，然后滚动本列表"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "dealloc 回调已执行：%d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "dealloc 回调已执行：%d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar：页签胶囊、搜索球与音乐条悬浮在彩色内容之上；滚动即可缩小"
     },
@@ -495,6 +535,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@；隐藏后 2 秒自动恢复"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "销毁：未执行"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "销毁：%d 秒后释放"
     },
     {
       "name": "cyl_l10n_2a0608059131",

@@ -25,6 +25,8 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/FlatDesign-StandardAppearance.md
 //   - Automatic centering of image-only tabs / 纯图标 Tab 的自动居中
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Image-Only-Tabs.md
+//   - The lifecycle library CYLDeallocBlockExecutor / 生命周期库 CYLDeallocBlockExecutor
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Lifecycle-Library.md
 //   - Liquid Glass Robustness / 液态玻璃的健壮性改进
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Liquid-Glass-Robustness.md
 //   - Tabs That Need Login / 需要登录的 Tab
@@ -99,6 +101,14 @@
 #import "CYLUtils/CYLUtils.h"
 #else
 #import "CYLUtils.h"
+#endif
+// [EN] D7: the animation keys moved here from `CYLUtils.h` (CYLUtils sees nothing above it). [CN] D7：动画 key 从 `CYLUtils.h` 移到这里（CYLUtils 看不到上面的任何层）。
+#if __has_feature(modules) && __has_include(<CYLAnimatedItem/CYLAnimatedItem-umbrella.h>)
+#pragma clang module import CYLAnimatedItem
+#elif __has_include(<CYLAnimatedItem/CYLAnimationKeys.h>)
+#import <CYLAnimatedItem/CYLAnimationKeys.h>
+#elif __has_include("CYLAnimationKeys.h")
+#import "CYLAnimationKeys.h"
 #endif
 // [CN] 动画视图协议（Swift 迁移后为公开头文件）：框架的伞头文件需要包含它，否则 Xcode 警告 "umbrella header ... does not
 //      include header"；CocoaPods 不带动画子模块时没有该文件。

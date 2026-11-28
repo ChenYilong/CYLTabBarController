@@ -89,14 +89,14 @@
       </view>
       <text class="cyl-glass-section-title" aria-role="heading">{{texts['Tap animations']}}</text>
       <view class="cyl-glass-card cyl-glass-items">
-        <view wx:for="{{tapAnimations}}" wx:key="*this" class="cyl-glass-item-cell" bindtap="cyl_playTapAnimation" data-name="{{item}}" aria-role="button" aria-label="{{item}}">
+        <view wx:for="{{tapAnimations}}" wx:key="*this" class="cyl-glass-item-cell" bindtap="cylPlayTapAnimation" data-name="{{item}}" aria-role="button" aria-label="{{item}}">
           <cyl-tab-bar-item class="cyl-glass-item" title="{{item}}" image="/shared/skins/2.1.0/light/home@3x.png" selected-image="/shared/skins/2.1.0/light/home_selected@3x.png" selected="{{true}}" item-style="{{itemStyle}}" animation-class="{{playing[item]}}" animation-duration="{{500}}" />
         </view>
       </view>
       <text class="cyl-glass-section-title" aria-role="heading">{{texts['Item styles']}}</text>
       <view class="cyl-glass-card cyl-glass-items">
-        <view class="cyl-glass-item-cell" bindtap="cyl_setItemStyle" data-style="flat" aria-role="button" aria-selected="{{itemStyle === 'flat'}}" aria-label="flat"><cyl-tab-bar-item class="cyl-glass-item" title="flat" image="/shared/skins/2.1.0/light/discover@3x.png" selected-image="/shared/skins/2.1.0/light/discover_selected@3x.png" selected="{{true}}" item-style="flat" /></view>
-        <view class="cyl-glass-item-cell" bindtap="cyl_setItemStyle" data-style="liquidGlass" aria-role="button" aria-selected="{{itemStyle === 'liquidGlass'}}" aria-label="liquidGlass"><cyl-tab-bar-item class="cyl-glass-item" title="liquidGlass" image="/shared/skins/2.1.0/light/discover@3x.png" selected-image="/shared/skins/2.1.0/light/discover_selected@3x.png" selected="{{true}}" item-style="liquidGlass" /></view>
+        <view class="cyl-glass-item-cell" bindtap="cylSetItemStyle" data-style="flat" aria-role="button" aria-selected="{{itemStyle === 'flat'}}" aria-label="flat"><cyl-tab-bar-item class="cyl-glass-item" title="flat" image="/shared/skins/2.1.0/light/discover@3x.png" selected-image="/shared/skins/2.1.0/light/discover_selected@3x.png" selected="{{true}}" item-style="flat" /></view>
+        <view class="cyl-glass-item-cell" bindtap="cylSetItemStyle" data-style="liquidGlass" aria-role="button" aria-selected="{{itemStyle === 'liquidGlass'}}" aria-label="liquidGlass"><cyl-tab-bar-item class="cyl-glass-item" title="liquidGlass" image="/shared/skins/2.1.0/light/discover@3x.png" selected-image="/shared/skins/2.1.0/light/discover_selected@3x.png" selected="{{true}}" item-style="liquidGlass" /></view>
       </view>
     </view>
   </scroll-view>

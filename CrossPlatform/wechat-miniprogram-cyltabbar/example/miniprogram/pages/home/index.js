@@ -10,6 +10,7 @@
  *      行会修改 App 的 TabBar 状态；其他行提示仅 iOS 示例提供。
  */
 const cylTabPage = require('../../utils/cyl_tab_page');
+const { cylPageScrolled } = require('../../utils/cyl_scroll_pause');
 const { cylLanguage, cylMoreTable, cylSetLanguage, cylChosen, cylSystemLanguage } = require('../../utils/cyl_demo_localization');
 
 /**
@@ -26,6 +27,8 @@ function cylFlaggedName(language) {
 const { cylDemoConfiguration } = require('../../utils/cyl_demo_configuration');
 const cylDemoList = require('../../shared/demo_list');
 const { cylHomeAction, CYL_TAP_STEPS, CYL_SOUND_STEPS } = require('../../utils/cyl_home_actions');
+const cylTeardown = require('../../utils/cyl_demo_teardown');
+const { cylSectionIsTags, cylTagConfiguration } = require('../../utils/cyl_demo_tags');
 const { CYL_DEMO_SKINS, cylEffectiveSkin, cylSkinSummary, cylSkinPreview } = require('../../utils/cyl_demo_skins');
 
 // [EN] UIColor.cyl_randomColor. [CN] 随机颜色。
@@ -90,7 +93,7 @@ Component({
       // [EN] -[CYLHomeViewController viewDidLoad]: dots in random colors on "Flat Design" and "Liquid Glass".
       // [CN] 「Flat Design」与「Liquid Glass」按钮上的随机颜色红点。
       this.setData({ nav: Object.assign(cylNavigationFrame(), { dots: [cylRandomColor(), cylRandomColor()] }) });
-      this.cylUnsubscribe = getApp().cyl_subscribe(() => this.cyl_render());
+      this.cylUnsubscribe = getApp().cyl_subscribe(() => this.cylRender());
     },
     detached() {
       if (this.cylUnsubscribe) {
@@ -100,7 +103,7 @@ Component({
   },
   pageLifetimes: {
     show() {
-      this.cyl_render();
+      this.cylRender();
     },
   },
   methods: {
@@ -142,12 +145,29 @@ Component({
       };
     },
 
+    /**
+     * [EN] The "Release the tab bar controller (in 3 s)" row: arms a dealloc callback on the cyl-tab-bar of every loaded tab page,
+     *      counts 3 s down (the row's status follows), then wx.reLaunch destroys the tab pages and their bars and shows the released
+     *      page (utils/cyl_demo_teardown.js).
+     * [CN] 「Release the tab bar controller (in 3 s)」行：在每个已加载 Tab 页面的 cyl-tab-bar 上登记 dealloc 回调，倒计时 3 秒（该行状态
+     *      随之更新），然后 wx.reLaunch 销毁 Tab 页面及其 TabBar，并显示释放后的页面（utils/cyl_demo_teardown.js）。
+     */
+    cyl_releaseTabBars() {
+      const pages = getApp().cylLoadedTabPages || {};
+      const bars = Object.keys(pages).map((route) => {
+        const page = pages[route];
+        const host = typeof page.getTabBar === 'function' ? page.getTabBar() : null;
+        return { bar: host ? host.selectComponent('#cyl-tab-bar') : null, name: route };
+      });
+      cylTeardown.cylStart(bars, () => this.cylRender(), () => wx.reLaunch({ url: '/pages/released/index' }));
+    },
+
     cyl_tabBar() {
       const tabBar = typeof this.getTabBar === 'function' ? this.getTabBar() : null;
       return tabBar ? tabBar.selectComponent('#cyl-tab-bar') : null;
     },
 
-    cyl_render() {
+    cylRender() {
       const state = getApp().globalData.cylTabBarState;
       const skin = cylEffectiveSkin(state);
       const configuration = cylDemoConfiguration(state.overrides, skin);
@@ -166,22 +186,26 @@ Component({
           : section.rows.map((row) => this.cyl_row(row, values, state, configuration));
         const title = section.skins
           ? this.t('Skins: holidays and colors (%@)').replace('%@', String(CYL_DEMO_SKINS.length)) : cylListText(section.title);
-        return { id: section.id, title, rows };
+        const shown = { id: section.id, title, rows };
+        // [EN] A section of plain rows is one tag list (utils/cyl_demo_tags.js); the others keep their rows. [CN] 只含普通行的分组是一个 TagList（utils/cyl_demo_tags.js），其余分组保持为行。
+        return cylSectionIsTags(shown) ? { ...shown, tagConfiguration: cylTagConfiguration(shown) } : shown;
+      });
+      // [EN] The teardown row (iOS CYLDemoReleaseRow, docs/Lifecycle-Library.md step 21): releases the tab bars after 3 s and the
+      //      released page shows how many dealloc callbacks ran. [CN] 销毁行（对应 iOS 的 CYLDemoReleaseRow）：3 秒后释放 TabBar，
+      //      释放后的页面显示执行了多少个 dealloc 回调。
+      sections.push({
+        id: 'teardown',
+        title: this.t('Playback'),
+        rows: [{ id: 'releaseTabBar', title: this.t('Release the tab bar controller (in 3 s)'), subtitle: cylTeardown.cylStatus(), accessory: 'none' }],
       });
       // [EN] The badge rows of CYLHomeViewController, after the demo sections. [CN] CYLHomeViewController 的角标行，在演示 section 之后。
-      sections.push({
+      // [EN] The badge samples are tags like every other section: the main title, the long press callout (docs/instructions/examples.md). [CN] 角标样例与其他分组一样是 Tag：主标题，长按弹出浮框。
+      const badgeSection = {
         id: 'badges',
         title: this.t('Badges'),
-        badges: cylDemoList.badgeSamples.map((sample, index) => ({
-          key: index,
-          title: cylListText(sample.title),
-          text: this.cyl_badgeText(sample),
-          dot: !sample.value,
-          animation: CYL_BADGE_ANIMATIONS.find((name) => sample.animation?.startsWith(name)) || '',
-          style: this.cyl_badgeStyle(sample),
-          position: sample.position || 'topRight',
-        })),
-      });
+        rows: cylDemoList.badgeSamples.map((sample, index) => ({ id: `badge:${index}`, title: cylListText(sample.title), accessory: 'none' })),
+      };
+      sections.push({ ...badgeSection, tagConfiguration: cylTagConfiguration(badgeSection) });
       // [EN] MainTabBarController: the first page's title gets " (Liquid)" on Liquid Glass; a badge row sets "Home (N)".
       // [CN] MainTabBarController：液态玻璃下第一个页面的标题加上「 (Liquid)」；角标行设为「首页(N)」。
       const liquidGlass = state.itemStyle ? state.itemStyle === 'liquidGlass' : configuration.CYLTabBarControllerStyleType === 'liquidGlass';
@@ -367,17 +391,31 @@ Component({
       return style;
     },
 
-    cyl_update(change) {
+    cylUpdate(change) {
       getApp().cyl_updateTabBarState(change);
     },
 
     cyl_override(change) {
-      this.cyl_update({ overrides: { ...getApp().globalData.cylTabBarState.overrides, ...change } });
+      this.cylUpdate({ overrides: { ...getApp().globalData.cylTabBarState.overrides, ...change } });
+    },
+
+    // [EN] A tap on a tag does what a tap on its row did: `tagtap` {section: 0, item}, from the tag list of the section `data-section`.
+    // [CN] 点击 Tag 与点击对应行效果相同：`tagtap` {section: 0, item}，来自 `data-section` 分组的 TagList。
+    cyl_onTag(event) {
+      const section = this.data.sections.find((candidate) => candidate.id === event.currentTarget.dataset.section);
+      const row = section?.rows[event.detail.item];
+      if (row) {
+        this.cyl_onRow({ currentTarget: { dataset: { id: row.id } } });
+      }
     },
 
     cyl_onRow(event) {
       const id = event.currentTarget.dataset.id;
       const state = getApp().globalData.cylTabBarState;
+      if (id.startsWith('badge:')) {
+        this.cyl_onBadge({ currentTarget: { dataset: { index: id.slice('badge:'.length) } } });
+        return;
+      }
       if (id.startsWith('skin:')) {
         getApp().cyl_setSkin(id.slice('skin:'.length));
         return;
@@ -396,10 +434,11 @@ Component({
           const tabs = bar.data.cylSlots.filter((slot) => !slot.isPlusButton);
           const current = tabs.findIndex((slot) => slot.selected);
           const next = tabs[current < 0 ? 0 : (current + 1) % tabs.length];
-          bar.cyl_onTap({ currentTarget: { dataset: { key: next.key } } });
+          bar.cylOnTap({ currentTarget: { dataset: { key: next.key } } });
         },
         gallery: () => wx.navigateTo({ url: '/pages/glass/index' }),
-        login: () => this.cyl_update({ loggedIn: !state.loggedIn }),
+        releaseTabBar: () => this.cyl_releaseTabBars(),
+        login: () => this.cylUpdate({ loggedIn: !state.loggedIn }),
         swipe: () => this.cyl_override({ CYLTabBarControllerSwipeToSwitchTab: !state.overrides?.CYLTabBarControllerSwipeToSwitchTab }),
       };
       if (actions[id]) {
@@ -421,7 +460,7 @@ Component({
         state: () => app.globalData.cylTabBarState,
         overrides: () => app.globalData.cylTabBarState.overrides || {},
         configuration: () => cylDemoConfiguration(app.globalData.cylTabBarState.overrides, cylEffectiveSkin(app.globalData.cylTabBarState)),
-        update: (change) => this.cyl_update(change),
+        update: (change) => this.cylUpdate(change),
         override: (change) => this.cyl_override(change),
         tabBar: () => this.cyl_tabBar(),
         toast: (title) => wx.showToast({ title, icon: 'none' }),
@@ -449,6 +488,7 @@ Component({
      * [CN] 首页「滚动时隐藏 TabBar」行：向下滚动隐藏，向上显示。
      */
     onPageScroll(event) {
+      cylPageScrolled(this, event);
       const state = getApp().globalData.cylTabBarState;
       const top = event.scrollTop;
       const last = this.cylLastScrollTop || 0;
@@ -464,18 +504,18 @@ Component({
       const down = top > last && top > 60;
       const hidden = behavior === 'OnScrollDown' ? down : !down && top > 60;
       if (hidden !== Boolean(state.tabBarHidden)) {
-        this.cyl_update({ tabBarHidden: hidden });
+        this.cylUpdate({ tabBarHidden: hidden });
       }
     },
 
     /**
-     * [EN] Item 37: the ◀︎ / ▶︎ arrows call cyl_switchToAdjacentTab(-1 / 1); the row shows the result (YES / NO).
-     * [CN] 第 37 项：◀︎ / ▶︎ 箭头调用 cyl_switchToAdjacentTab(-1 / 1)；该行显示结果（YES / NO）。
+     * [EN] Item 37: the ◀︎ / ▶︎ arrows call cylSwitchToAdjacentTab(-1 / 1); the row shows the result (YES / NO).
+     * [CN] 第 37 项：◀︎ / ▶︎ 箭头调用 cylSwitchToAdjacentTab(-1 / 1)；该行显示结果（YES / NO）。
      */
     cyl_onArrow(event) {
       const bar = this.cyl_tabBar();
-      const result = bar ? bar.cyl_switchToAdjacentTab(Number(event.currentTarget.dataset.step)) : false;
-      this.cyl_update({ adjacentResult: result ? 'YES' : 'NO' });
+      const result = bar ? bar.cylSwitchToAdjacentTab(Number(event.currentTarget.dataset.step)) : false;
+      this.cylUpdate({ adjacentResult: result ? 'YES' : 'NO' });
     },
 
     /**
@@ -492,7 +532,7 @@ Component({
     },
 
     // [EN] A tap on a switch stays on the switch (its change event acts). [CN] 点击开关不传给所在行（由其 change 事件处理）。
-    cyl_noop() {},
+    cylNoop() {},
 
     // [EN] A switch was flipped: the same as tapping its row. [CN] 拨动开关：与点击该行相同。
     cyl_onSwitch(event) {

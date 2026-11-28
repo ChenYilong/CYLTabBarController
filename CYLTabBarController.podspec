@@ -16,24 +16,13 @@ Pod::Spec.new do |s|
   # FIX: issue #535 — what Core and CYLBadgeView share: macros, helpers (`-cyl_setHidden:`, `-cyl_valueForKey:`,
   # `-cyl_tabButton`...), `+[CYLUtils isLiquidGlassActive]`, the string table (`CYLLocalizedString()`) and the resource
   # bundle. Both depend on it. Core 与 CYLBadgeView 共用的宏、工具方法、字符串表与资源包，二者都依赖它。
+  # [EN] D7 (docs/Animated-Item-Badge.md): CYLUtils is a pod of its own (CYLUtils.podspec, module CYLUtilsKit, at the bottom); this subspec
+  #      keeps its name and only depends on it, plus the component's core, which `pod 'CYLTabBarController/CYLUtils'` brought before.
+  # [CN] D7（docs/Animated-Item-Badge.md）：CYLUtils 是独立的 pod（CYLUtils.podspec，模块 CYLUtilsKit，位于最底层）；本子库保留名称，只依赖它，
+  #      以及此前 `pod 'CYLTabBarController/CYLUtils'` 带入的组件核心。
   s.subspec 'CYLUtils' do |utils|
-    # [EN] Swift migration (docs/Swift-Migration.md): translated files live in `Swift/` folders next to the Objective-C ones.
-    # [CN] Swift 迁移（docs/Swift-Migration.md）：已翻译的文件放在 Objective-C 文件旁的 `Swift/` 目录中。
-    utils.source_files = 'CYLTabBarController/CYLUtils/**/*.{h,m,swift}'
-    # [EN] The animation keys and URL options belong to the CYLAnimatedItem pod (CYLAnimatedItem.podspec), which CYLUtils
-    #      depends on; CYLUtils re-exports it (Swift `@_exported import`, Objective-C headers).
-    # [CN] 动画 key 与 URL 选项属于 CYLAnimatedItem pod（CYLAnimatedItem.podspec），CYLUtils 依赖它并重新导出（Swift `@_exported import`、
-    #      Objective-C 头文件）。
-    utils.exclude_files = 'CYLTabBarController/CYLUtils/CYLAnimationKeys.{h,m}', 'CYLTabBarController/CYLUtils/Swift/CYLAnimationURLOptions.swift', 'CYLTabBarController/CYLUtils/Swift/CYLAnimationKeyLookup.swift'
+    utils.dependency 'CYLUtils', s.version.to_s
     utils.dependency 'CYLAnimatedItem/Core', s.version.to_s
-    utils.public_header_files = 'CYLTabBarController/CYLUtils/**/*.h'
-    # FIX: issue #216 — theme switching (skins): public headers in `CYLUtils/CYLComponents/CYLTheme/`, implementation in
-    # Swift (`CYLUtils/Swift/`); its private helpers are internal Swift. [CN] 换肤（主题切换）：公开头文件位于
-    # `CYLUtils/CYLComponents/CYLTheme/`，实现为 Swift（`CYLUtils/Swift/`）；私有辅助方法为 Swift 内部代码。
-    # The library's resource bundle (localized strings now, images can go in it too), shipped as is, so its layout is
-    # the same in every integration (see `CYLResourceBundle()`).
-    utils.resources = ['CYLTabBarController/Resources/CYLTabBarController.bundle']
-    utils.frameworks = 'UIKit'
   end
 
   # FIX: issue #535 — the badge component on its own: `pod 'CYLTabBarController/CYLBadgeView'`.
@@ -42,12 +31,9 @@ Pod::Spec.new do |s|
   # 单独使用角标组件：`pod 'CYLTabBarController/CYLBadgeView'`。为任意 UIView、UIControl、UIBarButtonItem、UITabBarItem 添加带动画的角标，
   # 不包含 TabBar 代码。Core 依赖它，因此其他所有 subspec 都已包含，现有 Podfile 无需修改。
   s.subspec 'CYLBadgeView' do |badge|
-    badge.dependency 'CYLTabBarController/CYLUtils'
-    badge.source_files = 'CYLTabBarController/CYLBadgeView/**/*.{h,m,swift}'
-    badge.public_header_files = 'CYLTabBarController/CYLBadgeView/**/*.h'
-    # Shared by the badge sources only; tells a standalone build from one with Core (tab bar). 仅供角标源文件使用，用于区分是否包含 Core。
-    badge.private_header_files = 'CYLTabBarController/CYLBadgeView/CYLBadgeViewDefines.h'
-    badge.frameworks = 'UIKit', 'QuartzCore'
+    # [EN] D7: CYLBadge is a pod of its own (CYLBadge.podspec) on top of CYLUtils, which brings the lifecycle library (D8). This subspec keeps its name.
+    # [CN] D7：CYLBadge 是独立的 pod（CYLBadge.podspec），位于 CYLUtils 之上，生命周期库经由 CYLUtils 得到（D8）。本子库保留名称。
+    badge.dependency 'CYLBadge', s.version.to_s
   end
 
   # [EN] CYLAnimationEngine: the animation engine alone (animator protocols, registry, factory, players, view animator),
@@ -132,6 +118,8 @@ Pod::Spec.new do |s|
     #      with an animation subspec (`CYL_ANIMATION_ENGINE_AVAILABLE`).
     # [CN] 组件核心（CYLAnimatedItemView，静态图片），从不依赖动效引擎：只有引入动画子库时 TabBar 才会播放动画（`CYL_ANIMATION_ENGINE_AVAILABLE`）。
     core.dependency 'CYLTabBarController/CYLAnimatedItem'
+    # [EN] D8: the lifecycle library (CYLDeallocBlockExecutor) comes through CYLUtils, the only pod that depends on it.
+    # [CN] D8：生命周期库（CYLDeallocBlockExecutor）经由 CYLUtils 得到，只有它依赖该库。
     core.source_files = 'CYLTabBarController', 'CYLTabBarController/**/*.{h,m}', 'CYLTabBarController/Swift/*.swift', 'CYLTabBarController/Swift/Deprecated/*.swift'
     core.exclude_files = [
     'CYLTabBarController/Package/**/*', # SPM-only: the umbrella headers, module maps and header links of the C targets
@@ -145,7 +133,7 @@ Pod::Spec.new do |s|
     #      Swift/UIControl+CYLTabBarItemAnimationPlayer.swift 与 PAG 工具函数 Swift/CYLPAGTabBarItemAttributes.swift），只有引入动画子库时才编译
     #      （`CYL_ANIMATION_ENGINE_AVAILABLE`、`CYL_PAG_AVAILABLE`）。
     'CYLTabBarController/CYLTabBarItemAnimation/{GIF,Lottie,PAG,Rive,SVGA,Swift}/**/*',
-    'CYLTabBarController/CYLTabBarItemAnimation/{CYLTabBarItemAnimator,CYLTabBarItemAnimationPlayer,CYLTabBarItemAnimatorRegistry,CYLTabBarItemAnimationFactory,CYLTabBarItemAnimationPlayableView,CYLTabBarItemViewAnimator}.{h,m}',
+    'CYLTabBarController/CYLTabBarItemAnimation/{CYLTabBarItemAnimator,CYLTabBarItemAnimationPlayer,CYLTabBarItemAnimatorRegistry,CYLTabBarItemAnimationFactory,CYLTabBarItemAnimationTint,CYLTabBarItemAnimationColorCount,CYLTabBarItemAnimationPlayableView,CYLTabBarItemViewAnimator}.{h,m}',
     'CYLTabBarController/CYLAnimatedItem/**/*', # the CYLAnimatedItem subspec above (the engine files are in CYLTabBarItemAnimation/)
     'CYLTabBarController/**/LottieSwift/*.{h,m,Swift}',
     'CYLTabBarController/RiveSwift/**/*', # the Rive subspec below (Swift bridge)

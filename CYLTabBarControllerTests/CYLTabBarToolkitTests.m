@@ -227,7 +227,14 @@
     XCTAssertTrue([tabBarController cyl_performCustomTabActionIfNeededForViewController:first], @"the same tap: handled, not run again");
     XCTAssertFalse([tabBarController cyl_performCustomTabActionIfNeededForViewController:second]);
     XCTAssertEqual(runs, 1);
-    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    // [EN] Wait for a block queued after the controller's own reset block: the main queue is first in, first out, so the reset has run.
+    //      (A timed `runUntilDate:` returned too early on a busy CI runner.)
+    // [CN] 等待一个排在控制器重置 block 之后的 block：主队列先进先出，重置一定已执行。（定时的 `runUntilDate:` 在繁忙的 CI 机器上会提前返回。）
+    XCTestExpectation *nextTurn = [self expectationWithDescription:@"a later main queue turn"];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [nextTurn fulfill];
+    });
+    [self waitForExpectations:@[ nextTurn ] timeout:10.0];
     XCTAssertTrue([tabBarController cyl_performCustomTabActionIfNeededForViewController:first]);
     XCTAssertEqual(runs, 2, @"a later run loop turn runs it again");
 }

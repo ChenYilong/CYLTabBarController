@@ -228,7 +228,7 @@ const CYL_HOME_ACTIONS = {
     setTimeout(() => {
       const current = context.tabBar();
       if (current) {
-        current.cyl_playSelectedTapAnimation();
+        current.cylPlaySelectedTapAnimation();
       }
     }, 300);
   },
@@ -244,11 +244,11 @@ const CYL_HOME_ACTIONS = {
     setTimeout(() => {
       const bar = context.tabBar();
       if (bar) {
-        bar.cyl_playTabButtonTapFeedback();
+        bar.cylPlayTabButtonTapFeedback();
       }
     }, 300);
   },
-  // [EN] Item 37: the row does nothing; its arrows call cyl_switchToAdjacentTab (pages/home cyl_onArrow). [CN] 第 37 项：点击该行无效果；由箭头调用（pages/home 的 cyl_onArrow）。
+  // [EN] Item 37: the row does nothing; its arrows call cylSwitchToAdjacentTab (pages/home cyl_onArrow). [CN] 第 37 项：点击该行无效果；由箭头调用（pages/home 的 cyl_onArrow）。
   adjacentTab: () => {},
 };
 

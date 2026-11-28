@@ -30,10 +30,13 @@
     <string name="cyl_demo_6a69211e0f">Minden jelenet a nyilvános API-val készült lapsáv: stílusok, animációk, jelvények, Lottie és az újabb lap API</string>
     <string name="cyl_demo_7efc907fe3">Animált elem</string>
     <string name="cyl_demo_9244b5dc65">Az animált ikon + cím összetevő önmagában: GIF, Lottie, hiányzó fájl, kiegészítő és húzás</string>
+    <string name="cyl_demo_5dbde9a698">Tartalom belső margója</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset nincs beállítva: egy lapos és egy Liquid Glass elem, normál és kijelölt</string>
     <string name="cyl_demo_185d8ef0ae">Jelvények</string>
     <string name="cyl_demo_2db1db0706">Lejátszás</string>
     <string name="cyl_demo_34bffc9c7a">Lapikon-animációk: Összes lejátszása, sebesség, ismétlés</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">Sebesség %@, ismétlés %@; koppints a vezérlőkért</string>
+    <string name="cyl_demo_2f63c1fff7">A lapfülsáv-vezérlő felszabadítása (3 mp múlva)</string>
     <string name="cyl_demo_a4fe65264e">Nyelv</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">Jelenlegi: %@</string>
     <string name="cyl_demo_bbc5e661e1">rendszer</string>
@@ -130,6 +133,10 @@
     <string name="cyl_demo_7108183f18">Kérés megszakítva</string>
     <string name="cyl_demo_5fbceaee5f">Kérés URL nélkül</string>
     <string name="cyl_demo_4334569b3d">Egy HTML-oldal (hálózat)</string>
+    <string name="cyl_demo_e2917c5f0d">Lapos: itemContentHorizontalInset nincs beállítva</string>
+    <string name="cyl_demo_a7248eeb45">Normál</string>
+    <string name="cyl_demo_57fd7a0cf3">Kiválasztva</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset nincs beállítva</string>
     <string name="cyl_demo_d84eebada9">Fotó</string>
     <string name="cyl_demo_d47d7cb0e4">Továbbiak</string>
     <string name="cyl_demo_0e35f6e974">Alapok</string>
@@ -320,6 +327,7 @@
     <string name="cyl_demo_12e7b8220d">Összes lejátszása</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">Sebesség: %@</string>
     <string name="cyl_demo_f2f6a01889">Ismétlés</string>
+    <string name="cyl_demo_08078d674a">A lapfülsáv-vezérlő felszabadult</string>
     <string name="cyl_demo_44a57b22e0">Figyelmeztetés</string>
     <string name="cyl_demo_a127ceb079">Műveletlap</string>
     <string name="cyl_demo_9329618118">Oldallap</string>
@@ -338,6 +346,10 @@
     <string name="cyl_demo_1698b890f9">Az összes automatikus sort lefuttatja, egymás után.</string>
     <string name="cyl_demo_afa158bdc8">A jelenlegi kontextus fölött</string>
     <string name="cyl_demo_0add8377e7" formatted="false">Hosszan nyomva: „%@”</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">lefutott dealloc visszahívások: %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">lefutott dealloc visszahívások: %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">lebontás: felszabadítás %d mp múlva</string>
+    <string name="cyl_demo_c0fd658b68">lebontás: nem futott</string>
     <string name="cyl_demo_d4f455fa45">Megnyitás: két lapsáv, egy oldalazonosító</string>
     <string name="cyl_demo_5b88804382" formatted="false">%@. lapsáv · oldalazonosító: \"%@\"</string>
 </resources>

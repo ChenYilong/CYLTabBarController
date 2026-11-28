@@ -16,4 +16,4 @@
  *      （`Swift/UIViewController+CYLThemeSettings.swift`，所有 selector 不变），由下面导入的 Swift 生成接口（`CYLSwiftInterface.h`）声明
  *      （docs/Swift-Migration.md，第 30 步）。
  */
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"

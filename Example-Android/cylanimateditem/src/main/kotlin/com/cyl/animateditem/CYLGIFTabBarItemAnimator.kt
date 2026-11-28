@@ -117,7 +117,26 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
         invalidate()
     }
 
-    override fun cyl_playAnimationView() = playFrom(0f)
+    override fun cyl_playAnimationView() {
+        pausedMidPass = false
+        playFrom(0f)
+    }
+
+    private var pausedMidPass = false
+
+    /** [EN] Freezes the pass where it is (the time is kept). [CN] 在当前位置冻结这一遍播放（保留当前时刻）。 */
+    override fun cyl_pauseAnimationView() {
+        if (!playing) return
+        pausedMidPass = true
+        cancelPass()
+    }
+
+    /** [EN] Continues the frozen pass from its time. [CN] 从冻结的时刻继续播放。 */
+    override fun cyl_resumeAnimationView() {
+        if (!pausedMidPass) return
+        pausedMidPass = false
+        playFrom(playingFraction)
+    }
 
     override fun cyl_isAnimationViewPlaying(): Boolean = playing
 
@@ -196,7 +215,7 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
         }
     }
 
-    override fun cyl_showAnimationViewLastFrame() {
+    override fun cylShowAnimationViewLastFrame() {
         cancelPass()
         time = duration - 1
         invalidate()
@@ -246,7 +265,7 @@ class CYLGIFTabBarItemAnimationView internal constructor(context: Context, priva
                 // [EN] A missing file, a failed download or an unreadable one: the host shows its image or placeholder.
                 // [CN] 文件不存在、下载失败或无法读取：宿主显示其图片或占位图。
                 val bytes = try { file?.readBytes() } catch (error: java.io.IOException) { null }
-                if (bytes == null || bytes.isEmpty()) CYLTabBarItemAnimationFailure.reportLater(view) else view.setData(bytes)
+                if (bytes == null || bytes.isEmpty()) CYLTabBarItemAnimationFailure.reportLater(view, if (file == null) CYLResourceMissingReason.NOT_FOUND else CYLResourceMissingReason.UNREADABLE) else view.setData(bytes)
             }
             return view
         }

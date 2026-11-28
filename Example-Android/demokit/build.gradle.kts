@@ -40,7 +40,9 @@ android {
 
 dependencies {
     api(project(":cyltabbar"))
+    implementation(project(":classifymenu"))
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.material)
+    // [EN] DemoTeardown registers dealloc callbacks; :cyltabbar keeps the library private. [CN] DemoTeardown 注册 dealloc 回调；:cyltabbar 不对外暴露该库。
 }

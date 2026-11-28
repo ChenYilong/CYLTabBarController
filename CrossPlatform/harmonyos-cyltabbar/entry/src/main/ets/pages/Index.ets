@@ -1,22 +1,25 @@
 import { promptAction, display } from '@kit.ArkUI';
 import {
   CYLTabBarController, CYLTabBarItemAttributes, CYLPlusButton, CYLPlusButtonPageIndex, CYLBadge, CYLBadgeView,
-  CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset, CYLEdgeInsets, cyl_simulateMemoryWarning, cyl_badgeTitleForRow,
-  cyl_badgeStyleCount, cyl_applyBadgeSample, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle,
-  CYLTabBarMinimizeBehavior, cyl_reportScroll, cyl_pushViewController, CYLThemeManager, CYLThemeManagerCenter,
+  CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset, CYLEdgeInsets, cyl_simulateMemoryWarning, cylBadgeTitleForRow,
+  cylBadgeStyleCount, cylApplyBadgeSample, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle,
+  CYLTabBarMinimizeBehavior, cyl_reportScroll, cyl_reportScrollStarted, cyl_pausesAnimationsWhileUserScrolls, cyl_reportScrollStopped, cyl_pushViewController, CYLThemeManager, CYLThemeManagerCenter,
   cyl_tabBarItemIdentifiers, cyl_indexOfTabBarItemWithIdentifier, cyl_selectTabBarItemWithIdentifier
 } from 'cyltabbar';
-import { CYLLocalizedString, cyl_localizationKey, cyl_badgeAccessibilityText, CYLTabBarDefaultHeight } from 'cyltabbar';
+import { CYLLocalizedString, cyl_localizationKey, badgeAccessibilityText, CYLTabBarDefaultHeight } from 'cyltabbar';
 import { DemoTheme, DEMO_THEMES, demoRegisterThemes } from '../demo/DemoThemes';
 import { DemoScrollKind, DemoScrollSimulation, DEMO_SCROLL_SIMULATIONS, demoScrollKindName, demoScrollTitle } from '../demo/DemoScrollHide';
 import { cyl_restoreTabBar, CYLSetLocalizationLanguage, CYLLocalizationLanguage } from 'cyltabbar';
 import { DemoFlatDesignButton } from '../demo/DemoFlatDesign';
+import { DemoTeardown } from '../demo/DemoTeardown';
 import { DemoLiquidGlassButton } from '../demo/DemoLiquidGlass';
 import { CYLTabBarStyleType, CYLFlatDesignTintColor, CYLFlatDesignUnselectedColor, CYLLiquidGlassTintColor, CYLLiquidGlassUnselectedColor } from 'cyltabbar';
 import {
   DemoRow, DemoSection, DEMO_APPEARANCES, DEMO_TITLE_OFFSETS, DEMO_HOME, DEMO_CITY, DEMO_MESSAGE, DEMO_ME,
   DEMO_LANGUAGES, DEMO_LANGUAGE_NAMES
 } from '../demo/DemoRows';
+import { CYLTagListView } from '@cyl/classifymenu';
+import { DemoTagLists } from '../demo/DemoTagList';
 
 /**
  * [EN] The tabs of the Objective-C Example (MainTabBarController): Home, Nearby, Messages, Me, with identifiers.
@@ -101,6 +104,9 @@ struct Index {
   @State loggedIn: boolean = true;
   /** [EN] Toggled update rows, by id. [CN] 已切换的更新行。 */
   @State toggled: string[] = [];
+  /** [EN] The tag lists of the sectioned demo lists and their content heights per page (docs/instructions/examples.md). [CN] 分组演示列表的 TagList 及各页内容高度。 */
+  private cylTagLists: DemoTagLists = new DemoTagLists();
+  @State cylTagHeights: Map<string, number> = new Map<string, number>();
   /** [EN] Items 33-37: tab interactions (#535). [CN] 第 33-37 项：Tab 交互（#535）。 */
   @State tapAnimation: CYLTabButtonTapAnimationType = CYLTabButtonTapAnimationType.None;
   @State feedbackStep: number = 0;
@@ -218,23 +224,59 @@ struct Index {
     }
   }
 
+  /** [EN] Seconds left of the teardown countdown, 0 when it does not run. [CN] 销毁倒计时剩余秒数，未运行时为 0。 */
+  @State teardownRemaining: number = 0;
+
+  /**
+   * [EN] The "Release the tab bar controller" row: arms the dealloc callback on this controller, counts 3 s down (the status line
+   *      follows), then replaces the page with `pages/Released`, so this page disappears and its teardown blocks run.
+   * [CN] 「Release the tab bar controller」行：在本控制器上登记 dealloc 回调，倒计时 3 秒（状态行随之更新），然后把页面替换为
+   *      `pages/Released`，本页面消失，其销毁块运行。
+   */
+  private startTeardown(): void {
+    if (this.teardownRemaining > 0) {
+      return;
+    }
+    DemoTeardown.reset();
+    if (!DemoTeardown.arm('CYLTabBarController')) {
+      return;
+    }
+    this.teardownRemaining = 3;
+    const timer = setInterval(() => {
+      this.teardownRemaining -= 1;
+      if (this.teardownRemaining > 0) {
+        return;
+      }
+      clearInterval(timer);
+      this.getUIContext().getRouter().replaceUrl({ url: 'pages/Released' });
+    }, 1000);
+  }
+
   aboutToAppear(): void {
+    this.cylTagLists.onHeight = (page: string, height: number): void => {
+      if (this.cylTagHeights.get(page) !== height) {
+        const heights = new Map<string, number>(this.cylTagHeights);
+        heights.set(page, height);
+        this.cylTagHeights = heights;
+      }
+    };
+    cyl_pausesAnimationsWhileUserScrolls(true);
     demoRegisterThemes();
     CYLThemeManagerCenter.defaultThemeManager.addListener(this.themeListener);
     // [EN] SceneDelegate.m -setUpBadgeAppearance (#425). [CN] 全局角标偏移。
     CYLBadgeAppearance.globalAppearance.centerOffset = { horizontal: -5, vertical: 3 };
     // [EN] cyl_demo_showPlusButtonBadge: 1 at launch. [CN] 启动时加号角标为 1。
-    this.plusButtonBadge.cyl_showBadgeValue('1');
+    this.plusButtonBadge.showBadgeValue('1');
     const current = CYLLocalizationLanguage();
     // [EN] A language outside the picker (set elsewhere) shows as "Follow system". [CN] 不在选项中的语言显示为「跟随系统」。
     const known = DEMO_LANGUAGES.indexOf(current);
     this.languageIndex = known >= 0 ? known : DEMO_LANGUAGES.length - 1;
     for (const page of [DEMO_HOME, DEMO_CITY, DEMO_MESSAGE, DEMO_ME]) {
-      const count = Math.max(page === DEMO_HOME || page === DEMO_ME ? 30 : 15, cyl_badgeStyleCount());
+      const count = Math.max(page === DEMO_HOME || page === DEMO_ME ? 30 : 15, cylBadgeStyleCount());
       const badges: CYLBadge[] = [];
       for (let row = 0; row < count; row++) {
         const badge = new CYLBadge();
-        cyl_applyBadgeSample(badge, row, CYL_BADGE_ICON);
+        cylApplyBadgeSample(badge, row, CYL_BADGE_ICON);
         badges.push(badge);
       }
       this.rowBadges.set(page, badges);
@@ -254,15 +296,15 @@ struct Index {
       const home = this.badges[0];
       home.backgroundColor = CYL_RANDOM_COLORS[Math.floor(Math.random() * CYL_RANDOM_COLORS.length)];
       home.radius = 11 / 2;
-      home.cyl_showBadgeValue('', CYLBadgeAnimationType.Breathe);
+      home.showBadgeValue('', CYLBadgeAnimationType.Breathe);
       this.badges[1].backgroundColor = '#AF52DE';
-      this.badges[1].cyl_showBadgeValue('8', CYLBadgeAnimationType.Scale);
-      this.badges[2].cyl_showBadgeValue('100', CYLBadgeAnimationType.Bounce);
+      this.badges[1].showBadgeValue('8', CYLBadgeAnimationType.Scale);
+      this.badges[2].showBadgeValue('100', CYLBadgeAnimationType.Bounce);
       this.badges[3].centerOffset = { horizontal: -1, vertical: 3 };
-      this.badges[3].cyl_showBadgeValue('NEW', CYLBadgeAnimationType.Breathe);
+      this.badges[3].showBadgeValue('NEW', CYLBadgeAnimationType.Breathe);
       // [EN] The cover replaces the Home button, so its badge is cleared (MainTabBarController.m). [CN] 封面替换首页按钮，因此清除其角标。
       this.covers = [$r('app.media.home_select_cover')];
-      this.badges[0].cyl_clearBadge();
+      this.badges[0].clearBadge();
     }, 1500);
   }
 
@@ -481,7 +523,7 @@ struct Index {
     const badges = this.rowBadges.get(page) ?? [];
     return badges.map((badge: CYLBadge, row: number) => {
       const item: DemoRow = {
-        id: `badge-${row}`, title: cyl_badgeTitleForRow(row), badgeRow: row,
+        id: `badge-${row}`, title: cylBadgeTitleForRow(row), badgeRow: row,
         subtitle: CYLLocalizedString('%@ CYLTabBarController on HarmonyOS', page),
         action: () => this.badgeRowTapped(page, row),
       };
@@ -498,7 +540,7 @@ struct Index {
     } else if (page === DEMO_CITY) {
       this.push('pages/TextPage', { title: 'CYLDetailsViewController (navigation bar hidden)', color: '#5AC8FA', hidesNavigationBar: true } as DemoPushParams);
     } else {
-      this.badges[3].cyl_showBadgeValue(`${row}`, CYLBadgeAnimationType.None);
+      this.badges[3].showBadgeValue(`${row}`, CYLBadgeAnimationType.None);
       this.push('pages/TextPage', { title: 'testPush', color: '#FF0000' } as DemoPushParams);
     }
   }
@@ -947,7 +989,11 @@ struct Index {
 
   private sections(page: string): DemoSection[] {
     return [
-      { title: CYLLocalizedString('通用'), rows: this.generalRows() },
+      { title: CYLLocalizedString('通用'), rows: page === DEMO_HOME ? [{
+        // [EN] docs/Animated-Item-Badge-CrossPlatform.md, step H10. [CN] 步骤 H10。
+        id: 'badge-tags', title: 'CYLAnimatedItemView badges', subtitle: 'badgeValue · badgeAttributes',
+        action: () => this.push('pages/BadgeTags', {} as DemoPushParams),
+      } as DemoRow, ...this.generalRows()] : this.generalRows() },
       { title: CYLLocalizedString('TabBar 外观'), rows: this.appearanceRows() },
       { title: CYLLocalizedString('滚动隐藏：模拟意外情况（issue #13）'), rows: this.scrollSimulationRows() },
       { title: CYLLocalizedString('原地更新 Tab'), rows: this.tabItemUpdateRows(page) },
@@ -983,6 +1029,48 @@ struct Index {
         subtitle: CYLLocalizedString('showsImageWhenAnimationEnds: a play-once Lottie icon, then its still image'),
         action: () => this.push('pages/AnimatedItemEnd', {} as DemoPushParams),
       } as DemoRow] } as DemoSection] : []),
+      // [EN] The built-in default tint (docs/Animated-Item.md, "Tint"): one-color and multi-color files, normal and selected, light and dark.
+      // [CN] 内置默认着色（docs/Animated-Item.md，“Tint”）：单色与多色文件，常态与选中，浅色与深色。
+      ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('Default tint'), rows: [{
+        id: 'default-tint', title: CYLLocalizedString('Default tint'),
+        subtitle: CYLLocalizedString('A one-color file takes the built-in tint of its state and color mode; a multi-color file keeps its colors'),
+        action: () => this.push('pages/DefaultTint', {} as DemoPushParams),
+      } as DemoRow] } as DemoSection] : []),
+      // [EN] Rive and PAG (docs/Animated-Item.md): the menu button (menu_button.riv, isOpen, Loop on / off) and a PAG file, plain and with a SRC_IN tint.
+      // [CN] Rive 与 PAG（docs/Animated-Item.md）：菜单按钮（menu_button.riv，isOpen，循环开 / 关）与一个 PAG 文件，不着色与 SRC_IN 着色。
+      ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('Rive and PAG'), rows: [{
+        id: 'rive-and-pag', title: CYLLocalizedString('Rive and PAG'),
+        subtitle: CYLLocalizedString('The menu button (menu_button.riv, isOpen) with Loop on and off, and a PAG file, plain and tinted'),
+        action: () => this.push('pages/RiveAndPag', {} as DemoPushParams),
+      } as DemoRow] } as DemoSection] : []),
+      // [EN] itemContentHorizontalInset left unset: flat and Liquid Glass items, normal and selected.
+      // [CN] 未设置 itemContentHorizontalInset：扁平与液态玻璃条目，常态与选中。
+      ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('Content inset'), rows: [{
+        id: 'content-inset', title: CYLLocalizedString('Content inset'),
+        subtitle: CYLLocalizedString('itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected'),
+        action: () => this.push('pages/ContentInset', {} as DemoPushParams),
+      } as DemoRow] } as DemoSection] : []),
+      // [EN] The Rive colors hook (docs/Animated-Item.md, "Colors"): applyColors on a data-bound .riv.
+      // [CN] Rive 颜色钩子（docs/Animated-Item.md，“颜色”）：对数据绑定的 .riv 调用 applyColors。
+      ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('Rive colors'), rows: [{
+        id: 'rive-colors', title: CYLLocalizedString('Rive colors'),
+        subtitle: CYLLocalizedString('applyColors: a view model color property of a data-bound .riv'),
+        action: () => this.push('pages/RiveColors', {} as DemoPushParams),
+      } as DemoRow] } as DemoSection] : []),
+      // [EN] onResourceMissing (docs/Animated-Item.md): a missing file per type reports its reason. [CN] onResourceMissing：每种类型的缺失文件报告原因。
+      ...(page === DEMO_CITY ? [{ title: 'onResourceMissing', rows: [{
+        id: 'resource-missing', title: 'onResourceMissing',
+        subtitle: 'A missing GIF, SVGA, PAG, Lottie and Rive file, and an unknown type: the callback and the global listener',
+        action: () => this.push('pages/ResourceMissing', {} as DemoPushParams),
+      } as DemoRow] } as DemoSection] : []),
+      // [EN] The teardown row (iOS CYLDemoReleaseRow, docs/Lifecycle-Library.md step 21), on the second tab: leaves this page after 3 s
+      //      and the released page shows how many dealloc callbacks ran. [CN] 销毁行（对应 iOS 的 CYLDemoReleaseRow），位于第二个 Tab：3 秒后离开本页，
+      //      释放后的页面显示执行了多少个 dealloc 回调。
+      ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('Release the tab bar controller (in 3 s)'), rows: [{
+        id: 'release-tab-bar-controller', title: CYLLocalizedString('Release the tab bar controller (in 3 s)'),
+        subtitle: DemoTeardown.status(this.teardownRemaining),
+        action: () => this.startTeardown(),
+      } as DemoRow] } as DemoSection] : []),
       ...(page === DEMO_CITY ? [{ title: CYLLocalizedString('LiquidGlass'), rows: [{
         id: 'liquid-glass-dock', title: CYLLocalizedString('Liquid Glass: the see-through effect of the reference'),
         subtitle: CYLLocalizedString('harmonyos-liquid-glass-tabbar: tab capsule, search ball and music bar over colorful content; scroll to minimize'),
@@ -995,6 +1083,15 @@ struct Index {
       } as DemoRow] } as DemoSection] : []),
       { title: CYLLocalizedString('角标'), rows: page === DEMO_MESSAGE ? this.messageRows().concat(this.badgeRows(page)) : this.badgeRows(page) },
     ];
+  }
+
+  /** [EN] The sections shown as tags: every section, the badge samples too (docs/instructions/examples.md). [CN] 以 Tag 显示的分组：所有分组，含角标样例。 */
+  private cylTagSections(page: string): DemoSection[] {
+    return this.sections(page);
+  }
+
+  private cylBadgeSections(page: string): DemoSection[] {
+    return [];
   }
 
   // MARK: - Pages 页面
@@ -1037,7 +1134,7 @@ struct Index {
     .accessibilityGroup(true)
     .accessibilityText(row.title)
     .accessibilityDescription([row.subtitle ?? '', row.badgeRow !== undefined
-      ? cyl_badgeAccessibilityText((this.rowBadges.get(page) ?? [])[row.badgeRow]) : ''].filter((t: string) => t.length > 0).join(', '))
+      ? badgeAccessibilityText((this.rowBadges.get(page) ?? [])[row.badgeRow]) : ''].filter((t: string) => t.length > 0).join(', '))
     .id(`cyl-row-${page}-${row.id}`)
     .onClick(() => row.action())
   }
@@ -1140,7 +1237,15 @@ struct Index {
         .backgroundColor('#E6E6FA')
       } else if (index !== CYLPlusButtonPageIndex) {
         List() {
-          ForEach(this.sections(identifier), (section: DemoSection) => {
+          // [EN] The sections are one tag list (a titled header per section, More / Less after 3 rows, long press shows the subtitle);
+          //      the badge samples stay rows, because a badge is drawn over a row's icon, which a tag has no place for.
+          // [CN] 分组共用一个 TagList（每组带标题，超过 3 行出现 More / Less，长按显示副标题）；角标样例仍是行，因为角标画在行图标上，Tag 没有对应位置。
+          ListItem() {
+            CYLTagListView({ tagList: this.cylTagLists.listFor(identifier, this.cylTagSections(identifier)) })
+              .height(this.cylTagHeights.get(identifier) ?? 0)
+              .id(`cyl-taglist-${identifier}`)
+          }
+          ForEach(this.cylBadgeSections(identifier), (section: DemoSection) => {
             ListItemGroup({ header: this.cylSectionHeader(section.title) }) {
               ForEach(section.rows, (row: DemoRow) => {
                 ListItem() {
@@ -1160,8 +1265,13 @@ struct Index {
         //      gesture bar instead of staying under them. [CN] 修复（鸿蒙截图问题 5）：最后几行可以滚动到 TabBar、凸起的 PlusButton
         //      与手势条之上，而不是被它们挡住。
         .contentEndOffset(CYL_LIST_END_INSET)
-        .backgroundColor($r('app.color.cyl_grouped_background'))
+        // [EN] The colorful backing plate of the example (light and dark colors in resources): a gradient behind the list, so the Liquid Glass tags,
+        //      cards and tail control have colors to bend (docs/instructions/examples.md). [CN] 示例的彩色背板（浅色与深色颜色在资源中）：列表后的渐变色，液态玻璃有可折射的颜色。
+        .linearGradient({ angle: 160, colors: [[$r('app.color.cyl_plate_start'), 0], [$r('app.color.cyl_plate_mid'), 0.5], [$r('app.color.cyl_plate_end'), 1]] })
         .onDidScroll((offset: number) => cyl_reportScroll(offset))
+        // [EN] The tab icon animations pause while the user scrolls (cyl_pausesAnimationsWhileUserScrolls). [CN] 用户滚动时 Tab 图标动画暂停。
+        .onScrollStart(() => cyl_reportScrollStarted())
+        .onScrollStop(() => cyl_reportScrollStopped())
         .id(`cyl-page-${identifier}`)
       } else {
         Column()
@@ -1190,7 +1300,7 @@ struct Index {
     this.styleType = CYLTabBarStyleType.FlatDesign;
     this.selectedIndex = 0;
     this.covers = [];
-    this.badges.forEach((badge: CYLBadge) => badge.cyl_clearBadge());
+    this.badges.forEach((badge: CYLBadge) => badge.clearBadge());
     this.tabBarKey += 1;
     this.showLaunchBadges();
   }
@@ -1222,8 +1332,8 @@ struct Index {
         didSelectControl: (index: number, previous: number) => {
           // [EN] Item 55: a tap on a newly selected tab turns its badge into a dot of the same color; a re-tap of the
           //      selected tab changes nothing. [CN] 第 55 项：点击新选中的 Tab 时把角标变为同色红点；再次点击已选中的 Tab 不变。
-          if (index >= 0 && index !== previous && this.badges[index].cyl_isShowBadge() && this.badges[index].value !== '') {
-            this.badges[index].cyl_showBadgeValue('', CYLBadgeAnimationType.None);
+          if (index >= 0 && index !== previous && this.badges[index].isShowBadge() && this.badges[index].value !== '') {
+            this.badges[index].showBadgeValue('', CYLBadgeAnimationType.None);
           }
         },
         didLongPress: (index: number, identifier: string) => this.toast(CYLLocalizedString('长按了「%@」', identifier)),
@@ -1262,7 +1372,7 @@ struct Index {
         plusButtonAction: () => {
           // [EN] Item 5: the badge goes up by one per tap. [CN] 第 5 项：每次点击角标加 1。
           this.plusBadge += 1;
-          this.plusButtonBadge.cyl_showBadgeValue(`${this.plusBadge}`);
+          this.plusButtonBadge.showBadgeValue(`${this.plusBadge}`);
           this.toast(`Post tapped (${this.plusBadge - 1})`);
         },
         pageBuilder: (index: number, identifier: string) => {

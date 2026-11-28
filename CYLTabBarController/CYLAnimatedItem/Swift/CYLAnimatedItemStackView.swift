@@ -6,6 +6,9 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 #if SWIFT_PACKAGE
 // [EN] Swift Package Manager builds the Objective-C half (CYLAnimatedItemView) as its own module; CocoaPods and the Xcode
 //      framework compile this file into that module.
@@ -36,6 +39,107 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
      */
     public typealias ActionHandler = @convention(block) (CYLAnimatedItemStackView, String) -> Void
 
+    // MARK: - Background 背景
+
+    /**
+     [EN] The background of the whole stack, the same rules as `CYLAnimatedItemView`: `.flat` (default) fills it with `itemBackgroundColor`;
+          `.liquidGlass` draws Liquid Glass behind the items where the system draws it (`CYLAnimatedItemView.isLiquidGlassActive()`),
+          flat elsewhere. Nothing is drawn until one of the `item…` background properties is set.
+     [CN] 整个堆叠的背景，规则与 `CYLAnimatedItemView` 相同：`.flat`（默认）用 `itemBackgroundColor` 填充；`.liquidGlass` 在系统使用液态玻璃处
+          于条目后面绘制液态玻璃，其他系统为扁平。设置任一 `item…` 背景属性之前不绘制任何背景。
+     */
+    public var itemBackgroundStyle: CYLAnimatedItemBackgroundStyle = .flat {
+        didSet { if oldValue != itemBackgroundStyle { itemBackgroundDidChange() } }
+    }
+
+    /** [EN] The fill (flat) or the tint (glass). [CN] 填充色（扁平）或着色（玻璃）。 */
+    public var itemBackgroundColor: UIColor? {
+        didSet { if oldValue != itemBackgroundColor { itemBackgroundDidChange() } }
+    }
+
+    /**
+     [EN] The corner radius: 0 is square, `cylAnimatedItemCornerRadiusCapsule` a capsule, any other value points limited to half the height;
+          nil (the default) is a capsule for Liquid Glass and square for flat, as `CYLAnimatedItemView.itemCornerRadius`.
+     [CN] 圆角半径：0 为直角，`cylAnimatedItemCornerRadiusCapsule` 为胶囊，其他值为点数且最大取半高；nil（默认）时液态玻璃为胶囊、扁平为直角，
+          与 `CYLAnimatedItemView.itemCornerRadius` 相同。
+     */
+    public var itemCornerRadius: CGFloat? {
+        didSet { if oldValue != itemCornerRadius { itemBackgroundDidChange() } }
+    }
+
+    /**
+     [EN] The space between the OUTER border and the items, left and right only, added to `contentMargin` (top and bottom unchanged). nil (the default):
+          `cylAnimatedItemLiquidGlassContentInset` where Liquid Glass is really drawn, 0 when flat; any number wins, including 0 on glass.
+          Same rules as `CYLAnimatedItemView.itemContentHorizontalInset`.
+     [CN] 外边框与条目之间的距离，仅左右，加在 `contentMargin` 上（上下不变）。nil（默认）：真正绘制液态玻璃时为 `cylAnimatedItemLiquidGlassContentInset`，
+          扁平时为 0；任何数字都优先，包括液态玻璃上的 0。规则与 `CYLAnimatedItemView.itemContentHorizontalInset` 相同。
+     */
+    public var itemContentHorizontalInset: CGFloat? {
+        didSet {
+            guard oldValue != itemContentHorizontalInset else { return }
+            updateMarginConstraints()
+            setNeedsLayout()
+        }
+    }
+
+    /**
+     [EN] `itemContentHorizontalInset` for Objective-C: an `NSNumber` of points, nil for not set. [CN] 给 Objective-C 用的 `itemContentHorizontalInset`：点数的 `NSNumber`，nil 表示未设置。
+     */
+    public var itemContentHorizontalInsetNumber: NSNumber? {
+        get { itemContentHorizontalInset.map { NSNumber(value: Double($0)) } }
+        set { itemContentHorizontalInset = newValue.map { CGFloat($0.doubleValue) } }
+    }
+
+    /** [EN] The inset in use (see `itemContentHorizontalInset`). [CN] 实际使用的内缩（见 `itemContentHorizontalInset`）。 */
+    public var resolvedItemContentHorizontalInset: CGFloat {
+        CYLAnimatedItemBackgroundRenderer.resolvedContentHorizontalInset(itemContentHorizontalInset, style: itemBackgroundStyle)
+    }
+
+    /** [EN] The border width, 0 by default. [CN] 边框宽度，默认 0。 */
+    public var itemBorderWidth: CGFloat = 0 {
+        didSet { if oldValue != itemBorderWidth { itemBackgroundDidChange() } }
+    }
+
+    /** [EN] The border color. [CN] 边框颜色。 */
+    public var itemBorderColor: UIColor? {
+        didSet { if oldValue != itemBorderColor { itemBackgroundDidChange() } }
+    }
+
+    /**
+     [EN] The share of the color's alpha that tints a Liquid Glass: nil (the default) is 0.75, so an opaque color tints the glass instead of
+          covering it; 1 uses the color as it is (a selected tag keeps its full color, still glass). Not used by the flat style.
+     [CN] 颜色透明度中用于给液态玻璃着色的比例：nil（默认）为 0.75，不透明的颜色是给玻璃着色而不是盖住它；1 表示按原色（选中的标签保持完整颜色，
+          仍是玻璃）。扁平样式不使用。
+     */
+    public var itemGlassTintAlpha: CGFloat? {
+        didSet { if oldValue != itemGlassTintAlpha { itemBackgroundDidChange() } }
+    }
+
+    /** [EN] The background really drawn (flat where the system draws no glass). [CN] 实际绘制的背景（系统不使用玻璃时为扁平）。 */
+    public var resolvedItemBackgroundStyle: CYLAnimatedItemBackgroundStyle {
+        CYLAnimatedItemBackgroundRenderer.resolvedStyle(itemBackgroundStyle)
+    }
+
+    /** [EN] The Liquid Glass layer behind the items while it is drawn; nil otherwise. [CN] 绘制时位于条目后面的液态玻璃层；否则为 nil。 */
+    public var itemLiquidGlassView: UIView? { backgroundRenderer.glassView }
+
+    private let backgroundRenderer = CYLAnimatedItemBackgroundRenderer()
+    private var usesItemBackground = false
+
+    private func itemBackgroundDidChange() {
+        usesItemBackground = true
+        layoutItemBackground()
+        // [EN] The style decides the unset inset, hence the horizontal margin. [CN] 样式决定未设置时的内缩，也就决定左右边距。
+        updateMarginConstraints()
+        setNeedsLayout()
+    }
+
+    private func layoutItemBackground() {
+        guard usesItemBackground else { return }
+        backgroundRenderer.apply(on: self, style: itemBackgroundStyle, color: itemBackgroundColor, cornerRadius: itemCornerRadius,
+                                 borderWidth: itemBorderWidth, borderColor: itemBorderColor, tintAlpha: itemGlassTintAlpha)
+    }
+
     /**
      [EN] The vertical stack holding the items: centered, sized by its items, 16 pt between items by default.
      [CN] 容纳条目的竖向堆叠视图：居中，大小由条目决定，条目间距默认 16 pt。
@@ -54,9 +158,6 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     public var firstItemView: CYLAnimatedItemView? { entries.first?.view }
 
     /**
-     [EN] The smallest space between the items and the view's edges (16 by default). [CN] 条目与视图边缘之间的最小间距（默认 16）。
-     */
-    /**
      [EN] The direction of the items: `.vertical` (default, a column) or `.horizontal` (one row). Wraps `stackView.axis`;
           `contentMargin` and each item's spacing before follow the axis.
      [CN] 条目的方向：`.vertical`（默认，一列）或 `.horizontal`（一行）。封装 `stackView.axis`；`contentMargin` 与每个条目之前的间距随方向变化。
@@ -65,6 +166,8 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         get { stackView.axis }
         set {
             stackView.axis = newValue
+            updateDividerLook()
+            invalidateIntrinsicContentSize()
             setNeedsLayout()
         }
     }
@@ -75,7 +178,10 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
      */
     public var spacing: CGFloat {
         get { stackView.spacing }
-        set { stackView.spacing = newValue }
+        set {
+            stackView.spacing = newValue
+            refreshGaps()
+        }
     }
 
     /**
@@ -86,12 +192,180 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
           nil（默认）不提供。SF Symbols 图片是模板图，各状态的着色由这里提供。会被复制。
      */
     @NSCopying public var itemAppearance: UITabBarItemAppearance? {
-        didSet { entries.forEach { applyStackAppearance(to: $0) } }
+        didSet {
+            entries.forEach { applyStackAppearance(to: $0) }
+            updateDividerLook()
+        }
     }
 
+    /**
+     [EN] The default `animationTint` of every item ("title" or "#RRGGBB" / "#RRGGBBAA"), existing and appended later; an item's own `animationTint`
+          wins when it is set (non-empty), nil on the item inherits. Set back to nil it is removed from the items that did not set their own.
+          Resolved inside the item against the item's own traits, with the truth table of `CYLAnimatedItemView.animationTint`. nil by default.
+     [CN] 每个条目的默认 `animationTint`（"title" 或 "#RRGGBB" / "#RRGGBBAA"），包括之后追加的条目；条目自己的 `animationTint` 已设置（非空）时优先，
+          条目上为 nil 则继承。改回 nil 时从没有自己设置的条目上移除。由条目用自己的 trait、按 `CYLAnimatedItemView.animationTint` 的真值表解析。默认 nil。
+          [EN] Limits: the animation view is tinted only when `animationTint` is set or the rendering mode (automatic / alwaysTemplate / alwaysOriginal) asks; tab flows keep the
+               file's own colors by default. `renderingMode=automatic` is the UNIFIED policy for every engine: a ONE-color file is tinted like "title", a multi-color file keeps its
+               colors. One-color detection works for Lottie (fl/st colors within +-2/255) and GIF (first frame, 4-bit buckets, 98%); PAG, SVGA and Rive are UNDETECTABLE and are
+               treated as multi-color (kept as they are). An explicit `tint=title` forces the template look on ANY engine, even a multi-color one (do not use it as a per-engine fix).
+               One-color artwork whose color is not the icon color follows the item's effective icon color. A fixed `animationTint` is adapted (3:1) on drawn dark glass only, not on flat.
+          [CN] 限制：只有设置了 `animationTint` 或渲染模式（automatic / alwaysTemplate / alwaysOriginal）要求时，动画视图才会着色；Tab 流程默认保持文件自己的颜色。
+               `renderingMode=automatic` 是对所有引擎统一的策略：单色文件按 "title" 着色，多色文件保持原色。单色检测对 Lottie（fl/st 颜色在 +-2/255 内）与 GIF（首帧、4 位分桶、98%）有效；
+               PAG、SVGA、Rive 无法检测，视为多色（保持原样）。显式 `tint=title` 会对任何引擎强制模板外观，即使是多色文件（不要把它当作按引擎的修补手段）。
+               颜色不是图标颜色的单色素材跟随条目的有效图标颜色。固定的 `animationTint` 只在深色玻璃确实绘制时按 3:1 调整，扁平不调整。
+     */
+    public var animationTint: String? {
+        didSet { if oldValue != animationTint { entries.forEach { applyInheritedValues(to: $0.view) } } }
+    }
+
+    /**
+     [EN] The default `animationDarkTint` of every item, with the rules of `animationTint`. nil by default.
+     [CN] 每个条目的默认 `animationDarkTint`，规则同 `animationTint`。默认 nil。
+     */
+    public var animationDarkTint: String? {
+        didSet { if oldValue != animationDarkTint { entries.forEach { applyInheritedValues(to: $0.view) } } }
+    }
+
+    /**
+     [EN] The default `animationRenderingMode` of every item (automatic, alwaysTemplate, alwaysOriginal), existing and appended later; an item's own
+          non-automatic value wins. Applies only where the tint is unset. automatic by default.
+     [CN] 每个条目的默认 `animationRenderingMode`（automatic、alwaysTemplate、alwaysOriginal），包括之后追加的条目；条目自己的非 automatic 值优先。
+          只在着色未设置时生效。默认 automatic。
+          [EN] Limits: the animation view is tinted only when `animationTint` is set or the rendering mode (automatic / alwaysTemplate / alwaysOriginal) asks; tab flows keep the
+               file's own colors by default. `renderingMode=automatic` is the UNIFIED policy for every engine: a ONE-color file is tinted like "title", a multi-color file keeps its
+               colors. One-color detection works for Lottie (fl/st colors within +-2/255) and GIF (first frame, 4-bit buckets, 98%); PAG, SVGA and Rive are UNDETECTABLE and are
+               treated as multi-color (kept as they are). An explicit `tint=title` forces the template look on ANY engine, even a multi-color one (do not use it as a per-engine fix).
+               One-color artwork whose color is not the icon color follows the item's effective icon color. A fixed `animationTint` is adapted (3:1) on drawn dark glass only, not on flat.
+          [CN] 限制：只有设置了 `animationTint` 或渲染模式（automatic / alwaysTemplate / alwaysOriginal）要求时，动画视图才会着色；Tab 流程默认保持文件自己的颜色。
+               `renderingMode=automatic` 是对所有引擎统一的策略：单色文件按 "title" 着色，多色文件保持原色。单色检测对 Lottie（fl/st 颜色在 +-2/255 内）与 GIF（首帧、4 位分桶、98%）有效；
+               PAG、SVGA、Rive 无法检测，视为多色（保持原样）。显式 `tint=title` 会对任何引擎强制模板外观，即使是多色文件（不要把它当作按引擎的修补手段）。
+               颜色不是图标颜色的单色素材跟随条目的有效图标颜色。固定的 `animationTint` 只在深色玻璃确实绘制时按 3:1 调整，扁平不调整。
+     */
+    public var animationRenderingMode: CYLAnimatedItemRenderingMode = .automatic {
+        didSet { if oldValue != animationRenderingMode { entries.forEach { applyInheritedValues(to: $0.view) } } }
+    }
+
+    /**
+     [EN] The color of the dividers, resolved by each divider with its own traits (a dynamic color follows light and dark; a fixed one is used as it
+          is). nil (default): the EXPLICIT normal-state icon color of `itemAppearance` at alpha `cylAnimatedItemDividerAlpha` (0.6), else `UIColor.secondaryLabel`
+          (about 3:1 on light and dark bars; re-resolved on every appearance change).
+     [CN] 分隔条的颜色，由每条分隔条用自己的 trait 解析（动态颜色跟随浅色与深色；固定颜色原样使用）。nil（默认）：`itemAppearance` 普通状态的图标颜色
+          加 `cylAnimatedItemDividerAlpha`（0.6）透明度，否则 `UIColor.secondaryLabel`（浅色与深色 Bar 上约 3:1；每次外观变化时重新解析）。
+     */
+    public var dividerColor: UIColor? {
+        didSet { if oldValue != dividerColor { updateDividerLook() } }
+    }
+
+    /**
+     [EN] The length of the dividers' line, `cylAnimatedItemDividerLength` (20) by default; the line is 1 pixel thick and centered in a slot of
+          1 point by this length (swapped in a vertical stack).
+     [CN] 分隔条线的长度，默认 `cylAnimatedItemDividerLength`（20）；线厚 1 像素，居中于 1 点乘该长度的槽中（竖向堆叠时对调）。
+     */
+    public var dividerLength: CGFloat = cylAnimatedItemDividerLength {
+        didSet {
+            dividerLength = max(0, dividerLength)
+            if oldValue != dividerLength {
+                updateDividerLook()
+                invalidateIntrinsicContentSize()
+            }
+        }
+    }
+
+    /**
+     [EN] Whether a divider is drawn between every two visible items (false by default). `setDividerAfter(_:_:)` overrides it for one gap.
+          Never before the first or after the last visible item; a hidden item leaves no divider and no spacing.
+     [CN] 是否在每两个可见条目之间绘制分隔条（默认 false）。`setDividerAfter(_:_:)` 可对单个间隙覆盖。第一个可见条目之前与最后一个可见条目之后从不绘制；
+          隐藏的条目不留分隔条与间距。
+     */
+    public var showsDividers = false {
+        didSet { if oldValue != showsDividers { refreshGaps() } }
+    }
+
+    /**
+     [EN] The default space before a divider (between its owner item and the line); nil (default): `spacing`. A divider's own value wins.
+     [CN] 分隔条之前的默认间距（所属条目与线之间）；nil（默认）：`spacing`。分隔条自己的值优先。
+     */
+    public var dividerSpacingBefore: CGFloat? {
+        didSet { if oldValue != dividerSpacingBefore { refreshGaps() } }
+    }
+
+    /**
+     [EN] The default space after a divider (between the line and the next visible item); nil (default): that item's `spacingBefore`, else `spacing`.
+          A divider's own value wins.
+     [CN] 分隔条之后的默认间距（线与下一个可见条目之间）；nil（默认）：该条目的 `spacingBefore`，否则 `spacing`。分隔条自己的值优先。
+     */
+    public var dividerSpacingAfter: CGFloat? {
+        didSet { if oldValue != dividerSpacingAfter { refreshGaps() } }
+    }
+
+    /**
+     [EN] Attaches a divider after the CURRENT LAST item (nothing happens on an empty stack): `append(camera); appendDivider(spacingBefore: 8,
+          spacingAfter: 8); append(search)`. A nil spacing falls back to `dividerSpacingBefore` / `dividerSpacingAfter`, then as documented there.
+          The gap is before + 1 + after (the next item's `spacingBefore` is never added on top: spacing 12 and a divider of 8 and 8 make 17).
+     [CN] 在当前最后一个条目之后附加分隔条（空堆叠什么都不做）：`append(camera); appendDivider(spacingBefore: 8, spacingAfter: 8); append(search)`。
+          间距为 nil 时依次回退到 `dividerSpacingBefore` / `dividerSpacingAfter`，再按那里的说明。间隙为 before + 1 + after（下一个条目的 `spacingBefore`
+          从不叠加：spacing 为 12、分隔条 8 与 8 时间隙为 17）。
+     */
+    @nonobjc
+    open func appendDivider(spacingBefore: CGFloat? = nil, spacingAfter: CGFloat? = nil) {
+        guard let last = entries.last else { return }
+        setDivider(after: last.view, spacingBefore: spacingBefore, spacingAfter: spacingAfter)
+    }
+
+    /**
+     [EN] Puts a divider in the gap after `itemView` (with the spacings of `appendDivider`), even without `showsDividers`. The divider belongs to that
+          item: it moves with it and goes when it is removed. Drawn only while the item is visible and a later visible item exists. Not in the stack: ignored.
+     [CN] 在 `itemView` 之后的间隙放置分隔条（间距规则同 `appendDivider`），即使没有 `showsDividers`。分隔条属于该条目：随它移动，它被移除时一并消失。
+          仅当该条目可见且后面有可见条目时绘制。条目不在堆叠中：忽略。
+     */
+    @nonobjc
+    open func setDivider(after itemView: CYLAnimatedItemView, spacingBefore: CGFloat? = nil, spacingAfter: CGFloat? = nil) {
+        guard let entry = entry(for: itemView) else { return }
+        entry.dividerState = .on(before: spacingBefore, after: spacingAfter)
+        refreshGaps()
+    }
+
+    /**
+     [EN] Turns the gap after `itemView` off, also when `showsDividers` is true. Not in the stack: ignored.
+     [CN] 关闭 `itemView` 之后的间隙分隔条，`showsDividers` 为 true 时也一样。条目不在堆叠中：忽略。
+     */
+    @objc(removeDividerAfterItemView:)
+    open func removeDivider(after itemView: CYLAnimatedItemView) {
+        guard let entry = entry(for: itemView) else { return }
+        entry.dividerState = .off
+        refreshGaps()
+    }
+
+    /**
+     [EN] Whether a divider is configured after `itemView` (its own, else `showsDividers` unless removed). Whether it is drawn also depends on
+          visibility (see `setDivider`). false for an item not in the stack.
+     [CN] `itemView` 之后是否配置了分隔条（自己的，否则 `showsDividers`，除非已移除）。是否绘制还取决于可见性（见 `setDivider`）。条目不在堆叠中为 false。
+     */
+    @objc(hasDividerAfterItemView:)
+    public func hasDivider(after itemView: CYLAnimatedItemView) -> Bool {
+        guard let entry = entry(for: itemView) else { return false }
+        return entry.hasDivider(showsDividers)
+    }
+
+    /**
+     [EN] The dividers being drawn now, in order (not items: `itemViews` never holds them). They take no taps and VoiceOver skips them.
+     [CN] 当前正在绘制的分隔条，按顺序（不是条目：`itemViews` 从不包含它们）。它们不接收点击，VoiceOver 跳过。
+     */
+    public var dividerViews: [UIView] { entries.compactMap { $0.dividerShown ? $0.divider : nil } }
+
+    private func applyInheritedValues(to view: CYLAnimatedItemView) {
+        view.inheritedAnimationTint = animationTint
+        view.inheritedAnimationDarkTint = animationDarkTint
+        view.inheritedAnimationRenderingMode = animationRenderingMode
+    }
+
+    /**
+     [EN] The smallest space between the items and the view's edges (16 by default; 0 leaves no padding). [CN] 条目与视图边缘之间的最小间距（默认 16；0 表示没有内边距）。
+     */
     public var contentMargin: CGFloat = 16 {
         didSet {
             contentMargin = max(0, contentMargin)
+            invalidateIntrinsicContentSize()
             updateMarginConstraints()
             setNeedsLayout()
         }
@@ -126,7 +400,11 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
           `performAction(_:)` 与 VoiceOver 角色。
      */
     public var dispatchesItemTaps = true {
-        didSet { updateInteractionOfItemViews() }
+        didSet {
+            // [EN] A host that handles taps itself also keeps its own accessibility order. [CN] 自己处理点击的宿主也保持自己的无障碍顺序。
+            shouldGroupAccessibilityChildren = dispatchesItemTaps
+            updateInteractionOfItemViews()
+        }
     }
 
     // MARK: - Private state 私有状态
@@ -135,8 +413,28 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     private final class Entry {
         let view: CYLAnimatedItemView
         var action: String?
-        /// [EN] The item shows the stack's `itemAppearance` (it had none of its own). [CN] 条目显示堆叠视图的 `itemAppearance`（它自己没有）。
-        var usesStackAppearance = false
+        /// [EN] The space before the item (ignored for the first visible one). [CN] 条目之前的间距（第一个可见条目忽略）。
+        var spacingBefore: CGFloat = 0
+        /// [EN] The appearance the stack gave (the item's stored copy): the item's own appearance is any other. [CN] 堆叠视图给出的外观（条目保存的副本）：其他外观都是条目自己的。
+        var givenAppearance: UITabBarItemAppearance?
+        /// [EN] The divider after this item: unset (follows `showsDividers`), its own spacings, or removed. [CN] 此条目之后的分隔条：未设置（跟随 `showsDividers`）、自己的间距，或已移除。
+        enum DividerState { case unset, on(before: CGFloat?, after: CGFloat?), off }
+        var dividerState = DividerState.unset
+
+        func hasDivider(_ showsDividers: Bool) -> Bool {
+            switch dividerState {
+            case .unset: return showsDividers
+            case .on: return true
+            case .off: return false
+            }
+        }
+
+        var ownDividerSpacing: (before: CGFloat?, after: CGFloat?) {
+            if case let .on(before, after) = dividerState { return (before, after) }
+            return (nil, nil)
+        }
+        var divider: CYLAnimatedItemView?
+        var dividerShown = false
         let width: NSLayoutConstraint
         let height: NSLayoutConstraint
         var observations: [NSKeyValueObservation] = []
@@ -239,12 +537,13 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
     @objc(appendItemView:action:spacingBefore:)
     open func append(_ itemView: CYLAnimatedItemView, action: String?, spacingBefore: CGFloat) {
         guard entry(for: itemView) == nil else { return }
-        let previous = stackView.arrangedSubviews.last
         stackView.addArrangedSubview(itemView)
-        if let previous = previous { stackView.setCustomSpacing(max(0, spacingBefore), after: previous) }
         let entry = Entry(view: itemView)
-        entry.usesStackAppearance = itemView.itemAppearance == nil
+        entry.spacingBefore = max(0, spacingBefore)
         entries.append(entry)
+        refreshGaps()
+        applyInheritedValues(to: itemView)
+        invalidateIntrinsicContentSize()
         itemView.addTarget(self, action: #selector(itemTapped(_:)), for: .touchUpInside)
         observe(entry)
         setAction(action, for: itemView)
@@ -254,8 +553,120 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
 
     /// [EN] Gives the stack's appearance to an item that has none of its own. [CN] 把堆叠视图的外观交给没有自己外观的条目。
     private func applyStackAppearance(to entry: Entry) {
-        guard entry.usesStackAppearance else { return }
-        entry.view.itemAppearance = itemAppearance
+        let view = entry.view
+        // [EN] Only an item without an appearance of its own (or still showing the one given here) takes the stack's. [CN] 只有自己没有外观（或仍显示这里给出的外观）的条目才使用堆叠视图的。
+        guard view.itemAppearance == nil || view.itemAppearance === entry.givenAppearance else { return }
+        guard itemAppearance != nil || entry.givenAppearance != nil else { return }
+        view.applyInheritedItemAppearance(itemAppearance)
+        entry.givenAppearance = view.itemAppearance
+        // [EN] A subclass with its own colors puts them back (the hook is called after state changes too). [CN] 有自己颜色的子类把它们重新设置回去（状态变化之后也会调用该钩子）。
+        view.itemStateDidChange()
+    }
+
+    /// [EN] Dividers and spacing after any change of the items: a divider sits right after an item when the gap to the next VISIBLE item has one;
+    ///      the spaces around a divider are the stack's `spacing`, otherwise the next visible item's `spacingBefore`; a hidden item leaves none.
+    /// [CN] 条目变化后更新分隔条与间距：到下一个可见条目的间隙有分隔条时，分隔条紧跟在条目之后；分隔条两侧的间距为堆叠视图的 `spacing`，否则为下一个可见条目的
+    ///      `spacingBefore`；隐藏的条目不留间距。
+    private func refreshGaps() {
+        let visible = entries.filter { !$0.view.isHidden }
+        for entry in entries {
+            let isLastVisible = visible.last === entry
+            let show = !entry.view.isHidden && !isLastVisible && entry.hasDivider(showsDividers)
+            entry.dividerShown = show
+            if show {
+                let divider = entry.divider ?? makeDivider()
+                entry.divider = divider
+                var arranged = stackView.arrangedSubviews
+                let at = arranged.firstIndex(of: entry.view).map { $0 + 1 } ?? arranged.count
+                if !(at < arranged.count && arranged[at] === divider) {
+                    if divider.superview != nil {
+                        stackView.removeArrangedSubview(divider)
+                        divider.removeFromSuperview()
+                    }
+                    arranged = stackView.arrangedSubviews
+                    stackView.insertArrangedSubview(divider, at: (arranged.firstIndex(of: entry.view) ?? arranged.count - 1) + 1)
+                }
+            } else if let divider = entry.divider, divider.superview != nil {
+                stackView.removeArrangedSubview(divider)
+                divider.removeFromSuperview()
+            }
+        }
+        for (index, entry) in entries.enumerated() {
+            let next = entries[(index + 1)...].first { !$0.view.isHidden }
+            if entry.dividerShown, let divider = entry.divider {
+                // [EN] The exact gap: before + the line + after, on the owner item and on the divider. [CN] 精确的间隙：之前 + 线 + 之后，分别设在所属条目与分隔条上。
+                let gap = dividerGap(of: entry, next: next)
+                stackView.setCustomSpacing(gap.before, after: entry.view)
+                stackView.setCustomSpacing(gap.after, after: divider)
+            } else {
+                stackView.setCustomSpacing(next?.spacingBefore ?? UIStackView.spacingUseDefault, after: entry.view)
+            }
+        }
+        updateDividerLook()
+        invalidateIntrinsicContentSize()
+        setNeedsLayout()
+    }
+
+    /// [EN] before = own ?? `dividerSpacingBefore` ?? `spacing`; after = own ?? `dividerSpacingAfter` ?? the next item's `spacingBefore` ?? `spacing`.
+    /// [CN] before = 自己的 ?? `dividerSpacingBefore` ?? `spacing`；after = 自己的 ?? `dividerSpacingAfter` ?? 下一个条目的 `spacingBefore` ?? `spacing`。
+    private func dividerGap(of entry: Entry, next: Entry?) -> (before: CGFloat, after: CGFloat) {
+        let own = entry.ownDividerSpacing
+        let before = own.before ?? dividerSpacingBefore ?? stackView.spacing
+        let after = own.after ?? dividerSpacingAfter ?? next?.spacingBefore ?? stackView.spacing
+        return (max(0, before), max(0, after))
+    }
+
+    /// [EN] A divider is an item view the stack makes and owns, in the item's internal divider mode; it gets the stack's values like any item.
+    /// [CN] 分隔条是堆叠视图创建并拥有的条目视图，处于条目的内部分隔条模式；与其他条目一样接收堆叠视图的值。
+    private func makeDivider() -> CYLAnimatedItemView {
+        let divider = CYLAnimatedItemView(frame: .zero)
+        divider.cylIsDivider = true
+        return divider
+    }
+
+    private func updateDividerLook() {
+        for entry in entries {
+            guard let divider = entry.divider else { continue }
+            divider.cylDividerIsVertical = axis == .horizontal
+            divider.cylDividerLength = dividerLength
+            divider.cylDividerColor = dividerColor
+            applyInheritedValues(to: divider)
+            if divider.itemAppearance == nil || divider.isItemAppearanceInherited { divider.applyInheritedItemAppearance(itemAppearance) }
+        }
+        invalidateIntrinsicContentSize()
+    }
+
+    /**
+     [EN] Moves an item to `index` (clamped); an item not in the stack is ignored. The items' actions, spacing and accessibility stay.
+     [CN] 把条目移到 `index`（超出范围时取边界）；不在堆叠中的条目被忽略。条目的动作、间距与无障碍保持不变。
+     */
+    @objc(moveItemView:toIndex:)
+    open func move(_ itemView: CYLAnimatedItemView, to index: Int) {
+        guard let from = entries.firstIndex(where: { $0.view === itemView }) else { return }
+        let target = min(max(0, index), entries.count - 1)
+        guard target != from else { return }
+        let entry = entries.remove(at: from)
+        entries.insert(entry, at: target)
+        stackView.removeArrangedSubview(itemView)
+        stackView.insertArrangedSubview(itemView, at: target)
+        refreshGaps()
+        entries.forEach { updateAccessibility(of: $0.view) }
+    }
+
+    /**
+     [EN] Makes the stack hold exactly `itemViews`, in that order: missing ones are removed, new ones appended (no action, the default
+          spacing), the others kept and moved.
+     [CN] 让堆叠视图恰好容纳 `itemViews`，顺序一致：缺少的被移除，新的被追加（无动作、默认间距），其余保留并移动。
+     */
+    @objc(replaceItemViews:)
+    open func replaceItemViews(_ itemViews: [CYLAnimatedItemView]) {
+        entries.map { $0.view }.filter { view in !itemViews.contains { $0 === view } }.forEach { remove($0) }
+        for (index, view) in itemViews.enumerated() {
+            if entry(for: view) == nil {
+                append(view, action: nil, spacingBefore: stackView.spacing)
+            }
+            move(view, to: index)
+        }
     }
 
     /**
@@ -285,10 +696,19 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         guard let index = entries.firstIndex(where: { $0.view === itemView }) else { return }
         let entry = entries.remove(at: index)
         entry.observations.forEach { $0.invalidate() }
+        itemView.inheritedAnimationTint = nil
+        itemView.inheritedAnimationDarkTint = nil
+        itemView.inheritedAnimationRenderingMode = .automatic
+        if itemView.itemAppearance === entry.givenAppearance { itemView.applyInheritedItemAppearance(nil) }
         itemView.removeTarget(self, action: #selector(itemTapped(_:)), for: .touchUpInside)
         NSLayoutConstraint.deactivate([entry.width, entry.height])
         stackView.removeArrangedSubview(itemView)
         itemView.removeFromSuperview()
+        if let divider = entry.divider, divider.superview != nil {
+            stackView.removeArrangedSubview(divider)
+            divider.removeFromSuperview()
+        }
+        refreshGaps()
         // [EN] A new first item may now carry the background action. [CN] 新的第一个条目可能需要承载背景动作。
         entries.forEach { updateAccessibility(of: $0.view) }
     }
@@ -361,6 +781,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
             guard let self = self, let entry = entry, !self.updatingAccessibility else { return }
             self.updateAccessibility(of: entry.view)
             self.fit(entry)
+            self.invalidateIntrinsicContentSize()
         }
         let reread: (CYLAnimatedItemView) -> Void = { [weak self] view in
             guard let self = self, !self.updatingAccessibility else { return }
@@ -368,6 +789,7 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         }
         entry.observations = [
             view.observe(\.title) { v, _ in refit(v) },
+            view.observe(\.isHidden) { [weak self] _, _ in self?.refreshGaps() },
             view.observe(\.image) { v, _ in refit(v) },
             view.observe(\.selectedImage) { v, _ in refit(v) },
             view.observe(\.animationURL) { v, _ in refit(v) },
@@ -458,17 +880,20 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
 
     // MARK: - Layout 布局
 
+    /// [EN] `contentMargin` plus the content inset, left and right. [CN] 左右的 `contentMargin` 加内容内缩。
+    private var horizontalMargin: CGFloat { contentMargin + resolvedItemContentHorizontalInset }
+
     private func updateMarginConstraints() {
         NSLayoutConstraint.deactivate(marginConstraints)
         marginConstraints = [
-            stackView.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: contentMargin),
+            stackView.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: horizontalMargin),
             stackView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor, constant: contentMargin),
         ]
         NSLayoutConstraint.activate(marginConstraints)
     }
 
     private var itemMaxWidth: CGFloat {
-        bounds.width > 0 ? max(0, bounds.width - 2 * contentMargin) : 0
+        bounds.width > 0 ? max(0, bounds.width - 2 * horizontalMargin) : 0
     }
 
     /// [EN] Sizes an item for the view's width, so a long title wraps instead of widening the stack.
@@ -485,14 +910,47 @@ open class CYLAnimatedItemStackView: UIView, UIGestureRecognizerDelegate {
         NSLayoutConstraint.activate([entry.width, entry.height])
     }
 
+    /**
+     [EN] The stack hugs its items: each visible item at its own size (a hidden one counts for nothing, nor does its spacing), the spaces
+          between them, and `contentMargin` around. It follows Dynamic Type through the items' sizes.
+     [CN] 堆叠视图紧贴条目：每个可见条目取自己的尺寸（隐藏的条目及其间距不计），加上条目之间的间距与四周的 `contentMargin`。通过条目的尺寸跟随动态字体。
+     */
+    open override var intrinsicContentSize: CGSize {
+        let limit = itemMaxWidth > 0 ? itemMaxWidth : CGFloat.greatestFiniteMagnitude
+        let visible = entries.filter { !$0.view.isHidden }
+        var main: CGFloat = 0
+        var cross: CGFloat = 0
+        let horizontal = axis == .horizontal
+        for (index, entry) in visible.enumerated() {
+            let size = entry.view.sizeThatFits(CGSize(width: limit, height: .greatestFiniteMagnitude))
+            main += horizontal ? size.width : size.height
+            cross = max(cross, horizontal ? size.height : size.width)
+            if index > 0 {
+                let previous = visible[index - 1]
+                if previous.dividerShown {
+                    let gap = dividerGap(of: previous, next: entry)
+                    main += gap.before + 1 + gap.after
+                    cross = max(cross, dividerLength)
+                } else {
+                    main += entry.spacingBefore
+                }
+            }
+        }
+        let margins = CGSize(width: 2 * horizontalMargin, height: 2 * contentMargin)
+        return horizontal ? CGSize(width: main + margins.width, height: cross + margins.height)
+                          : CGSize(width: cross + margins.width, height: main + margins.height)
+    }
+
     open override func layoutSubviews() {
         entries.forEach(fit)
         super.layoutSubviews()
+        layoutItemBackground()
     }
 
     open override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         // [EN] Dynamic Type changes the titles' heights. [CN] 动态字体会改变标题高度。
+        invalidateIntrinsicContentSize()
         setNeedsLayout()
     }
 }

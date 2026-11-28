@@ -630,8 +630,8 @@
  */
 /*
  * [EN] The badge categories find an animated item's icon (docs/Animated-Item.md): a badge on a CYLAnimatedItemView goes on
- *      its icon (the image here, no animation), not on the whole control.
- * [CN] 角标分类方法能找到动效 item 的图标：CYLAnimatedItemView 上的角标放在其图标上（这里是图片，没有动画），而不是整个控件。
+ *      `badgeAnchorView`, a view kept on its icon (docs/Animated-Item-Badge.md, step 11), not on the whole control.
+ * [CN] 角标分类方法能找到动效 item 的图标：CYLAnimatedItemView 上的角标放在其 `badgeAnchorView`（保持在图标上的视图，docs/Animated-Item-Badge.md 步骤 11）上，而不是整个控件。
  */
 - (void)testABadgeOnAnAnimatedItemGoesOnItsIcon {
     Class componentClass = NSClassFromString(@"CYLAnimatedItemView");
@@ -645,7 +645,8 @@
     window.hidden = NO;
     [item layoutIfNeeded];
     UIImageView *imageView = [item valueForKey:@"imageView"];
-    XCTAssertEqual([item cyl_animatedItemBadgeHost], imageView, @"the icon hosts the badge");
+    UIView *anchor = [item valueForKey:@"badgeAnchorView"];
+    XCTAssertEqual([item cyl_animatedItemBadgeHost], anchor, @"the view kept on the icon hosts the badge");
     UIView *nonItem = [[UIView alloc] init];
     XCTAssertNil([nonItem cyl_animatedItemBadgeHost], @"other views are not animated items");
     [item cyl_showBadgeValue:@"3" animationType:CYLBadgeAnimationTypeNone];
@@ -660,8 +661,10 @@
         [queue addObjectsFromArray:view.subviews];
     }
     XCTAssertNotNil(badge, @"the badge is shown");
-    XCTAssertTrue([badge isDescendantOfView:imageView], @"the badge is added to the icon subview, not to the item or an anchor: %@",
+    XCTAssertTrue([badge isDescendantOfView:anchor], @"the badge is added to the anchor, which an image / animation switch never hides: %@",
                   badge.superview);
+    XCTAssertTrue(CGRectEqualToRect(anchor.frame, imageView.frame), @"the anchor is on the icon: %@ vs %@",
+                  NSStringFromCGRect(anchor.frame), NSStringFromCGRect(imageView.frame));
     XCTAssertTrue([item cyl_isShowBadge], @"the item reports the badge of its icon");
     [item cyl_clearBadge];
     XCTAssertFalse([item cyl_isShowBadge], @"clearing through the item clears the icon's badge");

@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The demo rows of the settings section, part 2: subviews outside their superview, images from a bundle, navigation
  *      settings without a base class, the slide transition classes, and a plus button whose image is set later. Translated

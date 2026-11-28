@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a pe Android: o aplicație nu poate trimite acest eveniment de sistem.";
 "Runs every automatic row, one after the other." = "Rulează toate rândurile automate, unul după altul.";
 "Tab bar %@ · page ID \"%@\"" = "Bara de file %@ · ID pagină „%@”";
+"Animated item engine API" = "API-ul motoarelor elementului animat";
+"Stop at 50%" = "Oprește la 50%";
+"Show image when ended" = "Afișează imaginea la final";
+"Restart token: %@" = "Token de repornire: %@";
+"End callback: %@" = "Callback de final: %@";
+"none yet" = "încă niciunul";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Redarea este condusă de gazdă (drivesAnimationPlayback = false)";
+"Engine API" = "API motor";
+"Pause while scrolling" = "Pauză la derulare";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Eliberează controlerul barei de file (în 3 s)";
+"teardown: not run" = "eliberare: neexecutată";
+"teardown: releasing in %d s" = "eliberare: în %d s";
+"dealloc callbacks ran: %d / %d" = "callback-uri dealloc executate: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "callback-uri dealloc executate: %d / %d (%@)";
+"Tab bar controller released" = "Controlerul barei de file a fost eliberat";
+"bridge: pause %d, resume %d" = "punte: pauză %d, reluare %d";
+"last event: -" = "ultimul eveniment: -";
+"last event: %@" = "ultimul eveniment: %@";
+"Content inset" = "Margine interioară a conținutului";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset nesetat: un element plat și unul Liquid Glass, normal și selectat";
+"Flat: itemContentHorizontalInset unset" = "Plat: itemContentHorizontalInset nesetat";
+"Normal" = "Normal";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset nesetat";

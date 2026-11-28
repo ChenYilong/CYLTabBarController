@@ -24,8 +24,11 @@ target 'CyltabbarExample' do
 
   # CYLTabBarController from this repository with its Rive subspec (RiveRuntime), as Example-Rive.
   pod 'CYLTabBarController/Rive', :path => '../../../..'
+  pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => '4276a6dab5a428ccc3a5f3f347eab991881fb97c' # TODO: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md)
   # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
   # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
+  pod 'CYLUtils', :path => '../../../..'
+  pod 'CYLBadge', :path => '../../../..'
   pod 'CYLAnimatedItem', :path => '../../../..'
   # FIX: issue #415 — SVGA tab icons (SVGAPlayer), one for one with the Rive ones, as Example-Rive.
   # SVGA Tab 图标（SVGAPlayer），与 Rive 图标一一对应，与 Example-Rive 相同。
@@ -34,6 +37,12 @@ target 'CyltabbarExample' do
   # [CN] 静态链接：Swift 库导入这两个 Objective-C pod，因此它们需要 module map。
   pod 'SVGAPlayerLite', :modular_headers => true
   pod 'Protobuf', :modular_headers => true
+
+  # [EN] The unit tests of the bridge view (CyltabbarExampleTests) only need the headers; the host app links the code.
+  # [CN] 桥接视图的单元测试（CyltabbarExampleTests）只需要头文件，代码由宿主 App 链接。
+  target 'CyltabbarExampleTests' do
+    inherit! :search_paths
+  end
 
   use_react_native!(
     :path => config[:reactNativePath],

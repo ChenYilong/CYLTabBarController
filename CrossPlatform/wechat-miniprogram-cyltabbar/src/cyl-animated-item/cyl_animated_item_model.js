@@ -1,5 +1,7 @@
 const { cylIsGIFImagePath } = require('./cyl_gif_image')
 const { cylCountdownText } = require('./cyl_animated_item_countdown')
+const { cylBadgeViewModel, cylBadgeParseAttributes } = require('../cyl-badge/cyl_badge_model')
+const { cylAnimatedItemContrastLift, cylAnimatedItemContrastLiftToReference, cylAnimatedItemFlatReferenceLuminance, CYL_ICON_MINIMUM_CONTRAST, CYL_TITLE_MINIMUM_CONTRAST, CYL_ADAPTED_KIND_ICON, CYL_ADAPTED_KIND_TEXT, CYL_ADAPTED_KIND_TITLE } = require('./cyl_animated_item_contrast')
 /**
  * [EN] The render model of cyl-animated-item, the mini program counterpart of iOS `CYLAnimatedItemView` (the
  *      CYLAnimatedItem pod) and Android `com.cyl.animateditem.CYLAnimatedItemView`. Pure functions without any wx API,
@@ -47,6 +49,73 @@ function cylAnimatedItemType(path) {
 }
 
 /**
+ * [EN] The "name=value" pairs after the first "?" or "#": split at "&", and at a "?" or "#" that starts the next group
+ *      ("artboard=CHAT#input=active"), not at one inside a value ("tint=#FF0000", a color written without encoding).
+ *      The HarmonyOS rule (`cylOptionPairs`).
+ * [CN] 第一个 "?" 或 "#" 之后的「名称=值」对：在 "&" 处分开，也在开始下一组的 "?" 或 "#" 处分开，但不在值内部的 "#" 处分开
+ *      （例如 "tint=#FF0000"）。鸿蒙的规则（`cylOptionPairs`）。
+ */
+function cylAnimatedItemOptionPairs(text) {
+  const pairs = []
+  text.split('&').forEach((piece) => {
+    let start = 0
+    for (let i = 1; i < piece.length; i++) {
+      const c = piece.charAt(i)
+      if ((c === '#' || c === '?') && piece.charAt(i - 1) !== '=') {
+        pairs.push(piece.slice(start, i))
+        start = i + 1
+      }
+    }
+    pairs.push(piece.slice(start))
+  })
+  return pairs
+}
+
+/** [EN] Percent-decoded text; an undecodable text is kept as it is. [CN] 百分号解码后的文本；无法解码时保持原样。 */
+function cylAnimatedItemDecode(text) {
+  try {
+    return decodeURIComponent(text)
+  } catch {
+    return text
+  }
+}
+
+/**
+ * [EN] An animation value split into its file (or inline Lottie JSON), its `#` options and its type, with the rules of
+ *      HarmonyOS `CYLAnimatedItemSource.parse` and the shared vectors in `CrossPlatform/animated-item-fixtures/
+ *      source-options.json` (test/cyl_animated_item_source.test.js): an `asset:` prefix is dropped; the options follow the first
+ *      "#" or "?"; names and values are percent-decoded; a pair without a name is dropped; the type comes from the file
+ *      extension ('lottie', 'pag', 'rive', 'svga', 'gif', or ''); trimmed text that starts with "{" or "[" is inline Lottie JSON.
+ *      Returns `{ url, file, inlineJSON, options, type }`; `file` is '' and `inlineJSON` is set for inline JSON, else
+ *      `inlineJSON` is undefined.
+ * [CN] 把动画值拆分为文件（或内联 Lottie JSON）、`#` 选项与类型，规则与鸿蒙的 `CYLAnimatedItemSource.parse` 以及共享测试向量
+ *      `CrossPlatform/animated-item-fixtures/source-options.json` 一致（test/cyl_animated_item_source.test.js）：丢弃 `asset:` 前缀；
+ *      选项位于第一个 "#" 或 "?" 之后；名称与值经百分号解码；没有名称的对被丢弃；类型来自文件扩展名（'lottie'、'pag'、'rive'、'svga'、
+ *      'gif' 或 ''）；去掉首尾空白后以 "{" 或 "[" 开头的文本是内联 Lottie JSON。返回 `{ url, file, inlineJSON, options, type }`；
+ *      内联 JSON 时 `file` 为 '' 且设置 `inlineJSON`，否则 `inlineJSON` 为 undefined。
+ */
+function cylAnimatedItemSource(value) {
+  const url = value === null || value === undefined ? '' : String(value)
+  const trimmed = url.trim()
+  if (!trimmed.startsWith('asset:') && (trimmed.startsWith('{') || trimmed.startsWith('['))) {
+    return { url, file: '', inlineJSON: trimmed, options: {}, type: 'lottie' }
+  }
+  const raw = trimmed.startsWith('asset:') ? trimmed.slice('asset:'.length) : trimmed
+  const query = raw.indexOf('?')
+  const hash = raw.indexOf('#')
+  const at = query >= 0 && hash >= 0 ? Math.min(query, hash) : Math.max(query, hash)
+  const options = {}
+  if (at >= 0) {
+    cylAnimatedItemOptionPairs(raw.slice(at + 1)).forEach((pair) => {
+      const eq = pair.indexOf('=')
+      if (eq > 0) options[cylAnimatedItemDecode(pair.slice(0, eq))] = cylAnimatedItemDecode(pair.slice(eq + 1))
+    })
+  }
+  const file = at >= 0 ? raw.slice(0, at) : raw
+  return { url, file, inlineJSON: undefined, options, type: cylAnimatedItemType(file) }
+}
+
+/**
  * [EN] The npm package that plays `type`, or '' (GIF needs none). [CN] 播放 `type` 的 npm 包，没有时为 ''（GIF 不需要）。
  */
 function cylAnimatedItemPackage(type) {
@@ -61,6 +130,14 @@ function cylAnimatedItemPackage(type) {
  *      `CYLAnimatedItemView.animationRestingProgress` 相同。
  */
 function cylAnimatedItemRestingProgress(p) {
+  // [EN] Host-driven (`drivesAnimationPlayback` false): the progress the host last stopped at, whatever is selected.
+  // [CN] 宿主驱动（`drivesAnimationPlayback` 为 false）：宿主上次停下的进度，与选中状态无关。
+  if (p.drivesAnimationPlayback === false) {
+    // [EN] `showsLastFrameWhenSelected` (default off): a selected host-driven item rests on the last frame, as the default rules do. [CN] `showsLastFrameWhenSelected`（默认关闭）：被选中的宿主驱动条目停在最后一帧，与默认规则相同。
+    if (p.showsLastFrameWhenSelected && p.selected) return 1
+    const hosted = Number(p.hostRestingProgress)
+    return Number.isFinite(hosted) ? Math.min(1, Math.max(0, hosted)) : 0
+  }
   if (p.selected) return 1
   const progress = Number(p.restingProgress)
   return Number.isFinite(progress) ? Math.min(1, Math.max(0, progress)) : 0
@@ -234,19 +311,491 @@ function cylAnimatedItemTitleLines(value) {
   return Number.isFinite(lines) && lines >= 0 ? Math.floor(lines) : 1
 }
 
+/**
+ * [EN] The two static layers of an item with both an `image` and a different `selectedImage` (no GIF): both stay mounted and a
+ *      selection change toggles only their opacity, so no node is created and no `src` changes on a tap (no frame can show a
+ *      blank or the previous image). Each layer has its own tint (`iconTint` for the normal one, `selectedIconTint` for the
+ *      selected one; a `selectedIconTint` that is not set means `iconTint`). `layered` is false for any other item.
+ * [CN] 同时有 `image` 与不同的 `selectedImage`（非 GIF）的条目的两个静态图层：两者都保持挂载，选中变化只切换它们的不透明度，
+ *      点击时既不创建节点也不改变 `src`（任何一帧都不会出现空白或上一张图片）。每个图层有自己的着色（普通图层用 `iconTint`，
+ *      选中图层用 `selectedIconTint`；未设置 `selectedIconTint` 时用 `iconTint`）。其他条目的 `layered` 为 false。
+ */
+function cylAnimatedItemStillLayers(p, fallbackImage, fallbackHidden, adapt) {
+  const normal = p.image || ''
+  const selected = p.selectedImage || ''
+  const adaptTint = adapt || ((c) => c)
+  const tintNormal = adaptTint(p.iconTint || '')
+  const tintSelected = p.selectedIconTint === null || p.selectedIconTint === undefined ? tintNormal : adaptTint(p.selectedIconTint)
+  const layered = !!normal && !!selected && normal !== selected && !!fallbackImage && !cylIsGIFImagePath(normal) && !cylIsGIFImagePath(selected)
+  return {
+    layered,
+    normalImage: normal,
+    selectedImage: selected,
+    normalTint: tintNormal,
+    selectedTint: tintSelected,
+    normalHidden: fallbackHidden || !!p.selected,
+    selectedHidden: fallbackHidden || !p.selected,
+    currentTint: p.selected ? tintSelected : tintNormal,
+  }
+}
+
+/**
+ * [EN] A color the animation can be drawn in as a canvas / CSS color: '#RGB', '#RRGGBB' and '#RRGGBBAA' ('#RGBA' too) as written
+ *      ('#RRGGBBAA' as rgba(), which every canvas understands), any other plain color text (a name, rgb(), hsl()) as it is; '' for
+ *      blank text, "title" or text outside a plain color's characters (it could break out of a style value). The shared contract is "#RRGGBB" / "#RRGGBBAA".
+ * [CN] 动画可以使用的 canvas / CSS 颜色：'#RGB'、'#RRGGBB'、'#RRGGBBAA'（及 '#RGBA'）；'#RRGGBBAA' 转为 rgba()（所有 canvas 都认识），
+ *      其他普通颜色文本（名称、rgb()、hsl()）原样使用；空白文本、"title" 或含有普通颜色以外字符的文本（可能破坏样式值）为 ''。共同约定为 "#RRGGBB" / "#RRGGBBAA"。
+ */
+function cylAnimatedItemTintColor(value) {
+  const text = String(value === null || value === undefined ? '' : value).trim()
+  if (!text || text.toLowerCase() === 'title' || /[^\w#(),.%\s/-]/.test(text)) return ''
+  const hex = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(text)
+  if (!hex || hex[1].length === 3 || hex[1].length === 6) return text
+  const digits = hex[1].length === 4 ? hex[1].replace(/./g, '$&$&') : hex[1]
+  const channel = (index) => Number.parseInt(digits.slice(index * 2, index * 2 + 2), 16)
+  return `rgba(${channel(0)},${channel(1)},${channel(2)},${Math.round((channel(3) / 255) * 1000) / 1000})`
+}
+
+/**
+ * [EN] A tint OPTION (`animationTint` / `animationDarkTint`) as a canvas / CSS color: only "#RGB", "#RGBA", "#RRGGBB" and
+ *      "#RRGGBBAA" count (8 digits are ALWAYS #RRGGBBAA, the iOS / Rive order, never #AARRGGBB); anything else (a name, "title",
+ *      other text) is '' = not set.
+ * [CN] 着色「选项」（`animationTint` / `animationDarkTint`）转为 canvas / CSS 颜色：只有 "#RGB"、"#RGBA"、"#RRGGBB"、"#RRGGBBAA"
+ *      有效（8 位始终是 #RRGGBBAA，即 iOS / Rive 的顺序，绝不是 #AARRGGBB）；其他文本（名称、"title"、任意文字）为 ''，即未设置。
+ */
+function cylAnimatedItemTintHex(value) {
+  const text = String(value === null || value === undefined ? '' : value).trim()
+  return /^#(?:[0-9a-f]{6}|[0-9a-f]{8})$/i.test(text) ? cylAnimatedItemTintColor(text) : ''
+}
+
+/**
+ * [EN] BUILT-IN COLORS (tint spec v2, section 3 and 10; the iOS system defaults, measured, used as constants because the mini program has no tint chain;
+ *      evaluated at resolve time with the item's OWN dark flag, never stored): normal icon and title = label (0,0,0 | 255,255,255); selected = the
+ *      host's default selected color when passed (`builtInSelectedColor`, the mini tab bar's own default), else systemBlue (0,136,255 | 0,145,255);
+ *      disabled = the UIButton disabled look (134,134,134 at 0.45 | 140,140,140 at 0.35); divider = secondaryLabel (60,60,67 at 0.6 | 235,235,245 at 0.6).
+ * [CN] 内置颜色（着色规范 v2 第 3、10 节；实测的 iOS 系统默认值，小程序没有 tint 继承链，因此用常量；解析时按条目「自己的」深色标志计算，不存储）：
+ *      普通图标与标题 = label（0,0,0 | 255,255,255）；选中 = 宿主传入的默认选中色（`builtInSelectedColor`，即小程序 TabBar 自己的默认值），否则 systemBlue
+ *      （0,136,255 | 0,145,255）；禁用 = UIButton 禁用外观（134,134,134 透明度 0.45 | 140,140,140 透明度 0.35）；分割线 = secondaryLabel（60,60,67 透明度 0.6 | 235,235,245 透明度 0.6）。
+ */
+const CYL_ANIMATED_ITEM_BUILTIN = {
+  label: ['rgb(0,0,0)', 'rgb(255,255,255)'],
+  selected: ['rgb(0,136,255)', 'rgb(0,145,255)'],
+  disabled: ['rgba(134,134,134,0.45)', 'rgba(140,140,140,0.35)'],
+  secondaryLabel: ['rgba(60,60,67,0.6)', 'rgba(235,235,245,0.6)'],
+}
+
+/** [EN] One built-in color by name and the dark flag. [CN] 按名称与深色标志取一个内置颜色。 */
+function cylAnimatedItemBuiltInColor(name, isDark) {
+  return CYL_ANIMATED_ITEM_BUILTIN[name][isDark ? 1 : 0]
+}
+
+/**
+ * [EN] The color levels of the icon and the title (iOS `CYLAnimatedItemView`, the precedence note of the tint unification): the state of an item is
+ *      'disabled' (`enabled` false), 'selected' or 'normal'. A color level is the text of a property; '' means the level is absent.
+ * [CN] 图标与标题的颜色层级（iOS `CYLAnimatedItemView`，tint 统一说明中的优先级）：条目状态为 'disabled'（`enabled` 为 false）、'selected' 或 'normal'。
+ *      颜色层级是属性的文本；'' 表示该层不存在。
+ */
+function cylAnimatedItemStateName(p) {
+  if (p.enabled === false) return 'disabled'
+  return p.selected ? 'selected' : 'normal'
+}
+
+const CYL_ANIMATED_ITEM_STATE_PART = { normal: '', selected: 'Selected', disabled: 'Disabled' }
+
+/**
+ * [EN] The SUBCLASS-EXPLICIT color of a state (`subclassTitleColor` / `subclassSelectedTitleColor` / `subclassDisabledTitleColor`, and the same three
+ *      for `...IconColor`; '' = none). `part` is 'Title' or 'Icon'. A missing selected value falls back to the normal one. It counts as an EXPLICIT color
+ *      (adapted on drawn dark glass) and is never written into the integrator's `titleColor` / `iconTint`.
+ * [CN] 某状态的「子类显式」颜色（`subclassTitleColor` / `subclassSelectedTitleColor` / `subclassDisabledTitleColor`，图标为同样三个 `...IconColor`；'' 为无）。
+ *      `part` 为 'Title' 或 'Icon'。缺少选中值时回退到常态值。它算「显式」颜色（在绘制的深色玻璃上适配），且绝不写入集成方的 `titleColor` / `iconTint`。
+ */
+function cylAnimatedItemSubclassExplicit(p, part, state) {
+  const read = (name) => String(p[`subclass${CYL_ANIMATED_ITEM_STATE_PART[name]}${part}Color`] ?? '').trim()
+  return state === 'selected' ? read('selected') || read('normal') : read(state)
+}
+
+/**
+ * [EN] The SUBCLASS BUILT-IN color of a state (the twin of iOS `applyTitleTintColor` / `applyIconTintColor`: `builtInTitleColor`,
+ *      `builtInSelectedTitleColor`, `builtInDisabledTitleColor`, and `builtInIconColor`, `builtInSelectedIconColor`, `builtInDisabledIconColor`; a host such as cyl-tag-list sets
+ *      them to its effective color of each state; '' = none). No fallback between states.
+ * [CN] 某状态的「子类内置」颜色（iOS `applyTitleTintColor` / `applyIconTintColor` 的对应：`builtInTitleColor`、`builtInSelectedTitleColor`、
+ *      `builtInDisabledTitleColor` 与 `builtInIconColor`、`builtInSelectedIconColor`、`builtInDisabledIconColor`；cyl-tag-list 等宿主把它们设为各状态的有效颜色；'' 为无）。状态之间不回退。
+ */
+function cylAnimatedItemSubclassBuiltIn(p, part, state) {
+  return String(p[`builtIn${CYL_ANIMATED_ITEM_STATE_PART[state]}${part}Color`] ?? '').trim()
+}
+
+/** [EN] The component built-in color of a state: the disabled look, the host's default selected color (else systemBlue) or label. [CN] 某状态的组件内置颜色：禁用外观、宿主的默认选中色（否则 systemBlue）或 label。 */
+function cylAnimatedItemComponentBuiltIn(p, state, dark) {
+  if (state === 'disabled') return cylAnimatedItemBuiltInColor('disabled', dark)
+  if (state === 'selected') return cylAnimatedItemTintColor(p.builtInSelectedColor) || cylAnimatedItemBuiltInColor('selected', dark)
+  return cylAnimatedItemBuiltInColor('label', dark)
+}
+
+/**
+ * [EN] The EFFECTIVE icon color of the current state, ONE function for every level (precedence, as iOS): the item's own explicit color (`iconTint` normal,
+ *      `selectedIconTint` selected; the item's, else the stack's, already merged by the caller) > subclass-explicit (`subclass...IconColor` of the state, selected
+ *      falls back to normal) > stack-inherited (`inheritedIconTint` / `inheritedSelectedIconTint`, for a host that passes the stack's color apart from its own)
+ *      > subclass built-in (`builtIn...IconColor`) > component built-in (disabled look, the host's default selected color else systemBlue, label). The explicit
+ *      levels AND both built-in levels (normal and selected) go through the glass adapter (`p.adaptColor`, else `cylAnimatedItemAdaptedColor` of `p`: only on drawn dark
+ *      glass, icon minimum 3); the DISABLED built-in look never. '' for a color the canvas cannot use.
+ * [CN] 当前状态「有效」的图标颜色，所有层级用同一个函数（优先级同 iOS）：条目自己的显式颜色（普通 `iconTint`，选中 `selectedIconTint`；条目的，否则堆叠的，由调用者合并）
+ *      > 子类显式（该状态的 `subclass...IconColor`，选中缺失时回退到常态）> 堆叠继承（`inheritedIconTint` / `inheritedSelectedIconTint`，供把堆叠的颜色与自己的分开传入的宿主）
+ *      > 子类内置（`builtIn...IconColor`）> 组件内置（禁用外观、宿主的默认选中色否则 systemBlue、label）。显式层与两个内置层（常态与选中）都经过玻璃适配
+ *      （`p.adaptColor`，否则用 `p` 的 `cylAnimatedItemAdaptedColor`：只在绘制的深色玻璃上，图标最低 3）；「禁用」内置外观从不适配。画布无法使用的颜色为 ''。
+ */
+function cylAnimatedItemResolvedIconColor(p) {
+  const state = cylAnimatedItemStateName(p)
+  const dark = p.isDark === undefined ? cylAnimatedItemIsDark(p) : !!p.isDark
+  const adapt = p.adaptColor || ((color) => cylAnimatedItemAdaptedColor(color, CYL_ADAPTED_KIND_ICON, p))
+  const own = cylAnimatedItemTintColor(p.selected ? p.selectedIconTint : p.iconTint)
+  if (own) return adapt(own)
+  const subclass = cylAnimatedItemTintColor(cylAnimatedItemSubclassExplicit(p, 'Icon', state))
+  if (subclass) return adapt(subclass)
+  const inherited = cylAnimatedItemTintColor(p.selected ? p.inheritedSelectedIconTint || p.inheritedIconTint : p.inheritedIconTint)
+  if (inherited) return adapt(inherited)
+  const builtIn = cylAnimatedItemTintColor(cylAnimatedItemSubclassBuiltIn(p, 'Icon', state))
+  if (builtIn) return state === 'disabled' ? builtIn : adapt(builtIn)
+  const component = cylAnimatedItemComponentBuiltIn(p, state, dark)
+  return state === 'disabled' ? component : adapt(component)
+}
+
+/** [EN] The effective icon color (see `cylAnimatedItemResolvedIconColor`, which this forwards to). [CN] 有效图标颜色（转到 `cylAnimatedItemResolvedIconColor`）。 */
+function cylAnimatedItemEffectiveIconColor(p) {
+  return cylAnimatedItemResolvedIconColor(p)
+}
+
+/**
+ * [EN] The animation rendering mode: 'automatic' (default), 'alwaysTemplate' or 'alwaysOriginal' (case-insensitive; also the URL option `renderingMode=`).
+ *      The property wins over the URL option; anything else is unset = automatic. [CN] 动画渲染模式：'automatic'（默认）、'alwaysTemplate'、
+ *      'alwaysOriginal'（不区分大小写；也可用 URL 选项 `renderingMode=`）。属性优先于 URL 选项；其他值视为未设置，即 automatic。
+ */
+function cylAnimatedItemRenderingMode(property, animationUrl) {
+  const modes = { automatic: 'automatic', alwaystemplate: 'alwaysTemplate', alwaysoriginal: 'alwaysOriginal' }
+  const given = modes[String(property === null || property === undefined ? '' : property).trim().toLowerCase()]
+  if (cylAnimatedItemHasValue(property)) return given || 'automatic'
+  return modes[cylAnimatedItemSourceOption(animationUrl, 'renderingMode').toLowerCase()] || 'automatic'
+}
+
+/**
+ * [EN] The one color an animation is drawn in (the same names and values as Rive's `tint` / `darkTint`), or '' for the file's own
+ *      colors. THE truth table (identical on every platform): an explicit `animationTint` always wins. "title": the EFFECTIVE icon color of the state
+ *      (explicit, else built-in). A fixed color ("#RRGGBB" / "#RRGGBBAA"): unselected the fixed color, in dark mode `animationDarkTint` when it is
+ *      a valid color; selected the EXPLICIT selected icon color when there is one (never the built-in one, or every fixed tint would turn blue when
+ *      selected), else the fixed color (`animationDarkTint` still applies in dark mode). `iconTint` / `selectedIconTint` are the EXPLICIT icon colors
+ *      (unset or '' = absent). With NO animationTint (unset or invalid text) the rendering mode decides (`animationRenderingMode`, else the source's
+ *      `renderingMode=`): alwaysOriginal never tints; alwaysTemplate tints with the effective icon color; automatic tints with it only when
+ *      `animationColorKind` is 'one' (the detector's result; 'multi' / 'unknown' / unset keep the file colors). This mini program can tint only Rive
+ *      and a playing GIF, so with an `animationType` other than 'rive' / 'gif' the rendering mode never tints. A set `animationTint` overrides the same
+ *      option in the animation source.
+ * [CN] 动画使用的唯一颜色（名称与取值同 Rive 的 `tint` / `darkTint`），'' 表示保持文件自身的颜色。真值表（各平台一致）：显式的 `animationTint` 始终优先。
+ *      "title"：该状态「有效」的图标颜色（显式，否则内置）。固定颜色（"#RRGGBB" / "#RRGGBBAA"）：未选中为固定颜色，深色模式下 `animationDarkTint` 有效时用它；
+ *      选中时有「显式」选中图标颜色就用它（绝不用内置色，否则选中时所有固定着色都会变蓝），否则用固定颜色（深色模式下 `animationDarkTint` 仍作用）。
+ *      `iconTint` / `selectedIconTint` 是「显式」图标颜色（未设置或 '' 为没有）。没有 animationTint（未设置或文本无效）时由渲染模式决定
+ *      （`animationRenderingMode`，否则来源中的 `renderingMode=`）：alwaysOriginal 从不着色；alwaysTemplate 用有效图标颜色着色；automatic 仅当
+ *      `animationColorKind` 为 'one'（检测结果；'multi' / 'unknown' / 未设置保持文件颜色）时着色。本小程序只能给 Rive 与播放中的 GIF 改色，因此
+ *      `animationType` 不是 'rive' / 'gif' 时渲染模式从不着色。已设置的 `animationTint` 覆盖动画来源中的同名选项。
+ */
+function cylAnimatedItemAnimationTint(input) {
+  const p = input || {}
+  // [EN] A non-blank property wins over the option of the same name in the source, valid or not (an invalid one is unset); a blank
+  //      one falls back to the option. Same on every platform. [CN] 非空属性（有效与否）优先于来源中同名的选项（无效即未设置）；
+  //      空属性回退到选项。各平台相同。
+  const option = cylAnimatedItemHasValue(p.animationTint) ? String(p.animationTint).trim() : cylAnimatedItemSourceOption(p.animationUrl, 'tint')
+  const darkOption = cylAnimatedItemHasValue(p.animationDarkTint) ? p.animationDarkTint : cylAnimatedItemSourceOption(p.animationUrl, 'darkTint')
+  const selectedColor = cylAnimatedItemTintColor(p.selectedIconTint)
+  // [EN] "title" is case-sensitive, as on every platform. [CN] "title" 区分大小写，各平台相同。
+  if (option === 'title') return cylAnimatedItemEffectiveIconColor(p)
+  const fixed = cylAnimatedItemTintHex(option)
+  if (!fixed) {
+    if (p.animationType && p.animationType !== 'rive' && p.animationType !== 'gif') return ''
+    const mode = cylAnimatedItemRenderingMode(p.animationRenderingMode, p.animationUrl)
+    if (mode === 'alwaysTemplate' || (mode === 'automatic' && p.animationColorKind === 'one')) return cylAnimatedItemEffectiveIconColor(p)
+    return ''
+  }
+  const adaptTint = p.adaptColor || ((c) => c)
+  if (p.selected && selectedColor) return adaptTint(selectedColor)
+  // [EN] A fixed tint is adapted on drawn glass only, not on a flat fill. [CN] 固定着色只在绘制玻璃时调整，不在扁平填充上调整。
+  const adaptFixed = p.adaptFixedTint || adaptTint
+  return adaptFixed((p.isDark && cylAnimatedItemTintHex(darkOption)) || fixed)
+}
+
+/**
+ * [EN] The value of the option `name` in the animation source ("file#tint=title&darkTint=#FFFFFF", also after a "?"), '' when
+ *      the source has none; percent-decoded, trimmed. [CN] 动画来源中选项 `name` 的值（"file#tint=title&darkTint=#FFFFFF"，也可在 "?" 之后），
+ *      没有时为 ''；百分号解码并去掉首尾空白。
+ */
+function cylAnimatedItemSourceOption(source, name) {
+  const text = String(source === null || source === undefined ? '' : source)
+  const at = text.search(/[#?]/)
+  if (at < 0) return ''
+  let found = ''
+  cylAnimatedItemOptionPairs(text.slice(at + 1)).forEach((pair) => {
+    const eq = pair.indexOf('=')
+    if (eq <= 0 || pair.slice(0, eq) !== name) return
+    let value = pair.slice(eq + 1)
+    try { value = decodeURIComponent(value) } catch (e) { /* keep the raw value */ }
+    found = value.trim()
+  })
+  return found
+}
+
+function cylAnimatedItemHasValue(value) {
+  return value !== null && value !== undefined && String(value).trim() !== ''
+}
+
+/**
+ * [EN] `color` (hex "#RGB" / "#RGBA" / "#RRGGBB" / "#RRGGBBAA", or rgb() / rgba()) with its alpha replaced by `alpha`, as an rgba() text; '' for anything
+ *      else (a name, blank): its channels are unknown. [CN] 把 `color`（十六进制或 rgb() / rgba()）的透明度替换为 `alpha`，返回 rgba() 文本；其他（名称、空白）为 ''，因为无法得知通道值。
+ */
+function cylAnimatedItemColorWithAlpha(color, alpha) {
+  const text = String(color === null || color === undefined ? '' : color).trim()
+  const hex = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(text)
+  if (hex) {
+    const digits = hex[1].length <= 4 ? hex[1].replace(/./g, '$&$&') : hex[1]
+    const channel = (index) => Number.parseInt(digits.slice(index * 2, index * 2 + 2), 16)
+    return `rgba(${channel(0)},${channel(1)},${channel(2)},${alpha})`
+  }
+  // [EN] The channels sit between the brackets; a separator is a comma or a space, each with optional whitespace around it. [CN] 通道位于括号之间；分隔符是逗号或空格，两侧可有空白。
+  const inner = /^rgba?\(([^)]*)\)$/i.exec(text)
+  const channels = /^(\d{1,3})(?:\s*,\s*|[^\S ]* \s*)(\d{1,3})(?:\s*,\s*|[^\S ]* \s*)(\d{1,3})(?:\s*[,/]\s*[\d.]+%?)?$/
+  const fn = inner && channels.exec(inner[1].trim())
+  return fn ? `rgba(${fn[1]},${fn[2]},${fn[3]},${alpha})` : ''
+}
+
+/**
+ * [EN] Inheritance: the item's own value when it is set (not blank), else the stack's. [CN] 继承：条目自己设置了（非空白）就用自己的，否则用堆叠的。
+ */
+function cylAnimatedItemInherited(own, inherited) {
+  if (cylAnimatedItemHasValue(own)) return String(own).trim()
+  return cylAnimatedItemHasValue(inherited) ? String(inherited).trim() : ''
+}
+
+/**
+ * [EN] The built-in divider (an INTERNAL mode of this item, switched on only by cyl-animated-item-stack; not API): the line is 1 px thick, `cylDividerLength` px long
+ *      (default 20), and the alpha of the explicit-icon-color derivation is 0.6 (iOS `cylAnimatedItemDividerAlpha`). [CN] 内置分割线（本条目的内部模式，只由
+ *      cyl-animated-item-stack 开启；不是 API）：线粗 1 px，长 `cylDividerLength` px（默认 20），显式图标颜色推导的透明度为 0.6（iOS `cylAnimatedItemDividerAlpha`）。
+ */
+const CYL_ANIMATED_ITEM_DIVIDER_THICKNESS = 1
+const CYL_ANIMATED_ITEM_DIVIDER_LENGTH = 20
+const CYL_ANIMATED_ITEM_DIVIDER_ALPHA = 0.6
+
+/**
+ * [EN] The divider line's color, resolved with the item's OWN dark flag (`userInterfaceStyle` / `systemTheme`): `cylDividerColor` (the stack's `dividerColor`) as is;
+ *      else the EXPLICIT normal icon color (`iconTint`: the item's, else the stack's) at alpha 0.6; else the built-in secondaryLabel (60,60,67 at 0.6 | 235,235,245 at 0.6: about 3.5:1 on white, 6:1 on black).
+ * [CN] 分割线颜色，按条目「自己的」深色标志（`userInterfaceStyle` / `systemTheme`）解析：`cylDividerColor`（堆叠的 `dividerColor`）原样使用；
+ *      否则为「显式」的普通图标颜色（`iconTint`：条目的，否则堆叠的）的 0.6 透明度；否则为内置 secondaryLabel（60,60,67 透明度 0.6 | 235,235,245 透明度 0.6：白底约 3.5:1，黑底约 6:1）。
+ */
+function cylAnimatedItemDividerColor(input) {
+  const p = input || {}
+  if (cylAnimatedItemHasValue(p.cylDividerColor)) return String(p.cylDividerColor).trim()
+  const fromIcon = cylAnimatedItemColorWithAlpha(p.iconTint, CYL_ANIMATED_ITEM_DIVIDER_ALPHA)
+  if (fromIcon) return fromIcon
+  return cylAnimatedItemBuiltInColor('secondaryLabel', cylAnimatedItemIsDark(p))
+}
+
+/**
+ * [EN] The divider's CSS: 1 px x `cylDividerLength`; `cylDividerVertical` (default true: a vertical line, as in a horizontal stack) swaps the sides.
+ * [CN] 分割线的 CSS：1 px x `cylDividerLength`；`cylDividerVertical`（默认 true：竖线，用于横向堆叠）为 false 时互换两边。
+ */
+function cylAnimatedItemDividerStyle(input) {
+  const p = input || {}
+  const length = cylAnimatedItemDimension(p.cylDividerLength, CYL_ANIMATED_ITEM_DIVIDER_LENGTH)
+  const thickness = CYL_ANIMATED_ITEM_DIVIDER_THICKNESS
+  const size = p.cylDividerVertical === false ? `width: ${length}px; height: ${thickness}px;` : `width: ${thickness}px; height: ${length}px;`
+  return `${size} background-color: ${cylAnimatedItemDividerColor(p)};`
+}
+
+/**
+ * [EN] The resting frame of the animation: 'last' when it rests at its end, else 'first'.
+ * [CN] 动画静止时所在的帧：停在结尾时为 'last'，否则为 'first'。
+ */
+function cylAnimatedItemRestingFrame(p) {
+  const atEnd = p.drivesAnimationPlayback === false ? cylAnimatedItemRestingProgress(p) >= 1 : p.selected
+  return atEnd ? 'last' : 'first'
+}
+
+/**
+ * [EN] The title color, ONE function for every level (precedence, as iOS): the item's own explicit color (`titleDarkColor` while dark, else `titleColor`) >
+ *      subclass-explicit (`subclassTitleColor` / `subclassSelectedTitleColor` / `subclassDisabledTitleColor`, selected falls back to normal) > stack-inherited
+ *      (`inheritedTitleColor`) > subclass built-in (`builtInTitleColor`, `builtInSelectedTitleColor`, `builtInDisabledTitleColor`) > component built-in (disabled look, the host's default
+ *      selected color else systemBlue, label). The explicit levels AND both built-in levels (normal and selected) are adapted on drawn dark glass (title minimum
+ *      4.5, `cylAnimatedItemAdaptedColor`); the DISABLED built-in look is not. Public properties keep the app's value: nothing is written back.
+ * [CN] 标题颜色，所有层级用同一个函数（优先级同 iOS）：条目自己的显式颜色（深色时 `titleDarkColor`，否则 `titleColor`）> 子类显式（`subclassTitleColor` /
+ *      `subclassSelectedTitleColor` / `subclassDisabledTitleColor`，选中缺失时回退到常态）> 堆叠继承（`inheritedTitleColor`）> 子类内置（`builtInTitleColor`、
+ *      `builtInSelectedTitleColor`、`builtInDisabledTitleColor`）> 组件内置（禁用外观、宿主的默认选中色否则 systemBlue、label）。显式层与两个内置层（常态与选中）在绘制的深色玻璃上适配
+ *      （标题最低 4.5，`cylAnimatedItemAdaptedColor`）；「禁用」内置外观不适配。公开属性保持应用的值：不会写回任何值。
+ */
+function cylAnimatedItemResolvedTitleColor(p) {
+  const state = cylAnimatedItemStateName(p)
+  const dark = cylAnimatedItemIsDark(p)
+  const adapt = (color) => cylAnimatedItemAdaptedColor(color, CYL_ADAPTED_KIND_TITLE, p)
+  const own = dark && p.titleDarkColor ? p.titleDarkColor : p.titleColor
+  if (own) return adapt(own)
+  const subclass = cylAnimatedItemSubclassExplicit(p, 'Title', state)
+  if (subclass) return adapt(subclass)
+  const inherited = String(p.inheritedTitleColor ?? '').trim()
+  if (inherited) return adapt(inherited)
+  const builtIn = cylAnimatedItemSubclassBuiltIn(p, 'Title', state)
+  if (builtIn) return state === 'disabled' ? builtIn : adapt(builtIn)
+  const component = cylAnimatedItemComponentBuiltIn(p, state, dark)
+  return state === 'disabled' ? component : adapt(component)
+}
+
+/**
+ * [EN] Whether the item DRAWS Liquid Glass: the resolved style is 'liquidGlass' AND `cylAnimatedItemLiquidGlassIsActive()` holds (iOS `drawsLiquidGlass`). Of the
+ *      properties only: no layer and no size, which change before layout. The contrast guard uses this one rule (and the component data field `itemDrawsLiquidGlass`).
+ * [CN] 条目是否「绘制」液态玻璃：解析后的样式为 'liquidGlass' 且 `cylAnimatedItemLiquidGlassIsActive()` 成立（iOS 的 `drawsLiquidGlass`）。只依据属性：
+ *      不依据图层或尺寸（它们在布局之前就会变化）。对比度 guard 使用这一条规则（以及组件数据字段 `itemDrawsLiquidGlass`）。
+ */
+function cylAnimatedItemDrawsLiquidGlass(p) {
+  return !!p && p.itemBackgroundStyle === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive()
+}
+
+/** [EN] The opposite of `cylAnimatedItemDrawsLiquidGlass`: glass asked for but not drawn counts as flat (iOS `drawsFlatBackground`). [CN] `cylAnimatedItemDrawsLiquidGlass` 的反面：请求了玻璃但没有绘制算扁平（iOS 的 `drawsFlatBackground`）。 */
+function cylAnimatedItemDrawsFlatBackground(p) {
+  return !cylAnimatedItemDrawsLiquidGlass(p)
+}
+
+/**
+ * [EN] The color adapter of an item: lifts a color (minimum contrast `minimum`) only when its Liquid Glass is really drawn (`cylAnimatedItemDrawsLiquidGlass`)
+ *      and the item is dark; else null (colors unchanged).
+ * [CN] 条目的颜色适配器：仅当液态玻璃真正绘制（`cylAnimatedItemDrawsLiquidGlass`）且条目为深色时，提亮颜色（最低对比度 `minimum`）；否则为 null（颜色不变）。
+ */
+function cylAnimatedItemGlassContrastAdapter(p, minimum) {
+  if (!cylAnimatedItemIsDark(p)) return null
+  if (cylAnimatedItemDrawsLiquidGlass(p)) return (color) => cylAnimatedItemContrastLift(color, minimum, p.itemBackgroundColor, Number(p.itemGlassTintAlpha))
+  // [EN] Flat with a fill (since 2026-11-27, iOS and Android): judged against the fill over black; flat without a fill is not adapted.
+  // [CN] 有填充的扁平背景（2026-11-27 起，与 iOS、Android 一致）：对照叠在黑色上的填充；没有填充的扁平背景不调整。
+  const reference = cylAnimatedItemFlatReferenceLuminance(cylAnimatedItemFlatFill(p))
+  if (reference === null) return null
+  return (color) => cylAnimatedItemContrastLiftToReference(color, minimum, reference)
+}
+
+/**
+ * [EN] The fill a FLAT item draws now ('' for none, and while glass is drawn): the pressed color while pressed and enabled, the countdown's built-in fill (#F2F2F7),
+ *      else `itemBackgroundColor`. [CN] 扁平条目当前绘制的填充（没有或绘制玻璃时为 ''）：按下且可用时为按下颜色，其次倒计时的内置填充（#F2F2F7），再次 `itemBackgroundColor`。
+ */
+function cylAnimatedItemFlatFill(p) {
+  if (!p || cylAnimatedItemDrawsLiquidGlass(p)) return ''
+  if (p.itemPressed && p.enabled !== false && p.itemHighlightedBackgroundColor) return p.itemHighlightedBackgroundColor
+  if (p.itemStyle === 'countdown') return '#F2F2F7'
+  return p.itemBackgroundColor || ''
+}
+
+/** [EN] A fixed animation tint is adapted on drawn dark glass only. [CN] 固定的动画着色只在绘制的深色玻璃上调整。 */
+function cylAnimatedItemGlassOnlyAdaptedColor(color, kind, p) {
+  if (!p || !cylAnimatedItemDrawsLiquidGlass(p)) return color
+  return cylAnimatedItemAdaptedColor(color, kind, p)
+}
+
+/**
+ * [EN] The colour `color` as it must be drawn for the item `p` (the item's properties, the item-state form of iOS `adaptedOnGlass(_:kind:)`): unchanged unless the
+ *      glass adapter applies (dark item with really drawn Liquid Glass, see `cylAnimatedItemGlassContrastAdapter`), else lifted to the minimum contrast of
+ *      `kind` (CYL_ADAPTED_KIND_ICON: 3, CYL_ADAPTED_KIND_TEXT or CYL_ADAPTED_KIND_TITLE: 4.5) against the RENDERED glass
+ *      (`cylAnimatedItemRenderedGlassReferenceLuminance`). The model uses this single path for the title, the icon tint and
+ *      the animation tint. A host that draws its own static icon (e.g. the cyl-tag-list component, which bakes the colour of a
+ *      `system:` symbol into an SVG data URI) must call it BEFORE baking the colour, with the same `p` as the item. The caller decides which colours are
+ *      adapted (explicit and built-in ones, not the disabled look).
+ * [CN] 条目 `p`（条目属性，即 iOS `adaptedOnGlass(_:kind:)` 的条目状态形式）实际应绘制的颜色：除非玻璃适配器生效（深色条目且真正绘制液态玻璃，见
+ *      `cylAnimatedItemGlassContrastAdapter`），否则原样返回；生效时对照「实际渲染」的玻璃（`cylAnimatedItemRenderedGlassReferenceLuminance`）提亮到 `kind` 的最低对比度
+ *      （CYL_ADAPTED_KIND_ICON：3，CYL_ADAPTED_KIND_TEXT 或 CYL_ADAPTED_KIND_TITLE：4.5）。模型的标题、图标着色与
+ *      动画着色都走这一条路径。自己绘制静态图标的宿主（如 cyl-tag-list 组件把 `system:` 符号的颜色烘焙进 SVG data URI）必须在烘焙颜色之前
+ *      以与条目相同的 `p` 调用它。哪些颜色要适配（显式与内置颜色，不含禁用外观）由调用者决定。
+ * @param {string} color the colour text
+ * @param {string} kind CYL_ADAPTED_KIND_ICON ('icon'), CYL_ADAPTED_KIND_TEXT ('text') or CYL_ADAPTED_KIND_TITLE ('title')
+ * @param {object} p the item properties (itemBackgroundStyle, itemBackgroundColor, itemGlassTintAlpha, userInterfaceStyle, systemTheme, ...)
+ */
+function cylAnimatedItemAdaptedColor(color, kind, p) {
+  const isTitle = kind === CYL_ADAPTED_KIND_TEXT || kind === CYL_ADAPTED_KIND_TITLE
+  const adapter = cylAnimatedItemGlassContrastAdapter(p || {}, isTitle ? CYL_TITLE_MINIMUM_CONTRAST : CYL_ICON_MINIMUM_CONTRAST)
+  return adapter ? adapter(color) : color
+}
+
+/**
+ * [EN] Static helper (iOS `resolvedContentHorizontalInset(_:style:)`): the content inset an item gets for an explicit value (0 or more; -1 = not set) and a background
+ *      style: the explicit value, else the Liquid Glass default while that glass is drawn, else 0. Forwards to `cylAnimatedItemBackgroundInset`.
+ * [CN] 静态辅助（iOS 的 `resolvedContentHorizontalInset(_:style:)`）：显式值（0 及以上；-1 为未设置）与背景样式对应的内容内边距：显式值，否则绘制液态玻璃时为玻璃默认值，否则为 0。
+ *      转到 `cylAnimatedItemBackgroundInset`。
+ */
+function cylAnimatedItemResolvedContentHorizontalInset(explicit, style) {
+  return cylAnimatedItemBackgroundInset(Number(explicit) >= 0 ? Number(explicit) : -1, style === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive())
+}
+
+/**
+ * [EN] Static helper (iOS `isAnimationEngineAvailable`): whether the engine of an animation `type` can draw. GIF is drawn by `<image>`, always; Lottie, PAG, Rive and
+ *      SVGA are engine components the APP names with `generic:`: a mini program cannot probe that in a pure function, so the item learns a missing engine from its first
+ *      `error` (`failedTypes`: the types whose engine failed, the item's `cylWarnedTypes`). Unknown type: false.
+ * [CN] 静态辅助（iOS 的 `isAnimationEngineAvailable`）：动画 `type` 的引擎是否可绘制。GIF 由 `<image>` 绘制，始终可用；Lottie、PAG、Rive、SVGA 是 App 用 `generic:` 指定的引擎组件：
+ *      小程序无法在纯函数里探测，所以条目从第一次 `error` 得知引擎缺失（`failedTypes`：引擎失败过的类型，即条目的 `cylWarnedTypes`）。未知类型：false。
+ */
+function cylAnimatedItemIsAnimationEngineAvailable(type, failedTypes) {
+  if (!CYL_ANIMATED_ITEM_TYPES.some((entry) => entry.type === type)) return false
+  if (type === 'gif') return true
+  return !(Array.isArray(failedTypes) && failedTypes.includes(type))
+}
+
+/**
+ * [EN] The EXPLICIT static-image tints of an item (own > subclass-explicit > stack-inherited, per level selected falling back to normal): `{ iconTint, selectedIconTint }`
+ *      as `cylAnimatedItemStillLayers` reads them. Built-in colors are not part of it.
+ * [CN] 条目的「显式」静态图片着色（自己的 > 子类显式 > 堆叠继承，每层选中缺失时回退到常态）：`cylAnimatedItemStillLayers` 读取的 `{ iconTint, selectedIconTint }`。内置颜色不在其中。
+ */
+function cylAnimatedItemExplicitStillTints(p) {
+  const has = cylAnimatedItemHasValue
+  const levels = [
+    [p.iconTint, p.selectedIconTint],
+    [cylAnimatedItemSubclassExplicit(p, 'Icon', 'normal'), cylAnimatedItemSubclassExplicit(p, 'Icon', 'selected')],
+    [p.inheritedIconTint, p.inheritedSelectedIconTint],
+  ]
+  const normal = levels.map((level) => level[0]).find(has) || ''
+  // [EN] The own selected tint (even '') stays as it was; else the first level with a color gives its selected one (its normal one when it has none). [CN] 自己的选中着色（即使是 ''）保持原样；否则取第一个有颜色的层级的选中值（没有时用它的常态值）。
+  if (p.selectedIconTint !== null && p.selectedIconTint !== undefined) return { iconTint: normal, selectedIconTint: p.selectedIconTint }
+  const first = levels.find((level) => has(level[0]) || has(level[1]))
+  return { iconTint: normal, selectedIconTint: first ? (has(first[1]) ? first[1] : first[0]) : null }
+}
+
+/** [EN] The opacity style of the animation while disabled (`itemDisabledAnimationAlpha` 0...1), else ''. [CN] 禁用时动画的透明度样式（`itemDisabledAnimationAlpha` 0...1），否则为 ''。 */
+function cylAnimatedItemDisabledAnimationStyle(p) {
+  const alpha = Number(p.itemDisabledAnimationAlpha)
+  return p.enabled === false && p.itemDisabledAnimationAlpha !== null && p.itemDisabledAnimationAlpha !== undefined && alpha >= 0 && alpha <= 1 ? `opacity: ${alpha};` : ''
+}
+
 function cylAnimatedItemModel(input) {
+  if (input?.cylInternalDivider) {
+    // [EN] The divider mode shows no icon, title, animation or badge, only the line, and no screen reader element. [CN] 分割线模式不显示图标、标题、动画与角标，只有一条线，读屏也不朗读。
+    const blank = cylAnimatedItemModel({ ...input, cylInternalDivider: false, animationUrl: '', animationData: null, image: '', selectedImage: '', title: '', accessibilityLabel: '', accessoryImage: '', accessoryText: '', itemStyle: 'plain', selected: false, embedded: false })
+    return { ...blank, isDivider: true, ariaHidden: true, ariaDisabled: false, ariaSelected: false, dividerStyle: cylAnimatedItemDividerStyle(input) }
+  }
   const p = cylAnimatedItemCountdownProperties(input)
   const animationPath = p.animationUrl || ''
   const hasAnimationData = !!p.animationData && typeof p.animationData === 'object'
   const animationType = cylAnimatedItemResolvedType(p, animationPath, hasAnimationData)
   const hasSource = !!animationPath || hasAnimationData
   const { usesEngine, gifShows, ended, animationShows } = cylAnimatedItemAnimationState(p, animationType, hasSource)
-  const fallbackImage = cylAnimatedItemFallbackImage(p, hasSource, animationShows)
+  // [EN] Dark Liquid Glass drawn: explicit title / icon colors without enough contrast are lifted (cyl_animated_item_contrast.js). [CN] 绘制深色液态玻璃时：对比度不足的显式标题 / 图标颜色会被提亮。
+  const adaptIcon = (color) => cylAnimatedItemAdaptedColor(color, CYL_ADAPTED_KIND_ICON, p)
+  // [EN] `disabledWinsImage` (default off): a disabled item shows its normal image and tint even while selected (`selectedImage` only when selected AND enabled). The static
+  //      image tints are the EXPLICIT levels only (own > subclass-explicit > stack-inherited; tint spec v2: a built-in color never tints a static image).
+  //      [CN] `disabledWinsImage`（默认关闭）：禁用的条目即使被选中也显示普通图片与着色（`selectedImage` 仅在选中且可用时）。静态图片着色只取「显式」层
+  //      （自己的 > 子类显式 > 堆叠继承；着色规范 v2：内置颜色从不给静态图片着色）。
+  const imageP = { ...p, ...cylAnimatedItemExplicitStillTints(p) }
+  if (p.disabledWinsImage && p.enabled === false) imageP.selected = false
+  const fallbackImage = cylAnimatedItemFallbackImage(imageP, hasSource, animationShows)
+  const fallbackHidden = (animationShows && !gifShows) || cylGIFImageStillShows(p, hasSource, fallbackImage)
+  const layers = cylAnimatedItemStillLayers(imageP, fallbackImage, fallbackHidden, adaptIcon)
   const iconSize = cylAnimatedItemDimension(p.iconSize, 24)
   const iconWidth = cylAnimatedItemDimension(p.iconWidth, iconSize)
   const iconHeight = cylAnimatedItemDimension(p.iconHeight, iconSize)
   const title = p.title || ''
-  const label = p.accessibilityLabel || title
+  // [EN] The badge (iOS `badgeValue` / `badgeAttributes` / `reservesBadgeSpace`): drawn by cyl-badge on an anchor at the icon's
+  //      top-trailing corner, never measured unless `reservesBadgeSpace` is on; read after the item's own label. The description
+  //      text comes from the host (`badgeAccessibilityLabel`, localized by the app); without it the badge text is read, a dot adds nothing.
+  // [CN] 角标（iOS `badgeValue` / `badgeAttributes` / `reservesBadgeSpace`）：由 cyl-badge 画在图标右上角的锚点上，除非开启 `reservesBadgeSpace`
+  //      否则不参与测量；在 item 自身的标签之后朗读。描述文字由宿主给出（`badgeAccessibilityLabel`，由 App 本地化）；没有时朗读角标文字，红点不追加内容。
+  const badge = cylBadgeViewModel(p.badgeValue, p.badgeAttributes)
+  const badgeReserve = p.reservesBadgeSpace === true && badge.showsBadge ? (cylBadgeParseAttributes(p.badgeAttributes).radius || 8) : 0
+  const badgeDescription = badge.showsBadge ? (p.badgeAccessibilityLabel || badge.text) : ''
+  const label = [p.accessibilityLabel || title, badgeDescription].filter(Boolean).join(', ')
   // [EN] Title look: color, font size (px) and line count (1: one line with an ellipsis, the default; 0: no limit;
   //      n > 1: up to n lines, then an ellipsis). [CN] 标题外观：颜色、字号（px）与行数（1：单行省略，默认；0：不限；n > 1：最多 n 行后省略）。
   const titleLines = cylAnimatedItemTitleLines(p.titleLines)
@@ -254,7 +803,9 @@ function cylAnimatedItemModel(input) {
   //      'system' / unset with the system theme dark). [CN] 深色模式：项为深色时（`userInterfaceStyle` 为 'dark'，或为 'system' /
   //      未设置且系统主题为深色）以 `titleDarkColor` 代替 `titleColor`。
   const dark = cylAnimatedItemIsDark(p)
-  const titleColor = dark && p.titleDarkColor ? p.titleDarkColor : p.titleColor
+  // [EN] Built-in title color (tint spec v2): no explicit color (own / dark variant) means label, or the selected color while selected (the disabled look while disabled).
+  //      [CN] 内置标题颜色（着色规范 v2）：没有显式颜色（自己的 / 深色变体）时为 label，选中时为选中色（禁用时为禁用外观）。
+  const titleColor = cylAnimatedItemResolvedTitleColor(p)
   const countdownWidth = cylAnimatedItemCountdownTitleWidth(p)
   const titleStyle = cylAnimatedItemTitleStyle(p, titleColor, titleLines) + (countdownWidth > 0 ? `min-width: ${countdownWidth}px; text-align: center;` : '')
   const titleLinesClass = cylAnimatedItemTitleLinesClass(titleLines)
@@ -265,23 +816,56 @@ function cylAnimatedItemModel(input) {
     dark,
     animationPath,
     animationType,
-    restingFrame: p.selected ? 'last' : 'first',
+    restingFrame: cylAnimatedItemRestingFrame(p),
     usesEngine,
     // [EN] The engine is hidden: its play-once animation ended and the still image shows. [CN] 引擎被隐藏：只播放一次的动画已结束，显示静态图片。
     animationHidden: usesEngine && ended,
     gifPath: gifShows ? cylAnimatedItemGifSource(p, animationPath) : '',
     fallbackImage,
-    fallbackHidden: (animationShows && !gifShows) || cylGIFImageStillShows(p, hasSource, fallbackImage),
+    fallbackHidden,
     // [EN] A GIF given as the image (no animation, or a failed one): it rests on its first frame, drawn on a canvas, until
     //      it is played (docs/GIF-Animation.md). [CN] 作为图片传入的 GIF（没有动画或动画失败）：在被播放之前停在第一帧（绘制在 canvas 上）。
     gifImage: cylGIFImageOf(p, hasSource, fallbackImage),
     gifImageStill: cylGIFImageStillShows(p, hasSource, fallbackImage),
     showsIcon: !!(fallbackImage || usesEngine || gifShows),
-    iconStyle: `width: ${iconWidth}px; height: ${iconHeight}px;`,
+    iconStyle: `width: ${iconWidth}px; height: ${iconHeight}px;` + (badgeReserve ? ` margin: ${badgeReserve}px;` : ''),
+    badgeShows: badge.showsBadge,
+    badgeAnchorStyle: `transform: translate(calc(50% + ${badge.offset.x}px), calc(-50% + ${badge.offset.y}px));`,
+    // [EN] `itemDisabledAnimationAlpha` (0...1; -1 = not set = 1): the alpha of the animation (engine, GIF) while disabled. [CN] `itemDisabledAnimationAlpha`（0...1；-1 为未设置，即 1）：禁用时动画（引擎、GIF）的透明度。
+    animationStyle: cylAnimatedItemDisabledAnimationStyle(p),
     // [EN] A tint applies to the static image only; an animation keeps its own colors. [CN] 着色只作用于静态图片。
-    iconTint: p.iconTint || '',
-    // [EN] The animation's one color (cyl-rive `tint`). [CN] 动画的单一颜色（cyl-rive 的 `tint`）。
-    animationTint: String(p.animationTint || '').trim(),
+    iconTint: layers.currentTint,
+    still: layers,
+    // [EN] The animation's one color (cyl-rive `tint`; GIF through a CSS filter): see `cylAnimatedItemAnimationTint`.
+    //      [CN] 动画的单一颜色（cyl-rive 的 `tint`；GIF 通过 CSS filter）：见 `cylAnimatedItemAnimationTint`。
+    animationTint: cylAnimatedItemAnimationTint({
+      animationTint: p.animationTint,
+      animationDarkTint: p.animationDarkTint,
+      animationUrl: animationPath,
+      animationType,
+      animationRenderingMode: p.animationRenderingMode,
+      animationColorKind: p.animationColorKind,
+      builtInSelectedColor: p.builtInSelectedColor,
+      enabled: p.enabled,
+      selected: p.selected,
+      isDark: dark,
+      adaptColor: adaptIcon,
+      adaptFixedTint: (color) => cylAnimatedItemGlassOnlyAdaptedColor(color, CYL_ADAPTED_KIND_ICON, p),
+      // [EN] The subclass, stack-inherited and built-in levels reach the one icon resolution (cylAnimatedItemResolvedIconColor). [CN] 子类、堆叠继承与内置层级都进入同一个图标解析（cylAnimatedItemResolvedIconColor）。
+      subclassIconColor: p.subclassIconColor,
+      subclassSelectedIconColor: p.subclassSelectedIconColor,
+      subclassDisabledIconColor: p.subclassDisabledIconColor,
+      inheritedIconTint: p.inheritedIconTint,
+      inheritedSelectedIconTint: p.inheritedSelectedIconTint,
+      builtInIconColor: p.builtInIconColor,
+      builtInSelectedIconColor: p.builtInSelectedIconColor,
+      builtInDisabledIconColor: p.builtInDisabledIconColor,
+      // [EN] The icon colors the tint follows: `animationIconTint` / `animationSelectedIconTint` when set (a tab bar item passes its
+      //      title colors), else `iconTint` / `selectedIconTint`. [CN] 着色所跟随的图标颜色：设置了 `animationIconTint` /
+      //      `animationSelectedIconTint` 时用它们（TabBar 项传入标题颜色），否则用 `iconTint` / `selectedIconTint`。
+      iconTint: cylAnimatedItemHasValue(p.animationIconTint) ? p.animationIconTint : p.iconTint,
+      selectedIconTint: cylAnimatedItemHasValue(p.animationSelectedIconTint) ? p.animationSelectedIconTint : p.selectedIconTint,
+    }),
     axisClass: (p.axis === 'vertical' ? 'cyl-animated-item-vertical' : 'cyl-animated-item-horizontal') + (p.embedded ? ' cyl-animated-item-embedded' : '') + (p.itemStyle === 'countdown' ? ' cyl-animated-item-countdown' : ''),
     ariaHidden: !!p.embedded,
     accessoryPlacement: ['leading', 'trailing', 'topTrailing'].includes(p.accessoryPlacement) ? p.accessoryPlacement : 'trailing',
@@ -293,11 +877,262 @@ function cylAnimatedItemModel(input) {
   }
 }
 
+/**
+ * [EN] The background of cyl-animated-item (`itemBackgroundStyle`, `itemBackgroundColor`, `itemCornerRadius`, `itemBorderWidth`,
+ *      `itemBorderColor`, the same names as iOS, Android and HarmonyOS): flat is the solid color; 'liquidGlass' is CSS
+ *      `backdrop-filter` (blur 16 px, saturation 160 %, brightness 1.05, the HarmonyOS values; the blur is the tab bar's lens) over a translucent tint, a faint top
+ *      highlight and the border, clipped to the radius. `cylAnimatedItemLiquidGlassIsActive()` (the same rule name as
+ *      `CYLAnimatedItemView.isLiquidGlassActive()` elsewhere) is always true in a mini program: where the WebView lacks
+ *      `backdrop-filter` only the tint stays, as in the tab bar.
+ * [CN] cyl-animated-item 的背景（`itemBackgroundStyle`、`itemBackgroundColor`、`itemCornerRadius`、`itemBorderWidth`、`itemBorderColor`，与 iOS、
+ *      Android、鸿蒙同名）：扁平为纯色；'liquidGlass' 为 CSS `backdrop-filter`（模糊 16 px、饱和度 160 %、亮度 1.05（鸿蒙取值），模糊同 TabBar 透镜的数值）加半透明着色、顶部
+ *      淡淡的高光与边框，按圆角裁剪。`cylAnimatedItemLiquidGlassIsActive()`（与其他平台的 `CYLAnimatedItemView.isLiquidGlassActive()` 同一规则）
+ *      在小程序中始终为真：WebView 不支持 `backdrop-filter` 时只剩着色，与 TabBar 相同。
+ */
+/** [EN] The named constant of the capsule (1000 px): pass it instead of a literal; CSS limits any radius to half the height, so it is exactly a capsule and follows the size. [CN] 胶囊的命名常量（1000 px）：传它而不是字面量；CSS 把任何圆角截断到半高，所以它恰好是胶囊并随尺寸变化。 */
+const cylAnimatedItemCornerRadiusCapsule = 1000
+
+/**
+ * [EN] The space (px) between the outer border and the content, left and right, that an item with the drawn Liquid Glass gets while
+ *      `itemContentHorizontalInset` is not set (-1): a capsule's round ends take room from the content, so the unset glass inset is wider; the
+ *      unset flat inset is 0. The same condition as the unset `itemCornerRadius`. Use the name, never the literal.
+ * [CN] 绘制液态玻璃的条目在未设置（-1）`itemContentHorizontalInset` 时，外侧边框与内容之间左右的间距（px）：胶囊的圆端会占去内容的空间，所以未设置时
+ *      玻璃的间距更宽；未设置时扁平的间距为 0。与未设置的 `itemCornerRadius` 条件相同。请用名称，不要写字面量。
+ */
+const cylAnimatedItemLiquidGlassContentInset = 14
+
+const cylLiquidGlassState = { activeOverride: undefined }
+
+function cylAnimatedItemLiquidGlassIsActive() {
+  return cylLiquidGlassState.activeOverride !== undefined ? cylLiquidGlassState.activeOverride : true
+}
+
+/** [EN] For tests: replaces the rule (`undefined` uses it). [CN] 供测试使用：替代该规则（`undefined` 表示使用该规则）。 */
+function cylAnimatedItemLiquidGlassSetActiveOverride(value) {
+  cylLiquidGlassState.activeOverride = value
+}
+
+/** [EN] The share of a host color's alpha that tints the glass. [CN] 宿主颜色透明度中用于给玻璃着色的比例。 */
+const cylAnimatedItemGlassTintAlpha = 0.75
+
+/**
+ * [EN] The channels { r, g, b, a } of a '#RGB', '#RRGGBB', '#RRGGBBAA', 'rgb()' or 'rgba()' color text; null for any other text.
+ * [CN] '#RGB'、'#RRGGBB'、'#RRGGBBAA'、'rgb()' 或 'rgba()' 颜色文本的通道 { r, g, b, a }；其他文本为 null。
+ */
+function cylAnimatedItemGlassTintChannels(text) {
+  const short = /^#([0-9a-fA-F]{3})$/.exec(text)
+  if (short) {
+    const h = short[1]
+    return { r: Number.parseInt(h[0] + h[0], 16), g: Number.parseInt(h[1] + h[1], 16), b: Number.parseInt(h[2] + h[2], 16), a: 1 }
+  }
+  const hex = /^#([0-9a-fA-F]{6})([0-9a-fA-F]{2})?$/.exec(text)
+  if (hex) {
+    const h = hex[1]
+    return { r: Number.parseInt(h.slice(0, 2), 16), g: Number.parseInt(h.slice(2, 4), 16), b: Number.parseInt(h.slice(4, 6), 16), a: hex[2] ? Number.parseInt(hex[2], 16) / 255 : 1 }
+  }
+  const fn = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)$/.exec(text)
+  if (fn) {
+    return { r: Number(fn[1]), g: Number(fn[2]), b: Number(fn[3]), a: fn[4] === undefined ? 1 : Number(fn[4]) }
+  }
+  return null
+}
+
+/**
+ * [EN] The tint a glass draws with: a '#RGB', '#RRGGBB', '#RRGGBBAA', 'rgb()' or 'rgba()' color made translucent (its alpha times
+ *      `cylAnimatedItemGlassTintAlpha`), so an opaque color such as a selected tag's green tints the glass instead of covering it; the same
+ *      rule as iOS, Android and HarmonyOS. Other color text is used as it is.
+ * [CN] 玻璃使用的着色：'#RGB'、'#RRGGBB'、'#RRGGBBAA'、'rgb()' 或 'rgba()' 颜色变为半透明（其透明度乘以 `cylAnimatedItemGlassTintAlpha`），因此选中标签的
+ *      绿色这样的不透明色是给玻璃着色而不是盖住它；与 iOS、Android、鸿蒙同一规则。其他颜色文本原样使用。
+ */
+function cylAnimatedItemGlassTint(color, tintAlpha) {
+  const text = String(color || '').trim()
+  const channels = cylAnimatedItemGlassTintChannels(text)
+  if (!channels) return text === 'transparent' ? '' : text
+  const { r, g, b, a } = channels
+  // A fully transparent color means "no color" too: the caller then uses the default frosted tint.
+  if (a === 0) return ''
+  return `rgba(${r},${g},${b},${Math.round(a * (Number(tintAlpha) >= 0 ? Number(tintAlpha) : cylAnimatedItemGlassTintAlpha) * 1000) / 1000})`
+}
+
+/**
+ * [EN] The content inset the host set (0 or more), or -1 when it is not set (undefined, null or '').
+ * [CN] 宿主设置的内容内边距（0 及以上）；未设置（undefined、null 或 ''）时为 -1。
+ */
+function cylAnimatedItemExplicitInset(contentInset) {
+  return contentInset === undefined || contentInset === null || contentInset === '' ? -1 : Number(contentInset)
+}
+
+/**
+ * [EN] The corner radius: the host's value (0 is square), else a capsule for the drawn glass and square for flat.
+ * [CN] 圆角：宿主的值（0 为方角），否则绘制的玻璃为胶囊，扁平为方角。
+ */
+function cylAnimatedItemBackgroundRadius(cornerRadius, glass) {
+  if (Number(cornerRadius) >= 0) return Number(cornerRadius)
+  return glass ? cylAnimatedItemCornerRadiusCapsule : 0
+}
+
+/**
+ * [EN] The content inset: the host's value, else the glass default for the drawn glass and 0 for flat.
+ * [CN] 内容内边距：宿主的值，否则绘制的玻璃为玻璃默认值，扁平为 0。
+ */
+function cylAnimatedItemBackgroundInset(explicitInset, glass) {
+  if (explicitInset >= 0) return explicitInset
+  return glass ? cylAnimatedItemLiquidGlassContentInset : 0
+}
+
+// [EN] The saturation and brightness of the drawn glass: the HarmonyOS `backgroundEffect` values (BLUR_SATURATION 1.6, LIGHT_BRIGHTNESS 1.05), so a tag
+//      looks the same on every platform. The blur stays 16 px here, the CSS equivalent of HarmonyOS's radius 28.
+// [CN] 绘制的玻璃的饱和度与亮度：鸿蒙 `backgroundEffect` 的取值（BLUR_SATURATION 1.6、LIGHT_BRIGHTNESS 1.05），使标签在各平台外观一致。
+//      这里的模糊保持 16 px，是鸿蒙半径 28 的 CSS 等价值。
+const cylAnimatedItemGlassSaturation = 1.6
+const cylAnimatedItemGlassBrightness = 1.05
+
+/**
+ * [EN] The `backdrop-filter` text of the drawn glass (only the glass branch uses it; flat has none).
+ * [CN] 绘制的玻璃的 `backdrop-filter` 文本（仅玻璃分支使用，扁平没有）。
+ */
+function cylAnimatedItemGlassFilter() {
+  return `blur(16px) saturate(${Math.round(cylAnimatedItemGlassSaturation * 100)}%) brightness(${cylAnimatedItemGlassBrightness})`
+}
+
+/**
+ * [EN] The alpha of the default glass tint in light mode (frosted 225, 222, 220); same value as iOS `defaultGlassTintAlphaLight`.
+ * [CN] 浅色模式默认玻璃着色（磨砂色 225, 222, 220）的透明度；与 iOS `defaultGlassTintAlphaLight` 同值。
+ */
+const cylAnimatedItemDefaultGlassTintAlphaLight = 0.10
+
+/**
+ * [EN] The alpha of the default glass tint in dark mode (white); same value as iOS `defaultGlassTintAlphaDark`.
+ * [CN] 深色模式默认玻璃着色（白色）的透明度；与 iOS `defaultGlassTintAlphaDark` 同值。
+ */
+const cylAnimatedItemDefaultGlassTintAlphaDark = 0.04
+
+/**
+ * [EN] The default glass tint in light mode as a CSS color: `rgba(225,222,220,0.10)`, applied with its own alpha (not multiplied by the 0.75 share of an explicit color).
+ * [CN] 浅色模式默认玻璃着色（CSS 颜色）：`rgba(225,222,220,0.10)`，以其自身透明度使用（不乘以显式颜色的 0.75 份额）。
+ */
+const cylAnimatedItemDefaultGlassTintLight = `rgba(225,222,220,${cylAnimatedItemDefaultGlassTintAlphaLight.toFixed(2)})`
+
+/**
+ * [EN] The default glass tint in dark mode as a CSS color: `rgba(255,255,255,0.04)`.
+ * [CN] 深色模式默认玻璃着色（CSS 颜色）：`rgba(255,255,255,0.04)`。
+ */
+const cylAnimatedItemDefaultGlassTintDark = `rgba(255,255,255,${cylAnimatedItemDefaultGlassTintAlphaDark.toFixed(2)})`
+
+/**
+ * [EN] The style text of the drawn glass: the tint (the default frosted tint without a usable color), blur and highlight.
+ * [CN] 绘制的玻璃的样式文本：着色（没有可用颜色时为默认的磨砂着色）、模糊与高光。
+ */
+function cylAnimatedItemGlassCss(color, tintAlpha, isDark, badged) {
+  const tint = (color ? cylAnimatedItemGlassTint(color, tintAlpha) : '') || (isDark ? cylAnimatedItemDefaultGlassTintDark : cylAnimatedItemDefaultGlassTintLight)
+  const filter = cylAnimatedItemGlassFilter()
+  let css = `background-color:${tint};backdrop-filter:${filter};-webkit-backdrop-filter:${filter};`
+  css += `box-shadow:inset 0 1px 0 rgba(255,255,255,${isDark ? 0.18 : 0.6});`
+  // [EN] A badge sits on top and may leave the item while it animates, so a badged item is never clipped (the radius still shapes the background).
+  // [CN] 角标位于最上层，动画时可以超出条目，因此带角标的条目不裁剪（圆角仍决定背景形状）。
+  if (!badged) css += 'overflow:hidden;'
+  return css
+}
+
+/**
+ * @returns {{css: string, glass: boolean}} the inline style of the root view, '' when no `item…` background property is set
+ */
+function cylAnimatedItemBackground(style, color, cornerRadius, borderWidth, borderColor, isDark, tintAlpha, contentInset, badged) {
+  const border = Math.max(0, Number(borderWidth) || 0)
+  const explicitInset = cylAnimatedItemExplicitInset(contentInset)
+  const used = style === 'liquidGlass' || (color || '') !== '' || Number(cornerRadius) >= 0 || border > 0 || (borderColor || '') !== '' || explicitInset >= 0
+  if (!used) return { css: '', glass: false }
+  const glass = style === 'liquidGlass' && cylAnimatedItemLiquidGlassIsActive()
+  // The host's value (0 is square); not set (-1): a capsule for the drawn Liquid Glass (the rule `0: automatic, a capsule` that
+  // CollectionViewClassifyMenu's tags had, moved here), square for flat.
+  // cylAnimatedItemCornerRadiusCapsule is the capsule: CSS limits it to half the height, so it follows the size.
+  const radius = cylAnimatedItemBackgroundRadius(cornerRadius, glass)
+  // The content inset: the host's value (0 or more), else the glass default for the drawn glass and 0 for flat. The stylesheet adds it to the
+  // padding of every layout (--cyl-item-inset), left and right.
+  const inset = cylAnimatedItemBackgroundInset(explicitInset, glass)
+  let css = `border-radius:${radius}px;`
+  if (inset > 0) css += `--cyl-item-inset:${inset}px;`
+  if (border > 0) css += `border:${border}px solid ${borderColor || 'transparent'};box-sizing:border-box;`
+  if (glass) {
+    css += cylAnimatedItemGlassCss(color, tintAlpha, isDark, badged)
+  } else if (color) {
+    css += `background-color:${color};`
+  }
+  return { css, glass }
+}
+
+/**
+ * [EN] The reason of a failed animation for `resourcemissing`: "engine library missing" (no engine component, e.g.
+ *      `cyl-animation-placeholder`'s message), "not found" (a missing file, a failed download or request), "unreadable"
+ *      (no permission, an empty file), else "decode failed". The same four strings on every platform.
+ * [CN] 动画失败时 `resourcemissing` 的原因："engine library missing"（没有引擎组件，如 `cyl-animation-placeholder` 的消息）、
+ *      "not found"（文件不存在、下载或请求失败）、"unreadable"（无权限、文件为空），其余为 "decode failed"。各平台字符串相同。
+ */
+function cylAnimatedItemMissingReason(message) {
+  const text = String(message || '')
+  if (/no animation component|no engine|install its package/i.test(text)) return 'engine library missing'
+  if (/not found|no such file|ENOENT|404|file not exist|request:fail|downloadFile:fail|download fail|failed to (load|fetch|download)/i.test(text)) return 'not found'
+  if (/permission|unreadable|empty file|EACCES/i.test(text)) return 'unreadable'
+  return 'decode failed'
+}
+
+/**
+ * [EN] The file name or path as configured: the `#` options of a source are not part of it. [CN] 按配置给出的文件名或路径：不含 source 的 `#` 选项。
+ */
+function cylAnimatedItemResource(animationUrl) {
+  const text = String(animationUrl || '')
+  const hash = text.indexOf('#')
+  return hash < 0 ? text : text.slice(0, hash)
+}
+
 module.exports = {
+  cylAnimatedItemDefaultGlassTintAlphaLight,
+  cylAnimatedItemDefaultGlassTintAlphaDark,
+  cylAnimatedItemDefaultGlassTintLight,
+  cylAnimatedItemDefaultGlassTintDark,
+  cylAnimatedItemGlassSaturation,
+  cylAnimatedItemGlassBrightness,
+  cylAnimatedItemGlassFilter,
+  cylAnimatedItemAdaptedColor,
+  cylAnimatedItemFlatFill,
+  cylAnimatedItemResolvedTitleColor,
+  cylAnimatedItemResolvedIconColor,
+  cylAnimatedItemDrawsLiquidGlass,
+  cylAnimatedItemDrawsFlatBackground,
+  cylAnimatedItemResolvedContentHorizontalInset,
+  cylAnimatedItemIsAnimationEngineAvailable,
+  cylAnimatedItemSubclassExplicit,
+  cylAnimatedItemSubclassBuiltIn,
+  cylAnimatedItemStateName,
+  CYL_ADAPTED_KIND_ICON,
+  CYL_ADAPTED_KIND_TEXT,
+  CYL_ADAPTED_KIND_TITLE,
+  cylAnimatedItemSourceOption,
+  cylAnimatedItemMissingReason,
+  cylAnimatedItemResource,
+  cylAnimatedItemGlassTint,
+  cylAnimatedItemCornerRadiusCapsule,
+  cylAnimatedItemLiquidGlassContentInset,
+  cylAnimatedItemBackground,
+  cylAnimatedItemLiquidGlassIsActive,
+  cylAnimatedItemLiquidGlassSetActiveOverride,
   cylAnimatedItemCountdownTitleWidth,
   cylAnimatedItemIsDark,
+  cylAnimatedItemColorWithAlpha,
+  cylAnimatedItemDividerColor,
+  cylAnimatedItemDividerStyle,
+  CYL_ANIMATED_ITEM_DIVIDER_LENGTH,
+  cylAnimatedItemInherited,
+  cylAnimatedItemAnimationTint,
+  cylAnimatedItemEffectiveIconColor,
+  cylAnimatedItemRenderingMode,
+  cylAnimatedItemBuiltInColor,
+  CYL_ANIMATED_ITEM_DIVIDER_ALPHA,
+  cylAnimatedItemTintColor,
+  cylAnimatedItemTintHex,
   cylAnimatedItemModel,
   cylAnimatedItemType,
+  cylAnimatedItemSource,
   cylAnimatedItemPackage,
   cylAnimatedItemRestingProgress,
   cylAnimatedItemGifSource,

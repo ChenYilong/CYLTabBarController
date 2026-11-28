@@ -1,5 +1,4 @@
 @import "../cyl-tab-bar/cyl_tap_animations.wxss";
-@import "../cyl-tab-bar/cyl_badge_animations.wxss";
 
 /* [EN] The icon above the title, centered in the item. [CN] 图标在标题上方，在 Item 中居中。 */
 :host {
@@ -58,31 +57,17 @@
   margin-top: 0;
 }
 
-.cyl-item-badge {
+/* [EN] Only the position stays here; the look moved to cyl-badge (`.cyl-badge-tab`, `.cyl-badge-dot-tab`). [CN] 这里只保留位置；外观移到了 cyl-badge（`.cyl-badge-tab`、`.cyl-badge-dot-tab`）。 */
+.cyl-item-badge-host {
   position: absolute;
   top: -4px;
   left: 18px;
-  min-width: 18px;
-  height: 18px;
-  box-sizing: border-box;
-  border-radius: 9px;
-  background-color: #ff3b30;
-  color: #ffffff;
-  font-size: 11px;
-  line-height: 16px;
-  text-align: center;
-  white-space: nowrap;
 }
 
-.cyl-item-badge-dot {
+.cyl-item-badge-host-dot {
   position: absolute;
   top: -2px;
   left: 24px;
-  width: 9px;
-  height: 9px;
-  padding: 0 !important;
-  border-radius: 5px;
-  background-color: #ff3b30;
 }
 
 /*

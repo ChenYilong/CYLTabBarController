@@ -1,4 +1,4 @@
-import { CYLOffset } from './CYLBadge';
+import { CYLOffset } from 'cylbadge';
 
 /**
  * [EN] The attributes of one tab, the CYLTabBarItem* keys of the iOS library (CYLTabBarController.h) as typed fields:
@@ -87,6 +87,14 @@ export interface CYLTabBarItemAttributes {
    * [CN] 选中时此 Tab 的图标颜色。
    */
   selectedIconColor?: ResourceColor;
+  /**
+   * [EN] CYLTabBarItemIconRenderingMode: how this tab's static icon is drawn (docs/Tab-Item-Colors.md, #787, as iOS and Android): 'template'
+   *      tints it (unselected: iconColor, else the title color; selected: selectedIconColor, else the selected title color), 'original'
+   *      never tints it, 'automatic' (default, also unset) tints only when an icon color is set. Case-insensitive; other values act as 'automatic'.
+   * [CN] 此 Tab 静态图标的渲染方式（与 iOS、Android 一致）：'template' 着色（未选中：iconColor，否则标题色；选中：selectedIconColor，否则选中标题色），
+   *      'original' 从不着色，'automatic'（默认，未设置时同）只有设置了图标颜色才着色。不区分大小写；其他值按 'automatic' 处理。
+   */
+  iconRenderingMode?: string;
   /** [EN] CYLTabBarItemBackgroundColor: the tab's background while not selected. [CN] 未选中时此 Tab 的背景色。 */
   backgroundColor?: ResourceColor;
   /** [EN] CYLTabBarItemSelectedBackgroundColor: the tab's background while selected. [CN] 选中时此 Tab 的背景色。 */
@@ -127,6 +135,7 @@ export const CYLTabBarItemTitleColor: string = 'titleColor';
 export const CYLTabBarItemSelectedTitleColor: string = 'selectedTitleColor';
 export const CYLTabBarItemIconColor: string = 'iconColor';
 export const CYLTabBarItemSelectedIconColor: string = 'selectedIconColor';
+export const CYLTabBarItemIconRenderingMode: string = 'iconRenderingMode';
 export const CYLTabBarItemBackgroundColor: string = 'backgroundColor';
 export const CYLTabBarItemSelectedBackgroundColor: string = 'selectedBackgroundColor';
 

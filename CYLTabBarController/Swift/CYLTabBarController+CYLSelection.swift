@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] `CYLTabBarController (CYLSelectionStatus)` and the controller's own `-tabBarController:shouldSelectViewController:`.
  *      Translated from Objective-C (docs/Swift-Migration.md, step 61). A subclass that overrides

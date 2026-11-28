@@ -140,3 +140,13 @@ Every example page that shows tab icon animations, on every platform, offers "Pl
 ## Swift first on iOS (added 2026-11-19)
 
 - **The iOS core is Swift; every new piece of code is Swift first (added 2026-11-19, owner)**: the core code of this project on iOS (the CocoaPods / Swift Package Manager / Carthage sources under `CYLTabBarController/`, including the `CYLAnimatedItem` module) is Swift. Write every new class, extension, test and example in Swift. Use Objective-C only where Swift cannot do the job (a header that must stay importable from Objective-C without modules, a `+load`-time hook, a C macro), and give the reason in a comment and in the task's document in `docs/`. Keep the public API usable from Objective-C (`@objc`, `@objcMembers`, `NS_SWIFT_NAME` counterparts) so existing Objective-C callers keep working. When you touch Objective-C code for a new feature, prefer adding the feature in a Swift file over growing the Objective-C file. Migration log: `docs/Swift-Migration.md`. Details: `AGENTS.md`, "Code rules".
+
+## Demo lists with sections: use a ClassifyMenu tag list
+
+When a demo page needs a table-view-like list with section grouping (not the Objective-C example's first tab), build it with CollectionViewClassifyMenu's tag list, as `docs/instructions/examples.md` says:
+
+1. One tag per row: the row's main title and its icon; the subtitle becomes the long-press callout.
+2. Every section header has a title. Tags use the adaptive width so a line holds as many tags as fit.
+3. Tags use the library's Liquid Glass style (`backgroundStyle` `liquidGlass`). Title labels wrap; an example sets the maximum to 3 lines. A section that needs more lines shows a More / Less toggle with the built-in icon.
+4. Keep tag titles short: move what the title says in brackets, `(…)` or `（…）`, behind the subtitle (it shows on a long press). A tap does what the old cell did. A long press shows the subtitle in a small floating callout with an arrow, set up through the tag list's long-press API; do not write gesture code in the example.
+5. Check the page in light and dark mode and with a long title, and attach a labeled screenshot (`scripts/stitch-screenshots.py`).

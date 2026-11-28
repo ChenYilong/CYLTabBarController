@@ -6,6 +6,12 @@
 //
 
 #import "CYLTabBarItemAnimationEngine.h"
+// [EN] The shared reader of a URL's options, from CYLUtils. [CN] 读取 URL 选项的共用函数，来自 CYLUtils。
+#if __has_include("../CYLUtils/CYLAnimationKeys.h")
+#import "../CYLUtils/CYLAnimationKeys.h"
+#else
+#import "CYLAnimationKeys.h"
+#endif
 #if __has_include("../CYLUtils/CYLUtilsMacros.h")
 #import "../CYLUtils/CYLUtilsMacros.h"
 #else
@@ -16,13 +22,14 @@
 // [CN] Tab 按钮使用引擎的部分，属于 Core：只有动画子库带入引擎时才编译。
 #if CYL_ANIMATION_ENGINE_AVAILABLE
 #import <objc/runtime.h>
+#import <objc/message.h>
 // [EN] `CYLTabBarItemAnimationSetService()`, `…DefaultStyleSource()` and `…DefaultHost()` are `@_cdecl` Swift functions (step 118): declared by the
 //      generated Swift interface, which this file must import itself (CI built it without any other header importing it).
 // [CN] 这三个函数是 `@_cdecl` 的 Swift 函数（第 118 步）：由生成的 Swift 接口声明，本文件必须自己导入它（CI 构建时没有其他头文件导入它）。
 #if __has_include("../CYLUtils/CYLSwiftInterface.h")
-#import "../CYLUtils/CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"
 #else
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"
 #endif
 #if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimatorRegistry.h>)
 #import <CYLAnimatedItem/CYLTabBarItemAnimatorRegistry.h>
@@ -34,276 +41,39 @@
 #else
 #import "CYLTabBarItemAnimationFactory.h"
 #endif
+// [EN] The template tint of an animation view lives in the CYLAnimatedItem component; the tab flow calls it. [CN] 动画视图的模板着色属于 CYLAnimatedItem 组件，Tab 流程调用它。
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationTint.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimationTint.h>
+#else
+#import "CYLTabBarItemAnimationTint.h"
+#endif
 
 static const void *CYLTabBarItemAnimationSourceURLKey = &CYLTabBarItemAnimationSourceURLKey;
 static const void *CYLTabBarItemAnimationShownURLKey = &CYLTabBarItemAnimationShownURLKey;
 
-#pragma mark - Template tint for every library 所有动画库的模板着色
-
-/*
- * [EN] The `tint` / `darkTint` options (`CYLTabBarAnimationOptionTint`, `CYLTabBarAnimationOptionDarkTint`) for the
- *      libraries that do not read them in their own view (Lottie, PAG, SVGA, GIF; Rive does), each through its official
- *      means when it has one: GIF frames become template images drawn in the view's `tintColor` (UIKit); Lottie 4.x takes
- *      a `ColorValueProvider` on the keypath "**.Color" (its player's `-applyColors:traitCollection:`); a library without
- *      a tint API (PAG, SVGA, Lottie 2.x) gets a layer of that color composited "sourceAtop" over its view, so only the
- *      icon's pixels take it. "title" follows the color the tab bar (or CYLAnimatedItemView's `iconColor`) passes to
- *      `-cyl_applyAnimationViewTintColor:`; "#RRGGBB(AA)" is fixed, with `darkTint` in Dark Mode. The method is added to the
- *      view's class at run time when it lacks one, so no library header is imported; it does nothing on a view without
- *      these options.
- * [CN] 为不在自身视图中读取 `tint` / `darkTint` 选项的动画库（Lottie、PAG、SVGA、GIF；Rive 自己读取）提供着色，有官方方式时使用官方方式：GIF 帧变为
- *      模板图片，以视图的 `tintColor` 绘制（UIKit）；Lottie 4.x 在 keypath "**.Color" 上使用 `ColorValueProvider`（其播放器的
- *      `-applyColors:traitCollection:`）；没有着色 API 的动画库（PAG、SVGA、Lottie 2.x）在视图上方叠加一层该颜色并以 "sourceAtop" 合成，只有图标的像素
- *      取该颜色。"title" 跟随 TabBar（或 CYLAnimatedItemView 的 `iconColor`）传给 `-cyl_applyAnimationViewTintColor:` 的颜色；"#RRGGBB(AA)" 为固定颜色，
- *      深色模式下使用 `darkTint`。视图类没有该方法时在运行时添加，因此不导入任何动画库的头文件；没有这些选项的视图不做任何事。
- */
-static const void *CYLTabBarItemAnimationTintOptionsKey = &CYLTabBarItemAnimationTintOptionsKey;
-static const void *CYLTabBarItemAnimationTintPlayerKey = &CYLTabBarItemAnimationTintPlayerKey;
-static const void *CYLTabBarItemAnimationTintOverlayKey = &CYLTabBarItemAnimationTintOverlayKey;
-static const void *CYLTabBarItemAnimationTintOriginalFramesKey = &CYLTabBarItemAnimationTintOriginalFramesKey;
-
-/// [EN] The options in a URL's fragment ("name=value&…", percent-encoded). [CN] URL fragment 中的选项（「名称=值&…」，百分号编码）。
-static NSDictionary<NSString *, NSString *> *CYLTabBarItemAnimationTintOptionsFromURL(NSURL *URL) {
-    NSString *fragment = URL ? [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:YES].percentEncodedFragment : nil;
-    NSMutableDictionary<NSString *, NSString *> *options = [NSMutableDictionary dictionary];
-    for (NSString *item in [fragment componentsSeparatedByString:@"&"]) {
-        NSRange separator = [item rangeOfString:@"="];
-        if (separator.location == NSNotFound || separator.location == 0) {
-            continue;
-        }
-        NSString *name = [[item substringToIndex:separator.location] stringByRemovingPercentEncoding];
-        NSString *value = [[[item substringFromIndex:NSMaxRange(separator)] stringByRemovingPercentEncoding]
-                           stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
-        if (name.length > 0 && value.length > 0) {
-            options[name] = value;
-        }
-    }
-    return [options copy];
-}
-
-/// [EN] "#RRGGBB" or "#RRGGBBAA" ("#" optional), else nil. [CN] "#RRGGBB" 或 "#RRGGBBAA"（"#" 可省略），否则为 nil。
-static UIColor *CYLTabBarItemAnimationTintColorFromHex(NSString *hex) {
-    NSString *digits = [hex hasPrefix:@"#"] ? [hex substringFromIndex:1] : hex;
-    if (digits.length != 6 && digits.length != 8) {
-        return nil;
-    }
-    unsigned long long value = 0;
-    if (![[NSScanner scannerWithString:digits] scanHexLongLong:&value]) {
-        return nil;
-    }
-    if (digits.length == 6) {
-        value = (value << 8) | 0xFF;
-    }
-    return [UIColor colorWithRed:((value >> 24) & 0xFF) / 255.0 green:((value >> 16) & 0xFF) / 255.0
-                            blue:((value >> 8) & 0xFF) / 255.0 alpha:(value & 0xFF) / 255.0];
-}
-
-/// [EN] The fixed tint (`tint` "#…", with `darkTint` in Dark Mode), nil for "title" or none. [CN] 固定着色（`tint` "#…"，深色模式用 `darkTint`）；"title" 或未设置时为 nil。
-static UIColor *CYLTabBarItemAnimationFixedTintColor(NSDictionary<NSString *, NSString *> *options) {
-    NSString *tint = options[@"tint"];
-    UIColor *light = [tint isEqualToString:@"title"] ? nil : CYLTabBarItemAnimationTintColorFromHex(tint);
-    if (!light) {
-        return nil;
-    }
-    UIColor *dark = CYLTabBarItemAnimationTintColorFromHex(options[@"darkTint"]);
-    if (!dark) {
-        return light;
-    }
-    return [UIColor colorWithDynamicProvider:^UIColor *(UITraitCollection *traits) {
-        return traits.userInterfaceStyle == UIUserInterfaceStyleDark ? dark : light;
-    }];
-}
-
-/// [EN] Draws `color` (nil: no tint) over the view by its library's means. [CN] 用动画库的方式在视图上绘制 `color`（nil 表示不着色）。
 /*!
- * [EN] Puts the tint overlay right above the library's own layers and below the view's subviews (a badge stays above it):
- *      libraries add their content layers after the overlay is made (Lottie when its composition is set up, SVGA on each
- *      draw), which hid it.
- * [CN] 把着色叠加图层放在动画库自身图层的正上方、视图子视图之下（角标仍在其上方）：动画库在叠加图层创建之后才添加其内容图层（Lottie 在设置 composition 时，
- *      SVGA 在每次绘制时），曾把它遮住。
+ * [EN] Tells `CYLAnimationEngines` (the animated item component, found at run time like `CYLAnimatedItemView` below, so this engine
+ *      and its Foundation-only tests do not depend on the view module) that the file of a tab could not be shown: it fires
+ *      `CYLAnimationEngines.resourceMissingListener` once per resource per tab button on the main queue, as Android's tab bar does
+ *      (`CYLTabBar.kt`, `cyl_animationViewDidFail`). `owner` is the tab button, or the animation view when it has none.
+ * [CN] 通知 `CYLAnimationEngines`（动效组件，与下面的 `CYLAnimatedItemView` 一样在运行时查找，因此本引擎及其只链接 Foundation 的测试不依赖视图模块）：
+ *      Tab 的文件无法显示。它在主队列对每个 Tab 按钮的每个资源只触发一次 `CYLAnimationEngines.resourceMissingListener`，与 Android 的 Tab 栏
+ *      （`CYLTabBar.kt`，`cyl_animationViewDidFail`）相同。`owner` 为 Tab 按钮，没有时为动画视图。
  */
-static void CYLTabBarItemAnimationRaiseTintOverlay(CALayer *hostLayer, CALayer *overlay) {
-    if (!overlay || overlay.superlayer != hostLayer) {
-        return;
-    }
-    CALayer *firstSubviewLayer = nil;
-    for (CALayer *layer in hostLayer.sublayers) {
-        if (layer != overlay && [layer.delegate isKindOfClass:[UIView class]]) {
-            firstSubviewLayer = layer;
-            break;
-        }
-    }
-    NSArray<CALayer *> *sublayers = hostLayer.sublayers;
-    NSUInteger index = [sublayers indexOfObjectIdenticalTo:overlay];
-    if (firstSubviewLayer) {
-        NSUInteger subviewIndex = [sublayers indexOfObjectIdenticalTo:firstSubviewLayer];
-        if (index + 1 != subviewIndex) {
-            [hostLayer insertSublayer:overlay below:firstSubviewLayer];
-        }
-    } else if (index != sublayers.count - 1) {
-        [hostLayer addSublayer:overlay];
+static void CYLTabBarItemAnimationReportTabFailure(NSURL *URL, NSError *error, id owner) {
+    Class engines = NSClassFromString(@"CYLAnimationEngines");
+    SEL selector = NSSelectorFromString(@"cyl_reportTabAnimationFailureOfURL:error:owner:");
+    if (URL && owner && [engines respondsToSelector:selector]) {
+        ((void (*)(id, SEL, NSURL *, NSError *, id))objc_msgSend)(engines, selector, URL, error, owner);
     }
 }
 
-/*!
- * [EN] Keeps the tint overlay the size of its view's layer: the overlay is made when the view is still 0 x 0 (a fixed tint
- *      is applied as the view is created) and most libraries' views (Lottie, PAG) never size their sublayers. Holds the
- *      layer, so the observation is removed before the layer goes.
- * [CN] 让着色叠加图层保持与其视图图层同尺寸：叠加图层在视图仍为 0 x 0 时创建（固定着色在创建视图时应用），而多数动画库的视图（Lottie、PAG）不会调整其子图层尺寸。
- *      持有该图层，使观察在图层释放之前移除。
- */
-@interface CYLTabBarItemAnimationTintOverlaySizer : NSObject
-@property (nonatomic, strong) CALayer *hostLayer;
-@property (nonatomic, weak) CALayer *overlay;
-@end
-
-@implementation CYLTabBarItemAnimationTintOverlaySizer
-
-static void *CYLTabBarItemAnimationTintOverlaySizerContext = &CYLTabBarItemAnimationTintOverlaySizerContext;
-
-- (instancetype)initWithHostLayer:(CALayer *)hostLayer overlay:(CALayer *)overlay {
-    if (self = [super init]) {
-        _hostLayer = hostLayer;
-        _overlay = overlay;
-        [hostLayer addObserver:self forKeyPath:@"bounds" options:0 context:CYLTabBarItemAnimationTintOverlaySizerContext];
+static void CYLTabBarItemAnimationReportTabNotMade(NSURL *URL, id owner) {
+    Class engines = NSClassFromString(@"CYLAnimationEngines");
+    SEL selector = NSSelectorFromString(@"cyl_reportTabAnimationNotMadeForURL:owner:");
+    if (URL && owner && [engines respondsToSelector:selector]) {
+        ((void (*)(id, SEL, NSURL *, id))objc_msgSend)(engines, selector, URL, owner);
     }
-    return self;
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-    if (context != CYLTabBarItemAnimationTintOverlaySizerContext) {
-        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-        return;
-    }
-    [CATransaction begin];
-    [CATransaction setDisableActions:YES];
-    self.overlay.frame = self.hostLayer.bounds;
-    CYLTabBarItemAnimationRaiseTintOverlay(self.hostLayer, self.overlay);
-    [CATransaction commit];
-}
-
-- (void)dealloc {
-    [_hostLayer removeObserver:self forKeyPath:@"bounds" context:CYLTabBarItemAnimationTintOverlaySizerContext];
-}
-
-@end
-
-static const void *CYLTabBarItemAnimationTintOverlaySizerKey = &CYLTabBarItemAnimationTintOverlaySizerKey;
-
-static void CYLTabBarItemAnimationApplyTint(UIView *view, UIColor *color) {
-    UIColor *resolved = [color resolvedColorWithTraitCollection:view.traitCollection];
-    // [EN] GIF: template frames in the view's tint color (UIKit's own tint). [CN] GIF：以视图 tint 颜色绘制的模板帧（UIKit 自身的着色）。
-    if ([view isKindOfClass:[UIImageView class]] && [view respondsToSelector:NSSelectorFromString(@"frames")]) {
-        UIImageView *imageView = (UIImageView *)view;
-        NSArray<UIImage *> *original = objc_getAssociatedObject(view, CYLTabBarItemAnimationTintOriginalFramesKey) ?: [view valueForKey:@"frames"];
-        objc_setAssociatedObject(view, CYLTabBarItemAnimationTintOriginalFramesKey, original, OBJC_ASSOCIATION_COPY_NONATOMIC);
-        UIImageRenderingMode mode = resolved ? UIImageRenderingModeAlwaysTemplate : UIImageRenderingModeAutomatic;
-        NSMutableArray<UIImage *> *frames = [NSMutableArray arrayWithCapacity:original.count];
-        for (UIImage *frame in original) {
-            [frames addObject:[frame imageWithRenderingMode:mode]];
-        }
-        NSUInteger shown = imageView.image ? [[view valueForKey:@"frames"] indexOfObjectIdenticalTo:imageView.image] : NSNotFound;
-        [view setValue:frames forKey:@"frames"];
-        imageView.image = (shown != NSNotFound && shown < frames.count) ? frames[shown] : frames.firstObject;
-        imageView.tintColor = resolved;
-        return;
-    }
-    // [EN] Lottie 4.x: a color value provider on every color. [CN] Lottie 4.x：作用于所有颜色的 color value provider。
-    id<CYLTabBarItemAnimationPlayer> player = objc_getAssociatedObject(view, CYLTabBarItemAnimationTintPlayerKey);
-    // [EN] A CYL playable view (SVGA, GIF) has a generic player that answers `-applyColors:…` for any view: colors work only
-    //      when the view itself takes them. [CN] CYL 的可播放视图（SVGA、GIF）使用通用播放器，它对任何视图都响应 `-applyColors:…`：只有视图本身接受颜色时才有效。
-    BOOL takesColors = [player respondsToSelector:@selector(applyColors:traitCollection:)]
-        && (![view conformsToProtocol:NSProtocolFromString(@"CYLTabBarItemAnimationPlayableView")]
-            || [view respondsToSelector:NSSelectorFromString(@"cyl_applyAnimationViewColors:")]);
-    if (takesColors) {
-        [player applyColors:(resolved ? @{ @"**.Color" : resolved } : nil) traitCollection:view.traitCollection];
-        return;
-    }
-    // [EN] No tint API: a layer composited "sourceAtop" over the library's view (a plain layer: inside the Liquid Glass bar a
-    //      view's layer was not composited), sized again on every tint pass and by the view's layout when it has one (the
-    //      SVGA view, which also keeps it above the drawing layer it adds later). The resolved color is set again on each
-    //      pass, which the tab bar runs on a light / dark switch.
-    // [CN] 没有着色 API：在动画库视图上方以 "sourceAtop" 合成的图层（使用普通图层：在液态玻璃 TabBar 中视图的图层不会被合成），每次着色时重新设置尺寸，
-    //      有布局方法的视图在布局时也会设置（SVGA 视图，它还让该图层位于之后添加的绘制图层之上）。每次着色都会重新设置解析后的颜色，TabBar 在浅色 / 深色切换时
-    //      会执行着色。
-    CALayer *overlay = objc_getAssociatedObject(view, CYLTabBarItemAnimationTintOverlayKey);
-    if (!resolved) {
-        [overlay removeFromSuperlayer];
-        objc_setAssociatedObject(view, CYLTabBarItemAnimationTintOverlayKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        objc_setAssociatedObject(view, CYLTabBarItemAnimationTintOverlaySizerKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        return;
-    }
-    if (!overlay) {
-        overlay = [CALayer layer];
-        overlay.compositingFilter = @"sourceAtop";
-        overlay.name = @"CYLTabBarItemAnimationTintOverlay";
-        objc_setAssociatedObject(view, CYLTabBarItemAnimationTintOverlayKey, overlay, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        CYLTabBarItemAnimationTintOverlaySizer *sizer = [[CYLTabBarItemAnimationTintOverlaySizer alloc] initWithHostLayer:view.layer overlay:overlay];
-        objc_setAssociatedObject(view, CYLTabBarItemAnimationTintOverlaySizerKey, sizer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-    overlay.backgroundColor = resolved.CGColor;
-    overlay.frame = view.bounds;
-    if (overlay.superlayer != view.layer) {
-        [view.layer addSublayer:overlay];
-    }
-    CYLTabBarItemAnimationRaiseTintOverlay(view.layer, overlay);
-}
-
-/// [EN] The `-cyl_applyAnimationViewTintColor:` added to a library's view class. [CN] 添加到动画库视图类上的 `-cyl_applyAnimationViewTintColor:`。
-static void CYLTabBarItemAnimationTintMethod(UIView *view, SEL _cmd, UIColor *color) {
-    NSDictionary<NSString *, NSString *> *options = objc_getAssociatedObject(view, CYLTabBarItemAnimationTintOptionsKey);
-    if (!options) {
-        return;
-    }
-    UIColor *fixed = CYLTabBarItemAnimationFixedTintColor(options);
-    if (fixed) {
-        CYLTabBarItemAnimationApplyTint(view, fixed);
-    } else if ([options[@"tint"] isEqualToString:@"title"]) {
-        CYLTabBarItemAnimationApplyTint(view, color);
-    }
-}
-
-/*!
- * [EN] The `-cyl_applyAnimationViewTintColor:selected:` added to a library's view class: a fixed tint on the unselected tab
- *      only; the selected tab takes `color`, the title's selected color (2026-11-19).
- * [CN] 添加到动画库视图类上的 `-cyl_applyAnimationViewTintColor:selected:`：固定着色只用于未选中的 Tab；选中的 Tab 使用 `color`（标题的选中颜色，
- *      2026-11-19）。
- */
-static void CYLTabBarItemAnimationTintWithStateMethod(UIView *view, SEL _cmd, UIColor *color, BOOL selected) {
-    NSDictionary<NSString *, NSString *> *options = objc_getAssociatedObject(view, CYLTabBarItemAnimationTintOptionsKey);
-    if (!options) {
-        return;
-    }
-    UIColor *fixed = CYLTabBarItemAnimationFixedTintColor(options);
-    if (fixed) {
-        CYLTabBarItemAnimationApplyTint(view, (selected && color) ? color : fixed);
-    } else if ([options[@"tint"] isEqualToString:@"title"]) {
-        CYLTabBarItemAnimationApplyTint(view, color);
-    }
-}
-
-/// [EN] Gives a new animation view its tint options and method, and its fixed tint. [CN] 为新的动画视图设置着色选项与方法，以及固定着色。
-static void CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id<CYLTabBarItemAnimationPlayer> player) {
-    NSDictionary<NSString *, NSString *> *options = CYLTabBarItemAnimationTintOptionsFromURL(sourceURL);
-    if (!options[@"tint"]) {
-        return;
-    }
-    SEL tintSelector = NSSelectorFromString(@"cyl_applyAnimationViewTintColor:");
-    if (![view respondsToSelector:tintSelector]) {
-        class_addMethod([view class], tintSelector, (IMP)CYLTabBarItemAnimationTintMethod, "v@:@");
-        class_addMethod([view class], NSSelectorFromString(@"cyl_applyAnimationViewTintColor:selected:"),
-                        (IMP)CYLTabBarItemAnimationTintWithStateMethod, "v@:@B");
-    }
-    objc_setAssociatedObject(view, CYLTabBarItemAnimationTintOptionsKey, options, OBJC_ASSOCIATION_COPY_NONATOMIC);
-    objc_setAssociatedObject(view, CYLTabBarItemAnimationTintPlayerKey, player, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    if (CYLTabBarItemAnimationFixedTintColor(options)) {
-        ((void (*)(id, SEL, UIColor *))[view methodForSelector:tintSelector])(view, tintSelector, nil);
-    }
-    // [EN] Once the library has set its view up (its content layers come after this call). [CN] 在动画库设置好视图之后（其内容图层在本调用之后添加）。
-    __weak UIView *weakView = view;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        UIView *strongView = weakView;
-        CYLTabBarItemAnimationRaiseTintOverlay(strongView.layer, objc_getAssociatedObject(strongView, CYLTabBarItemAnimationTintOverlayKey));
-    });
 }
 
 @implementation CYLTabBarItemAnimationEngine
@@ -355,6 +125,13 @@ static void CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id
             break;
         }
     }
+    // [EN] Reported before the tab button is looked for, as the Android tab bar does: the file the engine made this view for, once per
+    //      tab button and resource (a view rebuilt for the same file does not report again). A view with no recorded file was made elsewhere.
+    // [CN] 在查找 Tab 按钮之前报告（与 Android Tab 栏相同）：引擎为该视图使用的文件，每个 Tab 按钮每个资源一次（同一文件重建的视图不会再次报告）。
+    //      没有记录文件的视图是在别处创建的。
+    NSURL *failedURL = animationView ? objc_getAssociatedObject(animationView, CYLTabBarItemAnimationShownURLKey) : nil;
+    NSError *failure = [notification.userInfo[NSUnderlyingErrorKey] isKindOfClass:[NSError class]] ? notification.userInfo[NSUnderlyingErrorKey] : nil;
+    CYLTabBarItemAnimationReportTabFailure(failedURL, failure, control ?: animationView);
     if (!control) {
         return;
     }
@@ -394,13 +171,39 @@ static void CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id
 
 #pragma mark - Helpers
 
+/// [EN] The bar's default rendering mode, asked of the tab button `owner` is in (by selector: the engine does not know the tab bar); automatic without one.
+/// [CN] TabBar 的默认渲染模式，向 `owner` 所在的 Tab 按钮询问（通过 selector：引擎不依赖 TabBar）；没有时为 automatic。
+static NSInteger CYLTabBarItemAnimationDefaultRenderingModeOfOwner(id owner) {
+    UIView *view = [owner isKindOfClass:[UIView class]] ? owner : nil;
+    while (view && ![view isKindOfClass:[UIControl class]]) {
+        view = view.superview;
+    }
+    SEL selector = NSSelectorFromString(@"cyl_tabBarItemAnimationDefaultRenderingMode");
+    if (![view respondsToSelector:selector]) {
+        return CYLTabBarItemAnimationRenderingModeAutomatic;
+    }
+    return ((NSInteger (*)(id, SEL))[view methodForSelector:selector])(view, selector);
+}
+
+- (void)refreshAnimationTintInControl:(UIControl *)control {
+    UIView *animationView = [self animationViewInControl:control];
+    NSURL *sourceURL = animationView ? objc_getAssociatedObject(animationView, CYLTabBarItemAnimationSourceURLKey) : nil;
+    if (!sourceURL) {
+        return;
+    }
+    CYLTabBarItemAnimationResetTint(animationView);
+    CYLTabBarItemAnimationPrepareTabTint(animationView, sourceURL, [self.factory playerForView:animationView],
+                                         CYLTabBarItemAnimationDefaultRenderingModeOfOwner(control));
+}
+
 /*!
  * [EN] An animation view playing `shownURL`, the version of `sourceURL` (the light animation the tab was given) for the
- *      current style. Both URLs are kept on the view, so it can be swapped when the style changes (#442).
+ *      current style. Both URLs are kept on the view, so it can be swapped when the style changes (#442). `owner` (the tab button) is
+ *      who a missing resource is reported for.
  * [CN] 播放 `shownURL` 的动画视图；`shownURL` 是 `sourceURL`（Tab 设置的浅色动画）在当前风格下的版本。两者都保存在视图上，以便风格变化时
- *      替换（#442）。
+ *      替换（#442）。`owner`（Tab 按钮）是资源缺失时的报告对象。
  */
-- (UIView *)makeAnimationViewWithSourceURL:(NSURL *)sourceURL shownURL:(NSURL *)shownURL size:(CGSize)size contentMode:(UIViewContentMode)contentMode {
+- (UIView *)makeAnimationViewWithSourceURL:(NSURL *)sourceURL shownURL:(NSURL *)shownURL size:(CGSize)size contentMode:(UIViewContentMode)contentMode owner:(id)owner {
     UIView *animationView = [self.factory animationViewWithURL:shownURL size:size contentMode:contentMode];
     // [EN] Always remembered (#216: a theme may replace the file, so the view must know which one it shows); the #442
     //      checks below still ask the style source.
@@ -408,7 +211,11 @@ static void CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id
     if (animationView) {
         objc_setAssociatedObject(animationView, CYLTabBarItemAnimationSourceURLKey, sourceURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         objc_setAssociatedObject(animationView, CYLTabBarItemAnimationShownURLKey, shownURL, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        CYLTabBarItemAnimationPrepareTint(animationView, sourceURL, [self.factory playerForView:animationView]);
+        CYLTabBarItemAnimationPrepareTabTint(animationView, sourceURL, [self.factory playerForView:animationView],
+                                             CYLTabBarItemAnimationDefaultRenderingModeOfOwner(owner));
+    } else {
+        // [EN] No library made a view for the file: its resource is missing (or its engine is not in the build). [CN] 没有动画库为该文件创建视图：资源缺失（或其引擎未参与构建）。
+        CYLTabBarItemAnimationReportTabNotMade(shownURL, owner);
     }
     return animationView;
 }
@@ -534,7 +341,14 @@ static void CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id
     //      动画库绑定的 key。
     BOOL isLocalFile = [URL isKindOfClass:[NSURL class]] && URL.isFileURL && URL.path.length > 0;
     NSURL *animationURL = (isLocalFile && [[NSFileManager defaultManager] fileExistsAtPath:URL.path]) ? URL : nil;
-    if (!animationURL || !control || [self.host isPlusControl:control]) {
+    if (!control || [self.host isPlusControl:control]) {
+        return;
+    }
+    if (!animationURL) {
+        // [EN] A local file that is not there is reported as missing ("not found"); no URL, or a URL that is not a file, is not. [CN] 不存在的本地文件报告为缺失（"not found"）；没有 URL 或不是文件的 URL 不报告。
+        if (isLocalFile) {
+            CYLTabBarItemAnimationReportTabNotMade(URL, control);
+        }
         return;
     }
     // FIX: Lottie icons invisible in FlatDesign. No size means a zero size; every animation view needs the placeholder
@@ -557,7 +371,7 @@ static void CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id
     }
     // The dark animation where the style is dark. 深色风格下使用深色动画。
     NSURL *styleURL = followsDarkMode ? [self.styleSource URL:animationURL forTraitCollection:control.traitCollection] : animationURL;
-    UIView *animationView = [self makeAnimationViewWithSourceURL:animationURL shownURL:styleURL size:size contentMode:contentMode];
+    UIView *animationView = [self makeAnimationViewWithSourceURL:animationURL shownURL:styleURL size:size contentMode:contentMode owner:control];
     if (!animationView) {
         return;
     }
@@ -621,7 +435,7 @@ static void CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id
         }
         return;
     }
-    [self swapAnimationView:animationView withNewView:[self makeAnimationViewWithSourceURL:sourceURL shownURL:URL size:animationView.bounds.size contentMode:animationView.contentMode]];
+    [self swapAnimationView:animationView withNewView:[self makeAnimationViewWithSourceURL:sourceURL shownURL:URL size:animationView.bounds.size contentMode:animationView.contentMode owner:animationView.superview ?: animationView]];
 }
 
 /*!
@@ -666,7 +480,7 @@ static void CYLTabBarItemAnimationPrepareTint(UIView *view, NSURL *sourceURL, id
     }
     CGSize viewSize = CGSizeEqualToSize(size, CGSizeZero) ? animationView.bounds.size : size;
     NSURL *shownURL = [self.styleSource hasStyleVariantForURL:URL] ? [self.styleSource URL:URL forTraitCollection:control.traitCollection] : URL;
-    UIView *newAnimationView = [self makeAnimationViewWithSourceURL:URL shownURL:shownURL size:viewSize contentMode:contentMode];
+    UIView *newAnimationView = [self makeAnimationViewWithSourceURL:URL shownURL:shownURL size:viewSize contentMode:contentMode owner:control];
     [self swapAnimationView:animationView withNewView:newAnimationView];
     if (newAnimationView.superview) {
         [self applyDarkColorsToAnimationView:newAnimationView traitCollection:control.traitCollection];

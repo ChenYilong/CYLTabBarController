@@ -6,6 +6,10 @@
  *      不导入 ArkUI 的纯 TypeScript，因此规则可用 Node 做单元测试（cylanimateditem/test）；由组件负责绘制。
  */
 
+import {
+  cylAnimatedItemEffective, cylAnimatedItemRenderingMode, CYLAnimatedItemStateColorInput, cylAnimatedItemExplicitStateColor
+} from './CYLAnimatedItemColors';
+
 /**
  * [EN] Runs when an action is performed: a tap on an item, a tap on the background, or `performAction`.
  * [CN] 执行动作时调用：点击条目、点击背景或调用 `performAction`。
@@ -14,6 +18,25 @@ export type CYLAnimatedItemStackActionHandler = (stack: CYLAnimatedItemStackMode
 
 /** [EN] The default space between items and between the items and the view's edges. [CN] 条目之间以及条目与视图边缘的默认间距。 */
 export const CYLAnimatedItemStackDefaultSpacing: number = 16;
+
+/** [EN] The default divider length in vp. [CN] 分隔线的默认长度（vp）。 */
+export const CYLAnimatedItemDividerLength: number = 20;
+
+/** [EN] The thickness of a divider line in vp. [CN] 分隔线的粗细（vp）。 */
+export const CYLAnimatedItemDividerThickness: number = 1;
+
+/**
+ * [EN] The divider of the gap after one item (the item owns it: it moves and goes with the item). `shown` false is the "no divider
+ *      here" override that wins over `showsDividers`; the spacings are undefined when not set (the stack defaults, then the item
+ *      spacing apply: see `CYLAnimatedItemStackModel.gapAfter`).
+ * [CN] 某个条目之后间隙的分隔线（归该条目所有：随条目移动、随条目移除）。`shown` 为 false 是「此处没有分隔线」，优先于 `showsDividers`；
+ *      未设置的间距为 undefined（依次使用堆叠默认值与条目间距：见 `CYLAnimatedItemStackModel.gapAfter`）。
+ */
+export class CYLAnimatedItemDividerSpec {
+  shown: boolean = true;
+  spacingBefore: number | undefined = undefined;
+  spacingAfter: number | undefined = undefined;
+}
 
 let cylNextStackItemNumber: number = 0;
 
@@ -45,14 +68,30 @@ export class CYLAnimatedItemStackItem {
   spacingBefore: number = -1;
   /** [EN] The icon color of the item (a template / symbol image takes it); '' uses the stack's `iconColor`. [CN] 条目的图标颜色（模板 / 符号图片按此着色）；'' 时使用堆叠的 `iconColor`。 */
   iconColor: string = '';
-  /** [EN] The icon color while the item view is selected; '' uses the stack's `selectedIconColor`, then `iconColor`. [CN] 条目视图选中时的图标颜色；'' 时依次使用堆叠的 `selectedIconColor` 与 `iconColor`。 */
+  /** [EN] The icon color while the item view is selected; '' uses the stack's `selectedIconColor`, then the built-in selected color (never `iconColor`: each property on its own). [CN] 条目视图选中时的图标颜色；'' 时依次使用堆叠的 `selectedIconColor`、内置选中色（不使用 `iconColor`：各属性互相独立）。 */
   selectedIconColor: string = '';
+  /** [EN] The icon color while disabled; '' uses the stack's, then the built-in disabled color. [CN] 不可用时的图标颜色；'' 时使用堆叠的，再使用内置禁用色。 */
+  disabledIconColor: string = '';
+  /** [EN] The title color; '' uses the stack's `titleColor`, then the built-in label color. [CN] 标题颜色；'' 时使用堆叠的 `titleColor`，再使用内置标签色。 */
+  titleColor: string = '';
+  /** [EN] The title color while selected; '' uses the stack's, then the built-in selected color. [CN] 选中时的标题颜色；'' 时使用堆叠的，再使用内置选中色。 */
+  selectedTitleColor: string = '';
+  /** [EN] 'automatic' (default, inherits the URL option, then the stack's) | 'alwaysTemplate' | 'alwaysOriginal'. [CN] 动画渲染模式，'automatic'（默认）继承 URL 选项，再继承堆叠的。 */
+  animationRenderingMode: string = 'automatic';
   /**
    * [EN] Whether the item is enabled (true by default). A disabled item is drawn dimmed and, by default, is not interactive
    *      (`CYLAnimatedItemStackModel.isItemInteractive`): its action does not run and a tap on it reaches the background.
    * [CN] 条目是否可用（默认 true）。不可用的条目变暗显示，默认也不可交互（`CYLAnimatedItemStackModel.isItemInteractive`）：不执行其动作，点击会到达背景。
    */
   enabled: boolean = true;
+  /** [EN] The animation tint of this item; '' inherits the stack's `animationTint`. [CN] 该条目的动画着色；'' 时继承堆叠的 `animationTint`。 */
+  animationTint: string = '';
+  /** [EN] The dark animation tint of this item; '' inherits the stack's `animationDarkTint`. [CN] 该条目的深色动画着色；'' 时继承堆叠的 `animationDarkTint`。 */
+  animationDarkTint: string = '';
+  /** [EN] Hidden items are not drawn and leave no spacing (the next visible one is the first). [CN] 隐藏的条目不绘制，也不留间距（下一个可见条目成为第一个）。 */
+  isHidden: boolean = false;
+  /** [EN] The opacity 0...1 (a faded item keeps its place). [CN] 不透明度 0...1（变淡的条目保留位置）。 */
+  alpha: number = 1;
 
   constructor(title: string = '', image: Object | string = '', animationUrl: string = '') {
     cylNextStackItemNumber += 1;
@@ -60,6 +99,28 @@ export class CYLAnimatedItemStackItem {
     this.title = title;
     this.image = image;
     this.animationUrl = animationUrl;
+  }
+}
+
+/**
+ * [EN] One drawn element of the stack: an item, or the divider right after `item` (`isDivider`). Internal to the component.
+ * [CN] 堆叠中绘制的一个元素：一个条目，或 `item` 之后紧邻的分隔线（`isDivider`）。组件内部使用。
+ */
+export class CYLAnimatedItemStackElement {
+  readonly item: CYLAnimatedItemStackItem;
+  readonly isDivider: boolean;
+  /** [EN] The vp before the element (0 for the first): a divider's `dividerGapBefore`, an item after a divider the divider's `dividerGapAfter`. [CN] 元素之前的间距（第一个为 0）。 */
+  readonly spacingBefore: number;
+
+  constructor(item: CYLAnimatedItemStackItem, isDivider: boolean, spacingBefore: number = 0) {
+    this.item = item;
+    this.isDivider = isDivider;
+    this.spacingBefore = spacingBefore;
+  }
+
+  /** [EN] A key unique among the elements. [CN] 元素间唯一的键。 */
+  get key(): string {
+    return this.isDivider ? `${this.item.id}-divider` : this.item.id;
   }
 }
 
@@ -80,6 +141,20 @@ export class CYLAnimatedItemStackModel {
   private stackSpacing: number = CYLAnimatedItemStackDefaultSpacing;
   private stackIconColor: string = '';
   private stackSelectedIconColor: string = '';
+  private stackDisabledIconColor: string = '';
+  private stackTitleColor: string = '';
+  private stackSelectedTitleColor: string = '';
+  private stackRenderingMode: string = 'automatic';
+  private stackAnimationTint: string = '';
+  private stackAnimationDarkTint: string = '';
+  private stackDividerColor: string = '';
+  private stackDividerLength: number = CYLAnimatedItemDividerLength;
+  private dividersShown: boolean = false;
+  private readonly dividerOverrides: Map<CYLAnimatedItemStackItem, CYLAnimatedItemDividerSpec> = new Map();
+  private stackDividerSpacingBefore: number | undefined = undefined;
+  private stackDividerSpacingAfter: number | undefined = undefined;
+  private taps: boolean = true;
+  private hugs: boolean = false;
   private background: string | undefined = undefined;
   /** [EN] Bumped on every change; the view redraws when it changes. [CN] 每次变化时递增；变化时视图重绘。 */
   revision: number = 0;
@@ -146,7 +221,61 @@ export class CYLAnimatedItemStackModel {
     }
     this.entries.splice(index, 1);
     this.actions.delete(item);
+    this.dividerOverrides.delete(item);
     this.update();
+  }
+
+  /**
+   * [EN] Inserts `item` at `index` (clamped to 0...count; an item already in the stack is moved there instead).
+   * [CN] 在 `index`（限制在 0...数量）处插入 `item`；已在堆叠中的条目改为移到该位置。
+   */
+  insert(item: CYLAnimatedItemStackItem, index: number, action?: string, spacingBefore?: number): void {
+    if (this.entries.includes(item)) {
+      this.move(item, index);
+      return;
+    }
+    if (spacingBefore !== undefined) {
+      item.spacingBefore = Math.max(0, spacingBefore);
+    }
+    this.entries.splice(Math.max(0, Math.min(this.entries.length, index)), 0, item);
+    this.storeAction(action, item);
+    this.update();
+  }
+
+  /** [EN] Moves an item of the stack to `index` (clamped); its action goes with it. [CN] 把堆叠中的条目移到 `index`（限制范围）；动作随之移动。 */
+  move(item: CYLAnimatedItemStackItem, index: number): void {
+    const from = this.entries.indexOf(item);
+    if (from < 0) {
+      return;
+    }
+    this.entries.splice(from, 1);
+    this.entries.splice(Math.max(0, Math.min(this.entries.length, index)), 0, item);
+    this.update();
+  }
+
+  /**
+   * [EN] Replaces the order with `items` (the items already in the stack, in the new order; the ones left out are removed, new ones appended).
+   * [CN] 以 `items` 替换顺序（已在堆叠中的条目按新顺序排列；未包含的被移除，新的被追加）。
+   */
+  setItems(items: CYLAnimatedItemStackItem[]): void {
+    this.entries.slice().forEach((item: CYLAnimatedItemStackItem) => {
+      if (!items.includes(item)) {
+        this.actions.delete(item);
+        this.dividerOverrides.delete(item);
+      }
+    });
+    this.entries.length = 0;
+    items.forEach((item: CYLAnimatedItemStackItem) => {
+      if (!this.entries.includes(item)) {
+        this.entries.push(item);
+      }
+    });
+    this.update();
+  }
+
+  /** [EN] The items that are drawn (not hidden), top to bottom. [CN] 绘制的（未隐藏的）条目，自上而下。 */
+  get visibleItems(): CYLAnimatedItemStackItem[] {
+    return this.entries.filter((item: CYLAnimatedItemStackItem) => !item.isHidden);
   }
 
   /** [EN] Sets or, with undefined or '', removes the action of an item in the stack. [CN] 设置堆叠中条目的动作；传 undefined 或 '' 移除。 */
@@ -217,6 +346,9 @@ export class CYLAnimatedItemStackModel {
    * [CN] 点击 `item`（由视图调用）：执行其动作；没有动作的第一个条目代表背景（见 `actsOnBackground`），执行背景动作。没有执行任何处理时返回 false。
    */
   tapItem(item: CYLAnimatedItemStackItem): boolean {
+    if (!this.taps) {
+      return false;
+    }
     const action = this.actions.get(item);
     if (action !== undefined && this.isItemInteractive(item)) {
       return this.performAction(action);
@@ -226,6 +358,9 @@ export class CYLAnimatedItemStackModel {
 
   /** [EN] A tap on the background (the view calls it). [CN] 点击背景（由视图调用）。 */
   tapBackground(): boolean {
+    if (!this.taps) {
+      return false;
+    }
     return this.background !== undefined ? this.performAction(this.background) : false;
   }
 
@@ -240,7 +375,7 @@ export class CYLAnimatedItemStackModel {
    *      的点击交互）在子类中重写，并在开关变化后调用 `updateInteractionOfItemViews()`。与 iOS `isItemViewInteractive(_:)`、Android `isItemInteractive` 相同。
    */
   isItemInteractive(item: CYLAnimatedItemStackItem): boolean {
-    return this.actions.has(item) && item.enabled;
+    return this.taps && this.actions.has(item) && item.enabled && !item.isHidden;
   }
 
   /**
@@ -265,7 +400,7 @@ export class CYLAnimatedItemStackModel {
    * [CN] 存在背景动作时、自身不可交互的第一个条目：它作为该动作的按钮朗读。
    */
   actsOnBackground(item: CYLAnimatedItemStackItem): boolean {
-    return !this.isItemInteractive(item) && this.background !== undefined && this.firstItem === item;
+    return this.taps && !this.isItemInteractive(item) && this.background !== undefined && this.visibleItems[0] === item;
   }
 
   /** [EN] What a screen reader reads: the accessibility text, else the title. [CN] 读屏朗读的内容：无障碍文字，否则为标题。 */
@@ -283,7 +418,7 @@ export class CYLAnimatedItemStackModel {
    * [CN] 装饰条目（没有可朗读内容：无标题、无无障碍文字、无动作）对读屏隐藏。
    */
   isAccessibilityHidden(item: CYLAnimatedItemStackItem): boolean {
-    return !this.takesTaps(item) && this.accessibilityTextOf(item).length === 0;
+    return item.isHidden || (!this.takesTaps(item) && this.accessibilityTextOf(item).length === 0);
   }
 
   // [EN] Layout. [CN] 布局。
@@ -329,8 +464,13 @@ export class CYLAnimatedItemStackModel {
 
   /** [EN] The space before an item: 0 for the first, else its `spacingBefore` or the stack's `spacing`. [CN] 条目之前的间距：第一个为 0，否则为其 `spacingBefore` 或堆叠的 `spacing`。 */
   spacingBeforeOf(item: CYLAnimatedItemStackItem): number {
-    if (!this.entries.includes(item) || this.entries[0] === item) {
+    if (!this.entries.includes(item) || item.isHidden || this.visibleItems[0] === item) {
       return 0;
+    }
+    const visible = this.visibleItems;
+    const index = visible.indexOf(item);
+    if (index > 0 && this.showsDividerAfter(visible[index - 1])) {
+      return this.dividerGapAfter(visible[index - 1]);
     }
     return item.spacingBefore >= 0 ? item.spacingBefore : this.stackSpacing;
   }
@@ -348,7 +488,47 @@ export class CYLAnimatedItemStackModel {
     this.update();
   }
 
-  /** [EN] The default icon color of selected item views; '' uses `iconColor`. [CN] 选中的条目视图的默认图标颜色；'' 时使用 `iconColor`。 */
+  /** [EN] The default icon color of disabled items; '' = the built-in disabled color. [CN] 不可用条目的默认图标颜色；'' 为内置禁用色。 */
+  get disabledIconColor(): string {
+    return this.stackDisabledIconColor;
+  }
+
+  set disabledIconColor(color: string) {
+    this.stackDisabledIconColor = color;
+    this.update();
+  }
+
+  /** [EN] The default title color (the stack's explicit level); '' = the built-in label color. [CN] 默认标题颜色（堆叠的显式层）；'' 为内置标签色。 */
+  get titleColor(): string {
+    return this.stackTitleColor;
+  }
+
+  set titleColor(color: string) {
+    this.stackTitleColor = color;
+    this.update();
+  }
+
+  /** [EN] The default selected title color; '' = the built-in selected color. [CN] 默认选中标题颜色；'' 为内置选中色。 */
+  get selectedTitleColor(): string {
+    return this.stackSelectedTitleColor;
+  }
+
+  set selectedTitleColor(color: string) {
+    this.stackSelectedTitleColor = color;
+    this.update();
+  }
+
+  /** [EN] The default `animationRenderingMode` of the items that leave it automatic. [CN] 条目保持 automatic 时的默认 `animationRenderingMode`。 */
+  get animationRenderingMode(): string {
+    return this.stackRenderingMode;
+  }
+
+  set animationRenderingMode(value: string) {
+    this.stackRenderingMode = cylAnimatedItemRenderingMode(value);
+    this.update();
+  }
+
+  /** [EN] The default icon color of selected item views; '' = the built-in selected color (never `iconColor`). [CN] 选中的条目视图的默认图标颜色；'' 为内置选中色（不使用 `iconColor`）。 */
   get selectedIconColor(): string {
     return this.stackSelectedIconColor;
   }
@@ -358,15 +538,262 @@ export class CYLAnimatedItemStackModel {
     this.update();
   }
 
-  /** [EN] The icon color an item view draws with ('' leaves the image as it is). [CN] 条目视图绘制时使用的图标颜色（'' 表示保持图片原样）。 */
-  iconColorOf(item: CYLAnimatedItemStackItem, selected: boolean = false): string {
-    if (selected) {
-      const color = item.selectedIconColor || this.stackSelectedIconColor;
-      if (color) {
-        return color;
+  /** [EN] Whether the stack handles taps itself (iOS `dispatchesItemTaps`, true by default). false: no item or background action runs and the component takes no touches, so the host row gets them. [CN] 堆叠是否自己处理点击（iOS `dispatchesItemTaps`，默认 true）。false：不执行任何条目或背景动作，组件不接收触摸，由宿主行处理。 */
+  get dispatchesItemTaps(): boolean {
+    return this.taps;
+  }
+
+  set dispatchesItemTaps(value: boolean) {
+    this.taps = value;
+    this.update();
+  }
+
+  /** [EN] Whether the stack is only as large as its items plus `contentMargin` (false by default: it fills its parent and centers the items). [CN] 堆叠是否只有条目加 `contentMargin` 那么大（默认 false：填满父组件并居中条目）。 */
+  get hugsContent(): boolean {
+    return this.hugs;
+  }
+
+  set hugsContent(value: boolean) {
+    this.hugs = value;
+    this.update();
+  }
+
+  /** [EN] The default `animationTint` of the items that set none; '' for none. [CN] 未设置者的默认 `animationTint`；'' 表示没有。 */
+  get animationTint(): string {
+    return this.stackAnimationTint;
+  }
+
+  set animationTint(value: string) {
+    this.stackAnimationTint = value;
+    this.update();
+  }
+
+  /** [EN] The default `animationDarkTint`. [CN] 默认的 `animationDarkTint`。 */
+  get animationDarkTint(): string {
+    return this.stackAnimationDarkTint;
+  }
+
+  set animationDarkTint(value: string) {
+    this.stackAnimationDarkTint = value;
+    this.update();
+  }
+
+  /**
+   * [EN] The color of the dividers the stack draws (`showsDividers`, `setDivider`, `appendDivider`); '' (default) derives it: the stack's explicit
+   *      normal icon color (`iconColor`) at alpha 0.6, else the built-in divider color (secondary label, >= 3:1 on light and dark bars).
+   * [CN] 堆叠绘制的分隔线（`showsDividers`、`setDividerAfter`）的颜色；''（默认）时推导：堆叠的显式普通图标颜色（`iconColor`）加透明度 0.6，否则为内置分隔色（次级标签色，浅色与深色栏上对比度 >= 3:1）。
+   */
+  get dividerColor(): string {
+    return this.stackDividerColor;
+  }
+
+  set dividerColor(value: string) {
+    this.stackDividerColor = value;
+    this.update();
+  }
+
+  /** [EN] The effective animation tint of an item: its own, else the stack's. [CN] 条目生效的动画着色：自有，否则堆叠的。 */
+  animationTintOf(item: CYLAnimatedItemStackItem): string {
+    return cylAnimatedItemEffective(item.animationTint, this.stackAnimationTint);
+  }
+
+  /** [EN] The effective dark animation tint. [CN] 生效的深色动画着色。 */
+  animationDarkTintOf(item: CYLAnimatedItemStackItem): string {
+    return cylAnimatedItemEffective(item.animationDarkTint, this.stackAnimationDarkTint);
+  }
+
+  /** [EN] The length of a divider line in vp (default `CYLAnimatedItemDividerLength` = 20; never negative); it is 1 vp thick. [CN] 分隔线长度（vp，默认 20，不为负）；粗 1 vp。 */
+  get dividerLength(): number {
+    return this.stackDividerLength;
+  }
+
+  set dividerLength(value: number) {
+    this.stackDividerLength = Math.max(0, value);
+    this.update();
+  }
+
+  /** [EN] A divider between every two visible items (default false); `setDividerAfter` overrides single gaps. [CN] 每两个可见条目之间一条分隔线（默认 false）；`setDividerAfter` 可覆盖单个间隙。 */
+  get showsDividers(): boolean {
+    return this.dividersShown;
+  }
+
+  set showsDividers(value: boolean) {
+    this.dividersShown = value;
+    this.update();
+  }
+
+  /**
+   * [EN] Puts a divider in the gap after `item` (the item owns it: it moves and goes with the item), `spacingBefore` vp after the item
+   *      and `spacingAfter` vp before the next visible one; undefined falls back (see `gapAfter`). Replaces an earlier divider or "no
+   *      divider" of that gap. Ignored for an item not in the stack.
+   * [CN] 在 `item` 之后的间隙放一条分隔线（归该条目所有：随条目移动、随条目移除），距条目 `spacingBefore` vp、距下一个可见条目 `spacingAfter` vp；
+   *      undefined 时使用后备值（见 `gapAfter`）。替换该间隙之前的分隔线或「无分隔线」。不在堆叠中的条目被忽略。
+   */
+  setDivider(item: CYLAnimatedItemStackItem, spacingBefore?: number, spacingAfter?: number): void {
+    if (!this.entries.includes(item)) {
+      return;
+    }
+    const spec = new CYLAnimatedItemDividerSpec();
+    spec.spacingBefore = spacingBefore === undefined ? undefined : Math.max(0, spacingBefore);
+    spec.spacingAfter = spacingAfter === undefined ? undefined : Math.max(0, spacingAfter);
+    this.dividerOverrides.set(item, spec);
+    this.update();
+  }
+
+  /**
+   * [EN] Attaches a divider after the CURRENT LAST item (append flow: `append(a); appendDivider(8, 8); append(b)`); nothing on an empty stack.
+   * [CN] 在当前最后一个条目之后附加分隔线（追加流程：`append(a); appendDivider(8, 8); append(b)`）；堆叠为空时什么都不做。
+   */
+  appendDivider(spacingBefore?: number, spacingAfter?: number): void {
+    if (this.entries.length > 0) {
+      this.setDivider(this.entries[this.entries.length - 1], spacingBefore, spacingAfter);
+    }
+  }
+
+  /** [EN] Turns the gap after `item` off, even when `showsDividers` is true. [CN] 关闭 `item` 之后的间隙分隔线，即使 `showsDividers` 为 true。 */
+  removeDivider(item: CYLAnimatedItemStackItem): void {
+    if (!this.entries.includes(item)) {
+      return;
+    }
+    const spec = new CYLAnimatedItemDividerSpec();
+    spec.shown = false;
+    this.dividerOverrides.set(item, spec);
+    this.update();
+  }
+
+  /** [EN] Whether the gap after `item` is set to have a divider: its own, else `showsDividers` (visibility rules: `showsDividerAfter`). [CN] `item` 之后的间隙是否设置了分隔线：自己的，否则为 `showsDividers`（可见性规则见 `showsDividerAfter`）。 */
+  hasDivider(item: CYLAnimatedItemStackItem): boolean {
+    const spec = this.dividerOverrides.get(item);
+    return spec !== undefined ? spec.shown : this.dividersShown;
+  }
+
+  /** [EN] Alias: true is `setDivider(item)`, false `removeDivider(item)`, undefined forgets the item's own setting (`showsDividers` decides). [CN] 别名：true 为 `setDivider(item)`，false 为 `removeDivider(item)`，undefined 忘记该条目自己的设置（由 `showsDividers` 决定）。 */
+  setDividerAfter(item: CYLAnimatedItemStackItem, shown: boolean | undefined): void {
+    if (shown === true) {
+      this.setDivider(item);
+    } else if (shown === false) {
+      this.removeDivider(item);
+    } else if (this.dividerOverrides.delete(item)) {
+      this.update();
+    }
+  }
+
+  /** [EN] Alias of `hasDivider`. [CN] `hasDivider` 的别名。 */
+  dividerAfter(item: CYLAnimatedItemStackItem): boolean {
+    return this.hasDivider(item);
+  }
+
+  /** [EN] The next visible item after `item`; undefined for none. [CN] `item` 之后的下一个可见条目；没有时为 undefined。 */
+  private nextVisible(item: CYLAnimatedItemStackItem): CYLAnimatedItemStackItem | undefined {
+    const index = this.entries.indexOf(item);
+    for (let i = index + 1; i < this.entries.length; i++) {
+      if (!this.entries[i].isHidden) {
+        return this.entries[i];
       }
     }
-    return item.iconColor || this.stackIconColor;
+    return undefined;
+  }
+
+  /** [EN] Whether a divider is drawn after `item`: the item is visible, a visible item follows and `hasDivider`. [CN] `item` 之后是否绘制分隔线：条目可见、其后有可见条目，且 `hasDivider`。 */
+  showsDividerAfter(item: CYLAnimatedItemStackItem): boolean {
+    return this.entries.includes(item) && !item.isHidden && this.hasDivider(item) && this.nextVisible(item) !== undefined;
+  }
+
+  /** [EN] Whether a divider is drawn right before `item`. [CN] `item` 之前是否绘制分隔线。 */
+  showsDividerBefore(item: CYLAnimatedItemStackItem): boolean {
+    const visible = this.visibleItems;
+    const index = visible.indexOf(item);
+    return index > 0 && this.showsDividerAfter(visible[index - 1]);
+  }
+
+  /** [EN] The space from the owner to its divider: the divider's own, else the stack's `dividerSpacingBefore`, else `spacing`. [CN] 条目到其分隔线的间距：分隔线自己的，否则堆叠的 `dividerSpacingBefore`，否则 `spacing`。 */
+  dividerGapBefore(item: CYLAnimatedItemStackItem): number {
+    return this.dividerOverrides.get(item)?.spacingBefore ?? this.stackDividerSpacingBefore ?? this.stackSpacing;
+  }
+
+  /**
+   * [EN] The space from the divider to the next visible item: the divider's own, else the stack's `dividerSpacingAfter`, else that item's
+   *      `spacingBefore`, else `spacing`. The next item's own spacing is only this fallback, never added on top.
+   * [CN] 分隔线到下一个可见条目的间距：分隔线自己的，否则堆叠的 `dividerSpacingAfter`，否则该条目的 `spacingBefore`，否则 `spacing`。
+   *      下一个条目自己的间距只作为这个后备值，绝不叠加。
+   */
+  dividerGapAfter(item: CYLAnimatedItemStackItem): number {
+    const next = this.nextVisible(item);
+    const fallback = next !== undefined && next.spacingBefore >= 0 ? next.spacingBefore : this.stackSpacing;
+    return this.dividerOverrides.get(item)?.spacingAfter ?? this.stackDividerSpacingAfter ?? fallback;
+  }
+
+  /**
+   * [EN] The whole gap between `item` and the next visible item, undefined when there is none: with a divider before + thickness (1) +
+   *      after (spacing 12, divider(8, 8): 8 + 1 + 8 = 17); without one the next item's `spacingBefore` or `spacing`.
+   * [CN] `item` 与下一个可见条目之间的整个间隙，没有下一个时为 undefined：有分隔线时为 之前 + 粗细（1）+ 之后（spacing 12、divider(8, 8)：
+   *      8 + 1 + 8 = 17）；没有时为下一个条目的 `spacingBefore` 或 `spacing`。
+   */
+  gapAfter(item: CYLAnimatedItemStackItem): number | undefined {
+    const next = this.nextVisible(item);
+    if (!this.entries.includes(item) || item.isHidden || next === undefined) {
+      return undefined;
+    }
+    if (this.showsDividerAfter(item)) {
+      return this.dividerGapBefore(item) + CYLAnimatedItemDividerThickness + this.dividerGapAfter(item);
+    }
+    return next.spacingBefore >= 0 ? next.spacingBefore : this.stackSpacing;
+  }
+
+  /** [EN] The stack default of the space before a divider; undefined (default) uses `spacing`. [CN] 分隔线之前间距的堆叠默认值；undefined（默认）使用 `spacing`。 */
+  get dividerSpacingBefore(): number | undefined {
+    return this.stackDividerSpacingBefore;
+  }
+
+  set dividerSpacingBefore(value: number | undefined) {
+    this.stackDividerSpacingBefore = value === undefined ? undefined : Math.max(0, value);
+    this.update();
+  }
+
+  /** [EN] The stack default of the space after a divider; undefined (default) uses the next item's `spacingBefore`, else `spacing`. [CN] 分隔线之后间距的堆叠默认值；undefined（默认）使用下一个条目的 `spacingBefore`，否则 `spacing`。 */
+  get dividerSpacingAfter(): number | undefined {
+    return this.stackDividerSpacingAfter;
+  }
+
+  set dividerSpacingAfter(value: number | undefined) {
+    this.stackDividerSpacingAfter = value === undefined ? undefined : Math.max(0, value);
+    this.update();
+  }
+
+  /**
+   * [EN] What the component draws, top to bottom: the visible items with the dividers between them. The items list (`items`) never
+   *      holds dividers; they follow the items by themselves when items are appended, removed, moved or hidden.
+   * [CN] 组件绘制的内容，自上而下：可见条目及其间的分隔线。条目列表（`items`）不含分隔线；追加、移除、移动或隐藏条目时分隔线自动跟随。
+   */
+  get elements(): CYLAnimatedItemStackElement[] {
+    const result: CYLAnimatedItemStackElement[] = [];
+    this.visibleItems.forEach((item: CYLAnimatedItemStackItem) => {
+      result.push(new CYLAnimatedItemStackElement(item, false, this.spacingBeforeOf(item)));
+      if (this.showsDividerAfter(item)) {
+        result.push(new CYLAnimatedItemStackElement(item, true, this.dividerGapBefore(item)));
+      }
+    });
+    return result;
+  }
+
+  /**
+   * [EN] The EXPLICIT icon color an item view draws a static image with for a state (the item's, else the stack's; '' = none set, the image keeps
+   *      its colors). Each state's property on its own: a selected item with only `iconColor` has none (the view draws the built-in selected color
+   *      for symbols and the animation tint).
+   * [CN] 条目视图在某状态下绘制静态图片的显式图标颜色（条目的，否则堆叠的；'' = 均未设置，图片保持原色）。各状态的属性互相独立：只有 `iconColor` 的选中条目没有
+   *      显式颜色（符号图标与动画着色使用内置选中色）。
+   */
+  iconColorOf(item: CYLAnimatedItemStackItem, selected: boolean = false, enabled: boolean = true): string {
+    const input = new CYLAnimatedItemStateColorInput();
+    input.item.normal = item.iconColor;
+    input.item.selected = item.selectedIconColor;
+    input.item.disabled = item.disabledIconColor;
+    input.stack.normal = this.stackIconColor;
+    input.stack.selected = this.stackSelectedIconColor;
+    input.stack.disabled = this.stackDisabledIconColor;
+    input.selected = selected;
+    input.enabled = enabled;
+    return cylAnimatedItemExplicitStateColor(input);
   }
 
   /** [EN] The widest an item may be in a view `width` wide, so long titles wrap. [CN] 宽为 `width` 的视图中条目的最大宽度，使长标题换行。 */

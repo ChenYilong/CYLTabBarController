@@ -59,9 +59,9 @@ package it installed.
 
 Properties: `tabBarHeight` (px; the default, 0, is 48 px, the WeChat native tab bar's height; not used by Liquid Glass), `itemStyle` (CYLTabBarItemStyle `flat` / `liquidGlass`), `glassLensStyle` (CYLGlassLensStyle `regular`, the default "liquid", / `skeuomorphic`, "skeuomorphic liquid"; Liquid Glass only), `animationSpeed`, `animationLoop`, `configuration`, `strings`, `symbolsByTheme`, `imageBasePath`, `animationBasePath`, `selectedIdentifier`,
 `loggedIn`, `appVersion`. Events: `select`, `reselect`, `plustap`, `loginrequired` (detail: `index`, `identifier`,
-`pageIdentifier`, `pageParameters`, `context`, `isPlusButton`). Methods: `cyl_selectIdentifier`, `cyl_showBadgeValue`,
-`cyl_showBadgeDot`, `cyl_removeBadge`, `cyl_setThemeIdentifier`, `cyl_themeIdentifiers`, `cyl_playLottie`,
-`cyl_selectAdjacent`, `cyl_setItemStyle`, `cyl_setGlassLensStyle`, `cyl_playAll`, `cyl_setAnimationSpeed`, `cyl_setAnimationLoop`, `cyl_setHiddenIdentifiers` (property `hiddenIdentifiers`: tabs or the plus button left out of the bar, e.g. by user role), `cyl_setTabBarHidden` (property `tabBarHidden`: hides the bar of one page). Page behavior for swiping between tabs: `cyl-tabbar-miniprogram/cyl-tab-bar/cyl_swipe_behavior`.
+`pageIdentifier`, `pageParameters`, `context`, `isPlusButton`). Methods: `cylSelectIdentifier`, `cylShowBadgeValue`,
+`cylShowBadge`, `cylClearBadge`, `cylSetThemeIdentifier`, `cylThemeIdentifiers`, `cylPlayLottie`,
+`cylSelectAdjacent`, `cylSetItemStyle`, `cylSetGlassLensStyle`, `cylTabBarPlayAll`, `cylSetAnimationSpeed`, `cylSetAnimationLoop`, `cylSetHiddenIdentifiers` (property `hiddenIdentifiers`: tabs or the plus button left out of the bar, e.g. by user role), `cylSetTabBarHidden` (property `tabBarHidden`: hides the bar of one page). Page behavior for swiping between tabs: `cyl-tabbar-miniprogram/cyl-tab-bar/cyl_swipe_behavior`.
 
 ## The icon + title component: `cyl-animated-item`
 
@@ -77,17 +77,46 @@ stills a GIF always plays), `riveWasmPath` / `pagWasmPath` (cyl-rive / cyl-pag `
 `accessoryAccessibilityLabel`, `accessoryPlacement`, `animationTint` (one color for a Rive animation, passed to cyl-rive `tint`; '' keeps the file's colors), `titleColor`, `titleDarkColor` (the title color while dark; '' keeps `titleColor`), `userInterfaceStyle` ('system', the default, follows the system theme and needs `"darkmode": true` in app.json; 'light' or 'dark' forces it), `titleFontSize` (px; 0 keeps 14), `titleFontWeight` ('normal', 'bold', 'bolder', 'lighter' or 100–900; '' keeps the default), `titleLines` (1: one line with an ellipsis, the default; 0: no limit; n > 1: up to n lines), `titleLineHeight` (px; 0 keeps the default), `titleSpacing` (px between the icon and the title; -1 keeps 2 px vertical / 4 px horizontal; a vertical item centres each wrapped line), `dragEnabled`, `accessibilityLabel`, `embedded` (inside a control that is the accessibility element: no padding, no 44 px
 minimum, hidden from accessibility, no gestures). Methods (through
 `selectComponent`): `playAnimation()` (from progress 0; a file still loading plays when ready), `restartAnimation()`,
-`stopAnimation()`. Events: `itemtap`, `itemlongpress`, `accessorytap`, `dragstart` / `dragmove` / `dragend`, and the engine's own, forwarded with its detail: `animationready` (e.g. `duration`), `animationcomplete` (a non-looping pass ended, e.g. to count repeats), `animationloopcomplete` (a looping pass ended), `animationerror` (`message`; the item still shows its image). GIF sends none of the four.
+`stopAnimation()`, `cylAnimatedItemPlayer()` (the player, below). Events: `itemtap`, `itemlongpress`, `accessorytap`, `dragstart` / `dragmove` / `dragend`, and the engine's own, forwarded with its detail: `animationready` (e.g. `duration`), `animationcomplete` (a non-looping pass ended, e.g. to count repeats; `animationend` is sent with it, the same detail, the HarmonyOS name), `animationloopcomplete` (a looping pass ended), `animationerror` (`message`; the item still shows its image). GIF sends none of the four.
+
+### Engine contract: the player, host-driven mode, `restartToken`
+
+The same contract HarmonyOS defines (`CrossPlatform/harmonyos-cyltabbar/cylanimateditem/README.md`, "Engine views";
+[docs/Animated-Item.md](../../docs/Animated-Item.md), "Engine API across platforms").
+
+- **`cylAnimatedItemPlayer()`** (a method, not an event) returns the item's one `CYLAnimatedItemPlayer`
+  (`src/cyl-animated-item/cyl_animated_item_player.js`, pure JavaScript): `play()` (from progress 0 once; before
+  `animationready` it waits for the file), `stopAtProgress(p)` (pauses, then seeks to 0...1; where the engine has no seek it
+  rests on the first frame, or the last at 1), `speed`, `loops` (the item's `speed` and `loop`, applied at once),
+  `supportsSpeed` / `supportsLoops` / `supportsProgress` / `supportsColors`, `isPlaying`, `onEnded(cb)` (the end of a
+  play-once pass, the same moment as `animationcomplete`; returns a function that removes it), `applyColors(colors)` (a `Map`
+  or an object; undefined restores the file's colors). Support, by type: Lottie speed, progress, colors; PAG and SVGA speed,
+  progress; Rive speed, colors (no seek); GIF none of them (loops only with stills). `progress` (the current position) is not
+  offered: no engine component reports it.
+- **`drivesAnimationPlayback`** (default true). false: the item applies none of the default rules (a selection change touches no
+  engine, the engine never autoplays on `ready`, `restartToken` is ignored, the engine's own resting frame stays on the host's
+  last `stopAtProgress`) and the host plays through `cylAnimatedItemPlayer()`. `playAnimation()`, `restartAnimation()` and `stopAnimation()`
+  still do what they are called for. Set it when the item is created. All engines stay behind the four generic nodes
+  (`generic:cyl-lottie-view=…`), each package with its own default, so the 2 MB package limit is unchanged.
+- **`restartToken`** (Number, default 0): each time it grows the item plays again from the start, like `restartAnimation()`;
+  the value at creation and a lower value are not restarts. **`animationRestartToken`** is the same property under the HarmonyOS
+  name: growth of either one restarts (each has its own baseline).
+- **The end callback** is the `animationcomplete` event, sent together with its alias `animationend` (the HarmonyOS name, the same
+  detail), and `player.onEnded`. A GIF given
+  as the `image` (canvas) sends neither.
+- Tests: `test/cyl_animated_item_player.test.js` (player, host-driven mode, restart token) and
+  `test/cyl_animated_item_source.test.js` (`cylAnimatedItemSource`, the `#` options, against
+  `CrossPlatform/animated-item-fixtures/source-options.json`).
 
 ## The tab switch contract
 
 The same as iOS (`CYLTabBar` / `CYLAnimatedItemView`): **a switch stops and resets every other tab first, then the selected tab
 plays.** After any switch exactly one tab is selected (its `selected` comes from the one `selectedIdentifier`), and every other tab is
 stopped on its unselected look (`restingProgress` frame or static image), also when the switch comes mid-animation or two taps arrive
-quickly. `cyl-tab-bar` does it in `cyl_syncLottie` (`cyl_stopOtherAnimations`, then `cyl_playLottie`); `cyl-animated-item` does it for
-itself when `selected` turns false (`cyl_halt`: cancel a play still waiting for the file, pause the engine, then the resting frame).
-Exception: a tab with `CYLTabBarLottieLoopsWhenUnselected` keeps looping. Engines must stop on `cyl_pause()` and cancel a pending
-`cyl_playFromStart`; a seek alone (`cyl_setProgress`) is not a stop. Tests: `test/cyl_tab_switch.test.js`.
+quickly. `cyl-tab-bar` does it in `cylSyncLottie` (`cylStopOtherAnimations`, then `cylPlayLottie`); `cyl-animated-item` does it for
+itself when `selected` turns false (`cylHalt`: cancel a play still waiting for the file, pause the engine, then the resting frame).
+Exception: a tab with `CYLTabBarLottieLoopsWhenUnselected` keeps looping. Engines must stop on `cylPause()` and cancel a pending
+`cylPlayFromStart`; a seek alone (`cylSetProgress`) is not a stop. Tests: `test/cyl_tab_switch.test.js`.
 
 ## Layout
 

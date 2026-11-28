@@ -17,8 +17,8 @@
   </view>
 </view>
 <!-- [EN] The skin menu: the skins, a check on the current one, then "Follow the system Dark Mode". [CN] 换肤菜单：各皮肤（当前皮肤带勾号），然后是「跟随系统深色模式」。 -->
-<view wx:if="{{skinMenu}}" class="cyl-menu-backdrop" bindtap="cyl_closeSkinMenu" catchtouchmove="cyl_noop">
-  <view class="cyl-menu" style="top: {{nav.top + nav.height + 4}}px;" catchtap="cyl_noop">
+<view wx:if="{{skinMenu}}" class="cyl-menu-backdrop" bindtap="cyl_closeSkinMenu" catchtouchmove="cylNoop">
+  <view class="cyl-menu" style="top: {{nav.top + nav.height + 4}}px;" catchtap="cylNoop">
     <text class="cyl-menu-header">{{texts['Choose a theme']}}</text>
     <scroll-view scroll-y style="max-height: {{nav.menuHeight}}px;">
       <view wx:for="{{skinMenu}}" wx:for-item="row" wx:key="id">
@@ -33,7 +33,7 @@
     </scroll-view>
   </view>
 </view>
-<view class="cyl-page" style="padding-top: {{nav.top + nav.height + 8}}px;" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
+<view class="cyl-page" style="padding-top: {{nav.top + nav.height + 8}}px;" bindtouchstart="cylOnSwipeStart" bindtouchend="cylOnSwipeEnd">
   <!-- [EN] The navigation title, as a large title: the capsule leaves no room for it between the buttons. [CN] 导航标题以大标题显示：胶囊按钮使按钮之间没有放标题的空间。 -->
   <text id="cyl-navigation-title" class="cyl-large-title" aria-role="heading">{{navigationTitle}}</text>
   <view class="cyl-header">
@@ -41,22 +41,23 @@
     <text class="cyl-header-subtitle">{{texts['The tab bar below is the cyl-tab-bar component, configured with Example-Shared/Configurations/cyl_tabbar_configuration.json and a raised plus button.']}}</text>
   </view>
   <block wx:for="{{sections}}" wx:for-item="section" wx:key="id">
-    <text class="cyl-section-title" aria-role="heading">{{section.title}}</text>
-    <view wx:if="{{section.rows}}" class="cyl-section">
+    <text wx:if="{{!section.tagConfiguration}}" class="cyl-section-title" aria-role="heading">{{section.title}}</text>
+    <cyl-tag-list wx:if="{{section.tagConfiguration}}" id="cyl-tags-{{section.id}}" configuration="{{section.tagConfiguration}}" data-section="{{section.id}}" bind:tagtap="cyl_onTag" />
+    <view wx:elif="{{section.rows}}" class="cyl-section">
       <view wx:for="{{section.rows}}" wx:for-item="row" wx:key="id" class="cyl-home-row {{row.selected ? 'cyl-row-selected' : ''}}" hover-class="cyl-home-row-pressed" bindtap="cyl_onRow" data-id="{{row.id}}" aria-role="button" aria-label="{{row.title}}, {{row.subtitle}}">
         <image wx:if="{{row.preview.icon}}" class="cyl-skin-icon" src="{{row.preview.icon}}" aria-hidden="true" />
         <view wx:elif="{{row.preview.swatch}}" class="cyl-skin-swatch" style="background-color: {{row.preview.swatch}};" aria-hidden="true">{{row.preview.glyph}}</view>
         <view class="cyl-home-texts" aria-hidden="true">
           <text class="cyl-home-title {{row.dimmed ? 'cyl-home-dimmed' : ''}}">{{row.title}}</text>
           <text wx:if="{{row.subtitle}}" class="cyl-home-subtitle">{{row.subtitle}}</text>
-          <slider wx:if="{{row.slider !== null && row.slider !== undefined}}" class="cyl-home-slider" min="1" max="3" step="0.1" value="{{row.slider}}" catchtap="cyl_noop" catchchange="cyl_onTouchSlider" aria-hidden="false" aria-label="{{row.title}}" />
+          <slider wx:if="{{row.slider !== null && row.slider !== undefined}}" class="cyl-home-slider" min="1" max="3" step="0.1" value="{{row.slider}}" catchtap="cylNoop" catchchange="cyl_onTouchSlider" aria-hidden="false" aria-label="{{row.title}}" />
         </view>
-        <switch wx:if="{{row.accessory === 'switch'}}" checked="{{row.checked}}" catchchange="cyl_onSwitch" catchtap="cyl_noop" data-id="{{row.id}}" aria-label="{{row.title}}" />
+        <switch wx:if="{{row.accessory === 'switch'}}" checked="{{row.checked}}" catchchange="cyl_onSwitch" catchtap="cylNoop" data-id="{{row.id}}" aria-label="{{row.title}}" />
         <text wx:elif="{{row.accessory === 'chevron'}}" class="cyl-home-chevron" aria-hidden="true">›</text>
         <text wx:elif="{{row.accessory === 'check'}}" class="cyl-home-check" aria-hidden="true">✓</text>
         <view wx:elif="{{row.accessory === 'arrows'}}" class="cyl-home-arrows">
-          <text id="cyl-arrow-previous" class="cyl-home-arrow" catchtap="cyl_onArrow" data-step="-1" aria-role="button" aria-label="cyl_switchToAdjacentTab -1">◀︎</text>
-          <text id="cyl-arrow-next" class="cyl-home-arrow" catchtap="cyl_onArrow" data-step="1" aria-role="button" aria-label="cyl_switchToAdjacentTab 1">▶︎</text>
+          <text id="cyl-arrow-previous" class="cyl-home-arrow" catchtap="cyl_onArrow" data-step="-1" aria-role="button" aria-label="cylSwitchToAdjacentTab -1">◀︎</text>
+          <text id="cyl-arrow-next" class="cyl-home-arrow" catchtap="cyl_onArrow" data-step="1" aria-role="button" aria-label="cylSwitchToAdjacentTab 1">▶︎</text>
         </view>
       </view>
     </view>

@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a на Android: приложение не может отправить это системное событие.";
 "Runs every automatic row, one after the other." = "Запускает все автоматические строки одну за другой.";
 "Tab bar %@ · page ID \"%@\"" = "Панель вкладок %@ · ID страницы «%@»";
+"Animated item engine API" = "API движков анимированного элемента";
+"Stop at 50%" = "Остановить на 50%";
+"Show image when ended" = "Показывать изображение в конце";
+"Restart token: %@" = "Токен перезапуска: %@";
+"End callback: %@" = "Обратный вызов окончания: %@";
+"none yet" = "пока нет";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Воспроизведением управляет хост (drivesAnimationPlayback = false)";
+"Engine API" = "API движка";
+"Pause while scrolling" = "Пауза при прокрутке";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Освободить контроллер панели вкладок (через 3 с)";
+"teardown: not run" = "освобождение: не выполнялось";
+"teardown: releasing in %d s" = "освобождение: через %d с";
+"dealloc callbacks ran: %d / %d" = "выполнено обратных вызовов dealloc: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "выполнено обратных вызовов dealloc: %d / %d (%@)";
+"Tab bar controller released" = "Контроллер панели вкладок освобождён";
+"bridge: pause %d, resume %d" = "мост: пауза %d, возобновление %d";
+"last event: -" = "последнее событие: -";
+"last event: %@" = "последнее событие: %@";
+"Content inset" = "Внутренний отступ содержимого";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset не задан: плоский элемент и элемент Liquid Glass, обычное и выбранное состояние";
+"Flat: itemContentHorizontalInset unset" = "Плоский: itemContentHorizontalInset не задан";
+"Normal" = "Обычное";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset не задан";

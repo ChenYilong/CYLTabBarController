@@ -3,7 +3,7 @@ package com.cyl.tabbar.example.gif
 import android.os.Looper
 import com.cyl.tabbar.CYLConstants
 import com.cyl.tabbar.CYLGIFDrawable
-import com.cyl.tabbar.cyl_badge
+import com.cyl.tabbar.cylBadge
 import com.cyl.tabbar.demo.DemoListFragment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -33,7 +33,7 @@ class ExampleGIFTest {
         assertEquals(1.5f, controller.tabBarItemAnimationSpeed)
         assertNotNull("plus button", controller.tabBar.plusButton)
         shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(2000))
-        assertEquals("plus button badge after launch", "1", controller.tabBar.plusButton?.cyl_badge?.text)
+        assertEquals("plus button badge after launch", "1", controller.tabBar.plusButton?.cylBadge?.text)
     }
 
     @Test

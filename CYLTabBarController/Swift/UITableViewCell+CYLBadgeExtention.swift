@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] Row height that leaves room around the icon for its badge (the Objective-C header has a macro of the same name).
  * [CN] 行高：为图标四周的角标留出空间（Objective-C 头文件中有同名宏）。
@@ -256,6 +262,40 @@ extension UITableViewCell {
         if let badge = iconView.cyl_badge, let factoryAnimation = sample.factoryAnimation {
             badge.layer.add(factoryAnimation.animation(for: badge), forKey: CYLBadgeSample.animationKey)
         }
+    }
+
+    /**
+     * [EN] The badge sample of `row` as the item API takes it (docs/Animated-Item-Badge.md): the plain icon, the value ("" for a dot) and the style
+     *      keys of `CYLBadgeAttributeKey`, to set on an animated item or a tag (`badgeValue`, `badgeAttributes`) instead of drawing the badge into an
+     *      image. The `CAAnimation` factory samples keep their text and have no animation key (a factory animation is an object, not a name), the
+     *      margin and corner radius samples have no key, and a border that follows Dark Mode is white. Built on macOS, 2026-11-29.
+     * [CN] 第 `row` 行角标样例，按 item API 的方式给出（docs/Animated-Item-Badge.md）：原图标、值（"" 为红点）和 `CYLBadgeAttributeKey` 的样式键，
+     *      设置到动效 item 或 Tag 上（`badgeValue`、`badgeAttributes`），而不是把角标画进图片。`CAAnimation` 工厂样例保留文字、没有动画键（工厂动画是对象，不是名称），
+     *      外边距与圆角样例没有对应的键，跟随深色模式的边框为白色。 已于 2026-11-29 在 macOS 上构建。
+     */
+    public class func cylBadgeSampleItem(forRow row: Int) -> (icon: UIImage?, value: String, attributes: [String: Any]) {
+        let sample = CYLBadgeSample.sample(forRow: row)
+        let animationNames = ["none", "scale", "shake", "bounce", "breathe", "leftRightOnce", "rightLeftOnce", "fadeInOnce", "rollingOnce", "scaleOnce"]
+        var attributes: [String: Any] = [:]
+        if Int(sample.animationType.rawValue) > 0, Int(sample.animationType.rawValue) < animationNames.count {
+            attributes[CYLBadgeAttributeKey.animation] = animationNames[Int(sample.animationType.rawValue)]
+        }
+        if sample.customColors {
+            attributes[CYLBadgeAttributeKey.color] = "#800080"
+            attributes[CYLBadgeAttributeKey.textColor] = "#FFFF00"
+        }
+        if sample.customFont { attributes[CYLBadgeAttributeKey.font] = 12 }
+        if sample.border || sample.dynamicBorder {
+            attributes[CYLBadgeAttributeKey.borderColor] = "#FFFFFF"
+            attributes[CYLBadgeAttributeKey.borderWidth] = 2
+        }
+        if let position = sample.position {
+            attributes[CYLBadgeAttributeKey.centerOffset] = "{\(position.centerOffset.x), \(position.centerOffset.y)}"
+        }
+        if let radius = sample.radius { attributes[CYLBadgeAttributeKey.radius] = radius }
+        if let maximum = sample.maximum { attributes[CYLBadgeAttributeKey.maximumNumber] = maximum }
+        attributes[CYLBadgeAttributeKey.respectsReduceMotion] = sample.respectsReduceMotion
+        return (CYLBadgeSample.icon, sample.value, attributes)
     }
 
     /**

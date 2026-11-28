@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "Android では n/a：アプリはこのシステムイベントを送信できません。";
 "Runs every automatic row, one after the other." = "すべての自動行を順番に実行します。";
 "Tab bar %@ · page ID \"%@\"" = "タブバー %@ · ページ ID「%@」";
+"Animated item engine API" = "アニメーション項目のエンジン API";
+"Stop at 50%" = "50% で停止";
+"Show image when ended" = "終了時に画像を表示";
+"Restart token: %@" = "再生トークン：%@";
+"End callback: %@" = "終了コールバック：%@";
+"none yet" = "まだなし";
+"Host-driven playback (drivesAnimationPlayback = false)" = "ホストが再生を制御（drivesAnimationPlayback = false）";
+"Engine API" = "エンジン API";
+"Pause while scrolling" = "スクロール中は一時停止";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "タブバーコントローラを解放（3 秒後）";
+"teardown: not run" = "解放: 未実行";
+"teardown: releasing in %d s" = "解放: %d 秒後に実行";
+"dealloc callbacks ran: %d / %d" = "dealloc コールバック実行数: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "dealloc コールバック実行数: %d / %d (%@)";
+"Tab bar controller released" = "タブバーコントローラを解放しました";
+"bridge: pause %d, resume %d" = "ブリッジ: 一時停止 %d、再開 %d";
+"last event: -" = "最後のイベント: -";
+"last event: %@" = "最後のイベント: %@";
+"Content inset" = "コンテンツの余白";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset 未設定: フラットと Liquid Glass の項目、通常時と選択時";
+"Flat: itemContentHorizontalInset unset" = "フラット: itemContentHorizontalInset 未設定";
+"Normal" = "通常";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset 未設定";

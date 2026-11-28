@@ -56,6 +56,7 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL
 @property (nonatomic, assign) CGFloat progress;
 @property (nonatomic, assign) CGFloat animationSpeed;
 @property (nonatomic, assign) BOOL loops;
+@property (nonatomic, copy, nullable) void (^onEnded)(void);
 @end
 
 @implementation CYLAnimatedItemFakePlayer
@@ -69,6 +70,34 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL
 - (void)play { [self.calls addObject:@"play"]; }
 - (void)stop { [self.calls addObject:@"stop"]; }
 - (void)showLastFrame { [self.calls addObject:@"last"]; }
+@end
+
+/*
+ * [EN] Players that subclass the base player: one with none of the optional members, one with all of them. [CN] 继承基类播放器的播放器：一个没有任何可选成员，一个全部具备。
+ */
+@interface CYLAnimatedItemContractPlayer : CYLTabBarItemAnimationBasePlayer <CYLTabBarItemAnimationPlayer>
+@end
+
+@implementation CYLAnimatedItemContractPlayer
+- (void)play {}
+- (void)stop {}
+- (void)showLastFrame {}
+@end
+
+@interface CYLAnimatedItemFullContractPlayer : CYLTabBarItemAnimationBasePlayer <CYLTabBarItemAnimationPlayer>
+@property (nonatomic, assign) CGFloat progress;
+@property (nonatomic, assign) CGFloat animationSpeed;
+@property (nonatomic, assign) BOOL loops;
+@property (nonatomic, copy, nullable) NSDictionary<NSString *, UIColor *> *appliedColors;
+@end
+
+@implementation CYLAnimatedItemFullContractPlayer
+- (void)play {}
+- (void)stop {}
+- (void)showLastFrame {}
+- (void)applyColors:(NSDictionary<NSString *, UIColor *> *)colors traitCollection:(UITraitCollection *)traitCollection {
+    self.appliedColors = colors;
+}
 @end
 
 /*
@@ -206,6 +235,99 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL
     item.animationURL = [NSURL fileURLWithPath:@"/tmp/home.unknown"];
     XCTAssertFalse(item.isAnimationReady, @"an unknown file falls back to the image");
     XCTAssertFalse(item.imageView.hidden);
+}
+
+- (void)testRestartAnimationGrowsTheRestartToken {
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] init];
+    XCTAssertEqual(item.animationRestartToken, 0);
+    [item restartAnimation];
+    [item restartAnimation];
+    XCTAssertEqual(item.animationRestartToken, 2, @"Play all grows the token, with or without an animation");
+    [item playAnimation];
+    XCTAssertEqual(item.animationRestartToken, 2, @"only a restart grows it");
+}
+
+- (void)testNoteAnimationRestartGrowsOnlyTheToken {
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] init];
+    [item noteAnimationRestart];
+    XCTAssertEqual(item.animationRestartToken, 1, @"a subclass that overrides restartAnimation without super still reports the restart");
+}
+
+- (void)testAHostThatDrivesPlaybackGetsThePlayerAndNoDefaultRules {
+    CYLAnimatedItemFakeSource *source = [[CYLAnimatedItemFakeSource alloc] init];
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    XCTAssertTrue(item.drivesAnimationPlayback, @"the default rules apply by default");
+    item.animationSource = source;
+    item.drivesAnimationPlayback = NO;
+    item.animationLoops = YES;
+    item.animationSpeed = 3;
+    item.animationRestingProgress = 0.5;
+    item.animationURL = [NSURL URLWithString:@"https://example.com/home.fake"];
+    CYLAnimatedItemFakePlayer *player = (CYLAnimatedItemFakePlayer *)item.animationPlayer;
+    XCTAssertNotNil(player, @"the player is handed out");
+    XCTAssertFalse(player.loops, @"no loops rule");
+    XCTAssertEqual(player.animationSpeed, 1, @"no speed rule");
+    XCTAssertEqual(player.progress, 0, @"no resting progress rule");
+    item.drivesAnimationPlayback = YES;
+    XCTAssertTrue(player.loops, @"the rules apply as soon as the view drives again");
+    XCTAssertEqual(player.animationSpeed, 3);
+    XCTAssertEqual(player.progress, 0.5);
+}
+
+- (void)testOnAnimationEndComesFromThePlayersEnd {
+    CYLAnimatedItemFakeSource *source = [[CYLAnimatedItemFakeSource alloc] init];
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = source;
+    __block NSInteger ends = 0;
+    item.onAnimationEnd = ^{ ends += 1; };
+    item.animationURL = [NSURL URLWithString:@"https://example.com/home.fake"];
+    CYLAnimatedItemFakePlayer *player = (CYLAnimatedItemFakePlayer *)item.animationPlayer;
+    XCTAssertNotNil(player.onEnded, @"the view takes the player's end callback");
+    player.onEnded();
+    XCTAssertEqual(ends, 1);
+    item.animationLoops = YES;
+    player.onEnded();
+    XCTAssertEqual(ends, 1, @"a looping animation has no end to report");
+    item.drivesAnimationPlayback = NO;
+    player.onEnded();
+    XCTAssertEqual(ends, 2, @"a host that drives playback gets every end the player reports");
+    item.animationURL = nil;
+    XCTAssertNil(player.onEnded, @"the old player no longer calls the view");
+}
+
+- (void)testTheBasePlayerAnswersTheCrossPlatformContract {
+    CYLAnimatedItemContractPlayer *bare = [[CYLAnimatedItemContractPlayer alloc] initWithAnimationView:[[UIView alloc] init]];
+    XCTAssertFalse(bare.supportsSpeed);
+    XCTAssertFalse(bare.supportsLoops);
+    XCTAssertFalse(bare.supportsProgress);
+    XCTAssertFalse(bare.supportsColors);
+    XCTAssertFalse(bare.isPlaying);
+    XCTAssertEqual(bare.speed, 1);
+    bare.speed = 4;
+    XCTAssertEqual(bare.speed, 1, @"a no-op without speed");
+
+    CYLAnimatedItemFullContractPlayer *full = [[CYLAnimatedItemFullContractPlayer alloc] initWithAnimationView:[[UIView alloc] init]];
+    XCTAssertTrue(full.supportsSpeed);
+    XCTAssertTrue(full.supportsLoops);
+    XCTAssertTrue(full.supportsProgress);
+    XCTAssertTrue(full.supportsColors);
+    full.speed = 2;
+    XCTAssertEqual(full.animationSpeed, 2, @"speed is the HarmonyOS name of animationSpeed");
+    full.speed = 0;
+    XCTAssertEqual(full.speed, 1, @"0 or less is 1");
+    UIColor *red = [UIColor redColor];
+    [full applyColors:@{ @"Shape.Fill": red }];
+    XCTAssertEqualObjects(full.appliedColors[@"Shape.Fill"], red);
+    [full applyColors:nil];
+    XCTAssertNil(full.appliedColors);
+
+    __block NSInteger ends = 0;
+    full.onEnded = ^{ ends += 1; };
+    [full notifyPlaybackEnded];
+    XCTAssertEqual(ends, 1);
+    full.loops = YES;
+    [full notifyPlaybackEnded];
+    XCTAssertEqual(ends, 1, @"never while looping");
 }
 
 - (void)testTheSharedEngineIsTheDefaultSource {
@@ -360,6 +482,113 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL
     XCTAssertEqual(bare.imageView.image, placeholder);
 }
 
+/// [EN] `onAnimationLoaded` / `onAnimationFailed` (HarmonyOS's `onAnimationLoaded` / `onAnimationFailed`, forwarded by React Native
+///      and Flutter): a local file in place, a download that arrives or fails, a missing file.
+/// [CN] `onAnimationLoaded` / `onAnimationFailed`（鸿蒙同名回调，React Native 与 Flutter 转发它们）：本地文件就绪、下载完成或失败、文件不存在。
+- (void)testTheLoadedAndFailedCallbacksReportTheAnimation {
+    __block NSInteger loaded = 0;
+    __block NSInteger failed = 0;
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
+    item.onAnimationLoaded = ^{ loaded++; };
+    item.onAnimationFailed = ^{ failed++; };
+    NSString *full = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-callback-home.fake"];
+    [[@"{}" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:full atomically:YES];
+    item.animationURL = [NSURL fileURLWithPath:full];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertEqual(loaded, 1, @"a local file in place is loaded");
+    XCTAssertEqual(failed, 0);
+
+    NSString *missing = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-callback-missing.fake"];
+    [[NSFileManager defaultManager] removeItemAtPath:missing error:NULL];
+    item.animationURL = [NSURL fileURLWithPath:missing];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertEqual(failed, 1, @"a missing file fails");
+
+    CYLAnimatedItemView *download = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    download.animationSource = [[CYLAnimatedItemDownloadingSource alloc] init];
+    __block NSInteger downloaded = 0;
+    __block NSInteger downloadFailed = 0;
+    download.onAnimationLoaded = ^{ downloaded++; };
+    download.onAnimationFailed = ^{ downloadFailed++; };
+    download.animationURL = [NSURL URLWithString:@"https://example.com/home.fake"];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertEqual(downloaded, 0, @"still downloading");
+    CYLTabBarItemAnimationReportLoaded(download.animationView);
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertEqual(downloaded, 1, @"the download arrived");
+    CYLTabBarItemAnimationReportFailure(download.animationView, nil);
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertEqual(downloadFailed, 1, @"a failure after loading drops the animation");
+}
+
+/// [EN] Runs the main run loop until `condition` holds or 3 s passed (the reports arrive one or two main queue turns later).
+/// [CN] 运行主 run loop，直到 `condition` 成立或过去 3 秒（报告在一两次主队列循环之后到达）。
+static void CYLSpinUntil(BOOL (^condition)(void)) {
+    NSDate *end = [NSDate dateWithTimeIntervalSinceNow:3];
+    while (!condition() && end.timeIntervalSinceNow > 0) {
+        [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.02]];
+    }
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+}
+
+/// [EN] `onResourceMissing` and `CYLAnimationEngines.resourceMissingListener`: which file and why, once per resource per view, on the
+///      main queue; the placeholder or image shows as before.
+/// [CN] `onResourceMissing` 与 `CYLAnimationEngines.resourceMissingListener`：哪个文件、为什么；每个视图每个资源一次，在主队列；占位图或图片照常显示。
+- (void)testResourceMissingNamesTheFileAndTheReason {
+    NSMutableArray<NSString *> *heard = [NSMutableArray array];
+    NSMutableArray<NSString *> *global = [NSMutableArray array];
+    CYLAnimationEngines.resourceMissingListener = ^(NSString *resource, NSString *reason) {
+        XCTAssertTrue(NSThread.isMainThread);
+        [global addObject:[NSString stringWithFormat:@"%@|%@", resource.lastPathComponent, reason]];
+    };
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
+    item.onResourceMissing = ^(NSString *resource, NSString *reason) {
+        [heard addObject:[NSString stringWithFormat:@"%@|%@", resource.lastPathComponent, reason]];
+    };
+    NSString *missing = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-resource-missing.pag"];
+    [[NSFileManager defaultManager] removeItemAtPath:missing error:NULL];
+    item.animationURL = [NSURL fileURLWithPath:missing];
+    item.animationURL = nil;
+    item.animationURL = [NSURL fileURLWithPath:missing];
+    CYLSpinUntil(^BOOL{ return heard.count >= 1 && global.count >= 1; });
+    XCTAssertEqualObjects(heard, (@[ @"cyl-resource-missing.pag|not found" ]), @"once per resource per view");
+    XCTAssertEqualObjects(global, heard);
+    XCTAssertNotNil(item.imageView.image, @"the placeholder still shows");
+
+    NSString *empty = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-resource-empty.fake"];
+    [[NSData data] writeToFile:empty atomically:YES];
+    item.animationURL = [NSURL fileURLWithPath:empty];
+    CYLSpinUntil(^BOOL{ return heard.count >= 2; });
+    XCTAssertEqualObjects(heard.lastObject, @"cyl-resource-empty.fake|unreadable");
+
+    // [EN] A file the source does not play: a known type without its engine, or an unknown file. [CN] 来源不播放的文件：已知类型缺引擎，或未知文件。
+    NSString *unknown = [NSTemporaryDirectory() stringByAppendingPathComponent:@"cyl-resource-unknown.xyz"];
+    [[@"{}" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:unknown atomically:YES];
+    item.animationURL = [NSURL fileURLWithPath:unknown];
+    CYLSpinUntil(^BOOL{ return heard.count >= 3; });
+    XCTAssertEqualObjects(heard.lastObject, @"cyl-resource-unknown.xyz|decode failed");
+    CYLAnimationEngines.resourceMissingListener = nil;
+}
+
+- (void)testResourceMissingAfterTheViewWasMadeUsesTheErrorOfTheEngine {
+    NSMutableArray<NSString *> *heard = [NSMutableArray array];
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
+    item.onResourceMissing = ^(NSString *resource, NSString *reason) { [heard addObject:reason]; };
+    item.animationURL = [NSURL URLWithString:@"https://example.com/home.fake"];
+    CYLTabBarItemAnimationReportFailure(item.animationView, [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoSuchFileError userInfo:nil]);
+    CYLSpinUntil(^BOOL{ return heard.count >= 1; });
+    XCTAssertEqualObjects(heard, (@[ @"not found" ]));
+
+    [heard removeAllObjects];
+    item.animationURL = [NSURL URLWithString:@"https://example.com/other.fake"];
+    CYLTabBarItemAnimationReportFailure(item.animationView, [NSError errorWithDomain:@"CYLTest" code:1 userInfo:nil]);
+    CYLSpinUntil(^BOOL{ return heard.count >= 1; });
+    XCTAssertEqualObjects(heard, (@[ @"decode failed" ]));
+}
+
 - (void)testAFailureOfAnOldAnimationIsIgnored {
     CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
     item.animationSource = [[CYLAnimatedItemFakeSource alloc] init];
@@ -374,6 +603,15 @@ FOUNDATION_EXTERN BOOL CYLTabBarItemAnimationURLMayBeLottie(NSURL *_Nullable URL
 }
 
 #else
+- (void)testWithoutTheEngineTheResourceIsReportedAsEngineLibraryMissing {
+    NSMutableArray<NSString *> *heard = [NSMutableArray array];
+    CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
+    item.onResourceMissing = ^(NSString *resource, NSString *reason) { [heard addObject:[NSString stringWithFormat:@"%@|%@", resource.lastPathComponent, reason]]; };
+    item.animationURL = [NSURL fileURLWithPath:@"/tmp/cyl-home.pag"];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
+    XCTAssertEqualObjects(heard, (@[ @"cyl-home.pag|engine library missing" ]));
+}
+
 - (void)testWithoutTheEngineBothShowTheImage {
     UIImage *icon = [self icon];
     CYLAnimatedItemView *item = [[CYLAnimatedItemView alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];

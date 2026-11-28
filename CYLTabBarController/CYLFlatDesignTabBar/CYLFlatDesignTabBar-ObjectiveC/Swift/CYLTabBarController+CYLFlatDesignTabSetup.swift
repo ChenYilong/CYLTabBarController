@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] The FlatDesign part of `-setViewControllers:` (docs/Swift-Migration.md, step 126), called by the core through
 //      `CYLFlatDesignTabSetup` (Swift/CYLTabBarController+CYLTabSetup.swift). FlatDesign subspec only.
 // [CN] `-setViewControllers:` 的扁平样式部分（第 126 步），核心通过 `CYLFlatDesignTabSetup` 调用。仅属于扁平样式子库。

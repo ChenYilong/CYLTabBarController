@@ -20,7 +20,7 @@ Every rule has a tag. Each tag has a visible heading with its summary; the full 
 ## Task workflow and sessions (tag: `task-workflow`)
 
 - Before any task: list the other sessions (`ListAgents`), avoid duplicate work, tell them the files you change; `Mac*` sessions take iOS, `Win*` sessions the other platforms.
-- Start with a `TODO` list and the branch; record the task in memory with the prompt verbatim and a 100 / 60 rubric; score after each step, never stop below 60; print missing points as `TODO` at the end; `DONE` only at 100.
+- Start with a `TODO` list and the branch; record the task in memory with the prompt verbatim and a 100 / 60 rubric; score after each step, never stop below 60; print missing points as `TODO` at the end, only on substantial progress, a score change or a new missing point (changed rows only; none for a pure notification); `DONE` only at 100.
 - A hung emulator: tell the sessions that use it, restart it, then tell all sessions it is back.
 - Full rule: at reference of this tag (not required; do not read by default).
 
@@ -35,8 +35,9 @@ Every rule has a tag. Each tag has a visible heading with its summary; the full 
 
 - Swift first for the iOS core; Objective-C only where Swift cannot, with the reason.
 - Fix bugs in the core, never only in the example: record the bug, screenshot it, fix the component (`docs/Example-Layer-Fixes.md` only with the owner's approval).
-- Never remove or change a public API; no warnings; `CYL` / `cyl_` prefixes; one documentation block format for public API comments; bilingual `[EN]` / `[CN]` comments.
+- Never remove or change a public API; no warnings; `CYL` / `cyl_` prefixes (a `cylFoo` clash: `cyl` + module name + original name, e.g. `cylBadgeFoo`); one documentation block format for public API comments; bilingual `[EN]` / `[CN]` comments.
 - Every published package ships the root `LICENSE` (`scripts/check-license-notices.py`). Swift migration of the core layer: `docs/Swift-Migration.md`.
+- Swift protocols hold requirements only (no bodies, no stored properties); a new member of a released `@objc` protocol is `@objc optional`; insertion anchors are unique and include the declaration keyword; run `python3 scripts/check-swift-protocol-bodies.py CYLTabBarController` before pushing Swift written without a compiler.
 - Full rule: at reference of this tag (not required; do not read by default).
 
 ## Accessibility and localization (tag: `accessibility-localization`)
@@ -66,6 +67,7 @@ Every rule has a tag. Each tag has a visible heading with its summary; the full 
 
 - Examples import only `CYLTabBarController`; tables use the inset grouped style; demo rows never on the first tab, spread over the others; the first tab mirrors the Objective-C example.
 - The demo adds the first tab's cover itself, later; animated icon pages offer Play all, speed, and loop; default setup: plus button with its own page, a local configuration file, a raised plus button. New demos follow `cyl-new-project`.
+- A demo list that needs sections uses a CollectionViewClassifyMenu tag list (title and icon per row, a titled section header, adaptive tag width, titles wrap up to 3 lines in an example, a More / Less toggle with its built-in icon, tap as the old cell, long press shows the subtitle in an arrow callout through the tag list's long-press API; what a title says in brackets moves into the subtitle, so tag titles stay short; tags use the library's Liquid Glass style).
 - Full rule: at reference of this tag (not required; do not read by default).
 
 ## React Native and Flutter (tag: `cross-platform`)
@@ -83,6 +85,7 @@ Every rule has a tag. Each tag has a visible heading with its summary; the full 
 
 - Xcode projects keep the Objective-C example's format (`objectVersion = 46`); Podfile top lines and `post_install` hook; app icon and launch screen from the ObjC example; no copied sources.
 - Clean before every build (new derived data folder); run `scripts/free-ram.sh` before the simulator; details in `cyl-verify` and `cyl-xcode-compat`.
+- **Before you run a simulator you must read the simulator run rules** ([docs/instructions/macos.md](docs/instructions/macos.md#simulator-run-rules-added-2026-11-25), or the `cyl-verify` skill, "Running the simulator"), or this text: After a simulator test or screenshot run ends, immediately kill the app and the simulator processes; start them again only when needed. Never leave an app running or a simulator booted after the task is done.
 - Full rule: at reference of this tag (not required; do not read by default).
 
 ## Windows and HarmonyOS (tag: `windows-harmonyos`)

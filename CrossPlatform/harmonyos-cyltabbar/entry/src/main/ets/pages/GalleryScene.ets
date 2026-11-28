@@ -61,7 +61,7 @@ struct GalleryScene {
         selectedTitleColor: scene.colors !== undefined ? scene.colors[i % scene.colors.length] : undefined,
         backgroundColor: scene.backgrounds ? '#FFF6E0' : undefined,
         selectedBackgroundColor: scene.backgrounds ? '#FFD966' : undefined,
-        lottieFilePath: scene.lottie ? LOTTIE[i % LOTTIE.length] : undefined,
+        lottieFilePath: scene.lottie ? LOTTIE[i % LOTTIE.length] + (scene.lottieSuffixes?.[i] ?? '') : undefined,
       };
       return item;
     });
@@ -71,7 +71,7 @@ struct GalleryScene {
         if (scene.badgeColor !== undefined) {
           this.badges[i].backgroundColor = scene.badgeColor;
         }
-        this.badges[i].cyl_showBadgeValue(value, scene.tapAnimation === CYLTabButtonTapAnimationType.Bounce ? CYLBadgeAnimationType.Bounce : CYLBadgeAnimationType.None);
+        this.badges[i].showBadgeValue(value, scene.tapAnimation === CYLTabButtonTapAnimationType.Bounce ? CYLBadgeAnimationType.Bounce : CYLBadgeAnimationType.None);
       }
     });
     if (scene.plus) {
@@ -89,7 +89,7 @@ struct GalleryScene {
           clearInterval(this.suggestTimer);
           return;
         }
-        this.badges[middle].cyl_showBadgeValue('', CYLBadgeAnimationType.ScaleOnce);
+        this.badges[middle].showBadgeValue('', CYLBadgeAnimationType.ScaleOnce);
       }, 3000);
     }
   }
@@ -176,8 +176,8 @@ struct GalleryScene {
         },
         didSelect: (index: number) => {
           this.label = this.tabTitle(index);
-          if (index >= 0 && this.badges[index] !== undefined && this.badges[index].cyl_isShowBadge() && this.scene.style === CYLTabBarStyleType.LiquidGlass) {
-            this.badges[index].cyl_clearBadge();
+          if (index >= 0 && this.badges[index] !== undefined && this.badges[index].isShowBadge() && this.scene.style === CYLTabBarStyleType.LiquidGlass) {
+            this.badges[index].clearBadge();
           }
         },
         plusButtonAction: () => {

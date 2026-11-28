@@ -30,10 +30,13 @@
     <string name="cyl_demo_6a69211e0f">Кожна сцена — це панель вкладок, створена за допомогою публічного API: стилі, анімації, бейджі, Lottie та новіший API вкладок</string>
     <string name="cyl_demo_7efc907fe3">Анімований елемент</string>
     <string name="cyl_demo_9244b5dc65">Окремий компонент анімованого значка + заголовка: GIF, Lottie, відсутній файл, аксесуар і перетягування</string>
+    <string name="cyl_demo_5dbde9a698">Відступ вмісту</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset не задано: плаский елемент і елемент Liquid Glass, звичайний і вибраний</string>
     <string name="cyl_demo_185d8ef0ae">Бейджі</string>
     <string name="cyl_demo_2db1db0706">Відтворення</string>
     <string name="cyl_demo_34bffc9c7a">Анімації значків вкладок: Відтворити всі, швидкість, повтор</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">Швидкість %@, повтор %@; натисніть для налаштувань</string>
+    <string name="cyl_demo_2f63c1fff7">Звільнити контролер панелі вкладок (через 3 с)</string>
     <string name="cyl_demo_a4fe65264e">Мова</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">Поточне: %@</string>
     <string name="cyl_demo_bbc5e661e1">система</string>
@@ -130,6 +133,10 @@
     <string name="cyl_demo_7108183f18">Запит скасовано</string>
     <string name="cyl_demo_5fbceaee5f">Запит без URL</string>
     <string name="cyl_demo_4334569b3d">HTML-сторінка (мережа)</string>
+    <string name="cyl_demo_e2917c5f0d">Плаский: itemContentHorizontalInset не задано</string>
+    <string name="cyl_demo_a7248eeb45">Звичайний</string>
+    <string name="cyl_demo_57fd7a0cf3">Вибрано</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset не задано</string>
     <string name="cyl_demo_d84eebada9">Фото</string>
     <string name="cyl_demo_d47d7cb0e4">Ще</string>
     <string name="cyl_demo_0e35f6e974">Основне</string>
@@ -320,6 +327,7 @@
     <string name="cyl_demo_12e7b8220d">Відтворити все</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">Швидкість: %@</string>
     <string name="cyl_demo_f2f6a01889">Повтор</string>
+    <string name="cyl_demo_08078d674a">Контролер панелі вкладок звільнено</string>
     <string name="cyl_demo_44a57b22e0">Сповіщення</string>
     <string name="cyl_demo_a127ceb079">Аркуш дій</string>
     <string name="cyl_demo_9329618118">Аркуш сторінки</string>
@@ -338,6 +346,10 @@
     <string name="cyl_demo_1698b890f9">Запускає всі автоматичні рядки один за одним.</string>
     <string name="cyl_demo_afa158bdc8">Поверх поточного контексту</string>
     <string name="cyl_demo_0add8377e7" formatted="false">Довге натискання на «%@»</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">виконано зворотних викликів dealloc: %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">виконано зворотних викликів dealloc: %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">звільнення: через %d с</string>
+    <string name="cyl_demo_c0fd658b68">звільнення: не виконувалось</string>
     <string name="cyl_demo_d4f455fa45">Відкрити: дві панелі вкладок, один ID сторінки</string>
     <string name="cyl_demo_5b88804382" formatted="false">Панель вкладок %@ · ID сторінки «%@»</string>
 </resources>

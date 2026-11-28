@@ -16,6 +16,7 @@ export {
   CYLTabBarAnimationOptionRiveLegacyRuntime,
   CYLTabBarAnimationOptionRiveNumberInput,
   CYLTabBarAnimationOptionRiveNumberValues,
+  CYLTabBarAnimationOptionRiveColor,
   cylRiveNextNumber,
   cylRiveFileAndOptions,
   cylRiveRendererType,

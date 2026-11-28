@@ -107,11 +107,11 @@ build_xcframework() {
   (cd "$work" && carthage build --no-skip-current --use-xcframeworks --platform iOS)
   mkdir -p "$root/build"
   rm -f "$root/build/$CARTHAGE_ASSET"
-  # [EN] Both frameworks in one zip: CYLTabBarController links CYLAnimatedItem (docs/Animated-Item.md), and Carthage's binary
+  # [EN] All four frameworks in one zip: CYLTabBarController links CYLAnimatedItem, CYLBadge and CYLUtilsKit (docs/Animated-Item-Badge.md), and Carthage's binary
   #      spec extracts every framework of the archive.
-  # [CN] 两个 framework 放在同一个 zip 中：CYLTabBarController 链接 CYLAnimatedItem（docs/Animated-Item.md），Carthage 的二进制规格会解压
+  # [CN] 四个 framework 放在同一个 zip 中：CYLTabBarController 链接 CYLAnimatedItem、CYLBadge、CYLUtilsKit（docs/Animated-Item.md），Carthage 的二进制规格会解压
   #      压缩包中的每个 framework。
-  (cd "$work/Carthage/Build" && zip -qry "$root/build/$CARTHAGE_ASSET" CYLTabBarController.xcframework CYLAnimatedItem.xcframework)
+  (cd "$work/Carthage/Build" && zip -qry "$root/build/$CARTHAGE_ASSET" CYLTabBarController.xcframework CYLAnimatedItem.xcframework CYLBadge.xcframework CYLUtilsKit.xcframework)
   rm -rf "$work"
   echo "Carthage: build/$CARTHAGE_ASSET (upload it to the GitHub release of the tag)"
 }
@@ -178,8 +178,25 @@ bump_version() {
   echo "Podspec: s.version $version → $new_version (commit this change, then tag the merged commit $new_version)"
 }
 
+# [EN] Pending: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md). The core subspec needs
+#      CYLDeallocBlockExecutor ~> 1.4, which is not on trunk yet, so `lib` lints against a local podspec that fetches
+#      the branch the Podfiles pin (--external-podspecs downloads its source). Set CYL_DEALLOC_EXECUTOR_BRANCH= (empty) to lint against trunk.
+# [CN] 待办：CYLDeallocBlockExecutor 1.4.0 发布后删除（docs/Lifecycle-Library.md）。核心子库依赖 CYLDeallocBlockExecutor ~> 1.4，
+#      trunk 上还没有，因此 `lib` 使用一个从 Podfile 所固定分支获取源码的本地 podspec。设置 CYL_DEALLOC_EXECUTOR_BRANCH=（空）
+#      则使用 trunk。
+CYL_DEALLOC_EXECUTOR_BRANCH="${CYL_DEALLOC_EXECUTOR_BRANCH-4276a6dab5a428ccc3a5f3f347eab991881fb97c}"  # a commit (or a branch), as the Podfiles pin
+lint_external_podspecs() {
+  [ -n "$CYL_DEALLOC_EXECUTOR_BRANCH" ] || return 0
+  dir="$PWD/build/pod-lint-podspecs"
+  mkdir -p "$dir"
+  curl -fsSL --proto '=https' --tlsv1.2 "https://raw.githubusercontent.com/ChenYilong/CYLDeallocBlockExecutor/$CYL_DEALLOC_EXECUTOR_BRANCH/CYLDeallocBlockExecutor.podspec" |
+    sed "s|:tag => s.version.to_s|:commit => \"$CYL_DEALLOC_EXECUTOR_BRANCH\"|" > "$dir/CYLDeallocBlockExecutor.podspec"
+  grep -q ":commit =>" "$dir/CYLDeallocBlockExecutor.podspec" || { echo "error: could not pin CYLDeallocBlockExecutor to $CYL_DEALLOC_EXECUTOR_BRANCH" >&2; exit 1; }
+  echo "--external-podspecs=$dir/CYLDeallocBlockExecutor.podspec"
+}
+
 case "$1" in
-  push)      shift; pod trunk push "$COMPONENT_PODSPEC" --allow-warnings "$@"; pod trunk push "$PODSPEC" --allow-warnings "$@"; update_carthage; update_spm; update_navigation ;;
+  push)      shift; pod trunk push CYLUtils.podspec --allow-warnings "$@"; pod trunk push CYLBadge.podspec --allow-warnings "$@"; pod trunk push "$COMPONENT_PODSPEC" --allow-warnings "$@"; pod trunk push "$PODSPEC" --allow-warnings "$@"; update_carthage; update_spm; update_navigation ;;
   version)   release_version; echo "$version" ;;
   check-tag) check_tag "${2:?usage: $0 check-tag <tag>}" ;;
   bump)      bump_version "${2:-}"; update_carthage; update_spm; update_navigation ;;
@@ -188,6 +205,11 @@ case "$1" in
   spm)      update_spm; update_navigation ;;
   versions) update_carthage; update_spm; update_navigation ;;
   *)        [ "$1" = lib ] && shift
-            pod lib lint "$COMPONENT_PODSPEC" --allow-warnings "$@"
-            pod lib lint "$PODSPEC" --allow-warnings --include-podspecs="$COMPONENT_PODSPEC" "$@" ;;
+            # [EN] Layers bottom-up (CYLUtils, CYLBadge, CYLAnimatedItem, CYLTabBarController): each lint includes the podspecs below it, as none is on trunk yet.
+            # [CN] 自下而上逐层检查（CYLUtils、CYLBadge、CYLAnimatedItem、CYLTabBarController）：每层都带上它下面各层的 podspec，因为它们都还不在 trunk 上。
+            external_podspecs="$(lint_external_podspecs)"
+            pod lib lint CYLUtils.podspec --allow-warnings ${external_podspecs:+"$external_podspecs"} "$@"
+            pod lib lint CYLBadge.podspec --allow-warnings --include-podspecs=CYLUtils.podspec ${external_podspecs:+"$external_podspecs"} "$@"
+            pod lib lint "$COMPONENT_PODSPEC" --allow-warnings --include-podspecs="{CYLUtils,CYLBadge}.podspec" ${external_podspecs:+"$external_podspecs"} "$@"
+            pod lib lint "$PODSPEC" --allow-warnings --include-podspecs="{CYLUtils,CYLBadge,CYLAnimatedItem}.podspec" ${external_podspecs:+"$external_podspecs"} "$@" ;;
 esac

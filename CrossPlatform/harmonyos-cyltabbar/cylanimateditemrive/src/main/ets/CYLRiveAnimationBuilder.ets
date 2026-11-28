@@ -6,11 +6,11 @@ import { CYLRiveLoopPolicy } from './CYLRiveLoopPolicy';
 /**
  * [EN] Registers Rive with `CYLAnimatedItemEngines`, so `CYLAnimatedItemView` plays .riv files: the type needs the `arm64-v8a`
  *      native library of @ohos/rive (the registry's built-in requirement, left alone here so the x86_64 debug kit's `x86_64`
- *      is never overwritten; the item shows its still image on a device without it), and, in debug builds
+ *      is never overwritten; the item shows its still image on a device without it), and, in a HAP
  *      installed with the x86_64 debug engine kit (`cylanimateditem/x86_64-debug-engines/rive`), `context` lets Rive play on
  *      the x86_64 emulator too. Call it once, in `aboutToAppear` of the page or the app's first component.
  * [CN] 向 `CYLAnimatedItemEngines` 注册 Rive，使 `CYLAnimatedItemView` 能播放 .riv 文件：该类型需要 @ohos/rive 的 `arm64-v8a` 原生库
- *      （没有它的设备上条目显示静态图片）；安装了 x86_64 调试引擎包（`cylanimateditem/x86_64-debug-engines/rive`）的 debug 构建中，传入
+ *      （没有它的设备上条目显示静态图片）；安装了 x86_64 调试引擎包（`cylanimateditem/x86_64-debug-engines/rive`）的 HAP 中，传入
  *      `context` 后 Rive 也能在 x86_64 模拟器上播放。调用一次即可，放在页面或 App 第一个组件的 `aboutToAppear` 中。
  */
 export function cylRegisterRiveEngine(context?: common.Context): void {

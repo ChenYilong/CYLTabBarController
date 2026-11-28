@@ -6,6 +6,13 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
+internal import CYLDeallocBlockExecutor
 
 /// [EN] The blocks of `-reloadBadgesWithBlock:` / `-performWhenTabBarItemsReady:` that wait for the tab buttons (#404).
 /// [CN] `-reloadBadgesWithBlock:` / `-performWhenTabBarItemsReady:` 中等待 Tab 按钮创建的 block（#404）。
@@ -82,6 +89,10 @@ extension CYLTabBarController {
         for case let block as CYLViewDidLayoutSubViewsBlock in blocks {
             block(self)
         }
+        // [EN] The tab buttons are ready: `cyl.core.tabBarItemsReady` (CYLDeallocBlockExecutor), for blocks added with
+        //      `cylAddLifecycleCallback(forCustomEvent:)` on this controller or `CYLLifecycleCenter`. [CN] Tab 按钮已就绪的事件。
+        CYLAnimationEventBridge.install()
+        cylPostLifecycleEvent("cyl.core.tabBarItemsReady")
     }
 
     /// [EN] Adds a target-action once: the first event of `events` decides whether it is already there (#610).
@@ -100,6 +111,13 @@ extension CYLTabBarController {
     @objc(cyl_adoptTabButton:forTabBarItem:)
     func cylAdoptTabButton(_ tabButton: UIControl?, forTabBarItem item: UITabBarItem?) {
         guard let tabButton = tabButton, let item = item else { return }
+        // [EN] The tab button forwards its window, screen, scroll and badge events to its `UITabBarItem` (an item is not a view), so
+        //      `item.cylAddLifecycleCallback(for: .didEnterScreen)` and the `cyl.badge.*` events work on the item. Replaced by
+        //      each rebinding, so UIKit replacing the button (#610) keeps one forward. (CYLDeallocBlockExecutor, design v5.)
+        // [CN] Tab 按钮把窗口、屏幕、滚动与角标事件转发给其 `UITabBarItem`（item 不是视图）；每次重新绑定都会替换转发，因此 UIKit 替换
+        //      按钮（#610）后仍只有一个转发。
+        tabButton.cylForwardLifecycleEvents([.willMoveToWindow, .didMoveToWindow, .didEnterScreen, .didLeaveScreen,
+                                             .scrollWillBeginDragging, .scrollDidEndDragging, .scrollDidEndScrolling], to: item)
         for viewController in viewControllers ?? [] where viewController.tabBarItem === item && viewController.cyl_tabButton !== tabButton {
             viewController.cyl_tabButton = tabButton
         }

@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a na Androidu: aplikacija ne može poslati ovaj sistemski događaj.";
 "Runs every automatic row, one after the other." = "Pokreće sve automatske retke, jedan za drugim.";
 "Tab bar %@ · page ID \"%@\"" = "Traka s karticama %@ · ID stranice \"%@\"";
+"Animated item engine API" = "API pogona animirane stavke";
+"Stop at 50%" = "Zaustavi na 50 %";
+"Show image when ended" = "Prikaži sliku na kraju";
+"Restart token: %@" = "Token ponovnog pokretanja: %@";
+"End callback: %@" = "Povratni poziv završetka: %@";
+"none yet" = "još nema";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Reprodukcijom upravlja domaćin (drivesAnimationPlayback = false)";
+"Engine API" = "API pogona";
+"Pause while scrolling" = "Pauziraj tijekom pomicanja";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Oslobodi kontroler trake kartica (za 3 s)";
+"teardown: not run" = "rušenje: nije pokrenuto";
+"teardown: releasing in %d s" = "rušenje: oslobađanje za %d s";
+"dealloc callbacks ran: %d / %d" = "dealloc povratni pozivi izvršeni: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "dealloc povratni pozivi izvršeni: %d / %d (%@)";
+"Tab bar controller released" = "Kontroler trake kartica je oslobođen";
+"bridge: pause %d, resume %d" = "most: pauza %d, nastavak %d";
+"last event: -" = "posljednji događaj: -";
+"last event: %@" = "posljednji događaj: %@";
+"Content inset" = "Unutarnja margina sadržaja";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset nije postavljeno: ravna stavka i stavka Liquid Glass, normalna i odabrana";
+"Flat: itemContentHorizontalInset unset" = "Ravno: itemContentHorizontalInset nije postavljeno";
+"Normal" = "Normalno";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset nije postavljeno";

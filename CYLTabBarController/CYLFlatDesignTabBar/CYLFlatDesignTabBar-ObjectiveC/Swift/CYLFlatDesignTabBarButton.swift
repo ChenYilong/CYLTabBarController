@@ -7,6 +7,12 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 #if canImport(CYLAnimatedItem)
 import CYLAnimatedItem
 #endif
@@ -119,12 +125,14 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
         updateLayout()
     }
 
-    open override func tintColorDidChange() {
-        super.tintColorDidChange()
-        if isSelected {
-            titleLabel.textColor = titleTextAttributesForCurrentState()[.foregroundColor] as? UIColor
-            applyIconTintColor(iconColorForCurrentState())
-        }
+    /**
+     * [EN] The component applies the appearance (also on state, tint and trait changes), then the tab's title and icon colors are resolved again,
+     *      so a title color the item sets keeps winning over the appearance's.
+     * [CN] 组件应用外观（状态、tint 与 trait 变化时也会调用），然后重新解析 Tab 的标题与图标颜色，使 item 设置的标题颜色仍优先于外观的颜色。
+     */
+    open override func applyItemAppearance() {
+        super.applyItemAppearance()
+        if tabBarItemStorage != nil { applyTitleAndIconColors() }
     }
 
     open override var isSelected: Bool {
@@ -195,13 +203,56 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
         Self.stateAppearance(Self.defaultItemAppearance, for: currentState)
     }
 
-    /// [EN] `iconColor` of the appearance, else the flat design default (tint color when selected, gray otherwise).
-    /// [CN] appearance 的 `iconColor`，否则使用扁平样式默认值（选中为 tintColor，否则为灰色）。
+    /**
+     * [EN] THE color resolver of the flat tab, for the title and the icon, tiers from high to low: (1) `itemColor`, set by the app on this item (the title
+     *      foreground color of the state; the icon has no such item value); (2) `appearanceColor`, the bar appearance's color of the state;
+     *      (3) `itemFallback`, the item's normal-state title color for a state it sets nothing for (as the Objective-C button); (4) the bar's colors,
+     *      shared by title and icon: `tintColor` when selected, else `.systemGray`.
+     * [CN] 扁平 Tab 唯一的颜色解析器，标题与图标共用，层级从高到低：（1）`itemColor`，App 在该 item 上设置的颜色（该状态的标题前景色；图标没有这样的
+     *      item 值）；（2）`appearanceColor`，栏外观在该状态的颜色；（3）`itemFallback`，item 对某状态没有任何设置时其普通状态的标题颜色（与
+     *      Objective-C 按钮相同）；（4）栏颜色，标题与图标共用：选中为 `tintColor`，否则为 `.systemGray`。
+     */
+    private func resolvedColor(itemColor: UIColor? = nil, appearanceColor: UIColor?, itemFallback: UIColor? = nil) -> UIColor {
+        itemColor ?? appearanceColor ?? itemFallback ?? (currentState == .selected ? tintColor : .systemGray)
+    }
+
     private func iconColorForCurrentState() -> UIColor {
-        if let iconColor = currentStateAppearance?.iconColor {
-            return iconColor
+        resolvedColor(appearanceColor: currentStateAppearance?.iconColor)
+    }
+
+    private func applyTitleAndIconColors() {
+        applyAnimationTintOptions()
+        applyIconTintColor(iconColorForCurrentState())
+        let titleAttributes = titleTextAttributesForCurrentState()
+        titleLabel.textColor = titleAttributes[.foregroundColor] as? UIColor
+        titleLabel.font = titleAttributes[.font] as? UIFont
+    }
+
+    /**
+     * [EN] Hands the `tint` / `darkTint` options of the tab's animation URL to the component (`animationTint` set on the button still wins). As on
+     *      Liquid Glass, a selected tab with a fixed tint takes the title color. A per-tab `animationTint` or `.alwaysTemplate` set on the button
+     *      also prepares an animation view the URL asked nothing of.
+     * [CN] 把 Tab 动画 URL 的 `tint` / `darkTint` 选项交给组件（按钮上设置的 `animationTint` 仍然优先）。与液态玻璃相同，固定着色的 Tab 在选中时使用标题
+     *      颜色。按钮上设置的按 Tab `animationTint` 或 `.alwaysTemplate` 也会准备 URL 没有任何要求的动画视图。
+     */
+    private func applyAnimationTintOptions() {
+        // [EN] Without an engine there is no animation view to tint (and no tint functions to call). [CN] 没有引擎时没有可着色的动画视图（也没有可调用的着色函数）。
+        #if CYL_ANIMATION_ENGINE_AVAILABLE
+        let url = tabBarAnimationURL
+        let options = (CYLTabBarAnimationOptionsFromURL(url) as? [String: String]) ?? [:]
+        var tint = options[CYLTabBarAnimationOption.tint.rawValue]
+        if isSelected, let fixed = tint, fixed != "title",
+           CYLTabBarItemAnimationResolveTint(fixed, nil, false, false, .black, nil) != nil {
+            tint = "title"
         }
-        return isSelected ? tintColor : .systemGray
+        if inheritedAnimationTint != tint { inheritedAnimationTint = tint }
+        let darkTint = options[CYLTabBarAnimationOption.darkTint.rawValue]
+        if inheritedAnimationDarkTint != darkTint { inheritedAnimationDarkTint = darkTint }
+        if let view = animationView, let url, !(animationTint ?? "").isEmpty || animationRenderingMode == .alwaysTemplate {
+            _ = CYLTabBarItemAnimationPrepareItemTint(view, url, CYLTabBarItemAnimationFactory.shared().player(for: view),
+                                                      animationTint, animationDarkTint)
+        }
+        #endif
     }
 
     /// [EN] `titlePositionAdjustment` of the appearance, used when the item has no offset of its own.
@@ -310,14 +361,10 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
         }
         // [EN] Through the component's content, which shows it in `imageView`. [CN] 通过组件的内容写入，由组件显示在 `imageView` 中。
         self.image = image
-        // [EN] The icon and its animation, through the component (the animation view takes it when its `tint` option asks).
-        // [CN] 图标及其动画，通过组件着色（动画视图在其 `tint` 选项需要时使用）。
-        applyIconTintColor(iconColorForCurrentState())
-
-        let titleAttributes = titleTextAttributesForCurrentState()
         self.title = item?.title
-        titleLabel.textColor = titleAttributes[.foregroundColor] as? UIColor
-        titleLabel.font = titleAttributes[.font] as? UIFont
+        // [EN] The title, and the icon with its animation through the component (the animation view takes it when its tint options ask).
+        // [CN] 标题，以及通过组件着色的图标及其动画（动画视图在其着色选项需要时使用）。
+        applyTitleAndIconColors()
 
         if let item {
             backgroundColor = isSelected ? (item.selectedBackgroundColor ?? item.backgroundColor) : item.backgroundColor
@@ -397,26 +444,29 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
         // [EN] The tab's animation view is made here, after the button was tinted: it takes the icon color now (a tab that
         //      never changed state kept the file's own white strokes on a light bar).
         // [CN] Tab 的动画视图在这里创建，晚于按钮着色：此时为其着色（从未改变状态的 Tab 曾在浅色 TabBar 上保持文件自身的白色线条）。
+        applyAnimationTintOptions()
         applyIconTintColor(iconColorForCurrentState())
+        // [EN] This layout replaces the component's, so it also keeps the badge view on the icon, above the animation view.
+        // [CN] 本布局替代组件的布局，因此也要让角标视图保持在图标上、动画视图之上。
+        badgeAnchorView.frame = imageView.frame.inset(by: imageView.image?.alignmentRectInsets ?? .zero)
+        bringSubviewToFront(badgeAnchorView)
     }
 
     private func titleTextAttributesForCurrentState() -> [NSAttributedString.Key: Any] {
         let state = currentState
         let item = tabBarItemStorage
-        var attributes = item?.titleTextAttributes(for: state) ?? item?.titleTextAttributes(for: .normal)
-        // [EN] The appearance's attributes override the item's, as on `UITabBar` (which ignores the item's once it has an
-        //      appearance).
-        // [CN] appearance 的属性覆盖 item 的属性，与 `UITabBar` 相同（有 appearance 后忽略 item 的属性）。
-        if let appearanceAttributes = currentStateAppearance?.titleTextAttributes, !appearanceAttributes.isEmpty {
-            attributes = (attributes ?? [:]).merging(appearanceAttributes) { _, new in new }
-        }
-        var result = attributes ?? [:]
+        let own = item?.titleTextAttributes(for: state)
+        let normal = own == nil ? item?.titleTextAttributes(for: .normal) : nil
+        let appearanceAttributes = currentStateAppearance?.titleTextAttributes ?? [:]
+        // [EN] The appearance's other attributes (the font) override the item's, as on `UITabBar`; the color follows the resolver's tiers.
+        // [CN] 外观的其他属性（字体）覆盖 item 的属性，与 `UITabBar` 相同；颜色按解析器的层级决定。
+        var result = (own ?? normal ?? [:]).merging(appearanceAttributes) { _, new in new }
         if result[.font] == nil {
             result[.font] = UIFont.systemFont(ofSize: 10, weight: .medium)
         }
-        if result[.foregroundColor] == nil {
-            result[.foregroundColor] = state == .selected ? tintColor : UIColor.systemGray
-        }
+        result[.foregroundColor] = resolvedColor(itemColor: own?[.foregroundColor] as? UIColor,
+                                                 appearanceColor: appearanceAttributes[.foregroundColor] as? UIColor,
+                                                 itemFallback: normal?[.foregroundColor] as? UIColor)
         return result
     }
 
@@ -524,7 +574,7 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
      * [CN] 拥有本按钮的 TabBarController，适用于任意样式。`-cyl_tabBarController` 只查找系统样式，因此扁平样式读取 item 被赋予的控制器
      *      （`-cylflatdesign_setTabBarController:`），再读取其子控制器的（与 `CYLPlusButton` 的查找方式相同，#650）。
      */
-    private var animationTabBarController: CYLTabBarController? {
+    var animationTabBarController: CYLTabBarController? {
         if let controller = cylTabBarController {
             return controller
         }
@@ -614,3 +664,5 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
         set { super.accessibilityTraits = newValue }
     }
 }
+
+extension CYLFlatDesignTabBarButton: CYLTabBarItemAnimationDefaultsSource {}

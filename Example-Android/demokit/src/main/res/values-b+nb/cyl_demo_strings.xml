@@ -30,10 +30,13 @@
     <string name="cyl_demo_6a69211e0f">Hver scene er en fanelinje bygd med det offentlige API-et: stiler, animasjoner, merker, Lottie og det nyere fane-API-et</string>
     <string name="cyl_demo_7efc907fe3">Animert element</string>
     <string name="cyl_demo_9244b5dc65">Komponenten med animert ikon + tittel alene: GIF, Lottie, en manglende fil, et tilbehør og dra</string>
+    <string name="cyl_demo_5dbde9a698">Indre marg</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset ikke angitt: et flatt og et Liquid Glass-element, normalt og valgt</string>
     <string name="cyl_demo_185d8ef0ae">Merker</string>
     <string name="cyl_demo_2db1db0706">Avspilling</string>
     <string name="cyl_demo_34bffc9c7a">Animasjoner for faneikoner: Spill av alle, hastighet, gjentakelse</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">Hastighet %@, løkke %@; trykk for kontrollene</string>
+    <string name="cyl_demo_2f63c1fff7">Frigi fanelinje-kontrolleren (om 3 s)</string>
     <string name="cyl_demo_a4fe65264e">Språk</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">Gjeldende: %@</string>
     <string name="cyl_demo_bbc5e661e1">system</string>
@@ -130,6 +133,10 @@
     <string name="cyl_demo_7108183f18">Forespørsel avbrutt</string>
     <string name="cyl_demo_5fbceaee5f">Forespørsel uten URL</string>
     <string name="cyl_demo_4334569b3d">En HTML-side (nettverk)</string>
+    <string name="cyl_demo_e2917c5f0d">Flat: itemContentHorizontalInset ikke angitt</string>
+    <string name="cyl_demo_a7248eeb45">Normal</string>
+    <string name="cyl_demo_57fd7a0cf3">Valgt</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset ikke angitt</string>
     <string name="cyl_demo_d84eebada9">Bilde</string>
     <string name="cyl_demo_d47d7cb0e4">Mer</string>
     <string name="cyl_demo_0e35f6e974">Grunnleggende</string>
@@ -320,6 +327,7 @@
     <string name="cyl_demo_12e7b8220d">Spill av alle</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">Hastighet: %@</string>
     <string name="cyl_demo_f2f6a01889">Gjenta</string>
+    <string name="cyl_demo_08078d674a">Fanelinje-kontrolleren er frigitt</string>
     <string name="cyl_demo_44a57b22e0">Varsel</string>
     <string name="cyl_demo_a127ceb079">Handlingsark</string>
     <string name="cyl_demo_9329618118">Sideark</string>
@@ -338,6 +346,10 @@
     <string name="cyl_demo_1698b890f9">Kjører alle automatiske rader, én etter én.</string>
     <string name="cyl_demo_afa158bdc8">Over gjeldende kontekst</string>
     <string name="cyl_demo_0add8377e7" formatted="false">Trykket lenge på «%@»</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">dealloc-tilbakekall kjørt: %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">dealloc-tilbakekall kjørt: %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">nedrigging: frigjøres om %d s</string>
+    <string name="cyl_demo_c0fd658b68">nedrigging: ikke kjørt</string>
     <string name="cyl_demo_d4f455fa45">Åpne: to fanelinjer, én side-ID</string>
     <string name="cyl_demo_5b88804382" formatted="false">Fanelinje %@ · side-ID «%@»</string>
 </resources>

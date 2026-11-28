@@ -82,4 +82,19 @@ void main() {
       'CYLTabBarItemSelectedIconColor': '#FFFFFF',
     });
   });
+
+  test('onLifecycleEvent message: name and info, a bad info keeps the moment', () {
+    final ok = cylParseLifecycleEvent({'name': 'cyl.animation.didPause', 'userInfo': '{"url":"a.json"}'});
+    expect(ok.name, 'cyl.animation.didPause');
+    expect(ok.userInfo, {'url': 'a.json'});
+    final bad = cylParseLifecycleEvent({'name': 'cyl.badge.didShow', 'userInfo': 'not json'});
+    expect(bad.name, 'cyl.badge.didShow');
+    expect(bad.userInfo, isEmpty);
+    expect(cylParseLifecycleEvent(null).name, '');
+  });
+
+  test('animationsPaused defaults to false', () {
+    expect(const CYLTabBar().animationsPaused, false);
+    expect(const CYLTabBar(animationsPaused: true).animationsPaused, true);
+  });
 }

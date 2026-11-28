@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The values the library wrote, so a later change updates them while values the app set are kept.
  * [CN] 本库写入的值，使之后的变化可以更新它们，同时保留 App 自己设置的值。

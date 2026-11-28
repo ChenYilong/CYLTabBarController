@@ -18,6 +18,12 @@
 #if CYL_PAG_AVAILABLE
 import Foundation
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The generic helper with "<name>.pag": the same files, under the generic keys the PAG keys stand for. A name that is
  *      not a non-empty string becomes "", which leaves its item as it is.

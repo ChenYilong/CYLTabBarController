@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a på Android: en app kan inte skicka den här systemhändelsen.";
 "Runs every automatic row, one after the other." = "Kör alla automatiska rader, en efter en.";
 "Tab bar %@ · page ID \"%@\"" = "Flikfält %@ · sid-ID ”%@”";
+"Animated item engine API" = "Motor-API för animerat objekt";
+"Stop at 50%" = "Stoppa vid 50 %";
+"Show image when ended" = "Visa bild när den är klar";
+"Restart token: %@" = "Omstartstoken: %@";
+"End callback: %@" = "Slutcallback: %@";
+"none yet" = "ingen än";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Värden styr uppspelningen (drivesAnimationPlayback = false)";
+"Engine API" = "Motor-API";
+"Pause while scrolling" = "Pausa vid skrollning";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Frigör flikradens controller (om 3 s)";
+"teardown: not run" = "nedmontering: inte körd";
+"teardown: releasing in %d s" = "nedmontering: frigörs om %d s";
+"dealloc callbacks ran: %d / %d" = "dealloc-återanrop körda: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "dealloc-återanrop körda: %d / %d (%@)";
+"Tab bar controller released" = "Flikradens controller har frigjorts";
+"bridge: pause %d, resume %d" = "brygga: paus %d, återuppta %d";
+"last event: -" = "senaste händelse: -";
+"last event: %@" = "senaste händelse: %@";
+"Content inset" = "Inre marginal";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset inte angiven: ett platt och ett Liquid Glass-objekt, normalt och valt";
+"Flat: itemContentHorizontalInset unset" = "Platt: itemContentHorizontalInset inte angiven";
+"Normal" = "Normal";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset inte angiven";

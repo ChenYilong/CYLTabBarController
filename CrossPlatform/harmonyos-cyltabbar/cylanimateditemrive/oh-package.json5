@@ -7,6 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "@ohos/rive": "1.0.4",
-    "cylanimateditem": "file:../cylanimateditem"
+    "cylanimateditem": "file:../cylanimateditem",
+    "cylutils": "file:../cylutils"
   }
 }

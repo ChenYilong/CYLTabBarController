@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] The FlatDesign part of block 2 (docs/Swift-Migration.md, step 125): title offsets and image insets of the FlatDesign
 //      items (`CYLFlatDesignItemAppearance`, called by the core), the item colors and fonts of the tab attributes, and the
 //      mirroring of `tabBar.standardAppearance` onto the FlatDesign tab bar. FlatDesign subspec only.

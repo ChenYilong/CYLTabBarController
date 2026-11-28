@@ -67,7 +67,9 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         var normalColor: UIColor {
             switch self {
             case .normal, .roomStyle:
-                return .gray
+                // [EN] Follows Dark Mode like the unselected icons: #808080 (.gray) in light, #C6C6C6 in dark (the stroke of the dark Lottie files).
+                // [CN] 与未选中图标一样跟随深色模式：浅色 #808080（.gray），深色 #C6C6C6（深色 Lottie 文件的描边颜色）。
+                return UIColor.cylColor(withLight: .gray, dark: UIColor(red: 0xC6 / 255, green: 0xC6 / 255, blue: 0xC6 / 255, alpha: 1))
             }
         }
         

@@ -41,6 +41,12 @@ FOUNDATION_EXPORT const unsigned char CYLAnimatedItemVersionString[];
 #if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationFactory.h>)
 #import <CYLAnimatedItem/CYLTabBarItemAnimationFactory.h>
 #endif
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationColorCount.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimationColorCount.h>
+#endif
+#if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationTint.h>)
+#import <CYLAnimatedItem/CYLTabBarItemAnimationTint.h>
+#endif
 #if __has_include(<CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>)
 #import <CYLAnimatedItem/CYLTabBarItemAnimationPlayableView.h>
 #endif

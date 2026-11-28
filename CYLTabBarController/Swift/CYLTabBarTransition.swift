@@ -14,6 +14,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] Slides the new page in from one edge while the old page leaves at the other, for a `UITabBarControllerDelegate`
  *      transition. Translated from Objective-C (docs/Swift-Migration.md); Objective-C callers get this class from

@@ -6,7 +6,7 @@
  */
 const test = require('node:test')
 const assert = require('node:assert/strict')
-const { cylAnimatedItemModel, cylAnimatedItemType, cylAnimatedItemPackage, cylAnimatedItemRestingProgress, cylAnimatedItemGifSource, CYL_ANIMATED_ITEM_PLACEHOLDER } = require('../src/cyl-animated-item/cyl_animated_item_model')
+const { cylAnimatedItemMissingReason, cylAnimatedItemResource, cylAnimatedItemModel, cylAnimatedItemType, cylAnimatedItemPackage, cylAnimatedItemRestingProgress, cylAnimatedItemGifSource, CYL_ANIMATED_ITEM_PLACEHOLDER } = require('../src/cyl-animated-item/cyl_animated_item_model')
 
 test('the animation type from the extension', () => {
   assert.deepEqual(['a.json', 'a.lottie', 'a.pag', 'a.riv', 'a.svga', 'a.gif', 'a.png', 'https://x/a.riv#artboard=HOME', ''].map(cylAnimatedItemType),
@@ -160,7 +160,7 @@ test('cyl-animated-item: the same file set again keeps the loaded state (the eng
   const item = {
     data: { animationFailed: false },
     setData(data) { if (data.animationLoaded === false) resets.push(data) },
-    cyl_update() {},
+    cylUpdate() {},
   }
   observer.call(item, '/a.json', null, '')
   observer.call(item, '/a.json', null, '')
@@ -182,7 +182,7 @@ test('cyl-animated-item: the same file after a failure is a retry and resets the
   const item = {
     data: { animationFailed: false },
     setData(data) { Object.assign(this.data, data) },
-    cyl_update() {},
+    cylUpdate() {},
   }
   observer.call(item, 'https://x/a.json', null, '')
   item.data.animationFailed = true
@@ -193,7 +193,7 @@ test('cyl-animated-item: the same file after a failure is a retry and resets the
 test('title color, font size and line count', () => {
   const { cylAnimatedItemModel: model } = require('../src/cyl-animated-item/cyl_animated_item_model')
   const plain = model({ title: 'A' })
-  assert.equal(plain.titleStyle, '')
+  assert.equal(plain.titleStyle, 'color: rgb(0,0,0);', 'no explicit color: the built-in label color')
   assert.equal(plain.titleLinesClass, '')
   const styled = model({ title: 'A', titleColor: '#FF0000', titleFontSize: 17, titleLines: 2 })
   assert.equal(styled.titleStyle, 'color: #FF0000;font-size: 17px;-webkit-line-clamp: 2;')
@@ -204,18 +204,20 @@ test('title color, font size and line count', () => {
 
 test('title line height and spacing; spacing follows the axis', () => {
   const { cylAnimatedItemModel: model } = require('../src/cyl-animated-item/cyl_animated_item_model')
-  assert.equal(model({ title: 'A', titleSpacing: -1 }).titleStyle, '')
-  assert.equal(model({ title: 'A', axis: 'vertical', titleLineHeight: 22, titleSpacing: 12 }).titleStyle, 'line-height: 22px;margin-top: 12px;')
-  assert.equal(model({ title: 'A', axis: 'horizontal', titleSpacing: 0 }).titleStyle, 'margin-left: 0px;')
+  const L = 'color: rgb(0,0,0);'
+  assert.equal(model({ title: 'A', titleSpacing: -1 }).titleStyle, L)
+  assert.equal(model({ title: 'A', axis: 'vertical', titleLineHeight: 22, titleSpacing: 12 }).titleStyle, L + 'line-height: 22px;margin-top: 12px;')
+  assert.equal(model({ title: 'A', axis: 'horizontal', titleSpacing: 0 }).titleStyle, L + 'margin-left: 0px;')
 })
 
 test('title font weight: keywords and 100–900 only', () => {
   const { cylAnimatedItemModel: model } = require('../src/cyl-animated-item/cyl_animated_item_model')
-  assert.equal(model({ title: 'A', titleFontWeight: 'bold' }).titleStyle, 'font-weight: bold;')
-  assert.equal(model({ title: 'A', titleFontWeight: 600 }).titleStyle, 'font-weight: 600;')
-  assert.equal(model({ title: 'A', titleFontWeight: '650' }).titleStyle, '')
-  assert.equal(model({ title: 'A', titleFontWeight: 'red; x' }).titleStyle, '')
-  assert.equal(model({ title: 'A', titleFontWeight: '' }).titleStyle, '')
+  const L = 'color: rgb(0,0,0);'
+  assert.equal(model({ title: 'A', titleFontWeight: 'bold' }).titleStyle, L + 'font-weight: bold;')
+  assert.equal(model({ title: 'A', titleFontWeight: 600 }).titleStyle, L + 'font-weight: 600;')
+  assert.equal(model({ title: 'A', titleFontWeight: '650' }).titleStyle, L)
+  assert.equal(model({ title: 'A', titleFontWeight: 'red; x' }).titleStyle, L)
+  assert.equal(model({ title: 'A', titleFontWeight: '' }).titleStyle, L)
 })
 
 test('title dark color follows userInterfaceStyle and the system theme', () => {
@@ -226,11 +228,27 @@ test('title dark color follows userInterfaceStyle and the system theme', () => {
   assert.equal(model({ ...base, systemTheme: 'dark', userInterfaceStyle: 'light' }).titleStyle, 'color: #333333;')
   assert.equal(model({ ...base, systemTheme: 'light', userInterfaceStyle: 'dark' }).titleStyle, 'color: #EEEEEE;')
   assert.equal(model({ title: 'A', titleColor: '#333333', systemTheme: 'dark' }).titleStyle, 'color: #333333;')
-  assert.equal(model({ title: 'A', titleDarkColor: '#EEEEEE', systemTheme: 'light' }).titleStyle, '')
+  assert.equal(model({ title: 'A', titleDarkColor: '#EEEEEE', systemTheme: 'light' }).titleStyle, 'color: rgb(0,0,0);', 'light: the built-in label')
+  assert.equal(model({ title: 'A', systemTheme: 'dark' }).titleStyle, 'color: rgb(255,255,255);')
 })
 
 test('animationTint passes to the Rive engine as one color', () => {
   const { cylAnimatedItemModel: model } = require('../src/cyl-animated-item/cyl_animated_item_model')
   assert.equal(model({ animationUrl: 'a.riv', animationTint: ' #007AFF ' }).animationTint, '#007AFF')
   assert.equal(model({ animationUrl: 'a.riv' }).animationTint, '')
+})
+
+test('the reason of resourcemissing is one of the four strings every platform uses', () => {
+  assert.equal(cylAnimatedItemMissingReason('cyl-tab-bar: no animation component for a.riv; install its package and set the generic'), 'engine library missing')
+  assert.equal(cylAnimatedItemMissingReason('request:fail 404'), 'not found')
+  assert.equal(cylAnimatedItemMissingReason('ENOENT: no such file or directory'), 'not found')
+  assert.equal(cylAnimatedItemMissingReason('EACCES permission denied'), 'unreadable')
+  assert.equal(cylAnimatedItemMissingReason('bad file'), 'decode failed')
+  assert.equal(cylAnimatedItemMissingReason(undefined), 'decode failed')
+})
+
+test('the resource is the file as configured, without the # options', () => {
+  assert.equal(cylAnimatedItemResource('icons.riv#artboard=CHAT'), 'icons.riv')
+  assert.equal(cylAnimatedItemResource('https://x/a.json'), 'https://x/a.json')
+  assert.equal(cylAnimatedItemResource(undefined), '')
 })

@@ -1,0 +1,11 @@
+{
+  "name": "cylutils",
+  "version": "1.0.0",
+  "description": "CYLUtils for HarmonyOS NEXT: the bottom module, the only one that depends on the lifecycle library cyldeallocblockexecutor, which it re-exports.",
+  "main": "Index.ets",
+  "author": "ChenYilong",
+  "license": "MIT",
+  "dependencies": {
+    "cyldeallocblockexecutor": "file:../cyldeallocblockexecutor"
+  }
+}

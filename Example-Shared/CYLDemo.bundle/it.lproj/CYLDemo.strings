@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a su Android: un'app non può inviare questo evento di sistema.";
 "Runs every automatic row, one after the other." = "Esegue tutte le righe automatiche, una dopo l'altra.";
 "Tab bar %@ · page ID \"%@\"" = "Barra delle schede %@ · ID pagina \"%@\"";
+"Animated item engine API" = "API dei motori dell'elemento animato";
+"Stop at 50%" = "Ferma al 50%";
+"Show image when ended" = "Mostra l’immagine al termine";
+"Restart token: %@" = "Token di riavvio: %@";
+"End callback: %@" = "Callback di fine: %@";
+"none yet" = "ancora nessuno";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Riproduzione gestita dall'host (drivesAnimationPlayback = false)";
+"Engine API" = "API del motore";
+"Pause while scrolling" = "Pausa durante lo scorrimento";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Rilascia il controller della barra delle schede (tra 3 s)";
+"teardown: not run" = "rilascio: non eseguito";
+"teardown: releasing in %d s" = "rilascio: tra %d s";
+"dealloc callbacks ran: %d / %d" = "callback dealloc eseguiti: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "callback dealloc eseguiti: %d / %d (%@)";
+"Tab bar controller released" = "Controller della barra delle schede rilasciato";
+"bridge: pause %d, resume %d" = "bridge: pausa %d, ripresa %d";
+"last event: -" = "ultimo evento: -";
+"last event: %@" = "ultimo evento: %@";
+"Content inset" = "Margine interno del contenuto";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset non impostato: un elemento piatto e uno Liquid Glass, normale e selezionato";
+"Flat: itemContentHorizontalInset unset" = "Piatto: itemContentHorizontalInset non impostato";
+"Normal" = "Normale";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset non impostato";

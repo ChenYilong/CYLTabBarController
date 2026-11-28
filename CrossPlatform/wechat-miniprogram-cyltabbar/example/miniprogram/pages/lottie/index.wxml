@@ -52,9 +52,9 @@
   </view>
 
   <view class="cyl-section cyl-buttons">
-    <view class="cyl-row cyl-row-action" bindtap="cyl_play" aria-role="button" aria-label="{{texts['Play']}}"><text aria-hidden="true">{{texts['Play']}}</text></view>
-    <view class="cyl-row cyl-row-action" bindtap="cyl_pause" aria-role="button" aria-label="{{texts['Pause']}}"><text aria-hidden="true">{{texts['Pause']}}</text></view>
-    <view class="cyl-row cyl-row-action" bindtap="cyl_stop" aria-role="button" aria-label="{{texts['Stop']}}"><text aria-hidden="true">{{texts['Stop']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cylPlay" aria-role="button" aria-label="{{texts['Play']}}"><text aria-hidden="true">{{texts['Play']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cylPause" aria-role="button" aria-label="{{texts['Pause']}}"><text aria-hidden="true">{{texts['Pause']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cylStop" aria-role="button" aria-label="{{texts['Stop']}}"><text aria-hidden="true">{{texts['Stop']}}</text></view>
   </view>
 
   <text class="cyl-section-title" aria-role="heading">{{texts['Speed']}}</text>

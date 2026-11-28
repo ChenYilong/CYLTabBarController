@@ -7,6 +7,7 @@
  */
 const cylTabPage = require('../../utils/cyl_tab_page');
 const { cylFeedRows } = require('../../utils/cyl_feed_rows');
+const { cylPlayAll, cylRestartSelected, cylSetSpeed, cylSetLoops } = require('../../utils/cyl_item_players');
 const { cylDemoConfiguration, cylInstalledAnimation, cylAvailableAnimationFiles } = require('../../utils/cyl_demo_configuration');
 
 // [EN] Row titles of the animation packages. [CN] 动画包的行标题。
@@ -80,11 +81,11 @@ Component({
         animationAvailable: cylInstalledAnimation() === 'lottie' || cylAvailableAnimationFiles().length > 0,
       });
     },
-    cyl_update(change) {
+    cylUpdate(change) {
       getApp().cyl_updateTabBarState(change);
     },
     cyl_override(change) {
-      this.cyl_update({ overrides: { ...getApp().globalData.cylTabBarState.overrides, ...change } });
+      this.cylUpdate({ overrides: { ...getApp().globalData.cylTabBarState.overrides, ...change } });
     },
     cyl_badge(event) {
       const value = event.currentTarget.dataset.value;
@@ -96,44 +97,56 @@ Component({
       } else {
         badges[event.currentTarget.dataset.identifier] = value;
       }
-      this.cyl_update({ badges });
+      this.cylUpdate({ badges });
     },
     // [EN] CYLMineViewController: shows the row number as Me's badge, then pushes a red page with the pop gesture off.
     // [CN] CYLMineViewController：把行号显示为「我的」的角标，然后 push 一个关闭返回手势的红色页面。
     cyl_onFeedRow(event) {
       const badges = { ...getApp().globalData.cylTabBarState.badges, me: String(event.currentTarget.dataset.index) };
-      this.cyl_update({ badges });
+      this.cylUpdate({ badges });
       wx.navigateTo({ url: `/pages/pushed/locked?color=red&note=${encodeURIComponent('Pushed by Me: the pop gesture is off')}` });
     },
     cyl_skin(event) {
-      this.cyl_update({ themeIdentifier: event.currentTarget.dataset.value });
+      this.cylUpdate({ themeIdentifier: event.currentTarget.dataset.value });
     },
-    cyl_playAll() {
-      const tabBar = this.getTabBar?.();
-      const bar = tabBar?.selectComponent('#cyl-tab-bar');
-      if (bar) {
-        bar.cyl_playAll();
-      }
+    // [EN] The tab bar of this page, whose icons the playback controls play through cylAnimatedItemPlayer() (utils/cyl_item_players.js).
+    // [CN] 本页面的 TabBar，播放控件通过 cylAnimatedItemPlayer() 播放其图标（utils/cyl_item_players.js）。
+    cyl_tabBar() {
+      // [EN] No optional call `?.(`: WeChat DevTools may fail to compile it (test/cyl_syntax_guard.test.js). [CN] 不用可选调用 `?.(`：微信开发者工具可能无法编译（见 test/cyl_syntax_guard.test.js）。
+      const tabBar = typeof this.getTabBar === 'function' ? this.getTabBar() : null;
+      return tabBar ? tabBar.selectComponent('#cyl-tab-bar') : null;
+    },
+    cylTabBarPlayAll() {
+      cylPlayAll(this.cyl_tabBar());
+    },
+    cyl_restart() {
+      cylRestartSelected(this.cyl_tabBar());
     },
     cyl_speed(event) {
-      if (Number(event.detail.value) !== getApp().globalData.cylTabBarState.animationSpeed) {
-        this.cyl_update({ animationSpeed: Number(event.detail.value) });
+      const speed = Number(event.detail.value);
+      if (speed !== getApp().globalData.cylTabBarState.animationSpeed) {
+        cylSetSpeed(this.cyl_tabBar(), speed);
+        this.cylUpdate({ animationSpeed: speed });
       }
     },
     cyl_loop(event) {
-      this.cyl_update({ animationLoop: event.detail.value });
+      cylSetLoops(this.cyl_tabBar(), event.detail.value);
+      this.cylUpdate({ animationLoop: event.detail.value });
     },
-    cyl_itemStyle(event) {
-      this.cyl_update({ itemStyle: event.currentTarget.dataset.value });
+    cylTabBarItemStyle(event) {
+      this.cylUpdate({ itemStyle: event.currentTarget.dataset.value });
     },
     cyl_glassLensStyle(event) {
-      this.cyl_update({ glassLensStyle: event.currentTarget.dataset.value });
+      this.cylUpdate({ glassLensStyle: event.currentTarget.dataset.value });
     },
     cyl_style(event) {
       this.cyl_override({ CYLTabBarControllerStyleType: event.currentTarget.dataset.value });
     },
     cyl_tapAnimation(event) {
       this.cyl_override({ CYLTabBarControllerTabButtonTapAnimation: event.currentTarget.dataset.value });
+    },
+    cyl_openBadgeTags() {
+      wx.navigateTo({ url: '/pages/badge-tags/index' });
     },
     cyl_openItemPlayground() {
       wx.navigateTo({ url: '/pages/item/index' });
@@ -156,7 +169,7 @@ Component({
       if (icons === 'rive' && (!state.themeIdentifier || state.themeIdentifier === 'light')) {
         change.themeIdentifier = 'dark';
       }
-      this.cyl_update(change);
+      this.cylUpdate(change);
     },
     cyl_swipeOption(event) {
       this.cyl_override({ CYLTabBarControllerSwipeToSwitchTab: event.detail.value });
@@ -166,7 +179,7 @@ Component({
     },
     cyl_loginRequired(event) {
       this.cyl_override({ CYLTabBarControllerLoginRequiredTabBarItemIdentifiers: event.detail.value ? ['CYLMineViewController'] : [] });
-      this.cyl_update({ loggedIn: !event.detail.value });
+      this.cylUpdate({ loggedIn: !event.detail.value });
     },
   },
 });

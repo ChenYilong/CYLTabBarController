@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -94,7 +95,12 @@ interface CYLPlusButtonSubclassing {
  *      大于边界的可点击区域（#91）、像任何视图一样的角标，以及选中态（自己的页面、`selectedContentImage` / `selectedContentView`）。
  *      子类化并实现 `CYLPlusButtonSubclassing`，然后注册：`CYLPlusButton.registerPlusButton(MyPlusButton.Provider)`。
  */
-open class CYLPlusButton(context: Context) : FrameLayout(context) {
+open class CYLPlusButton(context: Context) : FrameLayout(context), CYLBadgeHosting {
+    /** [EN] The button itself hosts its badge. [CN] 按钮自身承载其角标。 */
+    override val cylBadgeAnchorView: ViewGroup get() = this
+    override val cylBadgeIconView: View get() = imageView
+    override val cylBadgePlacesBadge: Boolean get() = true
+
 
     /**
      * [EN] The image (`imageView`) and the title (`titleLabel`), like `UIButton`. [CN] 图片与标题，与 `UIButton` 相同。
@@ -387,9 +393,9 @@ open class CYLPlusButton(context: Context) : FrameLayout(context) {
         val titleTop = if (imageView.drawable == null && background != null) (height - titleHeight) / 2 else height - titleHeight
         titleLabel.layout(0, titleTop, width, titleTop + titleHeight)
         selectedContent?.layout(0, 0, width, height)
-        // [EN] Badges sit on the icon's top-right corner plus `cyl_badgeCenterOffset`, as on the tab buttons. [CN] 角标位于图标右上角并加上 `cyl_badgeCenterOffset`，与 Tab 按钮相同。
+        // [EN] Badges sit on the icon's top-right corner plus `cylBadgeCenterOffset`, as on the tab buttons. [CN] 角标位于图标右上角并加上 `cylBadgeCenterOffset`，与 Tab 按钮相同。
         val density = resources.displayMetrics.density
-        val state = cyl_badgeState
+        val state = cylBadgeState
         for (index in 0 until childCount) {
             val badge = getChildAt(index) as? CYLBadgeView ?: continue
             if (badge.measuredWidth == 0) badge.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)

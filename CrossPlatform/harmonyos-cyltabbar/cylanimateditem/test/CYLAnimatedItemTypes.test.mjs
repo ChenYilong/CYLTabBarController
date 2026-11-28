@@ -84,3 +84,16 @@ test('an app overrides the ABIs an engine needs, at registration or later; unreg
   R.setRequiredNativeAbis('PAG', []);
   assert.equal(R.canPlay('a.pag'), true, '[] = any device');
 });
+
+test('registering an engine keeps an ABI list set earlier (the x86_64 debug kit)', () => {
+  // [EN] loadX86_64DebugEngines adds x86_64 at launch; an engine registered afterwards with its arm64-v8a list must not
+  //      drop it again (PAG / Rive showed their still image on the x86_64 emulator).
+  R.setDeviceAbis(['x86_64']);
+  R.setRequiredNativeAbis('Rive', ['arm64-v8a', 'x86_64']);
+  R.register('Rive', undefined, undefined, ['arm64-v8a']);
+  assert.deepEqual(R.requiredNativeAbis('Rive'), ['arm64-v8a', 'x86_64']);
+  assert.equal(R.supportsDevice('Rive'), true);
+  // [EN] Without a kit the arm64-v8a list applies. [CN] 没有调试包时使用 arm64-v8a 列表。
+  R.register('PAG', undefined, undefined, ['arm64-v8a']);
+  assert.equal(R.supportsDevice('PAG'), false);
+});

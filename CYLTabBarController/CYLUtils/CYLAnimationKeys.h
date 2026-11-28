@@ -132,6 +132,21 @@ FOUNDATION_EXTERN NSURL * _Nullable CYLTabBarAnimationURLWithOptions(NSURL * _Nu
                                                                      NSDictionary * _Nullable options) CYL_NOEXCEPT;
 
 /*!
+ * [EN] The options in `URL`'s fragment, the reading side of `CYLTabBarAnimationURLWithOptions()`: "name=value&…", percent-decoded
+ *      (an undecodable text is kept as it is), a pair without a name or without a value left out. An empty dictionary
+ *      without a fragment. The same rules as the other platforms (`CrossPlatform/animated-item-fixtures/source-options.json`).
+ * [CN] `URL` 的 fragment 中的选项，即 `CYLTabBarAnimationURLWithOptions()` 的读取端：「名称=值&…」，百分号解码（无法解码的文本保持原样），
+ *      没有名称或没有值的键值对被省略。没有 fragment 时返回空字典。规则与其他平台相同（`CrossPlatform/animated-item-fixtures/source-options.json`）。
+ */
+// [EN] FIX: plain `NSDictionary *`, the exact type of the Swift `@_cdecl` definition (CYLAnimationURLOptions.swift): with
+//      `NSDictionary<NSString *, NSString *> *` the two declarations differ, and a file that sees both (SwiftPM:
+//      CYLTabBarItemAnimationEngine.m) fails with "call to 'CYLTabBarAnimationOptionsFromURL' is ambiguous". Keys and values are strings.
+// [CN] FIX：使用普通的 `NSDictionary *`，与 Swift `@_cdecl` 定义（CYLAnimationURLOptions.swift）的类型完全一致：若写成
+//      `NSDictionary<NSString *, NSString *> *`，两处声明不同，同时看到两者的文件（SwiftPM：CYLTabBarItemAnimationEngine.m）会报
+//      "call to 'CYLTabBarAnimationOptionsFromURL' is ambiguous"。键与值都是字符串。
+FOUNDATION_EXTERN NSDictionary * _Nonnull CYLTabBarAnimationOptionsFromURL(NSURL * _Nullable URL) CYL_NOEXCEPT;
+
+/*!
  * [EN] The keys of each animation type (Lottie, PAG, Rive, SVGA, GIF), declared here in the component's core so
  *      that they always exist: a project that passes one without that type's engine still compiles, gets a compile
  *      warning on the key (`CYL_PAG_REQUIRED` and its siblings, from `CYLAnimatedItemMacros.h`), a debug log at run
@@ -308,15 +323,15 @@ FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveNum
  * [EN] A tab icon tinted like a template image (bug B12; Android's key of the same name): "title" draws the icon in the tab's
  *      title color, the tab bar's tint when the tab is selected and its unselected tint otherwise, as UIKit draws a template
  *      static image; "#RRGGBB" or "#RRGGBBAA" draws it in that fixed color on the unselected tab, while the selected tab
- *      takes the title's selected color, as with "title" (2026-11-19). For one-color icons (icons.riv). Rive on iOS.
+ *      takes the title's selected color, as with "title" (2026-11-19). For one-color icons (icons.riv). Works for every animation library: Lottie 4 (a color value provider), GIF (template frames), PAG / SVGA / Lottie 2 (a sourceAtop overlay), Rive (the library's own method); `CYLAnimatedItemView.animationTint` overrides it.
  * [CN] 像模板图片一样为 Tab 图标着色（问题 B12；与 Android 同名的 key）："title" 用 Tab 标题的颜色绘制图标：选中时为 TabBar 的 tint，
  *      未选中时为未选中 tint，与 UIKit 绘制模板静态图片相同；"#RRGGBB" 或 "#RRGGBBAA" 在未选中的 Tab 上用该固定颜色绘制，选中的 Tab 使用标题的选中颜色，
- *      与 "title" 相同（2026-11-19）。用于单色图标（icons.riv）。iOS 上用于 Rive。
+ *      与 "title" 相同（2026-11-19）。用于单色图标（icons.riv）。对所有动画库有效：Lottie 4（color value provider）、GIF（模板帧）、PAG / SVGA / Lottie 2（sourceAtop 叠加图层）、Rive（动画库自己的方法）；`CYLAnimatedItemView.animationTint` 会覆盖它。
  */
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionTint;
 /*!
- * [EN] The Dark Mode color of a fixed `CYLTabBarAnimationOptionTint` ("#RRGGBB" or "#RRGGBBAA"): with tint @"#1C1C1E" and darkTint @"#F2F2F7" a one-color icon stays readable on a light and on a dark bar, switching with the appearance. Not needed with tint @"title", which follows the tab bar's (dynamic) tints already. Rive on iOS.
- * [CN] 固定 `CYLTabBarAnimationOptionTint`（"#RRGGBB" 或 "#RRGGBBAA"）在深色模式下的颜色：tint 为 @"#1C1C1E"、darkTint 为 @"#F2F2F7" 时，单色图标在浅色与深色 TabBar 上都清晰可辨，并随外观切换。tint 为 @"title" 时不需要，它已跟随 TabBar 的（动态）tint。iOS 上用于 Rive。
+ * [EN] The Dark Mode color of a fixed `CYLTabBarAnimationOptionTint` ("#RRGGBB" or "#RRGGBBAA"): with tint @"#1C1C1E" and darkTint @"#F2F2F7" a one-color icon stays readable on a light and on a dark bar, switching with the appearance. Not needed with tint @"title", which follows the tab bar's (dynamic) tints already. Works for every animation library, like the tint; `CYLAnimatedItemView.animationDarkTint` overrides it.
+ * [CN] 固定 `CYLTabBarAnimationOptionTint`（"#RRGGBB" 或 "#RRGGBBAA"）在深色模式下的颜色：tint 为 @"#1C1C1E"、darkTint 为 @"#F2F2F7" 时，单色图标在浅色与深色 TabBar 上都清晰可辨，并随外观切换。tint 为 @"title" 时不需要，它已跟随 TabBar 的（动态）tint。与 tint 相同，对所有动画库有效；`CYLAnimatedItemView.animationDarkTint` 会覆盖它。
  */
 FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionDarkTint;
 /*!

@@ -52,4 +52,4 @@ FOUNDATION_EXTERN NSException *_Nullable CYLCatchException(NS_NOESCAPE void (^bl
 
 NS_ASSUME_NONNULL_END
 
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"

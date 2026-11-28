@@ -1,5 +1,6 @@
-import type { ViewProps } from 'react-native';
-import NativeAnimationView from './CyltabbarAnimationViewNativeComponent';
+import { useImperativeHandle, useRef, type ComponentRef, type Ref } from 'react';
+import type { ColorValue, ViewProps } from 'react-native';
+import NativeAnimationView, { Commands } from './CyltabbarAnimationViewNativeComponent';
 
 /**
  * Options of an animation file, e.g. Rive's `artboard`, `stateMachine`, `input`, `duration`.
@@ -29,19 +30,215 @@ export function animationURLWithOptions(file: string, options: CYLAnimationOptio
   return pairs.length > 0 ? `${base}#${pairs.join('&')}` : base;
 }
 
+/**
+ * [EN] The named constant of the capsule (1000 points): pass it to `itemCornerRadius` instead of a literal; the view treats it as
+ *      exactly half the height. [CN] 胶囊的命名常量（1000 点）：传给 `itemCornerRadius`，视图把它当作恰好半高。
+ */
+export const cylAnimatedItemCornerRadiusCapsule = 1000;
+
+/**
+ * [EN] The named constant of the default content inset on Liquid Glass (14 points): what `itemContentHorizontalInset` resolves to where glass
+ *      is really drawn and the prop is unset. [CN] 液态玻璃上默认内容内缩的命名常量（14 点）：真正绘制玻璃且未设置 `itemContentHorizontalInset` 时的取值。
+ */
+export const cylAnimatedItemLiquidGlassContentInset = 14;
+
+/**
+ * [EN] The commands of the native view, for a `CYLAnimationView` whose `drivesAnimationPlayback` is false (the cross-platform
+ *      engine contract, docs/Animated-Item.md): `play()`, `stopAtProgress(progress)` and `restart()`.
+ * [CN] 原生视图的命令，用于 `drivesAnimationPlayback` 为 false 的 `CYLAnimationView`（跨端引擎契约，见 docs/Animated-Item.md）：
+ *      `play()`、`stopAtProgress(progress)`、`restart()`。
+ */
+export type CYLAnimationViewHandle = {
+  /** Plays from the current progress. */
+  play: () => void;
+  /** Stops and shows the frame at `progress`, 0 (the first frame) to 1 (the last). */
+  stopAtProgress: (progress: number) => void;
+  /** Plays again from the start. */
+  restart: () => void;
+};
+
+/**
+ * [EN] `automatic` (default): tint with the effective icon color only when the file is one-color; `alwaysTemplate`: always tint;
+ *      `alwaysOriginal`: never tint. Applies while `animationTint` is unset. Same values as the URL option `renderingMode=`.
+ * [CN] `automatic`（默认）：仅单色文件用有效图标颜色着色；`alwaysTemplate`：总是着色；`alwaysOriginal`：从不着色。`animationTint`
+ *      未设置时生效。取值与 URL 选项 `renderingMode=` 相同。
+ */
+export type CYLAnimationRenderingMode = 'automatic' | 'alwaysTemplate' | 'alwaysOriginal';
+
+/**
+ * [EN] The three internal props the Codegen spec carries for a badge: `null` / `undefined` is no badge (hidden), `""` a dot, any other
+ *      string the text; the style keys (`CYLBadgeAttributeKey`) travel as JSON. Never `""` for no badge: `""` is a dot.
+ * [CN] Codegen 规范为角标携带的三个内部 prop：`null` / `undefined` 表示无角标（隐藏），`""` 为红点，其他字符串为文字；样式键
+ *      （`CYLBadgeAttributeKey`）以 JSON 传递。不能用 `""` 表示无角标：`""` 是红点。
+ */
+export function cylBadgeNativeProps(badgeValue?: string | null, badgeAttributes?: CYLBadgeAttributes | null) {
+  return {
+    badgeValue: badgeValue ?? '',
+    badgeHidden: badgeValue === null || badgeValue === undefined,
+    badgeAttributesJSON: badgeAttributes ? JSON.stringify(badgeAttributes) : '',
+  };
+}
+
+/**
+ * [EN] The style keys of a badge, the same strings as iOS' `CYLBadgeAttributeKey` and the host view's `badgeAttributes`: `value`, `color`,
+ *      `animation` (one of the 10 names), `radius`, `centerOffset`, `textColor`, `font`, `borderColor`, `borderWidth`, `maximumNumber`,
+ *      `respectsReduceMotion`.
+ * [CN] 角标的样式键，与 iOS 的 `CYLBadgeAttributeKey` 和宿主视图的 `badgeAttributes` 相同的字符串。
+ */
+export const CYLBadgeAttributeKey = {
+  value: 'value',
+  color: 'color',
+  animation: 'animation',
+  radius: 'radius',
+  centerOffset: 'centerOffset',
+  textColor: 'textColor',
+  font: 'font',
+  borderColor: 'borderColor',
+  borderWidth: 'borderWidth',
+  maximumNumber: 'maximumNumber',
+  respectsReduceMotion: 'respectsReduceMotion',
+} as const;
+
+/** The values are strings or numbers (`#RRGGBB` colors, `{x, y}` offsets); unknown keys and types are ignored by the native side. */
+export type CYLBadgeAttributes = Record<string, string | number | boolean | null | undefined>;
+
 export type CYLAnimationViewProps = ViewProps & {
+  /**
+   * The badge: `null` / `undefined` (default) none, `""` a dot, otherwise the text (a number above `maximumNumber` shows "99+").
+   * Drawn by the native item, never by JavaScript. Written statically, not run on a device yet.
+   */
+  badgeValue?: string | null;
+  /** The badge's style, the keys of `CYLBadgeAttributeKey`. */
+  badgeAttributes?: CYLBadgeAttributes;
+  /** Reserves the badge's overhang when measuring (default false: the badge is not measured). */
+  reservesBadgeSpace?: boolean;
   /**
    * A file name in the app (iOS main bundle, Android assets), a path or a URL: `.riv`, `.json` (Lottie), `.pag`, `.gif`, `.svga`.
    */
   file: string;
   options?: CYLAnimationOptions;
   playing?: boolean;
+  /** Whether the item is selected: a selected item rests on its last frame, an unselected one on its first. */
+  selected?: boolean;
+  /** The playback rate, 1 is the file's own speed. */
+  animationSpeed?: number;
+  /** Whether the animation plays again after each pass. */
+  animationLoops?: boolean;
+  /** Plays again from the start when it changes (the value at creation is not a restart). */
+  animationRestartToken?: number;
+  /** true (default): the view applies the default playback rules; false: the host plays through `ref`. */
+  drivesAnimationPlayback?: boolean;
+  /** Shows `image` instead of the last frame when a play-once pass ends (default false); the next play shows the animation again. */
+  showsImageWhenAnimationEnds?: boolean;
+  /**
+   * The still image `showsImageWhenAnimationEnds` shows: a file name in the app (iOS main bundle, Android assets), a path or a
+   * URL, resolved like `file`. Without it the end shows the library's placeholder (the HarmonyOS rule).
+   */
+  image?: string;
+  /** The icon's side in points; unset fills the view. */
+  iconSize?: number;
+  /**
+   * The icon color, optional. Unset (undefined): the built-in default (label-like when normal, the inherited tint when selected);
+   * no color is forced on the native view, and going from set to undefined resets it.
+   */
+  tintColor?: ColorValue;
+  /** "title" or a fixed "#RRGGBB" / "#RRGGBBAA" for the animation; unset (undefined or empty) is not set. */
+  animationTint?: string;
+  /** The Dark Mode color of a fixed `animationTint`; unset (undefined or empty) is not set. */
+  animationDarkTint?: string;
+  /** Applies while `animationTint` is unset; default `automatic`. */
+  animationRenderingMode?: CYLAnimationRenderingMode;
+  /**
+   * The background: `flat` (default) fills with `itemBackgroundColor`; `liquidGlass` draws Liquid Glass tinted with it, where the
+   * platform draws Liquid Glass (iOS 26 and later, Android 12 and later with the glass available); elsewhere the view stays flat.
+   */
+  itemBackgroundStyle?: 'flat' | 'liquidGlass';
+  /** The solid fill when flat, the glass tint when `liquidGlass`; unset for none. */
+  itemBackgroundColor?: ColorValue;
+  /**
+   * The corner radius in points, limited to half the height; 0 is square, `cylAnimatedItemCornerRadiusCapsule` (1000) a capsule.
+   * Unset: a capsule for `liquidGlass`, square for `flat`.
+   */
+  itemCornerRadius?: number;
+  /**
+   * The space between the outer border and the content, left and right only, on top of the view's own padding, in points. Unset:
+   * `cylAnimatedItemLiquidGlassContentInset` (14) where Liquid Glass is really drawn, 0 for `flat`. Any number wins, including 0 on glass.
+   */
+  itemContentHorizontalInset?: number;
+  /** The border width in points; default 0. */
+  itemBorderWidth?: number;
+  /** The border color; unset for none. */
+  itemBorderColor?: ColorValue;
+  /** The animation is in place (a local file once parsed, a download once it arrived). */
+  onAnimationLoaded?: () => void;
+  /** The animation cannot play: a missing or corrupted file, a parse error, a failed download. */
+  onAnimationFailed?: () => void;
+  /** A play-once pass ended (not on a stop, not while looping). */
+  onAnimationEnd?: () => void;
+  /**
+   * The file cannot be shown. The event is `{ resource, reason }`: `resource` is the file as configured, `reason` one of
+   * "not found", "unreadable", "decode failed", "engine library missing". Once per resource per view; the view still shows its
+   * image or the placeholder.
+   */
+  onResourceMissing?: (event: { resource: string; reason: string }) => void;
+  /** The commands `play`, `stopAtProgress` and `restart`. */
+  ref?: Ref<CYLAnimationViewHandle>;
 };
 
 /**
  * An animation played by CYLTabBarController's own engine (the one of the tab icons), whatever its library: Rive, Lottie,
  * PAG, GIF or SVGA, when the app has that library (iOS subspec, Android dependency). 由 CYLTabBarController 自己的引擎（Tab 图标所用）播放的动画。
+ *
+ * The names follow the cross-platform engine contract (docs/Animated-Item.md, "Engine API across platforms"); both native
+ * halves wrap `CYLAnimatedItemView`, there is no engine logic in JavaScript.
+ * 名称遵循跨端引擎契约（docs/Animated-Item.md「跨端引擎 API」）；两个原生半边都封装 `CYLAnimatedItemView`，JavaScript 中没有引擎逻辑。
  */
-export function CYLAnimationView({ file, options, playing, ...rest }: CYLAnimationViewProps) {
-  return <NativeAnimationView {...rest} source={animationURLWithOptions(file, options)} playing={playing ?? false} />;
+export function CYLAnimationView({
+  file,
+  options,
+  playing,
+  onAnimationLoaded,
+  onAnimationFailed,
+  onAnimationEnd,
+  onResourceMissing,
+  animationTint,
+  animationDarkTint,
+  animationRenderingMode,
+  badgeValue,
+  badgeAttributes,
+  reservesBadgeSpace,
+  ref,
+  ...rest
+}: CYLAnimationViewProps) {
+  const native = useRef<ComponentRef<typeof NativeAnimationView>>(null);
+  useImperativeHandle(
+    ref,
+    () => ({
+      play: () => native.current && Commands.play(native.current),
+      stopAtProgress: (progress: number) => native.current && Commands.stopAtProgress(native.current, progress),
+      restart: () => native.current && Commands.restart(native.current),
+    }),
+    []
+  );
+  return (
+    <NativeAnimationView
+      {...rest}
+      ref={native}
+      source={animationURLWithOptions(file, options)}
+      playing={playing ?? false}
+      animationTint={animationTint || undefined}
+      animationDarkTint={animationDarkTint || undefined}
+      animationRenderingMode={animationRenderingMode ?? 'automatic'}
+      {...cylBadgeNativeProps(badgeValue, badgeAttributes)}
+      reservesBadgeSpace={reservesBadgeSpace ?? false}
+      onAnimationLoaded={onAnimationLoaded ? () => onAnimationLoaded() : undefined}
+      onAnimationFailed={onAnimationFailed ? () => onAnimationFailed() : undefined}
+      onAnimationEnd={onAnimationEnd ? () => onAnimationEnd() : undefined}
+      onResourceMissing={
+        onResourceMissing
+          ? (event) => onResourceMissing({ resource: event.nativeEvent.resource, reason: event.nativeEvent.reason })
+          : undefined
+      }
+    />
+  );
 }

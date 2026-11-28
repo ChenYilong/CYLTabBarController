@@ -1,8 +1,8 @@
 import { CYLLocalizedString } from 'cyltabbar';
 
 /**
- * [EN] The random colors of the "Flat Design" button's breathing dot (the Objective-C Example's `-cyl_showBadge` with a
- *      random `cyl_badgeBackgroundColor`). [CN] 「Flat Design」按钮呼吸红点的随机颜色。
+ * [EN] The random colors of the "Flat Design" button's breathing dot (the Objective-C Example's `-showBadge` with a
+ *      random `cylBadgeBackgroundColor`). [CN] 「Flat Design」按钮呼吸红点的随机颜色。
  */
 const DEMO_DOT_COLORS: string[] = ['#FF3B30', '#FF9500', '#34C759', '#007AFF', '#AF52DE', '#FF2D55'];
 

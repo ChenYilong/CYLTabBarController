@@ -1,5 +1,8 @@
 package com.cyl.tabbar
 
+import com.cyl.animateditem.CYLGlassBackdrop
+import com.cyl.animateditem.CYLGlassEffects
+import com.cyl.animateditem.CYLGlassEdge
 import android.content.res.Configuration
 import android.graphics.Canvas
 import android.graphics.Color
@@ -145,9 +148,19 @@ internal object CYLClassicTabBarStyle : CYLTabBarStyleRenderer {
         tabBar.cyl_setShadowVisible(true)
     }
 
+    /**
+     * [EN] An unset background follows dark mode (owner decision D3, 2026-11-27): `#F9F9F9` light, `#1C1C1E` dark (the FlatDesign dark fill); re-resolved on a live
+     *      light / dark switch (`CYLTabBar.onConfigurationChanged`). A set `cyl_tabBarBackgroundColor` is used as it is.
+     * [CN] 未设置的背景跟随深色模式（负责人决定 D3，2026-11-27）：浅色 `#F9F9F9`，深色 `#1C1C1E`（扁平样式的深色填充）；运行中切换浅色 / 深色时重新解析
+     *      （`CYLTabBar.onConfigurationChanged`）。设置了 `cyl_tabBarBackgroundColor` 时按原样使用。
+     */
     override fun applyBackgroundColor(tabBar: CYLTabBar, color: Int?) {
-        tabBar.background = ColorDrawable(color ?: 0xFFF9F9F9.toInt())
+        tabBar.background = ColorDrawable(color ?: if (tabBar.isInDarkMode()) DARK_DEFAULT_BACKGROUND else LIGHT_DEFAULT_BACKGROUND)
     }
+
+    /** [EN] The unset backgrounds. [CN] 未设置时的背景。 */
+    const val LIGHT_DEFAULT_BACKGROUND: Int = 0xFFF9F9F9.toInt()
+    const val DARK_DEFAULT_BACKGROUND: Int = 0xFF1C1C1E.toInt()
 
     override fun itemSpacing(tabBar: CYLTabBar): Int = tabBar.cyl_itemSpacing
 
@@ -176,7 +189,7 @@ internal object CYLClassicTabBarStyle : CYLTabBarStyleRenderer {
  *      在其上方居中（`layoutCentered` 使只有图标或只有标题时居中）；选中为蓝色，否则为灰色。
  */
 internal class CYLFlatDesignTabBarStyle : CYLTabBarStyleRenderer {
-    private val backdrop = CYLTabBarBackdrop()
+    private val backdrop = CYLGlassBackdrop()
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val rect = RectF()
 
@@ -239,9 +252,8 @@ internal class CYLFlatDesignTabBarStyle : CYLTabBarStyleRenderer {
  *      Android 12 只有模糊，更早的版本为半透明胶囊。
  */
 internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
-    private val panelBackdrop = CYLTabBarBackdrop()
-    private val bubbleBackdrop = CYLTabBarBackdrop()
-    private val highlight = CYLGlassHighlight()
+    private val panelBackdrop = CYLGlassBackdrop()
+    private val bubbleBackdrop = CYLGlassBackdrop()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val panel = RectF()
@@ -438,10 +450,15 @@ internal class CYLLiquidGlassTabBarStyle : CYLTabBarStyleRenderer {
     }
 
     override fun drawAboveItems(tabBar: CYLTabBar, canvas: Canvas) {
-        // [EN] Backdrop's default `Highlight` on the dock: the 0.5 dp rim. [CN] 胶囊上 Backdrop 默认的 `Highlight`：0.5 dp 的边缘高光。
-        if (!panelShape.isEmpty) highlight.draw(canvas, panelShape, panelShape.height() / 2f, tabBar.resources.displayMetrics.density, 1f)
+        // [EN] The shared glass edge (the same sheen and rim as tags and boards) on the dock and, while pressed, the bubble's rim. [CN] 共用的玻璃边缘（与标签、看板相同的高光与细边）：胶囊上绘制，按下时气泡绘制细边。
+        val density = tabBar.resources.displayMetrics.density
+        val dark = CYLGlassEdge.isDark(tabBar.resources)
+        if (!panelShape.isEmpty) {
+            CYLGlassEdge.drawSheen(canvas, panelShape, panelShape.height() / 2f, dark)
+            CYLGlassEdge.drawRim(canvas, panelShape, panelShape.height() / 2f, density, dark)
+        }
         val press = pressProgress.value
-        if (press > 0.01f && !bubble.isEmpty) highlight.draw(canvas, bubble, bubble.height() / 2f, tabBar.resources.displayMetrics.density, press)
+        if (press > 0.01f && !bubble.isEmpty) CYLGlassEdge.drawRim(canvas, bubble, bubble.height() / 2f, density, dark, press)
     }
 
     // MARK: - Pressing and dragging the bubble (DampedDragAnimation) 按下与拖动气泡

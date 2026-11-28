@@ -1,5 +1,5 @@
 # [EN] CYLAnimatedItem: the animated icon + title component (CYLAnimatedItemView), its animation engine and one subspec per
-#      animation type, as a pod and module of its own. It depends on no other pod of this repository: not on
+#      animation type, as a pod and module of its own. It depends on CYLBadge and CYLUtils below it, never on
 #      CYLTabBarController. Apps write `import CYLAnimatedItem` (Objective-C: `@import CYLAnimatedItem;`).
 #      CYLTabBarController depends on it (its Core on `CYLAnimatedItem/Core`, its animation subspecs on the matching
 #      `CYLAnimatedItem/<Type>`), never the other way round. Guide: docs/Animated-Item.md.
@@ -46,6 +46,8 @@ Pod::Spec.new do |s|
     core.public_header_files = 'CYLTabBarController/CYLAnimatedItem/*.h', 'CYLTabBarController/CYLUtils/CYLAnimationKeys.h'
     core.resources = ['CYLTabBarController/CYLAnimatedItem/Resources/CYLAnimatedItem.bundle']
     core.frameworks = 'UIKit'
+    # [EN] D7: CYLAnimatedItem sits on CYLBadge (which brings CYLUtils); it never depends on CYLTabBarController. [CN] D7：CYLAnimatedItem 位于 CYLBadge（带入 CYLUtils）之上；从不依赖 CYLTabBarController。
+    core.dependency 'CYLBadge', s.version.to_s
   end
 
   # [EN] The animation engine: animators, players, the registry and the factory. With it `CYL_ANIMATION_ENGINE_AVAILABLE` is 1.
@@ -53,7 +55,7 @@ Pod::Spec.new do |s|
   s.subspec 'Engine' do |engine|
     engine.dependency 'CYLAnimatedItem/Core'
     files = %w[CYLTabBarItemAnimator CYLTabBarItemAnimationPlayer CYLTabBarItemAnimatorRegistry CYLTabBarItemAnimationFactory
-               CYLTabBarItemAnimationPlayableView CYLTabBarItemViewAnimator]
+               CYLTabBarItemAnimationTint CYLTabBarItemAnimationColorCount CYLTabBarItemAnimationPlayableView CYLTabBarItemViewAnimator]
     engine.source_files = files.map { |name| "CYLTabBarController/CYLTabBarItemAnimation/#{name}.{h,m}" } +
                           ['CYLTabBarController/CYLTabBarItemAnimation/Swift/*.swift']
     engine.public_header_files = files.map { |name| "CYLTabBarController/CYLTabBarItemAnimation/#{name}.h" }

@@ -30,10 +30,13 @@
     <string name="cyl_demo_6a69211e0f">Chaque scène est une barre d\'onglets créée avec l\'API publique : styles, animations, badges, Lottie et la nouvelle API d\'onglets</string>
     <string name="cyl_demo_7efc907fe3">Élément animé</string>
     <string name="cyl_demo_9244b5dc65">Le composant icône animée + titre seul : GIF, Lottie, fichier manquant, accessoire et glisser</string>
+    <string name="cyl_demo_5dbde9a698">Marge intérieure du contenu</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset non défini : un élément plat et un élément Liquid Glass, normal et sélectionné</string>
     <string name="cyl_demo_185d8ef0ae">Badges</string>
     <string name="cyl_demo_2db1db0706">Lecture</string>
     <string name="cyl_demo_34bffc9c7a">Animations des icônes d\'onglet : tout lire, vitesse, boucle</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">Vitesse %@, boucle %@ ; touchez pour les commandes</string>
+    <string name="cyl_demo_2f63c1fff7">Libérer le contrôleur de la barre d’onglets (dans 3 s)</string>
     <string name="cyl_demo_a4fe65264e">Langue</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">Actuel : %@</string>
     <string name="cyl_demo_bbc5e661e1">système</string>
@@ -130,6 +133,10 @@
     <string name="cyl_demo_7108183f18">Requête annulée</string>
     <string name="cyl_demo_5fbceaee5f">Requête sans URL</string>
     <string name="cyl_demo_4334569b3d">Une page HTML (réseau)</string>
+    <string name="cyl_demo_e2917c5f0d">Plat : itemContentHorizontalInset non défini</string>
+    <string name="cyl_demo_a7248eeb45">Normal</string>
+    <string name="cyl_demo_57fd7a0cf3">Sélectionné</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass : itemContentHorizontalInset non défini</string>
     <string name="cyl_demo_d84eebada9">Photo</string>
     <string name="cyl_demo_d47d7cb0e4">Plus</string>
     <string name="cyl_demo_0e35f6e974">Base</string>
@@ -320,6 +327,7 @@
     <string name="cyl_demo_12e7b8220d">Tout lire</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">Vitesse : %@</string>
     <string name="cyl_demo_f2f6a01889">Boucle</string>
+    <string name="cyl_demo_08078d674a">Contrôleur de la barre d’onglets libéré</string>
     <string name="cyl_demo_44a57b22e0">Alerte</string>
     <string name="cyl_demo_a127ceb079">Feuille d\'actions</string>
     <string name="cyl_demo_9329618118">Feuille de page</string>
@@ -338,6 +346,10 @@
     <string name="cyl_demo_1698b890f9">Exécute toutes les lignes automatiques, l\'une après l\'autre.</string>
     <string name="cyl_demo_afa158bdc8">Par-dessus le contexte actuel</string>
     <string name="cyl_demo_0add8377e7" formatted="false">Appui long sur « %@ »</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">callbacks dealloc exécutés : %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">callbacks dealloc exécutés : %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">libération : dans %d s</string>
+    <string name="cyl_demo_c0fd658b68">libération : non exécutée</string>
     <string name="cyl_demo_d4f455fa45">Ouvrir : deux barres d’onglets, un seul ID de page</string>
     <string name="cyl_demo_5b88804382" formatted="false">Barre d\'onglets %@ · ID de page \"%@\"</string>
 </resources>

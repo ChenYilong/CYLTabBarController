@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a unter Android: Eine App kann dieses Systemereignis nicht auslösen.";
 "Runs every automatic row, one after the other." = "Führt alle automatischen Zeilen nacheinander aus.";
 "Tab bar %@ · page ID \"%@\"" = "Tab-Leiste %@ · Seiten-ID „%@“";
+"Animated item engine API" = "Engine-API der Animations-Elemente";
+"Stop at 50%" = "Bei 50 % anhalten";
+"Show image when ended" = "Bild am Ende anzeigen";
+"Restart token: %@" = "Neustart-Token: %@";
+"End callback: %@" = "Ende-Callback: %@";
+"none yet" = "noch keiner";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Wiedergabe durch den Host (drivesAnimationPlayback = false)";
+"Engine API" = "Engine-API";
+"Pause while scrolling" = "Beim Scrollen pausieren";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "TabBarController freigeben (in 3 s)";
+"teardown: not run" = "Abbau: nicht ausgeführt";
+"teardown: releasing in %d s" = "Abbau: Freigabe in %d s";
+"dealloc callbacks ran: %d / %d" = "dealloc-Callbacks ausgeführt: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "dealloc-Callbacks ausgeführt: %d / %d (%@)";
+"Tab bar controller released" = "TabBarController freigegeben";
+"bridge: pause %d, resume %d" = "Bridge: Pause %d, Fortsetzen %d";
+"last event: -" = "letztes Ereignis: -";
+"last event: %@" = "letztes Ereignis: %@";
+"Content inset" = "Inhaltsabstand";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset nicht gesetzt: ein flaches und ein Liquid-Glass-Element, normal und ausgewählt";
+"Flat: itemContentHorizontalInset unset" = "Flach: itemContentHorizontalInset nicht gesetzt";
+"Normal" = "Normal";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset nicht gesetzt";

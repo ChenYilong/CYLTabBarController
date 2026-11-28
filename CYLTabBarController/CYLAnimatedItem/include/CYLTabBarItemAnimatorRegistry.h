@@ -1,0 +1,1 @@
+../../CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.h

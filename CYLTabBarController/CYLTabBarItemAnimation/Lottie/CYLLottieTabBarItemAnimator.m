@@ -163,8 +163,22 @@ static void CYLLottieDownload(NSURL *URL, UIView *view, BOOL (^load)(UIView *vie
     LOTAnimationView *lottieView = self.lottieView;
     dispatch_async(dispatch_get_main_queue(), ^{
         lottieView.animationProgress = 0;
-        [lottieView play];
+        [self playWithEndNotification];
     });
+}
+
+/// [EN] Plays and tells `onEnded` when the pass runs to its end (`animationFinished` is NO after a stop or a restart). [CN] 播放，一遍播放到结尾时通知 `onEnded`（停止或重新播放后 `animationFinished` 为 NO）。
+- (void)playWithEndNotification {
+    __weak typeof(self) weakSelf = self;
+    [self.lottieView playWithCompletion:^(BOOL animationFinished) {
+        if (animationFinished) {
+            [weakSelf notifyPlaybackEnded];
+        }
+    }];
+}
+
+- (BOOL)isPlaying {
+    return self.lottieView.isAnimationPlaying;
 }
 
 - (void)showLastFrame {
@@ -218,7 +232,7 @@ static void CYLLottieDownload(NSURL *URL, UIView *view, BOOL (^load)(UIView *vie
     // [EN] Lottie 2.x reads it when a play starts: a playing view continues from where it is under the new mode.
     // [CN] Lottie 2.x 在开始播放时读取该值：正在播放的视图从当前位置按新模式继续播放。
     if (lottieView.isAnimationPlaying) {
-        [lottieView play];
+        [self playWithEndNotification];
     }
 }
 

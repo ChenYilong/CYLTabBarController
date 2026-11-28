@@ -1,0 +1,12 @@
+{
+  "name": "cyl-dealloc-block-executor-miniprogram",
+  "version": "1.4.0",
+  "private": true,
+  "description": "Lifecycle and teardown blocks for Mini Program pages, aligned with the iOS CYLDeallocBlockExecutor API.",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test \"test/*.test.js\""
+  },
+  "types": "typings/index.d.ts"
+}

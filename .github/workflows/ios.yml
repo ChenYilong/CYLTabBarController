@@ -203,6 +203,8 @@ jobs:
           scripts/pod-lint.sh xcframework
           unzip -l build/CYLTabBarController.xcframework.zip | grep -q "CYLTabBarController.xcframework/Info.plist"
           unzip -l build/CYLTabBarController.xcframework.zip | grep -q "CYLAnimatedItem.xcframework/Info.plist"
+          unzip -l build/CYLTabBarController.xcframework.zip | grep -q "CYLBadge.xcframework/Info.plist"
+          unzip -l build/CYLTabBarController.xcframework.zip | grep -q "CYLUtilsKit.xcframework/Info.plist"
           python3 -c 'import json; json.load(open("CYLTabBarController.json"))'
 
   # [EN] Every demo, one job each; one failing demo does not stop the others.

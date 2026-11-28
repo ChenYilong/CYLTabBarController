@@ -10,6 +10,13 @@
     "pages/Gallery",
     "pages/GalleryScene",
     "pages/LiquidGlassDock",
-    "pages/AnimatedItemEnd"
+    "pages/AnimatedItemEnd",
+    "pages/DefaultTint",
+    "pages/RiveAndPag",
+    "pages/ContentInset",
+    "pages/RiveColors",
+    "pages/Released",
+    "pages/ResourceMissing",
+    "pages/BadgeTags"
   ]
 }

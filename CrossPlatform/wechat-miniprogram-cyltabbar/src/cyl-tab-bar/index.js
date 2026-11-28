@@ -3,17 +3,19 @@
  *      CYLTabBarController configuration (the same keys as the iOS and Android libraries, docs/Configuration-File.md)
  *      and renders the tabs, a raised plus button, badges, skins and the style types. Use it inside the mini program's
  *      `custom-tab-bar` (app.json: "tabBar": {"custom": true}). Events: `select`, `reselect`, `plustap`,
- *      `loginrequired`; methods: `cyl_selectIdentifier`, `cyl_showBadgeValue`, `cyl_showBadgeDot`, `cyl_removeBadge`,
- *      `cyl_setThemeIdentifier`, `cyl_setHiddenIdentifiers`, `cyl_setTabBarHidden`.
+ *      `loginrequired`; methods: `cylSelectIdentifier`, `cylShowBadgeValue`, `cylShowBadge`, `cylClearBadge`,
+ *      `cylSetThemeIdentifier`, `cylSetHiddenIdentifiers`, `cylSetTabBarHidden`.
  * [CN] cyl-tab-bar：微信小程序版 CYLTabBarController。自定义 TabBar 组件，接收 CYLTabBarController 配置（与 iOS、Android
  *      库相同的键，见 docs/Configuration-File.md），渲染 Tab、凸起的 PlusButton、角标、皮肤与样式。在小程序的
  *      `custom-tab-bar` 中使用（app.json："tabBar": {"custom": true}）。事件：`select`、`reselect`、`plustap`、
- *      `loginrequired`；方法：`cyl_selectIdentifier`、`cyl_showBadgeValue`、`cyl_showBadgeDot`、`cyl_removeBadge`、
- *      `cyl_setThemeIdentifier`、`cyl_setHiddenIdentifiers`、`cyl_setTabBarHidden`。
+ *      `loginrequired`；方法：`cylSelectIdentifier`、`cylShowBadgeValue`、`cylShowBadge`、`cylClearBadge`、
+ *      `cylSetThemeIdentifier`、`cylSetHiddenIdentifiers`、`cylSetTabBarHidden`。
  */
 const { cylReadConfiguration } = require('./cyl_configuration');
 const { cylBadgeAnimationClass } = require('./cyl_debug');
 const { cylTabBarItemStyle, cylTabBarItemStyleForStyleType, cylGlassLensStyle } = require('./cyl_tab_bar_item_style');
+// Pending: replace the vendored copy with the npm package after the library is published (owner's OK): see ../cyl-dealloc-block-executor/VENDORED.md.
+const { LifecycleController, BadgeEvents } = require('../cyl-utils/index');
 
 /**
  * [EN] Heights in px from the stylesheets: the bar (index.wxss `.cyl-tab`, Liquid Glass `.cyl-style-liquidGlass .cyl-tab`),
@@ -81,7 +83,7 @@ const CYL_PLAYBACK_WINDOW = 3000;
  * [CN] 最后被点击的 Tab，App 中所有 TabBar 共享（每个 Tab 页面都有自己的 TabBar）。被点击而显示的页面立即绘制这个选中项，
  *      而不是自己过期的选中项（之前透镜先停在上一个 Tab，随后才跳过去）。
  */
-const cylLastSelection = { context: '', identifier: '', time: 0 };
+const cylLastSelection = { context: '', key: '', time: 0 };
 
 /**
  * [EN] Every attached bar of the app. A tap selects the tab in each bar of the same configuration context at once, so
@@ -95,9 +97,9 @@ const cylLastSelection = { context: '', identifier: '', time: 0 };
 const cylLiveBars = new Set();
 
 function cylRecentSelection(context) {
-  const recent = cylLastSelection.identifier && cylLastSelection.context === context
+  const recent = cylLastSelection.key && cylLastSelection.context === context
     && Date.now() - cylLastSelection.time < CYL_PLAYBACK_WINDOW;
-  return recent ? cylLastSelection.identifier : '';
+  return recent ? cylLastSelection.key : '';
 }
 
 function cylBadgeText(value) {
@@ -164,14 +166,77 @@ function cylHideItems(model, hidden) {
   model.items = model.items.filter((item) => !hidden.includes(item.identifier));
 }
 
-/** [EN] The first tab's identifier, '' without tabs. [CN] 第一个 Tab 的标识，没有 Tab 时为 ''。 */
+/** [EN] The first tab's key, '' without tabs. [CN] 第一个 Tab 的 key，没有 Tab 时为 ''。 */
 function cylFirstIdentifier(model) {
-  return model.items[0] ? model.items[0].identifier : '';
+  return model.items[0] ? model.items[0].key : '';
+}
+
+/**
+ * [EN] Gives every tab and the plus button a `key` that is unique in the bar: its identifier when no other one has it,
+ *      else `cyl-tab-<position>` (the plus button counts at its place). Tabs without identifier or title, repeated
+ *      identifiers, and an identifier that differs from the page identifier are all told apart by position, as iOS
+ *      selects by index.
+ * [CN] 为每个 Tab 与 PlusButton 生成在 TabBar 中唯一的 `key`：没有其他项使用其标识时用标识，否则用 `cyl-tab-<位置>`（PlusButton
+ *      按其位置计数）。没有标识或标题、标识重复、标识与页面标识不同的 Tab 都按位置区分，与 iOS 按 index 选中一致。
+ */
+function cylAssignKeys(model) {
+  const used = new Set();
+  const unique = (wanted, position) => {
+    let key = wanted && !used.has(wanted) ? wanted : `cyl-tab-${position}`;
+    while (used.has(key)) {
+      key = `${key}-${position}`;
+    }
+    used.add(key);
+    return key;
+  };
+  const plus = model.plusButton;
+  let position = 0;
+  model.items.forEach((item, index) => {
+    if (plus && plus.index === index) {
+      plus.key = unique(plus.identifier || 'cyl-plus-button', position);
+      position += 1;
+    }
+    item.key = unique(item.identifier, position);
+    position += 1;
+  });
+  if (plus && !plus.key) {
+    plus.key = unique(plus.identifier || 'cyl-plus-button', position);
+  }
+}
+
+/** [EN] The keys in bar order, the plus button's at its place. [CN] 按 TabBar 顺序排列的 key，PlusButton 在其位置。 */
+function cylSlotKeys(model) {
+  const keys = model.items.map((item) => item.key);
+  if (model.plusButton) {
+    keys.splice(Math.min(model.plusButton.index, keys.length), 0, model.plusButton.key);
+  }
+  return keys;
+}
+
+/** [EN] The key of the tab (or plus button) with this identifier, '' without one. [CN] 该标识的 Tab（或 PlusButton）的 key，没有时为 ''。 */
+function cylKeyOfIdentifier(model, identifier) {
+  if (!identifier) {
+    return '';
+  }
+  const item = model.items.find((candidate) => candidate.identifier === identifier);
+  if (item) {
+    return item.key;
+  }
+  return model.plusButton && model.plusButton.identifier === identifier ? model.plusButton.key : '';
 }
 
 /**
  * [EN] The bar's style type: the item style decides the glass capsule too. [CN] TabBar 的样式类型：Item 样式同时决定玻璃胶囊。
  */
+/**
+ * [EN] The unselected static icon tint of a tab: its own icon color; in FlatDesign without one (and not 'original'), the unselected title color
+ *      (owner decision D2, 2026-11-27). [CN] Tab 未选中静态图标的着色：自己的图标颜色；扁平样式下没有时（且不是 'original'）取未选中标题颜色（负责人决定 D2，2026-11-27）。
+ */
+function cylFlatUnselectedIconTint(item, styleType) {
+  if (item.iconTint || styleType !== 'flatDesign' || item.iconRenderingMode === 'original') return item.iconTint;
+  return item.titleColor || '#8E8E93';
+}
+
 function cylBarStyleType(itemStyle, styleType) {
   if (itemStyle === 'liquidGlass') {
     return 'liquidGlass';
@@ -196,15 +261,21 @@ function cylTitleFont(fontStyle) {
  */
 function cylAnimationProperties(lottie, isDarkBar) {
   if (!lottie) {
-    return { animationPath: '', animationSize: null, animationColors: null, loopsWhenUnselected: false, animationTint: '' };
+    return { animationPath: '', animationSize: null, animationColors: null, loopsWhenUnselected: false, animationTint: '', animationDarkTint: '', animationRenderingMode: '' };
   }
   return {
     animationPath: (isDarkBar && lottie.darkPath) || lottie.path,
     animationSize: `{${lottie.width}, ${lottie.height}}`,
     animationColors: (isDarkBar && lottie.darkColors) || lottie.colors,
     loopsWhenUnselected: Boolean(lottie.loopsWhenUnselected),
-    // [EN] The `tint` option; a dark bar takes `darkTint` when set. [CN] `tint` 选项；深色 TabBar 有 `darkTint` 时用它。
-    animationTint: (isDarkBar && lottie.darkTint) || lottie.tint || '',
+    // [EN] The `tint` and `darkTint` options as configured; cyl-animated-item resolves them. [CN] 按配置传递的 `tint` 与 `darkTint`
+    //      选项；由 cyl-animated-item 解析。
+    animationTint: lottie.tint || '',
+    animationDarkTint: lottie.darkTint || '',
+    // [EN] Owner decision (2026-11-27, as iOS and Android): without options the item's `automatic` applies (a one-colour Lottie / GIF follows the tab
+    //      color); an explicit `renderingMode` option wins. [CN] 负责人决定（2026-11-27，与 iOS、Android 一致）：没有选项时使用条目的 `automatic`（单色 Lottie / GIF
+    //      跟随 Tab 颜色）；显式的 `renderingMode` 选项优先。
+    animationRenderingMode: lottie.renderingMode || '',
   };
 }
 
@@ -277,19 +348,19 @@ Component({
     /**
      * [EN] CYLTabBarItemStyle (cyl_tab_bar_item_style.js) of every item at initialization: "flat" or "liquidGlass"
      *      (also its number, 0 or 1). Empty: from CYLTabBarControllerStyleType ("liquidGlass" gives liquidGlass). With
-     *      liquidGlass the bar is a floating glass capsule. cyl_setItemStyle() switches it later.
+     *      liquidGlass the bar is a floating glass capsule. cylSetItemStyle() switches it later.
      * [CN] 初始化时每个 Item 的 CYLTabBarItemStyle（cyl_tab_bar_item_style.js）："flat" 或 "liquidGlass"（也可用其数字
      *      0 或 1）。为空时由 CYLTabBarControllerStyleType 推出（"liquidGlass" 对应 liquidGlass）。liquidGlass 时 TabBar
-     *      为悬浮的玻璃胶囊。之后用 cyl_setItemStyle() 切换。
+     *      为悬浮的玻璃胶囊。之后用 cylSetItemStyle() 切换。
      */
     itemStyle: { type: null, value: '' },
     /**
      * [EN] CYLGlassLensStyle (cyl_tab_bar_item_style.js) of the Liquid Glass lens, for tabs and the plus button:
      *      "regular" (default, nearly opaque, the same on any bar) or "skeuomorphic" (see-through, like real glass); also
-     *      its number, 0 or 1. Used with the liquidGlass item style only. cyl_setGlassLensStyle() switches it later.
+     *      its number, 0 or 1. Used with the liquidGlass item style only. cylSetGlassLensStyle() switches it later.
      * [CN] 液态玻璃透镜的 CYLGlassLensStyle（cyl_tab_bar_item_style.js），Tab 与 PlusButton 共用："regular"（默认，
      *      接近不透明，在任何 TabBar 上一致）或 "skeuomorphic"（半透明，像真实的玻璃）；也可用其数字 0 或 1。仅在
-     *      liquidGlass Item 样式下使用。之后用 cyl_setGlassLensStyle() 切换。
+     *      liquidGlass Item 样式下使用。之后用 cylSetGlassLensStyle() 切换。
      */
     glassLensStyle: { type: null, value: '' },
     /**
@@ -308,6 +379,12 @@ Component({
      */
     selectedIdentifier: { type: String, value: '' },
     /**
+     * [EN] The position of the selected tab, the plus button counted (iOS selectedIndex); -1 leaves the selection to
+     *      `selectedIdentifier`. Wins when it changes.
+     * [CN] 选中 Tab 的位置，PlusButton 也计入（iOS selectedIndex）；-1 表示由 `selectedIdentifier` 决定。变化时优先。
+     */
+    selectedIndex: { type: Number, value: -1 },
+    /**
      * [EN] Whether the user is logged in; tabs in CYLTabBarControllerLoginRequiredTabBarItemIdentifiers need it.
      * [CN] 用户是否已登录；CYLTabBarControllerLoginRequiredTabBarItemIdentifiers 中的 Tab 需要登录。
      */
@@ -325,9 +402,9 @@ Component({
      *      app.json 中，只是 TabBar 不再显示。隐藏选中的 Tab 时选中第一个显示的 Tab。
      */
     // [EN] `type: null`: an array made in another JavaScript context (a test driver, a worker) is not an Array for
-    //      WeChat: `type: Array` turns it into [], and here it arrives as an object ({0: 'a'}), which cyl_render reads too.
+    //      WeChat: `type: Array` turns it into [], and here it arrives as an object ({0: 'a'}), which cylRender reads too.
     // [CN] `type: null`：其他 JavaScript 上下文（测试驱动、worker）创建的数组在微信看来不是 Array：`type: Array` 会把它
-    //      变成 []，在这里则以对象（{0: 'a'}）到达，cyl_render 同样能读取。
+    //      变成 []，在这里则以对象（{0: 'a'}）到达，cylRender 同样能读取。
     hiddenIdentifiers: { type: null, value: [] },
     /**
      * [EN] Hides the whole bar (iOS -setTabBarHidden:); each tab page has its own bar, so it hides it on that page only.
@@ -345,13 +422,22 @@ Component({
     cylBarStyle: '',
     cylThemeIdentifier: '',
     cylAnimatingIdentifier: '',
+    // [EN] Whether the glass lens springs in: only for a tap on this very instance (see cylSelect). A bar shown by a page
+    //      switch draws its lens at once. [CN] 玻璃透镜是否弹入：只在本实例上的点击时（见 cylSelect）。页面切换后显示的 TabBar
+    //      立即绘制透镜。
+    cylLensAnimated: false,
     cylTapAnimation: 'none',
     cylAnimationStyle: '',
   },
 
   observers: {
-    'configuration, strings, symbolsByTheme, imageBasePath, animationBasePath, selectedIdentifier, appVersion, itemStyle, glassLensStyle, hiddenIdentifiers, tabBarHeight': function () {
-      this.cyl_render();
+    'configuration, strings, symbolsByTheme, imageBasePath, animationBasePath, selectedIdentifier, appVersion, itemStyle, glassLensStyle, hiddenIdentifiers, tabBarHeight, selectedIndex': function () {
+      // [EN] The bar's own write of the mirrored `selectedIdentifier` / `selectedIndex` is not a new input: no second render.
+      // [CN] TabBar 自己写入的 `selectedIdentifier` / `selectedIndex` 镜像值不是新的输入：不再渲染第二次。
+      if (this.cylWritingMirror) {
+        return;
+      }
+      this.cylRender();
     },
   },
 
@@ -363,8 +449,8 @@ Component({
      */
     show() {
       const recent = this.cylModel ? cylRecentSelection(this.cylModel.context || '') : '';
-      if (recent && recent !== this.data.selectedIdentifier) {
-        this.setData({ selectedIdentifier: recent });
+      if (recent && recent !== this.cylSelectedKey) {
+        this.cylSelect(recent);
       }
     },
   },
@@ -376,22 +462,28 @@ Component({
       this.cylCovers = {};
       this.cylSystemTheme = cylSystemTheme();
       this.cylRequestedTheme = '';
+      // [EN] CYLDeallocBlockExecutor: each resource registers its own cleanup, keyed, where it is created; `detached` runs them.
+      // [CN] CYLDeallocBlockExecutor：每个资源在创建处注册各自带 key 的清理；`detached` 时运行。
+      this.cylLifecycle = new LifecycleController(this);
+      this.cylLifecycle.onLoad();
       this.cylThemeListener = (result) => {
         this.cylSystemTheme = result.theme === 'dark' ? 'dark' : 'light';
-        this.cyl_render();
+        this.cylRender();
       };
       if (typeof wx.onThemeChange === 'function') {
         wx.onThemeChange(this.cylThemeListener);
+        this.cylLifecycle.registry.addDeallocCallback((bar) => {
+          if (typeof wx.offThemeChange === 'function') {
+            wx.offThemeChange(bar.cylThemeListener);
+          }
+        }, { key: 'cyl.core.themeListener' });
       }
       cylLiveBars.add(this);
-      this.cyl_render();
+      this.cylLifecycle.registry.addDeallocCallback((bar) => cylLiveBars.delete(bar), { key: 'cyl.core.liveBar' });
+      this.cylRender();
     },
     detached() {
-      cylLiveBars.delete(this);
-      if (typeof wx.offThemeChange === 'function') {
-        wx.offThemeChange(this.cylThemeListener);
-      }
-      clearTimeout(this.cylAnimationTimer);
+      this.cylLifecycle.onUnload();
     },
   },
 
@@ -400,7 +492,7 @@ Component({
      * [EN] Rebuilds the render data from the configuration, the badges and the skin.
      * [CN] 根据配置、角标与皮肤重新生成渲染数据。
      */
-    cyl_render() {
+    cylRender() {
       if (!this.cylBadges) {
         return;
       }
@@ -417,19 +509,31 @@ Component({
       if (hidden.length > 0) {
         cylHideItems(model, hidden);
       }
+      cylAssignKeys(model);
       this.cylModel = model;
       const recent = this.cylRendered ? '' : cylRecentSelection(model.context || '');
       this.cylRendered = true;
-      // [EN] The first render of a bar follows the tab just tapped, and keeps it as its selection.
-      // [CN] TabBar 的首次渲染跟随刚被点击的 Tab，并把它保存为自己的选中项。
-      const requested = recent || this.data.selectedIdentifier;
-      const shown = model.items.some((item) => item.identifier === requested)
-        || (model.plusButton && model.plusButton.identifier === requested);
-      const selected = shown ? requested : cylFirstIdentifier(model);
-      const slots = model.items.map((item) => this.cyl_slot(item, selected));
+      // [EN] The first render of a bar follows the tab just tapped, and keeps it as its selection. Selection is held as a
+      //      key (a position in effect); `selectedIndex` and `selectedIdentifier` are converted at this edge when they
+      //      changed since the last render.
+      // [CN] TabBar 的首次渲染跟随刚被点击的 Tab，并把它保存为自己的选中项。选中项以 key（实质是位置）保存；`selectedIndex` 与
+      //      `selectedIdentifier` 自上次渲染以来变化时，在这里转换。
+      const slotKeys = cylSlotKeys(model);
+      const requested = this.cylRequestedKey(model, recent, slotKeys);
+      // [EN] A bar rendered before its configuration arrives (the example's custom-tab-bar passes {} first) has no tabs to
+      //      choose from: it keeps the requested key, so the render with the real configuration still draws the tapped
+      //      tab, not the first one for a frame.
+      // [CN] 配置到达之前就渲染的 TabBar（示例的 custom-tab-bar 先传入 {}）没有可选的 Tab：保留所请求的 key，这样带真实配置的
+      //      渲染仍然绘制被点击的 Tab，而不是先闪现第一个 Tab。
+      const selected = slotKeys.includes(requested) || slotKeys.length === 0 ? requested : cylFirstIdentifier(model);
+      // [EN] A selection that changes here (first render, a parent property) is not a tap on this instance: no lens spring-in.
+      // [CN] 在这里发生变化的选中项（首次渲染、父组件属性）不是本实例上的点击：透镜不弹入。
+      const lensPatch = selected === this.cylSelectedKey ? {} : { cylLensAnimated: false };
+      this.cylSelectedKey = selected;
+      const slots = model.items.map((item) => this.cylSlot(item, selected));
       if (model.plusButton) {
-        slots.splice(model.plusButton.index, 0, this.cyl_plusSlot(model.plusButton, selected,
-          this.cyl_itemStyle(model) === 'liquidGlass' ? CYL_LIQUID_GLASS_BAR_HEIGHT : cylBarHeight(this.data.tabBarHeight),
+        slots.splice(model.plusButton.index, 0, this.cylPlusSlot(model.plusButton, selected,
+          this.cylTabBarItemStyle(model) === 'liquidGlass' ? CYL_LIQUID_GLASS_BAR_HEIGHT : cylBarHeight(this.data.tabBarHeight),
           cylTitleLine(slots)));
       }
       slots.forEach((slot, index) => {
@@ -439,10 +543,11 @@ Component({
       });
       // [EN] One enum for the bar and its items: the item style decides the glass capsule too.
       // [CN] TabBar 与 Item 共用一个枚举：Item 样式同时决定玻璃胶囊。
-      const itemStyle = this.cyl_itemStyle(model);
+      const itemStyle = this.cylTabBarItemStyle(model);
       const styleType = cylBarStyleType(itemStyle, model.styleType);
-      this.setData({
-        ...(recent && recent !== this.data.selectedIdentifier ? { selectedIdentifier: recent } : {}),
+      this.cylWriteData({
+        ...this.cylSelectionMirror(model, selected),
+        ...lensPatch,
         cylSlots: slots,
         cylItemStyle: itemStyle,
         cylGlassLensStyle: cylGlassLensStyle(this.cylRequestedGlassLensStyle !== undefined
@@ -457,7 +562,24 @@ Component({
         cylFlipDirection: model.flipDirection,
         cylAnimationStyle: `animation-duration: ${model.animationDuration}ms;`,
         cylAnimationDuration: model.animationDuration,
-      }, () => this.cyl_syncLottie(selected));
+      }, () => this.cylSyncLottie(selected));
+    },
+
+    /**
+     * [EN] The key a render asks for: the tab just tapped, else the changed `selectedIndex`, else the changed
+     *      `selectedIdentifier`, else the current selection.
+     * [CN] 渲染所请求的 key：刚被点击的 Tab，否则是变化了的 `selectedIndex`，再否则是变化了的 `selectedIdentifier`，最后是当前选中项。
+     */
+    cylRequestedKey(model, recent, slotKeys) {
+      const indexSet = this.data.selectedIndex;
+      let requested = recent;
+      if (!requested && indexSet >= 0 && indexSet !== this.cylIndexMirror && slotKeys[indexSet]) {
+        requested = slotKeys[indexSet];
+      }
+      if (!requested && this.data.selectedIdentifier !== this.cylIdentifierMirror) {
+        requested = cylKeyOfIdentifier(model, this.data.selectedIdentifier);
+      }
+      return requested || this.cylSelectedKey;
     },
 
     /**
@@ -466,7 +588,7 @@ Component({
      * [CN] 播放刚被选中的 Tab 的 Lottie 图标（播放一次，停在最后一帧），其他 Tab 停在首帧或循环播放
      *      （CYLTabBarLottieLoopsWhenUnselected）。
      */
-    cyl_syncLottie(selected) {
+    cylSyncLottie(selected) {
       const previous = this.cylLottieSelected;
       this.cylLottieSelected = selected;
       if (previous !== undefined && previous !== selected) {
@@ -474,8 +596,8 @@ Component({
         //      mid-animation never keeps playing next to the new one (and exactly one tab looks selected).
         // [CN] iOS 约定：切换时先停止并重置其他所有 Tab，再播放选中的 Tab，因此动画途中被切走的 Tab 不会与新 Tab 同时播放
         //      （且只有一个 Tab 看起来是选中的）。
-        this.cyl_stopOtherAnimations(selected);
-        this.cyl_playLottie(selected);
+        this.cylStopOtherAnimations(selected);
+        this.cylPlayLottie(selected);
       }
     },
 
@@ -484,16 +606,16 @@ Component({
      *      (CYLTabBarLottieLoopsWhenUnselected) keeps looping.
      * [CN] 停止除 `selected` 以外的所有 Tab 并显示其静止帧；未选中时循环的 Tab（CYLTabBarLottieLoopsWhenUnselected）继续循环。
      */
-    cyl_stopOtherAnimations(selected) {
+    cylStopOtherAnimations(selected) {
       const model = this.cylModel;
       if (!model) {
         return;
       }
-      const keys = model.items.filter((item) => !item.lottie?.loopsWhenUnselected).map((item) => item.identifier);
+      const keys = model.items.filter((item) => !item.lottie?.loopsWhenUnselected).map((item) => item.key);
       keys.filter((key) => key !== selected).forEach((key) => {
         const item = this.selectComponent(`#cyl-item-${key}`);
-        if (item && typeof item.cyl_stopAnimation === 'function') {
-          item.cyl_stopAnimation();
+        if (item && typeof item.cylStopAnimation === 'function') {
+          item.cylStopAnimation();
         }
       });
     },
@@ -504,8 +626,8 @@ Component({
      * [CN] 从首帧播放该标识的 Tab 的 Lottie 图标（默认：选中的 Tab）；通过 switchTab 显示的页面会调用它，因为每个
      *      Tab 页面都有自己的 TabBar 实例。
      */
-    cyl_playLottie(identifier) {
-      const key = identifier || this.cylLottieSelected;
+    cylPlayLottie(identifier) {
+      const key = (this.cylModel && cylKeyOfIdentifier(this.cylModel, identifier)) || identifier || this.cylLottieSelected;
       const item = this.selectComponent(`#cyl-item-${key}`);
       if (!item) {
         return;
@@ -513,12 +635,12 @@ Component({
       const recordKey = `${this.cylModel?.context || ''}/${key}`;
       const elapsed = Date.now() - cylPlayback.startedAt;
       if (cylPlayback.key === recordKey && elapsed < CYL_PLAYBACK_WINDOW) {
-        item.cyl_playAnimation(elapsed / 1000);
+        item.cylPlayAnimation(elapsed / 1000);
         return;
       }
       cylPlayback.key = recordKey;
       cylPlayback.startedAt = Date.now();
-      item.cyl_playAnimation(0);
+      item.cylPlayAnimation(0);
     },
 
     /**
@@ -527,13 +649,17 @@ Component({
      * [CN] 一个 Tab 的渲染数据：当前状态的图片、标题与颜色、角标，以及无障碍标签（角标作为 Tab 的一部分朗读，
      *      例如 "Message, 3"）。
      */
-    cyl_slot(item, selectedIdentifier) {
-      const selected = item.identifier === selectedIdentifier;
+    cylSlot(item, selectedKey) {
+      const selected = item.key === selectedKey;
       const badge = cylBadgeText(this.cylBadges[item.identifier]);
       const isDot = badge === '•';
       const color = selected ? item.selectedTitleColor : item.titleColor;
       const lottie = item.lottie;
       const isDarkBar = this.cylModel ? this.cylModel.isDark : false;
+      // [EN] FlatDesign (owner decision D2, 2026-11-27, as iOS, Android and HarmonyOS): an unselected static icon without an icon color takes the
+      //      unselected title color; 'original' never tints; the selected icon keeps its own colors.
+      // [CN] 扁平样式（负责人决定 D2，2026-11-27，与 iOS、Android、鸿蒙一致）：没有图标颜色的未选中静态图标取未选中标题颜色；'original' 从不着色；选中图标保持自身颜色。
+      const iconTint = cylFlatUnselectedIconTint(item, this.cylModel && this.cylModel.styleType);
       // [EN] The tab is drawn by cyl-tab-bar-item, with the iOS CYLFlatDesignTabBarItem property names.
       // [CN] Tab 由 cyl-tab-bar-item 绘制，使用 iOS CYLFlatDesignTabBarItem 的属性名。
       const itemProperties = {
@@ -546,7 +672,7 @@ Component({
         imageSize: item.imageSize ? `{${item.imageSize.width}, ${item.imageSize.height}}` : null,
         imageInsets: item.imageInsets,
         titlePositionAdjustment: item.titleOffset,
-        iconTint: item.iconTint,
+        iconTint,
         selectedIconTint: item.selectedIconTint,
         backgroundColor: item.backgroundColor,
         selectedBackgroundColor: item.selectedBackgroundColor,
@@ -556,7 +682,7 @@ Component({
         },
       };
       return {
-        key: item.identifier,
+        key: item.key,
         isPlusButton: false,
         selected,
         item: itemProperties,
@@ -564,26 +690,26 @@ Component({
         image: cylSlotImage(item, selected),
         imageStyle: item.imageStyle,
         imageSizeStyle: item.imageSize ? `width: ${item.imageSize.width}px; height: ${item.imageSize.height}px;` : '',
-        tint: selected ? item.selectedIconTint : item.iconTint,
+        tint: selected ? item.selectedIconTint : iconTint,
         titleStyle: `${item.titleStyle}${cylDeclaration('color', color)}${selected ? item.selectedTitleFontStyle : item.titleFontStyle}`,
         // [EN] cyl-tab-bar-item draws the background. [CN] 背景由 cyl-tab-bar-item 绘制。
         itemStyle: '',
         badge: isDot ? '' : badge,
         showsDot: isDot,
-        badgeItem: this.cyl_badgeItem(item.identifier, isDot),
-        cover: this.cylCovers[item.identifier] ? this.cyl_cover(this.cylCovers[item.identifier]) : null,
+        badgeItem: this.cylBadgeItem(item.identifier, isDot),
+        cover: this.cylCovers[item.identifier] ? this.cylCover(this.cylCovers[item.identifier]) : null,
         accessibilityLabel: badge && !isDot ? `${item.accessibilityLabel}, ${badge}` : item.accessibilityLabel,
         accessibilityIdentifier: item.accessibilityIdentifier,
       };
     },
 
     /**
-     * [EN] The badge attributes of cyl_showBadgeValue for cyl-tab-bar-item: `color`, `animation` (CYLBadgeAnimationType
+     * [EN] The badge attributes of cylShowBadgeValue for cyl-tab-bar-item: `color`, `animation` (CYLBadgeAnimationType
      *      name), `radius` (of a dot) and `centerOffset` ([x, y], from the default place).
-     * [CN] cyl_showBadgeValue 的角标属性，供 cyl-tab-bar-item 使用：`color`、`animation`（CYLBadgeAnimationType 名称）、
+     * [CN] cylShowBadgeValue 的角标属性，供 cyl-tab-bar-item 使用：`color`、`animation`（CYLBadgeAnimationType 名称）、
      *      `radius`（小红点半径）与 `centerOffset`（[x, y]，相对默认位置）。
      */
-    cyl_badgeItem(identifier, isDot) {
+    cylBadgeItem(identifier, isDot) {
       const attributes = this.cylBadgeAttributes[identifier] || {};
       const offset = Array.isArray(attributes.centerOffset) ? attributes.centerOffset : null;
       const radius = Number(attributes.radius);
@@ -597,8 +723,8 @@ Component({
       };
     },
 
-    /** [EN] Render data of a cover (cyl_setCoverImage). [CN] 封面（cyl_setCoverImage）的渲染数据。 */
-    cyl_cover(cover) {
+    /** [EN] Render data of a cover (cylSetCoverImage). [CN] 封面（cylSetCoverImage）的渲染数据。 */
+    cylCover(cover) {
       const match = /\{\s*([\d.]+)\s*,\s*([\d.]+)\s*\}/.exec(cover.size);
       const width = match ? Number(match[1]) : 37;
       const height = match ? Number(match[2]) : 37;
@@ -606,17 +732,17 @@ Component({
     },
 
     /**
-     * [EN] Render data of the plus button's badge (cyl_showBadgeValue with the plus button's identifier), at the top
+     * [EN] Render data of the plus button's badge (cylShowBadgeValue with the plus button's identifier), at the top
      *      right of its image, as the tabs' badges.
-     * [CN] PlusButton 角标（使用 PlusButton 标识调用 cyl_showBadgeValue）的渲染数据，位于其图片右上角，与 Tab 的角标相同。
+     * [CN] PlusButton 角标（使用 PlusButton 标识调用 cylShowBadgeValue）的渲染数据，位于其图片右上角，与 Tab 的角标相同。
      */
-    cyl_plusBadge(identifier) {
+    cylPlusBadge(identifier) {
       const text = cylBadgeText(this.cylBadges[identifier]);
       if (!text) {
         return null;
       }
       const isDot = text === '•';
-      const badge = this.cyl_badgeItem(identifier, isDot);
+      const badge = this.cylBadgeItem(identifier, isDot);
       const offset = /\{\s*(-?[\d.]+)\s*,\s*(-?[\d.]+)\s*\}/.exec(badge.positionAdjustment || '');
       const size = /\{\s*([\d.]+)\s*,/.exec(badge.size || '');
       return {
@@ -635,9 +761,9 @@ Component({
      * [CN] PlusButton 的渲染数据：按 CYLPlusButtonCenterYMultiplier（50 pt 高的 TabBar）与 CYLPlusButtonCenterYOffset
      *      凸起，尺寸由 CYLPlusButtonSize / CYLPlusButtonImageSize 决定。
      */
-    cyl_plusSlot(plus, selectedIdentifier, barHeight = CYL_BAR_HEIGHT, tabTitleLine = null) {
+    cylPlusSlot(plus, selectedKey, barHeight = CYL_BAR_HEIGHT, tabTitleLine = null) {
       const titleLine = tabTitleLine || { iconHeight: CYL_ITEM_ICON_HEIGHT, titleOffset: 0 };
-      const selected = plus.hasPage && plus.identifier === selectedIdentifier;
+      const selected = plus.hasPage && plus.key === selectedKey;
       const imageWidth = plus.imageWidth || plus.width || 56;
       const imageHeight = plus.imageHeight || plus.height || 56;
       const titleHeight = plus.title && plus.keepsTitleVisible ? 16 : 0;
@@ -655,7 +781,7 @@ Component({
       const color = selected ? plus.selectedTitleColor : plus.titleColor;
       const widthStyle = plus.width ? ` width: ${plus.width}px;` : '';
       return {
-        key: plus.identifier || 'cyl-plus-button',
+        key: plus.key,
         isPlusButton: true,
         selected,
         showsSelection: selected && plus.showsSelection,
@@ -666,7 +792,7 @@ Component({
         hitStyle: cylPlusHitStyle(plus),
         imageStyle: `width: ${imageWidth}px; height: ${imageHeight}px;`,
         titleStyle: `${cylDeclaration('color', color)}${(selected ? plus.selectedTitleFontStyle : plus.titleFontStyle) || ''}`,
-        badge: this.cyl_plusBadge(plus.identifier || 'cyl-plus-button'),
+        badge: this.cylPlusBadge(plus.identifier || 'cyl-plus-button'),
         accessibilityLabel: plus.accessibilityLabel,
         accessibilityIdentifier: plus.accessibilityIdentifier,
       };
@@ -683,7 +809,7 @@ Component({
      * [CN] 长按与双击（issue #535 / #152）：按住达到长按时长时发出 `longpress`，代替点击；双击间隔内的两次点击在第二次
      *      点击后发出 `doubletap`。
      */
-    cyl_onTouchStart(event) {
+    cylOnTouchStart(event) {
       const key = event.currentTarget.dataset.key;
       const model = this.cylModel;
       clearTimeout(this.cylLongPressTimer);
@@ -693,22 +819,22 @@ Component({
       }
       this.cylLongPressTimer = setTimeout(() => {
         this.cylLongPressed = true;
-        this.triggerEvent('longpress', this.cyl_detail(key));
+        this.triggerEvent('longpress', this.cylDetail(key));
       }, model.longPressDuration * 1000);
     },
 
-    cyl_onTouchEnd() {
+    cylOnTouchEnd() {
       clearTimeout(this.cylLongPressTimer);
     },
 
     /**
      * [EN] The event detail of the tab or plus button `key`. [CN] Tab 或 PlusButton `key` 的事件详情。
      */
-    cyl_detail(key) {
+    cylDetail(key) {
       const model = this.cylModel;
       const plus = model.plusButton;
-      const isPlusButton = Boolean(plus) && key === (plus.identifier || 'cyl-plus-button');
-      const item = isPlusButton ? plus : model.items.find((candidate) => candidate.identifier === key);
+      const isPlusButton = Boolean(plus) && key === plus.key;
+      const item = isPlusButton ? plus : model.items.find((candidate) => candidate.key === key);
       return item ? {
         index: this.data.cylSlots.findIndex((slot) => slot.key === key),
         identifier: item.identifier,
@@ -724,19 +850,19 @@ Component({
      * [EN] Records a tap; the second tap on the same key within the double tap interval emits `doubletap`.
      * [CN] 记录一次点击；在双击间隔内对同一项的第二次点击发出 `doubletap`。
      */
-    cyl_recordTap(key) {
+    cylRecordTap(key) {
       const now = Date.now();
       const last = this.cylLastTap || {};
       if (last.key === key && now - last.time <= this.cylModel.doubleTapInterval * 1000) {
         this.cylLastTap = null;
-        const doubleTapDetail = this.cyl_detail(key);
+        const doubleTapDetail = this.cylDetail(key);
         setTimeout(() => this.triggerEvent('doubletap', doubleTapDetail), 0);
       } else {
         this.cylLastTap = { key, time: now };
       }
     },
 
-    cyl_onTap(event) {
+    cylOnTap(event) {
       const key = event.currentTarget.dataset.key;
       if (this.cylLongPressed && event.type === 'tap') {
         // [EN] The touch was a long press. [CN] 本次触摸是长按。
@@ -744,12 +870,12 @@ Component({
         return;
       }
       if (event.type === 'tap' && this.cylModel) {
-        this.cyl_recordTap(key);
+        this.cylRecordTap(key);
       }
       const model = this.cylModel;
       const plus = model.plusButton;
-      const isPlusButton = Boolean(plus) && key === (plus.identifier || 'cyl-plus-button');
-      const item = isPlusButton ? plus : model.items.find((candidate) => candidate.identifier === key);
+      const isPlusButton = Boolean(plus) && key === plus.key;
+      const item = isPlusButton ? plus : model.items.find((candidate) => candidate.key === key);
       if (!item) {
         return;
       }
@@ -768,26 +894,26 @@ Component({
         this.triggerEvent('loginrequired', detail);
         return;
       }
-      this.cyl_playTapAnimation(key);
-      this.cyl_playTabButtonTapFeedback();
+      this.cylPlayTapAnimation(key);
+      this.cylPlayTabButtonTapFeedback();
       if (isPlusButton && !plus.hasPage) {
         this.triggerEvent('plustap', detail);
         return;
       }
-      const currentIdentifier = this.data.selectedIdentifier || cylFirstIdentifier(model);
-      if (item.identifier === currentIdentifier) {
+      const currentKey = this.cylSelectedKey || cylFirstIdentifier(model);
+      if (key === currentKey) {
         this.triggerEvent('reselect', detail);
         return;
       }
       // [EN] Select and play at once on the tapped bar; the page's own bar continues the playback (cylPlayback).
       // [CN] 在被点击的 TabBar 上立即选中并播放；页面自己的 TabBar 继续该播放（cylPlayback）。
       cylLastSelection.context = model.context || '';
-      cylLastSelection.identifier = item.identifier;
+      cylLastSelection.key = key;
       cylLastSelection.time = Date.now();
-      this.setData({ selectedIdentifier: item.identifier });
+      this.cylSelect(key, true);
       cylLiveBars.forEach((bar) => {
         if (bar !== this) {
-          bar.cyl_followSelection(model.context || '', item.identifier);
+          bar.cylFollowSelection(model.context || '', key);
         }
       });
       this.triggerEvent('select', detail);
@@ -797,15 +923,13 @@ Component({
      * [EN] Selects a tab tapped on another bar of the same context (see cylLiveBars), when this bar shows it.
      * [CN] 选中同一上下文中另一个 TabBar 上被点击的 Tab（见 cylLiveBars），前提是本 TabBar 显示该 Tab。
      */
-    cyl_followSelection(context, identifier) {
+    cylFollowSelection(context, key) {
       const model = this.cylModel;
-      if (!model || (model.context || '') !== context || identifier === this.data.selectedIdentifier) {
+      if (!model || (model.context || '') !== context || key === this.cylSelectedKey) {
         return;
       }
-      const shown = model.items.some((candidate) => candidate.identifier === identifier)
-        || (model.plusButton && model.plusButton.identifier === identifier);
-      if (shown) {
-        this.setData({ selectedIdentifier: identifier });
+      if (cylSlotKeys(model).includes(key)) {
+        this.cylSelect(key);
       }
     },
 
@@ -813,23 +937,28 @@ Component({
      * [EN] Plays CYLTabBarControllerTabButtonTapAnimation on the tapped item.
      * [CN] 在被点击的项上播放 CYLTabBarControllerTabButtonTapAnimation。
      */
-    cyl_playTapAnimation(key) {
+    cylPlayTapAnimation(key) {
       const model = this.cylModel;
       if (!model) {
         return;
       }
-      const item = model.items.find((candidate) => candidate.identifier === key);
+      const item = model.items.find((candidate) => candidate.key === key);
       // [EN] A tab's own animation wins (viewController.cyl_tabButtonAnimation). [CN] Tab 自己的动画优先。
       const name = item?.tapAnimation || model.tapAnimation;
       if (!name || name === 'none') {
         return;
       }
       clearTimeout(this.cylAnimationTimer);
-      const fireworks = model.playsFireworks && !item?.tapAnimation ? this.cyl_fireworks(key) : null;
+      const fireworks = model.playsFireworks && !item?.tapAnimation ? this.cylTabBarFireworks(key) : null;
       this.setData({ cylAnimatingIdentifier: '', cylFireworks: null }, () => {
         this.setData({ cylAnimatingIdentifier: key, cylAnimatingName: name, cylFireworks: fireworks });
         this.cylAnimationTimer = setTimeout(() => this.setData({ cylAnimatingIdentifier: '', cylFireworks: null }),
           model.animationDuration + (fireworks ? 900 : 100));
+        // [EN] The timer is a resource of its own: cleared when the bar detaches (the keyed callback is replaced per timer).
+        // [CN] 定时器是独立的资源：TabBar detached 时清除（每个定时器替换同 key 的回调）。
+        if (this.cylLifecycle && !this.cylLifecycle.isDetached) {
+          this.cylLifecycle.registry.addDeallocCallback((bar) => clearTimeout(bar.cylAnimationTimer), { key: 'cyl.core.animationTimer' });
+        }
       });
     },
 
@@ -837,10 +966,10 @@ Component({
      * [EN] Plays the tap animation once on the selected tab (the Home row plays a new animation this way).
      * [CN] 在选中的 Tab 上播放一次点击动画（首页行以此展示新的动画）。
      */
-    cyl_playSelectedTapAnimation() {
+    cylPlaySelectedTapAnimation() {
       const model = this.cylModel;
-      const key = this.data.selectedIdentifier || (model?.items[0] ? model.items[0].identifier : '');
-      this.cyl_playTapAnimation(key);
+      const key = this.cylSelectedKey || (model?.items[0] ? model.items[0].key : '');
+      this.cylPlayTapAnimation(key);
     },
 
     /**
@@ -848,10 +977,10 @@ Component({
      *      fireworks image) that gather on the icon after the animation, then burst out.
      * [CN] CYLTabButtonAnimation 的烟花（playsFireworks）：10 个使用图标选中颜色（或烟花图片）的粒子，动画后聚到图标上，然后散开。
      */
-    cyl_fireworks(key) {
+    cylTabBarFireworks(key) {
       const model = this.cylModel;
       const plus = model.plusButton;
-      const item = plus && key === (plus.identifier || 'cyl-plus-button') ? plus : model.items.find((candidate) => candidate.identifier === key);
+      const item = plus && key === plus.key ? plus : model.items.find((candidate) => candidate.key === key);
       const color = (item && (item.selectedIconTint || item.selectedTitleColor)) || '#FF9500';
       const delay = model.animationDuration;
       const background = model.fireworksImage ? '' : ` background-color: ${color};`;
@@ -868,12 +997,12 @@ Component({
     },
 
     /**
-     * [EN] cyl_playTabButtonTapFeedback: the tap sound (CYLTabBarControllerTabButtonTapSoundURL) and the haptic
+     * [EN] cylPlayTabButtonTapFeedback: the tap sound (CYLTabBarControllerTabButtonTapSoundURL) and the haptic
      *      (CYLTabBarControllerTabButtonTapHapticStyle; a phone vibrates, DevTools does not).
-     * [CN] cyl_playTabButtonTapFeedback：点击声音（CYLTabBarControllerTabButtonTapSoundURL）与触感
+     * [CN] cylPlayTabButtonTapFeedback：点击声音（CYLTabBarControllerTabButtonTapSoundURL）与触感
      *      （CYLTabBarControllerTabButtonTapHapticStyle；真机振动，开发者工具不振动）。
      */
-    cyl_playTabButtonTapFeedback() {
+    cylPlayTabButtonTapFeedback() {
       const model = this.cylModel;
       if (!model) {
         return;
@@ -909,37 +1038,37 @@ Component({
      * [CN] cyl_switchToAdjacentTabWithStep:（issue #535）：像点击一样选中下一个（1）或上一个（-1）Tab；PlusButton 有页面时
      *      也算在内；需要登录的 Tab 开始登录（`loginrequired`）并返回 false；到两端时返回 false（不循环）。与是否开启滑动无关。
      */
-    cyl_switchToAdjacentTab(step) {
+    cylSwitchToAdjacentTab(step) {
       const model = this.cylModel;
       if (!model) {
         return false;
       }
       const plus = model.plusButton;
       const slots = this.data.cylSlots.filter((slot) => !slot.isPlusButton || plus?.hasPage);
-      const current = this.data.selectedIdentifier || (model.items[0] ? model.items[0].identifier : '');
+      const current = this.cylSelectedKey || (model.items[0] ? model.items[0].key : '');
       const index = slots.findIndex((slot) => slot.key === current);
       const next = slots[index + (step > 0 ? 1 : -1)];
       if (index < 0 || !next) {
         return false;
       }
-      const item = next.isPlusButton ? plus : model.items.find((candidate) => candidate.identifier === next.key);
+      const item = next.isPlusButton ? plus : model.items.find((candidate) => candidate.key === next.key);
       const needsLogin = item && model.loginRequiredIdentifiers.includes(item.identifier) && !this.data.loggedIn;
-      this.cyl_onTap({ currentTarget: { dataset: { key: next.key } } });
+      this.cylOnTap({ currentTarget: { dataset: { key: next.key } } });
       return !needsLogin;
     },
 
-    cyl_selectAdjacent(step) {
+    cylSelectAdjacent(step) {
       const model = this.cylModel;
       if (!model?.swipeToSwitchTab) {
         return false;
       }
-      const current = this.data.selectedIdentifier || (model.items[0] ? model.items[0].identifier : '');
-      const index = model.items.findIndex((item) => item.identifier === current);
+      const current = this.cylSelectedKey || (model.items[0] ? model.items[0].key : '');
+      const index = model.items.findIndex((item) => item.key === current);
       const next = model.items[index + (step > 0 ? 1 : -1)];
       if (index < 0 || !next) {
         return false;
       }
-      this.cyl_onTap({ currentTarget: { dataset: { key: next.identifier } } });
+      this.cylOnTap({ currentTarget: { dataset: { key: next.key } } });
       return true;
     },
 
@@ -947,22 +1076,118 @@ Component({
      * [EN] Selects a tab by its identifier, as `selectedIdentifier` does.
      * [CN] 按标识选中 Tab，与 `selectedIdentifier` 相同。
      */
-    cyl_selectIdentifier(identifier) {
+    cylSelectIdentifier(identifier) {
       this.setData({ selectedIdentifier: identifier || '' });
+    },
+
+    /**
+     * [EN] Selects a tab by its position, the plus button counted, as `selectedIndex` does (iOS selectedIndex).
+     * [CN] 按位置选中 Tab（PlusButton 也计入），与 `selectedIndex` 相同（iOS selectedIndex）。
+     */
+    cylSelectIndex(index) {
+      this.setData({ selectedIndex: Number.isInteger(index) ? index : -1 });
+    },
+
+    /**
+     * [EN] Selects the tab (or plus button) whose page is `pageIdentifier` by its position in this bar and plays its
+     *      Lottie icon: the route to index conversion for tab pages (iOS selects by index too). Returns whether the bar
+     *      has such a tab; a bar without configuration yet leaves the selection to the tap that is in flight.
+     * [CN] 按位置选中页面为 `pageIdentifier` 的 Tab（或 PlusButton）并播放其 Lottie 图标：Tab 页面的路由到 index 转换
+     *      （iOS 同样按 index 选中）。返回本 TabBar 是否有这样的 Tab；尚无配置的 TabBar 把选中交给正在进行的点击。
+     */
+    cylSelectPage(pageIdentifier) {
+      const model = this.cylModel;
+      const keys = model ? cylSlotKeys(model) : [];
+      const index = keys.findIndex((key) => {
+        const item = model.items.find((candidate) => candidate.key === key)
+          || (model.plusButton && model.plusButton.key === key ? model.plusButton : null);
+        return item && item.pageIdentifier === pageIdentifier;
+      });
+      if (index < 0) {
+        return false;
+      }
+      // [EN] A route sync is the truth now: a tap remembered for the other bars must not be applied over it by a later `show`.
+      // [CN] 路由同步此刻就是事实：为其他 TabBar 记住的点击不能再被之后的 `show` 覆盖在它上面。
+      if (cylLastSelection.key && cylLastSelection.context === (model.context || '') && cylLastSelection.key !== keys[index]) {
+        cylLastSelection.key = keys[index];
+        cylLastSelection.time = Date.now();
+      }
+      this.cylSelect(keys[index]);
+      this.cylPlayLottie(keys[index]);
+      return true;
+    },
+
+    /**
+     * [EN] Selects the tab with this key on this bar at once, and mirrors it to the public properties.
+     * [CN] 在本 TabBar 上立即选中该 key 的 Tab，并同步到公开属性。
+     */
+    cylSelect(key, animateLens) {
+      const model = this.cylModel;
+      this.cylSelectedKey = key;
+      if (model) {
+        // [EN] The lens springs in only for a tap on this instance (animateLens); every other selection (a followed tap, show,
+        //      route sync) draws it in its final state. [CN] 只有本实例上的点击（animateLens）让透镜弹入；其他选中（被跟随的点击、
+        //      show、路由同步）都以最终状态绘制。
+        this.cylWriteData({ ...this.cylSelectionMirror(model, key), cylLensAnimated: animateLens === true });
+      }
+    },
+
+    /**
+     * [EN] setData of the bar's own state: the observer of the public properties does not render again for the mirrored
+     *      `selectedIdentifier` / `selectedIndex` in it (the observer runs inside setData).
+     * [CN] 写入 TabBar 自己的状态：其中镜像的 `selectedIdentifier` / `selectedIndex` 不会让公开属性的 observer 再次渲染
+     *      （observer 在 setData 内运行）。
+     */
+    cylWriteData(patch, callback) {
+      this.cylWritingMirror = true;
+      try {
+        this.setData(patch, callback);
+      } finally {
+        this.cylWritingMirror = false;
+      }
+    },
+
+    /**
+     * [EN] The public properties (`selectedIdentifier`, `selectedIndex`) that differ from the selected key, as a setData
+     *      patch: only what differs, because setting a property runs the observer again.
+     * [CN] 与选中 key 不一致的公开属性（`selectedIdentifier`、`selectedIndex`），作为 setData 补丁：只含不同的部分，
+     *      因为设置属性会再次触发 observer。
+     */
+    cylSelectionMirror(model, key) {
+      const item = model.items.find((candidate) => candidate.key === key)
+        || (model.plusButton && model.plusButton.key === key ? model.plusButton : null);
+      this.cylIdentifierMirror = item ? item.identifier : '';
+      this.cylIndexMirror = cylSlotKeys(model).indexOf(key);
+      const mirror = {};
+      if (this.data.selectedIdentifier !== this.cylIdentifierMirror) {
+        mirror.selectedIdentifier = this.cylIdentifierMirror;
+      }
+      if (this.data.selectedIndex !== this.cylIndexMirror) {
+        mirror.selectedIndex = this.cylIndexMirror;
+      }
+      return mirror;
     },
 
     /**
      * [EN] Shows a badge with a number or a text on the tab with this identifier; "" or null removes it.
      * [CN] 在该标识的 Tab 上显示数字或文字角标；"" 或 null 移除角标。
      */
-    cyl_showBadgeValue(identifier, value, attributes) {
+    cylShowBadgeValue(identifier, value, attributes) {
       this.cylBadges[identifier] = value;
-      // [EN] As iOS, attributes set before cyl_showBadgeValue stay until the badge is removed: pass them to change them.
-      // [CN] 与 iOS 一样，在 cyl_showBadgeValue 之前设置的属性一直保留到角标被移除：传入属性以修改。
+      // [EN] As iOS, attributes set before cylShowBadgeValue stay until the badge is removed: pass them to change them.
+      // [CN] 与 iOS 一样，在 cylShowBadgeValue 之前设置的属性一直保留到角标被移除：传入属性以修改。
       if (attributes) {
         this.cylBadgeAttributes[identifier] = { ...attributes };
       }
-      this.cyl_render();
+      this.cylRender();
+      // [EN] The badge moment through CYLDeallocBlockExecutor: `registry.addCustomCallback(BadgeEvents.didShow, …)` on the bar, or
+      //      `LifecycleCenter.addCustomCallback` for every bar. A mini program badge is drawn by `setData`, so there is no separate `didBecomeReady`.
+      // [CN] 通过 CYLDeallocBlockExecutor 发出角标时机：在 TabBar 的 `registry` 或用 `LifecycleCenter` 监听。小程序角标由 `setData` 绘制，因此没有单独的 `didBecomeReady`。
+      this.cylPostBadgeEvent(BadgeEvents.didShow, { identifier, value });
+    },
+
+    cylPostBadgeEvent(name, userInfo) {
+      if (this.cylLifecycle && !this.cylLifecycle.isDetached) this.cylLifecycle.registry.postLifecycleEvent(name, userInfo);
     },
 
     /**
@@ -970,7 +1195,7 @@ Component({
      *      as -cyl_isShowBadge / -cyl_badgeValue.
      * [CN] 该标识的 Tab 或 PlusButton 的角标值（小红点为 "•"），没有角标时为 ''，对应 -cyl_isShowBadge / -cyl_badgeValue。
      */
-    cyl_badgeValue(identifier) {
+    cylBadgeValue(identifier) {
       const value = this.cylBadges[identifier];
       return value === undefined || value === null ? '' : String(value);
     },
@@ -982,40 +1207,42 @@ Component({
      * [CN] 用图片覆盖该标识的 Tab（-cyl_coverVisiableTabImageViewOrTabButton:，iOS 示例第一个 Tab 的封面）：图片按 `size`
      *      （"{w, h}"，默认 37 x 37）居中显示在 Tab 上并遮住该 Tab；在任何选中状态下都保持。'' 或 null 移除封面。
      */
-    cyl_setCoverImage(identifier, image, size) {
+    cylSetCoverImage(identifier, image, size) {
       if (image) {
         this.cylCovers[identifier] = { image, size: size || '{37, 37}' };
       } else {
         delete this.cylCovers[identifier];
       }
-      this.cyl_render();
+      this.cylRender();
     },
 
     /**
      * [EN] Shows a dot badge on the tab with this identifier.
      * [CN] 在该标识的 Tab 上显示小红点。
      */
-    cyl_showBadgeDot(identifier) {
-      this.cyl_showBadgeValue(identifier, '•');
+    cylShowBadge(identifier) {
+      this.cylShowBadgeValue(identifier, '•');
     },
 
     /**
      * [EN] Removes the badge of the tab with this identifier.
      * [CN] 移除该标识的 Tab 的角标。
      */
-    cyl_removeBadge(identifier) {
+    cylClearBadge(identifier) {
+      const had = this.cylBadges[identifier] !== undefined && this.cylBadges[identifier] !== null;
       delete this.cylBadges[identifier];
       delete this.cylBadgeAttributes[identifier];
-      this.cyl_render();
+      this.cylRender();
+      if (had) this.cylPostBadgeEvent(BadgeEvents.didClear, { identifier });
     },
 
     /**
-     * [EN] The item style in use: the one set by cyl_setItemStyle(), else the `itemStyle` property, else the one
+     * [EN] The item style in use: the one set by cylSetItemStyle(), else the `itemStyle` property, else the one
      *      CYLTabBarControllerStyleType implies.
-     * [CN] 当前使用的 Item 样式：cyl_setItemStyle() 设置的，否则为 `itemStyle` 属性，否则由 CYLTabBarControllerStyleType
+     * [CN] 当前使用的 Item 样式：cylSetItemStyle() 设置的，否则为 `itemStyle` 属性，否则由 CYLTabBarControllerStyleType
      *      推出。
      */
-    cyl_itemStyle(model) {
+    cylTabBarItemStyle(model) {
       const requested = this.cylRequestedItemStyle !== undefined ? this.cylRequestedItemStyle : this.data.itemStyle;
       if (requested !== '' && requested !== null && requested !== undefined) {
         return cylTabBarItemStyle(requested);
@@ -1028,11 +1255,11 @@ Component({
      *      controls of the examples call it ("Play all").
      * [CN] 让所有 Tab 图标动画从进度 0 播放一次（开启 `animationLoop` 时重复）。示例的播放控件调用它（"Play all"）。
      */
-    cyl_playAll() {
+    cylTabBarPlayAll() {
       (this.data.cylSlots || []).forEach((slot) => {
         const item = slot.item ? this.selectComponent(`#cyl-item-${slot.key}`) : null;
-        if (item && typeof item.cyl_playAnimation === 'function') {
-          item.cyl_playAnimation(0);
+        if (item && typeof item.cylPlayAnimation === 'function') {
+          item.cylPlayAnimation(0);
         }
       });
     },
@@ -1041,7 +1268,7 @@ Component({
      * [EN] Sets `hiddenIdentifiers` at run time: the tabs (or the plus button) to leave out of the bar.
      * [CN] 在运行时设置 `hiddenIdentifiers`：不在 TabBar 中显示的 Tab（或 PlusButton）。
      */
-    cyl_setHiddenIdentifiers(identifiers) {
+    cylSetHiddenIdentifiers(identifiers) {
       this.setData({ hiddenIdentifiers: Array.isArray(identifiers) ? identifiers.slice() : [] });
     },
 
@@ -1049,19 +1276,19 @@ Component({
      * [EN] Hides or shows the whole bar at run time (iOS -setTabBarHidden:).
      * [CN] 在运行时隐藏或显示整个 TabBar（iOS -setTabBarHidden:）。
      */
-    cyl_setTabBarHidden(hidden) {
+    cylSetTabBarHidden(hidden) {
       this.setData({ tabBarHidden: Boolean(hidden) });
     },
 
     /** [EN] Sets `animationSpeed` at run time. [CN] 在运行时设置 `animationSpeed`。 */
-    cyl_setAnimationSpeed(speed) {
+    cylSetAnimationSpeed(speed) {
       if (Number(speed) > 0) {
         this.setData({ animationSpeed: Number(speed) });
       }
     },
 
     /** [EN] Sets `animationLoop` at run time. [CN] 在运行时设置 `animationLoop`。 */
-    cyl_setAnimationLoop(loop) {
+    cylSetAnimationLoop(loop) {
       this.setData({ animationLoop: Boolean(loop) });
     },
 
@@ -1070,9 +1297,9 @@ Component({
      *      initial style.
      * [CN] 在运行时把所有 Item 切换为某个 CYLTabBarItemStyle（"flat" 或 "liquidGlass"）；'' 恢复初始样式。
      */
-    cyl_setItemStyle(style) {
+    cylSetItemStyle(style) {
       this.cylRequestedItemStyle = style === '' || style === null ? undefined : cylTabBarItemStyle(style);
-      this.cyl_render();
+      this.cylRender();
     },
 
     /**
@@ -1081,25 +1308,25 @@ Component({
      * [CN] 在运行时把液态玻璃透镜切换为某个 CYLGlassLensStyle（"regular" 或 "skeuomorphic"）；'' 恢复 `glassLensStyle`
      *      属性。
      */
-    cyl_setGlassLensStyle(style) {
+    cylSetGlassLensStyle(style) {
       this.cylRequestedGlassLensStyle = style === '' || style === null ? undefined : cylGlassLensStyle(style);
-      this.cyl_render();
+      this.cylRender();
     },
 
     /**
      * [EN] Switches to a skin of CYLTabBarControllerThemes; '' goes back to the configured skin (and Dark Mode).
      * [CN] 切换到 CYLTabBarControllerThemes 中的皮肤；'' 恢复配置的皮肤（以及深色模式）。
      */
-    cyl_setThemeIdentifier(identifier) {
+    cylSetThemeIdentifier(identifier) {
       this.cylRequestedTheme = identifier || '';
-      this.cyl_render();
+      this.cylRender();
     },
 
     /**
      * [EN] The skin in use and every skin of the configuration.
      * [CN] 当前使用的皮肤与配置中的所有皮肤。
      */
-    cyl_themeIdentifiers() {
+    cylThemeIdentifiers() {
       return {
         current: this.cylModel ? this.cylModel.themeIdentifier : '',
         all: this.cylModel ? this.cylModel.themeIdentifiers : [],

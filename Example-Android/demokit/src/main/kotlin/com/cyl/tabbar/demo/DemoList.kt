@@ -20,7 +20,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import com.cyl.tabbar.CYLTabBarController
 import com.cyl.tabbar.cyl_setUpAutomaticRowHeightForTableView
-import com.cyl.tabbar.cyl_showBadgeForRow
+import com.cyl.tabbar.cylShowBadgeForRow
 import com.cyl.tabbar.cyl_tabBarController
 import com.cyl.tabbar.cyl_wrapsTextLabels
 import com.cyl.tabbar.cyl_pushViewController
@@ -54,7 +54,9 @@ class DemoListFragment : Fragment() {
     val page: String get() = requireArguments().getString(PAGE) ?: DemoCatalog.HOME
     /** [EN] `CYLTabBarItemPageParameters.url` of the tab, when its page ID is "web". [CN] 页面 ID 为 "web" 时 Tab 的 `CYLTabBarItemPageParameters.url`。 */
     val url: String? get() = requireArguments().getString(URL)
+    /** [EN] The sections the list shows as rows: the ones with badge samples (the others are tags). [CN] 列表以行显示的分组：含角标样例的分组（其余为 Tag）。 */
     private var sections: List<DemoSection> = emptyList()
+    private var tagList: DemoTagList.Holder? = null
     private val adapter = Adapter()
     /** [EN] The list, also the scrolling view of scroll hiding (issue #13). [CN] 列表，也是滚动隐藏的滚动视图（issue #13）。 */
     var listView: ListView? = null
@@ -67,12 +69,13 @@ class DemoListFragment : Fragment() {
         super.onAttach(context)
         // [EN] The texts follow this page's locale (DemoText). [CN] 文字跟随本页面的语言（DemoText）。
         DemoText.attach(context)
+        // [EN] The tab icon animations pause while the user scrolls a list. [CN] 用户滚动列表时 Tab 图标动画暂停。
+        com.cyl.animateditem.CYLAnimatedItemView.pausesAnimationsWhileUserScrolls = true
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val context = inflater.context
         val list = ListView(context).apply {
-            adapter = this@DemoListFragment.adapter
             // [EN] Under a floating bar (FlatDesign, Liquid Glass) the page's bottom inset is the bar's height: the last rows
             //      scroll above the bar, and the rows still pass under it while scrolling, as an iOS table view does.
             // [CN] 浮动 TabBar（扁平样式、液态玻璃）下，页面的底部 inset 就是 TabBar 的高度：最后几行可滚到 TabBar 上方，滚动时各行仍从 TabBar 下方经过，
@@ -82,10 +85,10 @@ class DemoListFragment : Fragment() {
                 view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars()).bottom)
                 insets
             }
-            setOnItemClickListener { _, _, position, _ -> (this@DemoListFragment.adapter.getItem(position) as? DemoRow)?.let(::run) }
+            setOnItemClickListener { parent, _, position, _ -> (parent.getItemAtPosition(position) as? DemoRow)?.let(::run) }
             // [EN] A context menu on long press, as the iOS rows have (and the scroll hiding simulation "long press a row"). [CN] 长按弹出菜单，与 iOS 行一致（也用于滚动隐藏模拟 "长按某行"）。
-            setOnItemLongClickListener { _, view, position, _ ->
-                val row = this@DemoListFragment.adapter.getItem(position) as? DemoRow ?: return@setOnItemLongClickListener false
+            setOnItemLongClickListener { parent, view, position, _ ->
+                val row = parent.getItemAtPosition(position) as? DemoRow ?: return@setOnItemLongClickListener false
                 android.widget.PopupMenu(context, view).apply {
                     menu.add(android.R.string.copy).setOnMenuItemClickListener {
                         context.getSystemService(android.content.ClipboardManager::class.java)?.setPrimaryClip(android.content.ClipData.newPlainText("row", row.title))
@@ -95,15 +98,37 @@ class DemoListFragment : Fragment() {
                 true
             }
         }
+        // [EN] The sections are one tag list at the top of the list (a titled header per section, More / Less after 3 rows, long press
+        //      shows the subtitle); the badge sample rows follow as rows (docs/instructions/examples.md).
+        // [CN] 分组是列表顶部的一个 TagList（每组带标题，超过 3 行出现 More / Less，长按显示副标题）；角标样例行作为行跟在后面。
+        val holder = DemoTagList.Holder(context) { run(it) }
+        tagList = holder
+        list.addHeaderView(holder.view, null, false)
+        list.adapter = adapter
         cyl_setUpAutomaticRowHeightForTableView(list)
         list.setOnScrollListener(ScrollBridge())
         listView = list
         reload()
-        return FrameLayout(context).apply { addView(list) }
+        // [EN] The page background is a gradient, so the Liquid Glass tags and the bar have colors to bend and blur (docs/instructions/examples.md). The list is transparent.
+        // [CN] 页面背景为渐变色，液态玻璃的 Tag 与 TabBar 才有可折射、可模糊的颜色（docs/instructions/examples.md）。列表本身透明。
+        val dark = (context.resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        val colors = if (dark) intArrayOf(Color.parseColor("#5B2A3C"), Color.parseColor("#1F4A63"), Color.parseColor("#3B2D5C"))
+                     else intArrayOf(Color.parseColor("#FFB199"), Color.parseColor("#7EC8E3"), Color.parseColor("#C3AED6"))
+        // [EN] The plate is a SIBLING behind the list, not the list's ancestor: the Liquid Glass of the tags samples it (`backdropSource`); a glass inside its own
+        //      source could only draw tint and rim. [CN] 背板是列表后面的同级视图，而不是列表的祖先：标签的液态玻璃采样它（`backdropSource`）；位于自己的源之内的玻璃只能绘制着色与边缘。
+        val plate = View(context).apply {
+            background = android.graphics.drawable.GradientDrawable(android.graphics.drawable.GradientDrawable.Orientation.TL_BR, colors)
+        }
+        holder.view.backdropSource = plate
+        return FrameLayout(context).apply {
+            addView(plate, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+            addView(list)
+        }
     }
 
     override fun onDestroyView() {
         listView = null
+        tagList = null
         super.onDestroyView()
     }
 
@@ -114,7 +139,10 @@ class DemoListFragment : Fragment() {
 
     /** [EN] Reads the sections again (rows show the current state). [CN] 重新读取各 section（行显示当前状态）。 */
     fun reload() {
-        sections = DemoCatalog.sections(this)
+        val all = DemoCatalog.sections(this)
+        // [EN] Every section, the badge samples too, is part of the tag list (docs/instructions/examples.md). [CN] 所有分组（含角标样例）都在 TagList 中。
+        sections = emptyList()
+        tagList?.update(all) { it.subtitle?.invoke(this) }
         adapter.notifyDataSetChanged()
     }
 
@@ -146,7 +174,11 @@ class DemoListFragment : Fragment() {
     private inner class ScrollBridge : AbsListView.OnScrollListener {
         private var lastPosition = -1
         private var lastTop = 0
-        override fun onScrollStateChanged(view: AbsListView, scrollState: Int) { /* [EN] Only the offset matters. [CN] 只关心偏移。 */ }
+        override fun onScrollStateChanged(view: AbsListView, scrollState: Int) {
+            // [EN] The tab icon animations pause while the user scrolls (CYLAnimatedItemView.pausesAnimationsWhileUserScrolls).
+            // [CN] 用户滚动时 Tab 图标动画暂停。
+            com.cyl.tabbar.CYLScrollReporting.listViewScrollStateChanged(view, scrollState)
+        }
         override fun onScroll(view: AbsListView, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
             val top = view.getChildAt(0)?.top ?: return
             val height = view.getChildAt(0)?.height ?: return
@@ -175,7 +207,7 @@ class DemoListFragment : Fragment() {
                 is DemoRow -> ((convertView as? LinearLayout) ?: row(context)).also { view ->
                     val icon = view.getChildAt(0) as ImageView
                     icon.visibility = if (item.badgeRow >= 0) View.VISIBLE else View.GONE
-                    if (item.badgeRow >= 0) icon.cyl_showBadgeForRow(item.badgeRow)
+                    if (item.badgeRow >= 0) icon.cylShowBadgeForRow(item.badgeRow)
                     val texts = view.getChildAt(1) as LinearLayout
                     (texts.getChildAt(0) as TextView).text = item.title
                     val subtitle = item.subtitle?.invoke(this@DemoListFragment)

@@ -11,9 +11,17 @@ target 'CYLTabBarController-Swift' do
   
 #  pod 'CYLTabBarController', '1.99.4'
   pod 'CYLTabBarController', :path => '../'
+  pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDeallocBlockExecutor.git', :commit => '4276a6dab5a428ccc3a5f3f347eab991881fb97c' # TODO: remove after CYLDeallocBlockExecutor 1.4.0 is published (docs/Lifecycle-Library.md)
   # [EN] The animated item component's own pod (CYLAnimatedItem.podspec), by the same path until it is on the trunk.
   # [CN] 动效组件独立的 pod（CYLAnimatedItem.podspec），发布到 trunk 之前按相同路径引入。
+  pod 'CYLUtils', :path => '../'
+  pod 'CYLBadge', :path => '../'
   pod 'CYLAnimatedItem', :path => '../'
+  # [EN] The Badge page is a ClassifyMenu tag list (docs/instructions/examples.md, "Demo lists that need sections use a ClassifyMenu tag list"). Pinned by commit,
+  #      the same pin as the root Podfile (Example/); no copy of its sources.
+  # [CN] Badge 页面使用 ClassifyMenu 的 TagList（docs/instructions/examples.md）。按 commit 固定，与根目录 Podfile（Example/）的 pin 相同；不复制其源码。
+# [EN] 6bb6e2b8 (feat/harmony, 2026-11-29) adds the tag list style API the badge demos use. [CN] 6bb6e2b8（feat/harmony，2026-11-29）加入角标 Demo 使用的标签列表样式 API。
+  pod 'CollectionViewClassifyMenu', :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :commit => '6bb6e2b895f0698133d90af1362d5b5344b54ddf'
 
   # Pods for CYLTabBarController-Swift
 

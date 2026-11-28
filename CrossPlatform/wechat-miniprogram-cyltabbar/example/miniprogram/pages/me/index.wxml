@@ -1,9 +1,10 @@
 <!-- [EN] Arabic: the page right to left. [CN] 阿拉伯语：页面从右到左。 -->
 <page-meta page-style="{{cylRTL ? 'direction: rtl;' : ''}}"></page-meta>
 <import src="/templates/cyl_feed.wxml" />
-<view wx:if="{{!cylUnloaded}}" class="cyl-page" bindtouchstart="cyl_onSwipeStart" bindtouchend="cyl_onSwipeEnd">
+<view wx:if="{{!cylUnloaded}}" class="cyl-page" bindtouchstart="cylOnSwipeStart" bindtouchend="cylOnSwipeEnd">
   <view class="cyl-section">
     <view wx:if="{{installed === 'lottie' || installed === 'pag'}}" class="cyl-row cyl-row-action" bindtap="cyl_openPlayground" aria-role="button" aria-label="{{texts['cyl-lottie playground']}}"><text aria-hidden="true">{{texts['cyl-lottie playground']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_openBadgeTags" aria-role="button" aria-label="{{texts['CYLAnimatedItemView badges']}}"><text aria-hidden="true">{{texts['CYLAnimatedItemView badges']}}</text></view>
     <view class="cyl-row cyl-row-action" bindtap="cyl_openItemPlayground" aria-role="button" aria-label="{{texts['cyl-tab-bar-item playground']}}"><text aria-hidden="true">{{texts['cyl-tab-bar-item playground']}}</text></view>
   </view>
 
@@ -21,10 +22,11 @@
     <view class="cyl-row {{icons === 'images' ? 'cyl-row-selected' : ''}}" bindtap="cyl_icons" data-value="images" aria-role="button" aria-selected="{{icons === 'images'}}" aria-label="{{texts['Images']}}"><text aria-hidden="true">{{texts['Images']}}</text></view>
   </view>
 
-  <!-- [EN] Playback controls: Play all, speed, loop; they combine and apply live. [CN] 播放控件：全部播放、速度、循环；组合使用，实时生效。 -->
+  <!-- [EN] Playback controls through cylAnimatedItemPlayer(): Play all, Restart, speed, loop; they combine and apply live. [CN] 播放控件（通过 cylAnimatedItemPlayer()）：全部播放、重新播放、速度、循环；组合使用，实时生效。 -->
   <text class="cyl-section-title" aria-role="heading">{{texts['Playback']}}</text>
   <view class="cyl-section">
-    <view class="cyl-row cyl-row-action" bindtap="cyl_playAll" aria-role="button" aria-label="{{texts['Play all']}}"><text aria-hidden="true">{{texts['Play all']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cylTabBarPlayAll" aria-role="button" aria-label="{{texts['Play all']}}"><text aria-hidden="true">{{texts['Play all']}}</text></view>
+    <view class="cyl-row cyl-row-action" bindtap="cyl_restart" aria-role="button" aria-label="{{texts['Restart']}}"><text aria-hidden="true">{{texts['Restart']}}</text></view>
     <view class="cyl-row cyl-row-slider">
       <text aria-hidden="true">{{texts['Speed']}}</text>
       <slider class="cyl-slider" min="0.25" max="3" step="0.25" value="{{animationSpeed}}" block-size="20" bindchanging="cyl_speed" bindchange="cyl_speed" aria-label="{{texts['Speed']}}, {{animationSpeed}} {{texts['times']}}" />
@@ -52,7 +54,7 @@
 
   <text class="cyl-section-title" aria-role="heading">{{texts['Item style']}}</text>
   <view class="cyl-section">
-    <view wx:for="{{itemStyles}}" wx:key="*this" class="cyl-row {{currentItemStyle === item ? 'cyl-row-selected' : ''}}" bindtap="cyl_itemStyle" data-value="{{item}}" aria-role="button" aria-selected="{{currentItemStyle === item}}" aria-label="{{item ? item : texts['Follow the style']}}">
+    <view wx:for="{{itemStyles}}" wx:key="*this" class="cyl-row {{currentItemStyle === item ? 'cyl-row-selected' : ''}}" bindtap="cylTabBarItemStyle" data-value="{{item}}" aria-role="button" aria-selected="{{currentItemStyle === item}}" aria-label="{{item ? item : texts['Follow the style']}}">
       <text aria-hidden="true">{{item ? item : texts['Follow the style']}}</text>
     </view>
   </view>

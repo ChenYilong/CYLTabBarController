@@ -30,10 +30,13 @@
     <string name="cyl_demo_6a69211e0f">각 장면은 공개 API로 만든 탭 바입니다: 스타일, 애니메이션, 배지, Lottie 및 새로운 탭 API</string>
     <string name="cyl_demo_7efc907fe3">애니메이션 항목</string>
     <string name="cyl_demo_9244b5dc65">애니메이션 아이콘 + 제목 컴포넌트 단독 사용: GIF, Lottie, 누락된 파일, 액세서리 및 드래그</string>
+    <string name="cyl_demo_5dbde9a698">콘텐츠 여백</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset 설정 안 됨: 플랫 항목과 Liquid Glass 항목, 일반 및 선택 상태</string>
     <string name="cyl_demo_185d8ef0ae">배지</string>
     <string name="cyl_demo_2db1db0706">재생</string>
     <string name="cyl_demo_34bffc9c7a">탭 아이콘 애니메이션: 모두 재생, 속도, 반복</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">속도 %@, 반복 %@; 탭하여 컨트롤 표시</string>
+    <string name="cyl_demo_2f63c1fff7">탭 바 컨트롤러 해제 (3초 후)</string>
     <string name="cyl_demo_a4fe65264e">언어</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">현재: %@</string>
     <string name="cyl_demo_bbc5e661e1">시스템</string>
@@ -130,6 +133,10 @@
     <string name="cyl_demo_7108183f18">요청 취소됨</string>
     <string name="cyl_demo_5fbceaee5f">URL 없는 요청</string>
     <string name="cyl_demo_4334569b3d">HTML 페이지(네트워크)</string>
+    <string name="cyl_demo_e2917c5f0d">플랫: itemContentHorizontalInset 설정 안 됨</string>
+    <string name="cyl_demo_a7248eeb45">일반</string>
+    <string name="cyl_demo_57fd7a0cf3">선택됨</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset 설정 안 됨</string>
     <string name="cyl_demo_d84eebada9">사진</string>
     <string name="cyl_demo_d47d7cb0e4">더 보기</string>
     <string name="cyl_demo_0e35f6e974">기본</string>
@@ -320,6 +327,7 @@
     <string name="cyl_demo_12e7b8220d">모두 재생</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">속도: %@</string>
     <string name="cyl_demo_f2f6a01889">반복</string>
+    <string name="cyl_demo_08078d674a">탭 바 컨트롤러가 해제되었습니다</string>
     <string name="cyl_demo_44a57b22e0">알림</string>
     <string name="cyl_demo_a127ceb079">액션 시트</string>
     <string name="cyl_demo_9329618118">페이지 시트</string>
@@ -338,6 +346,10 @@
     <string name="cyl_demo_1698b890f9">모든 자동 행을 차례로 실행합니다.</string>
     <string name="cyl_demo_afa158bdc8">현재 컨텍스트 위에</string>
     <string name="cyl_demo_0add8377e7" formatted="false">\'%@\' 길게 누름</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">dealloc 콜백 실행: %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">dealloc 콜백 실행: %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">해제: %d초 후</string>
+    <string name="cyl_demo_c0fd658b68">해제: 실행 안 됨</string>
     <string name="cyl_demo_d4f455fa45">열기: 탭 바 두 개, 페이지 ID 하나</string>
     <string name="cyl_demo_5b88804382" formatted="false">탭 바 %@ · 페이지 ID “%@”</string>
 </resources>

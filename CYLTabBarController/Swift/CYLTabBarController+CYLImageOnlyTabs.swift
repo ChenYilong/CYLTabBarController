@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The associated object keys shared with CYLTabBarController.m, which reads and writes them too (selector-based
  *      keys, the same pointer on both sides).

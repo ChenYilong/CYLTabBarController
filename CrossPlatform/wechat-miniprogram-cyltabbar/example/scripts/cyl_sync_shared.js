@@ -179,6 +179,18 @@ function cylFindAsset(assets, key, theme, state) {
  */
 const CYL_MORE_LANGUAGES = ['hi', 'es', 'ar'];
 
+/**
+ * [EN] Texts only the mini program example has (the playback controls), so the library's tables cannot give them: language ->
+ *      English text -> translation. Applied after the lookup, for the texts the example uses. Add one per language here.
+ * [CN] 只有小程序示例才有的文字（播放控件），库的字符串表中没有：语言 -> 英文文字 -> 译文。在查找之后应用，只用于示例使用的文字。
+ *      每种语言都要在此添加。
+ */
+const CYL_EXAMPLE_ONLY_TEXTS = {
+  hi: { Playback: 'प्लेबैक', 'Play all': 'सभी चलाएँ', Restart: 'फिर से शुरू करें', Speed: 'गति', times: 'गुना', Loop: 'लूप', "Release the tab bar controller (in 3 s)": "टैब बार कंट्रोलर को रिलीज़ करें (3 सेकंड में)", "teardown: not run": "टियरडाउन: चलाया नहीं गया", "teardown: releasing in %d s": "टियरडाउन: %d सेकंड में रिलीज़", "dealloc callbacks ran: %d / %d": "dealloc कॉलबैक चले: %d / %d", "dealloc callbacks ran: %d / %d (%@)": "dealloc कॉलबैक चले: %d / %d (%@)", "Tab bar controller released": "टैब बार कंट्रोलर रिलीज़ हो गया" },
+  es: { Playback: 'Reproducción', 'Play all': 'Reproducir todo', Restart: 'Reiniciar', Speed: 'Velocidad', times: 'veces', Loop: 'Bucle', "Release the tab bar controller (in 3 s)": "Liberar el controlador de la barra de pestañas (en 3 s)", "teardown: not run": "liberación: no ejecutada", "teardown: releasing in %d s": "liberación: se libera en %d s", "dealloc callbacks ran: %d / %d": "callbacks de dealloc ejecutados: %d / %d", "dealloc callbacks ran: %d / %d (%@)": "callbacks de dealloc ejecutados: %d / %d (%@)", "Tab bar controller released": "Controlador de la barra de pestañas liberado" },
+  ar: { Playback: 'التشغيل', 'Play all': 'تشغيل الكل', Restart: 'إعادة التشغيل', Speed: 'السرعة', times: 'مرات', Loop: 'تكرار', "Release the tab bar controller (in 3 s)": "تحرير وحدة التحكم في شريط علامات التبويب (خلال 3 ث)", "teardown: not run": "التفكيك: لم يتم التشغيل", "teardown: releasing in %d s": "التفكيك: التحرير خلال %d ث", "dealloc callbacks ran: %d / %d": "اكتملت استدعاءات dealloc: %d / %d", "dealloc callbacks ran: %d / %d (%@)": "اكتملت استدعاءات dealloc: %d / %d (%@)", "Tab bar controller released": "تم تحرير وحدة التحكم في شريط علامات التبويب" },
+};
+
 function cylMoreStrings() {
   const bundle = path.join(CYL_REPOSITORY_ROOT, 'CYLTabBarController', 'Resources', 'CYLTabBarController.bundle');
   const read = (language) => cylReadStrings(path.join(bundle, `${language}.lproj`, 'CYLTabBarController.strings'));
@@ -221,6 +233,11 @@ function cylMoreStrings() {
         index += 1;
         return name || match;
       });
+    });
+    Object.entries(CYL_EXAMPLE_ONLY_TEXTS[language] || {}).forEach(([text, translation]) => {
+      if (texts.has(text)) {
+        table[text] = translation;
+      }
     });
     tables[language] = table;
   });

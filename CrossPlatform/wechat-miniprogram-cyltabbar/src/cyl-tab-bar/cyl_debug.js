@@ -7,18 +7,8 @@
  */
 
 /**
- * [EN] Badge debugging (docs/Badge-Debugging.md): true leaves out the badge animation classes (cyl-badge-<type>), so a
- *      screenshot shows each badge at its laid-out place while badge positions are checked.
- * [CN] 角标调试（docs/Badge-Debugging.md）：为 true 时不添加角标动画类（cyl-badge-<type>），调试角标坐标时截图中的角标就在布局位置。
+ * [EN] Badge debugging moved to `cyl-badge/cyl_badge_debug.js` (the badge module owns its switch); re-exported here so the old
+ *      path keeps working (docs/Badge-Debugging.md).
+ * [CN] 角标调试移到 `cyl-badge/cyl_badge_debug.js`（角标模块拥有自己的开关）；在此重新导出，旧路径仍可用（docs/Badge-Debugging.md）。
  */
-const CYL_BADGE_ANIMATION_DISABLED = false;
-
-/**
- * [EN] The class of a badge animation ('' when there is none or the badge debugging switch is on).
- * [CN] 角标动画的类名（没有动画或开启角标调试开关时为 ''）。
- */
-function cylBadgeAnimationClass(animation, disabled = CYL_BADGE_ANIMATION_DISABLED) {
-  return !disabled && animation ? `cyl-badge-${animation}` : '';
-}
-
-module.exports = { CYL_BADGE_ANIMATION_DISABLED, cylBadgeAnimationClass };
+module.exports = require('../cyl-badge/cyl_badge_debug');

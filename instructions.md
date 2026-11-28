@@ -17,6 +17,7 @@ Organized by tag (tag: `instructions`): each heading has its tag and a summary; 
 - `docs/instructions/<tag>.md`: the full text of each tag. `docs/instructions.md`: the rules of the documentation folder.
 - `.agents/skills/cyl-*` (linked from `.claude/skills`): the project skills; `cyl-docs` for documents and screenshots,
   `cyl-verify` for builds, tests, simulators and emulators.
+- **Before you run a simulator you must read the simulator run rules** ([docs/instructions/macos.md](docs/instructions/macos.md#simulator-run-rules-added-2026-11-25), or the `cyl-verify` skill, "Running the simulator"), or this text: After a simulator test or screenshot run ends, immediately kill the app and the simulator processes; start them again only when needed. Never leave an app running or a simulator booted after the task is done.
 
 ## Screenshots (tag: `screenshots`)
 

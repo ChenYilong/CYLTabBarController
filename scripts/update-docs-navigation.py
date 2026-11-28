@@ -218,7 +218,9 @@ def docs_index_table(prefix):
 
 def folder_tree(path, prefix="", extra=()):
     out = []
-    entries = sorted({e for e in os.listdir(path) if not e.startswith(".")} | set(extra))
+    # [EN] A "memory" folder holds local, git-ignored notes (.gitignore): never listed, so the tree is the same everywhere.
+    # [CN] "memory" 文件夹存放本地、被 git 忽略的笔记（.gitignore）：不列出，使目录树在任何机器上一致。
+    entries = sorted({e for e in os.listdir(path) if not e.startswith(".") and e != "memory"} | set(extra))
     for i, entry in enumerate(entries):
         last = i == len(entries) - 1
         full = os.path.join(path, entry)

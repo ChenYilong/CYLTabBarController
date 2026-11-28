@@ -4,13 +4,13 @@
   align-items: center;
   justify-content: center;
   min-height: 44px;
-  padding: 4px;
+  padding: 4px calc(4px + var(--cyl-item-inset, 0px));
   box-sizing: border-box;
 }
 .cyl-animated-item-embedded {
   display: flex;
   min-height: 0;
-  padding: 0;
+  padding: 0 var(--cyl-item-inset, 0px);
 }
 .cyl-animated-item-horizontal {
   flex-direction: row;
@@ -23,7 +23,7 @@
 .cyl-animated-item-bare {
   display: flex;
   min-height: 0;
-  padding: 0;
+  padding: 0 var(--cyl-item-inset, 0px);
   width: 100%;
   height: 100%;
 }
@@ -44,6 +44,15 @@
 .cyl-animated-item-icon {
   position: relative;
   flex: none;
+}
+/* [EN] The badge anchor: top trailing corner of the icon, out of the layout, never clipped (the icon box does not clip). [CN] 角标锚点：图标的右上角，不参与布局，不会被裁剪（图标盒子不裁剪）。 */
+.cyl-animated-item-badge-anchor {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: visible;
 }
 .cyl-animated-item-image,
 .cyl-animated-item-animation {
@@ -105,11 +114,18 @@
 /* [EN] The countdown style (`itemStyle` "countdown"): a bordered, rounded button with a light background; the border is
         gray while it counts down. [CN] 倒计时样式（`itemStyle` 为 "countdown"）：带边框与圆角、浅色背景的按钮；倒计时中边框为灰色。 */
 .cyl-animated-item-countdown {
-  padding: 8px 12px;
+  padding: 8px calc(12px + var(--cyl-item-inset, 0px));
   border: 0.5px solid #07c160;
   border-radius: 6px;
   background-color: #f2f2f7;
 }
 .cyl-animated-item-countdown.cyl-animated-item-disabled {
   border-color: #c7c7cc;
+}
+/* [EN] The internal divider mode: the root is the line itself (size and color inline). [CN] 内部分割线模式：根节点就是那条线（尺寸与颜色为内联样式）。 */
+.cyl-animated-item-divider {
+  display: block;
+  flex: none;
+  min-height: 0;
+  padding: 0;
 }

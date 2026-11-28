@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 // [EN] The push / pop hooks that let the FlatDesign tab bar follow navigation transitions, translated from Objective-C
 //      (docs/Swift-Migration.md, step 48). The selectors of UINavigationController+CYLFlatDesignTabBarPrivate.h are kept.
 //      `+cyl_navigationBarActionHook` is called by CYLFlatDesignTabBar only, so Liquid Glass and the classic style are untouched.

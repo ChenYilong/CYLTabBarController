@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a på Android: en app kan ikke sende denne systemhændelse.";
 "Runs every automatic row, one after the other." = "Kører alle automatiske rækker, den ene efter den anden.";
 "Tab bar %@ · page ID \"%@\"" = "Fanelinje %@ · side-ID »%@«";
+"Animated item engine API" = "Engine-API for animeret element";
+"Stop at 50%" = "Stop ved 50 %";
+"Show image when ended" = "Vis billede ved afslutning";
+"Restart token: %@" = "Genstartstoken: %@";
+"End callback: %@" = "Slutcallback: %@";
+"none yet" = "ingen endnu";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Værten styrer afspilningen (drivesAnimationPlayback = false)";
+"Engine API" = "Engine-API";
+"Pause while scrolling" = "Pause under rulning";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Frigiv fanebjælke-controlleren (om 3 s)";
+"teardown: not run" = "nedrivning: ikke kørt";
+"teardown: releasing in %d s" = "nedrivning: frigiver om %d s";
+"dealloc callbacks ran: %d / %d" = "dealloc-callbacks kørt: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "dealloc-callbacks kørt: %d / %d (%@)";
+"Tab bar controller released" = "Fanebjælke-controlleren er frigivet";
+"bridge: pause %d, resume %d" = "bro: pause %d, genoptag %d";
+"last event: -" = "seneste hændelse: -";
+"last event: %@" = "seneste hændelse: %@";
+"Content inset" = "Indre margen";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset ikke angivet: et fladt og et Liquid Glass-element, normalt og valgt";
+"Flat: itemContentHorizontalInset unset" = "Flad: itemContentHorizontalInset ikke angivet";
+"Normal" = "Normal";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset ikke angivet";

@@ -8,6 +8,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  [EN] Posted with the item as its object whenever a shown value of a `CYLFlatDesignTabBarItem` changes. Swift since
       docs/Swift-Migration.md step 118 (it was the only content of CYLFlatDesignTabBar.m); Objective-C reads the same string

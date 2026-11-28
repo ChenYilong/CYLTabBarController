@@ -8,5 +8,5 @@ export type {
   CYLTabBarBadge,
   CYLTabBarIconRenderingMode,
 } from './CyltabbarView.native';
-export { CYLAnimationView, animationURLWithOptions } from './CYLAnimationView';
-export type { CYLAnimationViewProps, CYLAnimationOptions } from './CYLAnimationView.native';
+export { CYLAnimationView, animationURLWithOptions, cylAnimatedItemCornerRadiusCapsule, cylAnimatedItemLiquidGlassContentInset, cylBadgeNativeProps, CYLBadgeAttributeKey } from './CYLAnimationView';
+export type { CYLAnimationViewProps, CYLAnimationOptions, CYLAnimationViewHandle, CYLBadgeAttributes } from './CYLAnimationView.native';

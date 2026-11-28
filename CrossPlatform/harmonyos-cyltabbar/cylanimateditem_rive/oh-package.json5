@@ -1,0 +1,11 @@
+{
+  "name": "cylanimateditem_rive",
+  "version": "1.0.0",
+  "description": "The Rive engine of CYLAnimatedItemView for HarmonyOS NEXT (@ohos/rive): CYLAnimatedItemRive.register() makes every CYLAnimatedItemView play .riv files.",
+  "main": "Index.ets",
+  "author": "ChenYilong",
+  "license": "MIT",
+  "dependencies": {
+    "cylanimateditemrive": "file:../cylanimateditemrive"
+  }
+}

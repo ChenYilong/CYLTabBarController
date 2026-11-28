@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a no Android: um app não pode enviar este evento do sistema.";
 "Runs every automatic row, one after the other." = "Executa todas as linhas automáticas, uma após a outra.";
 "Tab bar %@ · page ID \"%@\"" = "Barra de abas %@ · ID da página “%@”";
+"Animated item engine API" = "API dos motores do item animado";
+"Stop at 50%" = "Parar em 50%";
+"Show image when ended" = "Mostrar imagem ao terminar";
+"Restart token: %@" = "Token de reinício: %@";
+"End callback: %@" = "Callback de fim: %@";
+"none yet" = "ainda nenhum";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Reprodução controlada pelo host (drivesAnimationPlayback = false)";
+"Engine API" = "API do motor";
+"Pause while scrolling" = "Pausar ao rolar";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Liberar o controlador da barra de abas (em 3 s)";
+"teardown: not run" = "liberação: não executada";
+"teardown: releasing in %d s" = "liberação: em %d s";
+"dealloc callbacks ran: %d / %d" = "callbacks de dealloc executados: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "callbacks de dealloc executados: %d / %d (%@)";
+"Tab bar controller released" = "Controlador da barra de abas liberado";
+"bridge: pause %d, resume %d" = "ponte: pausa %d, retomada %d";
+"last event: -" = "último evento: -";
+"last event: %@" = "último evento: %@";
+"Content inset" = "Margem interna do conteúdo";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset não definido: um item plano e um item Liquid Glass, normal e selecionado";
+"Flat: itemContentHorizontalInset unset" = "Plano: itemContentHorizontalInset não definido";
+"Normal" = "Normal";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset não definido";

@@ -285,3 +285,16 @@
   text-align: center;
   color: #007aff;
 }
+
+/* [EN] The colorful backing plate of the example (docs/instructions/examples.md): a gradient behind the tag lists, so the Liquid Glass tags and cards have colors to bend. [CN] 示例的彩色背板：TagList 后的渐变色，液态玻璃有可折射的颜色。 */
+page {
+  background: linear-gradient(160deg, #ffb199 0%, #7ec8e3 50%, #c3aed6 100%);
+  background-attachment: fixed;
+}
+
+@media (prefers-color-scheme: dark) {
+  page {
+    background: linear-gradient(160deg, #5b2a3c 0%, #1f4a63 50%, #3b2d5c 100%);
+    background-attachment: fixed;
+  }
+}

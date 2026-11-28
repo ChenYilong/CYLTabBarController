@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a en Android: una app no puede enviar este evento del sistema.";
 "Runs every automatic row, one after the other." = "Ejecuta todas las filas automáticas, una tras otra.";
 "Tab bar %@ · page ID \"%@\"" = "Barra de pestañas %@ · ID de página «%@»";
+"Animated item engine API" = "API de motores del elemento animado";
+"Stop at 50%" = "Detener al 50 %";
+"Show image when ended" = "Mostrar imagen al terminar";
+"Restart token: %@" = "Token de reinicio: %@";
+"End callback: %@" = "Callback de fin: %@";
+"none yet" = "aún ninguno";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Reproducción controlada por el host (drivesAnimationPlayback = false)";
+"Engine API" = "API del motor";
+"Pause while scrolling" = "Pausar al desplazar";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Liberar el controlador de la barra de pestañas (en 3 s)";
+"teardown: not run" = "liberación: no ejecutada";
+"teardown: releasing in %d s" = "liberación: se libera en %d s";
+"dealloc callbacks ran: %d / %d" = "callbacks de dealloc ejecutados: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "callbacks de dealloc ejecutados: %d / %d (%@)";
+"Tab bar controller released" = "Controlador de la barra de pestañas liberado";
+"bridge: pause %d, resume %d" = "puente: pausa %d, reanudar %d";
+"last event: -" = "último evento: -";
+"last event: %@" = "último evento: %@";
+"Content inset" = "Margen interior del contenido";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset sin definir: un elemento plano y uno de Liquid Glass, normal y seleccionado";
+"Flat: itemContentHorizontalInset unset" = "Plano: itemContentHorizontalInset sin definir";
+"Normal" = "Normal";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset sin definir";

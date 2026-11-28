@@ -1,14 +1,16 @@
 // [EN] Swift Package Manager module map of the CYLAnimatedItem target. The headers stay where CocoaPods and Carthage
-//      expect them; `header` lists the public ones (an umbrella header would claim this whole directory).
-// [CN] CYLAnimatedItem target 的 Swift Package Manager module map。头文件保留在 CocoaPods 与 Carthage 期望的位置；用 `header` 列出公开头文件
-//      （umbrella header 会把整个目录作为模块）。
+//      expect them; this folder links to them, and `header` lists the public ones.
+// [CN] CYLAnimatedItem target 的 Swift Package Manager module map。头文件保留在 CocoaPods 与 Carthage 期望的位置；本目录用链接指向它们，`header` 列出公开头文件。
 module CYLAnimatedItem {
-    header "../CYLAnimatedItemMacros.h"
-    header "../../CYLUtils/CYLAnimationKeys.h"
-    header "../../CYLTabBarItemAnimation/CYLTabBarItemAnimator.h"
-    header "../../CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayer.h"
-    header "../../CYLTabBarItemAnimation/CYLTabBarItemAnimatorRegistry.h"
-    header "../../CYLTabBarItemAnimation/CYLTabBarItemAnimationFactory.h"
-    header "../../CYLTabBarItemAnimation/CYLTabBarItemViewAnimator.h"
+    header "CYLAnimatedItemMacros.h"
+    header "CYLAnimationKeys.h"
+    header "CYLTabBarItemAnimator.h"
+    header "CYLTabBarItemAnimationPlayer.h"
+    header "CYLTabBarItemAnimatorRegistry.h"
+    header "CYLTabBarItemAnimationFactory.h"
+    header "CYLTabBarItemAnimationColorCount.h"
+    header "CYLTabBarItemAnimationTint.h"
+    header "CYLTabBarItemViewAnimator.h"
+    header "CYLTabBarItemAnimationPlayableView.h"
     export *
 }

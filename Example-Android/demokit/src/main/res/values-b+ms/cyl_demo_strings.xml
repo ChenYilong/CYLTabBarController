@@ -30,10 +30,13 @@
     <string name="cyl_demo_6a69211e0f">Setiap adegan ialah bar tab yang dibina dengan API awam: gaya, animasi, lencana, Lottie dan API tab yang lebih baharu</string>
     <string name="cyl_demo_7efc907fe3">Item animasi</string>
     <string name="cyl_demo_9244b5dc65">Komponen ikon animasi + tajuk secara tersendiri: GIF, Lottie, fail yang hilang, aksesori dan seretan</string>
+    <string name="cyl_demo_5dbde9a698">Inset kandungan</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset tidak ditetapkan: satu item rata dan satu item Liquid Glass, biasa dan dipilih</string>
     <string name="cyl_demo_185d8ef0ae">Lencana</string>
     <string name="cyl_demo_2db1db0706">Main balik</string>
     <string name="cyl_demo_34bffc9c7a">Animasi ikon tab: Main semua, kelajuan, gelung</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">Kelajuan %@, gelung %@; ketik untuk kawalan</string>
+    <string name="cyl_demo_2f63c1fff7">Lepaskan pengawal bar tab (dalam 3 s)</string>
     <string name="cyl_demo_a4fe65264e">Bahasa</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">Semasa: %@</string>
     <string name="cyl_demo_bbc5e661e1">sistem</string>
@@ -130,6 +133,10 @@
     <string name="cyl_demo_7108183f18">Permintaan dibatalkan</string>
     <string name="cyl_demo_5fbceaee5f">Permintaan tanpa URL</string>
     <string name="cyl_demo_4334569b3d">Halaman HTML (rangkaian)</string>
+    <string name="cyl_demo_e2917c5f0d">Rata: itemContentHorizontalInset tidak ditetapkan</string>
+    <string name="cyl_demo_a7248eeb45">Biasa</string>
+    <string name="cyl_demo_57fd7a0cf3">Dipilih</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset tidak ditetapkan</string>
     <string name="cyl_demo_d84eebada9">Foto</string>
     <string name="cyl_demo_d47d7cb0e4">Lagi</string>
     <string name="cyl_demo_0e35f6e974">Asas</string>
@@ -320,6 +327,7 @@
     <string name="cyl_demo_12e7b8220d">Main semua</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">Kelajuan: %@</string>
     <string name="cyl_demo_f2f6a01889">Gelung</string>
+    <string name="cyl_demo_08078d674a">Pengawal bar tab telah dilepaskan</string>
     <string name="cyl_demo_44a57b22e0">Amaran</string>
     <string name="cyl_demo_a127ceb079">Helaian tindakan</string>
     <string name="cyl_demo_9329618118">Helaian halaman</string>
@@ -338,6 +346,10 @@
     <string name="cyl_demo_1698b890f9">Menjalankan setiap baris automatik, satu demi satu.</string>
     <string name="cyl_demo_afa158bdc8">Atas konteks semasa</string>
     <string name="cyl_demo_0add8377e7" formatted="false">\"%@\" ditekan lama</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">panggilan balik dealloc dijalankan: %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">panggilan balik dealloc dijalankan: %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">teardown: dilepaskan dalam %d s</string>
+    <string name="cyl_demo_c0fd658b68">teardown: belum dijalankan</string>
     <string name="cyl_demo_d4f455fa45">Buka: dua bar tab, satu ID halaman</string>
     <string name="cyl_demo_5b88804382" formatted="false">Bar tab %@ · ID halaman “%@”</string>
 </resources>

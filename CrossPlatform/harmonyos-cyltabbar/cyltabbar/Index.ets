@@ -4,18 +4,18 @@
 export {
   CYLTabBarItemAttributes, CYLTabBarItemTitle, CYLTabBarItemSelectedTitle, CYLTabBarItemImage, CYLTabBarItemSelectedImage,
   CYLTabBarItemIdentifier, CYLTitleOffset, CYLTabBarItemTitleColor, CYLTabBarItemSelectedTitleColor,
-  CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor,
+  CYLTabBarItemIconColor, CYLTabBarItemSelectedIconColor, CYLTabBarItemIconRenderingMode,
   CYLTabBarItemBackgroundColor, CYLTabBarItemSelectedBackgroundColor, CYLTabBarItemImageInsets
 } from './src/main/ets/CYLTabBarItem';
 export { CYLPlusButton, CYLPlusButtonInsets, cyl_plusButtonOverhang, cyl_liquidGlassContentDy } from './src/main/ets/CYLPlusButton';
 export {
   CYLTabBarController, CYLPlusButtonPageIndex, CYLEdgeInsets, CYLTabButtonTapAnimationType, CYLImpactFeedbackStyle, CYLColorModeStorageKey, cyl_updateColorMode,
-  CYLTabBarMinimizeBehavior, CYLScrollStorageKey, cyl_reportScroll, cyl_restoreTabBar, CYLRestoreTabBarStorageKey, CYLSelectRequestStorageKey,
+  CYLTabBarMinimizeBehavior, CYLScrollStorageKey, cyl_reportScroll, cyl_reportScrollStarted, cyl_pausesAnimationsWhileUserScrolls, cyl_reportScrollStopped, cyl_restoreTabBar, CYLRestoreTabBarStorageKey, CYLSelectRequestStorageKey,
   cyl_popSelectTabBarChildViewControllerAtIndex, cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier,
   cyl_pushViewController, cyl_pushOrPopToViewController, cyl_selectTabBarItemWithIdentifier, cyl_tabBarItemIdentifiers,
-  cyl_indexOfTabBarItemWithIdentifier, cyl_simulateMemoryWarning, CYLMemoryWarningStorageKey
+  cyl_indexOfTabBarItemWithIdentifier, cyl_simulateMemoryWarning, CYLMemoryWarningStorageKey, cyl_addTabBarControllerDeallocCallback
 } from './src/main/ets/CYLTabBarController';
-export { CYLBadgeSample, cyl_badgeTitleForRow, cyl_badgeStyleCount, cyl_applyBadgeSample } from './src/main/ets/CYLBadgeSamples';
+export { CYLBadgeSample, cylBadgeTitleForRow, cylBadgeStyleCount, cylApplyBadgeSample } from './src/main/ets/CYLBadgeSamples';
 export { CYLLottieIcon } from './src/main/ets/CYLLottieIcon';
 /**
  * [EN] The animated item component, for apps that place one outside the tab bar (they import only cyltabbar).
@@ -31,7 +31,7 @@ export { CYLRiveLoopPolicy, CYLRiveAnimationBuilder, cylRegisterRiveEngine } fro
 export { CYLSVGAView } from './src/main/ets/svga/CYLSVGAView';
 export { CYLSVGAMovie, cylLoadSVGAMovie, cylDecodeSVGAMovie } from './src/main/ets/svga/CYLSVGAMovie';
 export { cylDrawSVGAFrame, cylParseSVGAPath } from './src/main/ets/svga/CYLSVGARenderer';
-export { CYLBadge, CYLBadgeView, CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset } from './src/main/ets/CYLBadge';
+export { CYLBadge, CYLBadgeView, CYLBadgeAppearance, CYLBadgeAnimationType, CYLOffset } from 'cylbadge';
 export {
   CYLTabBarConfigurationParser, CYLTabBarConfigurationFormat, CYLTabBarConfigurationErrorCode, CYLTabBarConfigurationError,
   CYLTabBarConfigurationErrorDomain, CYLTabBarConfigurationMaximumLength, CYLTabBarConfigurationMaximumDepth
@@ -44,9 +44,9 @@ export {
 } from './src/main/ets/CYLThemeManager';
 export {
   CYLLocalizedString, cyl_localizationKey, cyl_setLocalizationContext, cyl_textOf, CYLLocalizationLanguage,
-  CYLSetLocalizationLanguage, cyl_addLocalizationLanguageListener, cyl_removeLocalizationLanguageListener, cyl_pickerLanguages
+  CYLSetLocalizationLanguage, cylAddLocalizationLanguageListener, cylRemoveLocalizationLanguageListener, cyl_pickerLanguages
 } from './src/main/ets/CYLLocalization';
-export { cyl_badgeAccessibilityText } from './src/main/ets/CYLTabBarController';
+export { badgeAccessibilityText, cylIconRenderingMode, cylStaticIconTintColor, cylIconFillColorOf, cylTabBarBackgroundColor } from './src/main/ets/CYLTabBarController';
 export {
   CYLTabBarStyleType,
   CYLFlatDesignTintColor,
@@ -61,7 +61,8 @@ export {
   cyl_flatDesignTabBarItem,
   cyl_flatDesignTabBarItemWithOffset,
   cyl_flatDesignHasPlusButton,
-  cyl_flatDesignHasPlusChildViewController
+  cyl_flatDesignHasPlusChildViewController,
+  CYLFlatDesignDarkBackgroundColor
 } from './src/main/ets/CYLFlatDesignTabBar';
 export { CYLColor } from './src/main/ets/CYLColor';
 export {
@@ -70,8 +71,8 @@ export {
   CYLTabBarAnimationOptionRiveArtboard, CYLTabBarAnimationOptionRiveStateMachine, CYLTabBarAnimationOptionRiveActiveProperty,
   CYLTabBarAnimationOptionRiveActiveDuration, CYLTabBarAnimationOptionRiveTriggerProperty, CYLTabBarAnimationOptionRiveInput,
   CYLTabBarAnimationOptionRiveTriggerInput, CYLTabBarAnimationOptionRiveAnimation, CYLTabBarAnimationOptionRiveLegacyRuntime,
-  CYLTabBarAnimationOptionRiveNumberInput, CYLTabBarAnimationOptionRiveNumberValues, cylRiveNextNumber,
-  CYLTabBarAnimationURLWithOptions, cylRiveFileAndOptions, cylRiveRendererType, cylEnsureRiveInitialized, cylRiveIsSupported
+  CYLTabBarAnimationOptionRiveNumberInput, CYLTabBarAnimationOptionRiveNumberValues, CYLTabBarAnimationOptionRiveColor,
+  cylRiveNextNumber, CYLTabBarAnimationURLWithOptions, cylRiveFileAndOptions, cylRiveRendererType, cylEnsureRiveInitialized, cylRiveIsSupported
 } from './src/main/ets/CYLRiveTabBarItemAnimator';
 export {
   CYLTabBarPageRegistry, CYLTabBarPageRequest, CYLTabBarPage, CYLTabBarAsyncPageFactory, CYLTabBarPageResolver, CYLTabBarPageSource,
@@ -92,3 +93,4 @@ export {
   CYLTabButtonFumeAnimation, CYLTabButtonPressAnimation, CYLTabButtonBlockAnimation, CYLTabButtonFlipAnimation,
   CYLTabButtonFrameAnimation
 } from './src/main/ets/CYLTabButtonAnimation';
+export { CYLLiquidGlassCapsuleEdge } from './src/main/ets/CYLLiquidGlass';

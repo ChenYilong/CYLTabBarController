@@ -56,7 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func viewControllers() -> [UINavigationController]{
-        let home = UINavigationController(rootViewController: CYLBadgeHelperTableViewController())
+        let home = UINavigationController(rootViewController: CYLBadgeTagTableViewController())
         let connection = UINavigationController(rootViewController: ConnectionViewController())
         let message = UINavigationController(rootViewController: MessageViewController())
         let personal =   UINavigationController(rootViewController: PersonalViewController())

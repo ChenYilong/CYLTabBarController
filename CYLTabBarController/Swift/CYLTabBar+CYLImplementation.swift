@@ -7,8 +7,15 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 #if canImport(CYLAnimatedItem)
 import CYLAnimatedItem
+internal import CYLDeallocBlockExecutor
 #endif
 
 // [EN] The implementation of `CYLTabBar`, translated from Objective-C (docs/Swift-Migration.md, step 51). The class stays
@@ -536,12 +543,35 @@ extension CYLTabBar {
         }
     }
 
+    static let cylDidLayoutBlockKey = "cyl.core.didLayoutSubViewsBlock"
+
+    /**
+     [EN] `didLayoutSubViewsBlock` runs through CYLDeallocBlockExecutor: a keyed `.end` block of `viewDidLayoutSubviews`
+          (setting the block again replaces it, setting nil removes it), dispatched by `cylInvokeLayoutBlocks()` where the
+          property used to be called. The block is read when it runs, so it behaves as before.
+     [CN] `didLayoutSubViewsBlock` 通过 CYLDeallocBlockExecutor 执行：`viewDidLayoutSubviews` 上带 key 的 `.end` block（再次设置会替换，
+          设置为 nil 会移除），由 `cylInvokeLayoutBlocks()` 在原来调用该属性的位置派发。执行时才读取该 block，行为与之前相同。
+     */
+    func cylRegisterDidLayoutSubViewsBlock() {
+        cylSetManualLifecycleDispatch(true, for: [.viewDidLayoutSubviews], timings: [.end])
+        guard didLayoutSubViewsBlock != nil else {
+            _ = cylCancelLifecycleCallback(key: Self.cylDidLayoutBlockKey)
+            return
+        }
+        cylAddLifecycleCallback(for: .viewDidLayoutSubviews, timing: .end, key: Self.cylDidLayoutBlockKey) { bar, _, _ in
+            bar.didLayoutSubViewsBlock?(bar)
+        }
+    }
+
+    /// [EN] Runs the `.end` blocks of this tab bar's layout. [CN] 执行本 TabBar 布局的 `.end` block。
+    private func cylInvokeLayoutBlocks() {
+        cylInvokeLifecycleCallbacks(for: .viewDidLayoutSubviews, timing: .end)
+    }
+
     /// [EN] `-[UITabBarItem cyl_viewDidLayoutSubviewsBlock]` of every item, after the layout. [CN] 布局之后执行各 item 的 `cyl_viewDidLayoutSubviewsBlock`。
     private func cylRunItemLayoutBlocks() {
         for item in items ?? [] {
-            if let block = item.cyl_viewDidLayoutSubviewsBlock, let view = item.cyl_tabButton {
-                block(item, view)
-            }
+            item.cylInvokeLifecycleCallbacks(for: .viewDidLayoutSubviews, timing: .end)
         }
     }
 
@@ -569,7 +599,7 @@ extension CYLTabBar {
         cylCutOverflowingTabTitlesIfNeeded()
         if !isPlusButtonActive {
             cylLayoutTabButtonsWithItemEdgeInsetsIfNeeded()
-            didLayoutSubViewsBlock?(self)
+            cylInvokeLayoutBlocks()
             return
         }
         let addedToTabBar = storage.plusButton?.superview == self
@@ -582,7 +612,7 @@ extension CYLTabBar {
                 let childViewX = layout.leading + CGFloat(buttonIndex) * (cyl_tabBarItemWidth + layout.spacing)
                 cylChangeX(forChildView: childView, childViewX: childViewX, tabBarItemWidth: cyl_tabBarItemWidth, index: buttonIndex)
             }
-            didLayoutSubViewsBlock?(self)
+            cylInvokeLayoutBlocks()
             return
         }
         let plusButtonWidth = cylPlusButtonWidth()
@@ -634,7 +664,7 @@ extension CYLTabBar {
             // [EN] Only change childView's x and width; the y and height values stay the same
             cylChangeX(forChildView: childView, childViewX: childViewX, tabBarItemWidth: tabBarItemWidth, index: visibleTabIndex)
         }
-        didLayoutSubViewsBlock?(self)
+        cylInvokeLayoutBlocks()
     }
 
     /**

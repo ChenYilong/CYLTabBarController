@@ -1,1 +1,1 @@
-{ "usingComponents": {}, "navigationStyle": "custom" }
+{ "usingComponents": { "cyl-tag-list": "cyl-tag-list-miniprogram/cyl-tag-list/cyl-tag-list" }, "navigationStyle": "custom" }

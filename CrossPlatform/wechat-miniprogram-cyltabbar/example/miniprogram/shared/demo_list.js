@@ -783,7 +783,7 @@ module.exports = {
    "value": ""
   },
   {
-   "title": "20. Number (cyl_showBadgeValue:)",
+   "title": "20. Number (cylShowBadgeValue:)",
    "value": "8"
   },
   {
@@ -796,15 +796,15 @@ module.exports = {
    "maximum": 9
   },
   {
-   "title": "23. New (cyl_showBadgeValue:@\"new\")",
+   "title": "23. New (cylShowBadgeValue:@\"new\")",
    "value": "new"
   },
   {
-   "title": "24. NEW (cyl_showBadgeValue:@\"NEW\")",
+   "title": "24. NEW (cylShowBadgeValue:@\"NEW\")",
    "value": "NEW"
   },
   {
-   "title": "25. Other text (cyl_showBadgeValue:)",
+   "title": "25. Other text (cylShowBadgeValue:)",
    "value": "hot"
   },
   {
@@ -876,12 +876,12 @@ module.exports = {
    "18. Spring once (cyl_springAnimationForDuration:)": "18. 弹簧一次 (cyl_springAnimationForDuration:)",
    "19. Red dot (cyl_showBadge)": "19. 红点 (cyl_showBadge)",
    "2. Shake (forever)": "2. 抖动（持续）",
-   "20. Number (cyl_showBadgeValue:)": "20. 数字 (cyl_showBadgeValue:)",
+   "20. Number (cylShowBadgeValue:)": "20. 数字 (cylShowBadgeValue:)",
    "21. Number above maximum (cyl_badgeMaximumBadgeNumber)": "21. 超过最大值的数字 (cyl_badgeMaximumBadgeNumber)",
    "22. Custom maximum (9)": "22. 自定义最大值（9）",
-   "23. New (cyl_showBadgeValue:@\"new\")": "23. 新 (cyl_showBadgeValue:@\"new\")",
-   "24. NEW (cyl_showBadgeValue:@\"NEW\")": "24. 新 (cyl_showBadgeValue:@\"NEW\")",
-   "25. Other text (cyl_showBadgeValue:)": "25. 其他文字 (cyl_showBadgeValue:)",
+   "23. New (cylShowBadgeValue:@\"new\")": "23. 新 (cylShowBadgeValue:@\"new\")",
+   "24. NEW (cylShowBadgeValue:@\"NEW\")": "24. 新 (cylShowBadgeValue:@\"NEW\")",
+   "25. Other text (cylShowBadgeValue:)": "25. 其他文字 (cylShowBadgeValue:)",
    "26. Custom colors (cyl_badgeBackgroundColor / cyl_badgeTextColor)": "26. 自定义颜色 (cyl_badgeBackgroundColor / cyl_badgeTextColor)",
    "27. Custom font (cyl_badgeFont)": "27. 自定义字体 (cyl_badgeFont)",
    "28. Border (cyl_badgeBorderColor / cyl_badgeBorderWidth)": "28. 边框 (cyl_badgeBorderColor / cyl_badgeBorderWidth)",
@@ -997,12 +997,12 @@ module.exports = {
    "18. Spring once (cyl_springAnimationForDuration:)": "18. 彈簧一次 (cyl_springAnimationForDuration:)",
    "19. Red dot (cyl_showBadge)": "19. 紅點 (cyl_showBadge)",
    "2. Shake (forever)": "2. 抖動（持續）",
-   "20. Number (cyl_showBadgeValue:)": "20. 數字 (cyl_showBadgeValue:)",
+   "20. Number (cylShowBadgeValue:)": "20. 數字 (cylShowBadgeValue:)",
    "21. Number above maximum (cyl_badgeMaximumBadgeNumber)": "21. 超過最大值的數字 (cyl_badgeMaximumBadgeNumber)",
    "22. Custom maximum (9)": "22. 自訂最大值（9）",
-   "23. New (cyl_showBadgeValue:@\"new\")": "23. 新 (cyl_showBadgeValue:@\"new\")",
-   "24. NEW (cyl_showBadgeValue:@\"NEW\")": "24. 新 (cyl_showBadgeValue:@\"NEW\")",
-   "25. Other text (cyl_showBadgeValue:)": "25. 其他文字 (cyl_showBadgeValue:)",
+   "23. New (cylShowBadgeValue:@\"new\")": "23. 新 (cylShowBadgeValue:@\"new\")",
+   "24. NEW (cylShowBadgeValue:@\"NEW\")": "24. 新 (cylShowBadgeValue:@\"NEW\")",
+   "25. Other text (cylShowBadgeValue:)": "25. 其他文字 (cylShowBadgeValue:)",
    "26. Custom colors (cyl_badgeBackgroundColor / cyl_badgeTextColor)": "26. 自訂顏色 (cyl_badgeBackgroundColor / cyl_badgeTextColor)",
    "27. Custom font (cyl_badgeFont)": "27. 自訂字體 (cyl_badgeFont)",
    "28. Border (cyl_badgeBorderColor / cyl_badgeBorderWidth)": "28. 邊框 (cyl_badgeBorderColor / cyl_badgeBorderWidth)",

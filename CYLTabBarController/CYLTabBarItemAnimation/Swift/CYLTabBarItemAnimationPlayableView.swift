@@ -7,6 +7,9 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 // [EN] FIX: issue #415 — the playable view protocols of the `CYLTabBarItemAnimation` subspec, translated from Objective-C
 //      (CYLTabBarItemAnimation/CYLTabBarItemAnimationPlayableView.h; docs/Swift-Migration.md). It lives with the engine (subspec
 //      CYLAnimationEngine), not in Core, so the engine builds without Core. Their Objective-C names,
@@ -109,6 +112,21 @@ public protocol CYLTabBarItemAnimationPlayableView: NSObjectProtocol {
      */
     @objc(cyl_applyAnimationViewTintColor:selected:)
     optional func applyAnimationTintColor(_ color: UIColor?, selected: Bool)
+
+    /**
+     * [EN] Whether a pass is playing now; the player's `isPlaying`. A view that cannot tell leaves it out (the player answers NO).
+     * [CN] 当前是否正在播放一遍；对应播放器的 `isPlaying`。无法判断的视图不实现（播放器回答 NO）。
+     */
+    @objc(cyl_animationViewIsPlaying)
+    optional func isAnimationPlaying() -> Bool
+
+    /**
+     * [EN] The callback of the end of a play-once pass (not of a stop, not while looping); the player's `onEnded` comes
+     *      through it. A view that cannot tell leaves it out and never calls it.
+     * [CN] 只播放一次的一遍播放结束时的回调（停止时不调用，循环时不调用）；播放器的 `onEnded` 经由它触发。无法判断的视图不实现，也从不调用。
+     */
+    @objc(cyl_setAnimationViewEndHandler:)
+    optional func setAnimationEndHandler(_ handler: (() -> Void)?)
 }
 
 /**

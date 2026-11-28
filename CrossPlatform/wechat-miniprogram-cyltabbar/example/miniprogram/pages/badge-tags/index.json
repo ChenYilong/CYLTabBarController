@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "Badges",
+  "usingComponents": {
+    "cyl-animated-item": "cyl-tabbar-miniprogram/cyl-animated-item/index"
+  }
+}

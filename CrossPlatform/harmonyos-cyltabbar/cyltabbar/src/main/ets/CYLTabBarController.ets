@@ -1,15 +1,19 @@
-import { CYLTabBarStyleType, cyl_tabBarStyleModifier } from './CYLFlatDesignTabBar';
+import { CYLTabBarStyleType, cyl_tabBarStyleModifier, CYLFlatDesignDarkBackgroundColor } from './CYLFlatDesignTabBar';
 import { CYLTabBarDefaultHeight } from './CYLConstants';
-import { CYLLiquidGlassTokens, CYLLiquidGlassCapsuleModifier, CYLLiquidGlassContainerModifier } from './CYLLiquidGlass';
+import { CYLLiquidGlassTokens, CYLLiquidGlassCapsuleModifier, CYLLiquidGlassContainerModifier, CYLLiquidGlassCapsuleEdge } from './CYLLiquidGlass';
 import { curves, window, KeyboardAvoidMode } from '@kit.ArkUI';
 import { CYLTabBarItemAttributes, CYLTitleOffset } from './CYLTabBarItem';
 import { CYLPlusButton, cyl_liquidGlassContentDy } from './CYLPlusButton';
-import { CYLBadge, CYLBadgeView } from './CYLBadge';
+import { CYLBadge, CYLBadgeView, CYLBadgeAccessibility, cylBadgeAccessibilityText } from 'cylbadge';
 import { CYLLottieIcon } from './CYLLottieIcon';
 import { CYLSVGAView } from './svga/CYLSVGAView';
-import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint,
-  CYLTabBarAnimationTintTitle } from './CYLRiveTabBarItemAnimator';
-import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines } from 'cylanimateditem';
+import { CYLRiveIcon, cylRiveIsSupported, cylRiveFileAndOptions, CYLTabBarAnimationOptionTint, CYLTabBarAnimationOptionDarkTint } from './CYLRiveTabBarItemAnimator';
+import { CYLAnimatedItemView, CYLAnimatedItemAnimationContext, CYLAnimatedItemEngines, CYLAnimatedItemSVGA, cylSetPausesWhileUserScrolls,
+  CYLAnimatedItemTintInput, CYLAnimatedItemTintResult, cylAnimatedItemResolveTint, cylAnimatedItemEffectiveRenderingMode,
+  CYL_RENDERING_MODE_AUTOMATIC, CYLLiquidGlass, cylAnimatedItemDetectColorKind, CYLAnimatedItemSource, CYL_COLOR_COUNT_UNKNOWN } from 'cylanimateditem';
+import { CYLAnimatedItemLottie } from 'cylanimateditem_lottie';
+// TODO: replace the file: dependency (cyltabbar/oh-package.json5, a vendored copy) with the ohpm package after the library is published (owner's OK).
+import { LifecycleController } from 'cylutils';
 import { CYLLocalizedString, cyl_textOf } from './CYLLocalization';
 import { CYLTabButtonAnimation, CYLTabButtonProperty, CYLTabButtonView, CYLTabButtonViewImpl } from './CYLTabButtonAnimation';
 
@@ -25,11 +29,12 @@ import { CYLGIFImagePlayback, CYLGIFImageState, cylIsGIFImagePath, cylGIFDuratio
  * [EN] What a screen reader says for a badge (read as part of its host, e.g. "Messages, 99+ new messages"); '' none.
  * [CN] 屏幕阅读器读出的角标内容（作为宿主的一部分读出）；无角标时为 ''。
  */
-export function cyl_badgeAccessibilityText(badge: CYLBadge | undefined): string {
-  if (badge === undefined || !badge.cyl_isShowBadge()) {
-    return '';
-  }
-  const text = badge.cyl_displayText();
+export function badgeAccessibilityText(badge: CYLBadge | undefined): string {
+  return cylBadgeAccessibilityText(badge);
+}
+
+// [EN] The localized description of a badge, installed once for every `cylbadge` user in this app (the animated item reads it too). [CN] 角标的本地化描述，为本应用中所有 `cylbadge` 的使用者安装一次（动效 item 也读取它）。
+CYLBadgeAccessibility.textProvider = (text: string | null): string => {
   if (text === null) {
     return CYLLocalizedString('有新内容');
   }
@@ -37,7 +42,7 @@ export function cyl_badgeAccessibilityText(badge: CYLBadge | undefined): string 
     return CYLLocalizedString('%@ 条新消息', text);
   }
   return CYLLocalizedString('Badge: %@', text);
-}
+};
 
 /**
  * [EN] CYLTabBarMinimizeBehavior (issue #13): how the tab bar reacts when the current page scrolls.
@@ -65,6 +70,68 @@ export function cyl_reportScroll(delta: number): void {
 }
 
 let cylScrollCounter: number = 0;
+
+/** [EN] The owner the scroll moments are reported on. [CN] 滚动时机所属的对象。 */
+class CYLScrollSource {
+}
+
+let cylScrollLifecycle: LifecycleController<CYLScrollSource> | undefined = undefined;
+
+function cylScrollController(): LifecycleController<CYLScrollSource> {
+  if (cylScrollLifecycle === undefined) {
+    cylScrollLifecycle = new LifecycleController<CYLScrollSource>(new CYLScrollSource());
+  }
+  return cylScrollLifecycle;
+}
+
+/**
+ * [EN] The user starts to scroll a List / Scroll (call it from `onScrollStart`): the global observers hear
+ *      `scrollWillBeginDragging`, and with `cyl_pausesAnimationsWhileUserScrolls(true)` every animated tab icon pauses.
+ * [CN] 用户开始滚动 List / Scroll（在 `onScrollStart` 中调用）：全局观察者收到 `scrollWillBeginDragging`，
+ *      设置 `cyl_pausesAnimationsWhileUserScrolls(true)` 后所有动画 Tab 图标暂停。
+ */
+export function cyl_reportScrollStarted(): void {
+  cylScrollController().scrollStarted();
+}
+
+/**
+ * [EN] true: every animated tab icon pauses while the user scrolls (between `cyl_reportScrollStarted()` and `cyl_reportScrollStopped()`)
+ *      and resumes afterwards. Set it before the tab bar appears. [CN] 为 true 时，用户滚动期间（`cyl_reportScrollStarted()` 与
+ *      `cyl_reportScrollStopped()` 之间）所有动画 Tab 图标暂停，之后恢复。请在 TabBar 出现之前设置。
+ */
+export function cyl_pausesAnimationsWhileUserScrolls(enabled: boolean): void {
+  cylSetPausesWhileUserScrolls(enabled);
+}
+
+/** [EN] The scroll stopped (call it from `onScrollStop`): `scrollDidEndScrolling`, the icons resume. [CN] 滚动停止（在 `onScrollStop` 中调用）：恢复图标动画。 */
+export function cyl_reportScrollStopped(): void {
+  cylScrollController().scrollStopped();
+}
+
+/**
+ * [EN] The lifecycle of the tab bar controller that is on screen (the newest one that appeared and has not disappeared), so an app
+ *      can register a dealloc callback on it without a reference to the component (iOS `cylWillDealloc`; the example's
+ *      "Release the tab bar controller" row counts the callbacks that ran).
+ * [CN] 当前显示的 TabBarController 的生命周期（最新出现且尚未消失的那个），使 App 无需持有组件引用即可在其上登记 dealloc 回调
+ *      （对应 iOS 的 `cylWillDealloc`；示例的「Release the tab bar controller」行统计已执行的回调数）。
+ */
+let cylActiveLifecycle: LifecycleController<CYLTabBarController> | undefined = undefined;
+
+/**
+ * [EN] Registers a keyed dealloc callback on the tab bar controller on screen: it runs once, when the controller's page disappears
+ *      (`aboutToDisappear`), through CYLDeallocBlockExecutor. Returns false when no controller is on screen. A callback with the
+ *      same key replaces the earlier one.
+ * [CN] 在当前显示的 TabBarController 上登记带 key 的 dealloc 回调：控制器所在页面消失（`aboutToDisappear`）时通过
+ *      CYLDeallocBlockExecutor 只运行一次。没有显示中的控制器时返回 false。同 key 的回调会替换之前的回调。
+ */
+export function cyl_addTabBarControllerDeallocCallback(key: string, callback: () => void): boolean {
+  const lifecycle = cylActiveLifecycle;
+  if (lifecycle === undefined || lifecycle.isDetached) {
+    return false;
+  }
+  lifecycle.registry.addDeallocCallback<CYLTabBarController>((owner: CYLTabBarController) => callback(), { key: key });
+  return true;
+}
 
 /** [EN] AppStorage key bumped by cyl_restoreTabBar. [CN] cyl_restoreTabBar 递增的 AppStorage 键。 */
 export const CYLRestoreTabBarStorageKey: string = 'cyl_restoreTabBar';
@@ -269,7 +336,7 @@ export struct CYLTabBarController {
   /** [EN] CYLTabBarControllerPlusButton; a new object updates the plus button in place (issue list #7). [CN] 新对象即原地更新加号按钮。 */
   @Prop plusButton: CYLPlusButton | undefined = undefined;
   @Link @Watch('cylOnSelectedIndexChange') selectedIndex: number;
-  /** [EN] The badge of each tab (-[UIView cyl_showBadgeValue:] on its tab button); created when unset. [CN] 每个 Tab 的角标；未设置时自动创建。 */
+  /** [EN] The badge of each tab (-[UIView showBadgeValue:] on its tab button); created when unset. [CN] 每个 Tab 的角标；未设置时自动创建。 */
   @State @Watch('cylOnBadgesChange') badges: CYLBadge[] = [];
   /** [EN] The plus button's badge. [CN] 加号按钮的角标。 */
   @State plusButtonBadge: CYLBadge = new CYLBadge();
@@ -290,9 +357,18 @@ export struct CYLTabBarController {
    * [EN] CYLTabBarControllerSelectedIconColor: the same for the selected icon. [CN] 选中图标的颜色。
    */
   @Prop selectedIconColor: ResourceColor | undefined = undefined;
+  /**
+   * [EN] CYLTabBarControllerIconRenderingMode: the static icon rendering mode ('template' / 'original' / 'automatic') of every tab without its
+   *      own `iconRenderingMode`; undefined = 'automatic'. [CN] 未单独设置 `iconRenderingMode` 的 Tab 的静态图标渲染方式；未设置时为 'automatic'。
+   */
+  @Prop iconRenderingMode: string | undefined = undefined;
   plusButtonTitleSelectedColor?: ResourceColor;
-  /** [EN] cyl_tabBarBackgroundColor / CYLTabBarBackgroundColor. [CN] TabBar 背景色。 */
-  @Prop tabBarBackgroundColor: ResourceColor = '#F8F8F8';
+  /**
+   * [EN] cyl_tabBarBackgroundColor / CYLTabBarBackgroundColor of the classic bar. '' (default) = unset: '#F8F8F8' light, '#1C1C1E' dark, following the color
+   *      mode (owner decision D3, 2026-11-27; `cylTabBarBackgroundColor`); any other value is used as it is.
+   * [CN] 经典 TabBar 的背景色。''（默认）表示未设置：浅色 '#F8F8F8'、深色 '#1C1C1E'，跟随颜色模式（负责人决定 D3，2026-11-27；`cylTabBarBackgroundColor`）；其他值按原样使用。
+   */
+  @Prop tabBarBackgroundColor: ResourceColor = '';
   /** [EN] cyl_tabBarShadowColor / CYLTabBarShadowColor: the line on top of the bar; transparent hides it. [CN] TabBar 顶部分割线颜色；透明即隐藏。 */
   @Prop tabBarShadowColor: ResourceColor = '#1F000000';
   /**
@@ -351,6 +427,9 @@ export struct CYLTabBarController {
   private cylGIFLoading: Set<string> = new Set();
   private cylGIFDescriptors: Map<number, CYLGIFImageDescriptor> = new Map();
   @State private cylGIFRevision: number = 0;
+  /** [EN] The one-colour detection of each GIF tab file (the item's detection, cached per file); the revision re-renders when a result arrives. [CN] 每个 GIF Tab 文件的单色检测结果（与条目相同的检测，按文件缓存）；结果到达时通过 revision 重新渲染。 */
+  private cylGifColorKinds: Map<string, string> = new Map<string, string>();
+  @State private cylGifColorKindRevision: number = 0;
   /**
    * [EN] -cyl_coverVisiableTabImageViewOrTabButton:...: an image covering a whole tab button (index -> image), as the
    *      Example's Taobao-style Home cover; undefined: none.
@@ -478,6 +557,13 @@ export struct CYLTabBarController {
    */
   @State private keyboardCoversTabBar: boolean = false;
   private cylKeyboardWindow: window.Window | undefined = undefined;
+  /**
+   * [EN] CYLDeallocBlockExecutor's controller of this page (iOS: the layout block; here the keyboard listener, as a keyed
+   *      dealloc callback `cyl.core.keyboardListener`, run by `aboutToDisappear()`).
+   * [CN] 本控制器的 CYLDeallocBlockExecutor 控制器（iOS 用于布局 block；这里用于键盘监听，作为带 key 的 dealloc 回调
+   *      `cyl.core.keyboardListener`，由 `aboutToDisappear()` 运行）。
+   */
+  private cylLifecycle: LifecycleController<CYLTabBarController> | undefined = undefined;
   private cylKeyboardListener: (height: number) => void = (height: number) => {
     let mode = KeyboardAvoidMode.OFFSET;
     try {
@@ -503,9 +589,15 @@ export struct CYLTabBarController {
   aboutToAppear(): void {
     // [EN] cyltabbar plays Lottie (@ohos/lottie), Rive (@ohos/rive) and SVGA (its own player): CYLAnimatedItemView draws them.
     // [CN] cyltabbar 播放 Lottie、Rive 与 SVGA（自带播放器）：由 CYLAnimatedItemView 绘制。
-    ['Lottie', 'Rive', 'SVGA'].forEach((type: string) => CYLAnimatedItemEngines.register(type));
-    // [EN] Debug builds installed with the x86_64 debug engine kit: Rive also plays on the x86_64 emulator.
-    // [CN] 安装了 x86_64 调试引擎包的 debug 构建：Rive 也能在 x86_64 模拟器上播放。
+    this.cylLifecycle = new LifecycleController<CYLTabBarController>(this);
+    this.cylLifecycle.registry.addLifecycleCallback<CYLTabBarController>('didReceiveMemoryWarning', (owner: CYLTabBarController) => owner.cylUnloadOnMemoryWarning(), { key: 'cyl.core.memoryWarning' });
+    // [EN] Lottie and SVGA play through the component's engines (cylanimateditem_lottie, cylanimateditem); Rive through
+    //      cyltabbar's view. [CN] Lottie 与 SVGA 通过组件的引擎播放；Rive 通过 cyltabbar 的视图播放。
+    CYLAnimatedItemLottie.register();
+    CYLAnimatedItemSVGA.register();
+    ['Rive'].forEach((type: string) => CYLAnimatedItemEngines.register(type));
+    // [EN] A HAP installed with the x86_64 debug engine kit: Rive also plays on the x86_64 emulator.
+    // [CN] 安装了 x86_64 调试引擎包的 HAP：Rive 也能在 x86_64 模拟器上播放。
     CYLAnimatedItemEngines.loadX86_64DebugEngines(this.getUIContext().getHostContext());
     this.loaded = [this.selectedIndex];
     this.cylGIFPlayback.loops = this.tabBarItemAnimationLoops;
@@ -513,12 +605,35 @@ export struct CYLTabBarController {
     while (this.badges.length < this.tabBarItemsAttributes.length) {
       this.badges.push(new CYLBadge());
     }
+    // [EN] The badges post cyl.badge.didShow / didClear to the observers of this controller and of LifecycleCenter.
+    // [CN] 角标把 cyl.badge.didShow / didClear 发给本控制器与 LifecycleCenter 的观察者。
+    const poster: (name: string, info: Record<string, Object>) => void = (name: string, info: Record<string, Object>): void => {
+      this.cylLifecycle?.registry.postLifecycleEvent(name, info);
+    };
+    this.badges.forEach((badge: CYLBadge) => {
+      badge.eventPoster = poster;
+    });
+    this.plusButtonBadge.eventPoster = poster;
     this.cylObserveKeyboard();
     // [EN] The Liquid Glass lens starts on the selected slot. [CN] 液态玻璃镜片从选中槽位开始。
     this.glassLensPosition = this.cylGlassSelectedSlot();
+    this.cylLifecycle.aboutToAppear();
+    cylActiveLifecycle = this.cylLifecycle;
   }
 
   aboutToDisappear(): void {
+    // [EN] The callbacks registered through cyl_addTabBarControllerDeallocCallback run here. [CN] 通过 cyl_addTabBarControllerDeallocCallback 登记的回调在此运行。
+    this.cylLifecycle?.aboutToDisappear();
+    if (cylActiveLifecycle === this.cylLifecycle) {
+      cylActiveLifecycle = undefined;
+    }
+  }
+
+  /**
+   * [EN] Removes the keyboard listener (the keyed dealloc callback `cyl.core.keyboardListener`).
+   * [CN] 移除键盘监听（带 key 的 dealloc 回调 `cyl.core.keyboardListener`）。
+   */
+  private cylRemoveKeyboardListener(): void {
     try {
       this.cylKeyboardWindow?.off('keyboardHeightChange', this.cylKeyboardListener);
     } catch (error) {
@@ -538,6 +653,14 @@ export struct CYLTabBarController {
     window.getLastWindow(context).then((found: window.Window) => {
       this.cylKeyboardWindow = found;
       found.on('keyboardHeightChange', this.cylKeyboardListener);
+      // [EN] If the component already disappeared (the window came late), the page is already torn down, so a new callback would never run: remove now.
+      // [CN] 若组件已消失（窗口回调较晚），此时新回调不会再执行：立即移除。
+      const lifecycle = this.cylLifecycle;
+      if (lifecycle === undefined || lifecycle.isDetached) {
+        this.cylRemoveKeyboardListener();
+      } else {
+        lifecycle.registry.addDeallocCallback<CYLTabBarController>((owner: CYLTabBarController) => owner.cylRemoveKeyboardListener(), { key: 'cyl.core.keyboardListener' });
+      }
       try {
         const area = found.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR);
         this.glassGestureBarHeight = this.getUIContext().px2vp(area.bottomRect.height);
@@ -724,12 +847,13 @@ export struct CYLTabBarController {
       .width('100%')
       .height('100%')
       .borderRadius(this.cylGlassRowHeight() / 2)
+      // [EN] The light is `cylanimateditem`'s (CYLLiquidGlass), the same as every tag and section card. [CN] 光来自 `cylanimateditem`（CYLLiquidGlass 的平板表面），与标签列表的分组卡片相同。
       .linearGradient({
         direction: GradientDirection.Bottom,
-        colors: [['#40FFFFFF', 0], ['#0AFFFFFF', 0.35], ['#00FFFFFF', 0.6], ['#14FFFFFF', 1]],
+        colors: CYLLiquidGlassCapsuleEdge.sheen(this.colorMode === 'dark'),
       })
       // [EN] The glass rim, under the tabs. [CN] 玻璃亮边，位于 Tab 之下。
-      .border({ width: 0.5, color: this.colorMode === 'dark' ? '#40FFFFFF' : '#99FFFFFF' })
+      .border({ width: CYLLiquidGlassCapsuleEdge.rimWidth(), color: CYLLiquidGlassCapsuleEdge.rim(this.colorMode === 'dark') })
       .position({ x: 0, y: 0 })
       .hitTestBehavior(HitTestMode.None)
   }
@@ -825,6 +949,19 @@ export struct CYLTabBarController {
   }
 
   cylOnMemoryWarning(): void {
+    // [EN] Through CYLDeallocBlockExecutor, as on iOS: the keyed `afterSuper` block `cyl.core.memoryWarning` does the work.
+    //      `cyl_simulateMemoryWarning` and a real warning (`UIAbility.onMemoryLevel` calling it) both come here; level 2 is
+    //      MEMORY_LEVEL_CRITICAL, the level the controller treats as a warning.
+    // [CN] 与 iOS 相同，经由 CYLDeallocBlockExecutor：带 key 的 `afterSuper` block `cyl.core.memoryWarning` 完成工作。
+    //      `cyl_simulateMemoryWarning` 与真实警告（`UIAbility.onMemoryLevel` 调用它）都经过这里；级别 2 是 MEMORY_LEVEL_CRITICAL。
+    if (this.cylLifecycle === undefined) {
+      this.cylUnloadOnMemoryWarning();
+      return;
+    }
+    this.cylLifecycle.memoryLevel(2);
+  }
+
+  private cylUnloadOnMemoryWarning(): void {
     this.cylRestoreFromScroll();
     let unloaded: number[] = [];
     if (this.unloadsUnselectedViewsOnMemoryWarning) {
@@ -1235,7 +1372,7 @@ export struct CYLTabBarController {
     const item = this.tabBarItemsAttributes[index];
     const title = cyl_textOf(this.selectedIndex === index ? (item.selectedTitle ?? item.title) : item.title);
     const label = title.length > 0 ? title : (item.identifier ?? `${index + 1}`);
-    const badge = cyl_badgeAccessibilityText(this.badges[index]);
+    const badge = badgeAccessibilityText(this.badges[index]);
     return badge.length > 0 ? CYLLocalizedString('%@, %@', label, badge) : label;
   }
 
@@ -1262,7 +1399,7 @@ export struct CYLTabBarController {
   cylPlusAccessibilityLabel(): string {
     const title = cyl_textOf(this.plusButton?.title);
     const label = title.length > 0 ? title : CYLLocalizedString('加号按钮');
-    const badge = cyl_badgeAccessibilityText(this.plusButtonBadge);
+    const badge = badgeAccessibilityText(this.plusButtonBadge);
     return badge.length > 0 ? CYLLocalizedString('%@, %@', label, badge) : label;
   }
 
@@ -1389,52 +1526,111 @@ export struct CYLTabBarController {
   }
 
   /**
-   * [EN] The color a tab's animation is drawn in (`CYLTabBarAnimationOptionTint` in its path's query): "title" = the
-   *      tab's icon color for its state, as iOS draws a template image (the item's `iconColor` / `selectedIconColor`, then
-   *      the controller's, then the title color); a fixed color, with `CYLTabBarAnimationOptionDarkTint` in dark mode; '' = the
-   *      file's own colors.
-   * [CN] Tab 动画的绘制颜色（路径查询参数中的 `CYLTabBarAnimationOptionTint`）："title" = Tab 当前状态的图标颜色，与 iOS 模板图片一致（先 Tab 的
-   *      `iconColor` / `selectedIconColor`，再控制器的，最后标题颜色）；固定颜色，深色模式下使用
-   *      `CYLTabBarAnimationOptionDarkTint`；'' = 文件自身的颜色。
+   * [EN] A tab's `tint` or `darkTint` option in the query of `path` (`CYLTabBarAnimationOptionTint` / `CYLTabBarAnimationOptionDarkTint`),
+   *      as written; '' for none. The component resolves it (`CYLAnimatedItemView.animationTint` / `animationDarkTint`).
+   * [CN] `path` 查询参数中 Tab 的 `tint` 或 `darkTint` 选项（`CYLTabBarAnimationOptionTint` / `CYLTabBarAnimationOptionDarkTint`），原样返回；没有时为 ''。
+   *      由组件解析（`CYLAnimatedItemView.animationTint` / `animationDarkTint`）。
    */
-  cylTabAnimationTint(index: number): ResourceColor {
-    return this.cylTintForPath(index, this.cylTabAnimationPath(index));
-  }
-
-  /**
-   * [EN] The tint of `path`'s options for tab `index` (see `cylTabAnimationTint`); '' for none.
-   * [CN] Tab `index` 的 `path` 选项中的着色（见 `cylTabAnimationTint`）；没有时为 ''。
-   */
-  cylTintForPath(index: number, path: string | undefined): ResourceColor {
+  cylTabTintOption(path: string | undefined, key: string): string {
     if (path === undefined) {
       return '';
     }
-    const options = cylRiveFileAndOptions(path)[1];
-    const tint = (options[CYLTabBarAnimationOptionTint] ?? '').trim();
-    if (tint.length === 0) {
+    return (cylRiveFileAndOptions(path)[1][key] ?? '').trim();
+  }
+
+  /**
+   * [EN] The `animationRenderingMode` a tab gives its animated item (tint spec v2, section 6, changed by the owner on 2026-11-27 as iOS and Android):
+   *      always 'automatic': a tab URL with no `tint` and no `renderingMode` option tints a ONE-colour Lottie / GIF with the tab color and keeps every
+   *      other file's colors; a `tint` or `renderingMode=` option of the URL decides as for every animation. (It was 'alwaysOriginal' without options.)
+   * [CN] Tab 交给其动效条目的 `animationRenderingMode`（着色规范 v2 第 6 节，负责人于 2026-11-27 修改，与 iOS、Android 一致）：始终为 'automatic'：没有 `tint`
+   *      也没有 `renderingMode` 选项的 Tab URL 以 Tab 颜色给「单色」Lottie / GIF 着色，其他文件保持自身颜色；URL 的 `tint` 或 `renderingMode=` 选项与其他动画一样决定。
+   *      （之前没有选项时为 'alwaysOriginal'。）
+   */
+  cylTabRenderingMode(path: string | undefined): string {
+    return CYL_RENDERING_MODE_AUTOMATIC;
+  }
+
+  /**
+   * [EN] The tab's icon color while unselected: the item's `iconColor`, then the controller's, then the title color. The animated item
+   *      takes it as `iconColor`. [CN] Tab 未选中时的图标颜色：先 Tab 的 `iconColor`，再控制器的，最后标题颜色。动效条目以此作为 `iconColor`。
+   */
+  cylTabNormalIconColor(index: number): ResourceColor {
+    const item = this.tabBarItemsAttributes[index];
+    return item.iconColor ?? this.iconColor ?? item.titleColor ?? this.unselectedColor;
+  }
+
+  /**
+   * [EN] The tab's icon color while selected: the item's `selectedIconColor`, then the controller's, then the selected title color. The
+   *      animated item takes it as `selectedIconColor`. [CN] Tab 选中时的图标颜色：先 Tab 的 `selectedIconColor`，再控制器的，最后选中标题颜色。
+   *      动效条目以此作为 `selectedIconColor`。
+   */
+  cylTabSelectedIconColor(index: number): ResourceColor {
+    const item = this.tabBarItemsAttributes[index];
+    return item.selectedIconColor ?? this.selectedIconColor ?? item.selectedTitleColor ?? this.tintColor;
+  }
+
+  /**
+   * [EN] The icon colors the animated item gets as `iconColor` / `selectedIconColor`: the tab's title-based ones when its animation path has
+   *      a `tint` option, '' otherwise (an untinted item keeps its static image's own colors). [CN] 动效条目的 `iconColor` / `selectedIconColor`：
+   *      动画路径有 `tint` 选项时为 Tab 基于标题的颜色，否则为 ''（未着色的条目保持静态图片自身颜色）。
+   */
+  cylTabItemIconColor(index: number, selected: boolean): ResourceColor {
+    if (this.cylTabTintOption(this.cylTabAnimationPath(index), CYLTabBarAnimationOptionTint) === '') {
       return '';
     }
-    if (tint === CYLTabBarAnimationTintTitle) {
-      const item = this.tabBarItemsAttributes[index];
-      return this.selectedIndex === index
-        ? (item.selectedIconColor ?? this.selectedIconColor ?? item.selectedTitleColor ?? this.tintColor)
-        : (item.iconColor ?? this.iconColor ?? item.titleColor ?? this.unselectedColor);
-    }
-    const dark = (options[CYLTabBarAnimationOptionDarkTint] ?? '').trim();
-    return this.colorMode === 'dark' && dark.length > 0 ? dark : tint;
+    return selected ? this.cylTabSelectedIconColor(index) : this.cylTabNormalIconColor(index);
   }
 
   /**
    * [EN] The color filter of a GIF tab icon with the `tint` option (`gifFilePath` "gif/a.gif?tint=title"): RGB = the tint,
    *      alpha = the GIF's alpha times the tint's, the same as the SRC_IN tint layer of the other engines
-   *      (`CYLAnimatedItemView.animationTintColor`), since a GIF is drawn as an Image, not an engine view. The identity
+   *      (`CYLAnimatedItemView.animationTint`), resolved by the same `cylAnimatedItemResolveTint`, since a GIF is drawn as an Image, not an engine view. The identity
    *      matrix without a tint (or with a color that is not "#RRGGBB" / "#AARRGGBB"): the GIF keeps its own colors.
    * [CN] 带 `tint` 选项的 GIF Tab 图标（`gifFilePath` "gif/a.gif?tint=title"）的颜色滤镜：RGB = 着色，alpha = GIF 的 alpha 乘以着色的 alpha，
-   *      与其他引擎的 SRC_IN 着色层（`CYLAnimatedItemView.animationTintColor`）相同，因为 GIF 由 Image 绘制而不是引擎视图。没有着色（或颜色
+   *      与其他引擎的 SRC_IN 着色层（`CYLAnimatedItemView.animationTint`）相同，由同一个 `cylAnimatedItemResolveTint` 解析，因为 GIF 由 Image 绘制而不是引擎视图。没有着色（或颜色
    *      不是 "#RRGGBB" / "#AARRGGBB"）时为单位矩阵：GIF 保持自身颜色。
    */
+  /**
+   * [EN] The detected kind of a GIF tab file (`CYL_COLOR_COUNT_ONE`, `..._MULTI`, `..._UNKNOWN`), detected once per file in the background; unknown until the
+   *      result arrives (the GIF keeps its colors meanwhile), then the bar re-renders. [CN] GIF Tab 文件的检测结果，每个文件在后台检测一次；结果到达前为 unknown
+   *      （此时 GIF 保持自身颜色），之后 TabBar 重新渲染。
+   */
+  private cylGifColorKindOf(path: string | undefined): string {
+    if (path === undefined || path === '' || this.cylGifColorKindRevision < 0) {
+      return CYL_COLOR_COUNT_UNKNOWN;
+    }
+    const file: string = path.split('#')[0].split('?')[0];
+    const known: string | undefined = this.cylGifColorKinds.get(file);
+    if (known !== undefined) {
+      return known;
+    }
+    this.cylGifColorKinds.set(file, CYL_COLOR_COUNT_UNKNOWN);
+    cylAnimatedItemDetectColorKind(CYLAnimatedItemSource.parse(path), this.getUIContext().getHostContext()).then((kind: string) => {
+      this.cylGifColorKinds.set(file, kind);
+      this.cylGifColorKindRevision++;
+    });
+    return CYL_COLOR_COUNT_UNKNOWN;
+  }
+
   cylGifColorFilter(index: number): ColorFilter {
-    return cylTintColorFilter(this.cylTintForPath(index, this.tabBarItemsAttributes[index].gifFilePath));
+    // [EN] A GIF is an Image, not an animated item: the component's resolver, with the same inputs the item gets. [CN] GIF 是 Image 而不是
+    //      动效条目：使用组件的解析函数，输入与条目相同。
+    const path = this.tabBarItemsAttributes[index].gifFilePath;
+    const input = new CYLAnimatedItemTintInput();
+    input.optionTint = this.cylTabTintOption(path, CYLTabBarAnimationOptionTint);
+    input.optionDarkTint = this.cylTabTintOption(path, CYLTabBarAnimationOptionDarkTint);
+    input.selected = this.selectedIndex === index;
+    input.dark = this.colorMode === 'dark';
+    input.hasSelectedIconColor = true;
+    // [EN] No option: automatic (owner decision 2026-11-27), so a ONE-colour GIF follows the tab color: the file's kind is detected like the item's.
+    // [CN] 没有选项：automatic（负责人决定，2026-11-27），因此「单色」GIF 跟随 Tab 颜色：文件类型的检测与条目相同。
+    input.renderingMode = cylAnimatedItemEffectiveRenderingMode(this.cylTabRenderingMode(path), this.cylTabTintOption(path, 'renderingMode'), '');
+    input.colorKind = this.cylGifColorKindOf(path);
+    const result: CYLAnimatedItemTintResult = cylAnimatedItemResolveTint(input);
+    if (result.kind === 'icon') {
+      return cylTintColorFilter(this.selectedIndex === index ? this.cylTabSelectedIconColor(index) : this.cylTabNormalIconColor(index));
+    }
+    return cylTintColorFilter(result.color);
   }
 
   /**
@@ -1449,10 +1645,32 @@ export struct CYLTabBarController {
     if (item.gifFilePath !== undefined) {
       return this.cylGifColorFilter(index);
     }
-    const color = this.selectedIndex === index
-      ? (item.selectedIconColor ?? this.selectedIconColor)
-      : (item.iconColor ?? this.iconColor);
-    return cylTintColorFilter(color ?? '');
+    return cylTintColorFilter(this.cylStaticTintOf(index));
+  }
+
+  /** [EN] The tint of a static tab icon for its state ('' none). [CN] 静态 Tab 图标在其状态下的着色（'' 为无）。 */
+  private cylStaticTintOf(index: number): ResourceColor {
+    const item = this.tabBarItemsAttributes[index];
+    const selected = this.selectedIndex === index;
+    const explicit = selected ? (item.selectedIconColor ?? this.selectedIconColor) : (item.iconColor ?? this.iconColor);
+    const fallback = selected ? this.cylTabSelectedIconColor(index) : this.cylTabNormalIconColor(index);
+    // [EN] FlatDesign (owner decision D2, 2026-11-27): an unselected icon without an icon color takes the unselected tint, as iOS flat and Android.
+    // [CN] 扁平样式（负责人决定 D2，2026-11-27）：没有图标颜色的未选中图标取未选中着色，与 iOS 扁平样式、Android 一致。
+    const flatUnselected: boolean = !selected && this.tabBarStyleType === CYLTabBarStyleType.FlatDesign;
+    return cylStaticIconTintColor(item.iconRenderingMode ?? this.iconRenderingMode, explicit, fallback, flatUnselected);
+  }
+
+  /**
+   * [EN] The fill color of a tab icon Image (Image.fillColor): the static icon's tint, so an SVG whose shapes use fill attributes is tinted
+   *      too (colorFilter alone left it untouched); undefined (no fill color) for a GIF and for an untinted icon, which keep their colors.
+   * [CN] Tab 图标 Image 的填充色（Image.fillColor）：静态图标的着色，使用 fill 属性的 SVG 也被着色（只用 colorFilter 时不着色）；
+   *      GIF 与未着色的图标为 undefined（不设置），保持原色。
+   */
+  cylIconFillColor(index: number): ResourceColor | undefined {
+    if (this.tabBarItemsAttributes[index].gifFilePath !== undefined) {
+      return undefined;
+    }
+    return cylIconFillColorOf(this.cylStaticTintOf(index));
   }
 
   cylTabAnimationSize(index: number): number {
@@ -1464,6 +1682,23 @@ export struct CYLTabBarController {
       return item.riveSize ?? this.imageSize;
     }
     return item.svgaSize ?? this.imageSize;
+  }
+
+  /**
+   * [EN] A Lottie tab (the first branch of `cylTabEngine`): played by cylanimateditem_lottie through the component.
+   * [CN] Lottie Tab（`cylTabEngine` 的第一个分支）：由 cylanimateditem_lottie 经组件播放。
+   */
+  cylTabIsLottie(index: number): boolean {
+    const item = this.tabBarItemsAttributes[index];
+    return item.lottieFilePath !== undefined && item.gifFilePath === undefined && item.imageURL === undefined;
+  }
+
+  /**
+   * [EN] A tab played by an engine of the component (Lottie, or SVGA: the third branch of `cylTabEngine`).
+   * [CN] 由组件引擎播放的 Tab（Lottie，或 SVGA：`cylTabEngine` 的第三个分支）。
+   */
+  cylTabUsesEngine(index: number): boolean {
+    return this.cylTabIsLottie(index) || (this.cylRivePath(index) === undefined && this.cylSVGAPath(index) !== undefined);
   }
 
   /** [EN] The engine view CYLAnimatedItemView shows for a tab. [CN] CYLAnimatedItemView 为 Tab 显示的引擎视图。 */
@@ -1534,13 +1769,40 @@ export struct CYLTabBarController {
           // [EN] The animated icon is CYLAnimatedItemView (docs/Animated-Item.md, TODO 5): the static image (else the
           //      placeholder) until the engine view reports it is drawn, and again when it fails.
           // [CN] 动效图标由 CYLAnimatedItemView 绘制（docs/Animated-Item.md，TODO 5）：引擎视图报告绘制完成之前，以及失败之后，显示静态图片（没有时为占位图）。
+          if (this.cylTabUsesEngine(index)) {
+            // [EN] A Lottie or SVGA tab: the component's own engine view (no animationBuilder), with the same playback.
+            // [CN] Lottie 或 SVGA Tab：组件自身的引擎视图（不传 animationBuilder），播放设置相同。
+            CYLAnimatedItemView({
+              isBare: true,
+              // [EN] The tab bar colors its own icons. [CN] TabBar 自行为图标着色。
+              tintsStaticImageAutomatically: false,
+              image: this.cylIcon(index) ?? '',
+              animationUrl: this.cylTabAnimationPath(index),
+              iconSize: this.cylTabAnimationSize(index),
+              isItemSelected: this.selectedIndex === index,
+              animationTint: this.cylTabTintOption(this.cylTabAnimationPath(index), CYLTabBarAnimationOptionTint),
+              animationDarkTint: this.cylTabTintOption(this.cylTabAnimationPath(index), CYLTabBarAnimationOptionDarkTint),
+              iconColor: this.cylTabItemIconColor(index, false),
+              selectedIconColor: this.cylTabItemIconColor(index, true),
+              animationRenderingMode: this.cylTabRenderingMode(this.cylTabAnimationPath(index)),
+              animationSpeed: this.tabBarItemAnimationSpeed,
+              animationLoops: this.tabBarItemAnimationLoops,
+              animationRestartToken: this.replayTokens[index] ?? 0,
+            })
+          } else {
           CYLAnimatedItemView({
             isBare: true,
+            // [EN] The tab bar colors its own icons. [CN] TabBar 自行为图标着色。
+            tintsStaticImageAutomatically: false,
             image: this.cylIcon(index) ?? '',
             animationUrl: this.cylTabAnimationPath(index),
             iconSize: this.cylTabAnimationSize(index),
             isItemSelected: this.selectedIndex === index,
-            animationTintColor: this.cylTabAnimationTint(index),
+            animationTint: this.cylTabTintOption(this.cylTabAnimationPath(index), CYLTabBarAnimationOptionTint),
+            animationDarkTint: this.cylTabTintOption(this.cylTabAnimationPath(index), CYLTabBarAnimationOptionDarkTint),
+            iconColor: this.cylTabItemIconColor(index, false),
+            selectedIconColor: this.cylTabItemIconColor(index, true),
+            animationRenderingMode: this.cylTabRenderingMode(this.cylTabAnimationPath(index)),
             // [EN] The playback goes through the component, which hands it to the engine in its context.
             // [CN] 播放设置经由组件传递，组件通过 context 交给引擎。
             animationSpeed: this.tabBarItemAnimationSpeed,
@@ -1550,6 +1812,7 @@ export struct CYLTabBarController {
               this.cylTabEngine(index, context)
             },
           })
+          }
         } else {
         Image(this.tapFrameImages[index] ?? this.cylGIFImageSource(index) ?? this.cylIcon(index))
           .width(this.imageSize)
@@ -1557,6 +1820,8 @@ export struct CYLTabBarController {
           .objectFit(ImageFit.Contain)
           // [EN] A GIF's `tint` option, or a static icon's icon color (identity otherwise). [CN] GIF 的 `tint` 选项，或静态图标的图标颜色（否则为单位矩阵）。
           .colorFilter(this.cylIconColorFilter(index))
+          // [EN] An SVG with fill attributes is tinted by fillColor (colorFilter does not reach it). [CN] 使用 fill 的 SVG 由 fillColor 着色（colorFilter 对其无效）。
+          .fillColor(this.cylIconFillColor(index))
           .scale({ x: this.tapScale[index] ?? 1, y: this.tapScale[index] ?? 1 })
           .rotate({ z: 1, angle: this.tapAngle[index] ?? 0 })
           .rotate({ y: 1, angle: this.tapFlip[index] ?? 0 })
@@ -1685,10 +1950,10 @@ export struct CYLTabBarController {
     Column() {
       Stack() {
         // [EN] The image and its badge in a box of the image's size: the badge is placed from the image's top-left, as iOS
-        //      places it on the plus button (center at its top-right corner plus cyl_badgeCenterOffset), not from the slot,
+        //      places it on the plus button (center at its top-right corner plus cylBadgeCenterOffset), not from the slot,
         //      which is wider than the image (the badge was 8 to 15 vp inside the image).
         // [CN] 图片与角标放在与图片等大的盒子中：角标以图片左上角为原点定位，与 iOS 在加号按钮上的位置相同（中心位于右上角再加
-        //      cyl_badgeCenterOffset），而不是以比图片更宽的槽位为原点（此前角标落在图片内侧 8 到 15 vp）。
+        //      cylBadgeCenterOffset），而不是以比图片更宽的槽位为原点（此前角标落在图片内侧 8 到 15 vp）。
         Stack() {
           if (this.plusButton?.backgroundImage !== undefined) {
             Image(this.plusButton.backgroundImage)
@@ -1900,7 +2165,7 @@ export struct CYLTabBarController {
         // [CN] 液态玻璃：CYLLiquidGlass.ets 的玻璃胶囊（模糊、barTintColor 或浅色玻璃着色、阴影、描边）。
         .attributeModifier(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass
           ? new CYLLiquidGlassCapsuleModifier(this.barTintColor, this.cylGlassRowHeight(), 3, this.colorMode === 'dark')
-          : cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor, this.tabBarHeight, this.barBackgroundImage))
+          : cyl_tabBarStyleModifier(this.tabBarStyleType, this.barTintColor, this.tabBarHeight, this.barBackgroundImage, this.colorMode === 'dark'))
         .padding({ left: this.itemEdgeInsets.left, right: this.itemEdgeInsets.right })
         .expandSafeArea(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? [] : [SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         .id('cyl-tab-bar')
@@ -1919,7 +2184,8 @@ export struct CYLTabBarController {
         // [EN] The bar color continues under the gesture bar (classic and FlatDesign); clear around the Liquid Glass capsule.
         // [CN] 经典与扁平样式的 TabBar 颜色延伸到手势条下方；液态玻璃胶囊四周透明。
         .backgroundColor(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? Color.Transparent
-          : (this.tabBarStyleType === CYLTabBarStyleType.FlatDesign ? (this.barTintColor ?? '#F9F9F9') : this.tabBarBackgroundColor))
+          : (this.tabBarStyleType === CYLTabBarStyleType.FlatDesign ? (this.barTintColor ?? (this.colorMode === 'dark' ? CYLFlatDesignDarkBackgroundColor : '#F9F9F9'))
+            : cylTabBarBackgroundColor(this.tabBarBackgroundColor, this.colorMode === 'dark')))
         .expandSafeArea(this.tabBarStyleType === CYLTabBarStyleType.LiquidGlass ? [] : [SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
         // [EN] Issue list #31: out of the layout while a resizing keyboard is up, so it never moves above the keyboard.
         // [CN] 问题清单 #31：缩小页面的键盘弹出时退出布局，因此不会移到键盘上方。
@@ -1943,6 +2209,46 @@ export struct CYLTabBarController {
  * [CN] `tint` 的 SRC_IN 颜色滤镜：RGB = 着色，alpha = 图像的 alpha 乘以着色的 alpha。支持 "#RRGGBB" / "#AARRGGBB" 字符串与 0xAARRGGBB
  *      数字；其他（无、''、资源）为单位矩阵。
  */
+export function cylIconRenderingMode(mode: string | undefined): string {
+  const lower = (mode ?? '').toLowerCase();
+  return lower === 'template' || lower === 'original' ? lower : 'automatic';
+}
+
+/**
+ * [EN] The tint of a static tab icon for its state: 'original' none (''), 'template' the explicit icon color, else `fallback` (the bar's
+ *      selected / unselected title color), 'automatic' the explicit icon color only ('' without one: the image keeps its colors), except with
+ *      `fallsBackWhenUnset` (an unselected FlatDesign icon, owner decision D2): then `fallback` too.
+ * [CN] 静态 Tab 图标在其状态下的着色：'original' 无（''），'template' 为显式图标颜色，否则用 `fallback`（TabBar 的选中 / 未选中标题色），
+ *      'automatic' 只用显式图标颜色（没有则为 ''：图片保持原色）。
+ */
+/**
+ * [EN] The classic bar's background: `color` when set (not ''), else '#F8F8F8' light / '#1C1C1E' dark (owner decision D3, 2026-11-27, as Android).
+ * [CN] 经典 TabBar 的背景：设置了（不是 ''）时为 `color`，否则浅色 '#F8F8F8' / 深色 '#1C1C1E'（负责人决定 D3，2026-11-27，与 Android 一致）。
+ */
+export function cylTabBarBackgroundColor(color: ResourceColor, dark: boolean): ResourceColor {
+  if (color !== '') {
+    return color;
+  }
+  return dark ? CYLFlatDesignDarkBackgroundColor : '#F8F8F8';
+}
+
+export function cylStaticIconTintColor(mode: string | undefined, explicit: ResourceColor | undefined, fallback: ResourceColor,
+  fallsBackWhenUnset: boolean = false): ResourceColor {
+  const resolved = cylIconRenderingMode(mode);
+  if (resolved === 'original') {
+    return '';
+  }
+  return explicit ?? (resolved === 'template' || fallsBackWhenUnset ? fallback : '');
+}
+
+/**
+ * [EN] The Image.fillColor for a static icon tint: the tint itself, undefined for '' (an untinted icon keeps its colors).
+ * [CN] 静态图标着色对应的 Image.fillColor：着色本身；'' 为 undefined（未着色的图标保持原色）。
+ */
+export function cylIconFillColorOf(tint: ResourceColor): ResourceColor | undefined {
+  return tint === '' ? undefined : tint;
+}
+
 export function cylTintColorFilter(tint: ResourceColor): ColorFilter {
   const identity: number[] = [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0];
   let hex: string;

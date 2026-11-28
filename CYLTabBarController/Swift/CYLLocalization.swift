@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] Short names for the tab item keys (`CYLTabBarItemTitle` …, now Swift constants in `CYLConstants+Keys.swift`; a seam
  *      with copied strings until they moved, docs/Swift-Migration.md).

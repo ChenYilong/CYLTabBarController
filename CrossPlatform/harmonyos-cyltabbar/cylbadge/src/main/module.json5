@@ -1,0 +1,10 @@
+{
+  "module": {
+    "name": "cylbadge",
+    "type": "har",
+    "deviceTypes": [
+      "phone",
+      "tablet"
+    ]
+  }
+}

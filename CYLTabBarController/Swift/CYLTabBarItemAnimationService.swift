@@ -6,6 +6,12 @@
 //
 
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 #if canImport(CYLAnimatedItem)
 import CYLAnimatedItem
 #endif
@@ -162,6 +168,11 @@ public protocol CYLTabBarItemAnimationService: NSObjectProtocol {
      * [CN] 将当前颜色应用到 `control` 的动画。
      */
     @objc(refreshAnimationColorsInControl:) optional func refreshAnimationColors(in control: UIControl)
+    /**
+     * [EN] Prepares the tint of `control`'s animation again, after the tab bar's default rendering mode changed.
+     * [CN] TabBar 默认渲染模式变化后，重新准备 `control` 动画的着色。
+     */
+    @objc(refreshAnimationTintInControl:) optional func refreshAnimationTint(in control: UIControl)
     /**
      * [EN] The file extensions this library plays.
      * [CN] 本动画库可播放的文件扩展名。

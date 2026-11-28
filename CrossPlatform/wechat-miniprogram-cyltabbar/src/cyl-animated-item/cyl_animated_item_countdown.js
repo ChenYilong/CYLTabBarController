@@ -83,9 +83,9 @@ class CYLAnimatedItemCountdown {
   setCacheKey(key) {
     const next = key ? String(key) : ''
     if (next === this.cacheKey) return
-    if (this.cacheKey) this.cyl_remove()
+    if (this.cacheKey) this.cylRemove()
     this.cacheKey = next
-    if (this.state === 'running') this.cyl_save()
+    if (this.state === 'running') this.cylSave()
     else this.restore()
   }
 
@@ -97,7 +97,7 @@ class CYLAnimatedItemCountdown {
       return
     }
     const start = this.now()
-    this.cyl_begin(start, start + duration, duration, true)
+    this.cylBegin(start, start + duration, duration, true)
   }
 
   /** [EN] Stops and goes idle, with no finish callback. [CN] 停止并回到待机，不触发结束回调。 */
@@ -105,7 +105,7 @@ class CYLAnimatedItemCountdown {
     this.state = 'idle'
     this.start_ = 0
     this.end = 0
-    this.cyl_remove()
+    this.cylRemove()
     this.onChange()
   }
 
@@ -119,7 +119,7 @@ class CYLAnimatedItemCountdown {
     const now = this.now()
     const left = this.end - now
     if (Number.isNaN(left) || left <= 0 || now - this.start_ < -CYL_COUNTDOWN_TOLERANCE || left > this.duration + CYL_COUNTDOWN_TOLERANCE) {
-      this.cyl_finish()
+      this.cylFinish()
       return
     }
     const seconds = Math.min(Math.ceil(left / 1000), Math.ceil(this.duration / 1000))
@@ -142,40 +142,40 @@ class CYLAnimatedItemCountdown {
     const valid = [start, end, duration].every((n) => Number.isFinite(n)) && duration > 0 && end - now > 0 &&
       now - start >= -CYL_COUNTDOWN_TOLERANCE && end - now <= duration + CYL_COUNTDOWN_TOLERANCE
     if (!valid) {
-      this.cyl_remove()
+      this.cylRemove()
       return
     }
-    this.cyl_begin(start, end, duration, false)
+    this.cylBegin(start, end, duration, false)
   }
 
-  cyl_begin(start, end, duration, announcesStart) {
+  cylBegin(start, end, duration, announcesStart) {
     this.start_ = start
     this.end = end
     this.duration = duration
     this.state = 'running'
     this.shownSeconds = -1
-    this.cyl_save()
+    this.cylSave()
     this.onChange()
     if (announcesStart) this.onStart()
     this.refresh()
   }
 
-  cyl_finish() {
+  cylFinish() {
     this.state = 'finished'
     this.start_ = 0
     this.end = 0
-    this.cyl_remove()
+    this.cylRemove()
     this.onChange()
     this.onFinish()
   }
 
-  cyl_save() {
+  cylSave() {
     if (this.cacheKey && this.storage) {
       this.storage.set(cylCountdownCacheName(this.cacheKey), { start: this.start_, end: this.end, duration: this.duration })
     }
   }
 
-  cyl_remove() {
+  cylRemove() {
     if (this.cacheKey && this.storage) this.storage.remove(cylCountdownCacheName(this.cacheKey))
   }
 }

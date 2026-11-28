@@ -29,9 +29,9 @@ import com.cyl.tabbar.CYLTabButtonBlockAnimation
 import com.cyl.tabbar.CYLTabButtonBounceAnimation
 import com.cyl.tabbar.CYLTabButtonPressAnimation
 import com.cyl.tabbar.CYLTabButtonScaleAnimation
-import com.cyl.tabbar.cyl_badgeBackgroundColor
-import com.cyl.tabbar.cyl_showBadge
-import com.cyl.tabbar.cyl_showBadgeValue
+import com.cyl.tabbar.cylBadgeBackgroundColor
+import com.cyl.tabbar.cylShowBadge
+import com.cyl.tabbar.cylShowBadgeValue
 import com.cyl.tabbar.cyl_tabButtonAnimation
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -193,10 +193,10 @@ object DemoGallery {
                         c.cyl_hidesBadgeOfSelectedTab = true
                         c.performWhenTabBarItemsReady { ready ->
                             val buttons = ready.tabBar.tabBarButtonArray
-                            buttons.getOrNull(0)?.cyl_showBadgeValue("New")
-                            buttons.getOrNull(1)?.cyl_showBadgeValue("120")
-                            buttons.getOrNull(2)?.let { it.cyl_badgeBackgroundColor = Color.rgb(0, 122, 255); it.cyl_showBadgeValue("1") }
-                            buttons.getOrNull(3)?.cyl_showBadge()
+                            buttons.getOrNull(0)?.cylShowBadgeValue("New")
+                            buttons.getOrNull(1)?.cylShowBadgeValue("120")
+                            buttons.getOrNull(2)?.let { it.cylBadgeBackgroundColor = Color.rgb(0, 122, 255); it.cylShowBadgeValue("1") }
+                            buttons.getOrNull(3)?.cylShowBadge()
                         }
                     }
                 },
@@ -269,7 +269,7 @@ object DemoGallery {
             cylDemoText("Remind") to listOf(
                 Scene(cylDemoText("System remind style"), cylDemoText("BottomNavigationView badges on the system tab bar")) { systemBar(it, 4, badges = true) },
                 tabBar(cylDemoText("Imitate system remind style"), cylDemoText("The same badges on CYLTabBarController")) { activity ->
-                    controller(activity, 4).also { c -> c.performWhenTabBarItemsReady { r -> r.tabBar.tabBarButtonArray.let { b -> b[0].cyl_showBadgeValue("3"); b[1].cyl_showBadge(); b[2].cyl_showBadgeValue("120") } } }
+                    controller(activity, 4).also { c -> c.performWhenTabBarItemsReady { r -> r.tabBar.tabBarButtonArray.let { b -> b[0].cylShowBadgeValue("3"); b[1].cylShowBadge(); b[2].cylShowBadgeValue("120") } } }
                 },
                 tabBar(cylDemoText("Remind with animation"), cylDemoText("The icon jumps when the badge appears (CYLTabButtonBlockAnimation.badgeChangedAnimation)")) { activity ->
                     badgeAnimationScene(activity) { _, icon, _ -> icon.animate().translationY(-12f).setDuration(150).withEndAction { icon.animate().translationY(0f).setDuration(150).start() }.start() }
@@ -278,7 +278,7 @@ object DemoGallery {
                     badgeAnimationScene(activity) { _, _, badge -> badge?.let { it.scaleX = 0f; it.scaleY = 0f; it.animate().scaleX(1f).scaleY(1f).setDuration(300).start() } }
                 },
                 tabBar(cylDemoText("Customize remind style"), cylDemoText("A gray bubble instead of the red badge")) { activity ->
-                    controller(activity, 4).also { c -> c.performWhenTabBarItemsReady { r -> r.tabBar.tabBarButtonArray.forEach { b -> b.cyl_badgeBackgroundColor = Color.GRAY; b.cyl_showBadgeValue("8") } } }
+                    controller(activity, 4).also { c -> c.performWhenTabBarItemsReady { r -> r.tabBar.tabBarButtonArray.forEach { b -> b.cylBadgeBackgroundColor = Color.GRAY; b.cylShowBadgeValue("8") } } }
                 },
             ),
             cylDemoText("Lottie") to listOf(
@@ -398,7 +398,7 @@ object DemoGallery {
             c.cyl_defaultTabButtonAnimation = CYLTabButtonBlockAnimation().apply { badgeChangedAnimation = animation }
             var count = 0
             repeating(1000, 2000) {
-                if (!activity.isFinishing) c.tabBar.tabBarButtonArray.getOrNull(1)?.cyl_showBadgeValue((++count).toString())
+                if (!activity.isFinishing) c.tabBar.tabBarButtonArray.getOrNull(1)?.cylShowBadgeValue((++count).toString())
                 !activity.isFinishing
             }
         }

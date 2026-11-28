@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a στο Android: μια εφαρμογή δεν μπορεί να στείλει αυτό το συμβάν συστήματος.";
 "Runs every automatic row, one after the other." = "Εκτελεί όλες τις αυτόματες γραμμές, τη μία μετά την άλλη.";
 "Tab bar %@ · page ID \"%@\"" = "Γραμμή καρτελών %@ · ID σελίδας «%@»";
+"Animated item engine API" = "API μηχανών του κινούμενου στοιχείου";
+"Stop at 50%" = "Διακοπή στο 50%";
+"Show image when ended" = "Εμφάνιση εικόνας στο τέλος";
+"Restart token: %@" = "Διακριτικό επανεκκίνησης: %@";
+"End callback: %@" = "Callback λήξης: %@";
+"none yet" = "κανένα ακόμη";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Η αναπαραγωγή ελέγχεται από τον host (drivesAnimationPlayback = false)";
+"Engine API" = "API μηχανής";
+"Pause while scrolling" = "Παύση κατά την κύλιση";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Αποδέσμευση του tab bar controller (σε 3 δ)";
+"teardown: not run" = "αποδέσμευση: δεν εκτελέστηκε";
+"teardown: releasing in %d s" = "αποδέσμευση: σε %d δ";
+"dealloc callbacks ran: %d / %d" = "εκτελέστηκαν callbacks dealloc: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "εκτελέστηκαν callbacks dealloc: %d / %d (%@)";
+"Tab bar controller released" = "Ο tab bar controller αποδεσμεύτηκε";
+"bridge: pause %d, resume %d" = "γέφυρα: παύση %d, συνέχιση %d";
+"last event: -" = "τελευταίο συμβάν: -";
+"last event: %@" = "τελευταίο συμβάν: %@";
+"Content inset" = "Εσωτερικό περιθώριο περιεχομένου";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset δεν έχει οριστεί: ένα επίπεδο και ένα στοιχείο Liquid Glass, κανονικό και επιλεγμένο";
+"Flat: itemContentHorizontalInset unset" = "Επίπεδο: itemContentHorizontalInset δεν έχει οριστεί";
+"Normal" = "Κανονικό";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset δεν έχει οριστεί";

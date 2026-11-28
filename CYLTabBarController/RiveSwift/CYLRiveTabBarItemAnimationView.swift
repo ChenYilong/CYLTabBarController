@@ -17,6 +17,12 @@
 //      `RiveUIView`、view model 实例），不使用已废弃的 `RiveViewModel`。仅在引入 Rive 运行时时编译。
 #if canImport(RiveRuntime)
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 import RiveRuntime
 
 /*!
@@ -211,6 +217,7 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
     private var deactivateTask: Task<Void, Never>?
     /// [EN] Plays again after each pass (`cyl_setAnimationViewLoops:`). [CN] 每次播放后再次播放（`cyl_setAnimationViewLoops:`）。
     private var loops = false
+    private var endHandler: (() -> Void)?
     private var loopTask: Task<Void, Never>?
 
     /// [EN] The colors asked for last (nil: the light colors), applied in order. [CN] 最近一次请求的颜色（nil 表示浅色颜色），按顺序应用。
@@ -261,7 +268,38 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
 
     /// [EN] The tint for the current title color and state. [CN] 当前标题颜色与状态下的着色。
     private var currentTintColor: UIColor? {
-        configuration.tintColor(titleColor: titleTintColor, selected: tintSelected)
+        if hasResolvedTint { return resolvedTintColor }
+        return configuration.tintColor(titleColor: titleTintColor, selected: tintSelected) ?? (rendersAsTemplate ? titleTintColor : nil)
+    }
+
+    /// [EN] Set once a `CYLAnimatedItemView` hands over its final color: it already applied `animationTint` / `animationDarkTint`, the URL
+    ///      options and the truth table, so this view stops resolving its own. [CN] 当 `CYLAnimatedItemView` 交来最终颜色后设置：条目已应用
+    ///      `animationTint` / `animationDarkTint`、URL 选项与真值表，本视图不再自行解析。
+    private var hasResolvedTint = false
+    private var resolvedTintColor: UIColor?
+
+    /// [EN] `cyl_applyAnimationViewResolvedTintColor:`: the final color (nil: no tint), from `CYLAnimatedItemView`. [CN] 来自 `CYLAnimatedItemView` 的最终颜色（nil 表示不着色）。
+    @objc(cyl_applyAnimationViewResolvedTintColor:)
+    public func applyResolvedAnimationTintColor(_ color: UIColor?) {
+        hasResolvedTint = true
+        resolvedTintColor = color
+        if isLoaded {
+            tintOverlay.apply(color, in: self)
+        }
+    }
+
+    /// [EN] `renderingMode=alwaysTemplate` (the URL option or the tab bar's default) without a `tint`: the title color. [CN] 没有 `tint` 时的 `renderingMode=alwaysTemplate`（URL 选项或 TabBar 默认值）：使用标题颜色。
+    private var rendersAsTemplate = false
+
+    /// [EN] `cyl_setAnimationViewTintFollowsTitle:`, from the tab flow. [CN] 由 Tab 流程调用。
+    @objc(cyl_setAnimationViewTintFollowsTitle:)
+    func setAnimationTintFollowsTitle(_ follows: Bool) {
+        guard rendersAsTemplate != follows else { return }
+        rendersAsTemplate = follows
+        if hasResolvedTint { return }
+        if isLoaded {
+            tintOverlay.apply(currentTintColor, in: self)
+        }
     }
 
     /// [EN] `cyl_applyAnimationViewTintColor:`: the tab's title color, without its state. [CN] Tab 的标题颜色，不含状态。
@@ -418,9 +456,24 @@ public final class CYLRiveTabBarItemAnimationView: UIView, CYLTabBarItemAnimatio
                 }
                 instance.setValue(of: property, to: false)
                 self.isActive = false
+                if !self.loops {
+                    self.endHandler?()
+                }
             }
         }
         scheduleLoop()
+    }
+
+    /// [EN] Called when a pass of a boolean state machine with an `activeDuration` ends and looping is off; a trigger or a
+    ///      held boolean (`activeDuration` 0) has no end to tell. [CN] 带 `activeDuration` 的布尔状态机的一遍播放结束且循环关闭时调用；
+    ///      trigger 或保持不变的布尔属性（`activeDuration` 为 0）没有可判断的结束。
+    public func setAnimationEndHandler(_ handler: (() -> Void)?) {
+        endHandler = handler
+    }
+
+    /// [EN] Whether the boolean is held true now (a trigger has no state to read). [CN] 布尔属性当前是否保持为 true（trigger 没有可读取的状态）。
+    public func isAnimationPlaying() -> Bool {
+        isActive
     }
 
     /// [EN] `cyl_setAnimationViewLoops:`. [CN] `cyl_setAnimationViewLoops:`。

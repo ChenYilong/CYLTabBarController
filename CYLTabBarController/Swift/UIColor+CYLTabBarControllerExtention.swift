@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] Semantic and system colors, a light / dark color pair and a random color. Translated from Objective-C
  *      (docs/Swift-Migration.md): every color is the UIKit one (the library needs iOS 13, so the old fallbacks for

@@ -1,0 +1,22 @@
+.cyl-inset-page {
+  min-height: 100vh;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  background: linear-gradient(160deg, #FFB199 0%, #7EC8E3 50%, #C3AED6 100%);
+}
+
+.cyl-inset-caption {
+  display: block;
+  margin: 24px 0 12px;
+  font-size: 13px;
+  color: #3C3C43;
+}
+
+.cyl-inset-row {
+  display: flex;
+  justify-content: space-around;
+}
+
+.cyl-inset-item {
+  display: block;
+}

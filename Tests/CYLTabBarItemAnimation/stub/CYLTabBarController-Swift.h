@@ -68,6 +68,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (CGFloat)cyl_animationViewProgress;
 - (void)cyl_setAnimationViewProgress:(CGFloat)progress;
 - (void)cyl_setAnimationViewSpeed:(CGFloat)speed;
+- (BOOL)cyl_animationViewIsPlaying;
+- (void)cyl_setAnimationViewEndHandler:(nullable void (^)(void))handler;
 @end
 
 @protocol CYLTabBarItemAnimationViewProviding <NSObject>

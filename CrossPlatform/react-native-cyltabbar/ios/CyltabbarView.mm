@@ -1,5 +1,12 @@
 #import "CyltabbarView.h"
 
+// [EN] Objective-C++ has no `@import`, so the generated Swift header of CYLAnimatedItem cannot import SVGAPlayerLite itself: its
+//      `SVGAPlayer` class must be declared first (the SVGA subspec only).
+// [CN] Objective-C++ 没有 `@import`，CYLAnimatedItem 生成的 Swift 头文件无法自行导入 SVGAPlayerLite：必须先声明 `SVGAPlayer` 类（仅 SVGA 子库）。
+#if __has_include(<SVGAPlayerLite/SVGAPlayer.h>)
+#import <SVGAPlayerLite/SVGAPlayer.h>
+#endif
+
 #import <CYLTabBarController/CYLTabBarController.h>
 // [EN] The classes translated to Swift (CYLTabBarHostView, step 36; the animation factory): the umbrella header does not
 //      import the generated Swift header (docs/Swift-Migration.md).
@@ -60,6 +67,9 @@ static id CYLRNJSONObject(NSString *JSON);
     _hostView.loginStateDidChange = ^(BOOL loggedIn) {
       [weakSelf emitLoginStateChange:loggedIn];
     };
+    _hostView.didPostLifecycleEvent = ^(NSString *name, NSString *userInfo) {
+      [weakSelf emitLifecycleEventNamed:name userInfo:userInfo];
+    };
     _hostView.didApplyManifest = ^(NSString *source) {
       [weakSelf emitManifestApplyWithSource:source];
     };
@@ -113,6 +123,7 @@ static id CYLRNJSONObject(NSString *JSON);
     [_hostView playAllAnimations];
   }
   _playAllRequest = newViewProps.playAllRequest;
+  _hostView.animationsPaused = newViewProps.animationsPaused;
   // [EN] After the selection: logging out may move it away from a tab that needs login. [CN] 在选中之后：退出登录可能使选中离开需要登录的 Tab。
   // [EN] -1: not set, the host uses the cached state. [CN] -1：未设置，宿主使用缓存的状态。
   if (newViewProps.loginState >= 0) {
@@ -267,6 +278,16 @@ static id CYLRNJSONObject(NSString *JSON)
   }
   std::static_pointer_cast<CyltabbarViewEventEmitter const>(_eventEmitter)
       ->onTabBarLayout(CyltabbarViewEventEmitter::OnTabBarLayout{.height = height});
+}
+
+- (void)emitLifecycleEventNamed:(NSString *)name userInfo:(NSString *)userInfo
+{
+  if (!_eventEmitter) {
+    return;
+  }
+  std::static_pointer_cast<CyltabbarViewEventEmitter const>(_eventEmitter)
+      ->onLifecycleEvent(CyltabbarViewEventEmitter::OnLifecycleEvent{
+          .name = std::string(name.UTF8String), .userInfo = std::string(userInfo.UTF8String)});
 }
 
 - (void)emitManifestApplyWithSource:(NSString *)source

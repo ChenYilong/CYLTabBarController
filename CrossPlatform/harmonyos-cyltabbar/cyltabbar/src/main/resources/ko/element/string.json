@@ -45,6 +45,10 @@
       "value": "깜박임 ×3"
     },
     {
+      "name": "cyl_l10n_9594eec95be7",
+      "value": "Blue"
+    },
+    {
       "name": "cyl_l10n_070554647306",
       "value": "테두리"
     },
@@ -95,6 +99,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem 가운데 정렬"
+    },
+    {
+      "name": "cyl_l10n_5adb0dc263ad",
+      "value": "Color: %@"
     },
     {
       "name": "cyl_l10n_f6da70b584ae",
@@ -281,12 +289,20 @@
       "value": "2초 뒤 플러스 버튼 이미지가 바뀌는 탭 바 컨트롤러를 엽니다. 레이아웃이 움직이면 안 됩니다"
     },
     {
+      "name": "cyl_l10n_ee38e4d5dd68",
+      "value": "Red"
+    },
+    {
       "name": "cyl_l10n_c27618b1aa9d",
       "value": "빨간 점"
     },
     {
       "name": "cyl_l10n_255c00a63f9d",
       "value": "빨간 점 반지름"
+    },
+    {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "탭 바 컨트롤러 해제 (3초 후)"
     },
     {
       "name": "cyl_l10n_56e8fac7007d",
@@ -303,6 +319,10 @@
     {
       "name": "cyl_l10n_9d01c837b4bc",
       "value": "Rive 탭 아이콘: house.riv (숫자 입력 Rooms)"
+    },
+    {
+      "name": "cyl_l10n_bdd66081cc94",
+      "value": "Rive colors"
     },
     {
       "name": "cyl_l10n_f0c792c049bc",
@@ -373,6 +393,10 @@
       "value": "Still image after the animation ends"
     },
     {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "탭 바 컨트롤러가 해제되었습니다"
+    },
+    {
       "name": "cyl_l10n_fee4a478923f",
       "value": "탭 상호작용"
     },
@@ -413,6 +437,10 @@
       "value": "탭 바 모양"
     },
     {
+      "name": "cyl_l10n_abf44ef609ef",
+      "value": "The file's colors"
+    },
+    {
       "name": "cyl_l10n_7c4aecba91c3",
       "value": "이 페이지 탭의 이미지를 앱의 rawfile(iOS의 리소스 번들)에서 불러옵니다. 다시 탭하면 복원"
     },
@@ -427,6 +455,10 @@
     {
       "name": "cyl_l10n_a4d0d101d6a3",
       "value": "왼쪽 위"
+    },
+    {
+      "name": "cyl_l10n_e38d6ac40a62",
+      "value": "applyColors: a view model color property of a data-bound .riv"
     },
     {
       "name": "cyl_l10n_2306a585ae00",
@@ -469,6 +501,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; 탭하여 선택한 뒤 이 목록을 스크롤"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "dealloc 콜백 실행: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "dealloc 콜백 실행: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: 다채로운 콘텐츠 위의 탭 캡슐, 검색 볼, 음악 바. 스크롤하면 축소"
     },
@@ -495,6 +535,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; 숨기면 2초 뒤 돌아옴"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "해제: 실행 안 됨"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "해제: %d초 후"
     },
     {
       "name": "cyl_l10n_2a0608059131",

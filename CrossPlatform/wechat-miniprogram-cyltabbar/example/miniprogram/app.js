@@ -32,9 +32,9 @@ App({
   globalData: {
     cylTabBarState: {
       badges: {},
-      // [EN] cyl_showBadgeValue attributes by identifier: {color, animation, radius, centerOffset}. [CN] 按标识的角标属性。
+      // [EN] cylShowBadgeValue attributes by identifier: {color, animation, radius, centerOffset}. [CN] 按标识的角标属性。
       badgeAttributes: {},
-      // [EN] cyl_setCoverImage by identifier: {image, size}. [CN] 按标识的封面。
+      // [EN] cylSetCoverImage by identifier: {image, size}. [CN] 按标识的封面。
       covers: {},
       themeIdentifier: '',
       // [EN] The skin of the skin picker (utils/cyl_demo_skins.js), following the system Dark Mode or not, and the
@@ -63,7 +63,18 @@ App({
   },
 
   onLaunch() {
+    // [EN] First the state every tab bar instance subscribes to: a module that fails to load below must not leave the app
+    //      without it (the custom tab bar's cyl_subscribe pushes to cylListeners).
+    // [CN] 先创建每个 TabBar 实例订阅的状态：下面的模块加载失败时不能让 App 缺少它（custom-tab-bar 的 cyl_subscribe 会向
+    //      cylListeners 添加监听）。
     this.cylListeners = [];
+    // [EN] The tab icon animations pause while the user scrolls a page (pages report it with cylPageScrolled).
+    // [CN] 用户滚动页面时 Tab 图标动画暂停（页面通过 cylPageScrolled 报告滚动）。
+    try {
+      require('cyl-tabbar-miniprogram/cyl-animated-item/cyl_animation_events').cylPausesAnimationsWhileUserScrolls(true);
+    } catch (error) {
+      console.error('cyl_animation_events failed to load', error);
+    }
     // [EN] The Rive icons (the iOS examples' icons.riv) are white strokes: with the Rive package installed, the example
     //      starts on the dark skin, as Example-Rive and Example-SwiftUI-Rive run in dark mode.
     // [CN] Rive 图标（iOS 示例的 icons.riv）是白色线条：安装 Rive 包时示例以深色皮肤启动，与运行在深色模式下的

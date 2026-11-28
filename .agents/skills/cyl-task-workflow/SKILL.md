@@ -46,6 +46,8 @@ Find the most relevant document in `docs/` (create one only when none fits) and 
 
 ## 5. Explain the missing points
 
+**When to print it (added 2026-11-25, owner):** only with substantial progress, a score change or a new missing point, and then only the rows that changed this turn (the full table on request). A pure notification, an FYI or a turn that changed nothing gets no table.
+
 When the final score is below 100, say why it cannot reach 100, and print every missing point as a `TODO` at the very
 end of the session's final message:
 

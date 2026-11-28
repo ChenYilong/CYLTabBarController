@@ -7,11 +7,14 @@
     "pages/me/index",
     "pages/lottie/index",
     "pages/item/index",
+    "pages/badge-tags/index",
+    "pages/inset/index",
     "pages/glass/index",
     "pages/demo/index",
     "pages/post/index",
     "pages/pushed/index",
-    "pages/pushed/locked"
+    "pages/pushed/locked",
+    "pages/released/index"
   ],
   "window": {
     "navigationBarTitleText": "CYLTabBarController",

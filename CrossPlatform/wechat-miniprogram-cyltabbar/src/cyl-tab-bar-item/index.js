@@ -16,7 +16,7 @@ const CYL_PROPERTIES = ['title', 'image', 'selectedImage', 'index', 'titlePositi
   'imageInsets', 'lottieFilePath', 'lottieURL', 'lottieSizeValue', 'enabled', 'selected', 'badgeValue', 'badgeColor',
   'badgeSize', 'badgeContentInset', 'badgePositionAdjustment', 'badgeAnimation', 'layoutCentered', 'backgroundColor',
   'selectedBackgroundColor', 'titleTextAttributes', 'badgeTextAttributes', 'standardAppearance', 'animationPath',
-  'animationSize', 'imageSize', 'iconTint', 'selectedIconTint', 'animationTint', 'label', 'animationColors', 'loopsWhenUnselected',
+  'animationSize', 'imageSize', 'iconTint', 'selectedIconTint', 'animationTint', 'animationDarkTint', 'animationRenderingMode', 'label', 'animationColors', 'loopsWhenUnselected',
   'animationClass', 'animationDuration', 'itemStyle', 'glassLensStyle', 'isDark', 'animationSpeed', 'animationLoop'];
 
 Component({
@@ -92,6 +92,10 @@ Component({
      * [CN] 动画的单一颜色（`tint` 选项）："title"（当前状态的标题颜色）、颜色，或 '' 表示不着色。
      */
     animationTint: { type: String, value: '' },
+    /** [EN] The `darkTint` option: the dark color of a fixed `animationTint`. [CN] `darkTint` 选项：固定 `animationTint` 的深色颜色。 */
+    animationDarkTint: { type: String, value: '' },
+    /** [EN] The `renderingMode` option: '' (unset), 'automatic', 'alwaysTemplate' or 'alwaysOriginal'; applies only without a tint. [CN] `renderingMode` 选项；仅在没有着色时生效。 */
+    animationRenderingMode: { type: String, value: '' },
     /** [EN] The accessibility label (default: the title, with the badge). [CN] 无障碍标签（默认：标题与角标）。 */
     label: { type: String, value: '' },
     /** [EN] The tap animation class name (CYLTabBarControllerTabButtonTapAnimation). [CN] 点击动画类名。 */
@@ -112,6 +116,11 @@ Component({
      * [CN] liquidGlass 下透镜的 CYLGlassLensStyle："regular"（默认）或 "skeuomorphic"。cyl-tab-bar 为其设置。
      */
     glassLensStyle: { type: String, value: 'regular' },
+    /**
+     * [EN] Whether the lens springs in when this item becomes selected (cyl-tab-bar sets it for a tap on its own instance only).
+     * [CN] 本 Item 被选中时透镜是否弹入（cyl-tab-bar 只在自己实例上的点击时设置）。
+     */
+    lensAnimated: { type: Boolean, value: false },
     /** [EN] Playback speed of the icon animation, above 0, applied live. [CN] 图标动画的播放速度，大于 0，实时生效。 */
     animationSpeed: { type: Number, value: 1 },
     /** [EN] Repeats the icon animation until turned off, applied live. [CN] 重复播放图标动画直到关闭，实时生效。 */
@@ -125,7 +134,7 @@ Component({
 
   observers: {
     [CYL_PROPERTIES.join(', ')]: function () {
-      this.cyl_update();
+      this.cylUpdate();
     },
     itemStyle(value) {
       this.setData({ cylItemStyle: cylTabBarItemStyle(value) });
@@ -135,12 +144,12 @@ Component({
   lifetimes: {
     attached() {
       this.cylAttributes = { title: {}, badge: {} };
-      this.cyl_update();
+      this.cylUpdate();
     },
   },
 
   methods: {
-    cyl_update() {
+    cylUpdate() {
       const properties = { ...this.data };
       ['title', 'badge'].forEach((kind) => {
         const set = this.cylAttributes?.[kind];
@@ -159,7 +168,7 @@ Component({
       this.cylSignature = signature;
     },
 
-    cyl_onTap() {
+    cylOnTap() {
       if (this.data.enabled === false) {
         return;
       }
@@ -170,25 +179,25 @@ Component({
      * [EN] `-setTitleTextAttributes:forState:`; state: "normal" / "selected" or UIControlState 0 / 4.
      * [CN] `-setTitleTextAttributes:forState:`；state 为 "normal" / "selected"，或 UIControlState 0 / 4。
      */
-    cyl_setTitleTextAttributes(attributes, state) {
+    cylSetTitleTextAttributes(attributes, state) {
       this.cylAttributes.title[cylStateKey(state)] = attributes || null;
-      this.cyl_update();
+      this.cylUpdate();
     },
 
     /** [EN] `-titleTextAttributesForState:`. [CN] 返回指定状态的标题文字属性。 */
-    cyl_titleTextAttributesForState(state) {
+    cylTitleTextAttributesForState(state) {
       const key = cylStateKey(state);
       return this.cylAttributes.title[key] || this.data.titleTextAttributes?.[key] || null;
     },
 
     /** [EN] `-setBadgeTextAttributes:forState:`. [CN] 设置指定状态的角标文字属性。 */
-    cyl_setBadgeTextAttributes(attributes, state) {
+    cylSetBadgeTextAttributes(attributes, state) {
       this.cylAttributes.badge[cylStateKey(state)] = attributes || null;
-      this.cyl_update();
+      this.cylUpdate();
     },
 
     /** [EN] `-badgeTextAttributesForState:`. [CN] 返回指定状态的角标文字属性。 */
-    cyl_badgeTextAttributesForState(state) {
+    cylBadgeTextAttributesForState(state) {
       const key = cylStateKey(state);
       return this.cylAttributes.badge[key] || this.data.badgeTextAttributes?.[key] || null;
     },
@@ -197,27 +206,27 @@ Component({
      * [EN] `-actualBadgeSuperView`: the node that hosts the badge, as {component, selector}.
      * [CN] `-actualBadgeSuperView`：承载角标的节点，返回 {component, selector}。
      */
-    cyl_actualBadgeSuperView() {
+    cylActualBadgeSuperView() {
       return { component: this, selector: '.cyl-item-icon-box' };
     },
 
     /** [EN] `tabBarButton`: this component. [CN] `tabBarButton`：本组件。 */
-    cyl_tabBarButton() {
+    cylTabBarButton() {
       return this;
     },
 
     /** [EN] `cylflatdesign_tabBarController`: the cyl-tab-bar that holds this item, or null. [CN] 所属的 cyl-tab-bar，没有时为 null。 */
-    cyl_tabBarController() {
+    cylTabBarController() {
       // [EN] The component whose template holds this item: cyl-tab-bar, or a page when the item is used alone.
       // [CN] 模板中包含本 Item 的组件：cyl-tab-bar；单独使用时为页面。
       const owner = typeof this.selectOwnerComponent === 'function' ? this.selectOwnerComponent() : null;
-      return owner && typeof owner.cyl_selectAdjacent === 'function' ? owner : null;
+      return owner && typeof owner.cylSelectAdjacent === 'function' ? owner : null;
     },
 
     /**
      * [EN] The icon component (cyl-animated-item), which plays and stops its engine view. [CN] 图标组件（cyl-animated-item），由它播放与停止引擎视图。
      */
-    cyl_animationView() {
+    cylAnimationView() {
       return this.selectComponent('#cyl-item-icon');
     },
 
@@ -226,20 +235,20 @@ Component({
      *      a playback another tab bar started.
      * [CN] 从首帧播放动画（Tab 被选中时），或从第 `offset` 秒开始，以继续另一个 TabBar 已开始的播放。
      */
-    cyl_playAnimation(offset) {
-      const view = this.cyl_animationView();
-      if (view && typeof view.cyl_playFromStart === 'function') {
-        view.cyl_playFromStart(offset);
+    cylPlayAnimation(offset) {
+      const view = this.cylAnimationView();
+      if (view && typeof view.cylPlayFromStart === 'function') {
+        view.cylPlayFromStart(offset);
       }
     },
 
     /** [EN] Stops the animation on its resting frame. [CN] 停止动画并显示静止帧。 */
-    cyl_stopAnimation() {
-      const view = this.cyl_animationView();
+    cylStopAnimation() {
+      const view = this.cylAnimationView();
       if (view && typeof view.stopAnimation === 'function') {
         view.stopAnimation();
-      } else if (view && typeof view.cyl_stop === 'function') {
-        view.cyl_stop();
+      } else if (view && typeof view.cylStop === 'function') {
+        view.cylStop();
       }
     },
   },

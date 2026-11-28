@@ -8,6 +8,9 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
 /**
  * [EN] Badges on a tab bar item (`UITabBarItem (CYLBadgeExtention)`): the item is not a view, so every badge call goes to
  *      the badge host of its tab button, in both Liquid Glass layers. Translated from Objective-C (docs/Swift-Migration.md,
@@ -89,7 +92,7 @@ extension UITabBarItem {
     }
 
     @objc(cyl_setBadgeValue:)
-    dynamic func cylSetBadgeValue(_ badgeValue: String) {
+    public dynamic func cylSetBadgeValue(_ badgeValue: String) {
         // [EN] No longer required (the deprecated system badge point), kept for apps that still add one.
         // [CN] 已不再必需（废弃的系统角标点），为仍在添加它的 App 保留。
         let removeSelector = NSSelectorFromString("cyl_removeTabBadgePoint")
@@ -130,7 +133,7 @@ extension UITabBarItem {
     }
 
     @objc(cyl_showBadgeValue:animationTypeValue:)
-    dynamic func cyl_showBadgeValue(_ value: String, animationTypeValue: NSNumber) {
+    public dynamic func cyl_showBadgeValue(_ value: String, animationTypeValue: NSNumber) {
         cyl_perform(NSSelectorFromString("cyl_showBadgeValue:animationTypeValue:"), with: value, with: animationTypeValue)
     }
 

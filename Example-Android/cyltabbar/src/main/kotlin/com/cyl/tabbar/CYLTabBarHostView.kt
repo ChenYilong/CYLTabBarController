@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import org.json.JSONArray
 import org.json.JSONObject
+import com.chenyilong.cyldeallocblockexecutor.LifecycleCenter
 import java.net.URI
 import java.util.concurrent.Executors
 
@@ -101,6 +102,39 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
      * [EN] The message of the failure that made the loader fall back to another source. [CN] 导致加载器回退到其他来源的失败原因。
      */
     var didFailManifest: ((String) -> Unit)? = null
+
+    /**
+     * [EN] Every animation (`cyl.animation.*`) and badge (`cyl.badge.*`) moment of any view, with the event name and the
+     *      posted info as a JSON object string. Set by the React Native and Flutter wrappers; observers on the core
+     *      library ([com.chenyilong.cyldeallocblockexecutor.LifecycleCenter]) are the way for native code.
+     * [CN] 任意视图的所有动画（`cyl.animation.*`）与角标（`cyl.badge.*`）时机，参数为事件名与以 JSON 对象字符串表示的附带信息。
+     *      由 React Native 与 Flutter 包装层设置；原生代码请直接使用核心库的 LifecycleCenter 观察者。
+     */
+    var didPostLifecycleEvent: ((name: String, userInfoJSON: String) -> Unit)? = null
+        set(value) {
+            field = value
+            relayLifecycleEvents()
+        }
+
+    /** [EN] (Re)subscribes the relay: only while a listener is set and the view is attached. [CN] （重新）订阅：仅在设置了监听且视图已附加时。 */
+    private fun relayLifecycleEvents() {
+        lifecycleRelayNames.forEach { LifecycleCenter.cancelCallback(key = lifecycleRelayKey + it) }
+        if (didPostLifecycleEvent == null || !isAttachedToWindow) return
+        lifecycleRelayNames.forEach { name ->
+            LifecycleCenter.addCustomCallback<Any>(name, key = lifecycleRelayKey + name) { _, _, info ->
+                val json = JSONObject()
+                info.userInfo?.forEach { (k, v) -> json.put(k, v?.toString()) }
+                didPostLifecycleEvent?.invoke(name, json.toString())
+            }
+        }
+    }
+
+    private val lifecycleRelayKey = "cyl.hostview.relay.${System.identityHashCode(this)}."
+    private val lifecycleRelayNames = listOf(
+        "cyl.animation.didStart", "cyl.animation.didPause", "cyl.animation.didResume", "cyl.animation.didStop",
+        "cyl.badge.didShow", "cyl.badge.didClear", "cyl.badge.didBecomeReady",
+        "cyl.badge.animationDidStart", "cyl.badge.animationDidStop",
+    )
 
     /**
      * [EN] Builds the controller again from `configuration` (images first). [CN] 由 `configuration` 重新创建控制器（先加载图片）。
@@ -299,6 +333,19 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
     fun playAllAnimations() {
         tabBarController?.cyl_playAllTabBarItemAnimations()
     }
+
+    /**
+     * [EN] True pauses every playing tab icon animation, false resumes them (`cyl.animation.didPause` / `didResume`). A React
+     *      Native or Flutter list sets it from its own scroll events, as those do not reach the native registry.
+     * [CN] 为 true 时暂停所有正在播放的 Tab 图标动画，为 false 时恢复（`cyl.animation.didPause` / `didResume`）。React Native 或 Flutter 的列表据自己的滚动事件设置它，因为这些事件到不了原生注册表。
+     */
+    var animationsPaused: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            if (value) com.cyl.animateditem.CYLAnimatedItemView.pauseAllAnimations()
+            else com.cyl.animateditem.CYLAnimatedItemView.resumeAllAnimations()
+        }
     /**
      * [EN] The login state the tab bar uses, reported once it is built: until the app sets [loggedIn], the state the library
      *      cached (`cyl_loggedIn`, kept across launches), so the app can start from it.
@@ -505,6 +552,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        relayLifecycleEvents()
         buildIfReady()
     }
 
@@ -515,6 +563,7 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
+        lifecycleRelayNames.forEach { LifecycleCenter.cancelCallback(key = lifecycleRelayKey + it) }
         // [EN] Rebuilt when attached again: the fragments cannot outlive the view tree. [CN] 再次附加时重新创建：Fragment 不能比视图树存活更久。
         if (tabBarController != null && effectiveConfiguration() != null) {
             // [EN] Loading the same configuration again builds the controller on the next attach.
@@ -672,29 +721,15 @@ open class CYLTabBarHostView @JvmOverloads constructor(context: Context, attrs: 
      */
     private fun showBadge(target: View, style: Map<String, Any?>, fallback: CYLEnums.CYLBadgeAnimationType) {
         val text = when (val value = style[BADGE_VALUE]) { is String -> value; is Number -> value.toString(); else -> "" }
-        when (val color = style[BADGE_COLOR]) {
-            is Int -> target.cyl_badgeBackgroundColor = color
-            is String -> CYLTabBarConfiguration.colorValue(color)?.let { target.cyl_badgeBackgroundColor = it }
-        }
-        (style[BADGE_RADIUS] as? Number)?.let { target.cyl_badgeRadius = it.toFloat() }
-        (style[BADGE_CENTER_OFFSET] as? List<*>)?.takeIf { it.size == 2 }?.let { offset ->
-            val x = (offset[0] as? Number)?.toFloat(); val y = (offset[1] as? Number)?.toFloat()
-            if (x != null && y != null) target.cyl_badgeCenterOffset = CYLOffset(x, y)
-        }
-        val animation = badgeAnimation(style[BADGE_ANIMATION]) ?: fallback
+        // [EN] The one parser of `:cylbadge` (S7): colors, radius, offset, font, border and the rest. [CN] `:cylbadge` 唯一的解析函数（S7）：颜色、半径、偏移、字体、边框等。
+        target.cylApplyBadgeAttributes(style)
+        val animation = if (style[BADGE_ANIMATION] != null) CYLBadgeAttributeKey.animationType(style) else fallback
         when (text) {
-            "" -> target.cyl_clearBadge()
+            "" -> target.cylClearBadge()
             // [EN] A dot animates only with an animation of its own, as on iOS. [CN] 红点仅在自身指定动画时播放，与 iOS 相同。
-            "dot" -> if (style[BADGE_ANIMATION] == null) target.cyl_showBadge() else target.cyl_showBadgeValue("", animation)
-            else -> target.cyl_showBadgeValue(text, animation)
+            "dot" -> if (style[BADGE_ANIMATION] == null) target.cylShowBadge() else target.cylShowBadgeValue("", animation)
+            else -> target.cylShowBadgeValue(text, animation)
         }
-    }
-
-    private fun badgeAnimation(value: Any?): CYLEnums.CYLBadgeAnimationType? = when (value) {
-        is CYLEnums.CYLBadgeAnimationType -> value
-        is Number -> CYLEnums.CYLBadgeAnimationType.entries.firstOrNull { it.rawValue == value.toInt() }
-        is String -> CYLEnums.CYLBadgeAnimationType.entries.firstOrNull { it.name.equals(value, ignoreCase = true) }
-        else -> null
     }
 
     /**

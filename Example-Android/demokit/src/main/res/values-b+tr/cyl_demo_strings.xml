@@ -30,10 +30,13 @@
     <string name="cyl_demo_6a69211e0f">Her sahne, genel API ile oluşturulmuş bir sekme çubuğudur: stiller, animasyonlar, rozetler, Lottie ve yeni sekme API\'si</string>
     <string name="cyl_demo_7efc907fe3">Animasyonlu öğe</string>
     <string name="cyl_demo_9244b5dc65">Tek başına animasyonlu simge + başlık bileşeni: GIF, Lottie, eksik dosya, aksesuar ve sürükleme</string>
+    <string name="cyl_demo_5dbde9a698">İçerik iç boşluğu</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset ayarlanmadı: düz bir öğe ve bir Liquid Glass öğesi, normal ve seçili</string>
     <string name="cyl_demo_185d8ef0ae">Rozetler</string>
     <string name="cyl_demo_2db1db0706">Oynatma</string>
     <string name="cyl_demo_34bffc9c7a">Sekme simgesi animasyonları: Tümünü oynat, hız, döngü</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">Hız %@, döngü %@; denetimler için dokunun</string>
+    <string name="cyl_demo_2f63c1fff7">Sekme çubuğu denetleyicisini serbest bırak (3 sn sonra)</string>
     <string name="cyl_demo_a4fe65264e">Dil</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">Geçerli: %@</string>
     <string name="cyl_demo_bbc5e661e1">sistem</string>
@@ -130,6 +133,10 @@
     <string name="cyl_demo_7108183f18">İstek iptal edildi</string>
     <string name="cyl_demo_5fbceaee5f">URL\'siz istek</string>
     <string name="cyl_demo_4334569b3d">Bir HTML sayfası (ağ)</string>
+    <string name="cyl_demo_e2917c5f0d">Düz: itemContentHorizontalInset ayarlanmadı</string>
+    <string name="cyl_demo_a7248eeb45">Normal</string>
+    <string name="cyl_demo_57fd7a0cf3">Seçili</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset ayarlanmadı</string>
     <string name="cyl_demo_d84eebada9">Fotoğraf</string>
     <string name="cyl_demo_d47d7cb0e4">Diğer</string>
     <string name="cyl_demo_0e35f6e974">Temel</string>
@@ -320,6 +327,7 @@
     <string name="cyl_demo_12e7b8220d">Tümünü oynat</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">Hız: %@</string>
     <string name="cyl_demo_f2f6a01889">Döngü</string>
+    <string name="cyl_demo_08078d674a">Sekme çubuğu denetleyicisi serbest bırakıldı</string>
     <string name="cyl_demo_44a57b22e0">Uyarı</string>
     <string name="cyl_demo_a127ceb079">Eylem sayfası</string>
     <string name="cyl_demo_9329618118">Sayfa tabakası</string>
@@ -338,6 +346,10 @@
     <string name="cyl_demo_1698b890f9">Tüm otomatik satırları art arda çalıştırır.</string>
     <string name="cyl_demo_afa158bdc8">Geçerli bağlamın üzerinde</string>
     <string name="cyl_demo_0add8377e7" formatted="false">\"%@\" öğesine uzun basıldı</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">çalışan dealloc geri çağrıları: %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">çalışan dealloc geri çağrıları: %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">serbest bırakma: %d sn sonra</string>
+    <string name="cyl_demo_c0fd658b68">serbest bırakma: çalıştırılmadı</string>
     <string name="cyl_demo_d4f455fa45">Aç: iki sekme çubuğu, tek sayfa kimliği</string>
     <string name="cyl_demo_5b88804382" formatted="false">Sekme çubuğu %@ · sayfa kimliği \"%@\"</string>
 </resources>

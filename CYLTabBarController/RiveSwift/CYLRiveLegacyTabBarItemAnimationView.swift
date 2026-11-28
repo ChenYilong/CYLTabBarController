@@ -17,6 +17,12 @@
 //      警告，且没有其他代码直接引用它（按其 Objective-C 名称解析）。仅在引入 Rive 运行时时编译。
 #if canImport(RiveRuntime)
 import UIKit
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 import RiveRuntime
 
 @available(*, deprecated, message: "Wraps Rive's legacy API for .riv files without a view model; created only through CYLTabBarItemAnimationViewProviding.")
@@ -29,6 +35,9 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
     /// [EN] Plays again after each pass (`cyl_setAnimationViewLoops:`). [CN] 每次播放后再次播放（`cyl_setAnimationViewLoops:`）。
     private var loops = false
     private var loopTask: Task<Void, Never>?
+    private var endHandler: (() -> Void)?
+    /// [EN] Whether the state machine input is held YES now. [CN] 状态机输入当前是否保持为 YES。
+    private var isActive = false
 
     // MARK: - [EN] CYLRiveFileInspecting [CN] 文件检查接口
 
@@ -83,7 +92,23 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
 
     /// [EN] The tint for the current title color and state. [CN] 当前标题颜色与状态下的着色。
     private var currentTintColor: UIColor? {
-        configuration.tintColor(titleColor: titleTintColor, selected: tintSelected)
+        if hasResolvedTint { return resolvedTintColor }
+        return configuration.tintColor(titleColor: titleTintColor, selected: tintSelected) ?? (rendersAsTemplate ? titleTintColor : nil)
+    }
+
+    /// [EN] Set once a `CYLAnimatedItemView` hands over its final color (`animationTint` / `animationDarkTint`, the URL options and the truth table
+    ///      already applied), so this view stops resolving its own: a state machine file without a view model (menu_button.riv) is tinted too.
+    /// [CN] 当 `CYLAnimatedItemView` 交来最终颜色（已应用 `animationTint` / `animationDarkTint`、URL 选项与真值表）后设置，本视图不再自行解析：
+    ///      没有 view model 的状态机文件（menu_button.riv）同样会被着色。
+    private var hasResolvedTint = false
+    private var resolvedTintColor: UIColor?
+
+    /// [EN] `cyl_applyAnimationViewResolvedTintColor:`: the final color (nil: no tint), from `CYLAnimatedItemView`. [CN] 来自 `CYLAnimatedItemView` 的最终颜色（nil 表示不着色）。
+    @objc(cyl_applyAnimationViewResolvedTintColor:)
+    public func applyResolvedAnimationTintColor(_ color: UIColor?) {
+        hasResolvedTint = true
+        resolvedTintColor = color
+        tintOverlay.apply(color, in: self)
     }
 
     private init(configuration: CYLRiveTabBarItemAnimationConfiguration, file: RiveFile) {
@@ -136,6 +161,18 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
         if let tint = currentTintColor {
             tintOverlay.apply(tint, in: self)
         }
+    }
+
+    /// [EN] `renderingMode=alwaysTemplate` (the URL option or the tab bar's default) without a `tint`: the title color. [CN] 没有 `tint` 时的 `renderingMode=alwaysTemplate`（URL 选项或 TabBar 默认值）：使用标题颜色。
+    private var rendersAsTemplate = false
+
+    /// [EN] `cyl_setAnimationViewTintFollowsTitle:`, from the tab flow. [CN] 由 Tab 流程调用。
+    @objc(cyl_setAnimationViewTintFollowsTitle:)
+    func setAnimationTintFollowsTitle(_ follows: Bool) {
+        guard rendersAsTemplate != follows else { return }
+        rendersAsTemplate = follows
+        if hasResolvedTint { return }
+        tintOverlay.apply(currentTintColor, in: self)
     }
 
     /// [EN] `cyl_applyAnimationViewTintColor:`: the tab's title color, without its state. [CN] Tab 的标题颜色，不含状态。
@@ -224,29 +261,66 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
             viewModel.play()
         } else if let input = configuration.stateMachineInput, usableInput {
             viewModel.setInput(input, value: false)
+            // [EN] Play with NO, so the state machine advances and runs its NO pass (menu_button.riv: hamburger -> X); a machine
+            //      that is not playing only sees NO and YES in one advance and stays where it was (docs/Animated-Item.md).
+            // [CN] 带着 NO 播放，使状态机前进并运行 NO 的那一遍（menu_button.riv：汉堡 -> X）；不在播放的状态机会在同一次前进中同时看到 NO 与 YES，
+            //      停在原处（docs/Animated-Item.md）。
+            viewModel.play()
             let duration = configuration.activeDuration
             deactivateTask = Task { @MainActor [weak self] in
-                // [EN] A frame later: the state machine sees NO, then YES. [CN] 一帧之后：状态机先看到 NO，再看到 YES。
-                try? await Task.sleep(nanoseconds: 50_000_000)
+                // [EN] Until the NO pass has settled (at least a frame, at most `CYLRiveInputPass.offWindowCap`: the input's
+                //      `activeDuration`, up to `maximumOffSeconds`), then YES.
+                // [CN] 等到 NO 的那一遍稳定（至少一帧，至多 `CYLRiveInputPass.offWindowCap`：输入的 `activeDuration`，不超过 `maximumOffSeconds`），再设为 YES。
+                var elapsed: TimeInterval = 0
+                repeat {
+                    try? await Task.sleep(nanoseconds: 16_000_000)
+                    elapsed += 0.016
+                    guard !Task.isCancelled, let self else {
+                        return
+                    }
+                    if CYLRiveInputPass.offWindowEnds(elapsed: elapsed, isSettled: !self.viewModel.isPlaying, activeDuration: duration) {
+                        break
+                    }
+                } while true
                 guard !Task.isCancelled, let self else {
                     return
                 }
                 self.viewModel.setInput(input, value: true)
                 self.viewModel.play()
-                guard duration > 0 else {
+                self.isActive = true
+                guard CYLRiveInputPass.hasEnd(activeDuration: duration) else {
                     return
                 }
                 try? await Task.sleep(nanoseconds: UInt64(duration * 1_000_000_000))
-                guard !Task.isCancelled else {
+                // [EN] The end rule is the pure function `CYLRiveInputPass.ending` (unit-tested without RiveRuntime).
+                // [CN] 结束规则是纯函数 `CYLRiveInputPass.ending`（无需 RiveRuntime 即可单元测试）。
+                guard case .ended(let notifiesEnd) = CYLRiveInputPass.ending(activeDuration: duration, isCancelled: Task.isCancelled, loops: self.loops) else {
                     return
                 }
                 self.viewModel.setInput(input, value: false)
+                self.isActive = false
+                if notifiesEnd {
+                    self.endHandler?()
+                }
             }
         } else {
             viewModel.reset()
             viewModel.play()
         }
         scheduleLoop()
+    }
+
+    /// [EN] Called when a pass of a state machine input with an `activeDuration` ends and looping is off, as the current
+    ///      renderer does; a trigger, a number input, a linear animation or an input held YES (`activeDuration` 0) has no end
+    ///      to tell. [CN] 带 `activeDuration` 的状态机输入的一遍播放结束且循环关闭时调用，与当前渲染器相同；trigger、数字输入、
+    ///      线性动画或保持为 YES 的输入（`activeDuration` 为 0）没有可判断的结束。
+    public func setAnimationEndHandler(_ handler: (() -> Void)?) {
+        endHandler = handler
+    }
+
+    /// [EN] Whether the input is held YES now (the other kinds have no state to read). [CN] 输入当前是否保持为 YES（其他类型没有可读取的状态）。
+    public func isAnimationPlaying() -> Bool {
+        isActive
     }
 
     /// [EN] `cyl_setAnimationViewLoops:`. [CN] `cyl_setAnimationViewLoops:`。
@@ -304,6 +378,7 @@ public final class CYLRiveLegacyTabBarItemAnimationView: UIView, CYLTabBarItemAn
         deactivateTask = nil
         loopTask?.cancel()
         loopTask = nil
+        isActive = false
         if configuration.animationName != nil {
             viewModel.stop()
         } else if let input = configuration.stateMachineInput {

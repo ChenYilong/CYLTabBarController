@@ -152,7 +152,7 @@ Page({
    * [EN] Replays a core tap animation (CYLTabBarControllerTabButtonTapAnimation) on a standalone cyl-tab-bar-item.
    * [CN] 在单独的 cyl-tab-bar-item 上重放核心层的点击动画（CYLTabBarControllerTabButtonTapAnimation）。
    */
-  cyl_playTapAnimation(event) {
+  cylPlayTapAnimation(event) {
     const name = event.currentTarget.dataset.name;
     this.setData({ [`playing.${name}`]: '' }, () => {
       this.setData({ [`playing.${name}`]: `cyl-animate-${name}` });
@@ -179,7 +179,7 @@ Page({
     this.setData({ 'checkin.week': week, 'checkin.stats.week': week.filter((day) => day.done).length });
   },
 
-  cyl_setItemStyle(event) {
+  cylSetItemStyle(event) {
     this.setData({ itemStyle: event.currentTarget.dataset.style });
   },
 

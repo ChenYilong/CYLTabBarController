@@ -45,6 +45,10 @@
       "value": "Berkelip ×3"
     },
     {
+      "name": "cyl_l10n_9594eec95be7",
+      "value": "Blue"
+    },
+    {
       "name": "cyl_l10n_070554647306",
       "value": "Sempadan"
     },
@@ -95,6 +99,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem: berpusat"
+    },
+    {
+      "name": "cyl_l10n_5adb0dc263ad",
+      "value": "Color: %@"
     },
     {
       "name": "cyl_l10n_f6da70b584ae",
@@ -281,12 +289,20 @@
       "value": "Membuka pengawal yang imej butang tambahnya berubah selepas 2 s; susun atur tidak boleh beralih"
     },
     {
+      "name": "cyl_l10n_ee38e4d5dd68",
+      "value": "Red"
+    },
+    {
       "name": "cyl_l10n_c27618b1aa9d",
       "value": "Titik merah"
     },
     {
       "name": "cyl_l10n_255c00a63f9d",
       "value": "Jejari titik merah"
+    },
+    {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "Lepaskan pengawal bar tab (dalam 3 s)"
     },
     {
       "name": "cyl_l10n_56e8fac7007d",
@@ -303,6 +319,10 @@
     {
       "name": "cyl_l10n_9d01c837b4bc",
       "value": "Rive tab icon: house.riv (number input Rooms)"
+    },
+    {
+      "name": "cyl_l10n_bdd66081cc94",
+      "value": "Rive colors"
     },
     {
       "name": "cyl_l10n_f0c792c049bc",
@@ -373,6 +393,10 @@
       "value": "Still image after the animation ends"
     },
     {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "Pengawal bar tab telah dilepaskan"
+    },
+    {
       "name": "cyl_l10n_fee4a478923f",
       "value": "Interaksi tab"
     },
@@ -413,6 +437,10 @@
       "value": "Rupa bar tab"
     },
     {
+      "name": "cyl_l10n_abf44ef609ef",
+      "value": "The file's colors"
+    },
+    {
       "name": "cyl_l10n_7c4aecba91c3",
       "value": "Imej tab halaman ini daripada rawfile aplikasi (bundle sumber dalam iOS); ketik sekali lagi untuk memulihkan"
     },
@@ -427,6 +455,10 @@
     {
       "name": "cyl_l10n_a4d0d101d6a3",
       "value": "Atas kiri"
+    },
+    {
+      "name": "cyl_l10n_e38d6ac40a62",
+      "value": "applyColors: a view model color property of a data-bound .riv"
     },
     {
       "name": "cyl_l10n_2306a585ae00",
@@ -469,6 +501,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; ketik untuk memilih, kemudian tatal senarai ini"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "panggilan balik dealloc dijalankan: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "panggilan balik dealloc dijalankan: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: kapsul tab, bola carian dan bar muzik di atas kandungan berwarna; tatal untuk mengecilkan"
     },
@@ -495,6 +535,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; apabila disembunyikan, kembali selepas 2 s"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "teardown: belum dijalankan"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "teardown: dilepaskan dalam %d s"
     },
     {
       "name": "cyl_l10n_2a0608059131",

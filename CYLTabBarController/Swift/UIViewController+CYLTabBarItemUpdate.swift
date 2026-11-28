@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] Rows, each one switching one thing on the tab, or back.
  * [CN] 每行切换 Tab 的一项，或恢复。

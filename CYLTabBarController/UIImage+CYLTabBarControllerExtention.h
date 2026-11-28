@@ -9,7 +9,7 @@
 // CYL-SWIFT-MIGRATION: objc-required — [EN] Only `CYLImageLoadOptions` is left: an `NS_OPTIONS` type, which Swift cannot export to Objective-C (a Swift OptionSet is not @objc) (step 116)
 //      (docs/Swift-Migration-Phase3.md). [CN] Swift 无法为 Objective-C 调用方导出的内容（见 docs/Swift-Migration-Phase3.md）。
 #import <UIKit/UIKit.h>
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -13,6 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cyltabbar/flutter_cyltabbar.dart';
 
+import 'demo/cyl_badge_tags_page.dart';
 import 'demo/cyl_badge_view.dart';
 import 'demo/cyl_demo_list.dart';
 import 'demo/cyl_localization.dart';
@@ -508,8 +509,16 @@ class _ExamplePageState extends State<CYLExamplePage> {
   // example's first tab imitates its home table, so they are on the other tabs. 播放控件：一个实时生效的策略，在其他 Tab 上
   // （Objective-C 示例的第一个 Tab 模仿其首页表格）。
   int _playAllRequest = 0;
+  // True while the user scrolls the demo list: the tab icon animations pause. 用户滚动示例列表时为 true：Tab 图标动画暂停。
+  bool _animationsPaused = false;
   double _animationSpeed = 1;
   bool _animationLoops = false;
+  // Host-driven mode of the engine row: with drivesAnimationPlayback false the item plays only on play() / restart().
+  bool _drivesPlayback = true;
+  // The still image after a play-once pass (showsImageWhenAnimationEnds with image); off keeps the last frame.
+  bool _showsImageWhenEnded = false;
+  int _engineEnded = 0;
+  final CYLAnimationController _engineController = CYLAnimationController();
   // CYLSwitchTitlePositionAdjustment(): the title row cycles the vertical offset of every title through 0, -4 and 4 at
   // runtime (`setTitlePositionAdjustment:`); null is the configuration's -3.5. 标题行在运行时依次切换所有标题的垂直偏移：
   // 0、-4、4；null 为配置中的 -3.5。
@@ -830,6 +839,62 @@ class _ExamplePageState extends State<CYLExamplePage> {
                 riveIcons: cylRiveTabIcons,
                 onRiveIconsChanged: widget.onRiveIconsChanged,
               ),
+            // The engine API of CYLAnimationView (docs/Animated-Item.md): the same Play all, speed and loop controls drive
+            // one icon of icons.riv through animationRestartToken, animationSpeed and animationLoops.
+            // CYLAnimationView 的引擎 API：同一组「全部播放」、倍速与循环控件通过 animationRestartToken、animationSpeed 与
+            // animationLoops 驱动 icons.riv 的一个图标。
+            if (!_plusPageSelected && _selectedIndex != 0)
+              Semantics(
+                label: 'CYLAnimationView, icons.riv',
+                image: true,
+                child: SizedBox(
+                  height: 48,
+                  child: CYLAnimationView(
+                    file: 'icons.riv',
+                    options: const {
+                      'artboard': 'TIMER',
+                      'stateMachine': 'TIMER_Interactivity',
+                      'input': 'active',
+                      'duration': 2,
+                    },
+                    selected: true,
+                    animationSpeed: _animationSpeed,
+                    animationLoops: _animationLoops,
+                    animationRestartToken: _playAllRequest,
+                    drivesAnimationPlayback: _drivesPlayback,
+                    showsImageWhenAnimationEnds: _showsImageWhenEnded,
+                    image: 'cyl_still_check.png',
+                    controller: _engineController,
+                    onAnimationEnd: () => setState(() => _engineEnded++),
+                    iconSize: 40,
+                  ),
+                ),
+              ),
+            if (!_plusPageSelected && _selectedIndex != 0)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Semantics(
+                    label: 'Drives playback',
+                    child: Switch(
+                      value: _drivesPlayback,
+                      onChanged: (value) => setState(() => _drivesPlayback = value),
+                    ),
+                  ),
+                  Semantics(
+                    label: 'Show image when ended',
+                    child: Switch(
+                      value: _showsImageWhenEnded,
+                      onChanged: (value) => setState(() => _showsImageWhenEnded = value),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => _engineController.play(),
+                    child: const Text('Play'),
+                  ),
+                  Text('end ×$_engineEnded', semanticsLabel: 'End callback $_engineEnded times'),
+                ],
+              ),
             Expanded(
               child: _plusPageSelected
                   ? Center(
@@ -843,6 +908,7 @@ class _ExamplePageState extends State<CYLExamplePage> {
                       ),
                     )
                   : CYLDemoList(
+                      onScrollingChanged: (scrolling) => setState(() => _animationsPaused = scrolling),
                       colors: CYLDemoColors(dark),
                       tint: skin.tint != null
                           ? hexColor(skin.tint!)
@@ -879,6 +945,10 @@ class _ExamplePageState extends State<CYLExamplePage> {
                           return widget.onChooseSkin(row.skin!.name);
                         }
                         if (row.id == 'skin') return _showSkinMenu(dark);
+                        if (row.id == 'badgeTags') {
+                          Navigator.of(context).push(MaterialPageRoute<void>(builder: (context) => const CYLBadgeTagsPage()));
+                          return;
+                        }
                         if (row.id == 'language') return _showLanguagePicker();
                         if (row.id == 'titleOffset') {
                           return setState(() => _titleOffset = _nextTitleOffset(_shownTitleOffset));
@@ -945,6 +1015,7 @@ class _ExamplePageState extends State<CYLExamplePage> {
         playbackSpeed: _animationSpeed,
         playbackLoops: _animationLoops,
         playAllRequest: _playAllRequest,
+        animationsPaused: _animationsPaused,
         titlePositionAdjustment: _titleOffset == null ? null : Offset(0, _titleOffset!),
         onMemoryWarning: (report) => showDialog<void>(
           context: context,

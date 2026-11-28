@@ -7,6 +7,34 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
+/**
+ [EN] A tab button that is not in a system tab bar and knows its controller (the FlatDesign button).
+ [CN] 不在系统 TabBar 中、但知道其控制器的 Tab 按钮（扁平样式按钮）。
+ */
+protocol CYLTabBarItemAnimationDefaultsSource: AnyObject {
+    var animationTabBarController: CYLTabBarController? { get }
+}
+
+extension UIControl {
+    /// [EN] `tabBarItemAnimationRenderingMode` of the controller of this tab button, asked by selector by the animation engine. [CN] 本 Tab 按钮所属控制器的 `tabBarItemAnimationRenderingMode`，由动画引擎通过 selector 询问。
+    @objc(cyl_tabBarItemAnimationDefaultRenderingMode)
+    func cylTabBarItemAnimationDefaultRenderingMode() -> Int {
+        let controller: CYLTabBarController?
+        if let source = self as? CYLTabBarItemAnimationDefaultsSource {
+            controller = source.animationTabBarController
+        } else {
+            controller = cylTabBarController
+        }
+        return (controller?.tabBarItemAnimationRenderingMode ?? .automatic).rawValue
+    }
+}
+
 /**
  [EN] Block 8 of the third batch handed over by Mac-CYLTabBarController文件夹 (docs/Swift-Migration.md, step 131): the animated tab
       icons (Lottie, PAG and the other engines of the `CYLTabBarItemAnimation` subspec) added to the tab buttons, from the
@@ -148,6 +176,23 @@ extension CYLTabBarController {
             tabBar.cylPlayTabBarItemAnimation(withSelectedControl: selectedLayerControl, url: url, size: size, defaultSelected: defaultSelected,
                                               contentMode: contentMode)
         }
+    }
+
+    /// [EN] `tabBarItemAnimationRenderingMode` changed: every tab's animation view is prepared again, then tinted. Only the stored or loaded tab bars (none is created).
+    /// [CN] `tabBarItemAnimationRenderingMode` 变化：重新准备每个 Tab 的动画视图并着色。只处理已保存或已加载的 TabBar（不会创建）。
+    func cylApplyTabBarItemAnimationRenderingMode() {
+        guard let service = CYLTabBarItemAnimationCore.service else { return }
+        var views: [UIView] = []
+        if let stored = cylPrivate.cylStoredTabBar() { views.append(stored) }
+        if isViewLoaded, !views.contains(tabBar) { views.append(tabBar) }
+        while let view = views.popLast() {
+            if let control = view as? UIControl {
+                service.refreshAnimationTint?(in: control)
+                control.setNeedsLayout()
+            }
+            views.append(contentsOf: view.subviews)
+        }
+        cylSetNeedsApplyTabBarItemAnimationTintColors()
     }
 
     /// [EN] Stops observing `tabImageViewDefaultOffset` of the CYLTabBar it was added to (the stored one, never the lazy getter).

@@ -119,3 +119,13 @@ __pycache__/
 # [CN] 维护者本地的参考项目（RiveViewer-miniapp 为 PolyForm-Noncommercial 许可）：不提交。
 CrossPlatform/RiveViewer-miniapp/
 CrossPlatform/LottieWMC/
+
+# Fetched by scripts/fetch-classifymenu.sh (pinned in classifymenu.pin)
+CrossPlatform/harmonyos-cyltabbar/cylclassifymenu/
+Example-Android/cylclassifymenu/
+CrossPlatform/wechat-miniprogram-cyltabbar/example/cylclassifymenu-miniprogram/
+# Fetched by scripts/harmonyos-build.sh (scripts/fetch-animation-resources.py PAGResources) for the HarmonyOS "Rive and PAG" page
+CrossPlatform/harmonyos-cyltabbar/entry/src/main/resources/rawfile/pag/
+
+# Session memory notes of a handover stay on the local machine and are never pushed. 交接用的会话记忆只保留在本机，不提交。
+docs/todo/**/memory/

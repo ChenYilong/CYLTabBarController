@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a على Android: لا يمكن للتطبيق إرسال حدث النظام هذا.";
 "Runs every automatic row, one after the other." = "يشغّل كل الصفوف التلقائية، واحدًا تلو الآخر.";
 "Tab bar %@ · page ID \"%@\"" = "شريط علامات التبويب %@ · معرّف الصفحة «%@»";
+"Animated item engine API" = "واجهة محركات العنصر المتحرك";
+"Stop at 50%" = "إيقاف عند 50%";
+"Show image when ended" = "عرض الصورة عند الانتهاء";
+"Restart token: %@" = "رمز إعادة التشغيل: %@";
+"End callback: %@" = "استدعاء الانتهاء: %@";
+"none yet" = "لا شيء بعد";
+"Host-driven playback (drivesAnimationPlayback = false)" = "المضيف يتحكم في التشغيل (drivesAnimationPlayback = false)";
+"Engine API" = "واجهة المحرك";
+"Pause while scrolling" = "إيقاف مؤقت أثناء التمرير";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "تحرير وحدة التحكم في شريط علامات التبويب (خلال 3 ث)";
+"teardown: not run" = "التفكيك: لم يتم التشغيل";
+"teardown: releasing in %d s" = "التفكيك: التحرير خلال %d ث";
+"dealloc callbacks ran: %d / %d" = "اكتملت استدعاءات dealloc: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "اكتملت استدعاءات dealloc: %d / %d (%@)";
+"Tab bar controller released" = "تم تحرير وحدة التحكم في شريط علامات التبويب";
+"bridge: pause %d, resume %d" = "الجسر: إيقاف مؤقت %d، استئناف %d";
+"last event: -" = "آخر حدث: -";
+"last event: %@" = "آخر حدث: %@";
+"Content inset" = "الهامش الداخلي للمحتوى";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset غير معيّن: عنصر مسطح وعنصر Liquid Glass، في الحالة العادية والمحددة";
+"Flat: itemContentHorizontalInset unset" = "مسطح: itemContentHorizontalInset غير معيّن";
+"Normal" = "عادي";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset غير معيّن";

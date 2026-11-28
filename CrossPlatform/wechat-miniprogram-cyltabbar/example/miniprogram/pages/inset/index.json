@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "Content inset",
+  "usingComponents": {
+    "cyl-animated-item": "cyl-tabbar-miniprogram/cyl-animated-item/index"
+  }
+}

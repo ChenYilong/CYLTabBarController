@@ -44,6 +44,8 @@ type Props = {
   header?: React.ReactNode;
   onRow: (row: CYLDemoRow, index: number) => void;
   onSwitch: (row: CYLDemoRow, on: boolean) => void;
+  /** The user starts or stops scrolling the list: the example pauses the tab icon animations meanwhile. 用户开始或停止滚动列表：示例据此暂停 Tab 图标动画。 */
+  onScrollingChanged?: (scrolling: boolean) => void;
 };
 
 /** How VoiceOver / TalkBack reads a badge, as `CYLBadge`: "New content", "3 new messages" or its text. 读屏软件读出的角标内容。 */
@@ -87,7 +89,7 @@ function rowAccessibilityState(item: CYLDemoRow, isSwitch: boolean, switches: Re
   return item.skin ? { selected: item.skin.name === currentSkin } : undefined;
 }
 
-export function CYLDemoList({ colors, tint, values, switches, currentSkin, badgeSubtitle, header, onRow, onSwitch }: Readonly<Props>) {
+export function CYLDemoList({ colors, tint, values, switches, currentSkin, badgeSubtitle, header, onRow, onSwitch, onScrollingChanged }: Readonly<Props>) {
   const sections = [
     ...DATA.sections.map((section) => ({
       title: t(section.title),
@@ -113,6 +115,12 @@ export function CYLDemoList({ colors, tint, values, switches, currentSkin, badge
         badge,
       })),
     },
+  ];
+
+  // [EN] React Native only: the badge tag page (docs/Animated-Item-Badge-CrossPlatform.md, step R5). [CN] 仅 React Native：角标 Tag 页（步骤 R5）。
+  sections[0]!.data = [
+    { id: 'badgeTags', icon: null, title: 'CYLAnimationView badges', subtitle: 'badgeValue · badgeAttributes', accessory: 'chevron' },
+    ...sections[0]!.data,
   ];
 
   const icon = (row: CYLDemoRow) => {
@@ -165,6 +173,13 @@ export function CYLDemoList({ colors, tint, values, switches, currentSkin, badge
 
   return (
     <SectionList
+      onScrollBeginDrag={() => onScrollingChanged?.(true)}
+      onScrollEndDrag={(event) => {
+        // A fling keeps the list moving: wait for onMomentumScrollEnd. 甩动时列表继续滚动：等待 onMomentumScrollEnd。
+        const velocity = event.nativeEvent.velocity;
+        if (!velocity || (Math.abs(velocity.x) < 0.05 && Math.abs(velocity.y) < 0.05)) onScrollingChanged?.(false);
+      }}
+      onMomentumScrollEnd={() => onScrollingChanged?.(false)}
       style={{ backgroundColor: colors.background }}
       contentContainerStyle={styles.content}
       sections={sections}

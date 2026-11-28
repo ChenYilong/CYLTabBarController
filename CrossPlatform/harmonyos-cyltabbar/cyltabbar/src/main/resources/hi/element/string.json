@@ -45,6 +45,10 @@
       "value": "3 बार झपकना"
     },
     {
+      "name": "cyl_l10n_9594eec95be7",
+      "value": "Blue"
+    },
+    {
       "name": "cyl_l10n_070554647306",
       "value": "बॉर्डर"
     },
@@ -95,6 +99,10 @@
     {
       "name": "cyl_l10n_5e74163d3804",
       "value": "CYLFlatDesignTabBarItem: बीच में"
+    },
+    {
+      "name": "cyl_l10n_5adb0dc263ad",
+      "value": "Color: %@"
     },
     {
       "name": "cyl_l10n_f6da70b584ae",
@@ -281,12 +289,20 @@
       "value": "ऐसा कंट्रोलर खोलता है जिसकी प्लस बटन छवि 2 s बाद बदलती है; लेआउट नहीं हिलना चाहिए"
     },
     {
+      "name": "cyl_l10n_ee38e4d5dd68",
+      "value": "Red"
+    },
+    {
       "name": "cyl_l10n_c27618b1aa9d",
       "value": "लाल बिंदु"
     },
     {
       "name": "cyl_l10n_255c00a63f9d",
       "value": "लाल बिंदु की त्रिज्या"
+    },
+    {
+      "name": "cyl_l10n_ba2e321351b3",
+      "value": "टैब बार कंट्रोलर को रिलीज़ करें (3 सेकंड में)"
     },
     {
       "name": "cyl_l10n_56e8fac7007d",
@@ -303,6 +319,10 @@
     {
       "name": "cyl_l10n_9d01c837b4bc",
       "value": "Rive tab icon: house.riv (number input Rooms)"
+    },
+    {
+      "name": "cyl_l10n_bdd66081cc94",
+      "value": "Rive colors"
     },
     {
       "name": "cyl_l10n_f0c792c049bc",
@@ -373,6 +393,10 @@
       "value": "Still image after the animation ends"
     },
     {
+      "name": "cyl_l10n_28cbf33cd2d5",
+      "value": "टैब बार कंट्रोलर रिलीज़ हो गया"
+    },
+    {
       "name": "cyl_l10n_fee4a478923f",
       "value": "टैब इंटरैक्शन"
     },
@@ -413,6 +437,10 @@
       "value": "टैब बार का रूप"
     },
     {
+      "name": "cyl_l10n_abf44ef609ef",
+      "value": "The file's colors"
+    },
+    {
       "name": "cyl_l10n_7c4aecba91c3",
       "value": "इस पेज के टैब की छवि ऐप की rawfile से (iOS का रिसोर्स बंडल); वापस लाने के लिए फिर से टैप करें"
     },
@@ -427,6 +455,10 @@
     {
       "name": "cyl_l10n_a4d0d101d6a3",
       "value": "ऊपर बाएँ"
+    },
+    {
+      "name": "cyl_l10n_e38d6ac40a62",
+      "value": "applyColors: a view model color property of a data-bound .riv"
     },
     {
       "name": "cyl_l10n_2306a585ae00",
@@ -469,6 +501,14 @@
       "value": "cyl_tabBarMinimizeBehavior = %@; चुनने के लिए टैप करें, फिर यह सूची स्क्रॉल करें"
     },
     {
+      "name": "cyl_l10n_59639b4b0250",
+      "value": "dealloc कॉलबैक चले: %d / %d"
+    },
+    {
+      "name": "cyl_l10n_04c2abbe5e66",
+      "value": "dealloc कॉलबैक चले: %d / %d (%@)"
+    },
+    {
       "name": "cyl_l10n_4abddd944c2e",
       "value": "harmonyos-liquid-glass-tabbar: रंगीन सामग्री के ऊपर टैब कैप्सूल, खोज गेंद और संगीत बार; छोटा करने के लिए स्क्रॉल करें"
     },
@@ -495,6 +535,14 @@
     {
       "name": "cyl_l10n_c4376b477be8",
       "value": "tabBarHidden = %@; छिपाने पर 2 s बाद लौटता है"
+    },
+    {
+      "name": "cyl_l10n_849bce3cbf78",
+      "value": "टियरडाउन: चलाया नहीं गया"
+    },
+    {
+      "name": "cyl_l10n_a797e7328b1f",
+      "value": "टियरडाउन: %d सेकंड में रिलीज़"
     },
     {
       "name": "cyl_l10n_2a0608059131",

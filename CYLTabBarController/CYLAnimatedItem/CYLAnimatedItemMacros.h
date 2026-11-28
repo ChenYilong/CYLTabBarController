@@ -4,10 +4,9 @@
 //
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
-//  [EN] The CYLAnimatedItem pod's own macros. It depends on no other pod (not on CYLTabBarController), so it does not
-//       import CYLUtils; CYLTabBarController's `CYLUtilsMacros.h` imports this file for the shared ones.
-//  [CN] CYLAnimatedItem pod 自己的宏。它不依赖任何其他 pod（不依赖 CYLTabBarController），因此不导入 CYLUtils；CYLTabBarController 的
-//       `CYLUtilsMacros.h` 导入本文件以获得共用的宏。
+//  [EN] The CYLAnimatedItem pod's own macros. It depends on the bottom pod CYLUtils only (never on CYLTabBarController) and
+//       imports its `CYLUtilsMacros.h` for the shared macros.
+//  [CN] CYLAnimatedItem pod 自己的宏。它只依赖最底层的 CYLUtils pod（从不依赖 CYLTabBarController），并导入其 `CYLUtilsMacros.h` 以获得共用的宏。
 //
 
 
@@ -111,24 +110,17 @@
 #endif
 
 /*!
- * [EN] Runs `Stuff` without the performSelector-leaks warning and logs an exception instead of crashing. CYLTabBarController
- *      uses this definition too (`CYLUtilsMacros.h` defines it only when the component is missing), so there is one
- *      definition and no "ambiguous expansion of macro" warning across the two modules.
- * [CN] 执行 `Stuff`，屏蔽 performSelector 泄漏警告，并在发生异常时记录日志而不是崩溃。CYLTabBarController 也使用这个定义
- *      （`CYLUtilsMacros.h` 只在缺少组件时定义），因此只有一个定义，两个 module 之间不会出现 "ambiguous expansion of macro" 警告。
+ * [EN] `CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS` has one definition, in the bottom pod's `CYLUtilsMacros.h`, imported here (D7).
+ * [CN] `CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS` 只有一个定义，位于最底层 pod 的 `CYLUtilsMacros.h`，在此导入（D7）。
  */
-#ifndef CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS
-#define CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS(Stuff) \
-do { \
-_Pragma("clang diagnostic push") \
-_Pragma("clang diagnostic ignored \"-Warc-performSelector-leaks\"") \
-@try { \
-Stuff; \
-} @catch (NSException *exception) { \
-NSLog(@"🔴 %@ (line %@): %@", @(__PRETTY_FUNCTION__), @(__LINE__), exception.reason); \
-} \
-_Pragma("clang diagnostic pop") \
-} while (0);
+#if __has_include(<CYLUtilsKit/CYLUtilsMacros.h>)
+#import <CYLUtilsKit/CYLUtilsMacros.h>
+#elif __has_include(<CYLUtils/CYLUtilsMacros.h>)
+#import <CYLUtils/CYLUtilsMacros.h>
+#elif __has_include("CYLUtilsMacros.h")
+#import "CYLUtilsMacros.h"
+#else
+#import "../CYLUtils/CYLUtilsMacros.h"
 #endif
 
 NS_ASSUME_NONNULL_BEGIN

@@ -86,23 +86,23 @@ class CYLTabBarControllerTest {
         activity.setContentView(controller.view)
         idle()
         val button = controller.tabBar.tabBarButtonArray[1]
-        assertFalse(button.cyl_isShowBadge())
-        button.cyl_showBadgeValue("120")
-        assertTrue(button.cyl_isShowBadge())
-        assertEquals("99+", button.cyl_badge?.text)
-        button.cyl_badgeMaximumBadgeNumber = 999
-        assertEquals("120", button.cyl_badge?.text)
-        button.cyl_showBadge()
-        assertTrue(button.cyl_badge!!.isDot)
-        button.cyl_badgeBackgroundColor = Color.BLUE
-        assertEquals(Color.BLUE, button.cyl_badge?.badgeBackgroundColor)
+        assertFalse(button.cylIsShowBadge())
+        button.cylShowBadgeValue("120")
+        assertTrue(button.cylIsShowBadge())
+        assertEquals("99+", button.cylBadge?.text)
+        button.cylBadgeMaximumBadgeNumber = 999
+        assertEquals("120", button.cylBadge?.text)
+        button.cylShowBadge()
+        assertTrue(button.cylBadge!!.isDot)
+        button.cylBadgeBackgroundColor = Color.BLUE
+        assertEquals(Color.BLUE, button.cylBadge?.badgeBackgroundColor)
         controller.cyl_hidesBadgeOfSelectedTab = true
         controller.selectedIndex = 1
-        assertTrue(button.cyl_isPauseBadge())
+        assertTrue(button.cylIsPauseBadge())
         controller.selectedIndex = 0
-        assertFalse(button.cyl_isPauseBadge())
-        button.cyl_clearBadge()
-        assertNull(button.cyl_badge)
+        assertFalse(button.cylIsPauseBadge())
+        button.cylClearBadge()
+        assertNull(button.cylBadge)
         // [EN] As iOS (CYLBadgeAccessibilityDescription): a dot, a number, "99+", 0 and text. [CN] 与 iOS 相同：红点、数字、"99+"、0 与文字。
         assertEquals("New content", CYLBadgeAccessibilityDescription(button.context, ""))
         assertEquals("3 new messages", CYLBadgeAccessibilityDescription(button.context, "3"))
@@ -226,8 +226,8 @@ class CYLTabBarControllerTest {
         assertEquals(1, pages[1].cyl_tabIndex)
         assertEquals("message", pages[1].cyl_tabBarItemIdentifier)
         assertEquals(controller.tabBar.tabBarButtonArray[1], pages[1].cyl_tabButton)
-        pages[1].cyl_showBadgeValue("5")
-        assertTrue(controller.tabBar.tabBarButtonArray[1].cyl_isShowBadge())
+        pages[1].cylShowBadgeValue("5")
+        assertTrue(controller.tabBar.tabBarButtonArray[1].cylIsShowBadge())
         assertEquals(pages[2], pages[0].cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier("me"))
         assertEquals(2, controller.selectedIndex)
         assertEquals(pages[0], pages[2].cyl_popSelectTabBarChildViewControllerForClassType(Page::class.java))
@@ -453,22 +453,22 @@ class CYLTabBarControllerTest {
         row.addView(android.widget.TextView(activity).apply { text = "Title" })
         activity.setContentView(row)
         idle()
-        icon.cyl_showBadgeValue("3", CYLEnums.CYLBadgeAnimationType.None)
+        icon.cylShowBadgeValue("3", CYLEnums.CYLBadgeAnimationType.None)
         idle()
-        val badge = icon.cyl_badge!!
+        val badge = icon.cylBadge!!
         assertEquals("the badge does not join the row", 2, row.childCount)
         // [EN] As iOS (`-cyl_layoutBadgeAtTopRightCorner`): 2 dp right of the right edge. [CN] 与 iOS 相同：右边缘右侧 2 dp。
         val gap = CYL_BADGE_CORNER_GAP_DP * icon.resources.displayMetrics.density
         assertEquals("centered 2 dp right of the icon's right edge", icon.right + gap, (badge.left + badge.right) / 2f, 1f)
         assertEquals("centered on the icon's top edge", icon.top.toFloat(), (badge.top + badge.bottom) / 2f, 1f)
         val narrow = badge.width
-        icon.cyl_showBadgeValue("new", CYLEnums.CYLBadgeAnimationType.None)
+        icon.cylShowBadgeValue("new", CYLEnums.CYLBadgeAnimationType.None)
         assertTrue("\"new\" is wider than \"3\"", badge.width > narrow)
         assertEquals(badge.measuredWidth, badge.width)
-        icon.cyl_badgeFont = CYLFont(20f)
+        icon.cylBadgeFont = CYLFont(20f)
         assertEquals("a bigger font grows the badge", badge.measuredHeight, badge.height)
-        icon.cyl_clearBadge()
-        assertNull(icon.cyl_badge)
+        icon.cylClearBadge()
+        assertNull(icon.cylBadge)
     }
 
     object BadgedPlusButton : CYLPlusButtonSubclassing {
@@ -499,12 +499,12 @@ class CYLTabBarControllerTest {
         val width = plus.width
         val height = plus.height
         for (value in 1..5) {
-            plus.cyl_showBadgeValue(value.toString(), CYLEnums.CYLBadgeAnimationType.None)
+            plus.cylShowBadgeValue(value.toString(), CYLEnums.CYLBadgeAnimationType.None)
             idle(); layout()
             assertEquals("width after badge $value", width, plus.width)
             assertEquals("height after badge $value", height, plus.height)
         }
-        val badge = plus.cyl_badge!!
+        val badge = plus.cylBadge!!
         assertEquals("on the icon's right edge", plus.imageView.right.toFloat(), (badge.left + badge.right) / 2f, 1f)
         assertEquals("on the icon's top edge", plus.imageView.top.toFloat(), (badge.top + badge.bottom) / 2f, 1f)
         CYLPlusButton.removePlusButtonForTabBarContext("badged-plus")

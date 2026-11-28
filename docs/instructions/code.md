@@ -25,6 +25,26 @@ by tag and kept under 200 lines: see [instructions.md](instructions.md)).
 - **No warnings**: fix every build and static-analyzer warning you meet, including old ones in code you did not change.
 - **Public API**: never remove or change an existing public API; add new API instead. Prefer implementing an existing
   protocol method over adding a new category method; file-private C functions and private headers are fine.
+- **Protocols hold requirements only; edits are anchored uniquely (added 2026-11-23, the `CYLAnimatedItemAnimating` break)**:
+  a Swift protocol lists requirements and nothing else: no function body, no stored property. Implementations go in the
+  class (or, for a Swift-only protocol, in a protocol extension; an `@objc` protocol cannot get Objective-C-visible
+  defaults from an extension). What happened: `pauseAnimation()` / `resumeAnimation()` were pasted with their bodies inside
+  `@objc public protocol CYLAnimatedItemAnimating` (commit `cc74a545`, still in `e0d5e960`), because the anchor text
+  `func playAnimation()` occurs in the protocol *and* in the class and the paste landed at the first match. Swift rejects
+  that, and every integrator that pinned the branch (CYLTableViewPlaceHolder) failed to compile before any CI had run on
+  the commit. Rules:
+  (1) **Released protocols**: `CYLAnimatedItemAnimating` and every other public protocol is released API; a new *required*
+  member breaks external conformers, so a new member of an `@objc` protocol is `@objc optional` (called as `x.method?()`),
+  or the method lives only on the class when every caller holds the class.
+  (2) **Anchors**: when a script or an edit inserts code, the anchor text includes the declaration keyword and the opening
+  brace (`open func playAnimation() {`, not `func playAnimation()`), is asserted to occur exactly once, and the insertion
+  point is the *end* of a declaration (never right after an opening brace). A search must also be scoped: the end marker of
+  a block is searched from the start marker, not from the top of the file.
+  (3) **Afterwards, check the enclosing declaration** of what was inserted (`sed -n '/protocol Name/,/^}/p'`), and compare
+  the protocol's member list with its version before the change.
+  (4) **Run `python3 scripts/check-swift-protocol-bodies.py CYLTabBarController`** before pushing Swift written without a
+  compiler: it fails on a protocol that contains a function body or a stored property (it found the two bodies above and
+  reports 0 after the fix). It is a heuristic, not a compile: say in the commit that the code was not compiled.
 - **Swift-friendly names for underscored protocol methods**: Swift method names must not contain underscores, but a
   Swift class that implements an Objective-C protocol method must use its imported name (e.g. `cyl_play…`); renaming it
   no longer satisfies the protocol. Adding `NS_SWIFT_NAME` to the existing method would change a Swift API already
@@ -38,13 +58,40 @@ by tag and kept under 200 lines: see [instructions.md](instructions.md)).
   another project, a sample, a snippet) follows the same rules:
   - Name new classes, structs, enums, protocols, file-private C functions and constants with the `CYL` prefix
     (`CYLBadgeView`, `CYLDemoTheme`), and the file after its main type (`CYLBadgeView.m`, `UIView+CYLBadgeExtention.m`).
-  - Name every method and property added in a category with the `cyl_` prefix (`-cyl_showBadgeValue:`), also in
-    extensions of system types written in Swift, Kotlin, Dart or TypeScript in this repository.
+  - **The prefix exists to stop silent overriding (amended 2026-11-27, owner decisions N0-N3,
+    [docs/Animated-Item-Badge-CrossPlatform.md](../Animated-Item-Badge-CrossPlatform.md#ennaming-where-a-cyl-prefix-is-needed-reassessed-per-platform)).**
+    Why iOS uses `cyl_`: Objective-C categories have no namespace. A category method silently overrides, or is
+    overridden by, a method with the same name that the integrating app, the system or another library has on that
+    class, so someone else's implementation is replaced. The `cyl_` prefix makes such a clash impossible. On every other
+    platform, reassess whether the language already prevents this, and keep a prefix only where it does not. The
+    spelling always follows the language:
+    - Objective-C selectors of category methods and properties (also `@objc` members added in Swift extensions):
+      `cyl_` is required (`-cyl_showBadgeValue:`); the Swift name is `cylFoo` (see the SonarCloud bullet below).
+    - Kotlin, Dart and TypeScript extensions: **`cyl_` is not required.** Extensions are resolved at compile time and
+      never override a member. On a platform type (`View`, `TextView`, `MenuItem`, Flutter classes) use `cylFoo`, with
+      no underscore, because a member the platform adds later silently wins over the extension; on our own types, no
+      prefix.
+    - Public methods of a WeChat Mini Program component instance: keep a prefix, spelled `cylFoo` (they share the
+      instance namespace with the framework's own methods and behaviours, so a same-named method silently shadows
+      them). **When `cylFoo` is already taken (owner, 2026-11-28, N4): `cyl` + module name + the original method name**,
+      so the module name is inserted and the clash goes away: `cylBadgeFoo`, `cylAnimatedItemPlayer`,
+      `cylTabBarPlayAll`. The module is the component or library that owns the method (`Badge`, `AnimatedItem`,
+      `TabBar`, `Lottie`). Apply the same style on any platform where a prefixed name clashes, and never add a suffix
+      or a digit to dodge a clash.
+    - No prefix: members of our own types on every platform, ArkTS APIs (ArkTS cannot extend system components or
+      prototypes), TypeScript / React Native props and ES module members, Dart library members. Global names keep a
+      prefix (Android resources, channel and native module names, component tags, CSS classes, event names, storage
+      keys).
+    - **Release status (owner, 2026-11-27): only iOS is released; Android, HarmonyOS, the WeChat Mini Program, React
+      Native and Flutter are not released yet.** iOS names keep their spelling (public API rule). On the other
+      platforms, existing names that break this rule (for example Android `View.cyl_*`, HarmonyOS `CYLBadge.cyl_*`,
+      mini program `cyl_*` component methods) are renamed directly, with no aliases and no deprecated forwards. Once a
+      platform is released, the public API rule applies to it too.
   - Remove any other prefix the copied code carries (another project's or author's prefix, `XX`, `My`, `QMUI`, `JX`…)
     and rename its symbols, files and references accordingly; keep a credit to the source in a comment instead.
   - Keep the names of public APIs that already shipped, as the Public API rule requires; this rule is for new code.
   - **Swift names follow SonarCloud (added 2026-11-23, owner; swift:S100 / S101 / S115 / S116 / S117 and the Swift
-    API Design Guidelines).** The `cyl_` rule above is for Objective-C selectors and for non-Swift languages. In Swift:
+    API Design Guidelines).** The `cyl_` rule above is for Objective-C selectors (and the reasons above for other languages). In Swift:
     types keep `CYL` (`CYLFoo`, no leading underscore); a member of our own type has no prefix (`reloadTabButtons`);
     a member added to a system type or to one of our types in an extension is `cylFoo` (add `@objc(cyl_foo)` when
     Objective-C calls it, so the selector stays); a global function or constant is `cylFoo`; a test helper is

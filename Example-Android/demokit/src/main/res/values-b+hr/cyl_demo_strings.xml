@@ -30,10 +30,13 @@
     <string name="cyl_demo_6a69211e0f">Svaka scena je traka s karticama izrađena javnim API-jem: stilovi, animacije, značke, Lottie i noviji API kartica</string>
     <string name="cyl_demo_7efc907fe3">Animirana stavka</string>
     <string name="cyl_demo_9244b5dc65">Komponenta animirane ikone + naslova zasebno: GIF, Lottie, datoteka koja nedostaje, dodatak i povlačenje</string>
+    <string name="cyl_demo_5dbde9a698">Unutarnja margina sadržaja</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset nije postavljeno: ravna stavka i stavka Liquid Glass, normalna i odabrana</string>
     <string name="cyl_demo_185d8ef0ae">Značke</string>
     <string name="cyl_demo_2db1db0706">Reprodukcija</string>
     <string name="cyl_demo_34bffc9c7a">Animacije ikona kartica: Reproduciraj sve, brzina, petlja</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">Brzina %@, petlja %@; dodirnite za kontrole</string>
+    <string name="cyl_demo_2f63c1fff7">Oslobodi kontroler trake kartica (za 3 s)</string>
     <string name="cyl_demo_a4fe65264e">Jezik</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">Trenutno: %@</string>
     <string name="cyl_demo_bbc5e661e1">sustav</string>
@@ -130,6 +133,10 @@
     <string name="cyl_demo_7108183f18">Zahtjev otkazan</string>
     <string name="cyl_demo_5fbceaee5f">Zahtjev bez URL-a</string>
     <string name="cyl_demo_4334569b3d">HTML stranica (mreža)</string>
+    <string name="cyl_demo_e2917c5f0d">Ravno: itemContentHorizontalInset nije postavljeno</string>
+    <string name="cyl_demo_a7248eeb45">Normalno</string>
+    <string name="cyl_demo_57fd7a0cf3">Odabrano</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset nije postavljeno</string>
     <string name="cyl_demo_d84eebada9">Fotografija</string>
     <string name="cyl_demo_d47d7cb0e4">Više</string>
     <string name="cyl_demo_0e35f6e974">Osnovno</string>
@@ -320,6 +327,7 @@
     <string name="cyl_demo_12e7b8220d">Reproduciraj sve</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">Brzina: %@</string>
     <string name="cyl_demo_f2f6a01889">Petlja</string>
+    <string name="cyl_demo_08078d674a">Kontroler trake kartica je oslobođen</string>
     <string name="cyl_demo_44a57b22e0">Upozorenje</string>
     <string name="cyl_demo_a127ceb079">Popis radnji</string>
     <string name="cyl_demo_9329618118">List stranice</string>
@@ -338,6 +346,10 @@
     <string name="cyl_demo_1698b890f9">Pokreće sve automatske retke, jedan za drugim.</string>
     <string name="cyl_demo_afa158bdc8">Preko trenutnog konteksta</string>
     <string name="cyl_demo_0add8377e7" formatted="false">Dugo pritisnuto „%@”</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">dealloc povratni pozivi izvršeni: %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">dealloc povratni pozivi izvršeni: %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">rušenje: oslobađanje za %d s</string>
+    <string name="cyl_demo_c0fd658b68">rušenje: nije pokrenuto</string>
     <string name="cyl_demo_d4f455fa45">Otvori: dvije trake kartica, jedan ID stranice</string>
     <string name="cyl_demo_5b88804382" formatted="false">Traka s karticama %@ · ID stranice \"%@\"</string>
 </resources>

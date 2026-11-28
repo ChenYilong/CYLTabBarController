@@ -7,6 +7,12 @@
 
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /// [EN] The system tab bar height, the default of `tabBarHeight`. [CN] 系统 TabBar 的高度，`tabBarHeight` 的默认值。
 private let cylDefaultTabBarHeight: CGFloat = 49
 

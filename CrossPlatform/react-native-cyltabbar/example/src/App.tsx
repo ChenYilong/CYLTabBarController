@@ -13,6 +13,7 @@ import { CYLTabBar, type CYLTabBarBadge, type CYLTabBarItem, type CYLTabBarPlusB
 import { SKINS, THEME_ICONS, type CYLSkin } from './CYLSkins';
 import { CYLDemoList, type CYLDemoRow } from './demo/CYLDemoList';
 import { CYLPlaybackControls } from './demo/CYLPlaybackControls';
+import { CYLBadgeTagsPage } from './demo/CYLBadgeTagsPage';
 import { CYL_PICKER_LANGUAGES, CYLDemoLanguage, CYLFlaggedLanguageName, CYLIsRightToLeft, CYLLanguageName, CYLSetDemoLanguage, t, tDevice } from './demo/CYLLocalization';
 
 /** A required image's URL, for the keys the component passes as they are. 被原样传递的键使用 require 图片的 URL。 */
@@ -499,6 +500,8 @@ function CYLMainTabBar({
   // example's first tab imitates its home table, so they are on the other tabs. 播放控件：一个实时生效的策略，在其他 Tab 上
   // （Objective-C 示例的第一个 Tab 模仿其首页表格）。
   const [playAllRequest, setPlayAllRequest] = useState(0);
+  // [EN] True while the user scrolls the demo list: the tab icon animations pause. [CN] 用户滚动示例列表时为 true：Tab 图标动画暂停。
+  const [animationsPaused, setAnimationsPaused] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [playbackLoops, setPlaybackLoops] = useState(false);
   // The "Rive tab icons" switch: icons.riv instead of the Lottie icons. Rive / Lottie 图标切换。
@@ -523,6 +526,7 @@ function CYLMainTabBar({
     return () => clearTimeout(timer);
   }, [skinName, skinPicker.skin.network]);
   const [orangePagePushed, setOrangePagePushed] = useState(false);
+  const [badgeTagsShown, setBadgeTagsShown] = useState(false);
   // The badge samples' subtitle uses the page's `title`; a badge row changes only `navigationItem.title` ("Home (n)").
   // 角标样例副标题使用页面的 `title`；点击角标行只修改 `navigationItem.title`（「Home (n)」）。
   const pageTitle = homePageTitle(selectedIndex, styleType);
@@ -571,6 +575,7 @@ function CYLMainTabBar({
         </View>
       ) : (
         <CYLDemoList
+          onScrollingChanged={setAnimationsPaused}
           colors={colors}
           tint={skin.tint ?? colors.tint}
           values={demoValues(skin.name, selectedIndex, shownTitleOffset)}
@@ -594,6 +599,7 @@ function CYLMainTabBar({
           }
           onRow={(row: CYLDemoRow) => {
             if (row.skin) return skinPicker.choose(row.skin.name);
+            if (row.id === 'badgeTags') return setBadgeTagsShown(true);
             if (row.id === 'skin') return setSkinMenuVisible(true);
             if (row.id === 'flatShowHide') return setTabBarHidden((hidden) => !hidden);
             if (row.id === 'memoryWarning') return setMemoryWarningRequest((request) => request + 1);
@@ -639,6 +645,7 @@ function CYLMainTabBar({
         playbackSpeed={playbackSpeed}
         playbackLoops={playbackLoops}
         playAllRequest={playAllRequest}
+        animationsPaused={animationsPaused}
         titlePositionAdjustment={titleOffset === undefined ? undefined : [0, titleOffset]}
         onMemoryWarning={(report) => Alert.alert(t('Memory warning'), report, [{ text: t('OK') }])}
         // -[MainTabBarController cyl_demo_presentLoginForViewController:completion:]: "Messages" and "Me" need login; the
@@ -660,6 +667,13 @@ function CYLMainTabBar({
       />
       {/* -[CYLHomeViewController pushToNewViewController]: a full screen orange page without a navigation bar, over the
           tab bar; tap to go back. 覆盖 TabBar 的全屏橙色页面，无导航栏；点击返回。 */}
+      {badgeTagsShown ? (
+        <View style={[styles.orangePage, { backgroundColor: colors.background, paddingTop: insetTop }]}>
+          <View style={styles.container}>
+            <CYLBadgeTagsPage colors={colors} onClose={() => setBadgeTagsShown(false)} />
+          </View>
+        </View>
+      ) : null}
       {orangePagePushed ? (
         <Pressable style={styles.orangePage} accessibilityRole="button" accessibilityLabel="Back" onPress={() => setOrangePagePushed(false)} />
       ) : null}

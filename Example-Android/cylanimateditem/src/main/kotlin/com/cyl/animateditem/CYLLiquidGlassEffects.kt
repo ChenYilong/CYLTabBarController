@@ -1,0 +1,398 @@
+/*
+   Liquid Glass for Android views (the tab bar and the tags of CollectionViewClassifyMenu). The AGSL shaders, the effect order (vibrancy, blur, lens), the highlight and the
+   values of the tab bar are ported from Kyant's Backdrop (https://github.com/Kyant0/AndroidLiquidGlass, `backdrop/` and
+   `LiquidBottomTabs.kt`), from Compose to Android views, and renamed to this library's conventions.
+
+   Copyright 2025 Kyant
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+   Changes: Compose modifiers replaced by RenderNode drawing in a View; only the rounded rectangle shapes the tab bar uses.
+ */
+
+package com.cyl.animateditem
+
+import android.graphics.BlendMode
+import android.graphics.Canvas
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.graphics.RenderEffect
+import android.graphics.RenderNode
+import android.graphics.RuntimeShader
+import android.graphics.Shader
+import android.util.Log
+import android.os.Build
+import android.view.View
+import androidx.annotation.RequiresApi
+import kotlin.math.PI
+import kotlin.math.sqrt
+
+/**
+ * [EN] What a device can draw: the full glass (refraction, Android 13+), a blur only (Android 12) or a translucent
+ *      color (older versions and software canvases).
+ * [CN] 设备能绘制的效果：完整的玻璃（折射，Android 13+）、只有模糊（Android 12），或半透明颜色（更早的版本与软件绘制）。
+ */
+object CYLLiquidGlassSupport {
+    @get:androidx.annotation.ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)
+    val rendersBlur: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    @get:androidx.annotation.ChecksSdkIntAtLeast(api = Build.VERSION_CODES.TIRAMISU)
+    val rendersRefraction: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+}
+
+/**
+ * [EN] The AGSL shaders, from Backdrop's `internal/Shaders.kt`. [CN] AGSL 着色器，来自 Backdrop 的 `internal/Shaders.kt`。
+ */
+object CYLLiquidGlassShaders {
+    private const val ROUNDED_RECT_SDF = """
+float radiusAt(float2 coord, float4 radii) {
+    if (coord.x >= 0.0) {
+        if (coord.y <= 0.0) return radii.y;
+        else return radii.z;
+    } else {
+        if (coord.y <= 0.0) return radii.x;
+        else return radii.w;
+    }
+}
+
+float sdRoundedRect(float2 coord, float2 halfSize, float radius) {
+    float2 cornerCoord = abs(coord) - (halfSize - float2(radius));
+    float outside = length(max(cornerCoord, 0.0)) - radius;
+    float inside = min(max(cornerCoord.x, cornerCoord.y), 0.0);
+    return outside + inside;
+}
+
+float2 gradSdRoundedRect(float2 coord, float2 halfSize, float radius) {
+    float2 cornerCoord = abs(coord) - (halfSize - float2(radius));
+    if (cornerCoord.x >= 0.0 || cornerCoord.y >= 0.0) {
+        return sign(coord) * normalize(max(cornerCoord, 0.0));
+    } else {
+        float gradX = step(cornerCoord.y, cornerCoord.x);
+        return sign(coord) * float2(gradX, 1.0 - gradX);
+    }
+}"""
+
+    /**
+     * [EN] The lens: the content bends near the edge, like the rim of a glass. [CN] 透镜：内容在边缘附近弯折，如同玻璃的边缘。
+     */
+    const val REFRACTION = """
+uniform shader content;
+uniform float2 size;
+uniform float2 offset;
+uniform float4 cornerRadii;
+uniform float refractionHeight;
+uniform float refractionAmount;
+uniform float depthEffect;
+$ROUNDED_RECT_SDF
+
+float circleMap(float x) {
+    return 1.0 - sqrt(1.0 - x * x);
+}
+
+half4 main(float2 coord) {
+    float2 halfSize = size * 0.5;
+    float2 centeredCoord = (coord + offset) - halfSize;
+    float radius = radiusAt(coord, cornerRadii);
+    float sd = sdRoundedRect(centeredCoord, halfSize, radius);
+    if (-sd >= refractionHeight) {
+        return content.eval(coord);
+    }
+    sd = min(sd, 0.0);
+    float d = circleMap(1.0 - -sd / refractionHeight) * refractionAmount;
+    float gradRadius = min(radius * 1.5, min(halfSize.x, halfSize.y));
+    float2 grad = normalize(gradSdRoundedRect(centeredCoord, halfSize, gradRadius) + depthEffect * normalize(centeredCoord));
+    float2 refractedCoord = coord + d * grad;
+    return content.eval(refractedCoord);
+}"""
+
+    /**
+     * [EN] The lens with chromatic dispersion, for the pressed selection bubble. [CN] 带色散的透镜，用于按下时的选中气泡。
+     */
+    const val REFRACTION_WITH_DISPERSION = """
+uniform shader content;
+uniform float2 size;
+uniform float2 offset;
+uniform float4 cornerRadii;
+uniform float refractionHeight;
+uniform float refractionAmount;
+uniform float depthEffect;
+uniform float chromaticAberration;
+$ROUNDED_RECT_SDF
+
+float circleMap(float x) {
+    return 1.0 - sqrt(1.0 - x * x);
+}
+
+half4 main(float2 coord) {
+    float2 halfSize = size * 0.5;
+    float2 centeredCoord = (coord + offset) - halfSize;
+    float radius = radiusAt(coord, cornerRadii);
+    float sd = sdRoundedRect(centeredCoord, halfSize, radius);
+    if (-sd >= refractionHeight) {
+        return content.eval(coord);
+    }
+    sd = min(sd, 0.0);
+    float d = circleMap(1.0 - -sd / refractionHeight) * refractionAmount;
+    float gradRadius = min(radius * 1.5, min(halfSize.x, halfSize.y));
+    float2 grad = normalize(gradSdRoundedRect(centeredCoord, halfSize, gradRadius) + depthEffect * normalize(centeredCoord));
+    float2 refractedCoord = coord + d * grad;
+    float dispersionIntensity = chromaticAberration * ((centeredCoord.x * centeredCoord.y) / (halfSize.x * halfSize.y));
+    float2 dispersedCoord = d * grad * dispersionIntensity;
+    half4 color = half4(0.0);
+    half4 red = content.eval(refractedCoord + dispersedCoord);
+    color.r += red.r / 3.5;
+    color.a += red.a / 7.0;
+    half4 orange = content.eval(refractedCoord + dispersedCoord * (2.0 / 3.0));
+    color.r += orange.r / 3.5;
+    color.g += orange.g / 7.0;
+    color.a += orange.a / 7.0;
+    half4 yellow = content.eval(refractedCoord + dispersedCoord * (1.0 / 3.0));
+    color.r += yellow.r / 3.5;
+    color.g += yellow.g / 3.5;
+    color.a += yellow.a / 7.0;
+    half4 green = content.eval(refractedCoord);
+    color.g += green.g / 3.5;
+    color.a += green.a / 7.0;
+    half4 cyan = content.eval(refractedCoord - dispersedCoord * (1.0 / 3.0));
+    color.g += cyan.g / 3.5;
+    color.b += cyan.b / 3.0;
+    color.a += cyan.a / 7.0;
+    half4 blue = content.eval(refractedCoord - dispersedCoord * (2.0 / 3.0));
+    color.b += blue.b / 3.0;
+    color.a += blue.a / 7.0;
+    half4 purple = content.eval(refractedCoord - dispersedCoord);
+    color.r += purple.r / 7.0;
+    color.b += purple.b / 3.0;
+    color.a += purple.a / 7.0;
+    return color;
+}"""
+
+    /**
+     * [EN] Backdrop's `vibrancy()`: saturation 1.5. [CN] Backdrop 的 `vibrancy()`：饱和度 1.5。
+     */
+    fun vibrancyColorFilter(saturation: Float = 1.5f, brightness: Float = 1f): ColorMatrixColorFilter {
+        val inverse = 1f - saturation
+        val r = 0.213f * inverse
+        val g = 0.715f * inverse
+        val b = 0.072f * inverse
+        val matrix = ColorMatrix(floatArrayOf(
+            r + saturation, g, b, 0f, 0f,
+            r, g + saturation, b, 0f, 0f,
+            r, g, b + saturation, 0f, 0f,
+            0f, 0f, 0f, 1f, 0f,
+        ))
+        // [EN] Brightness: a scale of the colour channels, applied after the saturation. [CN] 亮度：颜色通道的缩放，在饱和度之后应用。
+        if (brightness != 1f) matrix.postConcat(ColorMatrix().apply { setScale(brightness, brightness, brightness, 1f) })
+        return ColorMatrixColorFilter(matrix)
+    }
+}
+
+/**
+ * [EN] Draws what is behind a glass shape (the pages) inside a rounded rectangle, through Backdrop's effects: the pages are
+ *      recorded into a `RenderNode`, the part under the shape is copied into a second node that carries the effect chain,
+ *      and that node is drawn clipped to the shape. Android 12+ with a hardware canvas; `draw` returns false otherwise so
+ *      the caller draws a translucent color instead.
+ * [CN] 在圆角矩形中绘制 TabBar 后面的内容（页面），并应用 Backdrop 的效果：页面录制到一个 `RenderNode`，形状下方的部分复制到带效果链的
+ *      第二个节点，再按形状裁剪后绘制。需要 Android 12+ 与硬件加速画布；否则 `draw` 返回 false，由调用方改为绘制半透明颜色。
+ */
+class CYLGlassBackdrop {
+    private var sourceNode: Any? = null
+    private var shapeNode: Any? = null
+    private val clipPath = Path()
+    private var refraction: Any? = null
+    private var dispersion: Any? = null
+    private var loggedFailure = false
+
+    /**
+     * [EN] `source` is drawn so that its point (`sourceX`, `sourceY`) lands on `rect.left`, `rect.top`.
+     * [CN] 绘制 `source` 时，其坐标（`sourceX`, `sourceY`）对齐 `rect.left`、`rect.top`。
+     */
+    fun draw(
+        canvas: Canvas, source: View, sourceX: Float, sourceY: Float, rect: RectF, radius: Float, effects: CYLGlassEffects,
+        above: List<View> = emptyList(), nested: Boolean = false,
+    ): Boolean {
+        if (!CYLLiquidGlassSupport.rendersBlur || !canvas.isHardwareAccelerated || source.width <= 0 || rect.width() <= 0f) return false
+        // [EN] A glass inside the captured page (a Liquid Glass tag in a list: the source is the root view that contains it, and every
+        //      other glass tag) would capture the page again while the page is being captured: that nesting recurses without end. While a
+        //      capture is under way every glass view anywhere skips its backdrop (returns false: the caller draws its translucent tint).
+        // [CN] 被录制页面里的玻璃（列表中的液态玻璃标签：来源是包含它的根视图，还有其他所有玻璃标签）会在录制页面的过程中再次录制页面，这种嵌套会无限递归。
+        //      录制期间，任何位置的玻璃视图都跳过背景（返回 false：由调用方绘制半透明着色）。
+        //      `nested` lets this capture run inside exactly one other capture (a section board drawn behind a tag, see CYLLiquidGlassView); `above` are more
+        //      views (section cards behind a tag, back to front) drawn over the source into the SAME recording, each at its own window offset, so the effects run once. [CN] `nested` 允许本次录制在另一个录制之内恰好嵌套一层（绘制在标签后面的分区面板）；`above` 是在同一录制中、在源之上再绘制的其他视图（标签后面的分区卡片，由后到前），各自按其窗口偏移，因此效果只运行一次。
+        return captureOnce(nested) { drawSampled(canvas, source, sourceX, sourceY, rect, radius, effects, above) } ?: false
+    }
+
+    /**
+     * [EN] Last resort for "Recording currently in progress": our two nodes are closed with `endRecording` (so the next frame can
+     *      record), a warning is logged once, and false is returned (the caller draws its tint). [CN] 对 "Recording currently in progress" 的最后手段：用 `endRecording` 关闭我们的两个节点（下一帧才能录制），只记录一次警告，返回 false（调用方绘制着色）。
+     */
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun drawSampled(canvas: Canvas, source: View, sourceX: Float, sourceY: Float, rect: RectF, radius: Float, effects: CYLGlassEffects, above: List<View>): Boolean {
+        return try {
+            drawEffects(canvas, source, sourceX, sourceY, rect, radius, effects, above)
+            true
+        } catch (e: IllegalStateException) {
+            endRecordingQuietly(sourceNode)
+            endRecordingQuietly(shapeNode)
+            if (!loggedFailure) {
+                loggedFailure = true
+                Log.w("CYLGlassBackdrop", "glass not sampled: " + e.message)
+            }
+            false
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun endRecordingQuietly(node: Any?) {
+        try {
+            (node as? RenderNode)?.endRecording()
+        } catch (ignored: IllegalStateException) {
+            // [EN] The node was not recording. [CN] 该节点没有在录制。
+        }
+    }
+
+    internal companion object {
+        /** How many glass backdrops are recording now, nested (the UI thread only). */
+        private var capturing = 0
+
+        /**
+         * [EN] Runs `block` unless a capture is already under way (then null): the flag is reset in a `finally`, so an exception while recording
+         *      cannot leave every glass view on its fallback for good. [CN] 除非已有录制在进行（此时返回 null），否则运行 `block`：标志在 `finally` 中复位，
+         *      因此录制中的异常不会让所有玻璃视图永久停在降级绘制上。
+         */
+        fun <T> captureOnce(nested: Boolean = false, block: () -> T): T? {
+            // [EN] A nested capture (one level only) may start inside the first; nothing deeper. [CN] 嵌套录制（仅一层）可以在第一个之内开始；更深的不行。
+            if (capturing > 0 && !(nested && capturing == 1)) return null
+            capturing++
+            try {
+                return block()
+            } finally {
+                capturing--
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun drawEffects(canvas: Canvas, source: View, sourceX: Float, sourceY: Float, rect: RectF, radius: Float, effects: CYLGlassEffects, above: List<View>) {
+        val pages = (sourceNode as? RenderNode) ?: RenderNode("CYLGlassBackdropPages").also { sourceNode = it }
+        pages.setPosition(0, 0, source.width, source.height)
+        val recording = pages.beginRecording(source.width, source.height)
+        // [EN] The window's background first: pages are usually transparent where they have no content (the white is the
+        //      window's), so without it the glass would be clear there and the sharp page would show through it.
+        // [CN] 先绘制窗口背景：页面在没有内容的地方通常是透明的（白色来自窗口），没有它，玻璃在这些地方是透明的，清晰的页面会透出来。
+        recording.drawColor(windowBackgroundColor(source))
+        source.draw(recording)
+        if (above.isNotEmpty()) {
+            val sourceAt = IntArray(2)
+            val at = IntArray(2)
+            source.getLocationInWindow(sourceAt)
+            for (layer in above) {
+                layer.getLocationInWindow(at)
+                val save = recording.save()
+                recording.translate((at[0] - sourceAt[0]).toFloat(), (at[1] - sourceAt[1]).toFloat())
+                try {
+                    // [EN] A glass board goes into the backdrop WITHOUT its sheen and rim (its tint and fill only): the glass on top adds its own, so the edge is not lit twice.
+                    // [CN] 玻璃看板绘制到背景中时不含高光与细边（只有着色与填充）：上层玻璃自己再加，避免同一条边被照亮两次。
+                    val glass = ((layer as? CYLAnimatedItemView)?.itemLiquidGlassView ?: (layer as? CYLAnimatedItemStackView)?.itemLiquidGlassView) as? CYLLiquidGlassView
+                    if (glass != null) {
+                        recording.translate(glass.left.toFloat(), glass.top.toFloat())
+                        glass.drawForBackdrop(recording)
+                    } else {
+                        layer.draw(recording)
+                    }
+                } finally {
+                    recording.restoreToCount(save)
+                }
+            }
+        }
+        pages.endRecording()
+
+        val width = kotlin.math.ceil(rect.width()).toInt()
+        val height = kotlin.math.ceil(rect.height()).toInt()
+        val shape = (shapeNode as? RenderNode) ?: RenderNode("CYLGlassBackdropShape").also { shapeNode = it }
+        shape.setPosition(0, 0, width, height)
+        val shapeCanvas = shape.beginRecording(width, height)
+        shapeCanvas.translate(-sourceX, -sourceY)
+        shapeCanvas.drawRenderNode(pages)
+        shape.endRecording()
+        shape.setRenderEffect(effectChain(width.toFloat(), height.toFloat(), radius, effects))
+
+        clipPath.rewind()
+        clipPath.addRoundRect(rect, radius, radius, Path.Direction.CW)
+        canvas.save()
+        canvas.clipPath(clipPath)
+        canvas.translate(rect.left, rect.top)
+        canvas.drawRenderNode(shape)
+        canvas.restore()
+    }
+
+    /**
+     * [EN] The color behind the pages: the window's background color, else the theme's `colorBackground`. [CN] 页面后面的颜色：窗口背景色，否则为主题的 `colorBackground`。
+     */
+    private fun windowBackgroundColor(source: View): Int {
+        (source.rootView.background as? android.graphics.drawable.ColorDrawable)?.let { return it.color or 0xFF000000.toInt() }
+        val value = android.util.TypedValue()
+        return if (source.context.theme.resolveAttribute(android.R.attr.colorBackground, value, true) && value.type >= android.util.TypedValue.TYPE_FIRST_COLOR_INT && value.type <= android.util.TypedValue.TYPE_LAST_COLOR_INT) value.data or 0xFF000000.toInt()
+               else android.graphics.Color.WHITE
+    }
+
+    /**
+     * [EN] Backdrop's order: vibrancy, then blur, then the lens on top. [CN] Backdrop 的顺序：先鲜艳度，再模糊，最后透镜。
+     */
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun effectChain(width: Float, height: Float, radius: Float, effects: CYLGlassEffects): RenderEffect? {
+        var effect: RenderEffect? = if (effects.saturation != 1f || effects.brightness != 1f) RenderEffect.createColorFilterEffect(CYLLiquidGlassShaders.vibrancyColorFilter(effects.saturation, effects.brightness)) else null
+        if (effects.blurRadius > 0f) {
+            val blur = effect?.let { RenderEffect.createBlurEffect(effects.blurRadius, effects.blurRadius, it, Shader.TileMode.CLAMP) }
+                ?: RenderEffect.createBlurEffect(effects.blurRadius, effects.blurRadius, Shader.TileMode.CLAMP)
+            effect = blur
+        }
+        if (CYLLiquidGlassSupport.rendersRefraction && effects.refractionHeight > 0f && effects.refractionAmount > 0f) {
+            val lens = lensEffect(width, height, radius, effects)
+            effect = effect?.let { RenderEffect.createChainEffect(lens, it) } ?: lens
+        }
+        return effect
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun lensEffect(width: Float, height: Float, radius: Float, effects: CYLGlassEffects): RenderEffect {
+        val shader = if (effects.chromaticAberration) {
+            (dispersion as? RuntimeShader) ?: RuntimeShader(CYLLiquidGlassShaders.REFRACTION_WITH_DISPERSION).also { dispersion = it }
+        } else {
+            (refraction as? RuntimeShader) ?: RuntimeShader(CYLLiquidGlassShaders.REFRACTION).also { refraction = it }
+        }
+        val corner = radius.coerceAtMost(minOf(width, height) / 2f)
+        shader.setFloatUniform("size", width, height)
+        shader.setFloatUniform("offset", 0f, 0f)
+        shader.setFloatUniform("cornerRadii", corner, corner, corner, corner)
+        shader.setFloatUniform("refractionHeight", effects.refractionHeight)
+        shader.setFloatUniform("refractionAmount", -effects.refractionAmount)
+        shader.setFloatUniform("depthEffect", 0f)
+        if (effects.chromaticAberration) shader.setFloatUniform("chromaticAberration", 1f)
+        return RenderEffect.createRuntimeShaderEffect(shader, "content")
+    }
+}
+
+/**
+ * [EN] The effects of one glass shape, in px. [CN] 一个玻璃形状的效果（像素）。
+ */
+data class CYLGlassEffects(
+    val saturation: Float = 1.5f,
+    val blurRadius: Float = 0f,
+    val refractionHeight: Float = 0f,
+    val refractionAmount: Float = 0f,
+    val chromaticAberration: Boolean = false,
+    val brightness: Float = 1f,
+)

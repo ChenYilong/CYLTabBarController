@@ -1,0 +1,40 @@
+/* [EN] The look of the example's tag lists: a gradient plate, a glass section card, wrapping tags 10 px apart. [CN] 示例 TagList 的外观：渐变背景板、玻璃分组卡片、间距 10 px 的换行标签。 */
+page {
+  min-height: 100%;
+  background: linear-gradient(160deg, #dbe7ff 0%, #f3e1ff 50%, #ffe8d9 100%);
+}
+.cyl-badge-tags-page {
+  padding: 16px;
+}
+.cyl-badge-tags-toggle {
+  margin: 0;
+}
+.cyl-badge-tags-header {
+  padding: 16px 16px 8px;
+  font-size: 17px;
+  font-weight: bold;
+}
+/* [EN] The negative margins take back the outer half of the tags' spacing. [CN] 负外边距抵消标签间距的外侧部分。 */
+.cyl-badge-tags-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.45);
+}
+.cyl-badge-tags-tag {
+  margin: 5px;
+}
+@media (prefers-color-scheme: dark) {
+  page {
+    background: linear-gradient(160deg, #141b33 0%, #261a38 50%, #33211c 100%);
+  }
+  .cyl-badge-tags-header {
+    color: #ffffff;
+  }
+  .cyl-badge-tags-card {
+    background-color: rgba(30, 30, 34, 0.5);
+  }
+}

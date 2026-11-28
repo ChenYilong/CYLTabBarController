@@ -132,12 +132,12 @@ class CYLTabBarControllerPortTest {
         val item = controller.tabBarItems[1]
         item.badgeValue = "3"
         idle()
-        assertTrue(item.cyl_isShowBadge())
+        assertTrue(item.cylIsShowBadge())
         assertEquals(1, played)
         item.badgeValue = null
-        assertFalse(item.cyl_isShowBadge())
-        item.cyl_showBadgeValue("new", CYLEnums.CYLBadgeAnimationType.ScaleOnce)
-        assertTrue(controller.tabBar.tabBarButtonArray[1].cyl_isShowBadge())
+        assertFalse(item.cylIsShowBadge())
+        item.cylShowBadgeValue("new", CYLEnums.CYLBadgeAnimationType.ScaleOnce)
+        assertTrue(controller.tabBar.tabBarButtonArray[1].cylIsShowBadge())
     }
 
     // MARK: - Transitions 转场
@@ -398,14 +398,14 @@ class CYLTabBarControllerPortTest {
             val view = View(activity)
             host.addView(view, 40, 40)
             activity.setContentView(host)
-            view.cyl_showBadgeValue("12")
-            assertEquals(Color.MAGENTA, view.cyl_badge?.badgeBackgroundColor)
-            assertEquals("9+", view.cyl_badge?.text)
-            view.cyl_badgeBackgroundColor = Color.GREEN
-            view.cyl_showBadgeValue("3")
-            assertEquals("a value set on the view wins", Color.GREEN, view.cyl_badge?.badgeBackgroundColor)
-            view.cyl_resetBadgeAppearance()
-            assertEquals(Color.MAGENTA, view.cyl_badgeBackgroundColor)
+            view.cylShowBadgeValue("12")
+            assertEquals(Color.MAGENTA, view.cylBadge?.badgeBackgroundColor)
+            assertEquals("9+", view.cylBadge?.text)
+            view.cylBadgeBackgroundColor = Color.GREEN
+            view.cylShowBadgeValue("3")
+            assertEquals("a value set on the view wins", Color.GREEN, view.cylBadge?.badgeBackgroundColor)
+            view.cylResetBadgeAppearance()
+            assertEquals(Color.MAGENTA, view.cylBadgeBackgroundColor)
             appearance.radius = -1f
             assertEquals("not positive restores the default", 4f, appearance.radius, 0.01f)
         } finally {
@@ -413,22 +413,22 @@ class CYLTabBarControllerPortTest {
         }
         assertEquals(Color.RED, appearance.backgroundColor)
 
-        assertEquals(35, cyl_badgeStyleCount())
-        assertEquals("20. Number (cyl_showBadgeValue:)", cyl_badgeTitleForRow(19))
-        assertEquals("8. Shake ×3 (cyl_shakeAnimationRepeatTimes)", cyl_badgeTitleForRow(7))
+        assertEquals(35, cylBadgeStyleCount())
+        assertEquals("20. Number (cylShowBadgeValue:)", cylBadgeTitleForRow(19))
+        assertEquals("8. Shake ×3 (cyl_shakeAnimationRepeatTimes)", cylBadgeTitleForRow(7))
         val row = FrameLayout(activity)
         val icon = ImageView(activity)
         row.addView(icon, 90, 90)
         activity.setContentView(row)
-        for (index in 0 until cyl_badgeStyleCount()) icon.cyl_showBadgeForRow(index)
-        assertTrue(icon.cyl_isShowBadge())
+        for (index in 0 until cylBadgeStyleCount()) icon.cylShowBadgeForRow(index)
+        assertTrue(icon.cylIsShowBadge())
 
         val badgeView = CYLTabBarBadgeView(activity)
         badgeView.text = "99+"
         badgeView.textColor = Color.YELLOW
         assertEquals("99+", badgeView.badgeLabel.text.toString())
         assertEquals(Color.YELLOW, badgeView.badgeLabel.currentTextColor)
-        val label = TextView(activity).cyl_badgeTextDisplaying()
+        val label = TextView(activity).cylBadgeTextDisplaying()
         label.text = "new"
         assertEquals("new", label.text)
     }
@@ -439,10 +439,10 @@ class CYLTabBarControllerPortTest {
         val view = View(activity)
         host.addView(view, 40, 40)
         activity.setContentView(host)
-        for (type in CYLEnums.CYLBadgeAnimationType.values()) view.cyl_showBadgeValue("1", type)
+        for (type in CYLEnums.CYLBadgeAnimationType.values()) view.cylShowBadgeValue("1", type)
         assertEquals(9, CYLEnums.CYLBadgeAnimationType.ScaleOnce.rawValue)
-        view.cyl_clearBadge()
-        assertFalse(view.cyl_isShowBadge())
+        view.cylClearBadge()
+        assertFalse(view.cylIsShowBadge())
     }
 
     // MARK: - Memory warnings, handlers 内存警告、回调

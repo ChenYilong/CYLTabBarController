@@ -30,10 +30,13 @@
     <string name="cyl_demo_6a69211e0f">各シーンは公開 API で作成したタブバーです：スタイル、アニメーション、バッジ、Lottie、新しいタブ API</string>
     <string name="cyl_demo_7efc907fe3">アニメーションアイテム</string>
     <string name="cyl_demo_9244b5dc65">アニメーションアイコン + タイトルのコンポーネント単体：GIF、Lottie、ファイルなし、アクセサリ、ドラッグ</string>
+    <string name="cyl_demo_5dbde9a698">コンテンツの余白</string>
+    <string name="cyl_demo_0e4d2f4ccf">itemContentHorizontalInset 未設定: フラットと Liquid Glass の項目、通常時と選択時</string>
     <string name="cyl_demo_185d8ef0ae">バッジ</string>
     <string name="cyl_demo_2db1db0706">再生</string>
     <string name="cyl_demo_34bffc9c7a">タブアイコンのアニメーション：すべて再生、速度、ループ</string>
     <string name="cyl_demo_b51ada3b01" formatted="false">速度 %@、ループ %@。タップでコントロールを表示</string>
+    <string name="cyl_demo_2f63c1fff7">タブバーコントローラを解放（3 秒後）</string>
     <string name="cyl_demo_a4fe65264e">言語</string>
     <string name="cyl_demo_327e9fe9a3" formatted="false">現在：%@</string>
     <string name="cyl_demo_bbc5e661e1">システム</string>
@@ -130,6 +133,10 @@
     <string name="cyl_demo_7108183f18">リクエストのキャンセル</string>
     <string name="cyl_demo_5fbceaee5f">URL のないリクエスト</string>
     <string name="cyl_demo_4334569b3d">HTML ページ（ネットワーク）</string>
+    <string name="cyl_demo_e2917c5f0d">フラット: itemContentHorizontalInset 未設定</string>
+    <string name="cyl_demo_a7248eeb45">通常</string>
+    <string name="cyl_demo_57fd7a0cf3">選択中</string>
+    <string name="cyl_demo_596fe517ac">Liquid Glass: itemContentHorizontalInset 未設定</string>
     <string name="cyl_demo_d84eebada9">写真</string>
     <string name="cyl_demo_d47d7cb0e4">その他</string>
     <string name="cyl_demo_0e35f6e974">基本</string>
@@ -320,6 +327,7 @@
     <string name="cyl_demo_12e7b8220d">すべて再生</string>
     <string name="cyl_demo_2d6a5b15a4" formatted="false">速度：%@</string>
     <string name="cyl_demo_f2f6a01889">ループ</string>
+    <string name="cyl_demo_08078d674a">タブバーコントローラを解放しました</string>
     <string name="cyl_demo_44a57b22e0">アラート</string>
     <string name="cyl_demo_a127ceb079">アクションシート</string>
     <string name="cyl_demo_9329618118">ページシート</string>
@@ -338,6 +346,10 @@
     <string name="cyl_demo_1698b890f9">すべての自動行を順番に実行します。</string>
     <string name="cyl_demo_afa158bdc8">現在のコンテキストの上に表示</string>
     <string name="cyl_demo_0add8377e7" formatted="false">「%@」を長押し</string>
+    <string name="cyl_demo_90e2f34d00" formatted="false">dealloc コールバック実行数: %d / %d</string>
+    <string name="cyl_demo_59f4cc3b3b" formatted="false">dealloc コールバック実行数: %d / %d (%@)</string>
+    <string name="cyl_demo_bcf9dd075a" formatted="false">解放: %d 秒後に実行</string>
+    <string name="cyl_demo_c0fd658b68">解放: 未実行</string>
     <string name="cyl_demo_d4f455fa45">開く：2 つのタブバー、1 つのページ ID</string>
     <string name="cyl_demo_5b88804382" formatted="false">タブバー %@ · ページ ID「%@」</string>
 </resources>

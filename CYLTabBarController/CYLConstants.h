@@ -95,7 +95,7 @@
  */
 
 
-#import "CYLSwiftInterface.h"
+#import "CYLTabBarControllerSwiftInterface.h"
 
 #endif /* CYLConstants_h */
 

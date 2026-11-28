@@ -461,3 +461,28 @@
 "n/a on Android: an app cannot post this system event." = "n/a a Android: una app no pot enviar aquest esdeveniment del sistema.";
 "Runs every automatic row, one after the other." = "Executa totes les files automàtiques, una darrere l'altra.";
 "Tab bar %@ · page ID \"%@\"" = "Barra de pestanyes %@ · ID de pàgina «%@»";
+"Animated item engine API" = "API dels motors de l'element animat";
+"Stop at 50%" = "Atura al 50 %";
+"Show image when ended" = "Mostra la imatge en acabar";
+"Restart token: %@" = "Testimoni de reinici: %@";
+"End callback: %@" = "Callback de final: %@";
+"none yet" = "encara cap";
+"Host-driven playback (drivesAnimationPlayback = false)" = "Reproducció controlada pel host (drivesAnimationPlayback = false)";
+"Engine API" = "API del motor";
+"Pause while scrolling" = "Pausa en desplaçar";
+
+/* [EN] Teardown row of the Playback card and last bridge event (CYLDemoReleaseRow, CYLDemoPlaybackControlsView). [CN] Playback 卡片的释放行与最近的桥接事件。 */
+"Release the tab bar controller (in 3 s)" = "Allibera el controlador de la barra de pestanyes (en 3 s)";
+"teardown: not run" = "alliberament: no executat";
+"teardown: releasing in %d s" = "alliberament: s’alliberarà en %d s";
+"dealloc callbacks ran: %d / %d" = "callbacks de dealloc executats: %d / %d";
+"dealloc callbacks ran: %d / %d (%@)" = "callbacks de dealloc executats: %d / %d (%@)";
+"Tab bar controller released" = "Controlador de la barra de pestanyes alliberat";
+"bridge: pause %d, resume %d" = "pont: pausa %d, represa %d";
+"last event: -" = "últim esdeveniment: -";
+"last event: %@" = "últim esdeveniment: %@";
+"Content inset" = "Marge interior del contingut";
+"itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected" = "itemContentHorizontalInset sense definir: un element pla i un de Liquid Glass, normal i seleccionat";
+"Flat: itemContentHorizontalInset unset" = "Pla: itemContentHorizontalInset sense definir";
+"Normal" = "Normal";
+"Liquid Glass: itemContentHorizontalInset unset" = "Liquid Glass: itemContentHorizontalInset sense definir";

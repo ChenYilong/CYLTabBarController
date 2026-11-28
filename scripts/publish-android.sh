@@ -75,7 +75,7 @@ export LC_ALL=${LC_ALL:-C.UTF-8}
 GRADLE_ARGS=(-p "$PROJECT" --console=plain)
 [[ -n "$VERSION" ]] && GRADLE_ARGS+=("-PcylVersion=$VERSION")
 [[ -n "$GROUP" ]] && GRADLE_ARGS+=("-PcylGroup=$GROUP")
-MODULES=(:tabpages :cylanimateditem :cyltabbar)
+MODULES=(:tabpages :cylutils :cylbadge :cylanimateditem :cyltabbar)
 
 run() {
     echo "+ $*"
@@ -101,7 +101,7 @@ esac
 # 1. [EN] Tests and lint, as CI would. [CN] 与 CI 一样先运行测试与 lint。
 if [[ "$SKIP_TESTS" = 0 ]]; then
     step "Tests and lint 测试与 lint"
-    run "$GRADLE" "${GRADLE_ARGS[@]}" :tabpages:test :cylanimateditem:testDebugUnitTest :cylanimateditem:lintRelease :cyltabbar:testDebugUnitTest :cyltabbar:lintRelease
+    run "$GRADLE" "${GRADLE_ARGS[@]}" :tabpages:test :cylutils:lintRelease :cylbadge:lintRelease :cylanimateditem:testDebugUnitTest :cylanimateditem:lintRelease :cyltabbar:testDebugUnitTest :cyltabbar:lintRelease
 fi
 
 # 2. [EN] Credentials before any work that depends on them. [CN] 先检查凭据。

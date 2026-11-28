@@ -8,6 +8,12 @@
 import MachO
 import UIKit
 
+#if canImport(CYLUtilsKit)
+import CYLUtilsKit
+#endif
+#if canImport(CYLBadge)
+import CYLBadge
+#endif
 /**
  * [EN] The block types `CYLTabBarPageProvider`, `CYLTabBarPageFactory`, `CYLTabBarPageCompletion` and
  *      `CYLTabBarAsyncPageFactory` and the string type `CYLTabBarPageSource` stay declared in CYLTabBarPageRegistry.h

@@ -1,0 +1,37 @@
+@import './cyl_badge_animations.wxss';
+
+/* [EN] Defaults of the iOS appearance: red, white text, a 8 px dot. [CN] iOS 外观的默认值：红色、白字、8 px 红点。 */
+.cyl-badge-text {
+  display: inline-block;
+  box-sizing: border-box;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background-color: #ff3b30;
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+  white-space: nowrap;
+}
+.cyl-badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ff3b30;
+}
+
+/* [EN] The tab bar item's badge, the values it always had (`.cyl-item-badge` and `.cyl-item-badge-dot` of cyl-tab-bar-item, minus the position, which the item keeps). [CN] TabBar item 的角标，保持它一直使用的数值（cyl-tab-bar-item 的 `.cyl-item-badge` 与 `.cyl-item-badge-dot`，不含位置，位置仍由 item 决定）。 */
+.cyl-badge-tab {
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  line-height: 16px;
+}
+.cyl-badge-dot-tab {
+  width: 9px;
+  height: 9px;
+  padding: 0 !important;
+  border-radius: 5px;
+}
