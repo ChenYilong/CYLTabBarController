@@ -18,10 +18,10 @@
 
 // [EN] D7 (docs/Animated-Item-Badge.md): Core sits on top of CYLUtils, CYLBadge and CYLAnimatedItem, each a module of its own, and
 //      re-exports them so `import CYLTabBarController` keeps giving their keys and classes to callers (CocoaPods and the Xcode framework
-//      compile some of them into this module, hence `canImport`). Written statically, not compiled yet.
+//      compile some of them into this module, hence `canImport`). Built on macOS, 2026-11-29.
 // [CN] D7（docs/Animated-Item-Badge.md）：Core 位于 CYLUtils、CYLBadge 与 CYLAnimatedItem 之上，它们各自是独立的模块；在此重新导出，使
 //      `import CYLTabBarController` 仍向调用方提供它们的 key 与类（CocoaPods 与 Xcode framework 会把其中一部分编进本模块，因此用 `canImport`）。
-//      静态编写，尚未编译。
+//      已于 2026-11-29 在 macOS 上构建。
 #if canImport(CYLAnimatedItem)
 @_exported import CYLAnimatedItem
 #endif

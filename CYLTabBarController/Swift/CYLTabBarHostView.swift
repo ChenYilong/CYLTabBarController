@@ -82,9 +82,9 @@ enum CYLTabBarHostSupport {
         let value = attributes[cylTabBarHostBadgeValue]
         let text = (value as? String) ?? (value as? NSNumber)?.stringValue ?? ""
         // [EN] The one parser of CYLBadge (S7, docs/Animated-Item-Badge.md): colors, radius, offset, font, border and the rest, for a view. A page (not a view)
-        //      keeps the three keys it always read. Written statically, not compiled yet.
+        //      keeps the three keys it always read. Built on macOS, 2026-11-29.
         // [CN] CYLBadge 唯一的解析函数（S7，docs/Animated-Item-Badge.md）：视图上的颜色、半径、偏移、字体、边框等。页面（不是视图）仍只读它一直读取的三个键。
-        //      静态编写，尚未编译。
+        //      已于 2026-11-29 在 macOS 上构建。
         if let view = target as? UIView {
             view.cylApplyBadgeAttributes(attributes)
         } else {

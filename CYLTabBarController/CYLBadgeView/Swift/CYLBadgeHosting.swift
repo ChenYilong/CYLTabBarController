@@ -4,8 +4,8 @@
 //
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
-//  [EN] Not compiled yet: written statically on Linux (docs/Animated-Item-Badge.md, step 11).
-//  [CN] 尚未编译：在 Linux 上静态编写（docs/Animated-Item-Badge.md，第 11 步）。
+//  [EN] Built and unit-tested on macOS, 2026-11-29 (docs/Animated-Item-Badge.md, step 11).
+//  [CN] 已于 2026-11-29 在 macOS 上构建并通过单元测试（docs/Animated-Item-Badge.md，第 11 步）。
 //
 
 import UIKit

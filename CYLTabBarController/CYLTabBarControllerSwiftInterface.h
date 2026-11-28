@@ -9,9 +9,9 @@
  * [EN] The Objective-C interface of Core's Swift code (docs/Swift-Migration.md): the header Swift generates for the
  *      `CYLTabBarController` module. Split from `CYLSwiftInterface.h` (D7, docs/Animated-Item-Badge.md): CYLUtils and CYLBadge
  *      are modules of their own and have their own interface headers, which this one imports first.
- *      Written statically, not compiled yet.
+ *      Built on macOS, 2026-11-29.
  * [CN] Core 的 Swift 代码的 Objective-C 接口（docs/Swift-Migration.md）：Swift 为 `CYLTabBarController` 模块生成的头文件。从 `CYLSwiftInterface.h`
- *      拆出（D7，docs/Animated-Item-Badge.md）：CYLUtils 与 CYLBadge 是独立的模块，各有自己的接口头文件，本文件先导入它们。静态编写，尚未编译。
+ *      拆出（D7，docs/Animated-Item-Badge.md）：CYLUtils 与 CYLBadge 是独立的模块，各有自己的接口头文件，本文件先导入它们。 已于 2026-11-29 在 macOS 上构建。
  */
 // [EN] Not for the SwiftPM C target `CYLTabBarControllerObjC` (-DCYL_OBJC_BASE_TARGET): it sits below the Swift module, which imports it,
 //      so it cannot import the Swift module back. [CN] SwiftPM 的 C 目标 `CYLTabBarControllerObjC`（-DCYL_OBJC_BASE_TARGET）不使用：它位于

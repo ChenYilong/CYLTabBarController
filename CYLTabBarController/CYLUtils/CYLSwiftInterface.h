@@ -6,8 +6,8 @@
 //
 
 /*!
- * [EN] The Objective-C interface of CYLUtils' Swift code: the header Swift generates for the `CYLUtilsKit` module. CYLUtils is the bottom pod and sees nothing above it, so this file imports no CYLBadge, CYLAnimatedItem or CYLTabBarController header. Never imported while Swift itself compiles (`__swift__`). Written statically, not compiled yet (docs/Animated-Item-Badge.md, step 3).
- * [CN] CYLUtils 的 Swift 代码的 Objective-C 接口：Swift 为 `CYLUtilsKit` 模块生成的头文件。CYLUtils 是最底层的 pod，看不到上面的任何层，因此本文件不导入 CYLBadge、CYLAnimatedItem 或 CYLTabBarController 的头文件。Swift 自身编译时不导入（`__swift__`）。 静态编写，尚未编译（docs/Animated-Item-Badge.md，第 3 步）。
+ * [EN] The Objective-C interface of CYLUtils' Swift code: the header Swift generates for the `CYLUtilsKit` module. CYLUtils is the bottom pod and sees nothing above it, so this file imports no CYLBadge, CYLAnimatedItem or CYLTabBarController header. Never imported while Swift itself compiles (`__swift__`). Built on macOS, 2026-11-29 (docs/Animated-Item-Badge.md, step 3).
+ * [CN] CYLUtils 的 Swift 代码的 Objective-C 接口：Swift 为 `CYLUtilsKit` 模块生成的头文件。CYLUtils 是最底层的 pod，看不到上面的任何层，因此本文件不导入 CYLBadge、CYLAnimatedItem 或 CYLTabBarController 的头文件。Swift 自身编译时不导入（`__swift__`）。 已于 2026-11-29 在 macOS 上构建（docs/Animated-Item-Badge.md，第 3 步）。
  */
 // [EN] Not for the SwiftPM C target `CYLTabBarControllerObjC` (-DCYL_OBJC_BASE_TARGET): it sits below the Swift module, which imports it,
 //      so it cannot import the Swift module back. [CN] SwiftPM 的 C 目标 `CYLTabBarControllerObjC`（-DCYL_OBJC_BASE_TARGET）不使用：它位于

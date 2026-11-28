@@ -20,10 +20,10 @@ let package = Package(
         // [CN] 单独的动效条目组件（CocoaPods `CYLAnimatedItem` pod，docs/Animated-Item.md）：视图、占位图资源包与动画引擎，不含 TabBar。
         .library(name: "CYLAnimatedItem", targets: ["CYLAnimatedItem", "CYLAnimatedItemViews"]),
         // [EN] The two layers below the component (docs/Animated-Item-Badge.md, step 9): CYLUtilsKit (macros' Swift side, themes, localization, the
-        //      library bundle; the only target that depends on the lifecycle library, D8) and CYLBadge on top of it. Written statically: the manifest
-        //      could not be resolved here (no Swift toolchain).
+        //      library bundle; the only target that depends on the lifecycle library, D8) and CYLBadge on top of it. TODO: the SwiftPM build fails on Xcode 27.2 with a module
+        //      cycle, CYLAnimatedItem -> CYLTabBarControllerObjC -> CYLAnimatedItem (2026-11-29).
         // [CN] 组件之下的两层（docs/Animated-Item-Badge.md，第 9 步）：CYLUtilsKit（主题、本地化、库资源包；唯一依赖生命周期库的 target，D8）与其上的 CYLBadge。
-        //      静态编写：这里没有 Swift 工具链，无法解析 manifest。
+        //      TODO：在 Xcode 27.2 上 SwiftPM 构建因模块循环失败（CYLAnimatedItem -> CYLTabBarControllerObjC -> CYLAnimatedItem，2026-11-29）。
         .library(name: "CYLUtilsKit", targets: ["CYLUtilsKit"]),
         .library(name: "CYLBadge", targets: ["CYLBadge"]),
     ],
