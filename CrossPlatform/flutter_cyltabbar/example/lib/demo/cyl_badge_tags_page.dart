@@ -32,32 +32,34 @@ class _CYLBadgeTagsPageState extends State<CYLBadgeTagsPage> {
   // [EN] Right-to-left on this page only: the plugin passes Directionality to the native view (AC8). [CN] 仅本页从右到左：插件把 Directionality 传给原生视图（AC8）。
   bool _rightToLeft = false;
 
-  Widget _tag(String title, {String? value, Map<String, Object?>? attributes}) => Align(
-    alignment: AlignmentDirectional.centerStart,
-    child: Container(
-      margin: const EdgeInsets.only(top: 6),
-      padding: const EdgeInsetsDirectional.only(start: 4, end: 16),
-      decoration: BoxDecoration(color: const Color(0x33888888), borderRadius: BorderRadius.circular(14)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            // [EN] Wide enough for "99+": the platform view clips what it does not contain. [CN] 足够容纳 "99+"：platform view 会裁掉超出部分。
-            width: 64,
-            height: 52,
-            child: CYLAnimationView(
-              file: '',
-              image: 'cyl_still_check.png',
-              iconSize: 30,
-              reservesBadgeSpace: true,
-              badgeValue: value,
-              badgeAttributes: attributes,
-            ),
+  bool get _dark => Theme.of(context).brightness == Brightness.dark;
+
+  // [EN] A Liquid Glass capsule as wide as its content, as in the example's tag lists. [CN] 与示例 TagList 相同：宽度随内容的液态玻璃胶囊。
+  Widget _tag(String title, {String? value, Map<String, Object?>? attributes}) => Container(
+    padding: const EdgeInsetsDirectional.only(start: 4, end: 16),
+    decoration: ShapeDecoration(
+      color: _dark ? const Color(0x1FFFFFFF) : const Color(0x99FFFFFF),
+      shape: const StadiumBorder(side: BorderSide(color: Color(0x66FFFFFF))),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          // [EN] Wide enough for "99+": the platform view clips what it does not contain. [CN] 足够容纳 "99+"：platform view 会裁掉超出部分。
+          width: 64,
+          height: 52,
+          child: CYLAnimationView(
+            file: '',
+            image: 'cyl_still_check.png',
+            iconSize: 30,
+            reservesBadgeSpace: true,
+            badgeValue: value,
+            badgeAttributes: attributes,
           ),
-          const SizedBox(width: 4),
-          Text(title),
-        ],
-      ),
+        ),
+        const SizedBox(width: 4),
+        Flexible(child: Text(title)),
+      ],
     ),
   );
 
@@ -72,26 +74,59 @@ class _CYLBadgeTagsPageState extends State<CYLBadgeTagsPage> {
       title: const Text('CYLAnimationView badges'),
       actions: [TextButton(onPressed: () => setState(() => _rightToLeft = !_rightToLeft), child: const Text('RTL'))],
     ),
-    body: ListView(
-      // [EN] The key rebuilds the platform views, which take their direction when created. [CN] key 重建 platform view，它们在创建时取得方向。
-      key: ValueKey(_rightToLeft),
-      padding: const EdgeInsets.all(16),
-      children: [
-        Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: FilledButton.tonal(
-            onPressed: () => setState(() => _shows = !_shows),
-            child: Text(_shows ? 'badgeValue = null' : 'badgeValue'),
-          ),
+    // [EN] The gradient plate of the example's tag lists. [CN] 示例 TagList 的渐变背景板。
+    body: DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: _dark
+              ? const [Color(0xFF5B2A3C), Color(0xFF1F4A63), Color(0xFF3B2D5C)]
+              : const [Color(0xFFFFB199), Color(0xFF7EC8E3), Color(0xFFC3AED6)],
         ),
-        for (final (index, (value, animation, reduce)) in _samples.indexed)
-          _tag(
-            '${index + 1}. $animation${reduce ? ', Reduce Motion' : ''}',
-            value: _shows ? value : null,
-            attributes: {CYLBadgeAttributeKey.animation: animation, CYLBadgeAttributeKey.respectsReduceMotion: reduce},
-          ),
-        _tag('badgeValue = null'),
-      ],
+      ),
+      child: SizedBox.expand(
+        child: ListView(
+          // [EN] The key rebuilds the platform views, which take their direction when created. [CN] key 重建 platform view，它们在创建时取得方向。
+          key: ValueKey(_rightToLeft),
+          padding: const EdgeInsets.all(16),
+          children: [
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: FilledButton.tonal(
+                onPressed: () => setState(() => _shows = !_shows),
+                child: Text(_shows ? 'badgeValue = null' : 'badgeValue'),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsetsDirectional.only(start: 16, top: 12, bottom: 8),
+              child: Text('Badges', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+            ),
+            // [EN] The tags flow and wrap in a section card. [CN] 标签在分组卡片中流式换行。
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: _dark ? const Color(0x1FFFFFFF) : const Color(0x99FFFFFF),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0x40FFFFFF)),
+              ),
+              child: Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  for (final (index, (value, animation, reduce)) in _samples.indexed)
+                    _tag(
+                      '${index + 1}. $animation${reduce ? ', Reduce Motion' : ''}',
+                      value: _shows ? value : null,
+                      attributes: {CYLBadgeAttributeKey.animation: animation, CYLBadgeAttributeKey.respectsReduceMotion: reduce},
+                    ),
+                  _tag('badgeValue = null'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     ),
   );
 }

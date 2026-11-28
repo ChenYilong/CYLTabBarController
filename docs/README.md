@@ -339,6 +339,8 @@ docs/
 │   ├── flutter-playback-controls-android-api35-93abe96.png
 │   ├── flutter-plus-title-hidden-report.png
 │   ├── flutter-plus-title-own-page-ios.png
+│   ├── flutter-react-native-android-badge-clipping-before-after.png
+│   ├── flutter-react-native-android-badge-tags-taglist-look.png
 │   ├── flutter-rive-android-bar.png
 │   ├── flutter-rive-ios-bar.png
 │   ├── flutter-rive-svga-tab-taps-android.png

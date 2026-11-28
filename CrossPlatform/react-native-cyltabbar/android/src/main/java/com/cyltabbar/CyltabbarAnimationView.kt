@@ -36,6 +36,10 @@ class CyltabbarAnimationView(context: Context) : FrameLayout(context) {
   }
 
   init {
+    // [EN] An animating badge may leave the item's box: nothing here clips it (React views do not clip unless `overflow` is hidden).
+    // [CN] 动画中的角标可以超出条目范围：这里不做任何裁剪（React 视图只有在 `overflow` 为 hidden 时才裁剪）。
+    clipChildren = false
+    clipToPadding = false
     addView(item, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
   }
 

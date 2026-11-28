@@ -622,6 +622,14 @@ void didUpdateWidget(CYLAnimationView old) {
 
 ![Android badge demo in the tag list look](assets/android-animated-item-badge-tags-taglist-look.png)
 
+**其他平台参照 iOS：Flutter 与 React Native（Android 端）**（2026-11-29）：两个示例页改为同样的 TagList 外观（原生视图只承载图标与角标，胶囊、卡片与背景由框架绘制）。开启动画录屏发现**核心缺陷**：Scale 与 Bounce 角标在封装视图顶部被裁平（此前的验收在关闭动画的情况下进行，未发现）。React Native：`CyltabbarAnimationView` 关闭 `clipChildren` / `clipToPadding`。Flutter：platform view 无法画到自身之外，带角标的 `CYLAnimationView` 的 Android platform view 现在四周各大出 `cylAnimationViewBadgeOverflow`（16），原生端用等量内边距使条目与布局不变。修复后录屏的前 24 帧角标完整；浅色、深色、从右到左正常；`flutter test` 通过，`jest` 19 / 19，`tsc` 无错误。未验证：两者的 iOS 端；超出量大于 16 的自定义动画或大偏移仍会被 Flutter 裁掉。
+
+**Other platforms follow iOS: Flutter and React Native (Android half)** (2026-11-29): both demo pages have the same tag list look (the native view holds only the icon and badge; the framework draws the capsules, card and plate). Recording with animations on showed a **core bug**: the Scale and Bounce badges were cut flat at the top of the wrapper view (the earlier acceptance ran with animations off and missed it). React Native: `CyltabbarAnimationView` turns `clipChildren` / `clipToPadding` off. Flutter: a platform view cannot draw outside itself, so the Android platform view of a badged `CYLAnimationView` now reaches `cylAnimationViewBadgeOverflow` (16) beyond it on every side, with equal native padding, so the item and layout do not change. After the fix the badges are whole in the first 24 recorded frames; light, dark and right-to-left are right; `flutter test` passes, `jest` 19 / 19, `tsc` clean. Not verified: either iOS half; a custom animation or offset reaching further than 16 is still cut on Flutter.
+
+![Flutter and React Native badge clipping before and after](assets/flutter-react-native-android-badge-clipping-before-after.png)
+
+![Flutter and React Native badge demos in the tag list look](assets/flutter-react-native-android-badge-tags-taglist-look.png)
+
 ![Tag list tail fold tag before and after the ClassifyMenu pin](assets/harmonyos-android-taglist-fold-tag-pin-9a4c1908.png)
 
 ![HarmonyOS badge demo before and after](assets/harmonyos-animated-item-badge-tags-before-after.png)

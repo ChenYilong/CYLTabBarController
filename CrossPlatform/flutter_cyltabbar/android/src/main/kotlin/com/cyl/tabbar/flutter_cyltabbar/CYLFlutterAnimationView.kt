@@ -1,5 +1,6 @@
 package com.cyl.tabbar.flutter_cyltabbar
 
+import kotlin.math.roundToInt
 import android.content.Context
 import android.view.View
 import android.widget.FrameLayout
@@ -46,6 +47,9 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
   }
 
   init {
+    // [EN] The badge may be drawn outside the item while it animates, into the padding below. [CN] 角标动画时可画到条目之外，即下面的内边距里。
+    container.clipChildren = false
+    container.clipToPadding = false
     container.addView(item, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
     channel.setMethodCallHandler(this)
     (arguments["drivesAnimationPlayback"] as? Boolean)?.let { item.drivesAnimationPlayback = it }
@@ -98,7 +102,8 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
     val side = iconSize
     val size = when {
       side != null -> CYLSize(side, side)
-      container.width > 0 -> CYLSize(container.width / density, container.height / density)
+      container.width > 0 -> CYLSize((container.width - container.paddingLeft - container.paddingRight) / density,
+        (container.height - container.paddingTop - container.paddingBottom) / density)
       else -> return
     }
     if (item.iconSizeDp != size) item.iconSizeDp = size
@@ -141,5 +146,15 @@ internal class CYLFlutterAnimationView(context: Context, viewId: Int, arguments:
   private fun applyBadge(value: Any?, attributes: Any?) {
     item.badgeAttributes = (attributes as? Map<*, *>)?.entries?.associate { it.key.toString() to it.value }
     item.badgeValue = value as? String
+    // [EN] The Dart widget makes a badged platform view this much larger on every side (a platform view cannot draw outside itself); the
+    //      padding keeps the item at the size and place the host gave. Keep in step with `cylAnimationViewBadgeOverflow`.
+    // [CN] Dart 组件让带角标的 platform view 四周各大出这么多（platform view 无法画到自身之外）；内边距让条目保持宿主给定的尺寸与位置。
+    //      须与 `cylAnimationViewBadgeOverflow` 保持一致。
+    val overflow = if (value is String) (BADGE_OVERFLOW_DP * density).roundToInt() else 0
+    container.setPadding(overflow, overflow, overflow, overflow)
+  }
+
+  private companion object {
+    const val BADGE_OVERFLOW_DP = 16f
   }
 }

@@ -24,6 +24,12 @@ const double cylAnimatedItemCornerRadiusCapsule = 1000;
 /// resolves to where glass is really drawn and nothing is set.
 const double cylAnimatedItemLiquidGlassContentInset = 14;
 
+/// How far, on every side, the Android platform view of a badged [CYLAnimationView] reaches beyond the widget's own box, in logical
+/// pixels: a platform view cannot draw outside itself, so without it an animating badge is cut at the edge. The layout is unchanged.
+/// 带角标的 [CYLAnimationView] 的 Android platform view 在四周超出组件自身范围的距离（逻辑像素）：platform view 无法画到自身之外，
+/// 没有它，动画中的角标会在边缘被裁掉。布局不变。
+const double cylAnimationViewBadgeOverflow = 16;
+
 /// What the item's background is made of: the solid `itemBackgroundColor` ([flat], default), or Liquid Glass tinted with it
 /// ([liquidGlass]; drawn only where the platform draws Liquid Glass, elsewhere the view stays flat).
 enum CYLAnimatedItemBackgroundStyle { flat, liquidGlass }
@@ -362,7 +368,8 @@ class _CYLAnimationViewState extends State<CYLAnimationView> {
           onPlatformViewCreated: _created,
         );
       case TargetPlatform.android:
-        return PlatformViewLink(
+        final overflow = widget.badgeValue == null ? 0.0 : cylAnimationViewBadgeOverflow;
+        final view = PlatformViewLink(
           viewType: _viewType,
           surfaceFactory: (context, controller) => AndroidViewSurface(
             controller: controller as AndroidViewController,
@@ -383,6 +390,11 @@ class _CYLAnimationViewState extends State<CYLAnimationView> {
               ..create();
             return controller;
           },
+        );
+        // Always the same tree, so showing or clearing the badge only resizes the platform view. 组件树始终相同，显示或清除角标只改变其尺寸。
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [Positioned(left: -overflow, top: -overflow, right: -overflow, bottom: -overflow, child: view)],
         );
       default:
         return const SizedBox.shrink();
