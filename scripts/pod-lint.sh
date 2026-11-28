@@ -196,7 +196,7 @@ lint_external_podspecs() {
 }
 
 case "$1" in
-  push)      shift; pod trunk push "$COMPONENT_PODSPEC" --allow-warnings "$@"; pod trunk push "$PODSPEC" --allow-warnings "$@"; update_carthage; update_spm; update_navigation ;;
+  push)      shift; pod trunk push CYLUtils.podspec --allow-warnings "$@"; pod trunk push CYLBadge.podspec --allow-warnings "$@"; pod trunk push "$COMPONENT_PODSPEC" --allow-warnings "$@"; pod trunk push "$PODSPEC" --allow-warnings "$@"; update_carthage; update_spm; update_navigation ;;
   version)   release_version; echo "$version" ;;
   check-tag) check_tag "${2:?usage: $0 check-tag <tag>}" ;;
   bump)      bump_version "${2:-}"; update_carthage; update_spm; update_navigation ;;
@@ -205,7 +205,11 @@ case "$1" in
   spm)      update_spm; update_navigation ;;
   versions) update_carthage; update_spm; update_navigation ;;
   *)        [ "$1" = lib ] && shift
-            pod lib lint "$COMPONENT_PODSPEC" --allow-warnings "$@"
+            # [EN] Layers bottom-up (CYLUtils, CYLBadge, CYLAnimatedItem, CYLTabBarController): each lint includes the podspecs below it, as none is on trunk yet.
+            # [CN] 自下而上逐层检查（CYLUtils、CYLBadge、CYLAnimatedItem、CYLTabBarController）：每层都带上它下面各层的 podspec，因为它们都还不在 trunk 上。
             external_podspecs="$(lint_external_podspecs)"
-            pod lib lint "$PODSPEC" --allow-warnings --include-podspecs="$COMPONENT_PODSPEC" ${external_podspecs:+"$external_podspecs"} "$@" ;;
+            pod lib lint CYLUtils.podspec --allow-warnings ${external_podspecs:+"$external_podspecs"} "$@"
+            pod lib lint CYLBadge.podspec --allow-warnings --include-podspecs=CYLUtils.podspec ${external_podspecs:+"$external_podspecs"} "$@"
+            pod lib lint "$COMPONENT_PODSPEC" --allow-warnings --include-podspecs="{CYLUtils,CYLBadge}.podspec" ${external_podspecs:+"$external_podspecs"} "$@"
+            pod lib lint "$PODSPEC" --allow-warnings --include-podspecs="{CYLUtils,CYLBadge,CYLAnimatedItem}.podspec" ${external_podspecs:+"$external_podspecs"} "$@" ;;
 esac
