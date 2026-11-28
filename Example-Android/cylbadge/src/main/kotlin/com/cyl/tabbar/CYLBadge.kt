@@ -244,6 +244,13 @@ class CYLBadgeState internal constructor() {
      * [EN] The parent whose overlay holds the badge of a view that cannot hold children. [CN] 不能包含子视图的视图，其角标所在 overlay 的父视图。
      */
     internal var overlayHost: ViewGroup? = null
+    /**
+     * [EN] true: in a right-to-left layout the badge of this view (drawn in the parent's overlay) sits on the top left corner, the trailing one,
+     *      with `centerOffset.horizontal` mirrored. false (default): always top right. CYLAnimatedItemView sets it on its badge anchor.
+     * [CN] true：从右到左的布局中，本视图的角标（画在父视图 overlay 中）位于左上角（后缘），`centerOffset.horizontal` 随之镜像。false（默认）：始终在右上角。
+     *      CYLAnimatedItemView 在其角标锚点上开启。
+     */
+    var mirrorsInRightToLeft: Boolean = false
     internal var followsLayout = false
     var value: String? = null
     var paused = false
@@ -524,7 +531,9 @@ fun View.cylRefreshBadge() {
     val density = resources.displayMetrics.density
     state.overlayHost?.let {
         // [EN] In the parent's overlay: the view's top-right corner in the parent's coordinates. [CN] 在父视图的 overlay 中：视图右上角在父视图中的坐标。
-        val (left, top) = cylBadgeOrigin(right, top, badge, state.centerOffset, density)
+        val (trailingLeft, top) = cylBadgeOrigin(right, top, badge, state.centerOffset, density)
+        // [EN] Mirrored around the view's centre for the top left corner. [CN] 以视图中线镜像到左上角。
+        val left = if (state.mirrorsInRightToLeft && layoutDirection == View.LAYOUT_DIRECTION_RTL) this.left + right - trailingLeft - badge.measuredWidth else trailingLeft
         badge.layout(left, top, left + badge.measuredWidth, top + badge.measuredHeight)
         return
     }

@@ -78,7 +78,9 @@ object DemoCatalog {
                 sections += DemoSection(cylDemoText("Content inset"), listOf(DemoRow(cylDemoText("Content inset"), { cylDemoText("itemContentHorizontalInset unset: a flat and a Liquid Glass item, normal and selected") }) {
                     startActivity(android.content.Intent(requireContext(), DemoContentInsetActivity::class.java))
                 }))
-                sections += DemoSection(cylDemoText("Badges"), badgeRows(page, maxOf(30, cylBadgeStyleCount())))
+                sections += DemoSection(cylDemoText("Badges"), listOf(DemoRow("CYLAnimatedItemView badges", { "badgeValue · badgeAttributes" }) {
+                    startActivity(android.content.Intent(requireContext(), DemoBadgeTagActivity::class.java))
+                }) + badgeRows(page, maxOf(30, cylBadgeStyleCount())))
             }
             MESSAGE -> {
                 // [EN] Not on the first tab (AGENTS.md "Demo table rows"). [CN] 不放在第一个 Tab（AGENTS.md「Demo table rows」）。

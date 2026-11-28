@@ -271,6 +271,8 @@ private fun ImageView.repeatBadgeSampleAnimation(sample: CYLBadgeSample) {
     fun again() {
         badge.play(sample.animationType)
         if (left < 0 || --left > 0) badge.postDelayed({ if (badge.isAttachedToWindow) again() }, 1000)
+        // [EN] Scale, shake, bounce and breathe repeat forever once played: stop after the last time. [CN] 缩放、摇晃、弹跳与呼吸播放后会一直重复：最后一次结束后停止。
+        else badge.postDelayed({ badge.stopAnimation() }, 1000)
     }
     again()
 }

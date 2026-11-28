@@ -20,6 +20,9 @@
             android:name="com.cyl.tabbar.demo.DemoAnimatedItemActivity"
             android:exported="false" />
         <activity
+            android:name="com.cyl.tabbar.demo.DemoBadgeTagActivity"
+            android:exported="false" />
+        <activity
             android:name="com.cyl.tabbar.demo.DemoContentInsetActivity"
             android:exported="false" />
         <activity

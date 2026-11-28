@@ -88,6 +88,27 @@ class CYLAnimatedItemBadgeTest {
     }
 
     @Test
+    fun rightToLeftMirrorsTheIconAndPutsTheBadgeOnItsTopLeftCorner() {
+        val view = item()
+        view.badgeValue = "3"
+        relayout(view)
+        val badge = view.badgeAnchorView.cylBadge!!
+        val iconLeft = view.iconView.left
+        val titleLeft = view.titleView.left
+        val overhang = (badge.left + badge.right) / 2 - view.iconView.right
+        assertTrue(iconLeft < titleLeft)
+        // [EN] The direction resolves only on an attached view; the manifest of a test app has no supportsRtl, so ask for it. [CN] 只有已挂载的视图才解析方向；测试应用清单没有 supportsRtl，需打开。
+        val activity = view.context as Activity
+        activity.applicationInfo.flags = activity.applicationInfo.flags or android.content.pm.ApplicationInfo.FLAG_SUPPORTS_RTL
+        activity.setContentView(view.parent as View)
+        view.layoutDirection = View.LAYOUT_DIRECTION_RTL
+        relayout(view)
+        assertTrue(view.iconView.left > view.titleView.left)
+        assertEquals(view.iconView.left, view.badgeAnchorView.left)
+        assertEquals(overhang.toDouble(), (view.iconView.left - (badge.left + badge.right) / 2).toDouble(), 1.0)
+    }
+
+    @Test
     fun aDotAndTheStyleKeys() {
         val view = item()
         view.badgeAttributes = mapOf(CYLBadgeAttributeKey.RADIUS to "5", CYLBadgeAttributeKey.COLOR to "#FF3B30")

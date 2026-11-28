@@ -31,6 +31,7 @@ import com.cyl.tabbar.CYLBadgeAccessibilityDescription
 import com.cyl.tabbar.CYLBadgeAttributeKey
 import com.cyl.tabbar.CYLBadgeHosting
 import com.cyl.tabbar.cylApplyBadgeAttributes
+import com.cyl.tabbar.cylBadgeState
 import com.cyl.tabbar.cylBadgeRadius
 import com.cyl.tabbar.cylClearBadge
 import com.cyl.tabbar.cylIsShowBadge
@@ -711,8 +712,10 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         if (!accessoryInline()) return left to right
         val accessorySpacing = if (showsIcon() || showsTitle()) dp(spacingDp).roundToInt() else 0
         val inset = dp(accessorySizeDp).roundToInt() + accessorySpacing
-        return if (accessoryPlacement == CYLAnimatedItemAccessoryPlacement.Leading) left + inset to right else left to right - inset
+        return if ((accessoryPlacement == CYLAnimatedItemAccessoryPlacement.Leading) != isRightToLeft) left + inset to right else left to right - inset
     }
+
+    private val isRightToLeft: Boolean get() = layoutDirection == View.LAYOUT_DIRECTION_RTL
 
     /**
      * [EN] Horizontal axis: the icon then the title, centred (or leading) in `box`; returns the icon's origin.
@@ -720,10 +723,13 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
      */
     private fun layoutRow(box: android.graphics.Rect, iconW: Int, iconH: Int, titleW: Int, titleH: Int, spacing: Int): Pair<Int, Int> {
         val group = iconW + spacing + titleW
-        val start = if (alignment == CYLAnimatedItemAlignment.Leading) box.left else box.left + (box.width() - group) / 2
+        val rtl = isRightToLeft
+        val start = if (alignment != CYLAnimatedItemAlignment.Leading) box.left + (box.width() - group) / 2 else if (rtl) box.right - group else box.left
+        // [EN] Right-to-left: the title comes first from the left, the icon last (iOS mirrors the row the same way). [CN] 从右到左：标题在左、图标在右（与 iOS 的镜像一致）。
+        val titleLeft = if (rtl) start else start + iconW + spacing
         val titleTop = box.top + (box.height() - titleH) / 2
-        titleView.layout(start + iconW + spacing, titleTop, start + iconW + spacing + titleW, titleTop + titleH)
-        return start to box.top + (box.height() - iconH) / 2
+        titleView.layout(titleLeft, titleTop, titleLeft + titleW, titleTop + titleH)
+        return (if (rtl) start + titleW + spacing else start) to box.top + (box.height() - iconH) / 2
     }
 
     /**
@@ -733,9 +739,11 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
     private fun layoutColumn(box: android.graphics.Rect, iconW: Int, iconH: Int, titleW: Int, titleH: Int, spacing: Int): Pair<Int, Int> {
         val startY = box.top + (box.height() - (iconH + spacing + titleH)) / 2
         val leading = alignment == CYLAnimatedItemAlignment.Leading
-        val titleLeft = if (leading) box.left else box.left + (box.width() - titleW) / 2
+        // [EN] The x of an element of `width`: centred, or against the leading edge (the right one in right-to-left). [CN] 宽 `width` 的元素的 x：居中，或靠前缘（从右到左时为右侧）。
+        fun x(width: Int) = if (!leading) box.left + (box.width() - width) / 2 else if (isRightToLeft) box.right - width else box.left
+        val titleLeft = x(titleW)
         titleView.layout(titleLeft, startY + iconH + spacing, titleLeft + titleW, startY + iconH + spacing + titleH)
-        return (if (leading) box.left else box.left + (box.width() - iconW) / 2) to startY
+        return x(iconW) to startY
     }
 
     /**
@@ -765,10 +773,12 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
         val accessory = accessoryView ?: return
         val size = dp(accessorySizeDp).roundToInt()
         accessory.measure(MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY))
+        val rtl = isRightToLeft
         val (x, y) = when (accessoryPlacement) {
-            CYLAnimatedItemAccessoryPlacement.Leading -> left to top + (bottom - top - size) / 2
-            CYLAnimatedItemAccessoryPlacement.Trailing -> right - size to top + (bottom - top - size) / 2
-            CYLAnimatedItemAccessoryPlacement.TopTrailing -> min(right - size, iconLeft + iconWidth - size / 2) to max(0, iconTop - size / 2)
+            CYLAnimatedItemAccessoryPlacement.Leading -> (if (rtl) right - size else left) to top + (bottom - top - size) / 2
+            CYLAnimatedItemAccessoryPlacement.Trailing -> (if (rtl) left else right - size) to top + (bottom - top - size) / 2
+            CYLAnimatedItemAccessoryPlacement.TopTrailing ->
+                (if (rtl) max(left, iconLeft - size / 2) else min(right - size, iconLeft + iconWidth - size / 2)) to max(0, iconTop - size / 2)
         }
         accessory.layout(x, y, x + size, y + size)
     }
@@ -1986,6 +1996,7 @@ open class CYLAnimatedItemView @JvmOverloads constructor(
             isClickable = false
             isFocusable = false
             importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+            cylBadgeState.mirrorsInRightToLeft = true
             this@CYLAnimatedItemView.addView(this, LayoutParams(0, 0))
             storedBadgeAnchor = this
         }
