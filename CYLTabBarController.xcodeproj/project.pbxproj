@@ -21,6 +21,8 @@
 		0C99644106C516D6D542D373 /* CYLTabButtonAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6F919C0AF9BAB08363DC7D /* CYLTabButtonAnimation.swift */; };
 		0DC99D00C6D3F3ACF1783290 /* CYLTabBarBadgeView.h in Headers */ = {isa = PBXBuildFile; fileRef = 2357C953616F9EBF0007DCFC /* CYLTabBarBadgeView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0E5C1FA2CC240F4358070E9D /* CYLBadgeProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1B21C6E4F6DD55647C84249 /* CYLBadgeProtocol.swift */; };
+		A7C1D90E5B3F4A2688D10C02 /* CYLBadgeHosting.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C1D90E5B3F4A2688D10C01 /* CYLBadgeHosting.swift */; };
+		A7C1D90E5B3F4A2688D10C12 /* CYLBadgeAttributeKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C1D90E5B3F4A2688D10C11 /* CYLBadgeAttributeKey.swift */; };
 		0EDBAB53BB52C3876E253DF1 /* CYLThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0C1E171ABBA5B614E5BF3E /* CYLThemeManager.swift */; };
 		0F05B1E808A97ABB527C0DAF /* CYLUtilsKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE5645238D49F58F2C891809 /* CYLUtilsKit.framework */; };
 		0F6A71482CB0A22A1217F875 /* CYLTabBarItemAnimationService.h in Headers */ = {isa = PBXBuildFile; fileRef = D9EB498C4416043B208582C8 /* CYLTabBarItemAnimationService.h */; };
@@ -864,6 +866,8 @@
 		CF093AB55A322789EC5DAF77 /* UIBarButtonItem+CYLBadgeDeprecatedNames.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UIBarButtonItem+CYLBadgeDeprecatedNames.swift"; sourceTree = "<group>"; };
 		CFBBD5D0D21729BEE4C362DE /* CAAnimation+CYLBadgeDeprecatedNames.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "CAAnimation+CYLBadgeDeprecatedNames.swift"; sourceTree = "<group>"; };
 		D1B21C6E4F6DD55647C84249 /* CYLBadgeProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLBadgeProtocol.swift; sourceTree = "<group>"; };
+		A7C1D90E5B3F4A2688D10C01 /* CYLBadgeHosting.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLBadgeHosting.swift; sourceTree = "<group>"; };
+		A7C1D90E5B3F4A2688D10C11 /* CYLBadgeAttributeKey.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CYLBadgeAttributeKey.swift; sourceTree = "<group>"; };
 		D23DC72D9536BC98F84A08B3 /* UINavigationController+CYLFlatDesignTabBarPrivate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "UINavigationController+CYLFlatDesignTabBarPrivate.swift"; sourceTree = "<group>"; };
 		D2534A69F5FC89B62CD7252E /* green_lottie_tab_news_dark.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = green_lottie_tab_news_dark.json; sourceTree = "<group>"; };
 		D2E396F2E63F5565ECB146B1 /* CYLAnimatedItem.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = CYLAnimatedItem.h; sourceTree = "<group>"; };
@@ -1012,6 +1016,8 @@
 				B275C8925399CF9909CC0189 /* CAAnimation+CYLBadgeExtention.swift */,
 				D837C34EBDDBFF23CB60DBDF /* UIView+CYLBadgeExtention.swift */,
 				D1B21C6E4F6DD55647C84249 /* CYLBadgeProtocol.swift */,
+				A7C1D90E5B3F4A2688D10C01 /* CYLBadgeHosting.swift */,
+				A7C1D90E5B3F4A2688D10C11 /* CYLBadgeAttributeKey.swift */,
 				F16E361F65E1DDED662D158F /* UITabBarItem+CYLBadgeExtention.swift */,
 				FBFC445362C954B6C6748A81 /* UIBarButtonItem+CYLBadgeExtention.swift */,
 				AF0AEF727B52FB8DADC392D6 /* Deprecated */,
@@ -2614,6 +2620,8 @@
 				E5D876DCA01A88E9FB5C298B /* CAAnimation+CYLBadgeExtention.swift in Sources */,
 				F2563955BDA0E3BE5E170683 /* UIView+CYLBadgeExtention.swift in Sources */,
 				0E5C1FA2CC240F4358070E9D /* CYLBadgeProtocol.swift in Sources */,
+				A7C1D90E5B3F4A2688D10C02 /* CYLBadgeHosting.swift in Sources */,
+				A7C1D90E5B3F4A2688D10C12 /* CYLBadgeAttributeKey.swift in Sources */,
 				11FDB33646133849213508A1 /* UITabBarItem+CYLBadgeExtention.swift in Sources */,
 				15584333EE61FD0E8B902B97 /* UIBarButtonItem+CYLBadgeExtention.swift in Sources */,
 				C40B18BB1B394163A51A0535 /* CAAnimation+CYLBadgeDeprecatedNames.swift in Sources */,
