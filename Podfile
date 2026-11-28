@@ -20,12 +20,12 @@ pod 'CYLDeallocBlockExecutor', :git => 'https://github.com/ChenYilong/CYLDealloc
 pod 'CYLUtils', :path => './'
 pod 'CYLBadge', :path => './'
 pod 'CYLAnimatedItem', :path => './'
-# [EN] The demo sections are a ClassifyMenu tag list (docs/instructions/examples.md, "Demo lists that need sections use a ClassifyMenu tag list"). Pinned by commit,
-#      the same pin as the HarmonyOS, Android and mini program examples (CrossPlatform/harmonyos-cyltabbar/classifymenu.pin); no copy of its sources.
-# [CN] 演示 section 使用 ClassifyMenu 的 TagList（docs/instructions/examples.md）。按 commit 固定，与 HarmonyOS、Android、小程序示例使用同一个 pin
-#      （CrossPlatform/harmonyos-cyltabbar/classifymenu.pin）；不复制其源码。
-# [EN] iOS pin e4d883a2 (branch feat/harmony, the branch of the newest commit): callout closes on scroll, bubble below the tag, tag badges, an empty badgeText draws an 8 pt dot, a multi-character badge text grows the round badge into a capsule. [CN] iOS 的 pin 141740e8（分支 feat/tag-final-merge-plus）：滚动时关闭浮层、浮层位于 Tag 下方、Tag 角标、空 badgeText 绘制 8 pt 红点、多字符角标文字使圆形角标变为胶囊形。
-# [EN] 6bb6e2b8 (feat/harmony, 2026-11-29) adds the tag list style API the badge demos use. [CN] 6bb6e2b8（feat/harmony，2026-11-29）加入角标 Demo 使用的标签列表样式 API。
+# [EN] The demo sections are a ClassifyMenu tag list (docs/instructions/examples.md, "Demo lists that need sections use a ClassifyMenu tag list"). Pinned by commit; no copy of its sources.
+# [CN] 演示 section 使用 ClassifyMenu 的 TagList（docs/instructions/examples.md）。按 commit 固定；不复制其源码。
+# [EN] iOS pins 6bb6e2b8 (feat/harmony, 2026-11-29: the tag list style API the badge demos use). HarmonyOS, Android and the mini program read
+#      CrossPlatform/harmonyos-cyltabbar/classifymenu.pin (9a4c1908). TODO: neither commit contains the other; return to one pin when ClassifyMenu has a commit with both.
+# [CN] iOS 固定 6bb6e2b8（feat/harmony，2026-11-29：角标 Demo 使用的标签列表样式 API）。鸿蒙、Android、小程序读取
+#      CrossPlatform/harmonyos-cyltabbar/classifymenu.pin（9a4c1908）。TODO：两个提交互不包含；待 ClassifyMenu 提供同时包含两者的提交后恢复为同一个 pin。
 pod 'CollectionViewClassifyMenu', :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :commit => '6bb6e2b895f0698133d90af1362d5b5344b54ddf'
 
 #only for test
