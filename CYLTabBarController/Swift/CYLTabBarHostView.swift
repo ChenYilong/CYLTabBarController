@@ -81,17 +81,25 @@ enum CYLTabBarHostSupport {
     static func showBadge(on target: CYLBadgeProtocol, _ attributes: [String: Any], animationType: CYLBadgeAnimationType) {
         let value = attributes[cylTabBarHostBadgeValue]
         let text = (value as? String) ?? (value as? NSNumber)?.stringValue ?? ""
-        if let color = color(attributes[cylTabBarHostBadgeColor]) {
-            target.cyl_badgeBackgroundColor = color
-        }
-        if let radius = attributes[cylTabBarHostBadgeRadius] as? NSNumber {
-            target.cyl_badgeRadius = CGFloat(radius.doubleValue)
-        }
-        let offset = attributes[cylTabBarHostBadgeCenterOffset]
-        if let pair = offset as? [Any], pair.count == 2 {
-            target.cyl_badgeCenterOffset = CGPoint(x: (pair[0] as? NSNumber)?.doubleValue ?? 0, y: (pair[1] as? NSNumber)?.doubleValue ?? 0)
-        } else if let point = offset as? NSValue, String(cString: point.objCType) == String(cString: NSValue(cgPoint: .zero).objCType) {
-            target.cyl_badgeCenterOffset = point.cgPointValue
+        // [EN] The one parser of CYLBadge (S7, docs/Animated-Item-Badge.md): colors, radius, offset, font, border and the rest, for a view. A page (not a view)
+        //      keeps the three keys it always read. Written statically, not compiled yet.
+        // [CN] CYLBadge 唯一的解析函数（S7，docs/Animated-Item-Badge.md）：视图上的颜色、半径、偏移、字体、边框等。页面（不是视图）仍只读它一直读取的三个键。
+        //      静态编写，尚未编译。
+        if let view = target as? UIView {
+            view.cylApplyBadgeAttributes(attributes)
+        } else {
+            if let color = color(attributes[cylTabBarHostBadgeColor]) {
+                target.cyl_badgeBackgroundColor = color
+            }
+            if let radius = attributes[cylTabBarHostBadgeRadius] as? NSNumber {
+                target.cyl_badgeRadius = CGFloat(radius.doubleValue)
+            }
+            let offset = attributes[cylTabBarHostBadgeCenterOffset]
+            if let pair = offset as? [Any], pair.count == 2 {
+                target.cyl_badgeCenterOffset = CGPoint(x: (pair[0] as? NSNumber)?.doubleValue ?? 0, y: (pair[1] as? NSNumber)?.doubleValue ?? 0)
+            } else if let point = offset as? NSValue, String(cString: point.objCType) == String(cString: NSValue(cgPoint: .zero).objCType) {
+                target.cyl_badgeCenterOffset = point.cgPointValue
+            }
         }
         let animation = animation(attributes[cylTabBarHostBadgeAnimation], fallback: animationType)
         if text.isEmpty {

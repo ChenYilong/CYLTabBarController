@@ -51,6 +51,7 @@ fi
 python3 scripts/check-swift-protocol-bodies.py CYLTabBarController 2>&1 | tail -1 | grep -q "^0 hit" && ok "no protocol bodies" || bad "protocol bodies found"
 python3 scripts/sync-agent-skills.py --check >/dev/null 2>&1 && ok "skills in step" || bad "sync-agent-skills --check fails"
 python3 scripts/update-docs-navigation.py >/dev/null 2>&1; git diff --quiet -- docs README.md && ok "docs navigation current" || bad "docs navigation changed: commit it"
+python3 scripts/check-badge-keys.py >/dev/null 2>&1 && ok "the eleven badge keys are the same on every platform" || bad "badge keys differ between platforms: python3 scripts/check-badge-keys.py"
 # 4. Swift syntax, when a toolchain exists.
 if command -v swiftc >/dev/null; then
   for f in $(git diff --name-only HEAD~1 -- '*.swift'); do swiftc -parse "$f" >/dev/null 2>&1 && ok "parses $f" || bad "swiftc -parse fails: $f"; done

@@ -119,6 +119,10 @@ extension UIView {
     }
 
     private static func cylBadgePoint(_ value: Any?) -> CGPoint? {
+        // [EN] `[x, y]`, as the tab bar host view takes it. [CN] `[x, y]`，与 TabBar 宿主视图的写法相同。
+        if let pair = value as? [Any], pair.count == 2, let x = (pair[0] as? NSNumber)?.doubleValue, let y = (pair[1] as? NSNumber)?.doubleValue {
+            return CGPoint(x: x, y: y)
+        }
         if let point = value as? NSValue { return point.cgPointValue }
         if let text = value as? String, text.hasPrefix("{") { return NSCoder.cgPoint(for: text) }
         return nil
