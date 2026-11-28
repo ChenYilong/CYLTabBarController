@@ -3042,6 +3042,11 @@ open class CYLAnimatedItemView: UIControl, CYLAnimatedItemContent, CYLAnimatedIt
         anchor.backgroundColor = .clear
         addSubview(anchor)
         storedBadgeAnchor = anchor
+        // [EN] Placed on the icon at once: CYLBadge shows a badge synchronously only on a host that already has a size, and
+        //      tab badge lookups read this view before the next layout pass. [CN] 立即放到图标上：CYLBadge 只在已有尺寸的宿主上同步显示
+        //      角标，且 Tab 角标查找会在下一次布局之前读取本视图。
+        setNeedsLayout()
+        layoutIfNeeded()
         return anchor
     }
 
@@ -3186,5 +3191,7 @@ extension CYLAnimatedItemView: CYLTabBarItemAnimationFailureHandling {
 /// [EN] The item hands its badge to `badgeAnchorView` (a view kept on the icon), so `item.cyl_showBadgeValue(...)` and `item.badgeValue` are the same badge. [CN] item 把角标交给 `badgeAnchorView`（保持在图标上的视图），因此 `item.cyl_showBadgeValue(...)` 与 `item.badgeValue` 是同一个角标。
 extension CYLAnimatedItemView: CYLBadgeHosting {
     @objc public var cylBadgeAnchorView: UIView { badgeAnchorView }
+    /** [EN] true while `badgeValue` is set: the item's `accessibilityValue` then includes the description itself. [CN] 设置了 `badgeValue` 时为 true：此时 item 的 `accessibilityValue` 自行包含角标描述。 */
+    @objc public var cylBadgeHostDescribesBadge: Bool { badgeValue != nil }
 }
 #endif

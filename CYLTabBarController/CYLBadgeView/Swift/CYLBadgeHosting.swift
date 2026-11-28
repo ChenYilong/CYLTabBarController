@@ -27,4 +27,6 @@ import CYLUtilsKit
     @objc var cylBadgeAnchorView: UIView { get }
     /** [EN] The element whose `accessibilityValue` gets the badge description; the host itself when not implemented. [CN] 其 `accessibilityValue` 获得角标描述的元素；未实现时为宿主本身。 */
     @objc optional var cylBadgeAccessibilityHost: NSObject { get }
+    /** [EN] true while the host adds the badge description to its own `accessibilityValue`; the badge component then writes none. [CN] 宿主自行把角标描述加到自己的 `accessibilityValue` 时为 true；此时角标组件不再写入。 */
+    @objc optional var cylBadgeHostDescribesBadge: Bool { get }
 }

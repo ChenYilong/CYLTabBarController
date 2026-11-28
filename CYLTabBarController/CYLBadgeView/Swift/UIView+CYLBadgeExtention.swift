@@ -755,6 +755,15 @@ extension UIView {
             return
         }
         let saved = objc_getAssociatedObject(element, CYLBadgeViewKeys.originalAccessibilityValue)
+        // [EN] A host that describes its own badge: writing here too would repeat the description, and keep it after clearing.
+        //      A value written earlier is given back. [CN] 宿主自行描述角标：这里再写会重复描述，且清除后仍残留。之前写入的值予以还原。
+        if let host = element as? CYLBadgeHosting, host.cylBadgeHostDescribesBadge == true, host.cylBadgeAnchorView === self {
+            if saved != nil {
+                objc_setAssociatedObject(element, CYLBadgeViewKeys.originalAccessibilityValue, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+                element.accessibilityValue = saved as? String
+            }
+            return
+        }
         if let description {
             if saved == nil {
                 // [EN] NSNull marks "had no value", so the original nil can be restored too.

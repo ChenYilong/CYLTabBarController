@@ -68,6 +68,8 @@ final class CYLAnimatedItemBadgeTests: XCTestCase {
         item.accessibilityValue = "Selected"
         item.badgeValue = "3"
         XCTAssertTrue(item.accessibilityValue?.hasPrefix("Selected, ") == true)
+        let value = item.accessibilityValue ?? ""
+        XCTAssertEqual(value.components(separatedBy: ", ").count, 2, "the badge is described once: \(value)")
         item.badgeValue = nil
         XCTAssertEqual(item.accessibilityValue, "Selected")
     }

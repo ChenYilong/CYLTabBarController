@@ -446,6 +446,10 @@ open class CYLFlatDesignTabBarButton: CYLAnimatedItemView {
         // [CN] Tab 的动画视图在这里创建，晚于按钮着色：此时为其着色（从未改变状态的 Tab 曾在浅色 TabBar 上保持文件自身的白色线条）。
         applyAnimationTintOptions()
         applyIconTintColor(iconColorForCurrentState())
+        // [EN] This layout replaces the component's, so it also keeps the badge view on the icon, above the animation view.
+        // [CN] 本布局替代组件的布局，因此也要让角标视图保持在图标上、动画视图之上。
+        badgeAnchorView.frame = imageView.frame.inset(by: imageView.image?.alignmentRectInsets ?? .zero)
+        bringSubviewToFront(badgeAnchorView)
     }
 
     private func titleTextAttributesForCurrentState() -> [NSAttributedString.Key: Any] {
