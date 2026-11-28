@@ -577,6 +577,7 @@ docs/
 │   ├── plusbutton-touchable-area-1x.png
 │   ├── plusbutton-touchable-area-2x.png
 │   ├── push-from-anywhere-ios.png
+│   ├── react-native-android-animated-item-badge-tags.png
 │   ├── react-native-component-android-bar.png
 │   ├── react-native-component-android.png
 │   ├── react-native-component-ios-bar.png
