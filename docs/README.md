@@ -324,6 +324,7 @@ docs/
 │   ├── flatdesign-plus-button-missing-ios.png
 │   ├── flatdesign-standard-appearance-ios.png
 │   ├── flatdesign-standard-appearance-mapping.svg
+│   ├── flutter-android-animated-item-badge-tags.png
 │   ├── flutter-android-simulated-taps.png
 │   ├── flutter-component-android-bar.png
 │   ├── flutter-component-android.png
