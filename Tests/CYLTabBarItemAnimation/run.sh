@@ -15,7 +15,7 @@ trap 'rm -rf "$build"' EXIT
 
 xcrun clang -fobjc-arc -fmodules -Wall -Wextra -Wno-unused-parameter -DDEBUG=1 \
     -include "$here/CYLCoreStandIns.h" \
-    -I"$here/stub" -I"$animation" -I"$root/CYLTabBarController" -I"$root/CYLTabBarController/CYLUtils" \
+    -I"$here/stub" -I"$animation" -I"$root/CYLTabBarController" -I"$root/CYLTabBarController/CYLUtils" -I"$root/CYLTabBarController/CYLBadgeView" \
     "$here/main.m" "$here/stub/UIKit.m" "$here/CYLCoreStandIns.m" "$here/CYLAnimationKeyLookupStandIns.m" \
     "$animation/CYLTabBarItemAnimatorRegistry.m" \
     "$animation/CYLTabBarItemAnimationFactory.m" \

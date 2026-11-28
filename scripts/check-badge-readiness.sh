@@ -4,6 +4,7 @@
 #      compile-check handoff; exit 1 when a hard rule fails. Written statically, not run on a Mac yet.
 # [CN] CYLBadge / CYLUtils 拆分与 item 角标 API 的静态“可测试”门槛（docs/Animated-Item-Badge.md）。任何环境（含 Linux）都能运行，
 #      不需要 Xcode。会话在一次性交付编译检查之前运行；硬性规则失败时退出码为 1。静态编写，尚未在 Mac 上运行。
+# shellcheck disable=SC2015,SC2013,SC2086  # A && ok || bad is the report idiom here; word splitting is intended
 cd "$(dirname "$0")/.." || exit 1
 export LANG=C.UTF-8 LC_ALL=C.UTF-8   # CocoaPods wants UTF-8
 fail=0
