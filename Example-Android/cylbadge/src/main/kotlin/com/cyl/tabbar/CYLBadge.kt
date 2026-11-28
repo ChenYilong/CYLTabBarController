@@ -201,7 +201,7 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
     /**
      * [EN] Plays a custom `animator` on the badge (the iOS factory animations); `stopAnimation` stops it. [CN] 在角标上播放自定义 `animator`（iOS 的工厂动画）；`stopAnimation` 会停止它。
      */
-    internal fun playAnimator(animator: android.animation.Animator) {
+    fun playAnimator(animator: android.animation.Animator) {
         stopAnimation()
         if (BuildConfig.CYL_BADGE_ANIMATION_DISABLED) return
         runAndReport(animator, null)
@@ -485,7 +485,7 @@ private fun View.cylDetachBadge(badge: CYLBadgeView) {
  *      (`anchorRight`, `anchorTop`): its center at (right + 2, top) plus `cylBadgeCenterOffset`, as on iOS.
  * [CN] 锚点右上角为 (`anchorRight`, `anchorTop`) 时角标的 left 与 top：中心位于 (right + 2, top) 再加上 `cylBadgeCenterOffset`，与 iOS 相同。
  */
-internal fun cylBadgeOrigin(anchorRight: Int, anchorTop: Int, badge: View, offset: CYLOffset, density: Float): Pair<Int, Int> {
+fun cylBadgeOrigin(anchorRight: Int, anchorTop: Int, badge: View, offset: CYLOffset, density: Float): Pair<Int, Int> {
     val left = (anchorRight + CYL_BADGE_CORNER_GAP_DP * density - badge.measuredWidth / 2f + offset.horizontal * density).toInt()
     val top = (anchorTop - badge.measuredHeight / 2f + offset.vertical * density).toInt()
     return left to top
