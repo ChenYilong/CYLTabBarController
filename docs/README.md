@@ -725,7 +725,18 @@ docs/
 │   ├── task-workflow.md
 │   ├── testing.md
 │   └── windows-harmonyos.md
-└── instructions.md
+├── instructions.md
+└── learn-codebase/
+    ├── README.md
+    └── learn-codebase-2026-11-29/
+        ├── 01-repo-overview.md
+        ├── 02-ios.md
+        ├── 03-cross-platform.md
+        ├── 04-badge-task-and-branch.md
+        ├── 05-progress-and-resume.md
+        ├── README.md
+        ├── file-inventory.tsv
+        └── ios-core-read-order.txt
 ```
 
 <!-- navigation:end -->
