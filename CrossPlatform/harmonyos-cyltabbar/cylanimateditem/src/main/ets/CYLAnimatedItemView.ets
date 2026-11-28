@@ -23,8 +23,8 @@ import {
   CYLAnimatedItemDividerInput, CYLAnimatedItemDividerResult, cylAnimatedItemDividerColor, CYL_ANIMATED_ITEM_DIVIDER_LENGTH,
   CYL_ANIMATED_ITEM_DIVIDER_ALPHA, cylAnimatedItemEffectiveRenderingMode, CYL_RENDERING_MODE_AUTOMATIC
 } from './CYLAnimatedItemColors';
-import { CYL_COLOR_COUNT_UNKNOWN, CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE } from './CYLAnimatedItemColorCount';
-import { cylAnimatedItemDetectColorKind } from './CYLAnimatedItemColorCountLoader';
+import { CYL_COLOR_COUNT_UNKNOWN, CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE, cylAnimatedItemStaticImageTints } from './CYLAnimatedItemColorCount';
+import { cylAnimatedItemDetectColorKind, cylAnimatedItemDetectImageColorKind } from './CYLAnimatedItemColorCountLoader';
 import {
   CYLAnimatedItemMissingReporter, CYLAnimatedItemResourceMissingCallback, cylAnimatedItemResourceOf, CYL_RESOURCE_DECODE_FAILED,
   CYL_RESOURCE_ENGINE_LIBRARY_MISSING
@@ -490,8 +490,8 @@ function cylNextScrollObserverNumber(): number {
 @Component
 export struct CYLAnimatedItemView {
   @Prop itemTitle: string = '';
-  @Prop image: ResourceStr = '';
-  @Prop selectedImage: ResourceStr = '';
+  @Prop @Watch('cylDetectStaticImageKinds') image: ResourceStr = '';
+  @Prop @Watch('cylDetectStaticImageKinds') selectedImage: ResourceStr = '';
   @Prop placeholderImage: ResourceStr = $r('app.media.cyl_animated_item_placeholder');
   @Prop @Watch('cylAnimationDidChange') animationUrl: string = '';
   @Prop @Watch('cylPlaybackDidChange') isItemSelected: boolean = false;
@@ -610,6 +610,16 @@ export struct CYLAnimatedItemView {
   @Prop @Watch('cylTintDidChange') stackAnimationRenderingMode: string = CYL_RENDERING_MODE_AUTOMATIC;
   /** [EN] The detection of the animation file (one color or not), filled asynchronously. [CN] 动画文件的检测结果（是否单色），异步填写。 */
   @State cylColorKind: string = CYL_COLOR_COUNT_UNKNOWN;
+  // [EN] Grows when a static image's detection finishes, so the icon is drawn again. [CN] 静态图片检测完成时递增，使图标重新绘制。
+  @State cylStaticKindRevision: number = 0;
+  /**
+   * [EN] Whether the static image follows the rendering mode as an animation does: with no explicit `iconColor`, `automatic` draws a one-color
+   *      resource image in the icon color (visible in Dark Mode), `alwaysTemplate` any image, `alwaysOriginal` never; a multi-color image keeps its
+   *      colors. A host that colors its own icon (the tab bar) passes false.
+   * [CN] 静态图片是否像动画一样遵循渲染方式：没有显式 `iconColor` 时，`automatic` 用图标颜色绘制单色资源图片（深色模式下可见），
+   *      `alwaysTemplate` 绘制任何图片，`alwaysOriginal` 从不；多色图片保持原色。自行为图标着色的宿主（TabBar）传 false。
+   */
+  tintsStaticImageAutomatically: boolean = true;
   /**
    * [EN] The background: `flat` (default) fills the view with `itemBackgroundColor`; `liquidGlass` draws Liquid Glass (a blur
    *      with the tint `itemBackgroundColor`) clipped to `itemCornerRadius`; where `CYLLiquidGlass.isActive()` is false the style
@@ -977,6 +987,7 @@ export struct CYLAnimatedItemView {
     CYLLiquidGlass.trackSystemColorMode();
     // [EN] A badge set at creation: @Watch does not fire for the first value. [CN] 创建时设置的角标：@Watch 对第一个值不会触发。
     this.cylBadgeDidChange();
+    this.cylDetectStaticImageKinds();
     this.cylLifecycle = new LifecycleController<CYLAnimatedItemView>(this);
     this.cylLifecycle.registry.addDeallocCallback<CYLAnimatedItemView>((owner: CYLAnimatedItemView) => owner.cylTeardown(), { key: 'cyl.animatedItem.teardown' });
     this.cylLifecycle.aboutToAppear();
@@ -1393,6 +1404,51 @@ export struct CYLAnimatedItemView {
     return CYLAnimatedItemColorResolver.explicitColor(input);
   }
 
+  /** [EN] The cache key of a static image resource, or '' for what is not detected. [CN] 静态图片资源的缓存键；不检测的内容为 ''。 */
+  private cylStaticImageKey(source: ResourceStr): string {
+    return typeof source === 'object' && !cylIsSymbolResource(source) ?
+      `static:${source.bundleName}:${source.moduleName}:${source.id}:${source.params?.join(',') ?? ''}` : '';
+  }
+
+  /**
+   * [EN] Detects whether the static images are one color (once per resource, cached), the countdown, selected and placeholder images included.
+   * [CN] 检测静态图片是否单色（每个资源一次，带缓存），包括倒计时、选中与占位图片。
+   */
+  cylDetectStaticImageKinds(): void {
+    if (!this.tintsStaticImageAutomatically) {
+      return;
+    }
+    for (const source of [this.image, this.selectedImage, this.countdownImage, this.placeholderImage]) {
+      const key: string = this.cylStaticImageKey(source);
+      if (key === '' || CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE.get(key) !== undefined) {
+        continue;
+      }
+      cylAnimatedItemDetectImageColorKind(source as Resource, this.getUIContext().getHostContext()).then((kind: string) => {
+        CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE.set(key, kind);
+        this.cylStaticKindRevision += 1;
+      });
+    }
+  }
+
+  /**
+   * [EN] What tints the shown static image: the explicit icon color, else the effective icon color when the rendering mode tints it
+   *      (`tintsStaticImageAutomatically`), else '' (its own colors).
+   * [CN] 显示中的静态图片的着色：显式图标颜色；否则当渲染方式要求着色时为生效的图标颜色（`tintsStaticImageAutomatically`）；否则为 ''（原色）。
+   */
+  cylStaticTintColor(): ResourceColor {
+    const explicit: ResourceColor = this.cylExplicitIconColor();
+    if (explicit !== '' || !this.tintsStaticImageAutomatically) {
+      return explicit;
+    }
+    // [EN] Read so a finished detection redraws. [CN] 读取此值，使检测完成后重绘。
+    if (this.cylStaticKindRevision < 0) {
+      return '';
+    }
+    const mode: string = cylAnimatedItemEffectiveRenderingMode(this.animationRenderingMode, '', this.stackAnimationRenderingMode);
+    const kind: string = CYL_ANIMATED_ITEM_COLOR_COUNT_CACHE.get(this.cylStaticImageKey(this.cylFallbackImage())) ?? CYL_COLOR_COUNT_UNKNOWN;
+    return cylAnimatedItemStaticImageTints(mode, kind) ? this.cylEffectiveIconColor() : '';
+  }
+
   /**
    * [EN] The EFFECTIVE icon color of the current state: the ONE resolution (`CYLAnimatedItemColorResolver.resolvedIconColor`). [CN] 当前状态生效的图标颜色：唯一的解析。
    */
@@ -1572,7 +1628,7 @@ export struct CYLAnimatedItemView {
           .height(this.iconSize)
           .opacity(this.cylAnimationShows() ? 0 : 1)
           .accessibilityLevel('no')
-      } else if (!this.cylIsEmpty(this.cylFallbackImage()) && typeof this.cylExplicitIconColor() === 'object') {
+      } else if (!this.cylIsEmpty(this.cylFallbackImage()) && typeof this.cylStaticTintColor() === 'object') {
         // [EN] A resource color (`$r(...)`): `cylIconColorFilter` reads only hex strings, which left a bitmap icon untinted (a black
         //      icon on a dark background). The color is painted over the icon's alpha (source in), so ArkUI resolves it for the
         //      current light / dark mode, as for the animation tint below.
@@ -1586,7 +1642,7 @@ export struct CYLAnimatedItemView {
           Column()
             .width(this.iconSize)
             .height(this.iconSize)
-            .backgroundColor(this.cylExplicitIconColor())
+            .backgroundColor(this.cylStaticTintColor())
             .blendMode(BlendMode.SRC_IN)
         }
         .width(this.iconSize)
@@ -1598,8 +1654,8 @@ export struct CYLAnimatedItemView {
         Image(this.cylFallbackImage())
           .width(this.iconSize)
           .height(this.iconSize)
-          .fillColor(this.cylExplicitIconColor() === '' ? undefined : this.cylExplicitIconColor())
-          .colorFilter(new ColorFilter(cylIconColorFilter(this.cylExplicitIconColor())))
+          .fillColor(this.cylStaticTintColor() === '' ? undefined : this.cylStaticTintColor())
+          .colorFilter(new ColorFilter(cylIconColorFilter(this.cylStaticTintColor())))
           .objectFit(ImageFit.Contain)
           .opacity(this.cylAnimationShows() ? 0 : 1)
           .accessibilityLevel('no')

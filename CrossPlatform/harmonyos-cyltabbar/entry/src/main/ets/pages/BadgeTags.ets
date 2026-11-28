@@ -57,9 +57,6 @@ struct CYLBadgeTag {
       itemId: this.tagId,
       image: $r('app.media.fishpond_normal'),
       iconSize: 30,
-      // [EN] A template icon: tinted with the tag's text color, as a tag list tints its icons, so it follows Dark Mode.
-      // [CN] 模板图标：与 TagList 对图标的处理相同，用标签文字颜色着色，因此跟随深色模式。
-      iconColor: $r('app.color.cyl_tag_text'),
       titleColor: $r('app.color.cyl_tag_text'),
       // [EN] The badge is an overlay: the gap keeps the title clear of it, as the iOS tags do. [CN] 角标是浮层：此间距使标题避开角标，与 iOS 的 Tag 相同。
       spacing: 16,

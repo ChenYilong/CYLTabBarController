@@ -349,6 +349,7 @@ docs/
 │   ├── gif-liquid-glass.png
 │   ├── gif-tint-or-original-colors.png
 │   ├── glass-shared-edge-android-harmonyos.png
+│   ├── harmonyos-animated-item-badge-tags-auto-tint.png
 │   ├── harmonyos-animated-item-badge-tags-before-after.png
 │   ├── harmonyos-animated-item-badge-tags-clear-reshow.png
 │   ├── harmonyos-animated-item-badge-tags-scale-overflow.png

@@ -1774,6 +1774,8 @@ export struct CYLTabBarController {
             // [CN] Lottie 或 SVGA Tab：组件自身的引擎视图（不传 animationBuilder），播放设置相同。
             CYLAnimatedItemView({
               isBare: true,
+              // [EN] The tab bar colors its own icons. [CN] TabBar 自行为图标着色。
+              tintsStaticImageAutomatically: false,
               image: this.cylIcon(index) ?? '',
               animationUrl: this.cylTabAnimationPath(index),
               iconSize: this.cylTabAnimationSize(index),
@@ -1790,6 +1792,8 @@ export struct CYLTabBarController {
           } else {
           CYLAnimatedItemView({
             isBare: true,
+            // [EN] The tab bar colors its own icons. [CN] TabBar 自行为图标着色。
+            tintsStaticImageAutomatically: false,
             image: this.cylIcon(index) ?? '',
             animationUrl: this.cylTabAnimationPath(index),
             iconSize: this.cylTabAnimationSize(index),

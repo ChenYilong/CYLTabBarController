@@ -38,12 +38,42 @@ export async function cylAnimatedItemDetectColorKind(source: CYLAnimatedItemSour
   }
 }
 
-/** [EN] The GIF's first frame as RGBA bytes, through the pure detector. [CN] GIF 首帧的 RGBA 字节，交给纯检测函数。 */
-async function cylFirstFrameKind(bytes: Uint8Array): Promise<string> {
+/** [EN] The longer side, in px, a static image is scanned at (as Android). [CN] 扫描静态图片时长边的像素数（与 Android 相同）。 */
+const CYL_STATIC_IMAGE_SCAN_SIZE: number = 48;
+
+/**
+ * [EN] 'oneColor' | 'multiColor' | 'unknown' for a static image resource (`$r` media, SVG included, or `$rawfile`); never rejects. A path or URL
+ *      string is not detected ('unknown': the original colors stay).
+ * [CN] 静态图片资源（`$r` 媒体资源，包括 SVG，或 `$rawfile`）的检测结果；从不 reject。路径或 URL 字符串不检测（'unknown'：保持原色）。
+ */
+export async function cylAnimatedItemDetectImageColorKind(resource: Resource, context: common.Context | undefined): Promise<string> {
+  try {
+    if (context === undefined) {
+      return CYL_COLOR_COUNT_UNKNOWN;
+    }
+    const name: Object | undefined = resource.id === -1 || resource.params === undefined ? undefined : resource.params[0] as Object;
+    const bytes: Uint8Array = resource.type === CYL_RAWFILE_RESOURCE_TYPE ?
+      await context.resourceManager.getRawFileContent(name as string) : await context.resourceManager.getMediaContent(resource.id);
+    return await cylFirstFrameKind(bytes, CYL_STATIC_IMAGE_SCAN_SIZE);
+  } catch (e) {
+    return CYL_COLOR_COUNT_UNKNOWN;
+  }
+}
+
+/** [EN] The `type` of a `$rawfile(...)` resource. [CN] `$rawfile(...)` 资源的 `type`。 */
+const CYL_RAWFILE_RESOURCE_TYPE: number = 30000;
+
+/** [EN] The first frame as RGBA bytes (scaled to at most `maxSide` px when given), through the pure detector. [CN] 首帧的 RGBA 字节（给出 `maxSide` 时缩放到长边最多该像素数），交给纯检测函数。 */
+async function cylFirstFrameKind(bytes: Uint8Array, maxSide?: number): Promise<string> {
   const data = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
   const imageSource: image.ImageSource = image.createImageSource(data);
   try {
     const options: image.DecodingOptions = { desiredPixelFormat: image.PixelMapFormat.RGBA_8888, index: 0 };
+    if (maxSide !== undefined) {
+      const size: image.Size = (await imageSource.getImageInfo()).size;
+      const scale: number = Math.min(1, maxSide / Math.max(size.width, size.height, 1));
+      options.desiredSize = { width: Math.max(1, Math.round(size.width * scale)), height: Math.max(1, Math.round(size.height * scale)) };
+    }
     const pixelMap: image.PixelMap = await imageSource.createPixelMap(options);
     try {
       const info: image.ImageInfo = await pixelMap.getImageInfo();

@@ -104,3 +104,12 @@ test('detectable types and the cache', () => {
   cache.clear();
   assert.equal(cache.get('a.json'), undefined);
 });
+
+test('static image: alwaysTemplate tints, alwaysOriginal never, automatic only a one-color image', () => {
+  const tints = K.cylAnimatedItemStaticImageTints;
+  assert.equal(tints('alwaysTemplate', 'multiColor'), true);
+  assert.equal(tints('alwaysOriginal', 'oneColor'), false);
+  assert.equal(tints('automatic', 'oneColor'), true);
+  assert.equal(tints('automatic', 'multiColor'), false);
+  assert.equal(tints('automatic', 'unknown'), false);
+});

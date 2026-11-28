@@ -199,6 +199,19 @@ export function cylAnimatedItemGifColorKind(rgba: ArrayLike<number>, premultipli
 }
 
 /**
+ * [EN] Whether a static image is drawn in the icon color when no explicit icon color is set (the rendering mode, as for an animation and as Android's
+ *      `staticImageRenderingColor`): alwaysTemplate yes, alwaysOriginal no, automatic only when the image is detected as 'oneColor'.
+ * [CN] 没有显式图标颜色时静态图片是否用图标颜色绘制（按渲染模式，与动画及 Android 的 `staticImageRenderingColor` 相同）：alwaysTemplate 是，
+ *      alwaysOriginal 否，automatic 仅当图片检测为 'oneColor' 时。
+ */
+export function cylAnimatedItemStaticImageTints(renderingMode: string, colorKind: string): boolean {
+  if (renderingMode === 'alwaysOriginal') {
+    return false;
+  }
+  return renderingMode === 'alwaysTemplate' || colorKind === CYL_COLOR_COUNT_ONE;
+}
+
+/**
  * [EN] Whether the type of a file can be detected: Lottie (JSON text), GIF (first frame pixels); PAG, SVGA, Rive and anything else are 'unknown'.
  * [CN] 该类型的文件能否检测：Lottie（JSON 文本）、GIF（首帧像素）；PAG、SVGA、Rive 与其他均为 'unknown'。
  */
