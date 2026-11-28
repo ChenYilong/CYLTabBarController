@@ -1,10 +1,14 @@
 import type { ViewProps } from 'react-native';
 import NativeAnimationView from './CyltabbarAnimationViewNativeComponent';
 
-/** Options of an animation file, e.g. Rive's `artboard`, `stateMachine`, `input`, `duration`. */
+/**
+ * Options of an animation file, e.g. Rive's `artboard`, `stateMachine`, `input`, `duration`.
+ */
 export type CYLAnimationOptions = Record<string, string | number>;
 
-/** The URL of `file` with `options` in its fragment, sorted by name, like `CYLTabBarAnimationURLWithOptions()`. */
+/**
+ * The URL of `file` with `options` in its fragment, sorted by name, like `CYLTabBarAnimationURLWithOptions()`.
+ */
 /**
  * [EN] Code-unit order, as Android's `toSortedMap()`, so both platforms build the same URL (`localeCompare` would not).
  * [CN] 按 UTF-16 码元排序，与 Android 的 `toSortedMap()` 相同，两个平台生成同样的 URL（`localeCompare` 做不到）。
@@ -26,7 +30,9 @@ export function animationURLWithOptions(file: string, options: CYLAnimationOptio
 }
 
 export type CYLAnimationViewProps = ViewProps & {
-  /** A file name in the app (iOS main bundle, Android assets), a path or a URL: `.riv`, `.json` (Lottie), `.pag`, `.gif`. */
+  /**
+   * A file name in the app (iOS main bundle, Android assets), a path or a URL: `.riv`, `.json` (Lottie), `.pag`, `.gif`, `.svga`.
+   */
   file: string;
   options?: CYLAnimationOptions;
   playing?: boolean;
@@ -34,7 +40,7 @@ export type CYLAnimationViewProps = ViewProps & {
 
 /**
  * An animation played by CYLTabBarController's own engine (the one of the tab icons), whatever its library: Rive, Lottie,
- * PAG or GIF, when the app has that library (iOS subspec, Android dependency). 由 CYLTabBarController 自己的引擎（Tab 图标所用）播放的动画。
+ * PAG, GIF or SVGA, when the app has that library (iOS subspec, Android dependency). 由 CYLTabBarController 自己的引擎（Tab 图标所用）播放的动画。
  */
 export function CYLAnimationView({ file, options, playing, ...rest }: CYLAnimationViewProps) {
   return <NativeAnimationView {...rest} source={animationURLWithOptions(file, options)} playing={playing ?? false} />;

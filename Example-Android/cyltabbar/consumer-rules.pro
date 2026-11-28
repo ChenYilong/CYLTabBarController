@@ -22,3 +22,7 @@
     public ** getItemDecorationAt(int);
     public void invalidateItemDecorations();
 }
+
+# [EN] cyl_setupWithViewPager2 compiles against ViewPager2; apps without it never call it.
+# [CN] cyl_setupWithViewPager2 编译时依赖 ViewPager2；没有 ViewPager2 的 App 不会调用它。
+-dontwarn androidx.viewpager2.**

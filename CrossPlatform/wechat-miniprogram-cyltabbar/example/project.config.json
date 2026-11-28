@@ -1,0 +1,32 @@
+{
+  "appid": "wx5e29c9d33906f074",
+  "projectname": "cyl-tabbar-miniprogram-example",
+  "description": "The example of cyl-tabbar-miniprogram (CYLTabBarController for WeChat Mini Program)",
+  "compileType": "miniprogram",
+  "miniprogramRoot": "miniprogram/",
+  "libVersion": "latest",
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "packNpmManually": true,
+    "packNpmRelationList": [
+      {
+        "packageJsonPath": "./package.json",
+        "miniprogramNpmDistDir": "./miniprogram/"
+      }
+    ]
+  },
+  "packOptions": {
+    "ignore": [
+      {
+        "type": "regexp",
+        "value": "(^|/)\\._"
+      }
+    ],
+    "include": []
+  },
+  "condition": {}
+}

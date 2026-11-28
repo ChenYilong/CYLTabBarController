@@ -18,7 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         let window = UIWindow(windowScene: windowScene)
         // Rebuilt after a language change, so every text shows in the new language.
-        window.cyl_setRootViewControllerProvider { appDelegate.makeMainTabBarController() }
+        window.cylSetRootViewControllerProvider { appDelegate.makeMainTabBarController() }
         window.makeKeyAndVisible()
         self.window = window
         // Keep AppDelegate.window in sync for code that still reads it.

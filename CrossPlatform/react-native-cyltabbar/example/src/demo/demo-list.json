@@ -57,7 +57,7 @@
      "id": "flatShowHide",
      "icon": "eye",
      "title": "Show / hide CYLFlatDesignTabBar",
-     "subtitle": "Not supported by this tab bar style: FlatDesign (CYLFlatDesignTabBar) only",
+     "subtitle": "",
      "accessory": "none"
     },
     {
@@ -188,7 +188,7 @@
      "id": "login",
      "icon": "person_crop_circle_badge_xmark",
      "title": "Login state: {login}",
-     "subtitle": "Switch on means logged in, off means logged out (cached locally). While logged out, tapping “Messages, Me” shows the login screen first, then switches to that tab after logging in; while logged in, it switches right away.",
+     "subtitle": "Switch on means logged in, off means logged out (cached locally). While logged out, tapping “{loginTabs}” shows the login screen first, then switches to that tab after logging in; while logged in, it switches right away.",
      "accessory": "switch"
     }
    ]
@@ -201,7 +201,7 @@
      "id": "touchableArea",
      "icon": "hand_point_up_left",
      "title": "PlusButton touchable area (issue #91)",
-     "subtitle": "Turn the switch on to show the touchable area in translucent red, off to restore the normal look; drag the slider to multiply the area. Now: {touchScale}",
+     "subtitle": "Turn the switch on to show the touchable area in translucent red, off to restore the normal look; drag the slider to multiply the area. Now: {touchScale}x",
      "accessory": "switch",
      "slider": true
     },
@@ -298,7 +298,7 @@
      "id": "bundleImage",
      "icon": "@cyl_badge_sample_icon",
      "title": "Load images from a bundle (issue #535)",
-     "subtitle": "The image on the left is read from the resource bundle with CYLImageInBundle (not cached). CYLBundleImage in the main bundle: Found CYLImagePathInBundle ✓ (cyl_badge_sample_icon@3x.png) · CYLBundleImagePath ✓ · CYLBundleImageData 11 KB · CYLBundleImageFromData ✓ (@3x) · CYLImageNamed ✓",
+     "subtitle": "The image on the left is read from the resource bundle with CYLImageInBundle (not cached). CYLBundleImage in the main bundle: {bundleImage}",
      "accessory": "none"
     },
     {

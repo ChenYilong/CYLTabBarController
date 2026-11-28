@@ -38,10 +38,14 @@ object CYLTabBarItemAnimationStyleSource {
 
     fun isDark(configuration: Configuration) = (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 
-    /** [EN] The file to show for `url` in `configuration`: its dark version in Dark Mode. [CN] `configuration` 下 `url` 应显示的文件：深色模式下为其深色版本。 */
+    /**
+     * [EN] The file to show for `url` in `configuration`: its dark version in Dark Mode. [CN] `configuration` 下 `url` 应显示的文件：深色模式下为其深色版本。
+     */
     fun urlForStyle(url: String, configuration: Configuration): String = if (isDark(configuration)) darkURLs[url] ?: url else url
 
-    /** [EN] The colors for `url` in `configuration`: its colors, plus the dark colors in Dark Mode. [CN] `configuration` 下 `url` 的颜色：其颜色，深色模式下加上深色颜色。 */
+    /**
+     * [EN] The colors for `url` in `configuration`: its colors, plus the dark colors in Dark Mode. [CN] `configuration` 下 `url` 的颜色：其颜色，深色模式下加上深色颜色。
+     */
     fun colorsForStyle(url: String, configuration: Configuration): Map<String, Int>? {
         val all = HashMap(colors[url].orEmpty())
         if (isDark(configuration)) darkColors[url]?.let { all.putAll(it) }
@@ -57,6 +61,7 @@ private class CYLTabAnimationState(
     var view: View?,
     var loadedURL: String?,
     var playing: Boolean = false,
+    var loops: Boolean = false,
 )
 
 private val animationStates = WeakHashMap<View, CYLTabAnimationState>()
@@ -78,24 +83,35 @@ private fun View.cyl_insertAnimationView(state: CYLTabAnimationState) {
     host.addView(view, FrameLayout.LayoutParams(width, height, Gravity.CENTER))
     state.view = view
     state.loadedURL = url
+    (this as? CYLTabBarItemButton)?.cyl_setTabBarItemAnimationView(view)
     val player = CYLTabBarItemAnimationFactory.playerForView(view)
     if (state.speed > 0 && state.speed.isFinite()) player?.animationSpeed = state.speed
+    if (state.loops) player?.loops = true
     player?.applyColors(CYLTabBarItemAnimationStyleSource.colorsForStyle(state.url, resources.configuration), resources.configuration)
+    // [EN] The tab's current title color, for an animation with the `tint` option "title" (bug B12). [CN] Tab 当前标题颜色，供 `tint` 选项为 "title" 的动画使用（问题 B12）。
+    (this as? CYLTabBarItemButton)?.let { player?.setTintColor(it.titleLabel.currentTextColor, it.isSelected) }
     // [EN] The animation replaces the icon. [CN] 动画取代图标。
     when (this) {
-        is CYLTabBarItemButton -> iconView.visibility = View.INVISIBLE
-        is CYLPlusButton -> imageView.visibility = View.INVISIBLE
+        // [EN] While the file downloads, the tab keeps its image (or the placeholder). [CN] 文件下载期间，Tab 保留其图片（或占位图）。
+        is CYLTabBarItemButton -> iconView.visibility = if (CYLTabBarItemAnimationFailure.isLoading(view)) View.VISIBLE else View.INVISIBLE
+        is CYLPlusButton -> imageView.visibility = if (CYLTabBarItemAnimationFailure.isLoading(view)) View.VISIBLE else View.INVISIBLE
     }
     requestLayout()
 }
 
-/** [EN] `-cyl_tabBarItemAnimationView`: the animation view of this tab button, or null. [CN] 本 Tab 按钮的动画视图，没有时为 null。 */
+/**
+ * [EN] `-cyl_tabBarItemAnimationView`: the animation view of this tab button, or null. [CN] 本 Tab 按钮的动画视图，没有时为 null。
+ */
 val View.cyl_tabBarItemAnimationView: View? get() = animationStates[this]?.view
 
-/** [EN] `-cyl_isTabBarItemAnimationReady`: the animation view was added. [CN] 已添加动画视图。 */
+/**
+ * [EN] `-cyl_isTabBarItemAnimationReady`: the animation view was added. [CN] 已添加动画视图。
+ */
 fun View.cyl_isTabBarItemAnimationReady(): Boolean = cyl_tabBarItemAnimationView != null
 
-/** [EN] `cyl_tabBarItemAnimationPlayer`: the player of this tab button's animation, null without one. [CN] 本 Tab 按钮动画的播放器，没有时为 null。 */
+/**
+ * [EN] `cyl_tabBarItemAnimationPlayer`: the player of this tab button's animation, null without one. [CN] 本 Tab 按钮动画的播放器，没有时为 null。
+ */
 val View.cyl_tabBarItemAnimationPlayer: CYLTabBarItemAnimationPlayer? get() = CYLTabBarItemAnimationFactory.playerForView(cyl_tabBarItemAnimationView)
 
 /**
@@ -108,17 +124,67 @@ fun View.cyl_addTabBarItemAnimationWithURL(url: String?, size: CYLSize?, content
     if (url.isNullOrBlank() || animationStates[this]?.view != null) return
     val state = CYLTabAnimationState(url, size, contentMode, speed, null, null)
     animationStates[this] = state
+    cyl_installAnimationFailureFallback()
     cyl_insertAnimationView(state)
 }
 
-/** [EN] `-cyl_setTabBarItemAnimationSpeed:`: 0, negative or not finite: the default. [CN] 0、负数或非有限值表示默认值。 */
+/**
+ * [EN] A tab button whose animation file fails shows its image again, as on iOS (the engine reports through
+ *      `CYLTabBarItemAnimationFailure`, which lives in `:cylanimateditem` and does not know the tab bar).
+ * [CN] 动画文件加载失败的 Tab 按钮重新显示图片，与 iOS 一致（引擎通过 `:cylanimateditem` 中不了解 TabBar 的
+ *      `CYLTabBarItemAnimationFailure` 报告）。
+ */
+private fun cyl_installAnimationFailureFallback() {
+    if (CYLTabBarItemAnimationFailure.fallbackHandler == null) {
+        CYLTabBarItemAnimationFailure.fallbackHandler = { host ->
+            host.cyl_replaceTabBarItemAnimationWithURL(null, null)
+            // [EN] A tab with no static image shows the placeholder rather than an empty icon. [CN] 没有静态图片的 Tab 显示占位图，而不是空图标。
+            if (host is CYLTabBarItemButton && host.iconView.drawable == null) host.iconView.setImageDrawable(host.cyl_animationPlaceholder())
+        }
+        // [EN] A downloaded animation replaces the image or placeholder shown meanwhile. [CN] 下载完成的动画取代期间显示的图片或占位图。
+        CYLTabBarItemAnimationFailure.loadedFallbackHandler = { host ->
+            when (host) {
+                is CYLTabBarItemButton -> if (host.cyl_customIconView == null) host.iconView.visibility = View.INVISIBLE
+                is CYLPlusButton -> host.imageView.visibility = View.INVISIBLE
+            }
+        }
+    }
+}
+
+/**
+ * [EN] `-cyl_setTabBarItemAnimationSpeed:`: 0, negative or not finite: the default. [CN] 0、负数或非有限值表示默认值。
+ */
 fun View.cyl_setTabBarItemAnimationSpeed(speed: Float) {
     val state = animationStates[this] ?: return
     state.speed = speed
     cyl_tabBarItemAnimationPlayer?.animationSpeed = if (speed > 0 && speed.isFinite()) speed else 1f
 }
 
-/** [EN] `-cyl_reloadTabBarItemAnimationViewForCurrentStyle`: swaps to the file and colors of the current style (#442). [CN] 切换为当前风格的文件与颜色（#442）。 */
+/**
+ * [EN] `-cyl_setTabBarItemAnimationLoops:`: the animation repeats until this is false; applies to the animation already
+ *      playing and to the next plays.
+ * [CN] 动画重复播放直到设为 false；对正在播放的动画与之后的播放都生效。
+ */
+fun View.cyl_setTabBarItemAnimationLoops(loops: Boolean) {
+    val state = animationStates[this] ?: return
+    state.loops = loops
+    cyl_tabBarItemAnimationPlayer?.loops = loops
+}
+
+/**
+ * [EN] `-cyl_restartTabBarItemAnimation`: plays the animation again from progress 0, whatever its position ("Play all").
+ * [CN] 无论当前位置，从进度 0 重新播放动画（「全部播放」）。
+ */
+fun View.cyl_restartTabBarItemAnimation() {
+    val state = animationStates[this] ?: return
+    val player = cyl_tabBarItemAnimationPlayer ?: return
+    state.playing = true
+    player.play()
+}
+
+/**
+ * [EN] `-cyl_reloadTabBarItemAnimationViewForCurrentStyle`: swaps to the file and colors of the current style (#442). [CN] 切换为当前风格的文件与颜色（#442）。
+ */
 fun View.cyl_reloadTabBarItemAnimationViewForCurrentStyle() {
     val state = animationStates[this] ?: return
     val url = CYLTabBarItemAnimationStyleSource.urlForStyle(state.url, resources.configuration)
@@ -130,12 +196,15 @@ fun View.cyl_reloadTabBarItemAnimationViewForCurrentStyle() {
     }
 }
 
-/** [EN] `-cyl_replaceTabBarItemAnimationWithURL:size:contentMode:`: replaces the animation (e.g. a theme's). [CN] 替换动画（例如主题的动画）。 */
+/**
+ * [EN] `-cyl_replaceTabBarItemAnimationWithURL:size:contentMode:`: replaces the animation (e.g. a theme's). [CN] 替换动画（例如主题的动画）。
+ */
 fun View.cyl_replaceTabBarItemAnimationWithURL(url: String?, size: CYLSize?, contentMode: ImageView.ScaleType = ImageView.ScaleType.FIT_CENTER) {
     val previous = animationStates[this]
     if (url.isNullOrBlank()) {
         previous?.view?.let { (this as? ViewGroup)?.removeView(it) }
         animationStates.remove(this)
+        (this as? CYLTabBarItemButton)?.cyl_setTabBarItemAnimationView(null)
         when (this) {
             is CYLTabBarItemButton -> iconView.visibility = View.VISIBLE
             is CYLPlusButton -> imageView.visibility = View.VISIBLE
@@ -144,11 +213,14 @@ fun View.cyl_replaceTabBarItemAnimationWithURL(url: String?, size: CYLSize?, con
     }
     val state = CYLTabAnimationState(url, size, contentMode, previous?.speed ?: 0f, previous?.view, null, previous?.playing ?: false)
     animationStates[this] = state
+    cyl_installAnimationFailureFallback()
     cyl_insertAnimationView(state)
     if (state.playing) cyl_tabBarItemAnimationPlayer?.showLastFrame()
 }
 
-/** [EN] `-cyl_refreshTabBarItemAnimationColors`: applies the colors of the current style again (#216). [CN] 重新应用当前风格的颜色（#216）。 */
+/**
+ * [EN] `-cyl_refreshTabBarItemAnimationColors`: applies the colors of the current style again (#216). [CN] 重新应用当前风格的颜色（#216）。
+ */
 fun View.cyl_refreshTabBarItemAnimationColors() {
     val state = animationStates[this] ?: return
     cyl_tabBarItemAnimationPlayer?.applyColors(CYLTabBarItemAnimationStyleSource.colorsForStyle(state.url, resources.configuration), resources.configuration)
@@ -168,7 +240,9 @@ fun View.cyl_playTabBarItemAnimationWithURL(url: String?, size: CYLSize?, defaul
     if (defaultSelected) player.showLastFrame() else player.play()
 }
 
-/** [EN] `-cyl_stopTabBarItemAnimation`: stops, back to the first frame. [CN] 停止并回到第一帧。 */
+/**
+ * [EN] `-cyl_stopTabBarItemAnimation`: stops, back to the first frame. [CN] 停止并回到第一帧。
+ */
 fun View.cyl_stopTabBarItemAnimation() {
     val state = animationStates[this] ?: return
     state.playing = false
@@ -177,15 +251,23 @@ fun View.cyl_stopTabBarItemAnimation() {
 
 // MARK: - The Lottie-named methods (deprecated on iOS) Lottie 命名的方法（iOS 上已废弃）
 
-/** [EN] `-cyl_lottieAnimationView`. [CN] 动画视图。 */
+/**
+ * [EN] `-cyl_lottieAnimationView`. [CN] 动画视图。
+ */
 val View.cyl_lottieAnimationView: View? get() = cyl_tabBarItemAnimationView
-/** [EN] `-cyl_isLottieReady`: use `cyl_isTabBarItemAnimationReady`. [CN] 请使用 `cyl_isTabBarItemAnimationReady`。 */
+/**
+ * [EN] `-cyl_isLottieReady`: use `cyl_isTabBarItemAnimationReady`. [CN] 请使用 `cyl_isTabBarItemAnimationReady`。
+ */
 fun View.cyl_isLottieReady(): Boolean = cyl_isTabBarItemAnimationReady()
-/** [EN] `-cyl_addLottieImageWithLottieURL:size:contentMode:(animationSpeed:)`. [CN] 添加 Lottie 动画。 */
+/**
+ * [EN] `-cyl_addLottieImageWithLottieURL:size:contentMode:(animationSpeed:)`. [CN] 添加 Lottie 动画。
+ */
 @JvmOverloads
 fun View.cyl_addLottieImageWithLottieURL(lottieURL: String?, size: CYLSize?, contentMode: ImageView.ScaleType = ImageView.ScaleType.FIT_CENTER, animationSpeed: Float = 0f) =
     cyl_addTabBarItemAnimationWithURL(lottieURL, size, contentMode, animationSpeed)
-/** [EN] `-cyl_addLottieImageWithLottieFilePath:size:contentMode:`: a path or an asset name. [CN] 路径或 asset 名称。 */
+/**
+ * [EN] `-cyl_addLottieImageWithLottieFilePath:size:contentMode:`: a path or an asset name. [CN] 路径或 asset 名称。
+ */
 @JvmOverloads
 fun View.cyl_addLottieImageWithLottieFilePath(lottieFilePath: String, size: CYLSize?, contentMode: ImageView.ScaleType = ImageView.ScaleType.FIT_CENTER) =
     cyl_addTabBarItemAnimationWithURL(lottieFilePath, size, contentMode)
@@ -195,43 +277,75 @@ fun View.cyl_reloadLottieAnimationViewForCurrentStyle() = cyl_reloadTabBarItemAn
 fun View.cyl_animationLottieImageWithLottieURL(lottieURL: String?, size: CYLSize?, defaultSelected: Boolean, contentMode: ImageView.ScaleType = ImageView.ScaleType.FIT_CENTER) =
     cyl_playTabBarItemAnimationWithURL(lottieURL, size, defaultSelected, contentMode)
 fun View.cyl_stopAnimationOfLottieView() = cyl_stopTabBarItemAnimation()
-/** [EN] `-[UIView cyl_isLottieAnimationView]`: a Lottie view (lottie-android). [CN] 是否为 Lottie 视图（lottie-android）。 */
+/**
+ * [EN] `-[UIView cyl_isLottieAnimationView]`: a Lottie view (lottie-android). [CN] 是否为 Lottie 视图（lottie-android）。
+ */
 fun View.cyl_isLottieAnimationView(): Boolean = CYLLottieTabBarItemAnimator.isAvailable && CYLLottieTabBarItemAnimator.playerForAnimationView(this) != null
 
 // MARK: - CYLTabBar (CYLTabBarControllerExtention)
 
-/** [EN] `-cyl_animationLottieImageWithSelectedControl:…`: plays the selected button's animation and stops the others. [CN] 播放选中按钮的动画，停止其他按钮的动画。 */
+/**
+ * [EN] `-cyl_animationLottieImageWithSelectedControl:…`: plays the selected button's animation and stops the others. [CN] 播放选中按钮的动画，停止其他按钮的动画。
+ */
 @JvmOverloads
 fun CYLTabBar.cyl_animationLottieImageWithSelectedControl(selectedControl: View?, lottieURL: String?, size: CYLSize?, defaultSelected: Boolean, contentMode: ImageView.ScaleType = ImageView.ScaleType.FIT_CENTER) {
-    for (button in tabBarButtonArray) if (button !== selectedControl) button.cyl_stopTabBarItemAnimation()
-    plusButton?.takeIf { it !== selectedControl }?.cyl_stopTabBarItemAnimation()
+    cyl_stopAnimationsOfAllTabBarItemsExcept(selectedControl)
     selectedControl?.cyl_playTabBarItemAnimationWithURL(lottieURL, size, defaultSelected, contentMode)
 }
 
-/** [EN] `-cyl_stopAnimationOfAllLottieView`. [CN] 停止所有动画。 */
+/**
+ * [EN] Stops the animation of every tab button and of the plus button except `selectedControl`; each tab switch does this first,
+ *      whichever tab is selected, so exactly one item looks selected, as on iOS. [CN] 停止除 `selectedControl` 外所有 Tab 按钮和 PlusButton 的动画；
+ *      每次切换 Tab 都先执行，不论选中哪个 Tab，保证只有一个 item 呈选中外观，与 iOS 一致。
+ */
+internal fun CYLTabBar.cyl_stopAnimationsOfAllTabBarItemsExcept(selectedControl: View?) {
+    for (button in tabBarButtonArray) if (button !== selectedControl) button.cyl_stopTabBarItemAnimation()
+    plusButton?.takeIf { it !== selectedControl }?.cyl_stopTabBarItemAnimation()
+}
+
+/**
+ * [EN] `-cyl_stopAnimationOfAllLottieView`. [CN] 停止所有动画。
+ */
 fun CYLTabBar.cyl_stopAnimationOfAllLottieView() {
     for (button in tabBarButtonArray) button.cyl_stopTabBarItemAnimation()
     plusButton?.cyl_stopTabBarItemAnimation()
 }
 
+/**
+ * [EN] `-cyl_restartAllTabBarItemAnimations`: every tab icon animation plays again from progress 0. [CN] 所有 Tab 图标动画从进度 0 重新播放。
+ */
+fun CYLTabBar.cyl_restartAllTabBarItemAnimations() {
+    for (button in tabBarButtonArray) button.cyl_restartTabBarItemAnimation()
+}
+
+/**
+ * [EN] `-cyl_setAllTabBarItemAnimationsSpeed:loops:`: one playback policy for every tab icon animation, applied live.
+ * [CN] 所有 Tab 图标动画使用同一个播放策略，实时生效。
+ */
+fun CYLTabBar.cyl_setAllTabBarItemAnimationsSpeed(speed: Float, loops: Boolean) {
+    for (button in tabBarButtonArray) {
+        if (!button.cyl_isTabBarItemAnimationReady()) continue
+        button.cyl_setTabBarItemAnimationSpeed(speed)
+        button.cyl_setTabBarItemAnimationLoops(loops)
+    }
+}
+
 // MARK: - Attributes 属性
 
-/** [EN] The value of `genericKey` in a tab's attributes: the generic key, else the key of the library the attributes choose, else any library's key. [CN] Tab 属性中 `genericKey` 的值：通用 key，否则属性选择的动画库的 key，否则任一动画库的 key。 */
+/**
+ * [EN] The value of `genericKey` in a tab's attributes: the generic key, else the key of the library the attributes choose, else any library's key. [CN] Tab 属性中 `genericKey` 的值：通用 key，否则属性选择的动画库的 key，否则任一动画库的 key。
+ */
 internal fun CYLTabBarItemAttributesAnimationValue(attributes: Map<String, Any?>, genericKey: String): Any? {
     attributes[genericKey]?.let { return it }
     CYLTabBarItemAnimatorRegistry.attributeKeyForGenericKey(genericKey, attributes)?.let { key -> attributes[key]?.let { return it } }
-    val known = mapOf(
-        CYLConstants.CYLTabBarAnimationURL to listOf(CYLConstants.CYLTabBarLottieURL, CYLConstants.CYLTabBarPAGURL, CYLConstants.CYLTabBarRiveURL, CYLConstants.CYLTabBarGIFURL),
-        CYLConstants.CYLTabBarAnimationFilePath to listOf(CYLConstants.CYLTabBarLottieFilePath, CYLConstants.CYLTabBarPAGFilePath, CYLConstants.CYLTabBarRiveFilePath, CYLConstants.CYLTabBarGIFFilePath),
-        CYLConstants.CYLTabBarAnimationSize to listOf(CYLConstants.CYLTabBarLottieSize, CYLConstants.CYLTabBarPAGSize, CYLConstants.CYLTabBarRiveSize, CYLConstants.CYLTabBarGIFSize),
-        CYLConstants.CYLTabBarAnimationDarkURL to listOf(CYLConstants.CYLTabBarLottieDarkURL, CYLConstants.CYLTabBarPAGDarkURL, CYLConstants.CYLTabBarRiveDarkURL, CYLConstants.CYLTabBarGIFDarkURL),
-        CYLConstants.CYLTabBarAnimationDarkFilePath to listOf(CYLConstants.CYLTabBarLottieDarkFilePath, CYLConstants.CYLTabBarPAGDarkFilePath, CYLConstants.CYLTabBarRiveDarkFilePath, CYLConstants.CYLTabBarGIFDarkFilePath),
-        CYLConstants.CYLTabBarAnimationDarkColors to listOf(CYLConstants.CYLTabBarLottieDarkColors, CYLConstants.CYLTabBarRiveDarkColors),
-    )
-    return known[genericKey]?.firstNotNullOfOrNull { attributes[it] }
+    // [EN] Any type's own key, also when its library is not in the app (the tab then shows its image, or the placeholder).
+    // [CN] 任一类型自己的 key，包括其动画库不在 App 中时（此时 Tab 显示图片，没有时显示占位图）。
+    return com.cyl.animateditem.CYLAnimationEngines.attributesValue(attributes, genericKey)
 }
 
-/** [EN] A color map from a configuration value (keypath → "#RRGGBB" or Int). [CN] 由配置值得到的颜色表。 */
+/**
+ * [EN] A color map from a configuration value (keypath → "#RRGGBB" or Int). [CN] 由配置值得到的颜色表。
+ */
 @Suppress("UNCHECKED_CAST")
 internal fun CYLAnimationColorsValue(value: Any?): Map<String, Int>? =
     (value as? Map<String, Any?>)?.mapNotNull { (key, color) -> CYLTabBarConfiguration.colorValue(color)?.let { key to it } }?.toMap()?.takeIf { it.isNotEmpty() }
@@ -260,7 +374,9 @@ internal fun CYLTabBarItemAnimationURLOfAttributes(attributes: Map<String, Any?>
     return url
 }
 
-/** [EN] Whether a tab's attributes name an animation file. [CN] Tab 属性是否指定了动画文件。 */
+/**
+ * [EN] Whether a tab's attributes name an animation file. [CN] Tab 属性是否指定了动画文件。
+ */
 internal fun CYLTabBarItemAttributesHaveAnimationFile(attributes: Map<String, Any?>): Boolean =
     listOf(CYLConstants.CYLTabBarAnimationURL, CYLConstants.CYLTabBarAnimationFilePath).any { (CYLTabBarItemAttributesAnimationValue(attributes, it) as? String)?.isNotBlank() == true }
 
@@ -285,12 +401,16 @@ private fun CYLTabBarItemsAttributesAddingFilesOfType(context: android.content.C
     }
 }
 
-/** [EN] `CYLTabBarItemsAttributesAddingLottieFiles()`: "<name>.json" assets as `CYLTabBarLottieFilePath`. [CN] 以 "<name>.json" asset 作为 `CYLTabBarLottieFilePath`。 */
+/**
+ * [EN] `CYLTabBarItemsAttributesAddingLottieFiles()`: "<name>.json" assets as `CYLTabBarLottieFilePath`. [CN] 以 "<name>.json" asset 作为 `CYLTabBarLottieFilePath`。
+ */
 @JvmOverloads
 fun CYLTabBarItemsAttributesAddingLottieFiles(context: android.content.Context, attributes: List<Map<String, Any?>>, lottieFileNames: List<String>, assetDirectory: String? = null): List<Map<String, Any?>> =
     CYLTabBarItemsAttributesAddingFilesOfType(context, attributes, lottieFileNames, assetDirectory, "json", CYLConstants.CYLTabBarLottieFilePath, CYLConstants.CYLTabBarLottieDarkFilePath)
 
-/** [EN] `CYLTabBarItemsAttributesAddingPAGFiles()`: "<name>.pag" assets as `CYLTabBarPAGFilePath`. [CN] 以 "<name>.pag" asset 作为 `CYLTabBarPAGFilePath`。 */
+/**
+ * [EN] `CYLTabBarItemsAttributesAddingPAGFiles()`: "<name>.pag" assets as `CYLTabBarPAGFilePath`. [CN] 以 "<name>.pag" asset 作为 `CYLTabBarPAGFilePath`。
+ */
 @JvmOverloads
 fun CYLTabBarItemsAttributesAddingPAGFiles(context: android.content.Context, attributes: List<Map<String, Any?>>, pagFileNames: List<String>, assetDirectory: String? = null): List<Map<String, Any?>> =
     CYLTabBarItemsAttributesAddingFilesOfType(context, attributes, pagFileNames, assetDirectory, "pag", CYLConstants.CYLTabBarPAGFilePath, CYLConstants.CYLTabBarPAGDarkFilePath)
@@ -312,7 +432,9 @@ fun CYLTabBarItemAttributesAddingAnimationFile(context: android.content.Context,
     return CYLTabBarItemsAttributesAddingFilesOfType(context, listOf(attributes), listOf(name), assetDirectory, fileType, CYLConstants.CYLTabBarAnimationFilePath, CYLConstants.CYLTabBarAnimationDarkFilePath).first()
 }
 
-/** [EN] `CYLTabBarItemsAttributesAddingAnimationFiles()`: the same for every tab by position; a null or empty name leaves the tab static. [CN] 按位置对每个 Tab 执行；名称为 null 或空时保持静态。 */
+/**
+ * [EN] `CYLTabBarItemsAttributesAddingAnimationFiles()`: the same for every tab by position; a null or empty name leaves the tab static. [CN] 按位置对每个 Tab 执行；名称为 null 或空时保持静态。
+ */
 @JvmOverloads
 fun CYLTabBarItemsAttributesAddingAnimationFiles(context: android.content.Context, attributes: List<Map<String, Any?>>, fileNames: List<String?>, assetDirectory: String? = null): List<Map<String, Any?>> =
     attributes.mapIndexed { index, item -> fileNames.getOrNull(index)?.let { CYLTabBarItemAttributesAddingAnimationFile(context, item, it, assetDirectory) } ?: item }

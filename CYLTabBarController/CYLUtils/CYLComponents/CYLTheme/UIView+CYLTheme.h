@@ -10,7 +10,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class CYLThemeManager;
+/*!
+ * [EN] Implemented in Swift (`CYLUtils/Swift/UIView+CYLTheme.swift`); declared here for Objective-C callers only and hidden from
+ *      Swift (`__swift__`), which uses the Swift declarations (docs/Swift-Migration.md).
+ * [CN] 在 Swift 中实现（`CYLUtils/Swift/UIView+CYLTheme.swift`）；这里只为 Objective-C 调用方声明，并对 Swift 隐藏（`__swift__`），Swift 直接使用
+ *      Swift 声明（docs/Swift-Migration.md）。
+ */
+#ifndef __swift__
+
 
 /*!
  * FIX: issue #216
@@ -29,64 +36,10 @@ NS_ASSUME_NONNULL_BEGIN
  *      - `UITabBar`、`UINavigationBar`、`UIToolbar` 重新设置各自的 appearance，使其中的主题颜色随之更新（`CYLTabBarController`
  *        的 TabBar 推荐使用 `CYLTabBarTheme` 协议，见 `CYLTabBarController.h`）。
  */
-@interface UIView (CYLTheme)
 
-/*!
- * [EN] Registers properties of the receiver to set again when the theme changes, by their getter names, e.g.
- *      `@[ @"backgroundColor", @"tintColor" ]`; the setter follows the usual naming (`setBackgroundColor:`). A property
- *      that holds a theme color (`+[UIColor cyl_colorWithThemeProvider:]`) gets a fresh copy of it, one that holds a theme
- *      image (`+[UIImage cyl_imageWithThemeProvider:]`) or a theme effect (`+[UIVisualEffect cyl_effectWithThemeProvider:]`)
- *      gets the one of the new theme, any other object that is not a color, an image or an effect (e.g. an
- *      `NSAttributedString`) is set again as is; plain colors, images and effects are left alone, so a style set later
- *      in code is kept. `UIImageView`, `UIButton` and `UIVisualEffectView` need no registration for their images and
- *      effects, nor layers for colors set with `-[CALayer cyl_setThemeColor:forKey:]`.
- * [CN] 按 getter 名注册主题切换时需要重新设置的属性，例如 `@[ @"backgroundColor", @"tintColor" ]`；setter 按常规命名
- *      （`setBackgroundColor:`）。持有主题颜色（`+[UIColor cyl_colorWithThemeProvider:]`）的属性会得到该颜色的新副本；持有主题图片
- *      （`+[UIImage cyl_imageWithThemeProvider:]`）或主题效果（`+[UIVisualEffect cyl_effectWithThemeProvider:]`）的属性会得到新主题的
- *      图片或效果；非颜色、非图片、非效果的其他对象（例如 `NSAttributedString`）原样重新设置；普通颜色、图片与效果保持不变，后来在代码中
- *      设置的样式不会被覆盖。`UIImageView`、`UIButton`、`UIVisualEffectView` 的图片与效果无需注册，通过
- *      `-[CALayer cyl_setThemeColor:forKey:]` 设置的 layer 颜色也无需注册。
- */
-- (void)cyl_registerThemeColorProperties:(NSArray<NSString *> *)getters;
 
-/*!
- * [EN] Removes properties registered with `-cyl_registerThemeColorProperties:`.
- * [CN] 移除通过 `-cyl_registerThemeColorProperties:` 注册的属性。
- */
-- (void)cyl_unregisterThemeColorProperties:(NSArray<NSString *> *)getters;
-
-/*!
- * [EN] Called when the theme changes: sets the registered properties again, redraws labels and text views, applies the
- *      bar appearances again, then runs `cyl_themeDidChangeBlock`. Override it for anything else (an enum, a layer's
- *      `CGColor`...) and call super.
- * [CN] 主题切换时调用：重新设置已注册的属性，重绘 UILabel 与 UITextView，重新应用 Bar 的 appearance，然后执行
- *      `cyl_themeDidChangeBlock`。其他内容（枚举值、layer 的 `CGColor` 等）可重写本方法处理，并调用 super。
- * @param manager [EN] The manager whose theme changed. [CN] 主题发生变化的管理器。
- * @param identifier [EN] The identifier of the new theme. [CN] 新主题的 identifier。
- * @param theme [EN] The new theme object. [CN] 新的主题对象。
- */
-- (void)cyl_themeDidChangeByManager:(nullable CYLThemeManager *)manager
-                         identifier:(nullable __kindof NSObject<NSCopying> *)identifier
-                              theme:(nullable __kindof NSObject *)theme NS_REQUIRES_SUPER;
-
-/*!
- * [EN] Runs at the end of `-cyl_themeDidChangeByManager:identifier:theme:`, a block instead of a subclass.
- * [CN] 在 `-cyl_themeDidChangeByManager:identifier:theme:` 末尾执行，无需子类化即可响应主题切换。
- */
-@property (nonatomic, copy, nullable) void (^cyl_themeDidChangeBlock)(void);
-
-/*!
- * [EN] Brings the receiver and its subviews to the current themes of every manager now: colors, images, effects and
- *      layer colors, then the callbacks (`-cyl_themeDidChangeByManager:identifier:theme:` with a nil manager,
- *      `cyl_themeDidChangeBlock`). For a view that neither the windows nor the view controllers reach when the theme
- *      changes: call it from a custom view's `-didMoveToWindow`, a cell's `-prepareForReuse`, or after adding a view
- *      the app kept aside. No UIKit method is hooked.
- * [CN] 立即让自身及其子视图使用所有管理器的当前主题：颜色、图片、效果与 layer 颜色，然后调用回调（manager 为 nil 的
- *      `-cyl_themeDidChangeByManager:identifier:theme:`、`cyl_themeDidChangeBlock`）。用于主题切换时 window 与视图控制器都访问不到的视图：
- *      在自定义视图的 `-didMoveToWindow`、cell 的 `-prepareForReuse` 中，或加入 App 先前另外保存的视图后调用。不 hook 任何 UIKit 方法。
- */
-- (void)cyl_applyCurrentTheme;
-
-@end
+#endif
 
 NS_ASSUME_NONNULL_END
+
+#import "CYLSwiftInterface.h"

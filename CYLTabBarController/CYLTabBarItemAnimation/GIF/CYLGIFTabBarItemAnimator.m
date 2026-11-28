@@ -5,116 +5,52 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] The composition root of the GIF subspec: its `+load` registers the animator before any tab is built, and Swift has no `+load`. The view is Swift (CYLGIFTabBarItemAnimationView.swift). [CN] GIF 子库的组合根：其 `+load` 在创建任何 Tab 之前注册 animator，而 Swift 没有 `+load`。视图为 Swift（CYLGIFTabBarItemAnimationView.swift）。
+
 #import "CYLGIFTabBarItemAnimator.h"
 // [EN] The registry and the view protocols of the `CYLTabBarItemAnimation` subspec. [CN] `CYLTabBarItemAnimation` 子库的注册表与视图协议。
 #if __has_include("../CYLTabBarItemAnimatorRegistry.h")
 #import "../CYLTabBarItemAnimatorRegistry.h"
 #import "../CYLTabBarItemAnimationPlayableView.h"
+#import "../CYLTabBarItemAnimationFactory.h"
 #else
 #import "CYLTabBarItemAnimatorRegistry.h"
 #import "CYLTabBarItemAnimationPlayableView.h"
+#import "CYLTabBarItemAnimationFactory.h"
 #endif
-// [EN] `CYLTabBarAnimationURL` and the other generic keys. [CN] `CYLTabBarAnimationURL` 等通用 key。
-#if __has_include("../../CYLTabBarController.h")
-#import "../../CYLTabBarController.h"
-#import "../../UIImage+CYLTabBarControllerExtention.h"
+// [EN] `CYLTabBarAnimationURL` and the other generic keys, from CYLUtils: no Core, so the subspec works without the tab bar.
+// [CN] `CYLTabBarAnimationURL` 等通用 key，来自 CYLUtils：不依赖 Core，因此本子库无需 TabBar 也能使用。
+#if __has_include("../../CYLUtils/CYLAnimationKeys.h")
+#import "../../CYLUtils/CYLAnimationKeys.h"
 #else
-#import "CYLTabBarController.h"
-#import "UIImage+CYLTabBarControllerExtention.h"
+#import "CYLAnimationKeys.h"
 #endif
 
 #if CYL_GIF_AVAILABLE
-#import <ImageIO/ImageIO.h>
-
-NSString *const CYLTabBarGIFURL = @"CYLTabBarGIFURL";
-NSString *const CYLTabBarGIFFilePath = @"CYLTabBarGIFFilePath";
-NSString *const CYLTabBarGIFSize = @"CYLTabBarGIFSize";
-NSString *const CYLTabBarGIFDarkURL = @"CYLTabBarGIFDarkURL";
-NSString *const CYLTabBarGIFDarkFilePath = @"CYLTabBarGIFDarkFilePath";
-
-static NSString *const CYLGIFPlayAnimationKey = @"CYLGIFTabBarItemPlayAnimation";
+// [EN] The Swift view of this subspec, through the module's generated header (framework or static library). Swift Package
+//      Manager compiles the view into the CYLAnimatedItemViews target, whose generated header this C target does not get, so
+//      there the class is found by its Objective-C name.
+// [CN] 本子库的 Swift 视图，通过模块生成的头文件引入（framework 或静态库）。Swift Package Manager 把视图编译进 CYLAnimatedItemViews target，
+//      本 C target 拿不到其生成的头文件，因此在那里按 Objective-C 类名查找。
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItem-Swift.h>)
+#import <CYLAnimatedItem/CYLAnimatedItem-Swift.h>
+#define CYL_GIF_SWIFT_VIEW_AVAILABLE 1
+#elif __has_include("CYLAnimatedItem-Swift.h")
+#import "CYLAnimatedItem-Swift.h"
+#define CYL_GIF_SWIFT_VIEW_AVAILABLE 1
+#endif
 
 /*!
- * [EN] A GIF that plays by itself. The frames play through a keyframe animation of the layer's contents, so each keeps its own
- *      delay; `UIImageView.animationImages` gives every frame the same one. The image view already holds the end state while
- *      the animation runs, so nothing changes when the animation ends or the system removes it (e.g. in the background).
- * [CN] 自己会播放的 GIF。各帧通过 layer contents 的关键帧动画播放，因此保留各自的时长；`UIImageView.animationImages` 会让每一帧时长相同。动画运行期间
- *      图片视图已经持有结束状态，因此动画结束或被系统移除时（例如进入后台）画面不会变化。
+ * [EN] The view class of the GIF animator: the only place that names it.
+ * [CN] GIF animator 的视图类：唯一指定它的地方。
  */
-@interface CYLGIFTabBarItemAnimationView : UIImageView <CYLTabBarItemAnimationPlayableView, CYLTabBarItemAnimationViewProviding>
-@property (nonatomic, copy) NSArray<UIImage *> *frames;
-@property (nonatomic, copy) NSArray<NSNumber *> *frameDelays;
-@end
-
-@implementation CYLGIFTabBarItemAnimationView
-
-+ (nullable UIView<CYLTabBarItemAnimationPlayableView> *)cyl_animationViewWithFileURL:(NSURL *)fileURL
-                                                                             options:(NSDictionary<NSString *, NSString *> *)options
-                                                                         contentMode:(UIViewContentMode)contentMode {
-    CGImageSourceRef source = CGImageSourceCreateWithURL((__bridge CFURLRef)fileURL, NULL);
-    if (!source) {
-        return nil;
-    }
-    size_t count = CGImageSourceGetCount(source);
-    NSMutableArray<UIImage *> *frames = [NSMutableArray arrayWithCapacity:count];
-    NSMutableArray<NSNumber *> *frameDelays = [NSMutableArray arrayWithCapacity:count];
-    for (size_t index = 0; index < count; index++) {
-        CGImageRef imageRef = CGImageSourceCreateImageAtIndex(source, index, NULL);
-        if (!imageRef) {
-            continue;
-        }
-        [frames addObject:[UIImage imageWithCGImage:imageRef]];
-        CGImageRelease(imageRef);
-        NSDictionary *properties = (__bridge_transfer NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source, index, NULL);
-        [frameDelays addObject:@([UIImage cyl_GIFFrameDelayWithProperties:properties])];
-    }
-    CFRelease(source);
-    if (frames.count == 0) {
-        return nil;
-    }
-    CYLGIFTabBarItemAnimationView *view = [[self alloc] initWithImage:frames.firstObject];
-    view.frames = frames;
-    view.frameDelays = frameDelays;
-    view.contentMode = contentMode;
-    return view;
+static Class<CYLTabBarItemAnimationViewProviding> CYLGIFTabBarItemAnimationViewProvider(void) {
+#if defined(CYL_GIF_SWIFT_VIEW_AVAILABLE)
+    return [CYLGIFTabBarItemAnimationView class];
+#else
+    return NSClassFromString(@"CYLGIFTabBarItemAnimationView");
+#endif
 }
-
-- (void)cyl_playAnimationView {
-    [self.layer removeAnimationForKey:CYLGIFPlayAnimationKey];
-    self.image = self.frames.lastObject;
-    if (self.frames.count < 2) {
-        return;
-    }
-    double duration = [[self.frameDelays valueForKeyPath:@"@sum.self"] doubleValue];
-    NSMutableArray *contents = [NSMutableArray arrayWithCapacity:self.frames.count];
-    NSMutableArray<NSNumber *> *keyTimes = [NSMutableArray arrayWithCapacity:self.frames.count + 1];
-    double elapsed = 0;
-    for (NSUInteger index = 0; index < self.frames.count; index++) {
-        [contents addObject:(__bridge id)self.frames[index].CGImage];
-        [keyTimes addObject:@(elapsed / duration)];
-        elapsed += self.frameDelays[index].doubleValue;
-    }
-    // [EN] Discrete: one key time more than values, the last one 1. [CN] 离散模式：key time 比 values 多一个，最后一个为 1。
-    [keyTimes addObject:@1];
-    CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"contents"];
-    animation.calculationMode = kCAAnimationDiscrete;
-    animation.values = contents;
-    animation.keyTimes = keyTimes;
-    animation.duration = duration;
-    [self.layer addAnimation:animation forKey:CYLGIFPlayAnimationKey];
-}
-
-- (void)cyl_showAnimationViewLastFrame {
-    [self.layer removeAnimationForKey:CYLGIFPlayAnimationKey];
-    self.image = self.frames.lastObject;
-}
-
-- (void)cyl_stopAnimationView {
-    [self.layer removeAnimationForKey:CYLGIFPlayAnimationKey];
-    self.image = self.frames.firstObject;
-}
-
-@end
 
 @implementation CYLGIFTabBarItemAnimator
 
@@ -131,7 +67,7 @@ static NSString *const CYLGIFPlayAnimationKey = @"CYLGIFTabBarItemPlayAnimation"
             CYLTabBarAnimationDarkURL : CYLTabBarGIFDarkURL,
             CYLTabBarAnimationDarkFilePath : CYLTabBarGIFDarkFilePath,
         }
-                                                            viewProvider:[CYLGIFTabBarItemAnimationView class]];
+                                                            viewProvider:CYLGIFTabBarItemAnimationViewProvider()];
     });
     return animator;
 }

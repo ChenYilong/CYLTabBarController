@@ -14,14 +14,42 @@
  *      原有的导入方式不受影响。
  */
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] The functions are Swift (`@_cdecl`); these declarations stay for Objective-C callers
+//      because they carry `NS_FORMAT_ARGUMENT(1)` and `CYL_RETURNS_LOCALIZED_STRING` (format checks of `CYLLocalizedString(@"…")`
+//      with `stringWithFormat:`), which the generated Swift interface does not have (docs/Swift-Migration-Phase3.md).
+// [CN] 函数为 Swift（`@_cdecl`）；这些声明为 Objective-C 调用方保留，因为它们带有 `NS_FORMAT_ARGUMENT(1)` 与 `CYL_RETURNS_LOCALIZED_STRING`
+//      （与 `stringWithFormat:` 一起使用时的格式检查），生成的 Swift 接口没有这些属性。
 #import <UIKit/UIKit.h>
 
-/// Marks a function that returns translated text, for the static analyzer's localizability checker.
+/*!
+ * `noexcept` in C++: the declarations of CYLTabBarController-Swift.h (functions implemented in Swift with @_cdecl) carry
+ * it, and Objective-C++ files that import both headers fail to compile when the two declarations differ.
+ */
+#ifndef CYL_NOEXCEPT
+#if defined(__cplusplus)
+#define CYL_NOEXCEPT noexcept
+#else
+#define CYL_NOEXCEPT
+#endif
+#endif
+
+/*!
+ * Marks a function that returns translated text, for the static analyzer's localizability checker.
+ */
 #ifndef CYL_RETURNS_LOCALIZED_STRING
 #define CYL_RETURNS_LOCALIZED_STRING __attribute__((annotate("returns_localized_nsstring")))
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
+
+/*!
+ * [EN] Implemented in Swift (`Swift/CYLLocalizedString.swift`, each function exported under its C name with
+ *      `@_cdecl`); declared here for Objective-C callers only, and hidden from Swift (`__swift__`), which uses the
+ *      Swift functions and constant (docs/Swift-Migration.md).
+ * [CN] 在 Swift 中实现（`Swift/CYLLocalizedString.swift`，每个函数用 `@_cdecl` 以 C 名称导出）；这里只为 Objective-C 调用方声明，
+ *      并对 Swift 隐藏（`__swift__`），Swift 直接使用 Swift 函数与常量（docs/Swift-Migration.md）。
+ */
+#ifndef __swift__
 
 
 /*!
@@ -48,7 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
  *      没有时使用英文。因此本库不会显示 App 本身不支持的语言；声明了 `CFBundleLocalizations` 的 App 会跟随设备语言。
  *      可用 `CYLSetLocalizationLanguage()` 指定。线程安全。
  */
-FOUNDATION_EXTERN NSString *CYLLocalizedString(NSString *key) CYL_RETURNS_LOCALIZED_STRING NS_FORMAT_ARGUMENT(1);
+FOUNDATION_EXTERN NSString *CYLLocalizedString(NSString * _Nullable key) CYL_NOEXCEPT CYL_RETURNS_LOCALIZED_STRING NS_FORMAT_ARGUMENT(1);
 
 /*!
  * [EN] The library's resource bundle, `CYLTabBarController.bundle` (CYLUtils, no extra import). It holds the `*.lproj` string
@@ -57,7 +85,16 @@ FOUNDATION_EXTERN NSString *CYLLocalizedString(NSString *key) CYL_RETURNS_LOCALI
  * [CN] 本库的资源包 `CYLTabBarController.bundle`（属于 CYLUtils，无需额外导入）。其中存放各语言的 `*.lproj` 字符串表；图片等资源也可以
  *      放进同一个 bundle，并从中读取，例如上面的 `UIImage` 示例。
  */
-FOUNDATION_EXTERN NSBundle *CYLResourceBundle(void);
+FOUNDATION_EXTERN NSBundle *CYLResourceBundle(void) CYL_NOEXCEPT;
+
+/*!
+ * [EN] The resource bundle `<name>.bundle` of a subspec (e.g. `CYLAnimatedItem`), found where `CYLResourceBundle()` looks:
+ *      the SwiftPM module bundle, the library's own bundle (CocoaPods, frameworks), then the main bundle. nil when no
+ *      such bundle is in the app (the subspec that ships it is not part of the build).
+ * [CN] 某个子库的资源包 `<name>.bundle`（例如 `CYLAnimatedItem`），查找位置与 `CYLResourceBundle()` 相同：SwiftPM 模块 bundle、本库自身的
+ *      bundle（CocoaPods、framework）、主 bundle。App 中没有该资源包（提供它的子库未参与构建）时为 nil。
+ */
+FOUNDATION_EXTERN NSBundle * _Nullable CYLResourceBundleNamed(NSString *name) CYL_NOEXCEPT;
 
 /*!
  * [EN] Overrides the language of `CYLLocalizedString()`, e.g. @"ja" or @"zh-Hant", for an in-app language setting; nil
@@ -71,14 +108,14 @@ FOUNDATION_EXTERN NSBundle *CYLResourceBundle(void);
  * [CN] VoiceOver：同时把 App 的 `accessibilityLanguage` 设为该语言，即使与设备语言不同，VoiceOver 也会用对应语言的语音朗读。
  *      会发送 `CYLLocalizationLanguageDidChangeNotification`。
  */
-FOUNDATION_EXTERN void CYLSetLocalizationLanguage(NSString * _Nullable language);
+FOUNDATION_EXTERN void CYLSetLocalizationLanguage(NSString * _Nullable language) CYL_NOEXCEPT;
 
 /*!
  * [EN] Posted on the main queue by `CYLSetLocalizationLanguage()`. `-[UIWindow cyl_setRootViewControllerProvider:]`
  *      observes it to rebuild the screen in the new language.
  * [CN] 由 `CYLSetLocalizationLanguage()` 在主队列发送。`-[UIWindow cyl_setRootViewControllerProvider:]` 监听它，用新语言重建界面。
  */
-FOUNDATION_EXTERN NSString *const CYLLocalizationLanguageDidChangeNotification;
+#define CYLLocalizationLanguageDidChangeNotification @"CYLLocalizationLanguageDidChangeNotification"
 
 /*!
  * [EN] Like `CYLLocalizedString()`, but in `language` (matched to the closest translation); nil means the device language
@@ -87,12 +124,14 @@ FOUNDATION_EXTERN NSString *const CYLLocalizationLanguageDidChangeNotification;
  * [CN] 同 `CYLLocalizedString()`，但使用 `language`（匹配最接近的译文）；传 nil 表示设备语言（`[NSLocale preferredLanguages]`），
  *      与 App 当前语言无关。用于切换到看不懂的语言后用户仍需读懂的提示，例如语言设置的副标题。
  */
-FOUNDATION_EXTERN NSString *CYLLocalizedStringForLanguage(NSString *key, NSString * _Nullable language) CYL_RETURNS_LOCALIZED_STRING NS_FORMAT_ARGUMENT(1);
+FOUNDATION_EXTERN NSString *CYLLocalizedStringForLanguage(NSString * _Nullable key, NSString * _Nullable language) CYL_NOEXCEPT CYL_RETURNS_LOCALIZED_STRING NS_FORMAT_ARGUMENT(1);
 
 /*!
  * [EN] The language `CYLLocalizedString()` currently uses, e.g. @"zh-Hans".
  * [CN] `CYLLocalizedString()` 当前使用的语言，例如 @"zh-Hans"。
  */
-FOUNDATION_EXTERN NSString *CYLLocalizationLanguage(void);
+FOUNDATION_EXTERN NSString *CYLLocalizationLanguage(void) CYL_NOEXCEPT;
+
+#endif
 
 NS_ASSUME_NONNULL_END

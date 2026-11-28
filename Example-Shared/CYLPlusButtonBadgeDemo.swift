@@ -29,7 +29,7 @@ extension CYLTabBarController {
         guard hasPlusButton() else { return nil }
         return cyl_tabBarItemIdentifiers.lazy
             .compactMap { self.cyl_control(withTabBarItemIdentifier: $0) }
-            .first { $0.cyl_isPlusButton() }
+            .first { $0.cylIsPlusButton() }
     }
 
     /// Shows the badge (1) once the tab bar is laid out, delayed like the ObjC demo's tab badges.
@@ -50,7 +50,7 @@ extension CYLTabBarController {
     func demoPlusButtonDidTap(_ control: UIControl) {
         // [EN] Guard: plus button code only when this tab bar controller has one.
         // [CN] 仅在有 PlusButton 时处理 PlusButton。
-        guard hasPlusButton(), control.cyl_isPlusControl() else { return }
+        guard hasPlusButton(), control.cylIsPlusControl() else { return }
         demoUpdatePlusButtonBadge(addingOne: true)
     }
 
@@ -75,7 +75,7 @@ final class DemoPlusButton: CYLPlusButton, CYLPlusButtonSubclassing {
     static func plusButton() -> Any {
         let configuration = UIImage.SymbolConfiguration(pointSize: 28, weight: .regular)
         let image = UIImage(systemName: "plus.circle.fill", withConfiguration: configuration) ?? UIImage()
-        return DemoPlusButton.cyl_plusButton(with: image, title: CYLLocalizedString("发布"),
+        return DemoPlusButton.cyl_plusButton(with: image, title: cylDemoLocalizedString("发布"),
                                              selectedTitle: nil, selectedTitleColor: nil)
     }
 
@@ -102,9 +102,9 @@ extension CYLTabBarController {
         cyl_swipeToSwitchTabEnabled = true
         cyl_didLongPressControlBlock = { tabBarController, control in
             let name = control.cyl_tabBarItemDisplayName
-            let alert = UIAlertController(title: String(format: CYLLocalizedString("长按了「%@」"), name),
+            let alert = UIAlertController(title: String(format: cylDemoLocalizedString("长按了「%@」"), name),
                                           message: nil, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
+            alert.addAction(UIAlertAction(title: cylDemoLocalizedString("取消"), style: .cancel))
             tabBarController.present(alert, animated: true)
         }
     }

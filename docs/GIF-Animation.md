@@ -39,9 +39,9 @@
 
 | 设置 / Setting | 子库 / Subspec | 未选中 / Not selected | 选中时 / When selected | 切换到其他 Tab / When another tab is selected |
 |:---|:---|:---|:---|:---|
-| `CYLTabBarItemImage` 传 `+[UIImage cyl_animatedImageWithGIFData:]` | 不需要 / None | 循环 / Loops | 循环 / Loops | 循环 / Loops |
-| `CYLTabBarItemImageURL`（`.gif`） | 不需要 / None | 循环 / Loops | 循环 / Loops | 循环 / Loops |
-| `-setTabBarItemIconWithURL:selectedURL:size:atIndex:` | 不需要 / None | 循环 / Loops | 循环 / Loops | 循环 / Loops |
+| `CYLTabBarItemImage` 传 `+[UIImage cyl_animatedImageWithGIFData:]` | 不需要 / None | 第一帧 / First frame | **点击时播放一次（开启循环时一直播放） / Plays once per tap (repeats while looping is on)** | 第一帧 / First frame |
+| `CYLTabBarItemImageURL`（`.gif`） | 不需要 / None | 第一帧 / First frame | **点击时播放一次（开启循环时一直播放） / Plays once per tap (repeats while looping is on)** | 第一帧 / First frame |
+| `-setTabBarItemIconWithURL:selectedURL:size:atIndex:` | 不需要 / None | 第一帧 / First frame | **点击时播放一次（开启循环时一直播放） / Plays once per tap (repeats while looping is on)** | 第一帧 / First frame |
 | `CYLTabBarGIFURL` / `CYLTabBarGIFFilePath` | `GIF` | 第一帧 / First frame | **播放一次，停在最后一帧 / Plays once, stays on the last frame** | 回到第一帧 / Back to the first frame |
 | `CYLTabBarAnimationURL` / `CYLTabBarAnimationFilePath`（`.gif`） | `GIF` | 同上 / As above | 同上 / As above | 同上 / As above |
 | `CYLTabBarItemAttributesAddingAnimationFile(attributes, @"home.gif", nil)` | `GIF` | 同上 / As above | 同上 / As above | 同上 / As above |
@@ -89,7 +89,7 @@ pod 'CYLTabBarController/GIF'
 ```swift
 // The generic helper finds the file by name and picks the library by its extension. 通用函数按名称查找文件，并按扩展名选择动画库。
 var item = CYLTabBarItemAttributesAddingAnimationFile(attributes, "tab_star.gif", nil) as? [String: Any]
-item?[CYLTabBarAnimationSize] = NSValue(cgSize: CGSize(width: 30, height: 30))
+item?[cylTabBarAnimationSize] = NSValue(cgSize: CGSize(width: 30, height: 30))
 ```
 
 | Key | 说明 / Description |
@@ -146,7 +146,7 @@ flowchart LR
 | 中文 | English |
 |:---|:---|
 | `Example-GIF`：第 1 个 Tab 使用 `CYLTabBarGIFFilePath`，第 2 个 Tab 使用 `CYLTabBarItemAttributesAddingAnimationFile()`，都是选中时播放一次；第 3 个 Tab 使用 `CYLTabBarItemImageURL`，一直循环；第 4 个 Tab 是静态图片。素材来自 Google 的 Noto Emoji Animation（CC BY 4.0），见 [Example-GIF/README.md](../Example-GIF/README.md)。 | `Example-GIF`: tab 1 uses `CYLTabBarGIFFilePath` and tab 2 `CYLTabBarItemAttributesAddingAnimationFile()`, both playing once when selected; tab 3 uses `CYLTabBarItemImageURL` and keeps looping; tab 4 is a static image. The icons are Google's Noto Emoji Animation (CC BY 4.0), see [Example-GIF/README.md](../Example-GIF/README.md). |
-| Android 版 `example-gif`（[Android-Examples.md](Android-Examples.md)）使用同样的 GIF 文件与 key；Android 库的 `CYLGIFDrawable` 让作为图片传入的 GIF 同样循环播放。 | The Android `example-gif` ([Android-Examples.md](Android-Examples.md)) uses the same GIF files and keys; the Android library's `CYLGIFDrawable` makes a GIF given as an image loop too. |
+| Android 版 `example-gif`（[Android-Examples.md](Android-Examples.md)）使用同样的 GIF 文件与 key；Android 库的 `CYLGIFDrawable` 让作为图片传入的 GIF 与 iOS 一样停在第一帧，Tab 被点击或「全部播放」时播放一次，开启循环时一直播放（[截图](assets/android-gif-image-rest-then-play.png)）。鸿蒙：以 ".gif" 结尾的图片 URL 或路径停在第一帧，Tab 被选中或再次点击时播放一次，`tabBarItemAnimationLoops` 开启时重复播放（[截图](assets/harmonyos-gif-image-rest-then-play.png)）。微信小程序：cyl-animated-item 在 canvas 上绘制 ".gif" 图片的第一帧，只在播放时（选中、再次点击、全部播放；开启循环时重复）显示 GIF（[截图](assets/wechat-miniprogram-gif-image-rest-then-play.png)）。 | The Android `example-gif` ([Android-Examples.md](Android-Examples.md)) uses the same GIF files and keys; the Android library's `CYLGIFDrawable` makes a GIF given as an image rest on its first frame as on iOS, play once when its tab is tapped or on Play all, and repeat while looping is on ([screenshot](assets/android-gif-image-rest-then-play.png)). HarmonyOS: a ".gif" image URL or path rests on its first frame and plays once when its tab is selected or tapped again, repeating while `tabBarItemAnimationLoops` is on ([screenshot](assets/harmonyos-gif-image-rest-then-play.png)). WeChat Mini Program: cyl-animated-item draws a ".gif" image's first frame on a canvas and shows the GIF only while it plays (selected, re-tap, Play all; Loop repeats it) ([screenshot](assets/wechat-miniprogram-gif-image-rest-then-play.png)). |
 
 ## [CN]限制
 ## [EN]Limits

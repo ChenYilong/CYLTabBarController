@@ -1,0 +1,3 @@
+# Images added on 2026-11-18 before scripts/check-screenshot-labels.py existed, by other sessions, not yet relabeled.
+# Relabel each with scripts/stitch-screenshots.py (same file name), then delete its line. Do not add new lines.
+# Empty since 2026-11-18: every image is labeled.

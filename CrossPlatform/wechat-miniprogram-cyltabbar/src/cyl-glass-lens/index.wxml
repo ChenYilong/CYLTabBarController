@@ -1,0 +1,2 @@
+<!-- [EN] The lens (decoration). [CN] 透镜（装饰）。 -->
+<view class="cyl-glass-lens cyl-glass-lens-{{lensStyle === 'skeuomorphic' ? 'skeuomorphic' : 'regular'}} {{isDark ? 'cyl-glass-lens-dark' : ''}}" aria-hidden="true"></view>

@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "होम"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "आस-पास"
+    },
+    {
+      "name": "tab_messages",
+      "value": "संदेश"
+    },
+    {
+      "name": "tab_me",
+      "value": "मैं"
+    },
+    {
+      "name": "tab_post",
+      "value": "पोस्ट"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "रीफ़्रेश"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

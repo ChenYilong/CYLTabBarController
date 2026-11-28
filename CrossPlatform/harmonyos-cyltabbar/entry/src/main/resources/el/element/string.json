@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "Αρχική"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "Κοντά"
+    },
+    {
+      "name": "tab_messages",
+      "value": "Μηνύματα"
+    },
+    {
+      "name": "tab_me",
+      "value": "Εγώ"
+    },
+    {
+      "name": "tab_post",
+      "value": "Δημοσίευση"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "Ανανέωση"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

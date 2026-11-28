@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import com.cyl.tabbar.CYLConstants
+import com.cyl.tabbar.CYLTabBarAnimationURLWithOptions
 import com.cyl.tabbar.CYLEnums
 import com.cyl.tabbar.CYLPlusButton
 import com.cyl.tabbar.CYLTabBarController
@@ -48,6 +49,18 @@ class MainActivity : DemoTabBarActivity() {
                   CYLConstants.CYLTabBarItemSelectedImage to images[index] + "Selected") + animation(animationFiles[index])
         }.toMutableList()
         items[1] = items[1] + (CYLConstants.CYLTabBarItemDarkImage to "Message_night")
+        // [EN] Tint for every engine, as the iOS demo's `-CYLDemoAnimationTint YES`: launched with the boolean extra
+        //      `CYLDemoAnimationTint`, tab 1 follows its title color ("title") and tab 2 is dark gray, white at night (`darkTint`).
+        // [CN] 所有引擎的着色，与 iOS 演示的 `-CYLDemoAnimationTint YES` 相同：以布尔 extra `CYLDemoAnimationTint` 启动时，第 1 个 Tab 跟随标题颜色
+        //      （"title"），第 2 个 Tab 为深灰色，夜间为白色（`darkTint`）。
+        if (intent.getBooleanExtra("CYLDemoAnimationTint", false)) {
+            val tints = listOf(mapOf(CYLConstants.CYLTabBarAnimationOptionTint to "title"),
+                mapOf(CYLConstants.CYLTabBarAnimationOptionTint to "#1C1C1E", CYLConstants.CYLTabBarAnimationOptionDarkTint to "#FFFFFF"))
+            tints.forEachIndexed { index, options ->
+                val file = items[index][CYLConstants.CYLTabBarAnimationFilePath] as? String ?: return@forEachIndexed
+                items[index] = items[index] - CYLConstants.CYLTabBarAnimationFilePath + (CYLConstants.CYLTabBarAnimationURL to CYLTabBarAnimationURLWithOptions(file, options))
+            }
+        }
         val pages = listOf(
             HomePage(),
             ColorPage.newInstance(R.string.tab_health, Color.BLUE),

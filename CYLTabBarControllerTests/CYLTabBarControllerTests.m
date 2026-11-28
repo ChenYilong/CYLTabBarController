@@ -11,6 +11,12 @@
 #import <XCTest/XCTest.h>
 #import <CYLTabBarController/CYLTabBarController.h>
 
+/// [EN] The tap counting of the tab bar item gestures (CYLTabBarController+CYLTabBarItemGesture.m), for the timing tests.
+/// [CN] TabBarItem 手势的点击计数（CYLTabBarController+CYLTabBarItemGesture.m），用于时间相关的测试。
+@interface CYLTabBarController (CYLGestureTests)
+- (void)cyl_recognizeTapOnControl:(UIControl *)control viewController:(UIViewController *)viewController isReselect:(BOOL)isReselect;
+@end
+
 @interface CYLTabBarControllerTests : XCTestCase
 
 @end
@@ -173,6 +179,143 @@
     XCTAssertEqual(iconNotes.firstObject.userInfo[CYLTabBarItemChangedAttributesKey][CYLTabBarItemImage], image);
 }
 
+/// [EN] A badge keeps its font when every title changes in place ("Change all titles" in the ObjC example).
+/// [CN] 原地修改所有标题后，角标字体保持不变（ObjC 示例的「批量更换标题」）。
+- (void)testABadgeKeepsItsFontWhenTheTitlesChangeInPlace {
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new], [UIViewController new], [UIViewController new] ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"Home", CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] },
+                                                                                                    @{ CYLTabBarItemTitle : @"Nearby", CYLTabBarItemImage : [UIImage systemImageNamed:@"map"] },
+                                                                                                    @{ CYLTabBarItemTitle : @"Me", CYLTabBarItemImage : [UIImage systemImageNamed:@"person"] } ]];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 402, 874)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    void (^layOut)(void) = ^{
+        for (NSUInteger pass = 0; pass < 4; pass++) {
+            [tabBarController.tabBar setNeedsLayout];
+            [tabBarController.view layoutIfNeeded];
+            [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+        }
+    };
+    layOut();
+    [tabBarController.viewControllers[1].tabBarItem cyl_showBadgeValue:@"8" animationType:CYLBadgeAnimationTypeNone];
+    layOut();
+    NSArray<UILabel *> * (^badgeLabels)(void) = ^NSArray<UILabel *> * {
+        NSMutableArray<UILabel *> *labels = [NSMutableArray array];
+        NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.tabBar];
+        while (queue.count) {
+            UIView *view = queue.firstObject;
+            [queue removeObjectAtIndex:0];
+            if ([view isKindOfClass:[UILabel class]] && [((UILabel *)view).text isEqualToString:@"8"]) {
+                [labels addObject:(UILabel *)view];
+            }
+            [queue addObjectsFromArray:view.subviews];
+        }
+        return labels;
+    };
+    NSArray<UILabel *> *before = badgeLabels();
+    XCTAssertGreaterThan(before.count, 0u, @"the badge is shown");
+    NSMutableArray<UIFont *> *fontsBefore = [NSMutableArray array];
+    for (UILabel *label in before) {
+        [fontsBefore addObject:label.font];
+    }
+    [tabBarController updateTabBarItemsWithAttributes:@[ @{ CYLTabBarItemTitle : @"★ Home" }, @{ CYLTabBarItemTitle : @"★ Nearby" }, @{ CYLTabBarItemTitle : @"★ Me" } ]];
+    layOut();
+    NSArray<UILabel *> *after = badgeLabels();
+    XCTAssertEqual(after.count, before.count);
+    for (NSUInteger index = 0; index < MIN(after.count, fontsBefore.count); index++) {
+        XCTAssertEqualObjects(after[index].font, fontsBefore[index], @"badge %@ keeps its font", @(index));
+        XCTAssertTrue(CGAffineTransformIsIdentity(after[index].transform), @"badge %@ is not scaled", @(index));
+    }
+    // [EN] The ObjC example's "8" pulses forever (`CYLBadgeAnimationTypeScale`): after the change it still pulses and keeps
+    //      its font, rather than stopping at a small size. [CN] ObjC 示例中的「8」一直缩放（`CYLBadgeAnimationTypeScale`）：修改后
+    //      仍在缩放、字体不变，而不是停在较小的尺寸。
+    [tabBarController.viewControllers[2].tabBarItem cyl_showBadgeValue:@"8" animationType:CYLBadgeAnimationTypeScale];
+    layOut();
+    NSArray<UILabel *> *pulsing = [badgeLabels() filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(UILabel *label, NSDictionary *bindings) {
+        for (CALayer *layer = label.layer; layer; layer = layer.superlayer) {
+            if (layer.animationKeys.count > 0) {
+                return YES;
+            }
+        }
+        return NO;
+    }]];
+    XCTAssertGreaterThan(pulsing.count, 0u, @"the scale badge animates");
+    UIFont *pulsingFont = pulsing.firstObject.font;
+    [tabBarController updateTabBarItemsWithAttributes:@[ @{ CYLTabBarItemTitle : @"Home" }, @{ CYLTabBarItemTitle : @"Nearby" }, @{ CYLTabBarItemTitle : @"Me" } ]];
+    layOut();
+    NSUInteger stillPulsing = 0;
+    for (UILabel *label in badgeLabels()) {
+        for (CALayer *layer = label.layer; layer; layer = layer.superlayer) {
+            if (layer.animationKeys.count > 0) {
+                stillPulsing++;
+                XCTAssertEqualObjects(label.font, pulsingFont, @"the pulsing badge keeps its font");
+                break;
+            }
+        }
+    }
+    XCTAssertGreaterThan(stillPulsing, 0u, @"the scale badge still animates after the titles changed");
+}
+
+/// [EN] Gestures: two taps on the same tab within `cyl_tabBarItemDoubleTapInterval` report Reselect, then DoubleTap; a
+///      slower second tap reports Reselect only, and a third quick tap starts a new pair. Run in each style (classic on
+///      iOS 25 and earlier, Liquid Glass on iOS 26+, FlatDesign) by the style of the controller; the counting is shared.
+/// [CN] 手势：在 `cyl_tabBarItemDoubleTapInterval` 内两次点击同一 Tab，先上报 Reselect，再上报 DoubleTap；较慢的第二次点击只上报
+///      Reselect，快速的第三次点击重新开始计数。按控制器样式分别运行（iOS 25 及更早为经典样式，iOS 26+ 为液态玻璃，以及扁平样式）；计数逻辑共用。
+- (void)testDoubleTapTimingInEveryStyle {
+    for (NSNumber *style in @[ @(CYLTabBarStyleTypeDefault), @(CYLTabBarStyleTypeFlatDesign) ]) {
+        CYLTabBarController *tabBarController =
+            [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new], [UIViewController new] ]
+                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"A" }, @{ CYLTabBarItemTitle : @"B" } ]
+                                                       styleType:style.integerValue
+                                                         context:[NSUUID UUID].UUIDString];
+        NSMutableArray<NSNumber *> *gestures = [NSMutableArray array];
+        tabBarController.cyl_tabBarItemGestureHandler = ^(CYLTabBarController *controller, CYLTabBarItemGesture gesture, UIControl *control, UIViewController *viewController) {
+            [gestures addObject:@(gesture)];
+        };
+        tabBarController.cyl_tabBarItemDoubleTapInterval = 0.35;
+        UIControl *control = [[UIControl alloc] init];
+        UIViewController *selected = tabBarController.viewControllers[0];
+        [tabBarController cyl_recognizeTapOnControl:control viewController:selected isReselect:YES];
+        [tabBarController cyl_recognizeTapOnControl:control viewController:selected isReselect:YES];
+        XCTAssertEqualObjects(gestures, (@[ @(CYLTabBarItemGestureReselect), @(CYLTabBarItemGestureReselect), @(CYLTabBarItemGestureDoubleTap) ]),
+                              @"style %@: Reselect, then Reselect and DoubleTap", style);
+        [gestures removeAllObjects];
+        [tabBarController cyl_recognizeTapOnControl:control viewController:selected isReselect:YES];
+        XCTAssertEqualObjects(gestures, @[ @(CYLTabBarItemGestureReselect) ], @"style %@: a third tap starts a new pair", style);
+        [gestures removeAllObjects];
+        [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.45]];
+        [tabBarController cyl_recognizeTapOnControl:control viewController:selected isReselect:YES];
+        XCTAssertEqualObjects(gestures, @[ @(CYLTabBarItemGestureReselect) ], @"style %@: a slow second tap is no DoubleTap", style);
+    }
+}
+
+/// [EN] Gestures without a handler, block or delegate method: no long press recognizer is added to the tab bar
+///      controller's view; it comes once a handler is set.
+/// [CN] 没有 handler、block 或代理方法时：不会给 TabBarController 的 view 添加长按手势；设置 handler 后才添加。
+- (void)testNoGestureRecognizerWithoutAReceiver {
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new], [UIViewController new] ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"A" }, @{ CYLTabBarItemTitle : @"B" } ]];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 393, 852)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    NSUInteger (^longPresses)(void) = ^NSUInteger {
+        NSUInteger count = 0;
+        for (UIGestureRecognizer *recognizer in tabBarController.view.gestureRecognizers) {
+            if ([NSStringFromClass(recognizer.class) isEqualToString:@"CYLTabButtonLongPressGestureRecognizer"]) {
+                count++;
+            }
+        }
+        return count;
+    };
+    XCTAssertEqual(longPresses(), 0u, @"nothing is added without a receiver");
+    tabBarController.cyl_tabBarItemGestureHandler = ^(CYLTabBarController *controller, CYLTabBarItemGesture gesture, UIControl *control, UIViewController *viewController) {};
+    [tabBarController.view setNeedsLayout];
+    [tabBarController.view layoutIfNeeded];
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+    XCTAssertEqual(longPresses(), 1u, @"the long press comes with a handler");
+}
+
 /// [EN] VoiceOver reads a tab's new title after an in-place change, and a label the app set on the tab item is kept.
 /// [CN] 原地修改标题后 VoiceOver 读出新标题，App 自己给 TabBarItem 设置的 label 保持不变。
 - (void)testTabAccessibilityLabelsFollowTitlesAndKeepTheAppsLabels {
@@ -186,12 +329,19 @@
     [tabBarController updateTabBarItemAtIndex:1 attributes:@{ CYLTabBarItemTitle : @"★ B" }];
     [tabBarController.view setNeedsLayout];
     [tabBarController.view layoutIfNeeded];
-    XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.accessibilityLabel, @"★ A");
+    // [EN] The library writes the default label on Liquid Glass only: the classic tab buttons read the title themselves,
+    //      and the item's label stays nil there (iOS 17.5 simulator).
+    // [CN] 库只在液态玻璃下写入默认 label：经典样式的 Tab 按钮自己读取标题，item 的 label 保持为 nil（iOS 17.5 模拟器）。
+    BOOL writesDefaultLabels = [CYLConstants isLiquidGlassActive];
+    NSString * (^expected)(NSString *) = ^NSString *(NSString *title) {
+        return writesDefaultLabels ? title : nil;
+    };
+    XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.accessibilityLabel, expected(@"★ A"));
     XCTAssertEqualObjects(appLabeledItem.accessibilityLabel, @"Custom", @"the app's own label is kept");
     [tabBarController updateTabBarItemAtIndex:0 attributes:@{ CYLTabBarItemTitle : @"A" }];
     [tabBarController.view setNeedsLayout];
     [tabBarController.view layoutIfNeeded];
-    XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.accessibilityLabel, @"A", @"follows the title back");
+    XCTAssertEqualObjects(tabBarController.viewControllers[0].tabBarItem.accessibilityLabel, expected(@"A"), @"follows the title back");
 }
 
 /// [EN] The plus button's page follows the plus button's title: `-updatePlusButtonWithAttributes:` sets its navigation bar
@@ -236,11 +386,1003 @@
     XCTAssertEqualObjects(plusNavigation.tabBarItem.accessibilityLabel, @"★ Post", @"not the first title, \"Post\"");
 }
 
+/// [EN] FIX: issue #787. `CYLTabBarItemIconRenderingMode` and the tab bar's defaults (`CYLTabBarControllerIconRenderingMode`,
+///      `CYLTabBarControllerIconColor`, `CYLTabBarControllerSelectedIconColor`): "template" tints one image in both states,
+///      "original" keeps the image's colors, a tab's own value wins, an unknown value is dropped, and an in-place update
+///      keeps the tab's mode.
+/// [CN] FIX: issue #787。`CYLTabBarItemIconRenderingMode` 与 TabBar 的默认值：「template」让一张图片在两种状态下着色，「original」保持原色，
+///      Tab 自己的值优先，未知值被丢弃，原地更新时保持 Tab 的渲染方式。
+- (void)testIconRenderingMode {
+    UIImage * (^drawn)(UIColor *) = ^UIImage *(UIColor *color) {
+        return [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(8, 8)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+            [color setFill];
+            [context fillRect:CGRectMake(0, 0, 8, 8)];
+        }];
+    };
+    UIImage *icon = drawn(UIColor.blueColor);
+    XCTAssertEqual(icon.renderingMode, UIImageRenderingModeAutomatic);
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerIconRenderingMode : @"Template",
+        CYLTabBarControllerIconColor : @"#FF0000",
+        CYLTabBarControllerSelectedIconColor : @"#00FF00",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : icon },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : icon, CYLTabBarItemSelectedImage : drawn(UIColor.redColor),
+               CYLTabBarItemIconRenderingMode : @"original", CYLTabBarItemIconColor : UIColor.purpleColor },
+            @{ CYLTabBarItemIdentifier : @"c", CYLTabBarItemTitle : @"C", CYLTabBarItemImage : icon, CYLTabBarItemIconRenderingMode : @"bogus" },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    NSArray<NSDictionary *> *attributes = tabBarController.tabBarItemsAttributes;
+    XCTAssertEqual(attributes.count, 3u);
+    XCTAssertEqualObjects(attributes[0][CYLTabBarItemIconRenderingMode], @"template", @"the tab bar's default, lowercased");
+    XCTAssertTrue([attributes[0][CYLTabBarItemIconColor] isKindOfClass:[UIColor class]], @"the tab bar's icon color, parsed");
+    XCTAssertTrue([attributes[0][CYLTabBarItemSelectedIconColor] isKindOfClass:[UIColor class]]);
+    XCTAssertEqualObjects(attributes[1][CYLTabBarItemIconRenderingMode], @"original", @"a tab's own mode wins");
+    XCTAssertEqualObjects(attributes[1][CYLTabBarItemIconColor], UIColor.purpleColor, @"a tab's own color wins");
+    XCTAssertNil(attributes[2][CYLTabBarItemIconRenderingMode], @"an unknown mode is dropped");
+
+    [tabBarController loadViewIfNeeded];
+    UITabBarItem *a = tabBarController.viewControllers[0].tabBarItem;
+    UITabBarItem *b = tabBarController.viewControllers[1].tabBarItem;
+    UITabBarItem *c = tabBarController.viewControllers[2].tabBarItem;
+    XCTAssertEqual(a.image.renderingMode, UIImageRenderingModeAlwaysTemplate);
+    XCTAssertEqual(a.selectedImage.renderingMode, UIImageRenderingModeAlwaysTemplate, @"one image serves both states");
+    XCTAssertEqual(b.image.renderingMode, UIImageRenderingModeAlwaysOriginal);
+    XCTAssertEqual(b.selectedImage.renderingMode, UIImageRenderingModeAlwaysOriginal);
+    XCTAssertNotEqual(c.image.renderingMode, UIImageRenderingModeAlwaysTemplate, @"no mode: the image as it is");
+
+    // [EN] In place: a new image keeps the tab's mode; a new mode alone redraws both images.
+    // [CN] 原地更新：新图片保持 Tab 的渲染方式；只更新渲染方式也会重新绘制两张图片。
+    XCTAssertTrue([tabBarController updateTabBarItemAtIndex:0 attributes:@{ CYLTabBarItemImage : drawn(UIColor.greenColor) }]);
+    XCTAssertEqual(a.image.renderingMode, UIImageRenderingModeAlwaysTemplate);
+    XCTAssertTrue([tabBarController updateTabBarItemAtIndex:0 attributes:@{ CYLTabBarItemIconRenderingMode : @"original" }]);
+    XCTAssertEqual(a.image.renderingMode, UIImageRenderingModeAlwaysOriginal);
+}
+
+/// [EN] FIX: issue #787. A tab with a dark image (`CYLTabBarItemDarkImage`) and "template" still switches to the dark image
+///      in Dark Mode, and both variants stay templates.
+/// [CN] FIX: issue #787。带深色图片（`CYLTabBarItemDarkImage`）且为 "template" 的 Tab，在深色模式下仍切换为深色图片，两种外观都保持模板。
+- (void)testIconRenderingModeKeepsTheDarkImage {
+    UIImage * (^drawn)(CGFloat) = ^UIImage *(CGFloat side) {
+        return [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(side, side)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+            [UIColor.blueColor setFill];
+            [context fillRect:CGRectMake(0, 0, side, side)];
+        }];
+    };
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : drawn(8), CYLTabBarItemDarkImage : drawn(12),
+               CYLTabBarItemIconRenderingMode : @"template" },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : drawn(8) },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    [tabBarController loadViewIfNeeded];
+    UIImage *image = tabBarController.viewControllers[0].tabBarItem.image;
+    XCTAssertEqual(image.renderingMode, UIImageRenderingModeAlwaysTemplate);
+    UITraitCollection *dark = [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleDark];
+    UITraitCollection *light = [UITraitCollection traitCollectionWithUserInterfaceStyle:UIUserInterfaceStyleLight];
+    UIImage *darkVariant = [image imageWithConfiguration:[UIImageConfiguration configurationWithTraitCollection:dark]];
+    UIImage *lightVariant = [image imageWithConfiguration:[UIImageConfiguration configurationWithTraitCollection:light]];
+    XCTAssertEqualWithAccuracy(darkVariant.size.width, 12, 0.01, @"the dark image in Dark Mode");
+    XCTAssertEqualWithAccuracy(lightVariant.size.width, 8, 0.01, @"the light image otherwise");
+    XCTAssertEqual(darkVariant.renderingMode, UIImageRenderingModeAlwaysTemplate, @"still a template in Dark Mode");
+    XCTAssertEqual(tabBarController.viewControllers[0].tabBarItem.selectedImage.renderingMode, UIImageRenderingModeAlwaysTemplate);
+}
+
+/// [EN] FIX: issue #787. FlatDesign draws a "template" tab's image as a template (tinted by its image view) and an
+///      "original" tab's image with its own colors.
+/// [CN] FIX: issue #787。扁平样式把 "template" Tab 的图片作为模板绘制（由其图片视图着色），"original" Tab 的图片保持原色。
+- (void)testIconRenderingModeInFlatDesign {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    UIImage *icon = [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(8, 8)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [UIColor.blueColor setFill];
+        [context fillRect:CGRectMake(0, 0, 8, 8)];
+    }];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"t", CYLTabBarItemTitle : @"Template", CYLTabBarItemImage : icon, CYLTabBarItemIconRenderingMode : @"template" },
+            @{ CYLTabBarItemIdentifier : @"o", CYLTabBarItemTitle : @"Original", CYLTabBarItemImage : icon, CYLTabBarItemIconRenderingMode : @"original" },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view setNeedsLayout];
+    [tabBarController.view layoutIfNeeded];
+    NSMutableDictionary<NSString *, UIImage *> *images = [NSMutableDictionary dictionary];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    while (queue.count > 0) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:buttonClass]) {
+            UILabel *titleLabel = [view valueForKey:@"titleLabel"];
+            UIImageView *imageView = [view valueForKey:@"imageView"];
+            if (titleLabel.text && imageView.image) {
+                images[titleLabel.text] = imageView.image;
+            }
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    XCTAssertEqual(images[@"Template"].renderingMode, UIImageRenderingModeAlwaysTemplate, @"%@", images);
+    XCTAssertEqual(images[@"Original"].renderingMode, UIImageRenderingModeAlwaysOriginal, @"%@", images);
+    window.hidden = YES;
+}
+
+/// [EN] docs/Animated-Item.md TODO 4: a FlatDesign tab button is the shared component, `CYLAnimatedItemView`. Its image
+///      and title are the component's content (`image`, `title`), shown by the component's `imageView` and `titleLabel`;
+///      the component's long press is off, and selecting a tab updates the content to its selected image.
+/// [CN] docs/Animated-Item.md TODO 4：扁平样式的 Tab 按钮就是共用组件 `CYLAnimatedItemView`。其图片与标题是组件的内容（`image`、`title`），
+///      由组件的 `imageView` 与 `titleLabel` 显示；组件的长按已关闭；选中 Tab 时内容更新为其选中图片。
+/// [EN] Bug B13 (docs/Animated-Item.md), found with it: since the FlatDesign tab button became the animated item component, VoiceOver
+///      found no tab button (no "Home"): each one must be an accessibility element labeled with its title, with no
+///      ancestor that hides it from accessibility or is an element itself.
+/// [CN] Bug B13（docs/Animated-Item.md）：扁平样式 Tab 按钮改为动效组件后，VoiceOver 找不到 Tab 按钮（没有"Home"）：每个按钮都必须是
+///      以标题为标签的无障碍元素，且没有隐藏它或自身就是无障碍元素的父视图。
+- (void)testFlatDesignTabButtonsAreAccessibilityElements {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    UIImage *image = [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(8, 8)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+        [UIColor.grayColor setFill];
+        [context fillRect:CGRectMake(0, 0, 8, 8)];
+    }];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"home", CYLTabBarItemTitle : @"Home", CYLTabBarItemImage : image },
+            @{ CYLTabBarItemIdentifier : @"me", CYLTabBarItemTitle : @"Me", CYLTabBarItemImage : image },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    NSMutableArray<UIView *> *buttons = [NSMutableArray array];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    while (queue.count > 0) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:buttonClass]) {
+            [buttons addObject:view];
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    XCTAssertEqual(buttons.count, 2u);
+    for (UIView *button in buttons) {
+        XCTAssertTrue(button.isAccessibilityElement, @"%@", button);
+        NSArray<NSString *> *titles = @[@"Home", @"Me"];
+        XCTAssertTrue([titles containsObject:button.accessibilityLabel ?: @""], @"label %@", button.accessibilityLabel);
+        XCTAssertFalse(button.accessibilityElementsHidden);
+        XCTAssertFalse(button.hidden);
+        for (UIView *ancestor = button.superview; ancestor; ancestor = ancestor.superview) {
+            XCTAssertFalse(ancestor.accessibilityElementsHidden, @"hidden by %@", ancestor);
+            XCTAssertFalse(ancestor.isAccessibilityElement, @"covered by the element %@ (%@)", ancestor, ancestor.accessibilityLabel);
+            XCTAssertFalse(ancestor.hidden && ancestor != window, @"inside a hidden view %@", ancestor);
+        }
+    }
+    window.hidden = YES;
+}
+
+/*
+ * [EN] The item appearance moved from the FlatDesign button into CYLAnimatedItemView (docs/Animated-Item.md, the every-engine
+ *      tint row): icon tint and title tint per state, title offset.
+ * [CN] 从扁平样式按钮移到 CYLAnimatedItemView 的 item 外观：每个状态的图标着色与标题着色、标题偏移。
+ */
+- (void)testAnimatedItemViewAppliesTheItemAppearancePerState {
+    Class componentClass = NSClassFromString(@"CYLAnimatedItemView");
+    if (!componentClass) {
+        XCTSkip(@"The component is not compiled into this target");
+    }
+    UIControl *item = [[componentClass alloc] initWithFrame:CGRectMake(0, 0, 80, 60)];
+    [item setValue:@"Title" forKey:@"title"];
+    [item setValue:[[UIImage systemImageNamed:@"star"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forKey:@"image"];
+    UITabBarItemAppearance *appearance = [[UITabBarItemAppearance alloc] init];
+    appearance.normal.iconColor = UIColor.redColor;
+    // [EN] The same font in both states, so only the offset moves the title. [CN] 两个状态使用同一字体，只有偏移会移动标题。
+    appearance.normal.titleTextAttributes = @{ NSForegroundColorAttributeName : UIColor.orangeColor,
+                                               NSFontAttributeName : [UIFont boldSystemFontOfSize:13] };
+    appearance.selected.iconColor = UIColor.greenColor;
+    appearance.selected.titleTextAttributes = @{ NSForegroundColorAttributeName : UIColor.blueColor,
+                                                 NSFontAttributeName : [UIFont boldSystemFontOfSize:13] };
+    appearance.selected.titlePositionAdjustment = UIOffsetMake(0, 3);
+    appearance.disabled.iconColor = UIColor.grayColor;
+    [item setValue:appearance forKey:@"itemAppearance"];
+    UIImageView *imageView = [item valueForKey:@"imageView"];
+    UILabel *titleLabel = [item valueForKey:@"titleLabel"];
+    XCTAssertEqualObjects(imageView.tintColor, UIColor.redColor, @"normal icon tint");
+    XCTAssertEqualObjects(titleLabel.textColor, UIColor.orangeColor, @"normal title tint, different from the icon's");
+    [item layoutIfNeeded];
+    CGRect unselectedTitle = titleLabel.frame;
+    item.selected = YES;
+    XCTAssertEqualObjects(imageView.tintColor, UIColor.greenColor, @"selected icon tint");
+    XCTAssertEqualObjects(titleLabel.textColor, UIColor.blueColor, @"selected title tint");
+    XCTAssertEqualObjects(titleLabel.font, [UIFont boldSystemFontOfSize:13]);
+    [item layoutIfNeeded];
+    XCTAssertEqualWithAccuracy(CGRectGetMinY(titleLabel.frame) - CGRectGetMinY(unselectedTitle), 3, 0.5, @"selected title offset");
+    item.enabled = NO;
+    XCTAssertEqualObjects(imageView.tintColor, UIColor.grayColor, @"disabled wins over selected");
+}
+
+/*
+ * [EN] The FlatDesign bar's standardAppearance reaches its buttons through the component's itemAppearance.
+ * [CN] 扁平样式 TabBar 的 standardAppearance 通过组件的 itemAppearance 到达其按钮。
+ */
+/*
+ * [EN] The badge categories find an animated item's icon (docs/Animated-Item.md): a badge on a CYLAnimatedItemView goes on
+ *      its icon (the image here, no animation), not on the whole control.
+ * [CN] 角标分类方法能找到动效 item 的图标：CYLAnimatedItemView 上的角标放在其图标上（这里是图片，没有动画），而不是整个控件。
+ */
+- (void)testABadgeOnAnAnimatedItemGoesOnItsIcon {
+    Class componentClass = NSClassFromString(@"CYLAnimatedItemView");
+    if (!componentClass) {
+        XCTSkip(@"The component is not compiled into this target");
+    }
+    UIControl *item = [[componentClass alloc] initWithFrame:CGRectMake(0, 0, 80, 60)];
+    [item setValue:[UIImage systemImageNamed:@"star"] forKey:@"image"];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+    [window addSubview:item];
+    window.hidden = NO;
+    [item layoutIfNeeded];
+    UIImageView *imageView = [item valueForKey:@"imageView"];
+    XCTAssertEqual([item cyl_animatedItemBadgeHost], imageView, @"the icon hosts the badge");
+    UIView *nonItem = [[UIView alloc] init];
+    XCTAssertNil([nonItem cyl_animatedItemBadgeHost], @"other views are not animated items");
+    [item cyl_showBadgeValue:@"3" animationType:CYLBadgeAnimationTypeNone];
+    UIView *badge = nil;
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:window];
+    while (queue.count && !badge) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:[UILabel class]] && [((UILabel *)view).text isEqualToString:@"3"]) {
+            badge = view;
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    XCTAssertNotNil(badge, @"the badge is shown");
+    XCTAssertTrue([badge isDescendantOfView:imageView], @"the badge is added to the icon subview, not to the item or an anchor: %@",
+                  badge.superview);
+    XCTAssertTrue([item cyl_isShowBadge], @"the item reports the badge of its icon");
+    [item cyl_clearBadge];
+    XCTAssertFalse([item cyl_isShowBadge], @"clearing through the item clears the icon's badge");
+    CGRect inItem = [badge convertRect:badge.bounds toView:item];
+    CGRect icon = [imageView convertRect:imageView.bounds toView:item];
+    XCTAssertTrue(CGRectIntersectsRect(CGRectInset(inItem, -4, -4), icon), @"the badge sits on the icon: %@ vs %@",
+                  NSStringFromCGRect(inItem), NSStringFromCGRect(icon));
+}
+
+/*
+ * [EN] A tab's animation view swapped for a new one (another file, the dark file, a skin) used to take the badge away with
+ *      it: the badge, its value and its settings move to the new view (docs/Animated-Item.md, the audit after the component).
+ * [CN] Tab 的动画视图被换成新视图（另一个文件、深色文件、皮肤）时，角标曾随旧视图一起消失：现在角标及其值与设置移到新视图。
+ */
+- (void)testABadgeMovesWithASwappedAnimationView {
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
+    UIView *button = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)];
+    UIView *oldView = [[UIView alloc] initWithFrame:CGRectMake(30, 10, 30, 30)];
+    UIView *newView = [[UIView alloc] initWithFrame:CGRectMake(30, 10, 30, 30)];
+    [window addSubview:button];
+    [button addSubview:oldView];
+    window.hidden = NO;
+    oldView.cyl_badgeBackgroundColor = UIColor.purpleColor;
+    [oldView cyl_showBadgeValue:@"7" animationType:CYLBadgeAnimationTypeNone];
+    XCTAssertTrue([oldView cyl_isShowBadge]);
+    [button insertSubview:newView aboveSubview:oldView];
+    SEL replace = NSSelectorFromString(@"cyl_replaceTrackedSubview:withView:");
+    XCTAssertTrue([button respondsToSelector:replace]);
+    ((void (*)(id, SEL, UIView *, UIView *))[button methodForSelector:replace])(button, replace, oldView, newView);
+    [oldView removeFromSuperview];
+    XCTAssertFalse([oldView cyl_isShowBadge], @"cleared on the old view");
+    XCTAssertTrue([newView cyl_isShowBadge], @"shown on the new view");
+    XCTAssertEqualObjects(newView.cyl_badgeBackgroundColor, UIColor.purpleColor, @"settings move too");
+}
+
+/*
+ * [EN] #601 on a FlatDesign button (a CYLAnimatedItemView, which sets its own image view's visibility on every icon update):
+ *      a view shown in place of the icon keeps the tab's own icon hidden across selection changes, and the icon comes back
+ *      when the provider is removed.
+ * [CN] 扁平样式按钮（CYLAnimatedItemView，每次更新图标时会自行设置图片视图是否可见）上的 #601：替换图标的视图在切换选中后仍让 Tab 自身图标保持隐藏，
+ *      移除 provider 后图标恢复。
+ */
+/// [EN] The engine shows a tab's animation view in its icon's place (`-cyl_replaceTabImageViewWithNewView:show:`): in
+///      FlatDesign that view is the item's own icon, so a selection must not hide it (the selected tab's icon went blank).
+/// [CN] 引擎把 Tab 的动画视图显示在图标的位置（`-cyl_replaceTabImageViewWithNewView:show:`）：在扁平样式中该视图就是 item 自身的图标，因此
+///      切换选中不能隐藏它（选中 Tab 的图标曾变为空白）。
+- (void)testFlatDesignSelectedTabKeepsItsAnimationView {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass || !NSClassFromString(@"CYLGIFTabBarItemAnimator")) {
+        XCTSkip(@"FlatDesign or the GIF animator is not compiled into this target");
+    }
+    // [EN] A 1 x 1 GIF on disk. [CN] 磁盘上的 1 x 1 GIF。
+    NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    path = [path stringByAppendingPathExtension:@"gif"];
+    NSData *gif = [[NSData alloc] initWithBase64EncodedString:@"R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" options:0];
+    XCTAssertTrue([gif writeToFile:path atomically:YES]);
+    NSURL *gifURL = [NSURL fileURLWithPath:path];
+    UIImage *image = [[UIImage systemImageNamed:@"star"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : image, @"CYLTabBarGIFURL" : gifURL },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : image, @"CYLTabBarGIFURL" : gifURL },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    tabBarController.selectedIndex = 1;
+    [tabBarController.view layoutIfNeeded];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    UIControl *button = nil;
+    while (queue.count > 0 && !button) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:buttonClass] && [[view valueForKey:@"title"] isEqual:@"B"]) {
+            button = (UIControl *)view;
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    XCTAssertNotNil(button);
+    UIView *animationView = [button valueForKey:@"animationView"];
+    XCTAssertNotNil(animationView, @"the engine made the tab's animation view");
+    XCTAssertTrue(button.selected);
+    XCTAssertFalse([[button valueForKey:@"iconHidden"] boolValue], @"its own animation view does not hide the item's icon");
+    XCTAssertFalse(animationView.hidden, @"the selected tab shows its animation");
+    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+}
+
+- (void)testFlatDesignIconViewProviderKeepsTheComponentIconHidden {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    UIImage *image = [[UIImage systemImageNamed:@"star"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : image },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : image },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    UIControl *(^buttonB)(void) = ^UIControl * {
+        NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+        while (queue.count > 0) {
+            UIView *view = queue.firstObject;
+            [queue removeObjectAtIndex:0];
+            if ([view isKindOfClass:buttonClass] && [[view valueForKey:@"title"] isEqual:@"B"]) {
+                return (UIControl *)view;
+            }
+            [queue addObjectsFromArray:view.subviews];
+        }
+        return nil;
+    };
+    NSMutableArray<UIView *> *customs = [NSMutableArray array];
+    XCTAssertTrue([tabBarController setTabBarItemIconViewProvider:^UIView *(BOOL selected) {
+        UIView *custom = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 24, 24)];
+        custom.backgroundColor = selected ? UIColor.orangeColor : UIColor.grayColor;
+        [customs addObject:custom];
+        return custom;
+    } atIndex:1]);
+    [tabBarController.view layoutIfNeeded];
+    UIControl *button = buttonB();
+    XCTAssertNotNil(button);
+    UIImageView *imageView = [button valueForKey:@"imageView"];
+    XCTAssertTrue(imageView.hidden, @"the tab's own icon is hidden under the view shown in its place");
+    tabBarController.selectedIndex = 1;
+    [tabBarController.view layoutIfNeeded];
+    tabBarController.selectedIndex = 0;
+    [tabBarController.view layoutIfNeeded];
+    XCTAssertTrue(imageView.hidden, @"still hidden after selection changes (the component updates its icon then)");
+    XCTAssertTrue([[customs filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"hidden == NO"]] count] >= 1,
+                  @"a view for the current look shows");
+    [tabBarController setTabBarItemIconViewProvider:nil atIndex:1];
+    [tabBarController.view layoutIfNeeded];
+    XCTAssertFalse(((UIImageView *)[buttonB() valueForKey:@"imageView"]).hidden, @"the tab's own icon comes back");
+}
+
+- (void)testFlatDesignButtonsTakeTheBarAppearanceThroughTheComponent {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    UIImage *image = [[UIImage systemImageNamed:@"star"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : image },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : image },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UITabBarAppearance *appearance = [[UITabBarAppearance alloc] init];
+    appearance.stackedLayoutAppearance.normal.iconColor = UIColor.redColor;
+    appearance.stackedLayoutAppearance.selected.iconColor = UIColor.greenColor;
+    appearance.stackedLayoutAppearance.selected.titleTextAttributes = @{ NSForegroundColorAttributeName : UIColor.blueColor };
+    tabBarController.tabBar.standardAppearance = appearance;
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    NSMutableDictionary<NSString *, UIControl *> *buttons = [NSMutableDictionary dictionary];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    while (queue.count > 0) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:buttonClass] && [view valueForKey:@"title"]) {
+            buttons[[view valueForKey:@"title"]] = (UIControl *)view;
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    XCTAssertEqual(buttons.count, 2u, @"%@", buttons);
+    XCTAssertNotNil([buttons[@"A"] valueForKey:@"itemAppearance"], @"the bar's appearance is the component's item appearance");
+    XCTAssertEqualObjects(((UIImageView *)[buttons[@"A"] valueForKey:@"imageView"]).tintColor, UIColor.greenColor, @"selected icon tint");
+    XCTAssertEqualObjects(((UILabel *)[buttons[@"A"] valueForKey:@"titleLabel"]).textColor, UIColor.blueColor, @"selected title tint");
+    XCTAssertEqualObjects(((UIImageView *)[buttons[@"B"] valueForKey:@"imageView"]).tintColor, UIColor.redColor, @"normal icon tint");
+}
+
+- (void)testFlatDesignTabButtonIsTheAnimatedItemComponent {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    Class componentClass = NSClassFromString(@"CYLAnimatedItemView");
+    if (!buttonClass || !componentClass) {
+        XCTSkip(@"FlatDesign or the component is not compiled into this target");
+    }
+    XCTAssertTrue([buttonClass isSubclassOfClass:componentClass]);
+    UIImage *(^square)(UIColor *) = ^UIImage *(UIColor *color) {
+        return [[[UIGraphicsImageRenderer alloc] initWithSize:CGSizeMake(8, 8)] imageWithActions:^(UIGraphicsImageRendererContext *context) {
+            [color setFill];
+            [context fillRect:CGRectMake(0, 0, 8, 8)];
+        }];
+    };
+    UIImage *normal = square(UIColor.grayColor);
+    UIImage *selected = square(UIColor.blueColor);
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"a", CYLTabBarItemTitle : @"A", CYLTabBarItemImage : normal, CYLTabBarItemSelectedImage : selected },
+            @{ CYLTabBarItemIdentifier : @"b", CYLTabBarItemTitle : @"B", CYLTabBarItemImage : normal, CYLTabBarItemSelectedImage : selected },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    NSMutableDictionary<NSString *, UIControl *> *buttons = [NSMutableDictionary dictionary];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    while (queue.count > 0) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:buttonClass]) {
+            NSString *title = [view valueForKey:@"title"];
+            if (title) {
+                buttons[title] = (UIControl *)view;
+            }
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    XCTAssertEqual(buttons.count, 2u, @"%@", buttons);
+    for (UIControl *button in buttons.allValues) {
+        UILabel *titleLabel = [button valueForKey:@"titleLabel"];
+        UIImageView *imageView = [button valueForKey:@"imageView"];
+        XCTAssertEqualObjects(titleLabel.text, [button valueForKey:@"title"], @"the component's title label shows the title");
+        XCTAssertEqual(imageView.image, [button valueForKey:@"image"], @"the component's image view shows the image");
+        XCTAssertFalse(((UILongPressGestureRecognizer *)[button valueForKey:@"longPressGestureRecognizer"]).enabled,
+                       @"the tab bar handles its own gestures");
+    }
+    XCTAssertEqual([buttons[@"A"] valueForKey:@"image"], selected, @"the selected tab shows its selected image");
+    XCTAssertEqual([buttons[@"B"] valueForKey:@"image"], normal);
+    tabBarController.selectedIndex = 1;
+    [tabBarController.view layoutIfNeeded];
+    XCTAssertEqual([buttons[@"A"] valueForKey:@"image"], normal);
+    XCTAssertEqual([buttons[@"B"] valueForKey:@"image"], selected);
+    window.hidden = YES;
+}
+
+/// [EN] FIX: the FlatDesign "More" tab had no icon (the 1×1 transparent placeholder). With 8 tabs it now shows a real image
+///      and the "More" title.
+/// [CN] FIX：扁平样式的「More」Tab 没有图标（1×1 透明占位图）。8 个 Tab 时现在显示真实图片与「More」标题。
+- (void)testFlatDesignMoreTabHasAnIcon {
+    Class buttonClass = NSClassFromString(@"CYLFlatDesignTabBarButton");
+    if (!buttonClass) {
+        XCTSkip(@"FlatDesign is not compiled into this target");
+    }
+    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+    for (NSUInteger index = 0; index < 8; index++) {
+        [tabs addObject:@{ CYLTabBarItemIdentifier : [NSString stringWithFormat:@"t%@", @(index)],
+                           CYLTabBarItemTitle : [NSString stringWithFormat:@"T%@", @(index)],
+                           CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+    }
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerStyleType : @"flatDesign",
+        CYLTabBarControllerTabBarItemsAttributes : tabs,
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view setNeedsLayout];
+    [tabBarController.view layoutIfNeeded];
+    NSMutableDictionary<NSString *, NSValue *> *sizes = [NSMutableDictionary dictionary];
+    NSMutableArray<UIView *> *queue = [NSMutableArray arrayWithObject:tabBarController.view];
+    while (queue.count > 0) {
+        UIView *view = queue.firstObject;
+        [queue removeObjectAtIndex:0];
+        if ([view isKindOfClass:buttonClass] && !view.hidden) {
+            UILabel *titleLabel = [view valueForKey:@"titleLabel"];
+            UIImageView *imageView = [view valueForKey:@"imageView"];
+            sizes[titleLabel.text ?: @"(nil)"] = [NSValue valueWithCGSize:imageView.image.size];
+        }
+        [queue addObjectsFromArray:view.subviews];
+    }
+    window.hidden = YES;
+    NSLog(@"FlatDesign buttons: %@", sizes);
+    NSString *moreTitle = [sizes.allKeys filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"NOT (SELF BEGINSWITH 'T')"]].firstObject;
+    XCTAssertNotNil(moreTitle, @"a More button: %@", sizes);
+    XCTAssertGreaterThan(sizes[moreTitle].CGSizeValue.width, 1, @"More (%@) has a real icon, not the 1x1 placeholder: %@", moreTitle, sizes);
+}
+
+/// [EN] FIX: issue #515. With a plus button that is not in the middle (4 tabs, plus button at index 1), every
+///      `-setSelectedIndex:` selects one tab whose title and image belong together: the selected tab bar item is the
+///      selected view controller's own.
+/// [CN] FIX: issue #515。PlusButton 不在中间（4 个 Tab，PlusButton 位于下标 1）时，每次 `-setSelectedIndex:` 选中的 Tab 的标题与图片
+///      属于同一个 Tab：选中的 tab bar item 就是选中控制器自己的。
+- (void)testSelectedIndexWithAnOffCenterPlusButton {
+    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+    for (NSString *name in @[ @"A", @"B", @"C", @"D" ]) {
+        [tabs addObject:@{ CYLTabBarItemIdentifier : name.lowercaseString, CYLTabBarItemTitle : name, CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+    }
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : tabs,
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+        CYLTabBarControllerPlusButton : @{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"],
+                                           CYLPlusButtonIndexInTabBar : @1 },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    [tabBarController.view layoutIfNeeded];
+    for (NSUInteger index = 0; index < tabBarController.viewControllers.count; index++) {
+        UIViewController *viewController = tabBarController.viewControllers[index];
+        if (viewController.cyl_isPlaceholder) {
+            continue;
+        }
+        tabBarController.selectedIndex = index;
+        [tabBarController.view layoutIfNeeded];
+        XCTAssertEqual(tabBarController.selectedViewController, viewController, @"index %@", @(index));
+        XCTAssertEqual(tabBarController.tabBar.selectedItem, viewController.tabBarItem, @"index %@: the selected item is that tab's", @(index));
+        XCTAssertEqualObjects(tabBarController.tabBar.selectedItem.title, viewController.tabBarItem.title);
+    }
+    window.hidden = YES;
+}
+
+/// [EN] FIX: long titles next to the plus button moved its slot off the middle. On Liquid Glass the plus button now follows
+///      its slot (the tab button it covers) horizontally, and every title keeps its full text, also a new title set by
+///      the app.
+/// [CN] FIX：PlusButton 旁的长标题使其 slot 偏离中间。液态玻璃下 PlusButton 现在水平跟随它的 slot（它覆盖的 Tab 按钮），每个标题
+///      都保持完整文字，App 之后设置的新标题也一样。
+- (void)testLongTitlesNextToThePlusButtonKeepItOnItsSlot {
+    NSString *longTitle = @"Scene one: review";
+    NSString *secondTitle = @"Scene two: search";
+    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+    for (NSString *name in @[ longTitle, secondTitle, @"C", @"D" ]) {
+        [tabs addObject:@{ CYLTabBarItemIdentifier : [NSUUID UUID].UUIDString, CYLTabBarItemTitle : name, CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+    }
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : tabs,
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+        CYLTabBarControllerPlusButton : @{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"] },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 402, 874)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    void (^layOut)(void) = ^{
+        for (NSUInteger pass = 0; pass < 3; pass++) {
+            [tabBarController.tabBar setNeedsLayout];
+            [tabBarController.view layoutIfNeeded];
+            [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+        }
+    };
+    CYLTabBar *tabBar = (CYLTabBar *)tabBarController.tabBar;
+    void (^checkPlusButtonOnSlot)(NSString *) = ^(NSString *step) {
+        if (![CYLConstants isLiquidGlassActive]) {
+            return;
+        }
+        NSUInteger slotIndex = NSNotFound;
+        for (NSUInteger index = 0; index < tabBarController.viewControllers.count; index++) {
+            if (tabBarController.viewControllers[index].cyl_isPlaceholder) {
+                slotIndex = index;
+            }
+        }
+        NSArray<UIControl *> *tabButtons = [tabBar cyl_tabBarSubviews];
+        XCTAssertLessThan(slotIndex, tabButtons.count, @"%@", step);
+        if (slotIndex >= tabButtons.count) {
+            return;
+        }
+        UIControl *slot = tabButtons[slotIndex];
+        CGFloat slotCenterX = [slot.superview convertPoint:slot.center toView:tabBar].x;
+        CGFloat plusCenterX = [tabBar.plusButton.superview convertPoint:tabBar.plusButton.center toView:tabBar].x;
+        XCTAssertEqualWithAccuracy(plusCenterX, slotCenterX, 1, @"%@: the plus button is on its slot", step);
+    };
+    layOut();
+    UITabBarItem *firstItem = tabBarController.viewControllers.firstObject.tabBarItem;
+    XCTAssertEqualObjects(firstItem.title, longTitle, @"not cut");
+    XCTAssertEqualObjects(tabBarController.viewControllers[1].tabBarItem.title, secondTitle, @"not cut");
+    checkPlusButtonOnSlot(@"long titles");
+    firstItem.title = @"A";
+    layOut();
+    XCTAssertEqualObjects(firstItem.title, @"A", @"the app's new title is used");
+    checkPlusButtonOnSlot(@"after a title change");
+    window.hidden = YES;
+}
+
+/// [EN] FIX: titles too long for the platter overlapped. Only then are titles cut, the longest ones only: the short titles
+///      keep their text, the tab buttons no longer overlap, the plus button stays on its slot, the full title is the
+///      accessibility label, and a new title set by the app is used again.
+/// [CN] FIX：超出 platter 的长标题互相重叠。只有这时才截断标题，并且只截断最长的：短标题保持文字，Tab 按钮不再重叠，PlusButton 仍在
+///      它的 slot 上，完整标题作为无障碍标签，App 之后设置的新标题会重新生效。
+- (void)testOnlyTitlesOverflowingThePlatterAreCut {
+    if (![CYLConstants isLiquidGlassActive]) {
+        return;
+    }
+    NSString *longTitle = @"Scene one: review filter and more";
+    NSString *secondTitle = @"Scene two: search and sort";
+    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+    for (NSString *name in @[ longTitle, secondTitle, @"C", @"D" ]) {
+        [tabs addObject:@{ CYLTabBarItemIdentifier : [NSUUID UUID].UUIDString, CYLTabBarItemTitle : name, CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+    }
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : tabs,
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+        CYLTabBarControllerPlusButton : @{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"] },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 402, 874)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    void (^layOut)(void) = ^{
+        for (NSUInteger pass = 0; pass < 5; pass++) {
+            [tabBarController.tabBar setNeedsLayout];
+            [tabBarController.view layoutIfNeeded];
+            [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+        }
+    };
+    CYLTabBar *tabBar = (CYLTabBar *)tabBarController.tabBar;
+    void (^checkLayout)(NSString *) = ^(NSString *step) {
+        // [EN] Every title whole in its label, and no two labels overlapping (the buttons themselves always overlap a little).
+        // [CN] 每个标题在其标签中完整显示，且任意两个标签不重叠（按钮本身总会略微重叠）。
+        NSMutableArray<NSValue *> *labelFrames = [NSMutableArray array];
+        for (UIControl *tabButton in [tabBar cyl_tabBarSubviews]) {
+            UILabel *label = tabButton.cyl_tabLabel;
+            if (label.text.length == 0) {
+                continue;
+            }
+            XCTAssertLessThanOrEqual([label sizeThatFits:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX)].width, CGRectGetWidth(label.bounds) + 0.5,
+                                     @"%@: %@ is not squeezed", step, label.text);
+            [labelFrames addObject:[NSValue valueWithCGRect:[label convertRect:label.bounds toView:tabBar]]];
+        }
+        [labelFrames sortUsingComparator:^NSComparisonResult(NSValue *first, NSValue *second) {
+            return [@(CGRectGetMinX(first.CGRectValue)) compare:@(CGRectGetMinX(second.CGRectValue))];
+        }];
+        for (NSUInteger index = 1; index < labelFrames.count; index++) {
+            XCTAssertLessThanOrEqual(CGRectGetMaxX(labelFrames[index - 1].CGRectValue), CGRectGetMinX(labelFrames[index].CGRectValue),
+                                     @"%@: titles %@ and %@ do not overlap", step, @(index - 1), @(index));
+        }
+        NSUInteger slotIndex = NSNotFound;
+        for (NSUInteger index = 0; index < tabBarController.viewControllers.count; index++) {
+            if (tabBarController.viewControllers[index].cyl_isPlaceholder) {
+                slotIndex = index;
+            }
+        }
+        NSArray<UIControl *> *buttons = [tabBar cyl_tabBarSubviews];
+        if (slotIndex < buttons.count) {
+            UIControl *slot = buttons[slotIndex];
+            CGFloat slotCenterX = [slot.superview convertPoint:slot.center toView:tabBar].x;
+            CGFloat plusCenterX = [tabBar.plusButton.superview convertPoint:tabBar.plusButton.center toView:tabBar].x;
+            XCTAssertEqualWithAccuracy(plusCenterX, slotCenterX, 1, @"%@: the plus button is on its slot", step);
+        }
+    };
+    layOut();
+    UITabBarItem *firstItem = tabBarController.viewControllers[0].tabBarItem;
+    UITabBarItem *secondItem = tabBarController.viewControllers[1].tabBarItem;
+    XCTAssertTrue([firstItem.title hasSuffix:@"…"], @"the longest title is cut: %@", firstItem.title);
+    XCTAssertEqualObjects(firstItem.accessibilityLabel, longTitle);
+    XCTAssertEqualObjects(tabBarController.viewControllers.lastObject.tabBarItem.title, @"D", @"a short title stays");
+    XCTAssertGreaterThan(firstItem.title.length + secondItem.title.length, 20, @"only what overflows is cut: %@ / %@", firstItem.title, secondItem.title);
+    checkLayout(@"overflowing titles");
+    firstItem.title = @"A";
+    layOut();
+    XCTAssertEqualObjects(firstItem.title, @"A", @"the app's new title is used");
+    XCTAssertEqualObjects(secondItem.title, secondTitle, @"fits again: the full title is back");
+    checkLayout(@"after a title change");
+    window.hidden = YES;
+}
+
+/// [EN] Without a plus button a long title is left as it is.
+/// [CN] 没有 PlusButton 时长标题保持不变。
+/*!
+ * [EN] Liquid Glass: with the plus button's page selected, the real plus button (under the platter) is masked where its
+ *      title meets the lens, so the lens does not show a blurred copy of the title under the stand-in's; the mask goes
+ *      when another tab is selected.
+ * [CN] 液态玻璃：PlusButton 的页面被选中时，真实 PlusButton（位于底板之下）在标题与放大镜重叠的区域被遮住，放大镜不再在替身标题下
+ *      显示一层模糊的标题；选中其他 Tab 后遮罩移除。
+ */
+- (void)testTheSelectedPlusButtonTitleIsNotBlurredUnderTheLens {
+    if (![CYLConstants isLiquidGlassActive]) {
+        return;
+    }
+    UIViewController *menu = [[UIViewController alloc] init];
+    NSString *context = [NSUUID UUID].UUIDString;
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : context,
+        CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A", CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] },
+                                                      @{ CYLTabBarItemTitle : @"B", CYLTabBarItemImage : [UIImage systemImageNamed:@"star"] } ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [pageIdentifier isEqualToString:@"menu"] ? menu : [[UIViewController alloc] init];
+        },
+        CYLTabBarControllerPlusButton : @{ CYLTabBarItemTitle : @"Menu", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"],
+                                           CYLTabBarItemPageIdentifier : @"menu" },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 402, 874)];
+    window.rootViewController = tabBarController;
+    // [EN] In the app's scene and key: the selected layer renders only in a visible window.
+    // [CN] 放入 App 的 scene 并设为 key：选中图层只在可见的窗口中渲染。
+    for (UIScene *scene in UIApplication.sharedApplication.connectedScenes) {
+        if ([scene isKindOfClass:[UIWindowScene class]]) {
+            window.windowScene = (UIWindowScene *)scene;
+            break;
+        }
+    }
+    [window makeKeyAndVisible];
+    void (^layOut)(void) = ^{
+        for (NSUInteger pass = 0; pass < 6; pass++) {
+            [tabBarController.tabBar setNeedsLayout];
+            [tabBarController.view layoutIfNeeded];
+            [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+        }
+    };
+    layOut();
+    CYLPlusButton *plusButton = [CYLPlusButton plusButtonForTabBarContext:context];
+    XCTAssertNotNil(plusButton);
+    XCTAssertNil(plusButton.layer.mask, @"no mask while another tab is selected");
+    tabBarController.selectedViewController = [CYLPlusButton plusChildViewControllerForTabBarContext:context];
+    layOut();
+    UIButton *standIn = [plusButton valueForKey:@"selectedContentView"];
+    if (!standIn.window || standIn == plusButton) {
+        // [EN] Selected in code, the test host does not build the lens's stand-in; the masked title is checked on the
+        //      simulator instead (docs/SwiftUI-Integration.md). [CN] 用代码选中时，测试宿主不会创建放大镜中的替身；遮住标题的效果
+        //      改在模拟器上检查（docs/SwiftUI-Integration.md）。
+        XCTSkip(@"the lens's stand-in is not built when the plus page is selected in code");
+    }
+    CAShapeLayer *mask = (CAShapeLayer *)plusButton.layer.mask;
+    XCTAssertTrue([mask isKindOfClass:[CAShapeLayer class]], @"the selected plus button is masked under the lens");
+    CGPoint titleCenter = [plusButton.titleLabel convertPoint:CGPointMake(CGRectGetMidX(plusButton.titleLabel.bounds),
+                                                                          CGRectGetMidY(plusButton.titleLabel.bounds))
+                                                       toView:plusButton];
+    XCTAssertFalse(CGPathContainsPoint(mask.path, NULL, titleCenter, YES), @"the title is masked out");
+    XCTAssertTrue(CGPathContainsPoint(mask.path, NULL, CGPointMake(CGRectGetMidX(plusButton.bounds), 1), YES),
+                  @"the top of the icon, above the platter, stays");
+    tabBarController.selectedIndex = 0;
+    layOut();
+    XCTAssertNil(plusButton.layer.mask, @"the mask goes once another tab is selected");
+}
+
+- (void)testLongTitlesWithoutAPlusButtonAreNotCut {
+    NSString *longTitle = @"Scene one: review filter and more";
+    NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+    for (NSString *name in @[ longTitle, @"Scene two: search and sort", @"C", @"D" ]) {
+        [tabs addObject:@{ CYLTabBarItemIdentifier : [NSUUID UUID].UUIDString, CYLTabBarItemTitle : name, CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+    }
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : tabs,
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 390, 844)];
+    window.rootViewController = tabBarController;
+    window.hidden = NO;
+    for (NSUInteger pass = 0; pass < 3; pass++) {
+        [tabBarController.tabBar setNeedsLayout];
+        [tabBarController.view layoutIfNeeded];
+        [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+    }
+    XCTAssertFalse([tabBarController hasPlusButton]);
+    XCTAssertEqualObjects(tabBarController.viewControllers.firstObject.tabBarItem.title, longTitle, @"not cut without a plus button");
+    window.hidden = YES;
+}
+
+/// [EN] FIX: more than five tabs on the classic style / Liquid Glass showed the first five and no "More". With eight tabs
+///      UIKit's "More" tab is there and a later tab can be selected; five tabs are unchanged; a plus button with eight
+///      tabs does not crash.
+/// [CN] FIX：经典样式 / 液态玻璃下超过 5 个 Tab 时只显示前 5 个且没有「More」。8 个 Tab 时有 UIKit 的「More」，之后的 Tab 也能选中；
+///      5 个 Tab 不受影响；有 PlusButton 且 8 个 Tab 时不崩溃。
+- (void)testMoreTabWithMoreThanFiveTabs {
+    CYLTabBarController * (^make)(NSUInteger, NSDictionary *) = ^CYLTabBarController *(NSUInteger count, NSDictionary *plus) {
+        NSMutableArray<NSDictionary *> *tabs = [NSMutableArray array];
+        for (NSUInteger index = 0; index < count; index++) {
+            [tabs addObject:@{ CYLTabBarItemIdentifier : [NSString stringWithFormat:@"t%@", @(index)],
+                               CYLTabBarItemTitle : [NSString stringWithFormat:@"T%@", @(index)],
+                               CYLTabBarItemImage : [UIImage systemImageNamed:@"house"] }];
+        }
+        NSMutableDictionary *configuration = [@{
+            CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+            CYLTabBarControllerTabBarItemsAttributes : tabs,
+            CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+                return [[UIViewController alloc] init];
+            },
+        } mutableCopy];
+        if (plus) {
+            configuration[CYLTabBarControllerPlusButton] = plus;
+        }
+        return [CYLTabBarController tabBarControllerWithConfiguration:configuration];
+    };
+    UIWindow *window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 440, 956)];
+    window.hidden = NO;
+
+    CYLTabBarController *eight = make(8, nil);
+    window.rootViewController = eight;
+    [eight.view layoutIfNeeded];
+    XCTAssertTrue([eight.tabBar.items containsObject:eight.moreNavigationController.tabBarItem], @"a More tab");
+    eight.selectedIndex = 6;
+    XCTAssertEqual(eight.selectedViewController, eight.viewControllers[6], @"the seventh tab can be selected");
+
+    CYLTabBarController *five = make(5, nil);
+    window.rootViewController = five;
+    [five.view layoutIfNeeded];
+    XCTAssertEqual(five.tabBar.items.count, 5u);
+    XCTAssertFalse([five.tabBar.items containsObject:five.moreNavigationController.tabBarItem], @"five tabs: no More");
+
+    CYLTabBarController *withPlus = make(8, @{ CYLTabBarItemTitle : @"Post", CYLTabBarItemImage : [UIImage systemImageNamed:@"plus.circle"] });
+    window.rootViewController = withPlus;
+    [withPlus.view layoutIfNeeded];
+    XCTAssertGreaterThan(withPlus.tabBar.items.count, 0u);
+    window.hidden = YES;
+}
+
 - (void)testPerformanceExample {
     // This is an example of a performance test case.
     [self measureBlock:^{
         // Put the code you want to measure the time of here.
     }];
+}
+
+/// [EN] Issue #426 (step 103, Swift): unloading the views of unselected tabs skips the selected tab and the kept identifiers.
+/// [CN] Issue #426（第 103 步，Swift）：卸载未选中 Tab 的视图时跳过选中的 Tab 与保留的标识。
+- (void)testUnloadingUnselectedViewsKeepsTheSelectedAndTheKeptTabs {
+    CYLTabBarController *tabBarController = [CYLTabBarController tabBarControllerWithConfiguration:@{
+        CYLTabBarControllerContext : [NSUUID UUID].UUIDString,
+        CYLTabBarControllerTabBarItemsAttributes : @[
+            @{ CYLTabBarItemIdentifier : @"home", CYLTabBarItemTitle : @"Home" },
+            @{ CYLTabBarItemIdentifier : @"feed", CYLTabBarItemTitle : @"Feed" },
+            @{ CYLTabBarItemIdentifier : @"me", CYLTabBarItemTitle : @"Me" },
+        ],
+        CYLTabBarControllerPageResolver : ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+            return [[UIViewController alloc] init];
+        },
+    }];
+    tabBarController.cyl_keepsLoadedTabBarItemIdentifiers = @[ @"me" ];
+    for (UIViewController *viewController in tabBarController.viewControllers) {
+        [viewController loadViewIfNeeded];
+    }
+    NSArray<UIViewController *> *pages = tabBarController.viewControllers;
+    XCTAssertEqual(pages.count, 3u);
+    tabBarController.selectedIndex = 0;
+    [tabBarController unloadViewsOfUnselectedViewControllers];
+    XCTAssertTrue(pages[0].isViewLoaded, @"the selected tab keeps its view");
+    XCTAssertFalse(pages[1].isViewLoaded, @"an unselected tab is unloaded");
+    XCTAssertTrue(pages[2].isViewLoaded, @"a kept identifier is not unloaded");
+    XCTAssertFalse([tabBarController shouldUnloadViewOfViewController:pages[2]]);
+    XCTAssertTrue([tabBarController shouldUnloadViewOfViewController:pages[1]]);
+}
+
+/*!
+ * [EN] `-rootWindow` before the app has a window (at launch) returns nil and does not trap: step 104 returned a non-optional
+ *      UIWindow from Swift and crashed the Objective-C example at launch. The window is taken away for the call: the app
+ *      delegate answers no window, and the scene's windows leave their scene.
+ * [CN] App 还没有窗口时（启动时）`-rootWindow` 返回 nil 且不崩溃：第 104 步在 Swift 中返回非可选的 UIWindow，使 Objective-C 示例启动即崩溃。
+ *      调用期间移走窗口：App 代理不返回窗口，场景中的窗口离开场景。
+ */
+- (void)testRootWindowIsNilBeforeTheAppHasAWindow {
+    CYLTabBarController *tabBarController = [[CYLTabBarController alloc] initWithViewControllers:@[ [UIViewController new] ]
+                                                                           tabBarItemsAttributes:@[ @{ CYLTabBarItemTitle : @"A" } ]];
+    id<UIApplicationDelegate> delegate = UIApplication.sharedApplication.delegate;
+    NSMutableArray<UIWindow *> *windows = [NSMutableArray array];
+    NSMutableArray<UIWindowScene *> *scenes = [NSMutableArray array];
+    for (UIScene *scene in UIApplication.sharedApplication.connectedScenes) {
+        if (![scene isKindOfClass:[UIWindowScene class]]) {
+            continue;
+        }
+        for (UIWindow *window in [((UIWindowScene *)scene).windows copy]) {
+            [windows addObject:window];
+            [scenes addObject:(UIWindowScene *)scene];
+            window.windowScene = nil;
+        }
+    }
+    UIApplication.sharedApplication.delegate = nil;
+    CYL_DEPRECATED_DECLARATIONS_PUSH
+    UIWindow *window = [tabBarController rootWindow];
+    CYL_DEPRECATED_DECLARATIONS_POP
+    UIApplication.sharedApplication.delegate = delegate;
+    [windows enumerateObjectsUsingBlock:^(UIWindow *each, NSUInteger index, BOOL *stop) {
+        each.windowScene = scenes[index];
+    }];
+    XCTAssertNil(window, @"no window yet: nil, as the Objective-C method returned");
+}
+
+/// [EN] The initializer taking a configuration file (`try CYLTabBarController(configurationFile:)` in Swift) sets the controller up
+///      during `init`, when its tab bar must already be the library's `CYLTabBar`: a checked downcast of `tabBar` trapped here
+///      at launch of CYLSearchViewController's example (Debug).
+/// [CN] 接收配置文件的初始化方法（Swift 中的 `try CYLTabBarController(configurationFile:)`）在 `init` 期间完成设置，此时 `tabBar`
+///      必须已是本库的 `CYLTabBar`：对 `tabBar` 做检查式向下转换会在 CYLSearchViewController 示例启动时（Debug）陷入陷阱。
+- (void)testInitWithConfigurationFileSetsUpWithoutTrapping {
+    NSString *folder = [NSTemporaryDirectory() stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+    XCTAssertTrue([NSFileManager.defaultManager createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:NULL]);
+    NSString *json = @"{\"CYLTabBarControllerTabBarItemsAttributes\": ["
+                     @"{\"CYLTabBarItemIdentifier\": \"home\", \"CYLTabBarItemTitle\": \"Home\"},"
+                     @"{\"CYLTabBarItemIdentifier\": \"me\", \"CYLTabBarItemTitle\": \"Me\"}]}";
+    NSString *file = [folder stringByAppendingPathComponent:@"tabs.json"];
+    XCTAssertTrue([json writeToFile:file atomically:YES encoding:NSUTF8StringEncoding error:NULL]);
+    NSError *error = nil;
+    NSMutableDictionary *configuration = [[CYLTabBarController configurationWithContentsOfFile:file error:&error] mutableCopy];
+    XCTAssertNil(error);
+    configuration[CYLTabBarControllerPageResolver] = ^UIViewController *(NSString *pageIdentifier, NSDictionary *attributes) {
+        return [[UIViewController alloc] init];
+    };
+    CYLTabBarController *controller = [[CYLTabBarController alloc] initWithConfiguration:configuration];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller.tabBar isKindOfClass:[CYLTabBar class]], @"the library tab bar is in place");
+    XCTAssertEqual(controller.tabBarItemsAttributes.count, 2u);
 }
 
 @end

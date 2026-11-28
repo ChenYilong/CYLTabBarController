@@ -1,0 +1,976 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_bffed61338ea",
+      "value": "%@ CYLTabBarController a HarmonyOS"
+    },
+    {
+      "name": "cyl_l10n_9ecf653a3fc6",
+      "value": "%@ · un altre context · tocs al més: %@"
+    },
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "%@ missatges nous"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "Un controlador de barra de pestanyes d’un altre context, amb un botó més quadrat"
+    },
+    {
+      "name": "cyl_l10n_4d3d8ce4d921",
+      "value": "Animation ended: %d"
+    },
+    {
+      "name": "cyl_l10n_427131e7add2",
+      "value": "Un altre botó més"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, la barra de pestanyes del sistema HarmonyOS, amb les mateixes pestanyes"
+    },
+    {
+      "name": "cyl_l10n_0557fa923dce",
+      "value": "Enrere"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "Insígnia: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "Parpelleig ×3"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "Vora"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "Vora que segueix el mode fosc"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "A baix a l’esquerra"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "A baix a la dreta"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "Rebot (continu)"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "Rebot ×3 (cyl_bounceAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "Respiració (contínua)"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_687f0fbab628",
+      "value": "CYLTabBarRiveURL: selecting a tab sets its state machine input active; deselecting resets it"
+    },
+    {
+      "name": "cyl_l10n_d7c01888e55e",
+      "value": "CYLTabBarSVGAFilePath: es reprodueix un cop en seleccionar-la; si no, primer fotograma"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils: objectes associats febles i cerca del botó (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem: no centrat (estil del sistema)"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem: centrat"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Fitxer de configuració: %@"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "Radi de la cantonada"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "Colors personalitzats"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "Tipus de lletra personalitzat"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "Màxim personalitzat (9)"
+    },
+    {
+      "name": "cyl_l10n_3924c958175e",
+      "value": "Mode fosc"
+    },
+    {
+      "name": "cyl_l10n_b9c74f4cd786",
+      "value": "Atenuat"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Descobreix"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "Toca dues vegades per obrir"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "Aparició un cop"
+    },
+    {
+      "name": "cyl_l10n_153407d52fed",
+      "value": "Flat Design"
+    },
+    {
+      "name": "cyl_l10n_5cfed317a99d",
+      "value": "Estil Flat Design"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "Gir ×2"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "Icona GIF"
+    },
+    {
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Inici"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "D’esquerra a dreta un cop"
+    },
+    {
+      "name": "cyl_l10n_1aae3277f8d3",
+      "value": "Liquid Glass (referència)"
+    },
+    {
+      "name": "cyl_l10n_32f643a9aa26",
+      "value": "Liquid Glass: l’efecte de transparència de la referència"
+    },
+    {
+      "name": "cyl_l10n_f201a4158727",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_af3acf6eb4a9",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "Mantén premuda una pestanya o el botó més"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "Marge"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Jo"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Missatges"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "NOU"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "Nou"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "Pestanya següent (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_3826b8552c94",
+      "value": "Pista següent"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "Número"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "Número per sobre del màxim"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "D’acord"
+    },
+    {
+      "name": "cyl_l10n_8a7b0e9c294e",
+      "value": "Activat: %@; llisca la pàgina a l’esquerra / dreta"
+    },
+    {
+      "name": "cyl_l10n_06eb0a05de97",
+      "value": "Activat: %@; la pàgina nova entra pel costat de la seva pestanya"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "Altre text"
+    },
+    {
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Pàgina: %@"
+    },
+    {
+      "name": "cyl_l10n_105b296a83f9",
+      "value": "Pausa"
+    },
+    {
+      "name": "cyl_l10n_de3c731be563",
+      "value": "Reprodueix"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "Imatge del PlusButton carregada després"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "Àrea tàctil del PlusButton (issue #91)"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "Pestanya anterior (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "Push a un UITabBarController del sistema (un altre botó més)"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "Obre un altre CYLTabBarController (un altre PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "Push d’un TabBarController amb el mateix context (mateixa classe de botó més)"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "Mostra un TabBarController amb un context nou (PlusButton amb una subvista X que es pot tocar, issue #202)"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "Obre una pàgina que amaga la barra de navegació, sense classe base"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "Obre un controlador la imatge del botó més del qual canvia 2 s després; el disseny no s’ha de moure"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "Punt vermell"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "Radi del punt vermell"
+    },
+    {
+      "name": "cyl_l10n_56e8fac7007d",
+      "value": "Replay"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "De dreta a esquerra un cop"
+    },
+    {
+      "name": "cyl_l10n_e7d74cf8c9a3",
+      "value": "Rive tab icons (configuration file)"
+    },
+    {
+      "name": "cyl_l10n_9d01c837b4bc",
+      "value": "Rive tab icon: house.riv (number input Rooms)"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "Desplaçament un cop"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "Rotació (contínua)"
+    },
+    {
+      "name": "cyl_l10n_bd001817e373",
+      "value": "Icones de pestanya SVGA (fitxer de configuració)"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "Escala (contínua)"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "Escala un cop"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "Escala ×3"
+    },
+    {
+      "name": "cyl_l10n_13348442cc6a",
+      "value": "Cerca"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "Sacseig (continu)"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "Sacseig ×3 (cyl_shakeAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "Sacseig, s’atura amb Reduir el moviment"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "Mostra / amaga CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_ad30d6513b94",
+      "value": "Show the still image when it ends: off"
+    },
+    {
+      "name": "cyl_l10n_0d07e309ae6a",
+      "value": "Show the still image when it ends: on"
+    },
+    {
+      "name": "cyl_l10n_561582c1e7cc",
+      "value": "Mostra l’àrea tàctil en vermell translúcid: %@; escala %@x; toca per a 1x, 1,5x, 2x, desactivat"
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "Molla (contínua)"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "Molla un cop"
+    },
+    {
+      "name": "cyl_l10n_f1f3db859899",
+      "value": "Still image after the animation ends"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "Interaccions de les pestanyes"
+    },
+    {
+      "name": "cyl_l10n_5ea7bf3d8e63",
+      "value": "Tab icon animations loop: off"
+    },
+    {
+      "name": "cyl_l10n_918aff638366",
+      "value": "Tab icon animations loop: on"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "Animació en tocar les pestanyes (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "So i hàptica en tocar pestanyes (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "Pàgines, selecció i inici de sessió"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "Pestanya, %1$@ de %2$@"
+    },
+    {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Pestanya: %@"
+    },
+    {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "Galeria de barres de pestanyes"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "Aparença de la barra"
+    },
+    {
+      "name": "cyl_l10n_7c4aecba91c3",
+      "value": "La imatge de la pestanya d’aquesta pàgina prové del rawfile de l’app (el bundle de recursos d’iOS); toca de nou per restaurar"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "El botó més sobresurt de la barra; la part de sobre també respon (en vermell)"
+    },
+    {
+      "name": "cyl_l10n_9b6633b75bf2",
+      "value": "La pestanya «Jo» requereix iniciar sessió (issue #19); toca per alternar"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "A dalt a l’esquerra"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: 15 % de l’amplada d’una pestanya lliure a cada extrem"
+    },
+    {
+      "name": "cyl_l10n_6360bbdfb8ff",
+      "value": "cyl_itemEdgeInsets: zero, les pestanyes omplen la barra"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "Demostració dels mètodes cyl_pop / cyl_push"
+    },
+    {
+      "name": "cyl_l10n_ca3dcd2d62be",
+      "value": "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)"
+    },
+    {
+      "name": "cyl_l10n_3b06a9582640",
+      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message"
+    },
+    {
+      "name": "cyl_l10n_59884403daf6",
+      "value": "cyl_pushOrPopToViewController: pages/Index (ja a la pila: torna enrere)"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_9fb845377ee4",
+      "value": "cyl_pushViewController: una pàgina verda"
+    },
+    {
+      "name": "cyl_l10n_ff5772993aee",
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; toca per canviar; toca dues vegades una pestanya per veure-ho"
+    },
+    {
+      "name": "cyl_l10n_f69c71bc581e",
+      "value": "cyl_tabBarMinimizeBehavior = %@; toca per triar i desplaça aquesta llista"
+    },
+    {
+      "name": "cyl_l10n_4abddd944c2e",
+      "value": "harmonyos-liquid-glass-tabbar: càpsula de pestanyes, bola de cerca i barra de música sobre contingut de colors; desplaça per minimitzar"
+    },
+    {
+      "name": "cyl_l10n_3b4e07b5542e",
+      "value": "numberInput=Rooms: each select or tap again sets Rooms to the next value (3, 4, 5, 6)"
+    },
+    {
+      "name": "cyl_l10n_f3f4ecf4a4a6",
+      "value": "selectedIndex = %@ (la pàgina del botó més és %@, mai un índex de pestanya); toca per a la pestanya següent"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex i el PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_30be5f67de2b",
+      "value": "showsImageWhenAnimationEnds: a play-once Lottie icon, then its still image"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "Tema de standardAppearance (compartit per Liquid Glass i FlatDesign)"
+    },
+    {
+      "name": "cyl_l10n_c4376b477be8",
+      "value": "tabBarHidden = %@; amagada, torna al cap de 2 s"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "Actualitza els títols de totes les pestanyes alhora; toca de nou per restaurar"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "Halloween"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "Baixa i actualitza les icones de totes les pestanyes; toca de nou per restaurar"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "Baixa una icona de la xarxa"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "Amagar la barra de navegació sense classe base (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "N/A"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "Festa de mitja tardor"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "Resposta hàptica mitjana"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "Carregar imatges d'un bundle (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "Apropa"
+    },
+    {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "Tria de l’àlbum"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "Baixa la icona de la pestanya de la xarxa (en memòria cau); toca de nou per restaurar"
+    },
+    {
+      "name": "cyl_l10n_e05f97c5159d",
+      "value": "Crea un TabBarController a partir d’un fitxer de configuració"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Manté"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "mantinguda"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "Tanca"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "Avís de memòria"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "Botó més"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "Carrega la imatge"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "Carrega una imatge de fons"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "Descarrega les pestanyes no seleccionades; es tornen a carregar en seleccionar-les"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "Canvia al moment el títol de la pestanya d’aquesta pàgina; toca de nou per restaurar"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "Actualitza les pestanyes al moment"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "Original"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "Publica"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "Cancel·la"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "A prop"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "Compara amb la UITabBar del sistema"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "Nadal"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "Pasqua"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "Estiu"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "Espai"
+    },
+    {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Real: %@"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "Càpsula centrada"
+    },
+    {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Mostra les %@ simulacions"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "Llisca per canviar de pestanya (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "descarregada"
+    },
+    {
+      "name": "cyl_l10n_f79d05d929aa",
+      "value": "TabBarController creat de manera segura: %@ pestanyes"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "Rebot"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "Mostra un GIF animat com a icona de la pestanya; toca de nou per restaurar"
+    },
+    {
+      "name": "cyl_l10n_56e6ecf97176",
+      "value": "Loop"
+    },
+    {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Restaura"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "Sant Valentí"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "Jo"
+    },
+    {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Manual"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Manual: toca per activar l'amagat en desplaçar, desplaça't cap avall per amagar la TabBar i fes el que diu el títol. Esperat: la TabBar torna de seguida."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Manual: %@"
+    },
+    {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "Obre la galeria de barres de pestanyes"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "Activa l'interruptor i mantén premuda qualsevol pestanya o el PlusButton per veure'n l'identificador."
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "Canvia totes les icones de xarxa"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "Canvia totes les icones locals"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "Canvia tots els títols"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "Mostra altres pàgines a les pestanyes de tots dos costats (issue #481); toca de nou per restaurar"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "Fes una foto"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "Aspecte"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "Aspecte (tema, issue #216)"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "Aspectes: festes i colors (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Amaga la llista de simulacions"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "Canvia l’alçada de CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "Amplia i redueix"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "Any Nou"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "Gira"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "Cap"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "Sense classe base, i utilitats"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "Festa de la Primavera"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "Canvia el títol de la pestanya"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "Substitueix per una imatge més gran"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "Substitueix les pestanyes veïnes"
+    },
+    {
+      "name": "cyl_l10n_3e730a3320e9",
+      "value": "Pàgina substituta %@"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "Contingut nou"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "no carregada"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "Desplaçament del títol (titlePositionAdjustment)"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "Simula un avís de memòria"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "Cada escena és una barra de pestanyes feta amb l’API pública: estils, animacions, avisos, Lottie i les API de pestanyes més noves"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "Oceà"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "Missatges"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "Fosc"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "Transició lliscant (CYLTabBarSlideTransitionAnimator)"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "Minimitza / amaga la TabBar en desplaçar (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Amagar en desplaçar: simular interrupcions (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "Toca la X a dalt a la dreta del PlusButton: la X canvia a un color aleatori i el PlusButton no reacciona"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "Toca per canviar l'animació en tocar les pestanyes i el PlusButton. Ara: %@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "Toca per canviar tabBar.standardAppearance, actual: %@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "Toca per canviar el desplaçament vertical dels títols de totes les pestanyes, actual: %@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "Toca per canviar l’idioma"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "Toca per canviar i després toca qualsevol pestanya o el PlusButton per sentir-ho. L’hàptica només vibra en un dispositiu real. Actual: %@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "Clic + hàptica"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "Toqueu per triar un tema: el fons, les icones i els colors del text de la TabBar canvien al moment, en tots els estils de TabBar. Actual: %@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "Rosa"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "Aniversari"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "Actualitza les icones de totes les pestanyes amb imatges locals (nom, camí, UIImage, URL de fitxer); toca de nou per restaurar"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "Inicia sessió"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "Elimina la imatge"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "Línia verda"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "Icones de la xarxa"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "Gira la icona"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "Fitxer de so propi (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Autoprova"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Autoprova: executa totes les simulacions automàtiques i informa PASS / FAIL"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "Aranja"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "Insígnies"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "Defineix el color de fons de CYLFlatDesignTabBarItem"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "Idioma"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "Respondre fora de la supervista (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "Segueix el sistema"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "Navegació i comparacions"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "Resposta hàptica lleugera"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "Seleccionat"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "General"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "Fitxer de configuració"
+    },
+    {
+      "name": "cyl_l10n_d505958a042b",
+      "value": "Configuració: errors simulats"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "Resposta hàptica forta"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "Mantenir premudes les pestanyes (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "S'ha mantingut premut «%@»"
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "Durada de la pulsació llarga i interval del doble toc (issue #535 / #152)"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "Herba"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "Inici"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "Per defecte"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "Clic per defecte"
+    }
+  ]
+}

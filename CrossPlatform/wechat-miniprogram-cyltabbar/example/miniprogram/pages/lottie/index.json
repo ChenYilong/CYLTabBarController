@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "cyl-lottie",
+  "usingComponents": {
+    "cyl-lottie": "cyl-lottie-miniprogram/cyl-lottie/index",
+    "cyl-animated-item": "cyl-tabbar-miniprogram/cyl-animated-item/index",
+    "cyl-pag": "cyl-tabbar-miniprogram/cyl-animation-placeholder/index",
+    "cyl-rive": "cyl-tabbar-miniprogram/cyl-animation-placeholder/index"
+  }
+}

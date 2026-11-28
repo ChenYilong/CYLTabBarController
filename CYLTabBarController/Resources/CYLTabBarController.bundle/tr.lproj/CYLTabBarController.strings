@@ -124,6 +124,7 @@
 "有新内容" = "Yeni içerik";
 "%@ 条新消息" = "%@ yeni mesaj";
 "加号按钮" = "Artı düğmesi";
+"更多" = "Diğer";
 "模拟内存警告" = "Bellek uyarısını taklit et";
 "卸载未选中的 Tab，切换时重新加载" = "Seçili olmayan sekmeleri boşaltır; seçilince yeniden yüklenir";
 "内存警告" = "Bellek uyarısı";
@@ -368,3 +369,12 @@
 "网络图标、标题与配色" = "Ağ simgeleri, başlıklar ve renkler";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Yapılandırma dosyası";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Geri yükle";
+"保持" = "Koru";
+"不适用" = "Yok";
+"手动" = "Manuel";
+"自测" = "Otomatik test";
+"手动：%@" = "Manuel: %@";
+"实测：%@" = "Gerçek: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Otomatik test: tüm otomatik simülasyonları çalıştır, PASS / FAIL bildir";

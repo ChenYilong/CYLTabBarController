@@ -75,7 +75,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         var activeColor: UIColor {
             switch self {
             case .normal:
-                return UIColor.cyl_color(withLight: .black, dark: .white)
+                return UIColor.cylColor(withLight: .black, dark: .white)
             case .roomStyle:
                 return .white
             }
@@ -86,7 +86,7 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         var tabBarBackground: UIColor {
             switch self {
             case .normal:
-                return UIColor.cyl_color(withLight: .white, dark: .black)
+                return UIColor.cylColor(withLight: .white, dark: .black)
             case .roomStyle:
                 return .black
             }
@@ -150,10 +150,10 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         // [EN] 1. Title configuration
         var title: String {
             switch self {
-            case .home: return CYLLocalizedString("首页")
-            case .room: return CYLLocalizedString("房间")
-            case .chat: return CYLLocalizedString("消息")
-            case .mine: return CYLLocalizedString("我的")
+            case .home: return cylDemoLocalizedString("首页")
+            case .room: return cylDemoLocalizedString("房间")
+            case .chat: return cylDemoLocalizedString("消息")
+            case .mine: return cylDemoLocalizedString("我的")
             }
         }
         
@@ -208,8 +208,11 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
 
     // MARK: - Lifecycle
     
-    init() {
-        super.init(nibName: nil, bundle: nil)
+    // [EN] A convenience initializer: CYLTabBarController's initializers are inherited (this class declares no designated one), and
+    //      they all end in `init(configuration:)` since the class switch. [CN] 便利初始化方法：本类不声明指定初始化方法，因此继承
+    //      CYLTabBarController 的全部初始化方法，类切换起它们都走到 `init(configuration:)`。
+    convenience init() {
+        self.init(configuration: [:])
         self.delegate = self
         // [CN] flatDesign 必须在 setViewControllers 之前；且需先触发 cyl_tabBar 创建扁平 TabBar
         // flatDesign 的 setTabBarHeight 要求 cyl_tabBar 已是 CYLFlatDesignTabBar，否则会直接 return
@@ -224,9 +227,6 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
         buildArchitecture()
     }
     
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     // MARK: - Build Infrastructure
     
@@ -252,14 +252,14 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     private func buildTabBars(theme: Theme) {
         tabBarItemsAttributes = Module.allCases.map { module in
             var attrs: [String: Any] = [
-                CYLTabBarItemTitle: module.title,
-                CYLTabBarItemImage: module.icon(for: theme).identifier,
-                CYLTabBarItemSelectedImage: module.activeIcon.identifier,
-                CYLTabBarItemImagePositionAdjustment: NSValue(uiOffset: UIOffset(horizontal: 0, vertical: 1.5)),
-                CYLTabBarItemTitlePositionAdjustment: NSValue(uiOffset: UIOffset(horizontal: 0, vertical: -1.5))
+                cylTabBarItemTitle: module.title,
+                cylTabBarItemImage: module.icon(for: theme).identifier,
+                cylTabBarItemSelectedImage: module.activeIcon.identifier,
+                cylTabBarItemImagePositionAdjustment: NSValue(uiOffset: UIOffset(horizontal: 0, vertical: 1.5)),
+                cylTabBarItemTitlePositionAdjustment: NSValue(uiOffset: UIOffset(horizontal: 0, vertical: -1.5))
             ]
             if let darkIcon = module.darkIcon {
-                attrs[CYLTabBarItemDarkImage] = darkIcon.identifier
+                attrs[cylTabBarItemDarkImage] = darkIcon.identifier
             }
             
             if let anim = module.animation(for: theme), let url = anim.resolvedURL {
@@ -297,9 +297,9 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
             // A 1-pt line from the library; a dynamic color would give an image that follows Dark Mode too.
             flatTabBar.shadowImage = theme.shadowColor == .clear
                 ? UIImage()
-                : UIImage.cyl_image(with: theme.shadowColor, size: CGSize(width: 1, height: 1)) ?? UIImage()
+                : UIImage.cylImage(with: theme.shadowColor, size: CGSize(width: 1, height: 1)) ?? UIImage()
             viewControllers?.forEach { vc in
-                let item = vc.cyl_getViewControllerInsteadOfNavigation().cyl_tabBarItem
+                let item = vc.cylGetViewControllerInsteadOfNavigation().cyl_tabBarItem
                 item?.setTitleTextAttributes(normalAttrs, for: .normal)
                 item?.setTitleTextAttributes(activeAttrs, for: .selected)
             }
@@ -333,18 +333,18 @@ class MainTabBarController: CYLTabBarController, CYLFlatDesignUITabBarController
     /// #610 / #408: called for every tab button and for the plus button in the flat design style too; the identifier
     /// (a default, the class name, when none is set) tells which one was tapped.
     /// 扁平样式下点击每个 Tab 按钮和 PlusButton 也会调用；用标识（未设置时为默认值，即类名）区分是哪一个。
-    override func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
+    func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
         demoPlusButtonDidTap(control)
-        NSLog("[#610] flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier ?? "nil", control.cyl_isPlusButton() ? "plus button" : "tab button")
+        NSLog("[#610] flat design tapped \"%@\" (%@)", control.cyl_tabBarItemIdentifier ?? "nil", control.cylIsPlusButton() ? "plus button" : "tab button")
     }
 
-    override func tabBarController(_ _: UITabBarController, didSelect viewController: UIViewController) {
+    func tabBarController(_ _: UITabBarController, didSelect viewController: UIViewController) {
         // [CN] flatDesign 下点击时 selectedIndex 可能仍是旧值，用 VC 判断更准
         // [EN] With flatDesign, selectedIndex may still hold the old value on tap; checking the VC is more accurate
-        let root = viewController.cyl_getViewControllerInsteadOfNavigation()
+        let root = viewController.cylGetViewControllerInsteadOfNavigation()
         // [CN] 此处判断逻辑已根据 ViewController 标题解耦
         // [EN] The check here has been decoupled based on the ViewController title
-        currentTheme = (root.navigationItem.title == CYLLocalizedString("房间")) ? .roomStyle : .normal
+        currentTheme = (root.navigationItem.title == cylDemoLocalizedString("房间")) ? .roomStyle : .normal
     }
 }
 
@@ -354,6 +354,6 @@ private final class HomeViewController: CYLBadgeHelperTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // No navigation bar button here: a bell button is added first. 没有导航栏按钮：先添加铃铛按钮。
-        cyl_showNavigationBadge(value: "99", animationType: .scale, backgroundColor: UIColor.cyl_randomColor)
+        cylShowNavigationBadge(value: "99", animationType: .scale, backgroundColor: UIColor.cyl_randomColor)
     }
 }

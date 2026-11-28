@@ -7,18 +7,20 @@ description: "Create a new app or a new demo with CYLTabBarController: choose th
 
 Every new demo in this repository is created with this skill. Source of truth: code, then `docs/`, then `README.md`. If they disagree, fix the wrong one first (usually `README.md`), then this skill.
 
+> Animated tab icons: `pod 'CYLTabBarController/LottieSwift'` (or `PAG`, `Rive`, `SVGA`, `GIF`) brings Core and the engine. A project that uses CYLTabBarController by path or commit also names `pod 'CYLAnimatedItem'` the same way (its own pod, not on the trunk yet). Without a tab bar, use `pod 'CYLAnimatedItem'` and `import CYLAnimatedItem` (older names: `pod 'CYLTabBarController/CYLAnimatedItem'` plus `pod 'CYLTabBarController/CYLAnimatedItemLottieSwift'`, which now only depend on the CYLAnimatedItem pod). See docs/Animated-Item.md.
+
 ## 1. Choose the integration
 
 | Need | Integration | Nearest demo to copy | Minimum iOS |
 |:---|:---|:---|:---|
 | Tab bar, plus button, badges, themes (no animation) | `pod 'CYLTabBarController'` (Core is the default subspec) | `Example-Swift-04` (smallest UIKit), `Example-Swift-03` | podspec 12.0; use 15.0 |
 | SwiftUI app | same pod, `UIViewControllerRepresentable` + `UIHostingController` | `Example-SwiftUI` | 15.0 |
-| Lottie 4.x tab icons | `pod 'CYLTabBarController/LottieSwift'` | `Example-Swift` | subspec 13.0; use 15.0 |
+| Lottie 4.x tab icons | `pod 'CYLTabBarController/LottieSwift'` | `Example-Swift` | subspec 15.0 |
 | Lottie 2.5 (Objective-C) | `pod 'CYLTabBarController/Lottie'` | `Example-Swift-02` | use 15.0 |
 | PAG tab icons | `pod 'CYLTabBarController/PAG'` | `Example-PAG` | use 15.0 |
 | Rive tab icons | `pod 'CYLTabBarController/Rive'` (RiveRuntime ~> 6.29; CocoaPods only) | `Example-Rive`, `Example-SwiftUI-Rive` | subspec 14.0; demos use 15.0 |
 | GIF tab icons that play once | `pod 'CYLTabBarController/GIF'` (no third-party dependency) | `Example-GIF` | use 15.0 |
-| FlatDesign (the classic layout on every system) | `pod 'CYLTabBarController/CYLFlatDesignTabBar'` | `Example-network-download`, the root ObjC demo | subspec 13.0; use 15.0 |
+| FlatDesign (the classic layout on every system) | `pod 'CYLTabBarController/CYLFlatDesignTabBar'` | `Example-network-download`, the root ObjC demo | subspec 15.0 |
 | Swift Package Manager | package URL or `relativePath = ..` (Core + FlatDesign + Lottie 4.x; no PAG or Rive) | `Example-Swift-SwiftManager-FlatDesign`, `Example-Swift-Gallery`, `Example-Swift-SwiftManager` (iOS 26) | package iOS 13; use 15.0 |
 | Carthage | `binary "https://raw.githubusercontent.com/ChenYilong/CYLTabBarController/master/CYLTabBarController.json"`, a prebuilt XCFramework (up to 1.100.0: `github "ChenYilong/CYLTabBarController"`; no Lottie, PAG or Rive; see docs/Carthage.md) | `Example-Swift-Carthage` | 15.0 |
 | Objective-C, every feature | root `CYLTabBarController.xcodeproj` + `Example/` | `Example/` (the Tab Bar Gallery has a scene per API) | 15.0 |
@@ -26,7 +28,7 @@ Every new demo in this repository is created with this skill. Source of truth: c
 | React Native or Flutter app: the native tab bar, pages drawn in JS / Dart | `CrossPlatform/react-native-cyltabbar` (Fabric) or `CrossPlatform/flutter_cyltabbar` (platform view); Flutter on Android needs `FlutterFragmentActivity` | `CrossPlatform/*/example` | iOS 15.1 (RN) / 15.0 (Flutter); follow [React-Native-Component](../../../docs/React-Native-Component.md) or [Flutter-Component](../../../docs/Flutter-Component.md); a native app that draws its own pages: `CYLTabBarHostView` |
 | React Native or Flutter app with PAG / Rive tab icons | The same component plus the iOS subspec `CYLTabBarController/PAG` or `/Rive` (CocoaPods; Flutter turns Swift Package Manager off) and libpag / rive-android on Android; `CYLAnimationView` for animations in a page | `CrossPlatform/react-native-cyltabbar/example-pag`, `example-rive`; `CrossPlatform/flutter_cyltabbar/example_pag`, `example_rive` | the Podfile's `post_install` sets every pod to iOS 15.0 (React Native: 15.1), as AGENTS.md "Xcode projects"; reuse the native demo's files: add them to the iOS app target, point Android `assets.srcDirs` at them; see [Cross-Platform-Components](../../../docs/Cross-Platform-Components.md#enanimated-icon-demos) |
 
-`Example-Shared/` holds Swift sources that the Swift demos share; reuse it instead of copying. See [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md) for combining libraries and [Swift-Guide](../../../docs/Swift-Guide.md) for `import` failures.
+`Example-Shared/` holds Swift sources that the Swift demos share; reuse it instead of copying (SonarCloud counts copies as duplicated code). A new HealthyHome demo references `Example-Swift-03/HealthyHome` and puts its differences behind a compile condition; see AGENTS.md, "No copied sources". See [Tab-Bar-Item-Animation](../../../docs/Tab-Bar-Item-Animation.md) for combining libraries and [Swift-Guide](../../../docs/Swift-Guide.md) for `import` failures.
 
 ## 2. Versions (see `cyl-xcode-compat`)
 
@@ -57,7 +59,7 @@ func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene
     guard let windowScene = scene as? UIWindowScene else { return }
     let window = UIWindow(windowScene: windowScene)
     // The provider rebuilds the root after an in-app language change.
-    window.cyl_setRootViewControllerProvider {
+    window.cylSetRootViewControllerProvider {
         CYLTabBarController(viewControllers: makeViewControllers(), tabBarItemsAttributes: makeAttributes())
     }
     window.makeKeyAndVisible()
@@ -72,6 +74,15 @@ func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene
 - Objective-C: `README.md`, steps 2 to 4, and `Example/SceneDelegate.m`. SwiftUI: [SwiftUI-Integration](../../../docs/SwiftUI-Integration.md).
 - Plus button: `cyl-plus-button`. Animated icons: `cyl-tab-animation` and [Tab-Icon-Animation-Quick-Start](../../../docs/Tab-Icon-Animation-Quick-Start.md); suggest running the matching demo first. Skins: `cyl-theme`.
 
+### How the Podfile depends on CYLTabBarController
+
+Always CocoaPods, always the latest commit of CYLTabBarController on any branch (AGENTS.md, "Depending on CYLTabBarController").
+Before every build run `scripts/latest-cyl-commit.sh --podfile` (by its absolute path from another project) and put the line it
+prints into the Podfile: `pod 'CYLTabBarController', :git => 'https://github.com/ChenYilong/CYLTabBarController.git', :commit => '<sha>'`;
+then `pod install`. Not a version number, not a branch, not a tag. The only exception is a project named CYLTabBarController (this
+repository and its demos): `pod 'CYLTabBarController', :path => '<relative path to the folder with CYLTabBarController.podspec>'`,
+for example `:path => '../'` in a demo folder.
+
 ## 4. A demo inside this repository, in addition
 
 1. Copy the nearest demo above; do not start from an Xcode template, which writes a newer project format.
@@ -81,7 +92,51 @@ func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene
 5. Add it to the table in section 1 and to the demo list in `README.md`.
 6. Build: `scripts/ci-build-example.sh <folder>`, then follow `cyl-verify`.
 7. Check the project format with the commands in `cyl-xcode-compat`.
+8. Localization: a project must have at least two different macros that read the localized files of two different layers.
+   The library's own texts come from the **core** macro (`CYLLocalizedString`, `CYLTabBarController.bundle`); the demo's own
+   texts come from the **example** macro (iOS: `CYLDemoLocalizedString`, in Swift `cylDemoLocalizedString`, reading `Example-Shared/CYLDemo.bundle`). In a demo
+   project add `Example-Shared/CYLDemoLocalization.swift` (Swift) or `.m` + `.h` (Objective-C) and `CYLDemo.bundle` to the app
+   target (file references with `SOURCE_ROOT`, as the other demos do), and call the example macro for every demo-only text.
+   Never read the core bundle with `NSLocalizedString` / `NSBundle` calls of your own, and never leave loose `.lproj` folders.
+   Check with `python3 scripts/check-localization-macros.py`. Other platforms: the same two layers in their own package form
+   (AGENTS.md, "Localization (i18n / l10n) file structure").
 
 ## Podfile, app icon, launch screen
 
 Every Xcode project checks its Podfile (top lines `platform :ios, '15.0'`, `ENV['SWIFT_VERSION'] = '5'`, `project '<name>.xcodeproj'`; a `post_install` hook that sets `IPHONEOS_DEPLOYMENT_TARGET` to 15.0 on every pod), and copies the ObjC example's app icon and launch screen when it has none. Full rule and exceptions (one `post_install` only, React Native minimum 15.1): AGENTS.md, "Xcode projects: Podfile, app icon, launch screen".
+
+### Default setup in the examples
+
+Unless the task says otherwise, an example's CYLTabBarController has a plus button **with its own page**
+(`plusChildViewController`) and is created **from a local configuration file** with
+`+tabBarControllerWithConfigurationFile:error:` (tabs in `CYLTabBarControllerTabBarItemsAttributes`, the plus button in
+`CYLTabBarControllerPlusButton`, its page by `CYLTabBarItemPageIdentifier`). Another setup is used only on purpose and named
+in the demo. AGENTS.md, "How the examples set CYLTabBarController up".
+
+### CYLTableViewPlaceHolder in every example
+
+Every example, existing and new, integrates CYLTableViewPlaceHolder with CocoaPods at its latest commit on any branch
+(`CYL_REPO_URL=https://github.com/ChenYilong/CYLTableViewPlaceHolder.git scripts/latest-cyl-commit.sh --sha`, then
+`:git => …, :commit => '<sha>'`, plus the `LottieSwift` subspec). Every iOS example scroll view has pull to refresh
+(`cyl_header`), an empty-data and a no-network placeholder (animated icons preferred) and a red bar at the top while
+offline. MJRefresh is not used (`mj_` → `cyl_`, `MJRefresh…` → `CYLRefresh…`). Library-caused build errors go into
+`docs/CYLTableViewPlaceHolder-Integration-Issues.md`. AGENTS.md, "Depending on CYLTableViewPlaceHolder".
+
+## A new published package: its license notice
+
+A new library or package published to a registry (a pod, a Maven artifact, an npm, pub.dev or ohpm package) ships the
+root `LICENSE` inside it: in its resource `.bundle` on iOS, in `src/main/resources/META-INF/<module>/` on Android, in the
+component folder for a mini program, otherwise at the package root (create the resource folder when there is none).
+Add it to `docs/License-Notices.md` and `scripts/check-license-notices.py`, and run the script.
+
+## Plus button in demos
+
+- **A raised plus button (added 2026-11-12)**: when an example demonstrates the plus button, always prefer the raised look: the top of the plus button reaches above the top edge of the tab bar (an image taller than the bar, and/or `+multiplierOfTabBarHeight:` below 0.5 or a negative `+constantOfPlusButtonCenterYOffsetForTabBarHeight:`), in every style (classic, Liquid Glass, FlatDesign). A demo that needs a flat plus button (inside the bar) says so in its title or comment.
+
+## Animated icon examples: playback controls (TODO, 2026-11-13)
+
+Every example page that shows tab icon animations, on every platform, offers "Play all" (each animation restarts from progress 0), a speed slider and a loop switch, combined into one playback policy applied live (accessibility labels and values included). Change the core when an example needs it. Rule, scope and status: [docs/Tab-Icon-Animation-Quick-Start.md](../../../docs/Tab-Icon-Animation-Quick-Start.md#enplayback-controls-in-the-animation-examples).
+
+## Swift first on iOS (added 2026-11-19)
+
+- **The iOS core is Swift; every new piece of code is Swift first (added 2026-11-19, owner)**: the core code of this project on iOS (the CocoaPods / Swift Package Manager / Carthage sources under `CYLTabBarController/`, including the `CYLAnimatedItem` module) is Swift. Write every new class, extension, test and example in Swift. Use Objective-C only where Swift cannot do the job (a header that must stay importable from Objective-C without modules, a `+load`-time hook, a C macro), and give the reason in a comment and in the task's document in `docs/`. Keep the public API usable from Objective-C (`@objc`, `@objcMembers`, `NS_SWIFT_NAME` counterparts) so existing Objective-C callers keep working. When you touch Objective-C code for a new feature, prefer adding the feature in a Swift file over growing the Objective-C file. Migration log: `docs/Swift-Migration.md`. Details: `AGENTS.md`, "Code rules".

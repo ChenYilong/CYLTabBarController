@@ -20,7 +20,15 @@
 | 中文 | English |
 |:---|:---|
 | [用途](#cn用途) | [Purpose](#enpurpose) |
-| [规则](#cn规则) | [Rules](#enrules) |
+| [规则：文档（tag: `documentation`）](#cn规则文档tag-documentation) | [Rules: Documentation (tag: `documentation`)](#enrules-documentation-tag-documentation) |
+| [规则：Windows 与鸿蒙（tag: `windows-harmonyos`）](#cn规则windows-与鸿蒙tag-windows-harmonyos) | [Rules: Windows and HarmonyOS (tag: `windows-harmonyos`)](#enrules-windows-and-harmonyos-tag-windows-harmonyos) |
+| [规则：无障碍与本地化（tag: `accessibility-localization`）](#cn规则无障碍与本地化tag-accessibility-localization) | [Rules: Accessibility and localization (tag: `accessibility-localization`)](#enrules-accessibility-and-localization-tag-accessibility-localization) |
+| [规则：代码规则（tag: `code`）](#cn规则代码规则tag-code) | [Rules: Code rules (tag: `code`)](#enrules-code-rules-tag-code) |
+| [规则：角标调试（tag: `badges`）](#cn规则角标调试tag-badges) | [Rules: Badge debugging (tag: `badges`)](#enrules-badge-debugging-tag-badges) |
+| [规则：截图（tag: `screenshots`）](#cn规则截图tag-screenshots) | [Rules: Screenshots (tag: `screenshots`)](#enrules-screenshots-tag-screenshots) |
+| [规则：测试与命令（tag: `testing`）](#cn规则测试与命令tag-testing) | [Rules: Testing and commands (tag: `testing`)](#enrules-testing-and-commands-tag-testing) |
+| [规则：Git、提交与拉取请求（tag: `git`）](#cn规则git提交与拉取请求tag-git) | [Rules: Git, commits and pull requests (tag: `git`)](#enrules-git-commits-and-pull-requests-tag-git) |
+| [规则：任务流程与会话（tag: `task-workflow`）](#cn规则任务流程与会话tag-task-workflow) | [Rules: Task workflow and sessions (tag: `task-workflow`)](#enrules-task-workflow-and-sessions-tag-task-workflow) |
 
 <!-- navigation:end -->
 
@@ -30,11 +38,83 @@
 | 中文 | English |
 |:---|:---|
 | 本文件夹保存 CYLTabBarController 的双语项目文档。新增或编辑文档时，遵循仓库 `AGENTS.md` 与 `cyl-docs` skill，并运行文档导航生成器。 | This folder contains bilingual project documentation for CYLTabBarController. Follow the repository `AGENTS.md` and `cyl-docs` skill when adding or editing documents, and run the documentation navigation generator. |
+| 规则按标签（tag）分类：每个标签一个标题（标题中注明 tag），完整规则见 `docs/instructions/<tag>.md`（仓库根目录 `AGENTS.md` 顶部的标签表）。本文件保持在 200 行以内。 | Rules are grouped by tag: one heading per tag (the tag in the heading); the full rules are in `docs/instructions/<tag>.md` (the tag table at the top of the root `AGENTS.md`). This file stays under 200 lines. |
 
-## [CN]规则
-## [EN]Rules
+## [CN]规则：文档（tag: `documentation`）
+## [EN]Rules: Documentation (tag: `documentation`)
 
 | 中文 | English |
 |:---|:---|
 | 项目文档使用中英文双语；新文档需声明 `<!-- bound-classes: ... -->`，无代码类关联时使用 `none`。附件放在相邻的 `assets/` 文件夹中，并使用最短相对路径。 | Project documentation is bilingual. New documents declare `<!-- bound-classes: ... -->`, using `none` when no code classes apply. Keep attachments in an adjacent `assets/` folder and use the shortest relative paths. |
 | 修改本文件夹内文档后运行 `python3 scripts/update-docs-navigation.py`，并检查生成的导航改动。提交前按仓库规则审查 TODO、Linux 和未运行环境说明。 | After changing documents in this folder, run `python3 scripts/update-docs-navigation.py` and review the generated navigation changes. Before committing, follow the repository rules for reviewing TODO, Linux, and untested-environment notes. |
+| 完整规则：[docs/instructions/documentation.md](instructions/documentation.md)。 | Full rules: [docs/instructions/documentation.md](instructions/documentation.md). |
+
+## [CN]规则：Windows 与鸿蒙（tag: `windows-harmonyos`）
+## [EN]Rules: Windows and HarmonyOS (tag: `windows-harmonyos`)
+
+| 中文 | English |
+|:---|:---|
+| 鸿蒙端（HarmonyOS 6.0.1，API 21，DevEco Studio 6.0，ArkTS / ArkUI，代码在 `CrossPlatform/harmonyos-cyltabbar`）原则：公开 API 对标 iOS 端；示例（entry）对标 iOS 端 Objective-C Example，一比一复刻；内部实现对标 Android 端 Kotlin 源码（`Example-Android/cyltabbar`），从 Kotlin 迁移到鸿蒙。进度与打分见 [HarmonyOS-Parity.md](HarmonyOS-Parity.md)：每完成一个功能移除一个 TODO，直到满分。 | HarmonyOS (HarmonyOS 6.0.1, API 21, DevEco Studio 6.0, ArkTS / ArkUI, code in `CrossPlatform/harmonyos-cyltabbar`) principles: the public API matches the iOS library; the example (entry) is a one-to-one replica of the iOS Objective-C Example; the internal implementation is ported from the Android Kotlin sources (`Example-Android/cyltabbar`). Progress and score: [HarmonyOS-Parity.md](HarmonyOS-Parity.md); remove one TODO per feature done, until the score is 100. |
+| 本条按用户要求使用英文（见右列）。 | HarmonyOS: **CYLTabBarController ships a HarmonyOS component and a HarmonyOS example (added 2026-11-16, required).** The repository must always contain (1) the HarmonyOS tab bar component, the library module `CrossPlatform/harmonyos-cyltabbar/cyltabbar` (ArkTS / ArkUI, the HarmonyOS version of the tab bar), and (2) the HarmonyOS example, the `entry` module next to it, which shows that component's features as a showcase. Never delete, move out or leave them behind when merging or closing branches and pull requests; a branch or pull request that carries HarmonyOS work keeps both modules buildable (`hvigorw assembleHap`), and both reach `master` with the pull request that merges the cross-platform work. Details: `AGENTS.md`, "HarmonyOS port". |
+| 完整规则：[docs/instructions/windows-harmonyos.md](instructions/windows-harmonyos.md)。 | Full rules: [docs/instructions/windows-harmonyos.md](instructions/windows-harmonyos.md). |
+
+## [CN]规则：无障碍与本地化（tag: `accessibility-localization`）
+## [EN]Rules: Accessibility and localization (tag: `accessibility-localization`)
+
+| 中文 | English |
+|:---|:---|
+| 本条按用户要求使用英文（见右列）。 | All code of this project supports accessibility (screen readers, visual aids) and internationalization / localization through localization files, including the HarmonyOS code. Where support is missing, add it first. Automated UI tests locate controls through accessibility identifiers, accessibility labels / texts and localized strings first, to tap and to drive complex flows and consecutive steps; coordinates are the last resort. Details: `AGENTS.md`, skill `cyl-harmonyos-a11y-l10n`. |
+| 完整规则：[docs/instructions/accessibility-localization.md](instructions/accessibility-localization.md)。 | Full rules: [docs/instructions/accessibility-localization.md](instructions/accessibility-localization.md). |
+
+## [CN]规则：代码规则（tag: `code`）
+## [EN]Rules: Code rules (tag: `code`)
+
+| 中文 | English |
+|:---|:---|
+| 本条按用户要求使用英文（见右列）。 | Coding: **Fix bugs in the core first, not in the examples (added 2026-11-17)**: when an issue or a bug comes up, fix it first in the core code, so the same kind of problem goes away for every app, instead of working around it in the example layer. The core is the code published to a package registry: CocoaPods (and Swift Package Manager), Maven / Gradle (the Android library), npm (the React Native component), pub.dev (the Flutter component), ohpm (the HarmonyOS `cyltabbar` module) and the WeChat Mini Program component. A fix in the example layer is the worst option. If a bug cannot be fixed in the core, stop and ask the maintainer first, and say why. When the maintainer agrees to an example-layer fix, explain in the related document in `docs/` and in `docs/Example-Layer-Fixes.md` why the core could not solve it and why the example does. Details: `AGENTS.md`, "Code rules"; `docs/Example-Layer-Fixes.md`; skills `cyl-docs`, `cyl-verify`, `cyl-harmonyos-a11y-l10n`. |
+| 本条按用户要求使用英文（见右列）。 | **The iOS core is Swift; every new piece of code is Swift first (added 2026-11-19, owner)**: the core code of this project on iOS (the CocoaPods / Swift Package Manager / Carthage sources under `CYLTabBarController/`, including the `CYLAnimatedItem` module) is Swift. Write every new class, extension, test and example in Swift. Use Objective-C only where Swift cannot do the job (a header that must stay importable from Objective-C without modules, a `+load`-time hook, a C macro), and give the reason in a comment and in the task's document in `docs/`. Keep the public API usable from Objective-C (`@objc`, `@objcMembers`, `NS_SWIFT_NAME` counterparts) so existing Objective-C callers keep working. When you touch Objective-C code for a new feature, prefer adding the feature in a Swift file over growing the Objective-C file. Migration log: `docs/Swift-Migration.md`. Details: `AGENTS.md`, "Code rules". |
+| 完整规则：[docs/instructions/code.md](instructions/code.md)。 | Full rules: [docs/instructions/code.md](instructions/code.md). |
+
+## [CN]规则：角标调试（tag: `badges`）
+## [EN]Rules: Badge debugging (tag: `badges`)
+
+| 中文 | English |
+|:---|:---|
+| 本条按用户要求使用英文（见右列）。 | Coding: **Badge debugging: turn badge animations off with the build option (added 2026-11-17)**: while checking badge positions (coordinates, offsets, alignment with the icon), build with the badge-animation build option `CYL_BADGE_ANIMATION_DISABLED` on, so an animation (Bounce, Shake, Scale, Breathe, the one-shot types) never moves a badge while a screenshot or a layout dump is taken: an animated badge is drawn away from its laid-out place, and the measured coordinates are wrong. It exists in the core of each platform: iOS, the Swift compilation condition `CYL_BADGE_ANIMATION_DISABLED` on the CYLTabBarController target (Podfile `post_install`: `SWIFT_ACTIVE_COMPILATION_CONDITIONS = '$(inherited) CYL_BADGE_ANIMATION_DISABLED'`); Android (and the React Native and Flutter components, which use its host view), the Gradle property `-PcylBadgeAnimationDisabled=true` (`BuildConfig.CYL_BADGE_ANIMATION_DISABLED`); HarmonyOS, `CYL_BADGE_ANIMATION_DISABLED: true` in `buildProfileFields` of `CrossPlatform/harmonyos-cyltabbar/cyltabbar/build-profile.json5`; WeChat Mini Program (no compile-time defines), the constant `CYL_BADGE_ANIMATION_DISABLED = true` in `CrossPlatform/wechat-miniprogram-cyltabbar/src/cyl-tab-bar/cyl_debug.js`, then `npm run setup` in the example and recompile in DevTools. Turn it off again before committing (never commit it on, never ship it): after the positions are right, take one more check with animations on, because an animation's own offsets can still be wrong. Say in the report and in the screenshot label that the build option was on. Details: `docs/Badge-Debugging.md`. Details: `AGENTS.md`, "Code rules"; skills `cyl-verify`, `cyl-docs`, `cyl-harmonyos-a11y-l10n`. |
+| 本条按用户要求使用英文（见右列）。 | Coding: **Badge animation build controls default to NO (added 2026-11-17)**: every build control that turns badge animations off, including but not limited to the iOS Swift compilation condition `CYL_BADGE_ANIMATION_DISABLED`, the Android Gradle property `-PcylBadgeAnimationDisabled` (`BuildConfig.CYL_BADGE_ANIMATION_DISABLED`, also in the React Native and Flutter Android builds), the HarmonyOS `buildProfileFields` entry `CYL_BADGE_ANIMATION_DISABLED` in `cyltabbar/build-profile.json5`, the WeChat Mini Program constant `CYL_BADGE_ANIMATION_DISABLED` in `src/cyl-tab-bar/cyl_debug.js`, and any badge animation switch added later, defaults to NO (not set, `false`): badges animate as the app asks. Set one to YES (`true`) only while debugging badges: badge coordinates, offsets and alignment with the icon or other views. Set it on locally only; never commit, merge, release or publish it as YES (no Podfile, Xcode project, `gradle.properties`, CI setting or package with it on), and set it back to NO when the debugging is done, then check once more with animations on. Details: `docs/Badge-Debugging.md`. Details: `AGENTS.md`, "Code rules"; skills `cyl-verify`, `cyl-docs`, `cyl-harmonyos-a11y-l10n`. |
+| 完整规则：[docs/instructions/badges.md](instructions/badges.md)。 | Full rules: [docs/instructions/badges.md](instructions/badges.md). |
+
+## [CN]规则：截图（tag: `screenshots`）
+## [EN]Rules: Screenshots (tag: `screenshots`)
+
+| 中文 | English |
+|:---|:---|
+| 本条按用户要求使用英文（见右列）。 | Screenshots (added 2026-11-18): one column with several rows first; two columns with several rows only when one column would be taller than one phone screen (height above about 2.17 times the width); with a header band (platform and OS version, simulator / emulator / device, host OS, IDE version, commit, branch, date, purpose), a caption band above each cell and a footer band (result and method), in English, never overlapping the screenshots. Full rules, the reference example and the tool `scripts/stitch-screenshots.py`: [Screenshot-Guidelines.md](Screenshot-Guidelines.md). |
+| 本条按用户要求使用英文（见右列）。 | Screenshots of a tab bar (added 2026-11-18, maintainer): crop with at least 24 pt (72 px at @3x) above the raised plus button (or the bar), measured on the image (the drawn plus button and its badge reach above its accessibility frame), so the plus button and badges are whole; the stitched image keeps a white gap (`scripts/stitch-screenshots.py --top-gap`, 24 px by default) between every header or caption band and the screenshot below. Full rule: docs/Screenshot-Guidelines.md, "Space above the tab bar and below the bands". |
+| 完整规则：[docs/instructions/screenshots.md](instructions/screenshots.md)。 | Full rules: [docs/instructions/screenshots.md](instructions/screenshots.md). |
+
+## [CN]规则：测试与命令（tag: `testing`）
+## [EN]Rules: Testing and commands (tag: `testing`)
+
+| 中文 | English |
+|:---|:---|
+| 本条按用户要求使用英文（见右列）。 | Scripts (added 2026-11-16): run scripts and multi-line shell commands with bash, not zsh. zsh does not split an unquoted variable into words (`$box`, `$files`, `$F`), so a command that works in bash fails or measures the wrong thing in zsh (seen: "zsh doesn't split $box into words either", and the measurement had to be run again as a bash script). Run a script file with `bash script.sh` (shebang `#!/usr/bin/env bash`) and a one-off command as `bash -c '...'` or a heredoc piped to `bash`; when zsh cannot be avoided, use arrays (`"${files[@]}"`) or `${=var}`. Details: `AGENTS.md`, "Commands"; skill `cyl-verify`. |
+| 完整规则：[docs/instructions/testing.md](instructions/testing.md)。 | Full rules: [docs/instructions/testing.md](instructions/testing.md). |
+
+## [CN]规则：Git、提交与拉取请求（tag: `git`）
+## [EN]Rules: Git, commits and pull requests (tag: `git`)
+
+| 中文 | English |
+|:---|:---|
+| 本条按用户要求使用英文（见右列）。 | Commits: Every commit uses the `git cz` (Commitizen) style and is written entirely in English: no Chinese (and no other non-English text) anywhere in the subject, the body or the trailers. A user's prompt in another language is quoted in the task's document in `docs/`, never in the commit message. Details: `AGENTS.md`, "Git and pull requests". |
+| 本条按用户要求使用英文（见右列）。 | Commits and pull requests: **Every commit on a branch goes through an open pull request (added 2026-11-16)**: once a branch is created, every commit on it must reach a pull request. Never create a branch and keep committing to it without a pull request: the commits of a branch without a pull request are all ignored. Before every commit, check that the branch has an open pull request (`gh pr list --head <branch> --state open`); if it has none, open one right away. Target branch: the pull request that was active before this one was created (its head branch) first; only when there is none, `master`. If more than two pull requests are already open, stop and ask the maintainer whether to create a new branch with its own pull request or to keep committing to the current branch: more than two open pull requests make merging hard and leave no sound choice of target branch for each. Details: `AGENTS.md`, "Git and pull requests"; skills `cyl-docs`, `cyl-verify`. |
+| 本条按用户要求使用英文（见右列）。 | Commits: **Commit and push at the end of every turn (added 2026-11-16)**: when a question-and-answer turn ends and the current branch is not `master` or `main`, commit and push the work of that turn, without asking. This is always safe: the code stays on a branch and is never pushed to `master` or `main`, so pushing carries no risk to worry about. The open pull request rule still applies to every such commit (check for an open pull request first, open one if missing). On `master` or `main`, ask first. Details: `AGENTS.md`, "Git and pull requests"; skills `cyl-docs`, `cyl-verify`. |
+| 完整规则：[docs/instructions/git.md](instructions/git.md)。 | Full rules: [docs/instructions/git.md](instructions/git.md). |
+
+## [CN]规则：任务流程与会话（tag: `task-workflow`）
+## [EN]Rules: Task workflow and sessions (tag: `task-workflow`)
+
+| 中文 | English |
+|:---|:---|
+| 本条按用户要求使用英文（见右列）。 | Sessions: **Session roles by name (added 2026-11-19).** Before starting a task, check the names of the active sessions (for example with `ListAgents`). A session whose name starts with `Mac` (case-insensitive) mainly develops and tests the iOS side; a session whose name starts with `Win` (case-insensitive) mainly develops the other platforms (Android, HarmonyOS, React Native, Flutter, WeChat Mini Program). When sessions of both kinds are active, prefer to assign each platform's tasks to the matching session (iOS work to a `Mac` session, other platforms to a `Win` session), by message, instead of doing all of it in one session. When no session follows this naming, skip this rule and finish the task on your own. Details: `AGENTS.md`, "Git and pull requests"; skill `cyl-task-workflow`. |
+| 完整规则：[docs/instructions/task-workflow.md](instructions/task-workflow.md)。 | Full rules: [docs/instructions/task-workflow.md](instructions/task-workflow.md). |

@@ -5,6 +5,8 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] The composition root of the Lottie subspecs: its `+load` registers the animator before any tab is built, and Swift has no `+load`. The lottie-ios 4.x player is Swift (LottieSwift/CYLLottieSwiftTabBarItemAnimationPlayer.swift); the lottie-ios 2.x player stays here because a Swift import of lottie-ios 2.x leaks a `Lottie` module dependency to every client (see below). [CN] Lottie 子库的组合根：其 `+load` 在创建任何 Tab 之前注册 animator，而 Swift 没有 `+load`。lottie-ios 4.x 播放器为 Swift；lottie-ios 2.x 播放器保留在这里，因为 Swift 导入 lottie-ios 2.x 会把 `Lottie` 模块依赖泄露给所有使用方（见下文）。
+
 #import "CYLLottieTabBarItemAnimator.h"
 // The protocol and the registry of the `CYLTabBarItemAnimation` subspec (the source tree, or flattened by CocoaPods).
 // `CYLTabBarItemAnimation` 子库的协议与注册表（源码目录，或 CocoaPods 展平后）。
@@ -13,17 +15,19 @@
 #else
 #import "CYLTabBarItemAnimatorRegistry.h"
 #endif
-// Core's keys (`CYLTabBarLottie…`, `CYLTabBarAnimation…`). Core 的 key。
-#if __has_include("../../CYLTabBarController.h")
-#import "../../CYLTabBarController.h"
+// [EN] The keys (`CYLTabBarLottie…`, `CYLTabBarAnimation…`), from CYLUtils: no Core. [CN] key（`CYLTabBarLottie…`、`CYLTabBarAnimation…`），来自 CYLUtils：不依赖 Core。
+#if __has_include("../../CYLUtils/CYLAnimationKeys.h")
+#import "../../CYLUtils/CYLAnimationKeys.h"
 #else
-#import "CYLTabBarController.h"
+#import "CYLAnimationKeys.h"
 #endif
 // Shared through CYLUtils (the source tree, or flattened by CocoaPods). 通过 CYLUtils 共用（源码目录，或 CocoaPods 展平后）。
-#if __has_include("../../CYLUtils/CYLUtils.h")
-#import "../../CYLUtils/CYLUtils.h"
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
+#elif __has_include("../../CYLAnimatedItem/CYLAnimatedItemMacros.h")
+#import "../../CYLAnimatedItem/CYLAnimatedItemMacros.h"
 #else
-#import "CYLUtils.h"
+#import "CYLAnimatedItemMacros.h"
 #endif
 
 // FIX: issue #604 — only with a Lottie library; without one this file is empty and the class is never used.
@@ -35,11 +39,23 @@
 // [CN] FIX: issue #605 — 需先引入：两者同时在构建中时（例如 Rive 与会引入 Lottie 的扁平样式），下面生成的头文件也声明了 Rive 子库的 Swift 视图，这些视图遵守本头文件的协议。
 #if __has_include("../CYLTabBarItemAnimationPlayableView.h")
 #import "../CYLTabBarItemAnimationPlayableView.h"
+#import "../CYLTabBarItemAnimationFactory.h"
 #else
 #import "CYLTabBarItemAnimationPlayableView.h"
+#import "CYLTabBarItemAnimationFactory.h"
 #endif
-#if __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItem-Swift.h>)
+#import <CYLAnimatedItem/CYLAnimatedItem-Swift.h>
+#elif __has_include("CYLAnimatedItem-Swift.h")
+#import "CYLAnimatedItem-Swift.h"
+#elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 #import <CYLTabBarController/CYLTabBarController-Swift.h>
+#endif
+
+#if defined(SWIFT_PACKAGE)
+// [EN] Swift Package Manager: the Swift modules this file uses through their Objective-C interface. [CN] Swift Package Manager：本文件通过其 Objective-C 接口使用的 Swift 模块。
+#pragma clang module import CYLAnimatedItemSwift
+#pragma clang module import CYLTabBarControllerLottieSwift
 #endif
 
 #if __has_include(<Lottie/Lottie.h>)
@@ -51,6 +67,57 @@
 #endif
 
 #pragma mark - Lottie 2.x (Objective-C)
+
+// [EN] The lottie-ios 2.x player stays Objective-C: a Swift file that imports lottie-ios 2.x makes the CYLAnimatedItem Swift
+//      module depend on the `Lottie` module (`internal import` does not drop it without library evolution, and
+//      `@_implementationOnly` warns there), so a client without lottie-ios on its search paths fails with "unable to resolve
+//      module dependency: 'Lottie'" (the `pod lib lint` app of the root spec, CI run 45008954758). Swift tried and reverted
+//      2026-11-22 (docs/Swift-Migration.md, engine step 5 fix).
+// [CN] lottie-ios 2.x 播放器保留为 Objective-C：导入 lottie-ios 2.x 的 Swift 文件会让 CYLAnimatedItem 的 Swift 模块依赖 `Lottie` 模块（未开启
+//      library evolution 时 `internal import` 无法去掉该依赖，`@_implementationOnly` 会产生警告），搜索路径中没有 lottie-ios 的使用方会报错
+//      "unable to resolve module dependency: 'Lottie'"（根 spec 的 `pod lib lint` App，CI run 45008954758）。2026-11-22 尝试 Swift 后回退
+//      （docs/Swift-Migration.md 引擎第 5 步修复）。
+
+
+#if __has_include(<Lottie/Lottie.h>)
+/**
+ * [EN] Whether `URL` is a remote file (http, https...), which this animator downloads itself.
+ * [CN] `URL` 是否为远程文件（http、https 等），由本 animator 自行下载。
+ */
+static BOOL CYLLottieURLIsRemote(NSURL *URL) {
+    return !URL.isFileURL && URL.scheme.length > 0;
+}
+
+/**
+ * [EN] A remote Lottie file, as the GIF and PAG animators do: `view` is marked as loading, so the item keeps its static
+ *      image (or the placeholder); the file is downloaded through the shared URL session (its HTTP cache applies) and
+ *      handed to `load` on the main queue; then `CYLTabBarItemAnimationReportLoaded` or, when the download fails, the
+ *      status is 400 or above, or `load` returns NO, `CYLTabBarItemAnimationReportFailure`.
+ * [CN] 远程 Lottie 文件，与 GIF、PAG animator 相同：`view` 标记为加载中，item 保留静态图片（或占位图）；通过共享 URL session 下载
+ *      （遵循其 HTTP 缓存），在主队列交给 `load`；随后调用 `CYLTabBarItemAnimationReportLoaded`，下载失败、状态码不小于 400 或 `load`
+ *      返回 NO 时调用 `CYLTabBarItemAnimationReportFailure`。
+ */
+static void CYLLottieDownload(NSURL *URL, UIView *view, BOOL (^load)(UIView *view, NSData *data)) {
+    CYLTabBarItemAnimationMarkLoading(view);
+    __weak UIView *weakView = view;
+    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:URL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        NSInteger status = [response isKindOfClass:[NSHTTPURLResponse class]] ? ((NSHTTPURLResponse *)response).statusCode : 200;
+        NSData *usable = (data.length > 0 && status < 400) ? data : nil;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIView *strongView = weakView;
+            if (!strongView) {
+                return;
+            }
+            if (usable && load(strongView, usable)) {
+                CYLTabBarItemAnimationReportLoaded(strongView);
+            } else {
+                CYLTabBarItemAnimationReportFailure(strongView, error);
+            }
+        });
+    }];
+    [task resume];
+}
+#endif
 
 #if __has_include(<Lottie/Lottie.h>)
 /// [EN] Plays a `LOTAnimationView` (lottie-ios 2.x). [CN] 播放 `LOTAnimationView`（lottie-ios 2.x）。
@@ -66,6 +133,22 @@
 }
 
 + (UIView *)viewWithURL:(NSURL *)URL {
+    if (CYLLottieURLIsRemote(URL)) {
+        // [EN] Downloaded here, not by lottie-ios 2.x's -initWithContentsOfURL:, which reports neither success nor failure.
+        // [CN] 在这里下载，而不是使用 lottie-ios 2.x 的 -initWithContentsOfURL:，后者既不报告成功也不报告失败。
+        LOTAnimationView *view = [[LOTAnimationView alloc] initWithFrame:CGRectZero];
+        CYLLottieDownload(URL, view, ^BOOL(UIView *target, NSData *data) {
+            id JSON = [NSJSONSerialization JSONObjectWithData:data options:0 error:NULL];
+            LOTComposition *composition = [JSON isKindOfClass:[NSDictionary class]]
+                ? [LOTComposition animationFromJSON:JSON inBundle:nil] : nil;
+            if (!composition) {
+                return NO;
+            }
+            ((LOTAnimationView *)target).sceneModel = composition;
+            return YES;
+        });
+        return view;
+    }
     if (![LOTAnimationView instancesRespondToSelector:@selector(initWithContentsOfURL:)]) {
         return nil;
     }
@@ -122,174 +205,33 @@
     self.lottieView.animationSpeed = animationSpeed;
 }
 
-@end
-#endif
-
-#pragma mark - Lottie 4.x (Swift)
-
-#if __has_include(<Lottie/Lottie-Swift.h>)
-/// [EN] Plays a `CYLCompatibleLOTAnimationView` (lottie-ios 4.x, through the Swift bridge). [CN] 播放 `CYLCompatibleLOTAnimationView`（lottie-ios 4.x，经 Swift 桥接）。
-@interface CYLLottieSwiftTabBarItemAnimationPlayer : CYLTabBarItemAnimationBasePlayer <CYLTabBarItemAnimationPlayer>
-@end
-
-@implementation CYLLottieSwiftTabBarItemAnimationPlayer {
-    /// [EN] Whether the dark colors are applied now (#442). [CN] 当前是否已应用深色颜色（#442）。
-    BOOL _darkColorsApplied;
-    /// FIX: issue #216 — the keypaths `-applyColors:` set last. [CN] `-applyColors:` 上次设置的 keypath。
-    NSSet<NSString *> *_appliedColorKeypaths;
+- (BOOL)loops {
+    return self.lottieView.loopAnimation;
 }
 
-+ (BOOL)isLottieView:(UIView *)view {
-    // Avoid sending messages to a forward-declared class; resolve at runtime instead.
-    // 避免向前向声明的类发送消息，改为在运行时判断。
-    return [NSStringFromClass([view class]) containsString:@"CYLCompatibleLOTAnimationView"];
-}
-
-+ (UIView *)viewWithURL:(NSURL *)URL {
-    if (![CYLCompatibleLOTAnimationView instancesRespondToSelector:@selector(initWithCompatibleAnimation:)]) {
-        return nil;
-    }
-    CYLCompatibleLOTAnimation *composition = [[CYLCompatibleLOTAnimation alloc] initWithFilepath:URL.path];
-    return [[CYLCompatibleLOTAnimationView alloc] initWithCompatibleAnimation:composition];
-}
-
-- (CYLCompatibleLOTAnimationView *)lottieView {
-    return (CYLCompatibleLOTAnimationView *)self.animationView;
-}
-
-// [CN] 不能放到 dispatch_get_main_queue 中，否则暂停与播放可能错乱。
-// [EN] Not on dispatch_get_main_queue: pause and play may get out of order otherwise.
-
-- (void)play {
-    CYLCompatibleLOTAnimationView *lottieView = self.lottieView;
-    lottieView.animationProgress = 0;
-    [lottieView play];
-}
-
-- (void)showLastFrame {
-    // [CN] 希望Lottie icon 启动后 index== 0 不执行动画 #389
-    // [EN] Avoid triggering Lottie animation when index == 0 on app startup. #389
-    CYLCompatibleLOTAnimationView *lottieView = self.lottieView;
-    lottieView.animationProgress = 1;
-    [lottieView forceDrawingUpdate];
-}
-
-- (void)stop {
-    CYLCompatibleLOTAnimationView *lottieView = self.lottieView;
-    if (lottieView.animationProgress > 0) {
-        [lottieView stop];
-    }
-}
-
-- (CGFloat)progress {
-    CYLCompatibleLOTAnimationView *lottieView = self.lottieView;
-    return [lottieView respondsToSelector:@selector(animationProgress)] ? lottieView.animationProgress : 0;
-}
-
-- (void)setProgress:(CGFloat)progress {
-    CYLCompatibleLOTAnimationView *lottieView = self.lottieView;
-    if ([lottieView respondsToSelector:@selector(setAnimationProgress:)]) {
-        lottieView.animationProgress = progress;
-    }
-    if ([lottieView respondsToSelector:@selector(forceDrawingUpdate)]) {
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([lottieView performSelector:@selector(forceDrawingUpdate)]);
-    }
-}
-
-- (CGFloat)animationSpeed {
-    CYLCompatibleLOTAnimationView *lottieView = self.lottieView;
-    return [lottieView respondsToSelector:@selector(animationSpeed)] ? lottieView.animationSpeed : 1;
-}
-
-- (void)setAnimationSpeed:(CGFloat)animationSpeed {
-    CYLCompatibleLOTAnimationView *lottieView = self.lottieView;
-    if ([lottieView respondsToSelector:@selector(setAnimationSpeed:)]) {
-        lottieView.animationSpeed = animationSpeed;
-    }
-}
-
-/*!
- * FIX: issue #442 — Lottie 4.x only.
- * [EN] Sets `darkColors` with Lottie's value providers where `traitCollection` is dark, and removes them otherwise, so one
- *      file follows Dark Mode. Does nothing when they are already in that state.
- * [CN] `traitCollection` 为深色时，用 Lottie 的 value provider 设置 `darkColors`，否则移除，使一份文件即可适配深色模式。状态未变化时不做处理。
- */
-- (void)applyDarkColors:(NSDictionary<NSString *, UIColor *> *)darkColors traitCollection:(UITraitCollection *)traitCollection {
-    UIView *view = self.animationView;
-    // Methods added to `CYLCompatibleLOTAnimationView` for #442: call them only when the view responds to them.
-    // #442 为 `CYLCompatibleLOTAnimationView` 新增的方法：仅在视图能响应时调用。
-    SEL setColorSelector = @selector(setColorValue:forKeypathString:);
-    SEL removeColorSelector = @selector(removeValueProviderForKeypathString:);
-    if (!view || darkColors.count == 0 || ![view respondsToSelector:setColorSelector] || ![view respondsToSelector:removeColorSelector]) {
+- (void)setLoops:(BOOL)loops {
+    LOTAnimationView *lottieView = self.lottieView;
+    if (lottieView.loopAnimation == loops) {
         return;
     }
-    BOOL dark = NO;
-    if (@available(iOS 13.0, *)) {
-        dark = (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark);
-    }
-    if (_darkColorsApplied == dark) {
-        return;
-    }
-    [darkColors enumerateKeysAndObjectsUsingBlock:^(NSString *keypath, UIColor *color, BOOL *stop) {
-        (void)stop;
-        if (![keypath isKindOfClass:[NSString class]] || ![color isKindOfClass:[UIColor class]]) {
-            return;
-        }
-        if (dark) {
-            UIColor *resolvedColor = color;
-            if (@available(iOS 13.0, *)) {
-                resolvedColor = [color resolvedColorWithTraitCollection:traitCollection];
-            }
-            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([view performSelector:setColorSelector withObject:resolvedColor withObject:keypath]);
-        } else {
-            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([view performSelector:removeColorSelector withObject:keypath]);
-        }
-    }];
-    _darkColorsApplied = dark;
-    if ([view respondsToSelector:@selector(forceDrawingUpdate)]) {
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([view performSelector:@selector(forceDrawingUpdate)]);
-    }
-}
-
-/*!
- * FIX: issue #216 — Lottie 4.x only.
- * [EN] Sets `colors` (already resolved) with Lottie's value providers and removes the providers of the keypaths set by a
- *      previous call that are no longer in it; nil removes them all.
- * [CN] 用 Lottie 的 value provider 设置 `colors`（已解析），并移除上一次调用设置、这次不再包含的 keypath 的 provider；nil 移除全部。
- */
-- (void)applyColors:(nullable NSDictionary<NSString *, UIColor *> *)colors traitCollection:(UITraitCollection *)traitCollection {
-    UIView *view = self.animationView;
-    SEL setColorSelector = @selector(setColorValue:forKeypathString:);
-    SEL removeColorSelector = @selector(removeValueProviderForKeypathString:);
-    if (!view || ![view respondsToSelector:setColorSelector] || ![view respondsToSelector:removeColorSelector]) {
-        return;
-    }
-    for (NSString *keypath in _appliedColorKeypaths) {
-        if (!colors[keypath]) {
-            CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([view performSelector:removeColorSelector withObject:keypath]);
-        }
-    }
-    NSMutableSet<NSString *> *appliedKeypaths = [NSMutableSet set];
-    [colors enumerateKeysAndObjectsUsingBlock:^(NSString *keypath, UIColor *color, BOOL *stop) {
-        (void)stop;
-        if (![keypath isKindOfClass:[NSString class]] || ![color isKindOfClass:[UIColor class]]) {
-            return;
-        }
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([view performSelector:setColorSelector withObject:color withObject:keypath]);
-        [appliedKeypaths addObject:keypath];
-    }];
-    _appliedColorKeypaths = appliedKeypaths;
-    // [EN] `-applyColors:` carries the dark colors itself. [CN] `-applyColors:` 自己带有深色颜色。
-    _darkColorsApplied = NO;
-    if ([view respondsToSelector:@selector(forceDrawingUpdate)]) {
-        CYL_SUPPRESS_ARC_PERFORM_SELECTOR_LEAKS([view performSelector:@selector(forceDrawingUpdate)]);
+    lottieView.loopAnimation = loops;
+    // [EN] Lottie 2.x reads it when a play starts: a playing view continues from where it is under the new mode.
+    // [CN] Lottie 2.x 在开始播放时读取该值：正在播放的视图从当前位置按新模式继续播放。
+    if (lottieView.isAnimationPlaying) {
+        [lottieView play];
     }
 }
 
 @end
 #endif
 
-#pragma mark - The animator (the factory of the players above)
+// [EN] The lottie-ios 4.x player is Swift (docs/Swift-Migration.md, engine step 5): CYLLottieSwiftTabBarItemAnimationPlayer
+//      (LottieSwift/), compiled with lottie-ios 4.x and exported by the generated header imported above. This class stays
+//      Objective-C as the composition root: its +load registers the animator, which Swift cannot do.
+// [CN] lottie-ios 4.x 播放器为 Swift（docs/Swift-Migration.md 引擎第 5 步）：CYLLottieSwiftTabBarItemAnimationPlayer（LottieSwift/），随 lottie-ios 4.x
+//      编译，由上面引入的生成头文件导出。本类作为组合根保留为 Objective-C：其 +load 注册 animator，这是 Swift 做不到的。
+
+#pragma mark - The animator (the factory of the Swift players)
 
 @implementation CYLLottieTabBarItemAnimator
 
@@ -323,12 +265,30 @@
     };
 }
 
+/// [EN] Lottie 4 (LottieSwift) also plays `.lottie` archives; Lottie 2 does not. [CN] Lottie 4（LottieSwift）也能播放 `.lottie` 压缩包；Lottie 2 不能。
+static BOOL CYLLottieAnimatorAcceptsDotLottie(void) {
+#if __has_include(<Lottie/Lottie-Swift.h>)
+    return YES;
+#else
+    return NO;
+#endif
+}
+
 - (BOOL)canAnimateFileAtURL:(NSURL *)URL {
-    // Every file another animator does not take (they are looked up first). 其他 animator 不处理的文件（它们先被查找）。
-    return URL != nil;
+    // [EN] Every file another animator does not take (they are looked up first), but only a Lottie animation: a picture or
+    //      a broken file is left to the static image (CYLTabBarItemAnimationURLMayBeLottie).
+    // [CN] 其他 animator 不处理的文件（它们先被查找），但只接收 Lottie 动画：图片或损坏的文件交给静态图片（CYLTabBarItemAnimationURLMayBeLottie）。
+    return CYLTabBarItemAnimationURLMayBeLottie(URL, CYLLottieAnimatorAcceptsDotLottie());
 }
 
 - (UIView *)animationViewWithURL:(NSURL *)URL size:(CGSize)size contentMode:(UIViewContentMode)contentMode {
+    // [EN] Also checked here: a tab's Lottie keys bind a URL to this animator without asking -canAnimateFileAtURL:. A file
+    //      that does not load makes no view, so the caller keeps the static image instead of an empty Lottie view over it.
+    // [CN] 这里也要检查：Tab 的 Lottie key 会把 URL 绑定到本 animator，而不调用 -canAnimateFileAtURL:。无法加载的文件不创建视图，调用方因此保留静态
+    //      图片，而不是在其上方放一个空的 Lottie 视图。
+    if (!CYLTabBarItemAnimationURLMayBeLottie(URL, CYLLottieAnimatorAcceptsDotLottie())) {
+        return nil;
+    }
     // The first Lottie library linked makes the view (each behind its own guard). 由先引入的 Lottie 库创建视图（各自使用独立的 guard）。
     UIView *lottieView = nil;
 #if __has_include(<Lottie/Lottie.h>)

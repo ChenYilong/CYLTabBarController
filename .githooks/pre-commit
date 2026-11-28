@@ -1,0 +1,42 @@
+#!/bin/sh
+# [EN] Blocks a commit that adds or changes a screenshot in docs/assets without the header, captions and footer of
+#      docs/Screenshot-Guidelines.md (built by scripts/stitch-screenshots.py). Installed by scripts/install-git-hooks.sh.
+# [CN] 阻止提交没有页眉、说明与页脚（由 scripts/stitch-screenshots.py 生成）的 docs/assets 截图。
+root=$(git rev-parse --show-toplevel) || exit 0
+# [EN] The first Python that really runs: on Windows `python3` can be the Microsoft Store stub, which is found but fails.
+# [CN] 第一个真正能运行的 Python：Windows 上 `python3` 可能是微软商店的占位程序，能找到但运行失败。
+python=""
+for candidate in python3 python py; do
+    if "$candidate" -c "import sys" >/dev/null 2>&1; then python=$candidate; break; fi
+done
+[ -n "$python" ] || { echo "pre-commit: no working Python found, screenshot labels not checked" >&2; exit 0; }
+"$python" "$root/scripts/check-screenshot-labels.py" --staged || {
+    echo "pre-commit: screenshot without labels. Rebuild it with python3 scripts/stitch-screenshots.py (docs/Screenshot-Guidelines.md)." >&2
+    exit 1
+}
+# [EN] A commit that adds, deletes or renames a file under docs/ changes the file tree in docs/README.md: check the generated
+#      navigation, which CI's "Docs navigation" job checks too (it failed four times on 2026-11-19 for screenshots pushed without
+#      a regeneration). Only then, so another session's untracked file does not block an unrelated commit; for such a false
+#      alarm, CYL_SKIP_DOCS_NAV_CHECK=1 skips it (never --no-verify).
+# [CN] 新增、删除或重命名 docs/ 下文件的提交会改变 docs/README.md 中的文件树：检查生成的导航（CI 的 "Docs navigation" 也会检查；2026-11-19
+#      因推送截图后未重新生成而失败四次）。只在这种情况下检查，避免其他会话未跟踪的文件阻挡无关的提交；遇到这种误报时可设置
+#      CYL_SKIP_DOCS_NAV_CHECK=1 跳过（不要使用 --no-verify）。
+if [ -z "${CYL_SKIP_DOCS_NAV_CHECK:-}" ] && git diff --cached --name-status --diff-filter=ADR -- docs | grep -q .; then
+    "$python" "$root/scripts/update-docs-navigation.py" --check >/dev/null 2>&1 || {
+        echo "pre-commit: this commit adds, deletes or renames a file in docs/, and the docs navigation is out of date." >&2
+        echo "  Run: python3 scripts/update-docs-navigation.py, stage docs/README.md (and the other files it changed), commit again." >&2
+        echo "  If the stale entry is another session's untracked file, commit with CYL_SKIP_DOCS_NAV_CHECK=1." >&2
+        exit 1
+    }
+    # [EN] A new document also needs its row in the cyl-api-map skill (the same CI job checks it; it failed on 5ac06d3f).
+    # [CN] 新文档还需要在 cyl-api-map skill 中有一行（同一个 CI 任务会检查；5ac06d3f 上因此失败）。
+    "$python" "$root/scripts/sync-agent-skills.py" --check >/dev/null 2>&1 || {
+        echo "pre-commit: this commit adds, deletes or renames a file in docs/, and the agent skills check fails." >&2
+        echo "  Run: python3 scripts/sync-agent-skills.py --check, and add the document's row to .agents/skills/cyl-api-map/SKILL.md." >&2
+        exit 1
+    }
+fi
+if [ -x "$root/.git/hooks/pre-commit.chained" ]; then
+    exec "$root/.git/hooks/pre-commit.chained" "$@"
+fi
+exit 0

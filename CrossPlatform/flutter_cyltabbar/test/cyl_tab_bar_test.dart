@@ -57,4 +57,29 @@ void main() {
       'CYLTabBarItemPageIdentifier': 'menu',
     });
   });
+
+  test('icon rendering mode keys (#787)', () {
+    const bar = CYLTabBar(
+      iconRenderingMode: 'template',
+      iconColor: '#8E8E93',
+      selectedIconColor: '#FF3B30',
+      items: [
+        CYLTabBarItem(title: 'Home', image: CYLTabBarImage.name('home')),
+        CYLTabBarItem(title: 'Shop', image: CYLTabBarImage.name('shop'), iconRenderingMode: 'original', iconColor: '#000000', selectedIconColor: '#FFFFFF'),
+      ],
+    );
+    final configuration = bar.buildConfiguration();
+    expect(configuration['CYLTabBarControllerIconRenderingMode'], 'template');
+    expect(configuration['CYLTabBarControllerIconColor'], '#8E8E93');
+    expect(configuration['CYLTabBarControllerSelectedIconColor'], '#FF3B30');
+    final items = configuration['CYLTabBarControllerTabBarItemsAttributes'] as List;
+    expect(items[0], {'CYLTabBarItemTitle': 'Home', 'CYLTabBarItemImage': 'home'});
+    expect(items[1], {
+      'CYLTabBarItemTitle': 'Shop',
+      'CYLTabBarItemImage': 'shop',
+      'CYLTabBarItemIconRenderingMode': 'original',
+      'CYLTabBarItemIconColor': '#000000',
+      'CYLTabBarItemSelectedIconColor': '#FFFFFF',
+    });
+  });
 }

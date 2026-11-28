@@ -124,6 +124,7 @@
 "有新内容" = "New content";
 "%@ 条新消息" = "%@ new messages";
 "加号按钮" = "Plus button";
+"更多" = "More";
 "模拟内存警告" = "Simulate memory warning";
 "卸载未选中的 Tab，切换时重新加载" = "Unloads unselected tabs; they load again when selected";
 "内存警告" = "Memory warning";
@@ -368,3 +369,12 @@
 "网络图标、标题与配色" = "Network icons, titles and colors";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Configuration file";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Restore";
+"保持" = "Keep";
+"不适用" = "N/A";
+"手动" = "Manual";
+"自测" = "Self-test";
+"手动：%@" = "Manual: %@";
+"实测：%@" = "Real: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Self-test: run every automatic simulation, report PASS / FAIL";

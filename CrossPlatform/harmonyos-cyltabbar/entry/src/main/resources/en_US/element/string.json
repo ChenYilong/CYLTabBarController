@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "Home"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "Nearby"
+    },
+    {
+      "name": "tab_messages",
+      "value": "Messages"
+    },
+    {
+      "name": "tab_me",
+      "value": "Me"
+    },
+    {
+      "name": "tab_post",
+      "value": "Post"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "Refresh"
+    }
+  ]
+}

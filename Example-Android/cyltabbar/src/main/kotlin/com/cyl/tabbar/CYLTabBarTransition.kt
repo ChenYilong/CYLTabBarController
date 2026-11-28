@@ -10,7 +10,9 @@ import android.view.MotionEvent
 import android.view.View
 import kotlin.math.abs
 
-/** [EN] `UIRectEdge` for the slide transition: the edge the old tab leaves towards. [CN] 滑动转场的 `UIRectEdge`：旧 Tab 离开的方向。 */
+/**
+ * [EN] `UIRectEdge` for the slide transition: the edge the old tab leaves towards. [CN] 滑动转场的 `UIRectEdge`：旧 Tab 离开的方向。
+ */
 enum class CYLRectEdge { Left, Right }
 
 /**
@@ -21,7 +23,9 @@ enum class CYLRectEdge { Left, Right }
  *      `tabBarController_animationControllerForTransition` 中返回它。
  */
 open class CYLTabBarSlideTransitionAnimator(val targetEdge: CYLRectEdge) {
-    /** [EN] Default 0.35 s. [CN] 默认 0.35 秒。 */
+    /**
+     * [EN] Default 0.35 s. [CN] 默认 0.35 秒。
+     */
     var duration: Double = 0.35
 
     private var fromView: View? = null
@@ -29,17 +33,23 @@ open class CYLTabBarSlideTransitionAnimator(val targetEdge: CYLRectEdge) {
     private var completion: ((Boolean) -> Unit)? = null
     private var animator: ValueAnimator? = null
 
-    /** [EN] -1: the old tab leaves to the left (the new one comes from the right); 1: the other way. [CN] -1：旧 Tab 向左离开；1：相反。 */
+    /**
+     * [EN] -1: the old tab leaves to the left (the new one comes from the right); 1: the other way. [CN] -1：旧 Tab 向左离开；1：相反。
+     */
     private val offset: Float get() = if (targetEdge == CYLRectEdge.Right) 1f else -1f
 
-    /** [EN] Places both pages for `percent` (0: the old page, 1: the new one). [CN] 按 `percent` 放置两个页面（0：旧页面，1：新页面）。 */
+    /**
+     * [EN] Places both pages for `percent` (0: the old page, 1: the new one). [CN] 按 `percent` 放置两个页面（0：旧页面，1：新页面）。
+     */
     internal fun applyProgress(percent: Float) {
         val width = (toView?.width ?: fromView?.width ?: 0).toFloat()
         fromView?.translationX = width * offset * percent
         toView?.translationX = -width * offset * (1f - percent)
     }
 
-    /** [EN] `-animateTransition:`: slides `fromView` out and `toView` in, then calls `completion(finished)`. [CN] 滑出 `fromView`、滑入 `toView`，然后调用 `completion(finished)`。 */
+    /**
+     * [EN] `-animateTransition:`: slides `fromView` out and `toView` in, then calls `completion(finished)`. [CN] 滑出 `fromView`、滑入 `toView`，然后调用 `completion(finished)`。
+     */
     open fun animateTransition(fromView: View?, toView: View, completion: (Boolean) -> Unit) {
         prepare(fromView, toView, completion)
         animate(0f, 1f, finishing = true)
@@ -86,17 +96,23 @@ open class CYLPanGestureRecognizer {
 
     var state: State = State.Possible
         private set
-    /** [EN] `translationInView:`: the horizontal distance (px) since the pan began. [CN] 拖动开始以来的水平距离（像素）。 */
+    /**
+     * [EN] `translationInView:`: the horizontal distance (px) since the pan began. [CN] 拖动开始以来的水平距离（像素）。
+     */
     var translationX: Float = 0f
         private set
     private var startX = 0f
     private val targets = ArrayList<(CYLPanGestureRecognizer) -> Unit>()
 
-    /** [EN] `-addTarget:action:`. [CN] 添加回调。 */
+    /**
+     * [EN] `-addTarget:action:`. [CN] 添加回调。
+     */
     fun addTarget(target: (CYLPanGestureRecognizer) -> Unit) { targets += target }
     fun removeTarget(target: (CYLPanGestureRecognizer) -> Unit) { targets -= target }
 
-    /** [EN] Routes the touches of `view` here. [CN] 把 `view` 的触摸交给它。 */
+    /**
+     * [EN] Routes the touches of `view` here. [CN] 把 `view` 的触摸交给它。
+     */
     fun attachTo(view: View) {
         view.setOnTouchListener { touched, event -> onTouchEvent(event).also { if (event.actionMasked == MotionEvent.ACTION_UP) touched.performClick() } }
     }
@@ -138,7 +154,9 @@ open class CYLTabBarInteractiveTransition(val gestureRecognizer: CYLPanGestureRe
         gestureRecognizer.addTarget(listener)
     }
 
-    /** [EN] `-startInteractiveTransition:`: the controller starts the transition with the animator and the container width. [CN] 控制器以动画对象与容器宽度开始转场。 */
+    /**
+     * [EN] `-startInteractiveTransition:`: the controller starts the transition with the animator and the container width. [CN] 控制器以动画对象与容器宽度开始转场。
+     */
     internal fun startInteractiveTransition(animator: CYLTabBarSlideTransitionAnimator, width: Int) {
         this.animator = animator
         this.width = width.toFloat()

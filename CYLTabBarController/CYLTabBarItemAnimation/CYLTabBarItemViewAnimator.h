@@ -12,13 +12,22 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/GIF-Animation.md
 //   - Rive animated tab icons (used like Lottie and PAG) / Rive 动画 Tab 图标（与 Lottie、PAG 用法相同）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Rive-Animation.md
+//   - SVGA animated tab icons (used like Rive, PAG and Lottie) / SVGA 动画 Tab 图标（与 Rive、PAG、Lottie 用法相同）
+//     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/SVGA-Animation.md
 //   - The shared tab icon animation subspec: CYLTabBarItemAnimation (protocol-oriented, open to any library) / Tab 图标动画共用子库：CYLTabBarItemAnimation（面向协议，可扩展任意动画库）
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Bar-Item-Animation.md
 // docs-binding:end
 
 #import <Foundation/Foundation.h>
 #import "CYLTabBarItemAnimator.h"
-#import "CYLTabBarItemAnimationPlayableView.h"
+/*!
+ * [EN] Forward declarations only: the protocols are Swift (`CYLTabBarItemAnimationPlayableView.h` imports the generated
+ *      Swift interface), and that interface imports this module's umbrella header, which needs this class declared first.
+ *      The header itself is imported at the end.
+ * [CN] 这里只做前向声明：这些协议是 Swift（`CYLTabBarItemAnimationPlayableView.h` 导入生成的 Swift 接口），而该接口会导入本模块的伞头文件，
+ *      需要先声明本类。头文件在末尾导入。
+ */
+@protocol CYLTabBarItemAnimationPlayableView, CYLTabBarItemAnimationViewProviding;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -72,3 +81,5 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
+
+#import "CYLTabBarItemAnimationPlayableView.h"

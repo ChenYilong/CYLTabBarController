@@ -1,0 +1,251 @@
+#!/usr/bin/env python3
+"""
+CYLAnimatedItem x86_64 emulator helper (CYLTabBarController HarmonyOS, cylanimateditem/tools).
+
+The x86_64 HarmonyOS emulator rejects a HAP that carries arm64-v8a-only native libraries (@ohos/rive libohos_rive.so,
+@tencent/libpag libpag.so, and the libc++_shared.so next to them): "install parse native so failed", error 9568347.
+Prefer the build profile's "emulator" target (cylanimateditem/README.md, "x86_64 emulator"); this tool is for a HAP
+that was built without it, and for installing any HAP on the right device.
+
+  python3 cyl_hap_x86_64.py strip  <in.hap> [<out.hap>]   copy the HAP without the native libraries the device cannot load
+  python3 cyl_hap_x86_64.py install <app.hap> [--target 127.0.0.1:5557] [--hdc <path>] [--strip auto|yes|no]
+                                     [--x86-engines auto|yes|no]
+
+"install" asks the device for its ABIs (hdc shell param get const.product.cpu.abilist); with --strip auto (default) it
+strips libs/<abi>/ folders the device does not list, then runs hdc install -r. CYL_HAP_STRIP_LIBS=1 / 0 forces strip on /
+off. With --x86-engines auto (default) on an x86_64 device, it also adds the x86_64 debug engine kit
+(../x86_64-debug-engines/rive: libohos_rive.so of @ohos/rive 1.0.4, libc++_shared.so; ../x86_64-debug-engines/pag: libpag.so
+of @tencent/libpag 4.4.31, ../x86_64-debug-engines/pag-4.5.102), only for the engines the HAP uses and only in the exact
+package version its ArkTS was built with (kit.json; another version is skipped with a message), and the marker rawfile
+cyl_x86_64_debug_engines.json, so Rive and PAG play in DEBUG builds (CYLAnimatedItemEngines reads the marker); CYL_X86_ENGINES=1 / 0
+forces it. Standard library only. The Rive and PAG items of the stripped app show their still images
+(CYLAnimatedItemEngines.isSupportedOnDevice); their playback still needs an arm64 device.
+"""
+import json
+import os
+import re
+import subprocess
+import sys
+import tempfile
+import zipfile
+
+
+def cyl_strip(source, target, keep_abis=None):
+    """
+    Copies source to target without libs/<abi>/ entries whose ABI is not in keep_abis (None or []: drop all native
+    libraries). Returns the names that were left out.
+    """
+    dropped = []
+    with zipfile.ZipFile(source) as zin, zipfile.ZipFile(target, 'w') as zout:
+        for item in zin.infolist():
+            parts = item.filename.split('/')
+            if len(parts) > 2 and parts[0] == 'libs' and (not keep_abis or parts[1] not in keep_abis):
+                dropped.append(item.filename)
+                continue
+            zout.writestr(item, zin.read(item.filename))
+    return dropped
+
+
+def cyl_local_path(path):
+    """
+    An absolute path in the platform's own form. On Windows hdc reads "C:/Users/..." as a relative path ("Error opening
+    file ...\\C:/Users/..."), so it needs backslashes (reported by the CYLTableViewPlaceHolder session, 2026-11-22).
+    """
+    return os.path.abspath(os.path.normpath(path))
+
+
+CYL_KIT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'x86_64-debug-engines')
+CYL_MODULES_ABC = 'ets/modules.abc'
+CYL_MARKER = 'resources/rawfile/cyl_x86_64_debug_engines.json'
+
+
+def cyl_hap_libraries(path):
+    """
+    The native libraries a HAP uses, e.g. {'libpag.so', 'libohos_rive.so'}: those it carries for any ABI, and those its
+    ArkTS imports (`ets/modules.abc` names them, also when the "emulator" build target left the arm64 files out).
+    """
+    with zipfile.ZipFile(path) as hap:
+        names = {name.split('/')[-1] for name in hap.namelist() if name.startswith('libs/') and name.count('/') >= 2}
+        if CYL_MODULES_ABC in hap.namelist():
+            names |= {match.decode() for match in re.findall(rb'lib[A-Za-z0-9_+-]+\.so', hap.read(CYL_MODULES_ABC))}
+        return names
+
+
+def cyl_package_versions(path):
+    """
+    The ohpm package versions a HAP's ArkTS was built with, e.g. {'@tencent/libpag': '4.5.102', '@ohos/rive': '1.0.4'}
+    (`ets/modules.abc` names every imported file as "&<package>/<file>&<version>").
+    """
+    with zipfile.ZipFile(path) as hap:
+        if CYL_MODULES_ABC not in hap.namelist():
+            return {}
+        data = hap.read(CYL_MODULES_ABC)
+    found = re.findall(rb'&(@[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)/[^&\x00]*&(\d+(?:\.\d+)+)', data)
+    return {package.decode(): version.decode() for package, version in found}
+
+
+def cyl_kit_info(folder, name):
+    """
+    The kit.json of an engine folder ({"engine", "package", "version"}); without it, the engine name from the folder name.
+    """
+    info = {'engine': {'rive': 'Rive', 'pag': 'PAG'}.get(name.split('-')[0], name)}
+    path = os.path.join(folder, 'kit.json')
+    if os.path.isfile(path):
+        with open(path) as handle:
+            info.update(json.load(handle))
+    return info
+
+
+def _cyl_kit_wanted(libraries, shipped):
+    """
+    [EN] Whether an engine folder is used: it has libraries and, with shipped, its main library (the first .so that is not
+         libc++_shared.so) is one the app ships.
+    [CN] 引擎文件夹是否被使用：有库文件，且指定 shipped 时其主库（第一个非 libc++_shared.so 的 .so）为应用所带。
+    """
+    main = [f for f in libraries if f != 'libc++_shared.so']
+    return bool(libraries) and (shipped is None or bool(main and main[0] in shipped))
+
+
+def _cyl_kit_version_ok(info, name, versions, log):
+    """
+    [EN] Whether the app has exactly the package version the kit was built for; else logs the skip and returns False.
+    [CN] 应用是否正好使用该工具包对应的包版本；否则记录跳过信息并返回 False。
+    """
+    package, version = info.get('package'), info.get('version')
+    if versions is None or not package or versions.get(package) == version:
+        return True
+    if log:
+        log(f'x86_64 debug engine kit: skipped {name} ({package} {version}); the app uses {package} '
+            f'{versions.get(package, "unknown")}, so {info["engine"]} keeps its still images')
+    return False
+
+
+def cyl_add_debug_engines(source, target, kit_dir=CYL_KIT_DIR, shipped=None, versions=None, log=None):
+    """
+    Copies source to target with the x86_64 debug engine kit added: libs/x86_64/<library> for each engine folder of kit_dir
+    (stored, not compressed) and the marker rawfile that names the engines. With shipped (the library names of the
+    original HAP, cyl_hap_libraries), only the engines whose main library (the first .so that is not libc++_shared.so)
+    the app ships: an app without @tencent/libpag gets no PAG. With versions (cyl_package_versions), a folder whose kit.json
+    names a package is added only when the app has exactly that version: a native library of another version lacks
+    methods the app's ArkTS calls and crashes it (libpag 4.4.31 under @tencent/libpag 4.5.102: "undefined is not
+    callable" in PAGViewController.onVisibilityChanged, CYLTableViewPlaceHolder, 2026-11-22); such an engine is skipped
+    with a message and keeps its still images. Returns the engine names added.
+    """
+    engines, files = [], {}
+    for name in sorted(os.listdir(kit_dir)) if os.path.isdir(kit_dir) else []:
+        folder = os.path.join(kit_dir, name)
+        libraries = [f for f in sorted(os.listdir(folder)) if f.endswith('.so')] if os.path.isdir(folder) else []
+        if not _cyl_kit_wanted(libraries, shipped):
+            continue
+        info = cyl_kit_info(folder, name)
+        if not _cyl_kit_version_ok(info, name, versions, log) or info['engine'] in engines:
+            continue
+        engines.append(info['engine'])
+        for library in libraries:
+            files['libs/x86_64/' + library] = os.path.join(folder, library)
+    with zipfile.ZipFile(source) as zin, zipfile.ZipFile(target, 'w') as zout:
+        present = set(zin.namelist())
+        for item in zin.infolist():
+            if item.filename != CYL_MARKER:
+                zout.writestr(item, zin.read(item.filename))
+        for name, path in files.items():
+            if name not in present:
+                zout.write(path, name, compress_type=zipfile.ZIP_STORED)
+        if engines:
+            zout.writestr(CYL_MARKER, '{"engines": %s, "kit": "cylanimateditem/x86_64-debug-engines"}' % str(engines).replace("'", '"'))
+    return engines
+
+
+def cyl_hdc_default():
+    """
+    The hdc of DevEco Studio on Windows or macOS, else "hdc" from PATH.
+    """
+    for path in (r'C:\Program Files\Huawei\DevEco Studio\sdk\default\openharmony\toolchains\hdc.exe',
+                 '/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc'):
+        if os.path.exists(path):
+            return path
+    return 'hdc'
+
+
+def cyl_device_abis(hdc, target):
+    """
+    The device's ABIs, e.g. ['x86_64'] on the emulator, ['arm64-v8a'] on a phone.
+    """
+    command = [hdc] + (['-t', target] if target else []) + ['shell', 'param', 'get', 'const.product.cpu.abilist']
+    output = subprocess.run(command, capture_output=True, text=True).stdout.strip()
+    return [abi.strip() for abi in output.split(',') if abi.strip()]
+
+
+def cyl_hap_abis(path):
+    """
+    The ABIs a HAP carries native libraries for.
+    """
+    with zipfile.ZipFile(path) as hap:
+        return sorted({name.split('/')[1] for name in hap.namelist() if name.startswith('libs/') and name.count('/') >= 2})
+
+
+def _cyl_parse_install_args(args):
+    """
+    [EN] The "install" arguments: (hap, target, hdc, strip, engines).
+    [CN] "install" 的参数：(hap, target, hdc, strip, engines)。
+    """
+    hap, target, hdc, strip, engines = cyl_local_path(args[0]), '', cyl_hdc_default(), 'auto', 'auto'
+    for flag, value in zip(args[1::2], args[2::2]):
+        if flag == '--target':
+            target = value
+        elif flag == '--hdc':
+            hdc = value
+        elif flag == '--strip':
+            strip = value
+        elif flag == '--x86-engines':
+            engines = value
+    return hap, target, hdc, strip, engines
+
+
+def _cyl_env_choice(name, current):
+    """
+    [EN] The environment variable name set to 1 / 0 forces 'yes' / 'no'; otherwise current.
+    [CN] 环境变量 name 为 1 / 0 时强制为 'yes' / 'no'；否则保持 current。
+    """
+    forced = os.environ.get(name)
+    if forced in ('0', '1'):
+        return 'yes' if forced == '1' else 'no'
+    return current
+
+
+def main(argv):
+    if len(argv) < 2 or argv[0] not in ('strip', 'install'):
+        print(__doc__)
+        return 2
+    if argv[0] == 'strip':
+        source = cyl_local_path(argv[1])
+        target = cyl_local_path(argv[2]) if len(argv) > 2 else source.replace('.hap', '-x86_64.hap')
+        dropped = cyl_strip(source, target)
+        print(f'{target}: left out {len(dropped)} native libraries')
+        return 0
+    hap, target, hdc, strip, engines = _cyl_parse_install_args(argv[1:])
+    strip = _cyl_env_choice('CYL_HAP_STRIP_LIBS', strip)
+    device = cyl_device_abis(hdc, target)
+    carried = cyl_hap_abis(hap)
+    missing = [abi for abi in carried if abi not in device]
+    print(f'device ABIs: {", ".join(device) or "unknown"}; HAP native libraries: {", ".join(carried) or "none"}')
+    install = hap
+    if strip == 'yes' or (strip == 'auto' and missing and device):
+        install = os.path.join(tempfile.mkdtemp(prefix='cyl-hap-'), os.path.basename(hap).replace('.hap', '-x86_64.hap'))
+        dropped = cyl_strip(hap, install, keep_abis=device)
+        print(f'left out {len(dropped)} native libraries the device cannot load: {install}')
+    engines = _cyl_env_choice('CYL_X86_ENGINES', engines)
+    if engines == 'yes' or (engines == 'auto' and 'x86_64' in device):
+        with_engines = os.path.join(tempfile.mkdtemp(prefix='cyl-hap-'), os.path.basename(install).replace('.hap', '-engines.hap'))
+        added = cyl_add_debug_engines(install, with_engines, shipped=cyl_hap_libraries(hap),
+                                      versions=cyl_package_versions(hap), log=print)
+        print(f'x86_64 debug engine kit: {", ".join(added) or "none"} ({with_engines})')
+        install = with_engines
+    command = [hdc] + (['-t', target] if target else []) + ['install', '-r', cyl_local_path(install)]
+    result = subprocess.run(command, capture_output=True, text=True)
+    print(result.stdout.strip() or result.stderr.strip())
+    return 0 if 'successfully' in result.stdout else 1
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))

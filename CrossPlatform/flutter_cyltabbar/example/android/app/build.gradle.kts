@@ -13,6 +13,8 @@ android {
     sourceSets {
         getByName("main") {
             assets.srcDir("$cylRepository/Example/Classes/Other/LottieResources")
+            // [EN] icons.riv of Example-SwiftUI-Rive, for the Rive tab icons (not a copy). [CN] Rive Tab 图标所用的 icons.riv（不是副本）。
+            assets.srcDir("$cylRepository/Example-SwiftUI-Rive/AnimatedApp/RiveAssets")
         }
     }
     compileSdk = flutter.compileSdkVersion
@@ -65,4 +67,7 @@ flutter {
 dependencies {
     // [EN] The Lottie tab icons (the library plays them when lottie-android is present). [CN] Lottie Tab 图标（引入 lottie-android 时库会播放）。
     implementation(libs.lottie)
+    // [EN] The Rive tab icons (the library plays them through rive-android, found by reflection; it calls Rive.init).
+    // [CN] Rive Tab 图标（库通过反射找到 rive-android 播放，并调用 Rive.init）。
+    implementation(libs.rive.android)
 }

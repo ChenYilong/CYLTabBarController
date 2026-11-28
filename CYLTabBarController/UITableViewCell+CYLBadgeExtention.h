@@ -17,109 +17,30 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /*!
- * [EN] Row height that leaves room around the icon for its badge.
- * [CN] 行高：为图标四周的角标留出空间。
+ * [EN] Row height that leaves room around the icon for its badge (a macro; it was an extern constant, same name and value).
+ * [CN] 行高：为图标四周的角标留出空间（宏；原为 extern 常量，名称与值不变）。
  */
-FOUNDATION_EXTERN const CGFloat CYLBadgeRowHeight;
+#ifndef __swift__
+#define CYLBadgeRowHeight ((CGFloat)60)
+#endif
 
 /*!
- * [EN] Badge samples shared by all the example apps: every badge style and animation, one per row.
- *      The icon is `cyl_badge_sample_icon` in the library's resource bundle (`CYLResourceBundle()`).
- * [CN] 所有示例工程共用的角标样例：每行一种角标样式或动画。图标为本库资源包（`CYLResourceBundle()`）中的 `cyl_badge_sample_icon`。
+ * [EN] `UITableViewCell (CYLBadgeExtention)`, `CYLBadgeHelperTableViewController` and `-[UIViewController cyl_addBadgeHelperTable]`
+ *      are implemented in Swift (`Swift/UITableViewCell+CYLBadgeExtention.swift`, every name and selector kept) and declared by
+ *      the generated Swift interface (`CYLSwiftInterface.h`), imported at the end of this header. The method below stays
+ *      declared here: its signature has an Objective-C enum of this module (docs/Swift-Migration.md, step 34).
+ * [CN] `UITableViewCell (CYLBadgeExtention)`、`CYLBadgeHelperTableViewController` 与 `-[UIViewController cyl_addBadgeHelperTable]` 在
+ *      Swift 中实现（`Swift/UITableViewCell+CYLBadgeExtention.swift`，所有名称与 selector 不变），由本头文件末尾导入的 Swift 生成接口
+ *      （`CYLSwiftInterface.h`）声明。下面的方法仍在此声明：其签名中含本模块的 Objective-C 枚举（docs/Swift-Migration.md，第 34 步）。
  */
-@interface UITableViewCell (CYLBadgeExtention)
 
 /*!
- * [EN] Shows the icon in the cell and a badge on it. Style and animation change with the row, so a table lists them all.
- * [CN] 在 cell 上显示图标及其角标，样式和动画随行号变化。
+ * [EN] `UIViewController (CYLNavigationBadge)` (`-cyl_showNavigationBadgeValue:animationType:backgroundColor:`) is Swift since docs/Swift-Migration.md step 115 (phase ③, group A of docs/Swift-Migration-Phase3.md): Objective-C
+ *      sees it through the generated Swift interface (`CYLSwiftInterface.h`), with the same names.
+ * [CN] `UIViewController (CYLNavigationBadge)` (`-cyl_showNavigationBadgeValue:animationType:backgroundColor:`) is 自第 115 步（第 ③ 阶段 A 组）起为 Swift：Objective-C 通过生成的 Swift 接口（`CYLSwiftInterface.h`）看到它，名称不变。
  */
-- (void)cyl_showBadgeForRow:(NSInteger)row;
 
-/*!
- * [EN] Title of the badge sample shown on `row`, followed by the core API that produces the effect, e.g.
- *      "20. Number (cyl_showBadgeValue:)" or "6. Rotation (forever) (cyl_rotationAnimationWithDuration:)".
- * [CN] 第 `row` 行角标样例的标题，后面附上实现该效果的核心 API，例如“20. 数字 (cyl_showBadgeValue:)”。
- */
-+ (NSString *)cyl_badgeTitleForRow:(NSInteger)row;
-
-/*!
- * [EN] Number of different badge samples.
- * [CN] 角标样例的种数。
- */
-+ (NSInteger)cyl_badgeStyleCount;
-
-/*!
- * [EN] Lets the title and the subtitle wrap onto as many lines as they need, never truncated with an ellipsis. Use it
- *      with `+cyl_setUpAutomaticRowHeightForTableView:`.
- * [CN] 标题与副标题按需换行，不会以省略号截断。与 `+cyl_setUpAutomaticRowHeightForTableView:` 一起使用。
- */
-- (void)cyl_wrapsTextLabels;
-
-/*!
- * [EN] Rows as high as their wrapped text (`-cyl_wrapsTextLabels`), estimated at `CYLBadgeRowHeight`.
- * [CN] 行高随换行后的文字变化（`-cyl_wrapsTextLabels`），预估行高为 `CYLBadgeRowHeight`。
- */
-+ (void)cyl_setUpAutomaticRowHeightForTableView:(UITableView *)tableView;
-
-@end
-
-/*!
- * [EN] A badge on the navigation bar, adding the bar button when there is none.
- * [CN] 导航栏上的角标，没有按钮时先添加按钮。
- */
-@interface UIViewController (CYLNavigationBadge)
-
-/*!
- * [EN] Shows `value` (@"" for a red dot) with `animationType` and `backgroundColor` (nil: the default, see
- *      `CYLBadgeAppearance`) on `navigationItem.rightBarButtonItem`. When there is no right button, a bell button (a
- *      "Badge" text button before iOS 13) is added first, with no action: set `target` / `action` on the returned item
- *      to handle taps. Call it from `-viewDidLoad` or later; the badge appears once the bar button is laid out.
- *
- *          [self cyl_showNavigationBadgeValue:@"new" animationType:CYLBadgeAnimationTypeShake
- *                             backgroundColor:UIColor.cyl_randomColor];
- *          // Swift
- *          cyl_showNavigationBadge(value: "new", animationType: .shake, backgroundColor: .cyl_randomColor)
- *
- * [CN] 在 `navigationItem.rightBarButtonItem` 上显示角标：文字为 `value`（传 @"" 为红点），动画为 `animationType`，背景色为
- *      `backgroundColor`（传 nil 使用默认颜色，见 `CYLBadgeAppearance`）。没有右侧按钮时先添加一个铃铛按钮（iOS 13 以下为文字
- *      “Badge”），该按钮没有点击事件，可给返回的按钮设置 `target` / `action`。在 `-viewDidLoad` 或之后调用；按钮完成布局后显示角标。
- *      示例见上。
- *
- * @return [EN] The right bar button item that shows the badge. [CN] 显示角标的右侧按钮。
- */
-- (UIBarButtonItem *)cyl_showNavigationBadgeValue:(NSString *)value
-                                    animationType:(CYLBadgeAnimationType)animationType
-                                  backgroundColor:(nullable UIColor *)backgroundColor
-    NS_SWIFT_NAME(cyl_showNavigationBadge(value:animationType:backgroundColor:));
-
-@end
-
-/*!
- * [EN] Table of every badge sample, one per row. Tap a row to clear its badge; the tap also simulates a memory warning
- *      (`+[CYLTabBarController cyl_simulateMemoryWarning]`) and logs the tab bar's state afterwards.
- * [CN] 列出全部角标样例的列表，点击一行清除该行角标；同时模拟内存警告（`+[CYLTabBarController cyl_simulateMemoryWarning]`），
- *      并输出之后的 TabBar 状态。
- */
-@interface CYLBadgeHelperTableViewController : UITableViewController
-
-/*!
- * [EN] Section 0 holds the settings rows (`CYLSettingsSection`: language, memory warning); the badge samples are in section 1.
- *      Called after a badge row is tapped (its badge cleared), e.g. to push a page; the row is `indexPath.row`.
- * [CN] 第 0 组只有一行，为语言设置（`-cyl_languageCellForTableView:`）；角标样例在第 1 组。点击角标行（并清除角标）后调用，
- *      例如用于 push 新页面；行号为 `indexPath.row`。
- */
-@property (nonatomic, copy, nullable) void (^didSelectRowHandler)(NSIndexPath *indexPath);
-
-@end
-
-@interface UIViewController (CYLBadgeExtention)
-
-/*!
- * [EN] Adds a `CYLBadgeHelperTableViewController` as a child that fills this view controller's view.
- * [CN] 添加一个铺满当前视图的 `CYLBadgeHelperTableViewController` 子控制器。
- */
-- (void)cyl_addBadgeHelperTable;
-
-@end
 
 NS_ASSUME_NONNULL_END
+
+#import "CYLSwiftInterface.h"

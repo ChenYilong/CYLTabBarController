@@ -9,25 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "CYLFlatDesignTabBarItem.h"
 
-NS_ASSUME_NONNULL_BEGIN
-
-@interface CYLFlatDesignTabBarButton : UIControl
-
 /*!
- * [EN] Creates a flat-design tab bar button for `tabBarItem` and links the item back to this button.
- * [CN] 使用 tabBarItem 创建扁平化 TabBar 按钮，并将该 Item 关联回此按钮。
+ * [EN] `CYLFlatDesignTabBarButton` is implemented in Swift (`Swift/CYLFlatDesignTabBarButton.swift`, docs/Swift-Migration.md,
+ *      step 49); its declaration comes from the generated Swift interface, through CYLFlatDesignTabBarItem.h.
+ * [CN] `CYLFlatDesignTabBarButton` 在 Swift 中实现（`Swift/CYLFlatDesignTabBarButton.swift`，docs/Swift-Migration.md，第 49 步）；其声明来自
+ *      Swift 生成接口，经由 CYLFlatDesignTabBarItem.h 导入。
  */
-- (instancetype)initWithTabBarItem:(CYLFlatDesignTabBarItem *)tabBarItem;
-@property (nonatomic, strong) CYLFlatDesignTabBarItem *tabBarItem;
-@property (nonatomic, strong, readonly) UIImageView *imageView;
-@property (nonatomic, strong, readonly) UILabel *titleLabel;
-
-/*!
- * [EN] Returns the view that hosts this button's badge.
- * [CN] 返回承载该按钮角标的视图。
- */
-- (UIView *)actualBadgeSuperView;
-
-@end
-
-NS_ASSUME_NONNULL_END

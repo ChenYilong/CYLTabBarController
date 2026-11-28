@@ -10,7 +10,7 @@ import UIKit
 import CYLTabBarController
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
   
     var window: UIWindow?
 
@@ -20,21 +20,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
 
         // The window is created in SceneDelegate (UIScene life cycle).
 
-        //tabbar背景色
-//        UITabBar.appearance().backgroundColor = UIColor.white
-        // [CN] tabbar字体颜色
-        // [EN] tabbar font color
+        // [EN] The tab bar's tint color. [CN] TabBar 的着色。
         UITabBar.appearance().tintColor = UIColor(red: 1.0, green: 102.0 / 255.0, blue: 0, alpha: 1.0)
 
         return true
     }
 
-    func application(_ _: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options _: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
-    }
+    // [EN] No `application(_:configurationForConnecting:options:)`: Info.plist names the "Default Configuration" and its
+    //      SceneDelegate, which UIKit uses without it. [CN] 不实现 `application(_:configurationForConnecting:options:)`：Info.plist
+    //      已声明 "Default Configuration" 及其 SceneDelegate，UIKit 会直接使用。
 
     func makeMainTabBarController() -> MainTabBarController {
-        let titles = CYLLocalizedTabBarItemsAttributes(["首页", "同城", "消息", "我的"],
+        let titles = cylLocalizedTabBarItemsAttributes(["首页", "同城", "消息", "我的"],
                                                        ["home_normal", "mycity_normal", "message_normal", "account_normal"],
                                                        ["home_highlight", "mycity_highlight", "message_highlight", "account_highlight"],
                                                        [:])
@@ -50,13 +47,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UITabBarControllerDelegate
         // [CN] 第 2 个 Tab，通用函数：按名称查找文件，并按扩展名选择动画库。播放方式相同。
         if let item = CYLTabBarItemAttributesAddingAnimationFile(items[1], "tab_star.gif", nil) as? [String: Any] {
             items[1] = item
-            items[1][CYLTabBarAnimationSize] = size
+            items[1][cylTabBarAnimationSize] = size
         }
-        // [EN] Tab 3, a plain image entry: no animation key, so the GIF keeps looping, selected or not.
-        // [CN] 第 3 个 Tab，普通图片入口：没有动画 key，因此 GIF 一直循环，无论是否选中。
-        items[2][CYLTabBarItemImageURL] = Bundle.main.url(forResource: "tab_fire", withExtension: "gif")
-        items[2][CYLTabBarItemImageURLSize] = size
+        // [EN] Tab 3, a plain image entry: no animation key; the GIF rests on its first frame and plays once per tap (loops while looping is on).
+        // [CN] 第 3 个 Tab，普通图片入口：没有动画 key；GIF 停在第一帧，每次点击播放一次（开启循环时一直播放）。
+        items[2][cylTabBarItemImageURL] = Bundle.main.url(forResource: "tab_fire", withExtension: "gif")
+        items[2][cylTabBarItemImageURLSize] = size
         // [EN] Tab 4 keeps its static images. [CN] 第 4 个 Tab 保持静态图片。
+        // [EN] `-CYLDemoAnimationTint YES`: the GIF tabs tinted like template images (`tint` option): tab 1 in its title's
+        //      colors ("title"), tab 2 in a fixed color with a Dark Mode one ("#1C1C1E" / `darkTint` "#FFFFFF").
+        // [CN] `-CYLDemoAnimationTint YES`：GIF Tab 像模板图片一样着色（`tint` 选项）：第 1 个 Tab 使用标题颜色（"title"），第 2 个 Tab 使用固定颜色及其深色模式
+        //      颜色（"#1C1C1E" / `darkTint` "#FFFFFF"）。
+        if UserDefaults.standard.bool(forKey: "CYLDemoAnimationTint") {
+            let rocket = Bundle.main.url(forResource: "tab_rocket", withExtension: "gif")
+            let star = Bundle.main.url(forResource: "tab_star", withExtension: "gif")
+            items[0][CYLTabBarGIFFilePath] = nil
+            items[0][CYLTabBarGIFURL] = CYLTabBarAnimationURLWithOptions(rocket, [.tint: "title"] as [CYLTabBarAnimationOption: String])
+            items[1][cylTabBarAnimationFilePath] = nil
+            items[1][cylTabBarAnimationURL] = CYLTabBarAnimationURLWithOptions(star, [.tint: "#1C1C1E", .darkTint: "#FFFFFF"] as [CYLTabBarAnimationOption: String])
+        }
         DemoPlusButton.register()
         return MainTabBarController(viewControllers: viewControllers(), tabBarItemsAttributes: items, styleType: CYLDemoTabBarStyle.styleType, context: nil)
     }

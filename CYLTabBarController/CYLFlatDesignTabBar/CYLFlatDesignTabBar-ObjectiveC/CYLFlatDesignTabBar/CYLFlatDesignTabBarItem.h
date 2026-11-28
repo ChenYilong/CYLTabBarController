@@ -14,142 +14,26 @@
 // docs-binding:end
 
 #import <UIKit/UIKit.h>
-@class CYLFlatDesignTabBarButton;
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString *const CYLFlatDesignTabBarItemDidChange;
-
-@interface CYLFlatDesignTabBarItem : NSObject
+/*!
+ * [EN] Posted with the item as its object whenever a shown value of a `CYLFlatDesignTabBarItem` changes.
+ * [CN] `CYLFlatDesignTabBarItem` 显示的值每次变化时发送，object 为该 item。
+ */
+#ifndef __swift__
+#define CYLFlatDesignTabBarItemDidChange @"CYLFlatDesignTabBarItemDidChange"
+#endif
 
 /*!
- * [EN] Creates a flat-design tab bar item with a title and image.
- * [CN] 使用标题与图片创建扁平化 TabBarItem。
+ * [EN] `CYLFlatDesignTabBarItem` and `CYLFlatDesignTabBarButton` are implemented in Swift (`Swift/CYLFlatDesignTabBarItem.swift`,
+ *      `Swift/CYLFlatDesignTabBarButton.swift`, docs/Swift-Migration.md, step 49); Objective-C callers get their declarations from
+ *      the generated Swift interface imported below. Selectors and Swift names are unchanged.
+ * [CN] `CYLFlatDesignTabBarItem` 与 `CYLFlatDesignTabBarButton` 在 Swift 中实现（`Swift/CYLFlatDesignTabBarItem.swift`、
+ *      `Swift/CYLFlatDesignTabBarButton.swift`，docs/Swift-Migration.md，第 49 步）；Objective-C 调用方从下方导入的 Swift 生成接口获得其声明。
+ *      selector 与 Swift 名称不变。
  */
-- (instancetype)initWithTitle:(nullable NSString *)title
-                        image:(nullable UIImage *)image;
-
-/*!
- * [EN] Creates a flat-design tab bar item with a title, image and selected image.
- * [CN] 使用标题、图片与选中态图片创建扁平化 TabBarItem。
- */
-- (instancetype)initWithTitle:(nullable NSString *)title
-                        image:(nullable UIImage *)image
-                selectedImage:(nullable UIImage *)selectedImage;
-
-/*!
- * [EN] Designated initializer: title, images, index, title/image offsets, image insets and optional Lottie file path and size.
- * [CN] 指定初始化方法：设置标题、图片、索引、标题/图片偏移、图片内边距，以及可选的 Lottie 文件路径与尺寸。
- */
-- (instancetype)initWithTitle:(nullable NSString *)title
-                        image:(nullable id)image
-                selectedImage:(nullable id)selectedImage
-                        index:(NSInteger)index
-      titlePositionAdjustment:(UIOffset)titlePositionAdjustment
-      imagePositionAdjustment:(UIOffset)imagePositionAdjustment
-                  imageInsets:(UIEdgeInsets)imageInsets
-               lottieFilePath:(nullable NSString *)lottieFilePath
-              lottieSizeValue:(nullable NSValue *)lottieSizeValue;
-
-//- (UIControl *)getTabBarControl;
-//FIXME:  to delete @property (nullable, nonatomic, weak) UIControl *view;
-
-@property (nullable, nonatomic, strong) CYLFlatDesignTabBarButton *tabBarButton;
-
-#pragma mark - 系统 UITabBarItem 有的属性
-// default is YES
-@property (nonatomic, assign, getter=isEnabled) BOOL enabled;
-@property (nonatomic, assign) NSUInteger index;
-
-@property (nullable, nonatomic, copy) NSString *title;
-@property (nullable, nonatomic, strong) UIImage *image;
-@property (nullable, nonatomic, strong) UIImage *selectedImage;
-// [CN] ⚠️ PATCH(aifirx): 原本是 strong，与 UIViewController.cyl_tabBarItem 的关联对象（RETAIN）构成
-// <ViewController> → <CYLFlatDesignTabBarItem> → <childViewController> 的自我强引用闭环，
-// 导致 tab 子控制器在 pop 之后永远无法释放。改为 weak。
-// [EN] ⚠️ PATCH(aifirx): This used to be strong, which together with the associated object (RETAIN) of
-//      UIViewController.cyl_tabBarItem formed the retain cycle
-//      <ViewController> → <CYLFlatDesignTabBarItem> → <childViewController>,
-//      so tab child controllers were never released after being popped. Changed to weak.
-@property (nullable, nonatomic, weak) UIViewController *childViewController;
-// [CN] default is nil, badgeValue为nil并且badgeSize为CGSizeZero时，badge隐藏
-// [EN] default is nil; the badge is hidden when badgeValue is nil and badgeSize is CGSizeZero
-@property (nullable, nonatomic, copy) NSString *badgeValue;
-@property (nonatomic, readwrite, copy, nullable) UIColor *badgeColor;
-
-@property (nullable, nonatomic, weak, getter=cylflatdesign_tabBarController, setter=cylflatdesign_setTabBarController:) UIViewController __kindof *cylflatdesign_tabBarController;
-
-@property (nonatomic, readwrite, assign) UIOffset titlePositionAdjustment UI_APPEARANCE_SELECTOR;
-
-/*!
- * [EN] Like `-[UITabBarItem standardAppearance]`: while this item is selected, the whole flat design tab bar uses this
- *      appearance instead of `-[CYLFlatDesignTabBar standardAppearance]`. `CYLTabBarController` assigns the child view
- *      controller's `tabBarItem.standardAppearance` here when the app has set one. See
- *      `-[CYLFlatDesignTabBar standardAppearance]` for what is mapped.
- * [CN] 与 `-[UITabBarItem standardAppearance]` 相同：该 item 选中期间，整个扁平样式 TabBar 使用此 appearance，而不是
- *      `-[CYLFlatDesignTabBar standardAppearance]`。App 设置了子控制器的 `tabBarItem.standardAppearance` 时，`CYLTabBarController`
- *      会将其赋给这里。映射关系见 `-[CYLFlatDesignTabBar standardAppearance]`。
- */
-@property (nullable, nonatomic, copy) UITabBarAppearance *standardAppearance API_AVAILABLE(ios(13.0));
-
-/*!
- * [EN] Sets the title text attributes for `state` (like UITabBarItem).
- * [CN] 设置指定状态下的标题文字属性（同 UITabBarItem）。
- */
-- (void)setTitleTextAttributes:(nullable NSDictionary<NSAttributedStringKey,id> *)attributes forState:(UIControlState)state UI_APPEARANCE_SELECTOR;
-
-/*!
- * [EN] Returns the title text attributes for `state`.
- * [CN] 返回指定状态下的标题文字属性。
- */
-- (nullable NSDictionary<NSAttributedStringKey,id> *)titleTextAttributesForState:(UIControlState)state;
-
-/*!
- * [EN] Sets the badge text attributes for `state`.
- * [CN] 设置指定状态下的角标文字属性。
- */
-- (void)setBadgeTextAttributes:(nullable NSDictionary<NSAttributedStringKey,id> *)textAttributes forState:(UIControlState)state UI_APPEARANCE_SELECTOR;
-
-/*!
- * [EN] Returns the badge text attributes for `state`.
- * [CN] 返回指定状态下的角标文字属性。
- */
-- (nullable NSDictionary<NSAttributedStringKey,id> *)badgeTextAttributesForState:(UIControlState)state;
-
-#pragma mark - CYLFlatDesignTabBarItem 新增属性
-// [CN] 若设置badgeSize为CGSizeZero，则badge自动计算大小，默认为CGSizeZero
-// [EN] If badgeSize is CGSizeZero, the badge size is calculated automatically. Defaults to CGSizeZero
-@property (nonatomic, readwrite, assign) CGSize badgeSize;
-// default {1, 6, 1, 6}
-@property (nonatomic, readwrite, assign) UIEdgeInsets badgeContentInset UI_APPEARANCE_SELECTOR;
-@property (nonatomic, readwrite, assign) UIOffset badgePositionAdjustment UI_APPEARANCE_SELECTOR;
-@property (nonatomic, readwrite, assign) UIOffset imagePositionAdjustment UI_APPEARANCE_SELECTOR;
-
-/*
- [CN] 没有image时，title是否居中显示
- 或没有title时，image是否居中显示，默认为NO
- [EN] Whether the title is centered when there is no image,
-      or the image is centered when there is no title. Defaults to NO
- */
-@property (nonatomic, readwrite, assign) BOOL layoutCentered UI_APPEARANCE_SELECTOR;
-
-@property (nullable, nonatomic, strong) UIColor *backgroundColor;
-@property (nullable, nonatomic, strong) UIColor *selectedBackgroundColor;
-
-@property (nonatomic, assign) UIEdgeInsets imageInsets;
-
-@property (nonatomic, strong, nullable) NSURL *lottieURL;
-
-@property (nonatomic, copy, nullable) NSString *lottieFilePath;
-
-@property (nonatomic, strong, nullable) NSValue *lottieSizeValue;
-
-/*!
- * [EN] Returns the view that hosts this item's badge (from its tab bar button).
- * [CN] 返回承载该 Item 角标的视图（取自其 TabBar 按钮）。
- */
-- (UIView *)actualBadgeSuperView;
-
-@end
 
 NS_ASSUME_NONNULL_END
+
+#import "CYLSwiftInterface.h"

@@ -50,19 +50,6 @@ class CYLTabBarControllerPortTest {
         }
     }
 
-    private fun attributes(vararg titles: String) = titles.map { mapOf(CYLConstants.CYLTabBarItemTitle to it, CYLConstants.CYLTabBarItemIdentifier to it.lowercase()) }
-
-    private fun <T> withActivity(block: (FragmentActivity) -> T): T {
-        val controller = Robolectric.buildActivity(FragmentActivity::class.java).setup()
-        try {
-            return block(controller.get())
-        } finally {
-            controller.pause().stop().destroy()
-        }
-    }
-
-    private fun idle() = shadowOf(Looper.getMainLooper()).idle()
-
     private fun controllerIn(activity: FragmentActivity, pages: List<Fragment>, attributes: List<Map<String, Any?>>): CYLTabBarController {
         val controller = CYLTabBarController(activity, pages, attributes)
         activity.setContentView(controller.view)
@@ -191,6 +178,7 @@ class CYLTabBarControllerPortTest {
         override fun showLastFrame() { events += "last" }
         override fun stop() { events += "stop" }
         override var animationSpeed: Float = 1f
+        override var loops: Boolean = false
         var colors: Map<String, Int>? = null
         override fun applyColors(colors: Map<String, Int>?, configuration: Configuration) { this.colors = colors }
     }
@@ -265,6 +253,43 @@ class CYLTabBarControllerPortTest {
     }
 
     @Test
+    fun playAllSpeedAndLoopCombineIntoOnePlaybackPolicy() = withActivity { activity ->
+        val animator = TestAnimator("TestPlayback", "anim")
+        CYLTabBarItemAnimatorRegistry.registerAnimator(animator)
+        try {
+            val tabs = listOf(
+                mapOf(CYLConstants.CYLTabBarItemTitle to "Home", CYLConstants.CYLTabBarAnimationFilePath to "home.anim"),
+                mapOf(CYLConstants.CYLTabBarItemTitle to "Me", CYLConstants.CYLTabBarAnimationFilePath to "me.anim"),
+                mapOf(CYLConstants.CYLTabBarItemTitle to "Static"),
+            )
+            val controller = controllerIn(activity, listOf(Page(), Page(), Page()), tabs)
+            val buttons = controller.tabBar.tabBarButtonArray
+            val players = buttons.take(2).map { it.cyl_tabBarItemAnimationPlayer as TestPlayer }
+            assertFalse("off by default: animations play once", controller.tabBarItemAnimationLoops)
+            assertTrue(players.none { it.loops })
+
+            controller.tabBarItemAnimationLoops = true
+            assertTrue("the loop switch reaches the animations already added", players.all { it.loops })
+            controller.tabBarItemAnimationSpeed = 2.5f
+            players.forEach { it.events.clear() }
+            controller.cyl_playAllTabBarItemAnimations()
+            players.forEach {
+                assertEquals("Play all restarts every icon, selected or not", listOf("play"), it.events)
+                assertEquals(2.5f, it.animationSpeed, 0.01f)
+                assertTrue(it.loops)
+            }
+            controller.tabBarItemAnimationLoops = false
+            assertTrue(players.none { it.loops })
+            // [EN] A tab without an animation is left alone. [CN] 没有动画的 Tab 不受影响。
+            buttons[2].cyl_setTabBarItemAnimationLoops(true)
+            buttons[2].cyl_restartTabBarItemAnimation()
+            assertNull(buttons[2].cyl_tabBarItemAnimationPlayer)
+        } finally {
+            CYLTabBarItemAnimatorRegistry.unregisterAnimatorWithIdentifier("TestPlayback")
+        }
+    }
+
+    @Test
     fun lottieAnimatorWorksWithLottieAndroid() = withActivity { activity ->
         assertTrue("lottie-android is on the test classpath", CYLLottieTabBarItemAnimator.isAvailable)
         assertNotNull(CYLTabBarItemAnimatorRegistry.sharedRegistry.animatorWithIdentifier("Lottie"))
@@ -274,6 +299,8 @@ class CYLTabBarControllerPortTest {
         val view = CYLTabBarItemAnimationFactory.animationViewWithURL(activity, file.absolutePath, CYLSize(30f, 30f), ImageView.ScaleType.FIT_CENTER)
         assertNotNull(view)
         assertTrue(view!!.cyl_isLottieAnimationView())
+        assertEquals("merge paths are on, as on iOS", true,
+            view.javaClass.getMethod("isMergePathsEnabledForKitKatAndAbove").invoke(view))
         val player = CYLTabBarItemAnimationFactory.playerForView(view)!!
         player.animationSpeed = 1.5f
         assertEquals(1.5f, player.animationSpeed, 0.01f)
@@ -304,6 +331,14 @@ class CYLTabBarControllerPortTest {
         val player = button.cyl_tabBarItemAnimationPlayer!!
         player.play(); player.stop(); player.showLastFrame()
         assertTrue(view.duration > 0)
+        // [EN] One animation view: the component's animationView is the tab bar's (docs/Animated-Item.md, task 4).
+        // [CN] 只有一个动画视图：组件的 animationView 即 TabBar 的动画视图（docs/Animated-Item.md，任务 4）。
+        assertSame(view, button.animationView)
+        assertTrue(button.isAnimationReady)
+        assertNotNull(button.animationPlayer)
+        button.cyl_replaceTabBarItemAnimationWithURL(null, null)
+        assertNull(button.animationView)
+        assertNull(button.cyl_tabBarItemAnimationView)
     }
 
     // MARK: - Themes 主题

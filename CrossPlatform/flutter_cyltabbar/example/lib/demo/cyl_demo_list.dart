@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 
 import '../cyl_skins.dart';
 import 'cyl_badge_view.dart';
+import 'cyl_localization.dart';
 
 class CYLDemoRow {
   CYLDemoRow(Map<String, dynamic> json)
@@ -134,10 +135,27 @@ class CYLDemoList extends StatelessWidget {
   final void Function(CYLDemoRow row, int index) onRow;
   final void Function(CYLDemoRow row, bool on) onSwitch;
 
-  String _fill(String text) => text.replaceAllMapped(
-    RegExp(r'\{(\w+)\}'),
-    (match) => values[match[1]] ?? '-',
-  );
+  /// A row's texts in the current language. The language row shows the language (`-cyl_languageCellForTableView:`), its
+  /// subtitle in the device language so it stays readable; the login row shows its state.
+  /// 当前语言中的行文字。语言行显示当前语言（`-cyl_languageCellForTableView:`），副标题使用设备语言以便始终能看懂；登录行显示登录状态。
+  ({String title, String subtitle, String? label}) _texts(CYLDemoRow row) {
+    if (row.id == 'language') {
+      final language = CYLLocalization.language;
+      return (
+        title: '🌐 ${t('Language')}：${CYLLocalization.flaggedName(language)}',
+        subtitle: CYLLocalization.device('Tap to change the language'),
+        label: '${t('Language')}, ${CYLLocalization.name(language)}',
+      );
+    }
+    final title = row.id == 'login'
+        ? t(
+            switches['login'] == true
+                ? 'Login state: logged in'
+                : 'Login state: logged out',
+          )
+        : t(row.title, values);
+    return (title: title, subtitle: t(row.subtitle, values), label: null);
+  }
 
   Widget _icon(CYLDemoRow row) {
     final skin = row.skin;
@@ -272,24 +290,29 @@ class CYLDemoList extends StatelessWidget {
 
   /// How VoiceOver / TalkBack reads a badge, as `CYLBadge`: "New content", "3 new messages" or its text. 读屏软件读出的角标内容。
   static String badgeAccessibilityText(String value) {
-    if (value.isEmpty) return 'New content';
-    return RegExp(r'^\d+$').hasMatch(value) ? '$value new messages' : value;
+    if (value.isEmpty) return t('New content');
+    return RegExp(r'^\d+$').hasMatch(value)
+        ? t('{count} new messages', {'count': value})
+        : value;
   }
 
   Widget _row(CYLDemoRow row, int index, int count) {
     final first = index == 0;
     final last = index == count - 1;
-    final subtitle = row.badge != null ? badgeSubtitle : _fill(row.subtitle);
+    final texts = _texts(row);
+    final subtitle = row.badge != null ? badgeSubtitle : texts.subtitle;
     // Accessibility: one element per row, its title and subtitle (and its badge); a switch row is the switch; rows with
     // their own buttons (arrows, "Tap me") let those buttons be reached. 无障碍：每行一个元素（标题、副标题与角标）；开关行即开关；
     // 带按钮的行（箭头、「Tap me」）让这些按钮可被访问。
     final isSwitch = row.accessory == 'switch';
     final grouped = row.accessory != 'arrows' && row.button == null;
-    final label = [
-      _fill(row.title),
-      subtitle,
-      if (row.badge != null) badgeAccessibilityText(row.badge!.value),
-    ].where((part) => part.isNotEmpty).join(', ');
+    final label =
+        texts.label ??
+        [
+          texts.title,
+          subtitle,
+          if (row.badge != null) badgeAccessibilityText(row.badge!.value),
+        ].where((part) => part.isNotEmpty).join(', ');
     return Semantics(
       container: true,
       button: grouped && !isSwitch,
@@ -302,7 +325,15 @@ class CYLDemoList extends StatelessWidget {
                 ? onSwitch(row, switches[row.id] != true)
                 : onRow(row, index)
           : null,
-      child: _rowContent(row, index, first, last, subtitle, isSwitch),
+      child: _rowContent(
+        row,
+        index,
+        first,
+        last,
+        texts.title,
+        subtitle,
+        isSwitch,
+      ),
     );
   }
 
@@ -311,6 +342,7 @@ class CYLDemoList extends StatelessWidget {
     int index,
     bool first,
     bool last,
+    String title,
     String subtitle,
     bool isSwitch,
   ) {
@@ -343,7 +375,7 @@ class CYLDemoList extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _fill(row.title),
+                      title,
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w500,
@@ -422,7 +454,7 @@ class CYLDemoList extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(4, 28, 4, 10),
                 child: Text(
-                  section.title,
+                  t(section.title),
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,

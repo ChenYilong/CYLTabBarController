@@ -1,0 +1,18 @@
+{
+  "apiType": "stageMode",
+  "buildOption": {
+    // [EN] Badge debugging build option (docs/Badge-Debugging.md): set CYL_BADGE_ANIMATION_DISABLED to true while checking badge
+    //      positions, so screenshots show badges at their laid-out place. Keep it false in every release.
+    // [CN] 角标调试编译选项（docs/Badge-Debugging.md）：调试角标坐标期间设为 true，截图中的角标就在布局位置。发布版本保持 false。
+    "arkOptions": {
+      "buildProfileFields": {
+        "CYL_BADGE_ANIMATION_DISABLED": false
+      }
+    }
+  },
+  "targets": [
+    {
+      "name": "default"
+    }
+  ]
+}

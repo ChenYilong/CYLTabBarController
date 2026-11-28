@@ -9,80 +9,17 @@ import CYLTabBarController
 import UIKit
 class MainTabBarController: CYLTabBarController {
     
-    // MARK: - Your main designated initializer
-    override init(
-        viewControllers: [UIViewController],
-        tabBarItemsAttributes: [[AnyHashable: Any]],
-        imageInsets: UIEdgeInsets,
-        titlePositionAdjustment: UIOffset,
-        
-        context: String?
-    ) {
-        super.init(
-            viewControllers: viewControllers,
-            tabBarItemsAttributes: tabBarItemsAttributes,
-            imageInsets: imageInsets,
-            titlePositionAdjustment: titlePositionAdjustment,
-            context: context
-        )
-    }
-    override init(
-        viewControllers: [UIViewController],
-        tabBarItemsAttributes: [[AnyHashable: Any]],
-        imageInsets: UIEdgeInsets,
-        titlePositionAdjustment: UIOffset,
-        styleType: CYLTabBarStyleType,
-        context: String?
-    ) {
-        super.init(
-            viewControllers: viewControllers,
-            tabBarItemsAttributes: tabBarItemsAttributes,
-            imageInsets: imageInsets,
-            titlePositionAdjustment: titlePositionAdjustment,
-            styleType: styleType,
-            context: context
-        )
-    }
-  
-//    override init() {
-//            super.init()
-//    }
+    // [EN] No designated initializer here, so every initializer of CYLTabBarController is inherited, `init(coder:)` and
+    //      `init(nibName:bundle:)` included: the ObjC initializers forward through `self`, and an initializer that a Swift
+    //      subclass loses fails with "Use of unimplemented initializer".
+    // [CN] 这里不声明指定初始化方法，因此继承 CYLTabBarController 的全部初始化方法（包括 `init(coder:)` 与 `init(nibName:bundle:)`）：
+    //      ObjC 初始化方法通过 `self` 互相转发，Swift 子类缺失的初始化方法会报错 "Use of unimplemented initializer"。
 
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-            super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    }
-
-//    required init(coder aDecoder: NSCoder) {
-//            super.init(coder: aDecoder)
-//    }
-
-    
     convenience init(context: String = "") {
         let imageInsets = UIEdgeInsets.zero
         let titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -3.5)
         
         self.init(viewControllers: Self.makeViewControllers(), tabBarItemsAttributes: Self.makeTabBarItemsAttributes(), imageInsets: imageInsets, titlePositionAdjustment: titlePositionAdjustment, context: context)
-    }
-    // MARK: - REQUIRED by UIKit (🔥 Fix here)
-//    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-//        
-//        let imageInsets = UIEdgeInsets.zero
-//        let titlePositionAdjustment = UIOffset(horizontal: 0, vertical: -3.5)
-//        
-//        super.init(
-//            viewControllers: Self.makeViewControllers(),
-//            tabBarItemsAttributes: Self.makeTabBarItemsAttributes(),
-//            imageInsets: imageInsets,
-//            titlePositionAdjustment: titlePositionAdjustment,
-//            context: ""
-//        )
-//        
-////        self.tabBarStyleType = .liquidGlass
-//    }
-    
-    // MARK: - REQUIRED
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
@@ -109,11 +46,11 @@ class MainTabBarController: CYLTabBarController {
     // Issue #428: called once for each Lottie view, after `lottieAnimationSpeed` was applied; one tab can get its own
     // speed here. 每个 Lottie 视图添加后回调一次，可在这里为某一个 Tab 单独设置速度。
     private func observeLottieAnimationViewDidAdd() {
-        let name = NSNotification.Name.CYLTabBarItemAnimationViewDidAdd
+        let name = NSNotification.Name.cylTabBarItemAnimationViewDidAdd
         _ = NotificationCenter.default.addObserver(forName: name, object: nil, queue: .main) { [weak self] note in
-            guard let tabButton = note.object as? UIControl, tabButton.cyl_tabBarController === self else { return }
+            guard let tabButton = note.object as? UIControl, tabButton.cylTabBarController === self else { return }
             if tabButton.cyl_tabBarChildViewControllerIndex == 0 {
-                tabButton.cyl_setTabBarItemAnimationSpeed(2.0)
+                tabButton.cylSetTabBarItemAnimationSpeed(2.0)
             }
         }
     }
@@ -128,7 +65,7 @@ class MainTabBarController: CYLTabBarController {
         demoShowPlusButtonBadgeAfterLayout()
     }
 
-    override func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
+    func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
         demoPlusButtonDidTap(control)
     }
 }
@@ -155,11 +92,11 @@ extension MainTabBarController {
     static func makeTabBarItemsAttributes() -> [[AnyHashable: Any]] {
         // Dark Mode (#620): "home_normal" also loads home_normal_dark (naming convention), the message tab names its dark
         // image, account_normal has its own Dark appearance. 深色模式：见 README「适配深色模式」。
-        let attributes = CYLLocalizedTabBarItemsAttributes(["首页", "鱼塘", "消息", "我的"],
+        let attributes = cylLocalizedTabBarItemsAttributes(["首页", "鱼塘", "消息", "我的"],
                                                            ["home_normal", "fishpond_normal", "message_normal", "account_normal"],
                                                            ["home_highlight", "fishpond_highlight", "message_highlight", "account_highlight"],
                                                            [2: "message_normal_night"])
-        let lottieAttributes = CYLTabBarItemsAttributesAddingLottieFiles(attributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil)
+        let lottieAttributes = CYLTabBarItemsAttributesAddingLottieFiles(attributes, ["green_lottie_tab_home", "green_lottie_tab_discover", "green_lottie_tab_news", "green_lottie_tab_mine"], nil) as? [[AnyHashable: Any]] ?? []
         // #442 (Lottie 4.x): one file per tab follows Dark Mode, its colors set with Lottie's value providers.
         // 每个 Tab 一份 Lottie 文件适配深色模式，颜色通过 Lottie 的 value provider 设置。
         return zip(lottieAttributes, lottieDarkColors()).map { item, darkColors in
@@ -191,9 +128,9 @@ extension MainTabBarController {
     // [EN] `override`: CYLTabBarController adopts CYLTabBarControllerDelegate, which declares this method.
     // [CN] `override`：CYLTabBarController 遵循声明该方法的 CYLTabBarControllerDelegate。
     @objc(tabBarController:didRecognizeTabBarItemGesture:control:viewController:)
-    override func tabBarController(_ _: CYLTabBarController, didRecognize gesture: CYLTabBarItemGesture,
+    func tabBarController(_ _: CYLTabBarController, didRecognize gesture: CYLTabBarItemGesture,
                                 control: UIControl, viewController: UIViewController?) {
-        let content = viewController?.cyl_getViewControllerInsteadOfNavigation()
+        let content = viewController?.cylGetViewControllerInsteadOfNavigation()
         switch gesture {
         case .reselect:
             // [EN] Tap the selected tab: scroll to the top.
@@ -209,7 +146,7 @@ extension MainTabBarController {
             // [EN] Long press: an action sheet for the tab.
             // [CN] 长按：弹出该 Tab 的操作菜单。
             let sheet = UIAlertController(title: control.cyl_tabBarItemIdentifier, message: "Long press (#152)", preferredStyle: .actionSheet)
-            sheet.addAction(UIAlertAction(title: CYLLocalizedString("取消"), style: .cancel))
+            sheet.addAction(UIAlertAction(title: cylDemoLocalizedString("取消"), style: .cancel))
             sheet.popoverPresentationController?.sourceView = control
             sheet.popoverPresentationController?.sourceRect = control.bounds
             if presentedViewController == nil {

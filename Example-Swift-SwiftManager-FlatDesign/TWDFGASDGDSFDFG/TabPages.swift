@@ -19,7 +19,7 @@ final class SwiftAutoPageViewController: UIViewController, CYLTabBarPage {
 
     static func cylTabBarPage(attributes tabAttributes: [String: Any]) -> UIViewController? {
         let page = SwiftAutoPageViewController()
-        page.title = tabAttributes[CYLTabBarItemTitle] as? String
+        page.title = tabAttributes[cylTabBarItemTitle] as? String
         return UINavigationController(rootViewController: page)
     }
 }
@@ -57,13 +57,13 @@ enum TabPages {
     /// [EN] A tab bar controller from a configuration, listing the tabs that got no page.
     static func makeTabBarController() -> CYLTabBarController {
         let tabBarController = CYLTabBarController(configuration: [
-            CYLTabBarControllerPageLookupOrder: [CYLTabBarPageSource.sharedRegistry, CYLTabBarPageSource.automaticRegistration],
-            CYLTabBarControllerTabBarItemsAttributes: [
-                [CYLTabBarItemTitle: "Home", CYLTabBarItemImage: "system:house", CYLTabBarItemPageIdentifier: "swift-home"],
-                [CYLTabBarItemTitle: "Auto", CYLTabBarItemImage: "system:star", CYLTabBarItemPageIdentifier: "swift-auto"],
-                [CYLTabBarItemTitle: "Docs", CYLTabBarItemImage: "system:book", CYLTabBarItemPageIdentifier: "swift-docs",
-                 CYLTabBarItemPageParameters: ["topic": "Documentation"]],
-                [CYLTabBarItemTitle: "Missing", CYLTabBarItemImage: "system:questionmark", CYLTabBarItemPageIdentifier: "no-such-page"],
+            cylTabBarControllerPageLookupOrder: [cylTabBarPageSourceSharedRegistry, cylTabBarPageSourceAutomaticRegistration],
+            cylTabBarControllerTabBarItemsAttributes: [
+                [cylTabBarItemTitle: "Home", cylTabBarItemImage: "system:house", cylTabBarItemPageIdentifier: "swift-home"],
+                [cylTabBarItemTitle: "Auto", cylTabBarItemImage: "system:star", cylTabBarItemPageIdentifier: "swift-auto"],
+                [cylTabBarItemTitle: "Docs", cylTabBarItemImage: "system:book", cylTabBarItemPageIdentifier: "swift-docs",
+                 cylTabBarItemPageParameters: ["topic": "Documentation"]],
+                [cylTabBarItemTitle: "Missing", cylTabBarItemImage: "system:questionmark", cylTabBarItemPageIdentifier: "no-such-page"],
             ],
         ])
         for skipped in tabBarController.cyl_skippedTabs {

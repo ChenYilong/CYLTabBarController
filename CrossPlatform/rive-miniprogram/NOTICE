@@ -1,0 +1,11 @@
+cyl-rive-miniprogram
+Copyright (c) ChenYilong. The cyl-rive component and scripts/cyl_build.js are licensed under the MIT License (see LICENSE).
+
+miniprogram_dist/rive is built by scripts/cyl_build.js from @rive-app/canvas-advanced 2.39.1
+(https://github.com/rive-app/rive-wasm, MIT, Copyright (c) 2020-2021 Rive; license in miniprogram_dist/rive/LICENSE):
+canvas_advanced.js is canvas_advanced.mjs turned into CommonJS with mini program shims declared before it, and
+rive.wasm.br is rive.wasm compressed with Brotli.
+
+The approach (a 2D canvas, the canvas-advanced runtime, WXWebAssembly with a Brotli WebAssembly in the package) follows
+the README of RiveViewer-miniapp (CrossPlatform/RiveViewer-miniapp); none of its code, which is licensed
+PolyForm-Noncommercial-1.0.0, is included.

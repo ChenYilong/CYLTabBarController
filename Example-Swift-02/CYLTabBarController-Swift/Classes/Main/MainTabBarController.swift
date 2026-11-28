@@ -9,53 +9,11 @@ import CYLTabBarController
 import UIKit
 class MainTabBarController: CYLTabBarController {
     
-    // MARK: - Your main designated initializer
-    override init(
-        viewControllers: [UIViewController],
-        tabBarItemsAttributes: [[AnyHashable: Any]],
-        imageInsets: UIEdgeInsets,
-        titlePositionAdjustment: UIOffset,
-        context: String?
-    ) {
-        super.init(
-            viewControllers: viewControllers,
-            tabBarItemsAttributes: tabBarItemsAttributes,
-            imageInsets: imageInsets,
-            titlePositionAdjustment: titlePositionAdjustment,
-            context: context
-        )
-    }
-    // The ObjC initializer above forwards to this one via `self`, so a Swift subclass
-    // must override it too, otherwise: "Use of unimplemented initializer".
-    override init(
-        viewControllers: [UIViewController],
-        tabBarItemsAttributes: [[AnyHashable: Any]],
-        imageInsets: UIEdgeInsets,
-        titlePositionAdjustment: UIOffset,
-        styleType: CYLTabBarStyleType,
-        context: String?
-    ) {
-        super.init(
-            viewControllers: viewControllers,
-            tabBarItemsAttributes: tabBarItemsAttributes,
-            imageInsets: imageInsets,
-            titlePositionAdjustment: titlePositionAdjustment,
-            styleType: styleType,
-            context: context
-        )
-    }
-    // MARK: - REQUIRED by UIKit (🔥 Fix here)
-    // Must only forward to super: CYLTabBarController's designated initializer calls
-    // `[super init]`, which UIKit routes back here via `initWithNibName:bundle:`.
-    // Calling `super.init(viewControllers:...)` from here recurses until the stack overflows.
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
-    }
-    
-    // MARK: - REQUIRED
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    // [EN] No designated initializer here, so every initializer of CYLTabBarController is inherited, `init(coder:)` and
+    //      `init(nibName:bundle:)` included: the ObjC initializers forward through `self`, and an initializer that a Swift
+    //      subclass loses fails with "Use of unimplemented initializer".
+    // [CN] 这里不声明指定初始化方法，因此继承 CYLTabBarController 的全部初始化方法（包括 `init(coder:)` 与 `init(nibName:bundle:)`）：
+    //      ObjC 初始化方法通过 `self` 互相转发，Swift 子类缺失的初始化方法会报错 "Use of unimplemented initializer"。
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -100,7 +58,7 @@ class MainTabBarController: CYLTabBarController {
             issue610Label.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             issue610Label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
         ])
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: CYLLocalizedString("Swap icons"), style: .plain,
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: cylDemoLocalizedString("Swap icons"), style: .plain,
                                                             target: self, action: #selector(issue610SwapIcons))
         let arguments = ProcessInfo.processInfo.arguments
         if arguments.contains("-CYL610Landscape"), #available(iOS 16.0, *) {
@@ -157,7 +115,7 @@ class MainTabBarController: CYLTabBarController {
     /// Tab buttons that report taps through CYLTabBarController's target-action. The plus button and the plus child
     /// view controller's button report through the plus button instead, so they are left out.
     private func issue610TabControls() -> [UIControl] {
-        return tabBar.cyl_visibleControls()?.filter { !$0.cyl_isPlusControl() } ?? []
+        return tabBar.cylVisibleControls()?.filter { !$0.cylIsPlusControl() } ?? []
     }
 
     /// "1" / "0" per control: does it carry CYLTabBarController's tap action right now?
@@ -183,7 +141,7 @@ class MainTabBarController: CYLTabBarController {
         let icons = Self.issue610IconSets[issue610IconSetIndex]
         // `tabBar.items` also holds the plus button's item; skip it.
         let items = (viewControllers ?? [])
-            .filter { !$0.cyl_isPlaceholder && $0 !== CYLPlusChildViewController }
+            .filter { !$0.cyl_isPlaceholder && $0 !== cylPlusChildViewController }
             .map { $0.tabBarItem! }
         for (index, item) in items.enumerated() where index < icons.count {
             item.image = UIImage(named: icons[index].normal)
@@ -192,7 +150,7 @@ class MainTabBarController: CYLTabBarController {
         NSLog("[#610] swapped tab bar icons to set %ld", issue610IconSetIndex)
     }
 
-    override func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
+    func tabBarController(_ _: CYLTabBarController, didSelect control: UIControl) {
         demoPlusButtonDidTap(control)
         issue610CallbackCount += 1
         let index = selectedIndex
@@ -207,7 +165,7 @@ class MainTabBarController: CYLTabBarController {
         let identifier = control.cyl_tabBarItemIdentifier
         NSLog("[#408] tapped \"%@\" (selected \"%@\")", identifier ?? "nil", cyl_selectedTabBarItemIdentifier ?? "nil")
         for eachIdentifier in cyl_tabBarItemIdentifiers {
-            let isPlusButton = cyl_control(withTabBarItemIdentifier: eachIdentifier)?.cyl_isPlusButton() ?? false
+            let isPlusButton = cyl_control(withTabBarItemIdentifier: eachIdentifier)?.cylIsPlusButton() ?? false
             NSLog("   \"%@\": index %lu, %@", eachIdentifier, cyl_index(ofTabBarItemIdentifier: eachIdentifier), isPlusButton ? "plus button" : "tab button")
         }
         switch identifier {

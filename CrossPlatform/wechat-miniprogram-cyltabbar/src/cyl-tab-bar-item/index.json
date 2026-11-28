@@ -1,0 +1,21 @@
+{
+  "component": true,
+  "usingComponents": {
+    "cyl-glass-lens": "../cyl-glass-lens/index",
+    "cyl-animated-item": "../cyl-animated-item/index"
+  },
+  "componentGenerics": {
+    "cyl-lottie-view": {
+      "default": "../cyl-animation-placeholder/index"
+    },
+    "cyl-pag-view": {
+      "default": "../cyl-animation-placeholder/index"
+    },
+    "cyl-rive-view": {
+      "default": "../cyl-animation-placeholder/index"
+    },
+    "cyl-svga-view": {
+      "default": "../cyl-animation-placeholder/index"
+    }
+  }
+}

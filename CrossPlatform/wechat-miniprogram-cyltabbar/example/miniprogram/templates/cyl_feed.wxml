@@ -1,0 +1,10 @@
+<!-- [EN] The feed of badge rows of an iOS tab (utils/cyl_feed_rows.js); the page handles cyl_onFeedRow. [CN] iOS Tab 的角标行信息流（utils/cyl_feed_rows.js）；页面处理 cyl_onFeedRow。 -->
+<template name="cylFeed">
+  <text class="cyl-section-title" aria-role="heading">{{title}}</text>
+  <view class="cyl-section">
+    <view wx:for="{{rows}}" wx:key="index" class="cyl-row cyl-feed-row" hover-class="cyl-row-pressed" bindtap="cyl_onFeedRow" data-index="{{index}}" aria-role="button" aria-label="{{item.title}}{{item.subtitle ? ', ' + item.subtitle : ''}}{{item.dot ? ', •' : (item.text ? ', ' + item.text : '')}}">
+      <view class="cyl-feed-texts" aria-hidden="true"><text class="cyl-feed-title">{{item.title}}</text><text wx:if="{{item.subtitle}}" class="cyl-feed-subtitle">{{item.subtitle}}</text></view>
+      <view wx:if="{{item.dot || item.text}}" class="cyl-feed-badge {{item.dot ? 'cyl-feed-dot' : ''}}" aria-hidden="true">{{item.dot ? '' : item.text}}</view>
+    </view>
+  </view>
+</template>

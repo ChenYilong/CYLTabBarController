@@ -17,77 +17,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface UITabBarItem (CYLTabBarControllerExtention)
-
-@property (nonatomic, readonly, nullable) UIControl *cyl_selectedTabButton;
-@property (nonatomic, readonly) UIControl *cyl_visiableTabButton;
-@property (nonatomic, strong, getter=cyl_lottieURL, setter=cyl_setLottieURL:) NSURL *cyl_lottieURL DEPRECATED_MSG_ATTRIBUTE("Use cyl_tabBarItemAnimationURL");
-
-@property (nonatomic, strong, getter=cyl_lottieSizeValue, setter=cyl_setLottieSizeValue:) NSValue *cyl_lottieSizeValue DEPRECATED_MSG_ATTRIBUTE("Use cyl_tabBarItemAnimationSizeValue");
-
-/// [EN] FIX: issue #604 — the item's animation file, for any library. [CN] 该 item 的动画文件，适用于任意动画库。
-@property (nonatomic, strong, nullable, getter=cyl_tabBarItemAnimationURL, setter=cyl_setTabBarItemAnimationURL:) NSURL *cyl_tabBarItemAnimationURL;
-/// [EN] FIX: issue #604 — the item's animation size (NSValue of CGSize), for any library. [CN] 该 item 的动画尺寸（CGSize 的 NSValue），适用于任意动画库。
-@property (nonatomic, strong, nullable, getter=cyl_tabBarItemAnimationSizeValue, setter=cyl_setTabBarItemAnimationSizeValue:) NSValue *cyl_tabBarItemAnimationSizeValue;
-@property (nonatomic, assign, getter=cyl_imagePositionAdjustment, setter=cyl_setImagePositionAdjustment:) UIOffset cyl_imagePositionAdjustment;
-
-/**
- * 获取一个UITabBarItem内显示图标的UIImageView，如果找不到则返回nil
- * [EN] Returns the image view that shows this item's icon, or nil.
- * [CN] 返回该 Item 用于显示图标的图片视图，找不到时返回 nil。
- */
-- (nullable UIImageView *)cyl_imageView;
-
 /*!
- * [EN] Same as `-cyl_imageView`.
- * [CN] 同 -cyl_imageView。
+ * [EN] `UITabBarItem (CYLTabBarControllerExtention)` and `UITabBarAppearance (CYLTabBarControllerExtention)` are implemented in
+ *      Swift (`Swift/UITabBarItem+CYLTabBarControllerExtention.swift`); Objective-C callers get the declarations, with their
+ *      documentation, from the generated Swift interface imported at the end of this header (docs/Swift-Migration.md).
+ * [CN] `UITabBarItem (CYLTabBarControllerExtention)` 与 `UITabBarAppearance (CYLTabBarControllerExtention)` 在 Swift 中实现
+ *      （`Swift/UITabBarItem+CYLTabBarControllerExtention.swift`）；Objective-C 调用方从本头文件末尾导入的 Swift 生成接口获得声明及其文档
+ *      （docs/Swift-Migration.md）。
  */
-- (nullable UIImageView *)cyl_imageViewInTabBarButton;
-
-/*!
- * [EN] Runs when the user taps this tab twice quickly, e.g. to scroll to the top and refresh: a per-tab shortcut for the
- *      DoubleTap of `-[CYLTabBarController cyl_tabBarItemGestureHandler]` (see docs/TabBarItem-Gestures.md), with the
- *      same recognition and interval (`cyl_tabBarItemDoubleTapInterval`), in every style. Set it on the tab's item: the
- *      navigation controller's `tabBarItem` (the root view controller's also works). Runs after the gesture handler and
- *      the delegate. `index` is the tab's index in `viewControllers`.
- * [CN] 快速连续两次点击该 Tab 时执行，例如回到顶部并刷新：是 `-[CYLTabBarController cyl_tabBarItemGestureHandler]` 中 DoubleTap 的
- *      单个 Tab 快捷写法（见 docs/TabBarItem-Gestures.md），识别方式与间隔（`cyl_tabBarItemDoubleTapInterval`）相同，适用于所有样式。
- *      设置在该 Tab 的 item 上：导航控制器的 `tabBarItem`（根控制器的也可以）。在手势 handler 与代理之后执行。`index` 为该 Tab 在
- *      `viewControllers` 中的下标。
- */
-@property (nonatomic, copy, nullable, getter=cyl_doubleTapBlock, setter=cyl_setDoubleTapBlock:) void (^cyl_doubleTapBlock)(UITabBarItem *tabBarItem, NSInteger index);
-
-/*!
- * [EN] Runs after every layout of the tab bar with the button UIKit draws for this item (`cyl_tabButton`), e.g. to add or
- *      place a view of your own on it, which UIKit's layout would otherwise move or cover. The button can be a new one
- *      after UIKit rebuilt it (e.g. after the item's image changed): look subviews up again each time. The system tab
- *      bar (Liquid Glass, classic); FlatDesign items are views of the library and are laid out by it.
- * [CN] TabBar 每次布局之后执行，参数为 UIKit 为该 item 绘制的按钮（`cyl_tabButton`），例如在按钮上添加或摆放自己的视图，避免被 UIKit
- *      的布局移动或遮挡。UIKit 重建按钮后（例如修改了 item 的图片）可能是新的按钮：每次都请重新查找子视图。适用于系统 TabBar
- *      （液态玻璃、经典样式）；扁平样式的 item 是本库自己的视图，由本库布局。
- */
-@property (nonatomic, copy, nullable, getter=cyl_viewDidLayoutSubviewsBlock, setter=cyl_setViewDidLayoutSubviewsBlock:) void (^cyl_viewDidLayoutSubviewsBlock)(UITabBarItem *tabBarItem, UIView *view);
-
-@end
-
-/*!
- * [EN] Item styles of a `UITabBarAppearance` in one go.
- * [CN] 一次设置 `UITabBarAppearance` 的 item 样式。
- */
-API_AVAILABLE(ios(13.0))
-@interface UITabBarAppearance (CYLTabBarControllerExtention)
-
-/*!
- * [EN] Runs `block` on `stackedLayoutAppearance`, `inlineLayoutAppearance` and `compactInlineLayoutAppearance`, so a style
- *      applies whether the items are stacked (iPhone portrait) or inline (iPad, landscape):
- *          [appearance cyl_applyItemAppearanceWithBlock:^(UITabBarItemAppearance *itemAppearance) {
- *              itemAppearance.selected.iconColor = UIColor.systemRedColor;
- *          }];
- * [CN] 对 `stackedLayoutAppearance`、`inlineLayoutAppearance`、`compactInlineLayoutAppearance` 依次执行 `block`，使样式在 item
- *      纵向排列（iPhone 竖屏）与横向排列（iPad、横屏）时都生效（示例见上方英文）。
- */
-- (void)cyl_applyItemAppearanceWithBlock:(void (NS_NOESCAPE ^)(UITabBarItemAppearance *itemAppearance))block;
-
-@end
 
 NS_ASSUME_NONNULL_END
+
+#import "CYLSwiftInterface.h"

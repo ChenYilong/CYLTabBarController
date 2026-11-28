@@ -117,8 +117,8 @@ enum GalleryProvider {
 
     static func redAttributes(_: Int) -> [String: Any] {
         let gray = Gallery.gray(175)
-        return [CYLTabBarItemTitleColor: gray, CYLTabBarItemSelectedTitleColor: Gallery.red,
-                CYLTabBarItemIconColor: gray, CYLTabBarItemSelectedIconColor: Gallery.red]
+        return [cylTabBarItemTitleColor: gray, cylTabBarItemSelectedTitleColor: Gallery.red,
+                cylTabBarItemIconColor: gray, cylTabBarItemSelectedIconColor: Gallery.red]
     }
 
     static func customColorStyle() -> UIViewController {
@@ -137,15 +137,15 @@ enum GalleryProvider {
     static func backgroundTabBarController(styleType: CYLTabBarStyleType = Gallery.fullWidthStyle) -> CYLTabBarController {
         let attributes = Gallery.attributes(5, showsTitles: false, pointSize: 22) { index -> [String: Any] in
             if index == 2 {
-                return [CYLTabBarItemImage: Gallery.symbol("camera", filled: false, pointSize: 28),
-                        CYLTabBarItemSelectedImage: Gallery.symbol("camera", filled: true, pointSize: 28),
-                        CYLTabBarItemIconColor: UIColor.white, CYLTabBarItemSelectedIconColor: UIColor.white,
-                        CYLTabBarItemBackgroundColor: Gallery.rgb(17, 86, 136),
-                        CYLTabBarItemSelectedBackgroundColor: Gallery.rgb(22, 24, 25)]
+                return [cylTabBarItemImage: Gallery.symbol("camera", filled: false, pointSize: 28),
+                        cylTabBarItemSelectedImage: Gallery.symbol("camera", filled: true, pointSize: 28),
+                        cylTabBarItemIconColor: UIColor.white, cylTabBarItemSelectedIconColor: UIColor.white,
+                        cylTabBarItemBackgroundColor: Gallery.rgb(17, 86, 136),
+                        cylTabBarItemSelectedBackgroundColor: Gallery.rgb(22, 24, 25)]
             }
-            return [CYLTabBarItemIconColor: Gallery.gray(165), CYLTabBarItemSelectedIconColor: UIColor.white,
-                    CYLTabBarItemBackgroundColor: Gallery.rgb(37, 39, 42),
-                    CYLTabBarItemSelectedBackgroundColor: Gallery.rgb(22, 24, 25)]
+            return [cylTabBarItemIconColor: Gallery.gray(165), cylTabBarItemSelectedIconColor: UIColor.white,
+                    cylTabBarItemBackgroundColor: Gallery.rgb(37, 39, 42),
+                    cylTabBarItemSelectedBackgroundColor: Gallery.rgb(22, 24, 25)]
         }
         let controller = Gallery.tabBarController(pages: Gallery.pages(5), attributes: attributes, styleType: styleType)
         Gallery.setBackgroundColor(of: controller, to: Gallery.rgb(37, 39, 42))
@@ -176,7 +176,7 @@ enum GalleryProvider {
         controller.cyl_defaultTabButtonAnimation = GalleryHighlightableAnimation()
         Gallery.forEachTabButton(of: controller) { button, _ in
             let scale = GalleryHighlightableAnimation.largeScale
-            button.cyl_tabImageView()?.transform = CGAffineTransform(scaleX: scale, y: scale)
+            button.cylTabImageView()?.transform = CGAffineTransform(scaleX: scale, y: scale)
         }
         return Gallery.embed(controller)
     }
@@ -184,8 +184,8 @@ enum GalleryProvider {
     // MARK: - Irregular and customized clicks
 
     static func tealAttributes(_: Int) -> [String: Any] {
-        return [CYLTabBarItemTitleColor: UIColor.white, CYLTabBarItemSelectedTitleColor: Gallery.teal,
-                CYLTabBarItemIconColor: UIColor.white, CYLTabBarItemSelectedIconColor: Gallery.teal]
+        return [cylTabBarItemTitleColor: UIColor.white, cylTabBarItemSelectedTitleColor: Gallery.teal,
+                cylTabBarItemIconColor: UIColor.white, cylTabBarItemSelectedIconColor: Gallery.teal]
     }
 
     /// [EN] Home, Find, Favor and Me around a large round plus button. [CN] Home、Find、Favor、Me 位于大号圆形 PlusButton 两侧。
@@ -194,10 +194,10 @@ enum GalleryProvider {
         let tabs = [Gallery.tabs[0], Gallery.tabs[1], Gallery.tabs[3], Gallery.tabs[4]]
         let attributes: [[String: Any]] = tabs.enumerated().map { index, tab in
             var item = tealAttributes(index)
-            item[CYLTabBarItemTitle] = tab.title
-            item[CYLTabBarItemImage] = Gallery.symbol(tab.symbol, filled: false)
-            item[CYLTabBarItemSelectedImage] = Gallery.symbol(tab.symbol, filled: true)
-            item[CYLTabBarItemIdentifier] = tab.identifier
+            item[cylTabBarItemTitle] = tab.title
+            item[cylTabBarItemImage] = Gallery.symbol(tab.symbol, filled: false)
+            item[cylTabBarItemSelectedImage] = Gallery.symbol(tab.symbol, filled: true)
+            item[cylTabBarItemIdentifier] = tab.identifier
             return item
         }
         let pages = Gallery.pages(4)
@@ -296,7 +296,7 @@ enum GalleryProvider {
         let selected = Gallery.rgb(252, 13, 27)
         let lottieURL = Bundle.main.url(forResource: "tab_search_animate", withExtension: "json")
         let attributes = Gallery.attributes(5, showsTitles: false, pointSize: 22) { index -> [String: Any] in
-            var item: [String: Any] = [CYLTabBarItemIconColor: normal, CYLTabBarItemSelectedIconColor: selected]
+            var item: [String: Any] = [cylTabBarItemIconColor: normal, cylTabBarItemSelectedIconColor: selected]
             if index == 2, let lottieURL = lottieURL {
                 item[CYLTabBarLottieURL] = lottieURL
                 item[CYLTabBarLottieSize] = NSValue(cgSize: CGSize(width: 33, height: 33))
@@ -311,7 +311,7 @@ enum GalleryProvider {
 
     static func reselectStyle() -> CYLTabBarController {
         let pages: [UIViewController] = (0..<3).map { index in
-            let list = GalleryListViewController(style: .plain)
+            let list = GalleryListViewController(style: .insetGrouped)
             list.title = Gallery.tabs[index].title
             return GalleryNavigationController(rootViewController: list)
         }
@@ -336,10 +336,10 @@ enum GalleryProvider {
         let colors: [UIColor] = [.systemRed, .systemOrange, .systemGreen, .systemBlue, .systemPurple]
         let attributes = Gallery.attributes(5) { index -> [String: Any] in
             let color = colors[index]
-            return [CYLTabBarItemSelectedTitleColor: color, CYLTabBarItemSelectedIconColor: color,
-                    CYLTabBarItemTitleFont: UIFont.systemFont(ofSize: 10),
-                    CYLTabBarItemSelectedTitleFont: UIFont.systemFont(ofSize: 11, weight: .bold),
-                    CYLTabBarItemSelectedBackgroundColor: color.withAlphaComponent(0.12)]
+            return [cylTabBarItemSelectedTitleColor: color, cylTabBarItemSelectedIconColor: color,
+                    cylTabBarItemTitleFont: UIFont.systemFont(ofSize: 10),
+                    cylTabBarItemSelectedTitleFont: UIFont.systemFont(ofSize: 11, weight: .bold),
+                    cylTabBarItemSelectedBackgroundColor: color.withAlphaComponent(0.12)]
         }
         return Gallery.tabBarController(pages: Gallery.pages(5), attributes: attributes)
     }
@@ -365,7 +365,7 @@ enum GalleryProvider {
 
     static func edgeInsetsStyle() -> UIViewController {
         let controller = backgroundTabBarController(styleType: .default)
-        controller.tabBar.cyl_itemEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        controller.tabBar.cylItemEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         controller.tabBar.itemSpacing = 2
         Gallery.setBackgroundColor(of: controller, to: .black)
         return Gallery.embed(controller)

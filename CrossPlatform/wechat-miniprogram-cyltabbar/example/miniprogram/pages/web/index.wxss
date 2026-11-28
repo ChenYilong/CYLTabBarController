@@ -1,0 +1,9 @@
+/* [EN] A replaced tab's plain page covers the page. [CN] 被替换 Tab 的空白页面覆盖本页。 */
+.cyl-replaced-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+}

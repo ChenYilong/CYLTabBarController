@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "Acasă"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "În apropiere"
+    },
+    {
+      "name": "tab_messages",
+      "value": "Mesaje"
+    },
+    {
+      "name": "tab_me",
+      "value": "Eu"
+    },
+    {
+      "name": "tab_post",
+      "value": "Publică"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "Reîmprospătează"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "src": [
+    "pages/Index",
+    "pages/ConfigurationDemo",
+    "pages/TextPage",
+    "pages/SystemTabs",
+    "pages/AnotherTabBar",
+    "pages/PopPushDemo",
+    "pages/ConfigurationFailures",
+    "pages/Gallery",
+    "pages/GalleryScene",
+    "pages/LiquidGlassDock",
+    "pages/AnimatedItemEnd"
+  ]
+}

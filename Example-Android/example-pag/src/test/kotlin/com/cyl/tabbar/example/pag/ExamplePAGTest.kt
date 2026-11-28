@@ -52,5 +52,12 @@ class ExamplePAGTest {
                                  "setProgress" to listOf("double"), "getProgress" to emptyList(), "play" to emptyList(), "stop" to emptyList())) {
             assertTrue("$expected in PAGView", expected in methods)
         }
+        // [EN] PAGImageView, the view the library makes first (CYLPAGTabBarItemAnimator). [CN] PAGImageView：库优先创建的视图。
+        val imageView = Class.forName("org.libpag.PAGImageView", false, javaClass.classLoader)
+        val imageMethods = imageView.methods.map { it.name to it.parameterTypes.map { type -> type.simpleName } }.toSet()
+        for (expected in listOf("setPath" to listOf("String"), "flush" to emptyList(), "setScaleMode" to listOf("int"), "setRepeatCount" to listOf("int"),
+                                 "setCurrentFrame" to listOf("int"), "currentFrame" to emptyList(), "numFrames" to emptyList(), "play" to emptyList(), "pause" to emptyList())) {
+            assertTrue("$expected in PAGImageView", expected in imageMethods)
+        }
     }
 }

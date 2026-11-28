@@ -1,0 +1,22 @@
+{
+  "sports": [
+    { "id": "run", "emoji": "🏃", "name": "Run" },
+    { "id": "ride", "emoji": "🚴", "name": "Ride" },
+    { "id": "swim", "emoji": "🏊", "name": "Swim" },
+    { "id": "gym", "emoji": "🏋️", "name": "Gym" },
+    { "id": "yoga", "emoji": "🧘", "name": "Yoga" },
+    { "id": "hike", "emoji": "🥾", "name": "Hike" },
+    { "id": "ball", "emoji": "🏀", "name": "Ball" },
+    { "id": "dance", "emoji": "💃", "name": "Dance" }
+  ],
+  "stats": { "week": 4, "total": 128, "streak": 9 },
+  "week": [
+    { "day": "Mon", "done": true },
+    { "day": "Tue", "done": true },
+    { "day": "Wed", "done": false },
+    { "day": "Thu", "done": true },
+    { "day": "Fri", "done": true },
+    { "day": "Sat", "done": false },
+    { "day": "Sun", "done": false }
+  ]
+}

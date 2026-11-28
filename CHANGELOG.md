@@ -1,0 +1,14 @@
+# Changelog
+
+## Unreleased
+
+### Deprecated: Swift names renamed to lowerCamelCase / Swift 名称改为 lowerCamelCase
+
+- **[EN]** About 500 public Swift names (functions and properties of the `cyl_` extensions, the `CYL…` global functions, the `CYL…` configuration keys and notification names) have a lowerCamelCase replacement (`cyl_isTabButton()` to `cylIsTabButton()`, `CYLScreenWidth()` to `cylScreenWidth()`, `CYLTabBarItemTitle` to `cylTabBarItemTitle`). Every old Swift name still compiles: it is a deprecated forward (`@available(*, deprecated, renamed:)`, Xcode offers the fix-it) in the `Deprecated/` folders of each subspec, and they are removed at the next major version. Objective-C is not affected: every selector and `@_cdecl` name is unchanged. Names that apps override or implement (open members, the requirements of public protocols) keep their names. List and rule: `docs/Swift-Coding-Style.md`, "Sonar naming rename".
+- **[CN]** 约 500 个公开 Swift 名称（`cyl_` 扩展的方法与属性、`CYL…` 全局函数、`CYL…` 配置键与通知名）有了 lowerCamelCase 的新名称（`cyl_isTabButton()` 改为 `cylIsTabButton()`，`CYLScreenWidth()` 改为 `cylScreenWidth()`，`CYLTabBarItemTitle` 改为 `cylTabBarItemTitle`）。所有旧的 Swift 名称仍可编译：它们是各子库 `Deprecated/` 文件夹中已废弃的转发（`@available(*, deprecated, renamed:)`，Xcode 提供一键修复），将在下一个主版本移除。Objective-C 不受影响：所有 selector 与 `@_cdecl` 名称均不变。App 会重写或实现的名称（open 成员、公开协议的要求）保持原名。清单与规则见 `docs/Swift-Coding-Style.md` 的 “Sonar naming rename”。
+
+### Breaking: the minimum iOS version is 15.0 / 最低 iOS 版本提高到 15.0
+
+- **[EN]** `CYLTabBarController.podspec`, `CYLAnimatedItem.podspec` and `Package.swift` now require iOS 15.0 (they were iOS 12.0, with the LottieSwift and FlatDesign subspecs at 13.0 and Rive at 14.0). Apps that support iOS 12 to 14 stay on the previous release. The Example projects and their Podfiles are at 15.0 too. Reason: the Swift migration (docs/Swift-Migration.md) uses iOS 13+ UIKit types (`UITabBarItemAppearance`, `UITabBarItemStateAppearance`) without availability guards, which broke builds at deployment target 12.0 (CYLTableViewPlaceHolder's "iOS 12 runtime" job); current Xcode cannot build below iOS 15 anyway.
+- **[CN]** `CYLTabBarController.podspec`、`CYLAnimatedItem.podspec` 与 `Package.swift` 现在要求 iOS 15.0（此前为 iOS 12.0，LottieSwift 与 FlatDesign 子库为 13.0，Rive 为 14.0）。仍支持 iOS 12 到 14 的 App 请继续使用上一个版本。Example 工程及其 Podfile 同样为 15.0。原因：Swift 迁移（docs/Swift-Migration.md）使用了 iOS 13+ 的 UIKit 类型（`UITabBarItemAppearance`、`UITabBarItemStateAppearance`）且没有可用性判断，导致以部署目标 12.0 构建失败（CYLTableViewPlaceHolder 的「iOS 12 runtime」任务）；当前 Xcode 本来也无法构建 iOS 15 以下。
+- **TODO:** the podspec `version` is not bumped here; the maintainer picks the release number. Dead `#available(iOS 13...)` branches are removed in a separate cleanup step. / podspec 的 `version` 在这里没有修改，由维护者决定发布版本号；失效的 `#available(iOS 13...)` 分支在单独的清理步骤中移除。

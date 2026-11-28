@@ -34,7 +34,13 @@ class ViewController: UIViewController {
     func addleftBarButtonItem() {
         let vces: Int = (self.navigationController?.viewControllers.count)!
         if vces > 1 && isShowBackBtn == true {
-            self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "back")?.withRenderingMode(.alwaysOriginal), style: .prominent, target: self, action: #selector(backClicked))
+            let backStyle: UIBarButtonItem.Style
+            if #available(iOS 26.0, *) {
+                backStyle = .prominent
+            } else {
+                backStyle = .done
+            }
+            self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(named: "back")?.withRenderingMode(.alwaysOriginal), style: backStyle, target: self, action: #selector(backClicked))
         }else {
             self.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: UIView())
         }

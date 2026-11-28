@@ -1,0 +1,118 @@
+// The Protocol Buffers schema of a CYLTabBarController configuration (proto3).
+// CYLTabBarController 配置的 Protocol Buffers 结构定义（proto3）。
+//
+// The field names are the configuration keys, so a binary message (.binpb / .pb) decodes to the same dictionary as
+// every other format. CYLTabBarConfigurationParser has this schema built in: no protobuf runtime is needed. Field
+// numbers never change; new keys get new numbers. Values are strings written as in the other formats, e.g.
+// "{0, -2}" or "system:house.fill".
+// 字段名即配置键，因此二进制消息（.binpb / .pb）解析出的字典与其他格式相同。CYLTabBarConfigurationParser 内置了本结构定义，
+// 无需 protobuf 运行库。字段编号永不改变，新增的键使用新编号。值为字符串，写法与其他格式相同，如 "{0, -2}"、"system:house.fill"。
+//
+// The text format (.textproto) needs no schema; with it, protoc can encode a binary file:
+// 文本格式（.textproto）无需结构定义；可以用 protoc 将其编码为二进制文件：
+//   protoc --encode=cyl.CYLTabBarConfiguration cyl_tabbar_configuration.proto \
+//       < cyl_tabbar_configuration.textproto > cyl_tabbar_configuration.binpb
+
+syntax = "proto3";
+
+package cyl;
+
+message CYLTabBarConfiguration {
+  repeated CYLTabBarItem CYLTabBarControllerTabBarItemsAttributes = 1;
+  string CYLTabBarControllerImageInsets = 2;
+  string CYLTabBarControllerTitlePositionAdjustment = 3;
+  string CYLTabBarControllerStyleType = 4;
+  string CYLTabBarControllerContext = 5;
+  // 6 was CYLTabBarControllerNavigationControllerClass (removed before release). 6 曾为导航控制器类（发布前已移除）。
+  reserved 6;
+  // A number, e.g. "1.5"; see CYLTabBarControllerTabBarItemAnimationSpeed. 数字，例如 "1.5"；见 CYLTabBarControllerTabBarItemAnimationSpeed。
+  string CYLTabBarControllerTabBarItemAnimationSpeed = 7;
+  // [EN] Skins: named values that "@name" tab values refer to. [CN] 皮肤："@name" 形式的 Tab 值所引用的命名值。
+  repeated CYLTabBarTheme CYLTabBarControllerThemes = 8;
+  string CYLTabBarControllerThemeIdentifier = 9;
+  string CYLTabBarControllerDarkThemeIdentifier = 10;
+  string CYLTabBarControllerThemeManagerName = 11;
+  // [EN] The plus button: CYLTabBarItemTitle, CYLTabBarItemImage, CYLTabBarItemSelectedTitle, CYLTabBarItemSelectedTitleColor.
+  // [CN] PlusButton：CYLTabBarItemTitle、CYLTabBarItemImage、CYLTabBarItemSelectedTitle、CYLTabBarItemSelectedTitleColor。
+  CYLTabBarItem CYLTabBarControllerPlusButton = 12;
+  // [EN] Icon tint of every tab without its own (#787): "template", "original" or "automatic", and "#RRGGBB" colors.
+  // [CN] 没有单独设置的所有 Tab 的图标着色（#787）："template"、"original" 或 "automatic"，以及 "#RRGGBB" 颜色。
+  string CYLTabBarControllerIconRenderingMode = 13;
+  string CYLTabBarControllerIconColor = 14;
+  string CYLTabBarControllerSelectedIconColor = 15;
+}
+
+message CYLTabBarTheme {
+  string CYLTabBarThemeIdentifier = 1;
+  map<string, string> CYLTabBarThemeValues = 2;
+}
+
+message CYLTabBarItem {
+  string CYLTabBarItemTitle = 1;
+  string CYLTabBarItemImage = 2;
+  string CYLTabBarItemSelectedImage = 3;
+  string CYLTabBarItemDarkImage = 4;
+  string CYLTabBarItemSelectedDarkImage = 5;
+  string CYLTabBarItemImageURL = 6;
+  string CYLTabBarItemSelectedImageURL = 7;
+  string CYLTabBarItemImageURLSize = 8;
+  string CYLTabBarItemImageInsets = 9;
+  string CYLTabBarItemTitlePositionAdjustment = 10;
+  string CYLTabBarItemImagePositionAdjustment = 11;
+  string CYLTabBarLottieFilePath = 12;
+  string CYLTabBarLottieURL = 13;
+  string CYLTabBarLottieSize = 14;
+  string CYLTabBarItemIdentifier = 15;
+  string CYLTabBarLottieDarkURL = 16;
+  string CYLTabBarLottieDarkFilePath = 17;
+  map<string, string> CYLTabBarLottieDarkColors = 18;
+  // 19, 20 were class names (removed before release; pages come from page IDs). 19、20 曾为类名（发布前已移除；页面由页面 ID 获得）。
+  reserved 19, 20;
+  string CYLTabBarItemSelectedTitle = 21;
+  string CYLTabBarItemTitleColor = 22;
+  string CYLTabBarItemSelectedTitleColor = 23;
+  string CYLTabBarItemIconColor = 24;
+  string CYLTabBarItemSelectedIconColor = 25;
+  string CYLTabBarItemSelectedBackgroundColor = 26;
+  string CYLTabBarItemBackgroundColor = 27;
+  string CYLTabBarItemTitleFont = 28;
+  string CYLTabBarItemSelectedTitleFont = 29;
+  string CYLTabBarItemAccessibilityIdentifier = 30;
+  string CYLTabBarItemAccessibilityLabel = 31;
+  string CYLTabBarItemAccessibilityHint = 32;
+  string CYLTabBarItemPageIdentifier = 33;
+  map<string, string> CYLTabBarItemPageParameters = 34;
+  // Comma-separated, e.g. "ios,android". 逗号分隔，例如 "ios,android"。
+  string CYLTabBarItemPlatforms = 35;
+  string CYLTabBarItemMinimumAppVersion = 36;
+  // Tab animations (#604, #752): the generic keys of any library, the options, Lottie, PAG and Rive.
+  // Tab 动画（#604、#752）：任何动画库的通用键、选项、Lottie、PAG 与 Rive。
+  string CYLTabBarAnimationURL = 37;
+  string CYLTabBarAnimationFilePath = 38;
+  string CYLTabBarAnimationSize = 39;
+  string CYLTabBarAnimationDarkURL = 40;
+  string CYLTabBarAnimationDarkFilePath = 41;
+  map<string, string> CYLTabBarAnimationDarkColors = 42;
+  map<string, string> CYLTabBarAnimationColors = 43;
+  map<string, string> CYLTabBarAnimationOptions = 44;
+  string CYLTabBarLottieLoopsWhenUnselected = 45;
+  string CYLTabBarPAGURL = 46;
+  string CYLTabBarPAGFilePath = 47;
+  string CYLTabBarPAGSize = 48;
+  string CYLTabBarPAGDarkURL = 49;
+  string CYLTabBarPAGDarkFilePath = 50;
+  string CYLTabBarRiveURL = 51;
+  string CYLTabBarRiveFilePath = 52;
+  string CYLTabBarRiveSize = 53;
+  string CYLTabBarRiveDarkURL = 54;
+  string CYLTabBarRiveDarkFilePath = 55;
+  map<string, string> CYLTabBarRiveDarkColors = 56;
+  // GIF tab icons (#605). GIF Tab 图标（#605）。
+  string CYLTabBarGIFURL = 57;
+  string CYLTabBarGIFFilePath = 58;
+  string CYLTabBarGIFSize = 59;
+  string CYLTabBarGIFDarkURL = 60;
+  string CYLTabBarGIFDarkFilePath = 61;
+  // [EN] "template", "original" or "automatic" (#787). [CN] "template"、"original" 或 "automatic"（#787）。
+  string CYLTabBarItemIconRenderingMode = 62;
+}

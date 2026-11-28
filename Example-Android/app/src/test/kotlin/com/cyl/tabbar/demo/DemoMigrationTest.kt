@@ -44,7 +44,7 @@ class DemoMigrationTest {
     fun countsMatchTheIOSExample() {
         assertEquals("configuration edge cases", 46, DemoConfiguration.edgeCaseCount)
         assertEquals("scroll hiding simulations", 39, DemoScrollHide.count)
-        assertEquals("gallery scenes", 44, DemoGallery.sceneCount)
+        assertEquals("gallery scenes", 46, DemoGallery.sceneCount)
         assertEquals("gallery sections", 10, DemoGallery.sections.size)
         assertEquals("skins", 17, DemoTheme.all.size)
     }
@@ -85,7 +85,8 @@ class DemoMigrationTest {
     fun everyConfigurationFailureGivesAResult() {
         val (_, home) = launch()
         val network = setOf("D3", "D4", "D5", "D7 · An HTML page (network)", "D10", "C10", "C16")
-        val rows = DemoCatalog.sections(home).first { it.title == "Configuration file" }.rows.drop(1)
+        // [EN] The first two rows are the file and manifest demos. [CN] 前两行是配置文件与清单演示。
+        val rows = DemoCatalog.sections(home).first { it.title == "Configuration file" }.rows.drop(2)
         assertEquals(46, rows.size)
         for (row in rows.filter { row -> network.none { row.title.startsWith(it) } }) {
             row.action(home)
@@ -154,5 +155,44 @@ class DemoMigrationTest {
                 host.pause().stop().destroy()
             }
         }
+    }
+
+    @Test
+    fun theManifestDemoBuildsATabBarInEveryTheme() {
+        val (activity, home) = launch()
+        val row = DemoCatalog.sections(home).first { it.title == "Configuration file" }.rows[1]
+        assertTrue(row.title.contains("configuration manifest"))
+        val manifest = com.cyl.tabbar.CYLTabBarManifest.manifestWithRoute(activity, "Manifests/cyl_tabbar_manifest.json")
+        // [EN] The images of the manifest are in the app assets (Skins/2.1.0, "../" from Manifests). [CN] 清单的图片在 App assets 中（Skins/2.1.0，相对 Manifests 为 "../"）。
+        for (theme in listOf("light", "dark", "christmas")) {
+            assertNotNull("$theme home image", manifest.pathOfAsset("home", theme, "normal"))
+        }
+        assertEquals(null, manifest.assetError())
+        for (theme in listOf("light", "dark", "christmas")) {
+            val controller = manifest.tabBarController(activity)
+            controller.cyl_themeManager.currentThemeIdentifier = theme
+            assertTrue("$theme: tabs", controller.viewControllers.isNotEmpty())
+            assertEquals(theme, controller.cyl_themeManager.currentThemeIdentifier)
+            // [EN] The tab images are the manifest's PNG assets, not the demo resolver's fallback icon. [CN] Tab 图片是清单的 PNG 资源，而不是演示解析器的后备图标。
+            val shown = (controller.tabBarItems[0].image as android.graphics.drawable.BitmapDrawable).bitmap
+            val expected = (com.cyl.tabbar.CYLTabBarConfiguration.drawable(activity, manifest.pathOfAsset("home", theme, "normal")!!) as android.graphics.drawable.BitmapDrawable).bitmap
+            assertTrue("$theme: the manifest's home image", shown.sameAs(expected))
+            // [EN] The plus button's default index is computed as on iOS: the middle of the visible regular tabs (2 here: 1).
+            // [CN] PlusButton 的默认位置与 iOS 相同按计算得出：可见常规 Tab 的正中（此处 2 个：1）。
+            assertEquals("$theme: plus button in the middle", controller.viewControllers.size / 2, controller.tabBar.plusButtonIndex())
+        }
+    }
+
+    @Test
+    fun exampleTextsComeFromTheStringTablesInTheCurrentLanguage() {
+        val (activity, _) = launch()
+        assertEquals("Choose a skin", DemoText.string("Choose a skin", context = activity))
+        val chinese = activity.createConfigurationContext(android.content.res.Configuration(activity.resources.configuration).apply {
+            setLocale(java.util.Locale.forLanguageTag("zh-Hans"))
+        })
+        assertEquals("选择皮肤", DemoText.string("Choose a skin", context = chinese))
+        assertEquals("A text without an entry is shown as given", DemoText.string("A text without an entry is shown as given", context = chinese))
+        assertEquals("2 of 5", DemoText.fill("%1\$@ of %2\$@", arrayOf(2, 5)))
+        assertEquals("a b", DemoText.fill("%@ %@", arrayOf("a", "b")))
     }
 }

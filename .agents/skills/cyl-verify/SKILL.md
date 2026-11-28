@@ -7,6 +7,65 @@ description: "How to build, test and check CYLTabBarController and its demos, ru
 
 Say plainly what could not be verified. Never call something fixed from a build alone if it is a visual change.
 
+## Before every build of a project that depends on CYLTabBarController
+
+Find the latest commit again, every time: `scripts/latest-cyl-commit.sh` prints the newest commit on any branch by commit
+timestamp (`<sha> <date> <branch>`). A project not named CYLTabBarController must depend on exactly that commit
+(`pod 'CYLTabBarController', :git => '…', :commit => '<sha>'`, then `pod install`); a project named CYLTabBarController uses
+the relative path to the folder with the podspec (`:path => '../'` from a demo). Name the commit in the report. AGENTS.md,
+"Depending on CYLTabBarController".
+
+## Commit message author line
+
+Every commit message carries the line `By  @ChenYilong <luohanchenyilong@163.com>` (exactly as written, two spaces after
+`By`) in its body, after the description and before trailers such as `Claude-Session:`. Check it before every push
+(`git log -1 --format=%B`); amend a commit that lacks it. AGENTS.md, "Commit messages".
+
+## Commit message style: `git cz`, English only
+
+Every commit uses the `git cz` (Commitizen) style and is written entirely in English: no Chinese (and no other non-English text) anywhere in the subject, the body or the trailers. A user's prompt in another language is quoted in the task's document in `docs/`, never in the commit message.
+Before pushing: `git log -1 --format=%B | python3 -c "import re,sys; sys.exit(1 if re.search('[\u4e00-\u9fff]', sys.stdin.read()) else 0)"` prints nothing. AGENTS.md, "Git and pull requests".
+
+## Commit and push at the end of every turn
+
+**Commit and push at the end of every turn (added 2026-11-16)**: when a question-and-answer turn ends and the current branch is not `master` or `main`, commit and push the work of that turn, without asking. This is always safe: the code stays on a branch and is never pushed to `master` or `main`, so pushing carries no risk to worry about. The open pull request rule still applies to every such commit (check for an open pull request first, open one if missing). On `master` or `main`, ask first. AGENTS.md, "Git and pull requests".
+
+## Badge debugging: animations off
+
+**Badge debugging: turn badge animations off with the build option (added 2026-11-17)**: while checking badge positions (coordinates, offsets, alignment with the icon), build with the badge-animation build option `CYL_BADGE_ANIMATION_DISABLED` on, so an animation (Bounce, Shake, Scale, Breathe, the one-shot types) never moves a badge while a screenshot or a layout dump is taken: an animated badge is drawn away from its laid-out place, and the measured coordinates are wrong. It exists in the core of each platform: iOS, the Swift compilation condition `CYL_BADGE_ANIMATION_DISABLED` on the CYLTabBarController target (Podfile `post_install`: `SWIFT_ACTIVE_COMPILATION_CONDITIONS = '$(inherited) CYL_BADGE_ANIMATION_DISABLED'`); Android (and the React Native and Flutter components, which use its host view), the Gradle property `-PcylBadgeAnimationDisabled=true` (`BuildConfig.CYL_BADGE_ANIMATION_DISABLED`); HarmonyOS, `CYL_BADGE_ANIMATION_DISABLED: true` in `buildProfileFields` of `CrossPlatform/harmonyos-cyltabbar/cyltabbar/build-profile.json5`; WeChat Mini Program (no compile-time defines), the constant `CYL_BADGE_ANIMATION_DISABLED = true` in `CrossPlatform/wechat-miniprogram-cyltabbar/src/cyl-tab-bar/cyl_debug.js`, then `npm run setup` in the example and recompile in DevTools. Turn it off again before committing (never commit it on, never ship it): after the positions are right, take one more check with animations on, because an animation's own offsets can still be wrong. Say in the report and in the screenshot label that the build option was on. Details: `docs/Badge-Debugging.md`. AGENTS.md, "Code rules".
+
+**Badge animation build controls default to NO (added 2026-11-17)**: every build control that turns badge animations off, including but not limited to the iOS Swift compilation condition `CYL_BADGE_ANIMATION_DISABLED`, the Android Gradle property `-PcylBadgeAnimationDisabled` (`BuildConfig.CYL_BADGE_ANIMATION_DISABLED`, also in the React Native and Flutter Android builds), the HarmonyOS `buildProfileFields` entry `CYL_BADGE_ANIMATION_DISABLED` in `cyltabbar/build-profile.json5`, the WeChat Mini Program constant `CYL_BADGE_ANIMATION_DISABLED` in `src/cyl-tab-bar/cyl_debug.js`, and any badge animation switch added later, defaults to NO (not set, `false`): badges animate as the app asks. Set one to YES (`true`) only while debugging badges: badge coordinates, offsets and alignment with the icon or other views. Set it on locally only; never commit, merge, release or publish it as YES (no Podfile, Xcode project, `gradle.properties`, CI setting or package with it on), and set it back to NO when the debugging is done, then check once more with animations on. Details: `docs/Badge-Debugging.md`.
+
+## License notice in every published package
+
+Every package published to an outside registry (CocoaPods, Swift Package Manager, Carthage, Maven / Gradle, npm, pub.dev,
+ohpm, the WeChat Mini Program npm package) ships the root `LICENSE` inside the package, on every platform:
+
+- iOS: in the package's resource `.bundle` (`CYLTabBarController.bundle/LICENSE`, `CYLAnimatedItem.bundle/LICENSE`).
+- Android: in the library's Java resources, `src/main/resources/META-INF/<module>/LICENSE` (packed into the AAR).
+- Mini program: in the component folder (`src/LICENSE`) and at the package root.
+- npm, pub.dev, ohpm: at the package root, which the registry publishes.
+- A package without a built-in resource folder gets one, or the license at its root.
+
+Before pushing: `python3 scripts/check-license-notices.py` (exits 1 and names each missing file). A new published package
+gets its license file, a row in `docs/License-Notices.md` and an entry in the script, in the same change.
+
+## Where a check runs: GitHub CI or locally
+
+GitHub CI/CD for iOS runs on **macOS 26** by default: always read `.github/workflows/ios.yml` on master first to confirm it
+(`runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}`; the `MACOS_RUNNER` variable can change it). Running **locally** (not
+through GitHub CI/CD, directly on this Mac) ignores that limit: the default local system is **macOS 27** with **Xcode 27**
+and its simulators. Name the environment (runner, or local macOS and Xcode versions) in every report. AGENTS.md,
+"CI/CD and where tests run".
+
+Before every local build, check the first line of `.github/workflows/ios.yml`, the local environment comment
+(`# local-run-environment: macOS …, Xcode …`): run `scripts/local-run-environment.sh`, which adds it when missing, leaves it
+when the versions are unchanged and rewrites it when macOS or Xcode differs (Xcode of `/Applications/Xcode.app`).
+
+- **Screenshots (added 2026-11-12)**: every screenshot, from CI/CD and from local builds, is saved in the repository with the related document in `docs/` (create the document when none fits; images in `docs/assets/`) and committed to git. Use clear original screenshots: never scaled down or recompressed; a crop that keeps the original resolution is allowed. When the result looks as expected, also update `README.md` with the latest screenshots, in the related section (create it when there is none). Every screenshot, in the document and in the README, is labeled with: the platform (iOS, Android, Flutter, React Native, HarmonyOS, WeChat Mini Program); the environment: operating system version, simulator or emulator (device model and OS version), and the SDK version of that platform (iOS SDK / Xcode, Android SDK / API level, Flutter SDK, React Native, HarmonyOS SDK, WeChat Mini Program base library); this repository's version or commit (with its link); and the time it was taken.
+- **Screenshot moments and layout (added 2026-11-12)**: take and commit screenshots at key moments: when a TODO or Linux note can be removed, when a pull request can be merged, or when the result is judged as expected with no bug and no open issue. The README shows cropped key details, a full screen only when it is needed; several details go into one stitched image. Stitching order of preference (updated by the maintainer on 2026-11-18, second time): one column with several rows (top to bottom) first; two columns with several rows only when the one-column image would be taller than one screen of a common phone (height above about 2.17 times the width, a 19.5:9 phone shown at phone width); a matrix stays a grid; last, a single horizontal row, at most three images. `scripts/stitch-screenshots.py` chooses the columns this way by default (`--columns auto`). (Replaced: 2026-11-12 "a vertical stack first, then two columns"; 2026-11-18 morning "two columns first".)
+- **Screenshot header, captions and footer (added 2026-11-18)**: every stitched image (and every single screenshot committed) has a header band on top, a caption band above each cell and a footer band at the bottom, added around the screenshots and never overlapping or covering them; English only; white bands with bold red text (`#FF3B30`), about 2 % of the image width. Header, in order: platform and OS version, simulator / emulator / device model, host OS and version, IDE and version (build), SDK when not implied, app and repository commit (the change's commit in parentheses), branch, date, then `Purpose: …`. Captions: the state or step and its measurement (`launch, no play`; `11 s later, 0 changed pixels`). Footer: the result against the expectation and the method (`Result: … (expected: …). Method: …`), plus the test or document. Build it with `scripts/stitch-screenshots.py` (ffmpeg only; it marks the PNG), and run `python3 scripts/check-screenshot-labels.py` before every commit that adds a screenshot: it fails on any image added since 2026-11-18 without the marker. Enforced (added 2026-11-18): every clone runs `bash scripts/install-git-hooks.sh` once, so the pre-commit hook blocks a commit with an unlabeled screenshot (CI does not run it: removed by the maintainer on 2026-11-18). Never commit a screenshot made any other way, and never bypass the hook with `--no-verify`. Full rules and the reference example: [docs/Screenshot-Guidelines.md](../../../docs/Screenshot-Guidelines.md); that document wins over any summary.
+
 ## Commands
 
 ```sh
@@ -16,8 +75,11 @@ scripts/ci-build-example.sh <demo folder>                   # one demo, as CI bu
 scripts/plus-child-theme-test.sh "iPhone 17 Pro Max"        # plus child + theme, on a simulator
 scripts/scroll-hide-self-test.sh                            # scroll hiding, on a simulator
 python3 scripts/update-docs-navigation.py --check
+python3 scripts/check-localization-macros.py                    # localization acceptance: a core macro and an example macro, each reading its own bundle
+python3 scripts/check-public-api-comments.py                    # public API comments are /*! ... */ blocks, not stacked //
 python3 scripts/sync-agent-skills.py --check
 scripts/publish-android.sh staging                          # Android library: Maven bundle, checked (local | staging | central | github)
+(cd Example-Android && LC_ALL=C.UTF-8 gradle testDebugUnitTest :tabpages:test lintDebug assembleRelease)   # Android, as .github/workflows/android.yml runs it
 # React Native component (CrossPlatform/react-native-cyltabbar): yarn; yarn tsc --noEmit; in example/ios: LANG=en_US.UTF-8 pod install,
 # then xcodebuild; in example/android: JAVA_HOME=<JDK 17> ./gradlew :app:assembleDebug
 # Flutter component (CrossPlatform/flutter_cyltabbar): flutter analyze; flutter test; in example: flutter build ios --simulator
@@ -25,7 +87,30 @@ scripts/publish-android.sh staging                          # Android library: M
 # Library: CYLTabBarHostViewTests (scripts/unit-tests.sh), CYLTabBarHostViewTest (Android, Robolectric)
 ```
 
+Localization acceptance (AGENTS.md, "Localization (i18n / l10n) file structure"): a project must have at least two different
+macros that read the localized files of two different layers, and a project is accepted only when both exist and are used:
+the **core** macro (iOS: `CYLLocalizedString`, reading `CYLTabBarController.bundle`) and the **example** macro (iOS:
+`CYLDemoLocalizedString`, in Swift `cylDemoLocalizedString`, reading `Example-Shared/CYLDemo.bundle`). Other platforms use another package form, name and folder
+name, but still one macro or helper per layer. `scripts/check-localization-macros.py` checks the iOS side and every example
+Xcode project that compiles a file calling the example macro (it must also compile `CYLDemoLocalization.m` or `.swift` and
+ship `CYLDemo.bundle`); after adding a localized text or a demo project, run it, then build that demo.
+
 The `CYLTabBarController` scheme has no test action: use `scripts/unit-tests.sh`. Static analysis: `xcodebuild analyze` must report no warnings.
+
+Screenshots of the ObjC demo without driving the UI (it shows a splash ad for about 10 s first, so wait about 18 s):
+`xcrun simctl launch <udid> CYL.CYLTabBarController -CYLDemoGalleryScene 8.1` opens gallery scene 8.1 (section.row, as the
+list numbers it; docs/Tab-Bar-Gallery.md), and `-CYLDemoManifestTheme light|dark|christmas` builds the tab bar from the
+configuration manifest. Taps with axe are often swallowed under load: prefer these launch arguments.
+
+- **Run scripts with bash, not zsh (added 2026-11-16).** The interactive shell here is zsh, which does not split an
+  unquoted variable into words: `for f in $list`, `cmd $args` or `sips $box` get one argument holding the whole
+  string, where bash would pass several. A command that works in bash then fails or measures the wrong thing in zsh
+  (seen: "zsh doesn't split $box into words either", and the measurement had to be run again as a bash script).
+  So prefer bash for every script and every command with variables, loops or word lists:
+  - run a script file with `bash script.sh` (shebang `#!/usr/bin/env bash`), never `zsh` or `sh` when it relies on
+    bash behavior; run a one-off multi-line command as `bash -c '…'` or a heredoc piped to `bash`;
+  - in zsh, when bash is not possible, use arrays (`files=(a b)`, `"${files[@]}"`) or `${=var}` to split on purpose;
+  - quote every expansion (`"$var"`) unless splitting is wanted.
 
 ## Common failures
 
@@ -53,6 +138,7 @@ The `CYLTabBarController` scheme has no test action: use `scripts/unit-tests.sh`
 | React Native Android debug build: red screen, `Unable to load script` / Metro download stalls on the emulator | The emulator cannot reach the Mac's Metro | `adb reverse tcp:8081 tcp:8081`, then reopen the app (or `./gradlew :app:assembleRelease`, which bundles the JS) |
 | R8-minified release (RN, Flutter): tabs show images, or a crash `ClassNotFoundException: org.libpag.…` | The wrappers compile the library's sources, so its `consumer-rules.pro` must be added with `consumerProguardFiles` | Keep that line in the wrapper's Gradle file; check a demo with `flutter build apk --release` |
 | Checking the transparent strip (RN Android, Flutter) | Nothing tappable lies below the strip in the demos | In a scratch copy, make a page a tappable color toggle; a tap in the strip must toggle it, a tap on the plus button's upper part must not |
+| Flutter iOS: an axe tap by label or point never selects a tab (added 2026-11-18) | axe's default style sends one simulator tap event; Flutter hands it to the native view only after accepting the gesture, when the touch is gone (UIKit's selection gesture sees 0 touches at {0, 0}) | Use `axe tap --tap-style physical` for the Flutter tab bar; not a library bug (docs/Flutter-Component.md). **Fixed in the core (2026-11-19)**: such a gesture now selects the tab under the touch's hit-test point, so default taps work too. Before the first tap after a launch, run `axe describe-ui` once and wait about 3 s: the first accessibility query turns on Flutter's semantics tree, and the rebuild swallows a tap sent right then (physical taps too) |
 | PAG / Rive demo (RN, Flutter) Android: icons blank | No `.pag` files (fetched by `pod install` in `Example-PAG`), or Rive not initialized | Run `pod install` in `Example-PAG` first; the library calls `Rive.init` itself |
 | A resource added to a Flutter Runner project lands in `RunnerTests` | The script took the first Resources phase | Add it to the Resources phase of the application target |
 | `CYLTabBarHostView` shows no tab for an item | Neither a page ID nor an identifier: no page | The host gives such a tab a page ID of its own (`CYLTabBarHostView-tab-<index>`) |
@@ -74,3 +160,97 @@ The `CYLTabBarController` scheme has no test action: use `scripts/unit-tests.sh`
   run the one-time `scripts/free-ram.sh --install` (a sudoers rule that allows only `/usr/sbin/purge`). Never type,
   store or ask for a password to work around that; continue without the purge and mention the hint.
 - It quits no app or simulator, and does nothing outside macOS.
+
+### CYLTableViewPlaceHolder in every example
+
+Every example, existing and new, integrates CYLTableViewPlaceHolder with CocoaPods at its latest commit on any branch
+(`CYL_REPO_URL=https://github.com/ChenYilong/CYLTableViewPlaceHolder.git scripts/latest-cyl-commit.sh --sha`, then
+`:git => …, :commit => '<sha>'`, plus the `LottieSwift` subspec). Every iOS example scroll view has pull to refresh
+(`cyl_header`), an empty-data and a no-network placeholder (animated icons preferred) and a red bar at the top while
+offline. MJRefresh is not used (`mj_` → `cyl_`, `MJRefresh…` → `CYLRefresh…`). Library-caused build errors go into
+`docs/CYLTableViewPlaceHolder-Integration-Issues.md`. AGENTS.md, "Depending on CYLTableViewPlaceHolder".
+
+## HarmonyOS: IDE preparation and emulator prerequisites (added 2026-11-16)
+
+Before any HarmonyOS work (building, installing or running a HAP, taking emulator screenshots), check these:
+
+1. **DevEco Studio is installed**: `/Applications/DevEco-Studio.app` (DevEco Studio 6.0). The SDK is the bundled one:
+   `DEVECO_SDK_HOME=/Applications/DevEco-Studio.app/Contents/sdk`; `hdc` is at
+   `sdk/default/openharmony/toolchains/hdc`; build with the bundled node running
+   `tools/hvigor/bin/hvigorw.js assembleHap --no-daemon`.
+2. **The region is China.** The emulator (Device Manager, emulator images) is only offered when DevEco Studio's region
+   is China. The region file is
+   `~/Library/Application Support/Huawei/DevEcoStudio6.0/options/country.region.xml` (the folder follows the DevEco
+   version). It must say `<countryregion name="CN"/>`, not another region such as `NZ`:
+
+   ```xml
+   <application>
+       <component name="CountryRegionSetting">
+           <countryregion name="CN"/>
+       </component>
+   </application>
+   ```
+
+   Check it with `grep countryregion "$HOME/Library/Application Support/Huawei/DevEcoStudio"*/options/country.region.xml`.
+   If it is not `CN`: quit DevEco Studio first (it writes its settings back on exit), keep a copy of the file, change
+   the value to `CN`, start DevEco Studio again and check the file once more.
+3. **An emulator image is installed and the emulator starts**: the Mate 70 Pro image under `~/.Huawei/Emulator/deployed`
+   (`Emulator -hvd "Mate 70 Pro" -path ~/.Huawei/Emulator/deployed -imageRoot ~/Library/Huawei/Sdk`, from
+   `/Applications/DevEco-Studio.app/Contents/tools/emulator/`), signed in to a Huawei account in DevEco Studio when
+   the image download asks for it, with hardware virtualization available on the Mac.
+4. **Signing is not needed on the emulator**: it installs the unsigned `entry-default-unsigned.hap`
+   (`hdc install -r`). Do not ask the owner for a signing setup for emulator runs.
+
+## Locating controls in UI tests
+
+All code of this project supports accessibility and localization, including the HarmonyOS code. UI tests and simulator /
+emulator checks locate controls through accessibility identifiers, accessibility labels / texts and localized strings
+first (XCUITest, `axe describe-ui`, `uiautomator`, HarmonyOS UiTest `ON.id()` / `ON.text()`, Flutter
+`find.bySemanticsLabel`, React Native `getByLabelText`), for taps, complex flows and consecutive steps. Coordinates are
+the last resort; a control that cannot be found that way is a bug: add the label first. HarmonyOS details: `cyl-harmonyos-a11y-l10n`.
+
+## Pull requests for every branch
+
+- **Every branch with commits has an open pull request (added 2026-11-16).** After creating a branch, any commit on it
+  must be in a pull request. Never create a branch and keep committing to it without one: commits on a branch with no
+  pull request are ignored, because nothing ever merges them.
+  - **Before every commit**, check that the current branch has an open pull request
+    (`gh pr list --state open --head <branch>`). If it has none (never opened, closed or merged), open a new one right
+    after pushing (`gh pr create --base <target> --head <branch>`).
+  - **Target branch**: the branch of the pull request that was active (open) before this one was created; only when
+    there is none, `master` (or `main`).
+  - **More than two open pull requests: ask first.** When the repository already has more than two open pull requests,
+    do not open another one on your own: ask the owner whether to create a new branch and pull request or to keep
+    committing on the current branch. More than two open branches make merging hard and leave no sensible target for
+    each branch.
+  - Push only to branches that have an open pull request; do not recreate a branch that was deleted after its pull
+    request was closed or merged.
+
+## Fix in the core first (added 2026-11-17)
+
+Change the core code (the code published to CocoaPods, Swift Package Manager, Maven / Gradle, npm, pub.dev, ohpm or
+the WeChat Mini Program component) so that the whole class of bug is avoided; a fix only in the example layer is the
+worst option. If the core cannot fix it, ask the owner first and explain why; after the owner agrees, fix it in the
+example and record the reason in `docs/Example-Layer-Fixes.md` (see AGENTS.md, "Code rules").
+
+## Task workflow and hung emulators (added 2026-11-18)
+
+Start every task with the `cyl-task-workflow` skill: check the other sessions, a `TODO` list with the current branch
+at the top, the task and its rubric (100 = full marks, 60 = pass) in `docs/`, work until the score passes, and the
+missing points as `TODO` at the end. A hung or unopenable emulator or simulator: tell the other sessions that use it,
+then restart it from the command line without asking, and afterwards tell all active sessions it is available again
+so that they resume tasks paused because of it ("Hung emulator" in that skill).
+
+- Screenshots of a tab bar (added 2026-11-18, maintainer): crop with at least 24 pt (72 px at @3x) above the raised plus button (or the bar), measured on the image (the drawn plus button and its badge reach above its accessibility frame), so the plus button and badges are whole; the stitched image keeps a white gap (`scripts/stitch-screenshots.py --top-gap`, 24 px by default) between every header or caption band and the screenshot below. Full rule: docs/Screenshot-Guidelines.md, "Space above the tab bar and below the bands".
+
+## Swift first on iOS (added 2026-11-19)
+
+- **The iOS core is Swift; every new piece of code is Swift first (added 2026-11-19, owner)**: the core code of this project on iOS (the CocoaPods / Swift Package Manager / Carthage sources under `CYLTabBarController/`, including the `CYLAnimatedItem` module) is Swift. Write every new class, extension, test and example in Swift. Use Objective-C only where Swift cannot do the job (a header that must stay importable from Objective-C without modules, a `+load`-time hook, a C macro), and give the reason in a comment and in the task's document in `docs/`. Keep the public API usable from Objective-C (`@objc`, `@objcMembers`, `NS_SWIFT_NAME` counterparts) so existing Objective-C callers keep working. When you touch Objective-C code for a new feature, prefer adding the feature in a Swift file over growing the Objective-C file. Migration log: `docs/Swift-Migration.md`. Details: `AGENTS.md`, "Code rules".
+
+## HarmonyOS x86_64 emulator and arm64-only engines (added 2026-11-22, owner)
+
+The CollectionViewClassifyMenu HAP won't install on this x86_64 emulator because its Rive and PAG libraries are arm64-only (`libohos_rive.so`, `libpag.so`: `arm64-v8a` only; install error 9568347; without `libs/` it installs but the first PAG or Rive view crashes). The fix belongs in CYLTabBarController's CYLAnimatedItemView library (`CrossPlatform/harmonyos-cyltabbar/cylanimateditem`): engines declare the native ABIs they need, `CYLAnimatedItemEngines.canPlay` is false on a device without them and the item shows its still image, plus an x86_64 debug build option that leaves the arm64-only `.so` files out of the HAP; then every example and library on the component runs its full test on the x86_64 emulator. Until it is done, a test of PAG or Rive on the x86_64 emulator is not a pass: say it needs an arm64 device, or use the local workaround in `instructions.md` (never committed). Full text: `instructions.md`, "HarmonyOS x86_64 emulator and arm64-only animation engines" and `CrossPlatform/harmonyos-cyltabbar/cylanimateditem/README.md`, "x86_64 emulator". Status: built in cylanimateditem (2026-11-22); dependents adopt it.
+
+## Rive and PAG on x86_64: Plan 1 (x86_64 libraries), else Plan 2 (macOS session) (added 2026-11-22, owner)
+
+For tests that only run on arm64 (PAG and Rive playback): Plan 1 changes CYLTabBarController's HarmonyOS `cylanimateditem` to load x86_64 builds of the PAG and Rive libraries, brought in from GitHub, when the running system is x86_64 (`deviceInfo.abiList`). First it must compile and never crash or break other features; then make playback work. Until it passes its tests it stays behind a debug build option (only the emulator triggers it); removing that guard needs the owner's approval: ask first. If Plan 1 fails, Plan 2 hands the test to the macOS (arm64) session. Full text: `instructions.md`, "Rive and PAG on the x86_64 emulator: two plans for arm64-only tests". Status (2026-11-22): Plan 1 done for Rive and PAG behind the debug guard: `cylanimateditem/x86_64-debug-engines/{rive,pag}`, added by `tools/cyl_hap_x86_64.py install` (only the engines the app uses), turned on by `CYLAnimatedItemEngines.loadX86_64DebugEngines` in debug builds; guard removal needs the owner's approval.

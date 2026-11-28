@@ -124,6 +124,7 @@
 "有新内容" = "Nowa zawartość";
 "%@ 条新消息" = "Nowe wiadomości: %@";
 "加号按钮" = "Przycisk plus";
+"更多" = "Więcej";
 "模拟内存警告" = "Symuluj ostrzeżenie o pamięci";
 "卸载未选中的 Tab，切换时重新加载" = "Zwalnia niewybrane karty; ładują się ponownie po wybraniu";
 "内存警告" = "Ostrzeżenie o pamięci";
@@ -368,3 +369,12 @@
 "网络图标、标题与配色" = "Ikony z sieci, tytuły i kolory";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Plik konfiguracji";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Przywróć";
+"保持" = "Zachowaj";
+"不适用" = "N/D";
+"手动" = "Ręcznie";
+"自测" = "Autotest";
+"手动：%@" = "Ręcznie: %@";
+"实测：%@" = "Rzeczywiste: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Autotest: uruchom wszystkie automatyczne symulacje, zgłoś PASS / FAIL";

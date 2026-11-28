@@ -1,0 +1,470 @@
+[
+  {
+    "id": 1,
+    "status": "DONE (harmonyos-verify-home-eba8c44.jpeg: NEW on one line on 我的; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Badge text wraps: \"NEW\" on Me shows as \"NE\" / \"W\" on two lines; text badges do not grow with their text",
+    "evidence": "harmonyos-home-mate70pro-api21.jpeg, harmonyos-styles-*-*.png (Me tab, all styles)",
+    "cause": "CYLBadgeView is a child of the icon Stack, which has a fixed width (imageSize, 26 vp); the badge Text is measured inside that width, so long text wraps. iOS (sizeToFit + margin) and Android (wrap_content) size the badge to its label",
+    "fix": "Host stacks no longer fix their width (tab icon, plus button, demo rows), so the badge is measured with the free width; the badge Text is one line (maxLines 1, no wrap) and its width is the text width + margin, at least its height; the badge width is explicit, as Android CYLBadge.onMeasure / iOS -cyl_adjustLabelWidth: max(height, measured text width (MeasureUtils.measureText, bold) + margin); the border width (twice) is added too, as in PR #801"
+  },
+  {
+    "id": 2,
+    "status": "DONE (harmonyos-verify-home-eba8c44.jpeg: title rows from the layout dump: tabs 2675-2716 px, plus title 2676-2717 px (1 px, 0.3 vp); Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Icon and title centre lines differ between the tabs and the plus button: the plus title 发布 sits a few px off the line of the tab titles",
+    "evidence": "harmonyos-home-mate70pro-api21.jpeg (title row: 同城 / 消息 / 我的 vs 发布)",
+    "cause": "Tab buttons centre icon + title vertically (justifyContent Center), the plus title is placed at a fixed y (tabBarHeight - 17): two layouts that only agree by chance",
+    "fix": "Tab buttons use the same fixed layout as the plus button: title top at tabBarHeight - 17, icon right above it (3 vp gap); every title shares one baseline and icons one centre line"
+  },
+  {
+    "id": 3,
+    "status": "DONE (harmonyos-verify-home-eba8c44.jpeg: 扁平样式, 液态玻璃, 首页 and 换肤 on one centre line; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "Navigation bar: the left buttons (扁平样式, 液态玻璃) and 换肤 sit at the top while the title 首页 is centred: not on one centre line",
+    "evidence": "harmonyos-home-mate70pro-api21.jpeg, harmonyos-styles-*-981db1e / b7995d0 (top bar)",
+    "cause": "The bar buttons use position({ left / right }) without a height, so they are placed at y = 0 of the 44 vp bar",
+    "fix": "Bar buttons get the bar's height (44 vp) and centre their content vertically"
+  },
+  {
+    "id": 4,
+    "status": "DONE (harmonyos-verify-home-eba8c44.jpeg: status bar area gray like the navigation bar; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "Status bar area is white above the gray navigation bar",
+    "evidence": "harmonyos-styles-space-skin-981db1e.png (top)",
+    "cause": "Since the nav bars no longer extend into the status bar (fix of the hidden buttons), nothing paints the status bar area",
+    "fix": "EntryAbility sets the system bar colors of the main window (status bar = navigation bar color, dark text; dark mode: dark bar, light text)"
+  },
+  {
+    "id": 5,
+    "status": "DONE (harmonyos-verify-home-eba8c44.jpeg: tabBarHidden / cyl_tabBarMinimizeBehavior subtitles in Chinese; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "Untranslated English subtitles in the Chinese UI (tabBarHidden = false; hidden, it comes back after 2 s / cyl_tabBarMinimizeBehavior = Never; tap to choose, then scroll this list)",
+    "evidence": "harmonyos-home-mate70pro-api21.jpeg",
+    "cause": "Dynamic subtitles built with template strings, not CYLLocalizedString",
+    "fix": "Subtitles go through CYLLocalizedString with keys in scripts/harmonyos-l10n.json (en, zh-Hans); resources regenerated"
+  },
+  {
+    "id": 6,
+    "status": "DONE (harmonyos-verify-liquid-glass-eba8c44.png: the selected capsule follows the rounded ends; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Liquid Glass: the selected tab's capsule has square corners that stick out of the rounded bar (left end, behind the Home cover)",
+    "evidence": "harmonyos-styles-space-skin-981db1e.png, harmonyos-flatdesign-liquidglass-taps-mate70pro.png (right column)",
+    "cause": "The selected background is drawn on the whole tab button without corner radius, and the bar does not clip its children",
+    "fix": "Liquid Glass tab buttons get a corner radius of half the bar height, so the selection is a capsule inside the bar"
+  },
+  {
+    "id": 7,
+    "status": "DONE (harmonyos-verify-skins-eba8c44.png: classic with Ocean and Space: the plus button shows the skin's image; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "The plus button does not follow updates: with a skin the classic bar keeps the default + image (FlatDesign / Liquid Glass show the skin icon only because they rebuild the bar)",
+    "evidence": "harmonyos-styles-space-skin-981db1e.png (left: + image; middle and right: comet)",
+    "cause": "CYLTabBarController.plusButton is a plain field, not @Prop: a new plus button from the parent is ignored until the controller is rebuilt (also affects the touchable-area and the late-image demos)",
+    "fix": "plusButton is a @Prop, so a new CYLPlusButton from the parent updates the bar in place"
+  },
+  {
+    "id": 8,
+    "status": "DONE (harmonyos-verify-skins-eba8c44.png: FlatDesign with Space: one color, bar and gesture strip; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "FlatDesign with a skin is two-tone: the bar row stays light gray-purple, the strip under the gesture bar is the skin color",
+    "evidence": "harmonyos-styles-space-skin-981db1e.png (middle)",
+    "cause": "CYLFlatDesignTabBarModifier draws the light blur material over the skin tint",
+    "fix": "PR #799: with barTintColor the modifier draws the tint without the light material; PR #804: the tint and image branches also reset backgroundBlurStyle(BlurStyle.NONE), because the modifier is applied again to the same bar and the default look's material stayed"
+  },
+  {
+    "id": 9,
+    "status": "DONE (no longer applies: HarmonyOS/ was merged into the port and deleted in PR #800)",
+    "scope": "HarmonyOS/ (separate project in this repository)",
+    "title": "Plus button title 发布 sits about 12 vp below the other tab titles",
+    "evidence": "The deleted HarmonyOS/ demo (its screenshots were removed in 2e1aaec)",
+    "cause": "plusButtonView centres a 44 vp image + title, tabButton centres a 26 vp icon stack + title: the larger image pushes the plus title down",
+    "fix": "HarmonyOS/ was merged into the official port and deleted (PR #800); the port places tab and plus titles on one line (#2)"
+  },
+  {
+    "id": 10,
+    "status": "DONE (harmonyos-verify-pushed-page-eba8c44.jpeg: ‹ 返回 and the page title 另一个加号按钮 in Chinese; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "Pushed pages are not localized: ‹ Back, page titles (System tab bar, Another plus button, cyl_pop / cyl_push) and row texts stay English",
+    "evidence": "Code review while checking the screenshots (pages/TextPage, SystemTabs, AnotherTabBar, PopPushDemo)",
+    "cause": "Literal strings in the pushed pages",
+    "fix": "Texts go through CYLLocalizedString (iOS keys where they exist: 返回 / Back, cyl_pop / cyl_push 系列方法演示, Push To 系统 UITabBarController ...); resources regenerated"
+  },
+  {
+    "id": 11,
+    "status": "DONE (harmonyos-port-svga-demo-taps.png, b840da3, emulator 127.0.0.1:5557)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "SVGA (and Lottie) icons larger than imageSize sit about 5 vp right of and below their titles",
+    "evidence": "The deleted HarmonyOS/ demo showed icons 19-29 px right of their titles (screenshots removed in 2e1aaec); the port: harmonyos-port-svga-demo-taps.png (b840da3, centred, -2 to +1.5 px)",
+    "cause": "The icon Stack had a fixed imageSize with alignContent TopStart, so a bigger icon spilled right and down; the title line and the badge anchor used imageSize",
+    "fix": "The icon Stack takes the real icon size (no fixed size, centred in the tab); the title line and the badge anchorWidth use cylIconHeight (Lottie / SVGA / image size)"
+  },
+  {
+    "id": 12,
+    "status": "DONE (harmonyos-verify-skins-eba8c44.png: Ocean, classic: the blue reaches under the gesture bar; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Ocean skin, classic style: a white strip under the tab bar (the bar color does not reach under the gesture bar)",
+    "evidence": "harmonyos-styles-ocean-skin-b7995d0.png (left)",
+    "cause": "The bar container (added for the Liquid Glass insets) had no background",
+    "fix": "981db1e: the container takes the bar background (classic / FlatDesign), transparent for Liquid Glass; the Space screenshot of 981db1e shows it fixed, Ocean needs a new screenshot"
+  },
+  {
+    "id": 13,
+    "status": "DONE (harmonyos-verify-replacement-page-eba8c44.jpeg: 替换页 3; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "\"Replacement page N\" (issue #481 demo) is English only",
+    "evidence": "Code review (reported by the CYLTableViewPlaceHolder session)",
+    "cause": "Template string in Index.ets cylPage",
+    "fix": "CYLLocalizedString('替换页 %@') (the iOS key); the replaced tab's own title (was \"Replaced N\") also uses 替换页 %@ (替换页 2 in harmonyos-verify-l10n-mate70pro-api21.png)"
+  },
+  {
+    "id": 14,
+    "status": "DONE (harmonyos-verify-configuration-svga-eba8c44.jpeg: the first tap on 发现 right after pushing the page selects it; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "The first tap on a tab right after pushing the configuration demo page does nothing; the next tap works",
+    "evidence": "Emulator check of the SVGA demo (CYLTabBarController-folder session, b840da3, 127.0.0.1:5557)",
+    "cause": "Likely the tab's exclusive gesture group (LongPressGesture before TapGesture): during or right after the push transition the first tap is not recognised by the group",
+    "fix": "Tabs take taps through onClick and the long press as a parallelGesture (a long press marks its tab so the following click is ignored)"
+  },
+  {
+    "id": 15,
+    "status": "DONE (harmonyos-verify-home-end-eba8c44.jpeg: the last row (35. 右下角) scrolls fully above the tab bar; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "The last demo rows stay hidden behind the tab bar, the raised plus button and the gesture bar",
+    "evidence": "harmonyos-home-mate70pro-api21.jpeg (bottom rows under the bar; reported in PR #803)",
+    "cause": "The demo List has no end inset for the bar",
+    "fix": "PR #803: List.contentEndOffset(120 vp) so every row can scroll above the bar"
+  },
+  {
+    "id": 16,
+    "status": "DONE (harmonyos-verify-skins-eba8c44.png: the skin's plus image stays inside the button; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "A skin's plus image is drawn at the 52 vp button size and spreads over the list above the bar",
+    "evidence": "harmonyos-styles-space-skin-981db1e.png (comet over the list; reported in PR #803)",
+    "cause": "The skin plus copies imageSize 52 from the default round button, but the skin image is a tab-style icon",
+    "fix": "PR #803: a skin's plus image uses 40 vp"
+  },
+  {
+    "id": 17,
+    "status": "DONE (harmonyos-verify-home-eba8c44.jpeg: 不居中显示 row has the subtitle cyl_itemEdgeInsets：为零，Tab 铺满 TabBar; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "The row CYLFlatDesignTabBarItem 不居中显示（系统效果） has no subtitle, unlike its neighbours",
+    "evidence": "harmonyos-home-mate70pro-api21.jpeg (reported in PR #803)",
+    "cause": "Missing subtitle in appearanceRows",
+    "fix": "PR #803: subtitle cyl_itemEdgeInsets: zero, the tabs fill the bar (localized)"
+  },
+  {
+    "id": 18,
+    "status": "DONE (harmonyos-verify-l10n-mate70pro-api21.png: 繁體中文 and Deutsch, every row translated)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (l10n)",
+    "title": "Traditional Chinese shows English for every HarmonyOS-only string",
+    "evidence": "scripts/harmonyos-l10n.json had no zh-Hant table (reported in PR #804)",
+    "cause": "Only en and zh-Hans were written for keys the iOS bundle does not have",
+    "fix": "PR #804: zh-Hant for all HarmonyOS-only keys; resources regenerated"
+  },
+  {
+    "id": 19,
+    "status": "DONE (harmonyos-verify-home-end-eba8c44.jpeg: row 28 边框: the bordered 5 is not clipped; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "A bordered text badge (the Border option) clips its text",
+    "evidence": "PR #805 review",
+    "cause": "cylTextBadgeWidth() left out borderWidth, but ArkUI draws the border inside the width",
+    "fix": "PR #805 merged: the width adds the border on both sides"
+  },
+  {
+    "id": 20,
+    "status": "DONE (harmonyos-verify-l10n-mate70pro-api21.png: 繁體中文 and Deutsch, every row translated)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, entry)",
+    "title": "The HarmonyOS-only strings stay English in the 30 other languages (de 29 copies of English, fr / es 29, ar / ko / ja 27; report of the CYLSearchViewController session)",
+    "evidence": "string.json of every language except zh_CN / zh_TW",
+    "cause": "scripts/harmonyos-l10n.json had only en, zh-Hans and zh-Hant",
+    "fix": "All 46 HarmonyOS-only keys translated in all 33 languages in scripts/harmonyos-l10n.json (merged with 3344398), resources regenerated; only API names, Liquid Glass and loanwords (Badge, OK) stay as in English"
+  },
+  {
+    "id": 21,
+    "status": "DONE (harmonyos-verify-configuration-svga-eba8c44.jpeg: tab titles 首页 / 发现 / 消息 / 我的 and the page title in Chinese; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, entry)",
+    "title": "SVGA configuration demo: tab titles and the page title are English (Home, Discover, Message, Me) in the Chinese UI",
+    "evidence": "harmonyos-port-svga-demo-page.png",
+    "cause": "configurationWithRawFile ignored CYLTabBarControllerLocalization, and the SVGA file had none",
+    "fix": "Two layers: the demo page shows the file's English titles as localization keys (3eb7381; Home / Discover / Message / Me copied from Example-Shared/Configurations/Localization for 33 languages), and the library's configurationWithRawFile now also applies CYLTabBarControllerLocalization of a file, as iOS (6bd5b02)"
+  },
+  {
+    "id": 22,
+    "status": "DONE (harmonyos-verify-configuration-svga-eba8c44.jpeg: the page shows 页面：svga-home / svga-discover; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "Configuration demo page: the labels \"identifier:\" and \"page:\" are English, and \"page: -\" shows no page",
+    "evidence": "harmonyos-port-svga-demo-page.png",
+    "cause": "Literal English labels in ConfigurationDemo.ets; the SVGA file had no CYLTabBarItemPageIdentifier",
+    "fix": "The page says which file, tab and page it is, through CYLLocalizedString (Configuration file / Tab / Page: %@, 33 languages; 3eb7381 + translations); each SVGA tab has a page identifier svga-<identifier>"
+  },
+  {
+    "id": 23,
+    "status": "DONE (by design, harmonyos-verify-liquid-glass-eba8c44.png: the 8 badge uses CYLBadgeAnimationTypeScale, a forever pulse from 1.4x to 0.6x, the same as iOS cyl_scale(fromScale: 1.4, toScale: 0.6); the two shots catch both ends; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Liquid Glass: the \"8\" badge on 同城 is drawn about twice its size and covers the icon",
+    "evidence": "harmonyos-flatdesign-liquidglass-taps-mate70pro.png col. 3",
+    "cause": "Probably captured during the Scale animation (spring curve overshoots past 1) replayed when the style switches; not seen in the other columns",
+    "fix": "No code change; take the screenshot 1 s after switching the style and check the badge is 2 × radius"
+  },
+  {
+    "id": 24,
+    "status": "DONE (harmonyos-verify-liquid-glass-eba8c44.png: 2 s after the switch the bar sits above the gesture bar; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Liquid Glass: right after the switch the bar sits low, behind the gesture bar, with titles cut off",
+    "evidence": "harmonyos-flatdesign-liquidglass-taps-mate70pro.png col. 2",
+    "cause": "Probably captured during the style switch animation; col. 3 shows the settled bar",
+    "fix": "No code change; take the screenshot 1 s after the switch and check the bar is above the gesture bar"
+  },
+  {
+    "id": 25,
+    "status": "DONE (harmonyos-verify-home-eba8c44.jpeg: 99+ and NEW centred on the icon corner; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Wide badges (99+, NEW) are anchored by their left end at the icon corner and grow only to the right, unlike iOS and Android",
+    "evidence": "Code review of 3eb7381 / aaddad4 (PR #806, \"wide badges grow right\") against Example-Android CYLBadge.kt cyl_badgeOrigin (anchorRight + 2 dp - width / 2) and the iOS placement (center 2 pt right of the host's right edge)",
+    "cause": "markAnchor x was set to half the badge height for text badges, so the badge's left cap sat on the corner",
+    "fix": "markAnchor x 50% for every badge: the centre is 2 vp right of the corner plus centerOffset, so wide badges grow to both sides as on iOS and Android"
+  },
+  {
+    "id": 26,
+    "status": "DONE (harmonyos-cvcm-issue26-good.jpeg, harmonyos-cvcm-issue26-all.jpeg; emulator Mate 70 Pro (HarmonyOS 6.0.0.112, API 21, x86_64; Rive / PAG .so excluded), 127.0.0.1:5555, 2026-11-17; CollectionViewClassifyMenu feat/harmony 518946b: tapping 好评(9) selects it and shows the 9 good reviews, hilog CYLTagList \"tap gesture 0-1\"; 全部 shows all 10 again)",
+    "scope": "ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md)",
+    "title": "The review filter 好评(9) does not filter the list when tapped",
+    "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): reviews-all",
+    "cause": "Not investigated here; owned by the winCollectionViewClassifyMenu session",
+    "fix": "5dc703b (feat/harmony): tag taps go through a priorityGesture TapGesture on each item; host test ReviewFilterTap; traced in hilog domain CYLTagList"
+  },
+  {
+    "id": 27,
+    "status": "DONE (harmonyos-cvcm-issue27-plus.jpeg, harmonyos-cvcm-issue27-filter-open.jpeg; emulator Mate 70 Pro (HarmonyOS 6.0.0.112, API 21, x86_64; Rive / PAG .so excluded), 127.0.0.1:5555, 2026-11-17; CollectionViewClassifyMenu feat/harmony 518946b: tab-plus has accessibility description 按场景分组的筛选演示 and opens 查询筛选; menuLinkageFilter has description 多选筛选 and opens the filter panel)",
+    "scope": "ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md)",
+    "title": "The plus button and the menu-linkage filter button have no accessibility text and do nothing when tapped",
+    "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): query-menu-linkage",
+    "cause": "Missing accessibilityText / onClick",
+    "fix": "95bebc1 (feat/harmony): accessibility labels and taps for the plus button and the menu-linkage filter button"
+  },
+  {
+    "id": 28,
+    "status": "DONE (harmonyos-classifymenu-dark-animations-x86-9dc1f761.png: dark mode, every tag row at full width, the speed and loop labels readable; x86_64 emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, ClassifyMenu 9dc1f761 as a local x86_64 debug build, 2026-11-22)",
+    "scope": "ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md)",
+    "title": "Dark mode, animations page: empty rows; the speed and loop labels are invisible",
+    "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): animations-tab",
+    "cause": "Empty rows: tags clamped to width 0 before the list knew its width; invisible labels: 7 Texts without a color",
+    "fix": "849c2d8 (feat/harmony), with a host regression test"
+  },
+  {
+    "id": 29,
+    "status": "TODO need 模拟器截图验证",
+    "scope": "ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md)",
+    "title": "Crash in libohos_rive.so on the animations page",
+    "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de): animations-tab; 2026-11-22 rerun on the x86_64 emulator (ClassifyMenu 9dc1f761, local x86_64 debug build without the arm64-only .so files): the page ran 68 s without a crash, but no Rive view was created there, so this needs an arm64 device (harmonyos-classifymenu-dark-animations-x86-9dc1f761.png)",
+    "cause": "Crash when a Rive view is disposed (bug in the ohos_rive library, still there)",
+    "fix": "95bebc1 (feat/harmony): avoided by pooling Rive views (BuilderNode / NodeContainer) and never disposing them"
+  },
+  {
+    "id": 30,
+    "status": "DONE (by design, B1: tab titles stay 10 fp and shrink toward 8 fp, then ellipsize, only when a long title such as 场景一：评价筛选 would not fit; harmonyos-push-*.jpeg)",
+    "scope": "ChenYilong/CollectionViewClassifyMenu (harmony port; other repository, tracker docs/harmony-verification.md)",
+    "title": "Bottom tab bar titles are small (8 fp) after the B1 fix",
+    "evidence": "harmonyos-push-*.jpeg on feat/harmony 98df838 (report of session chenyilong-de)",
+    "cause": "Intended shrink-to-fit for long titles",
+    "fix": "No change (owner's decision)"
+  },
+  {
+    "id": 31,
+    "status": "DONE (harmonyos-bundle-image-row-localized.png, emulator 127.0.0.1:5559, 2026-11-16 11:13)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "The tab bar moves up with the keyboard (it sits right above the keyboard while typing); it must stay fixed at the bottom, in sync with iOS",
+    "evidence": "harmonyos-emulator-pages-b7fdf26.png (taken on 5559 at 10:37, Home list)",
+    "cause": "Text not passed through CYLLocalizedString",
+    "fix": "Synced with iOS, where UIKit never moves the tab bar for the keyboard (it stays at the bottom, covered) and CYLTabBarController+CYLTabBarMinimize.swift treats UIKeyboardWillShowNotification as an interruption that shows a scroll-hidden bar again. HarmonyOS: the controller follows the window's keyboardHeightChange; while the keyboard is up and the avoid mode is not OFFSET, the tab bar container is Visibility.None (out of the layout), so it stays behind the keyboard and the content fills up to the keyboard; it comes back unmoved when the keyboard closes (OFFSET mode already keeps it in place). The keyboard coming up also restores a scroll-hidden bar (cylRestoreFromScroll), as iOS; its going away does not"
+  },
+  {
+    "id": 32,
+    "status": "DONE (harmonyos-system-tab-bar-plus-before-after.png, emulator 127.0.0.1:5559, 2026-11-16 11:01)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "The system tab bar page (推入到系统 UITabBarController) shows its page body \"Home\" in English in the Chinese UI",
+    "evidence": "harmonyos-emulator-pages-b7fdf26.png, 4th screen",
+    "cause": "Text not passed through CYLLocalizedString",
+    "fix": "The page shows the selected tab's localized title (or the localized plus button name after a tap)"
+  },
+  {
+    "id": 33,
+    "status": "DONE (harmonyos-system-tab-bar-plus-before-after.png, emulator 127.0.0.1:5559, 2026-11-16 11:08)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "System tab bar page with another plus button: the plus button floats 80 vp above the bar, over the page, instead of sitting in the bar",
+    "evidence": "User screenshot of 2026-11-16 10:48 (the same as harmonyos-emulator-pages-b7fdf26.png, 4th screen)",
+    "cause": "The row opened the ArkUI system Tabs page and drew a stand-in button with margin({ bottom: 80 }); the system bar has no plus button, and iOS opens a CYLTabBarController instead",
+    "fix": "As iOS CYLTabBarDemoRowPushSystemStyle: the row opens AnotherTabBar in the Liquid Glass style with the other (square) plus button; the system Tabs page (row \"和系统 UITabBar 比较\") draws no plus button"
+  },
+  {
+    "id": 34,
+    "status": "DONE (harmonyos-verify-pushed-page-eba8c44.jpeg: the navigation title fits on one line; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "Pushed pages: a long navigation title (推入到系统 UITabBarController（另一个加号按钮）) wraps onto two lines and crowds the bar",
+    "evidence": "harmonyos-emulator-pages-b7fdf26.png, harmonyos-system-tab-bar-plus-before-after.png (top panel)",
+    "cause": "The nav titles of the pushed pages have no line limit",
+    "fix": "Nav titles of SystemTabs, AnotherTabBar, TextPage, PopPushDemo and ConfigurationFailures: maxLines(1), minFontSize(12) / maxFontSize(17), ellipsis"
+  },
+  {
+    "id": 35,
+    "status": "DONE (harmonyos-verify-keyboard-fixed-tab-bar.jpeg: CYLSearchViewController HarmonyOS example (KeyboardAvoidMode.RESIZE) built with cyltabbar 696efb5; with the keyboard up the tab bar stays behind it and the results fill up to the keyboard; after 取消 the bar is back at y 2563 px, unmoved; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "The tab bar moves up with the keyboard (it sits right above the keyboard while typing); it must stay fixed at the bottom, as on iOS",
+    "evidence": "harmonyos-keyboard-moves-tab-bar-cylsearch.png cols. 2-3 (CYLSearchViewController HarmonyOS example on cyltabbar 3ddb96c, Mate 70 Pro emulator API 21, 2026-11-16 10:12; reported by the maintainer)",
+    "cause": "The app resizes its page for the keyboard (KeyboardAvoidMode.RESIZE); the tab bar is the last child of the controller's column, so it is laid out at the new, higher bottom",
+    "fix": "CYLTabBarController follows the window's keyboardHeightChange; while the keyboard is up and the avoid mode is not OFFSET, the tab bar container is Visibility.None (out of the layout), so it stays behind the keyboard and the content fills up to the keyboard; it comes back unmoved when the keyboard closes. OFFSET mode already keeps the bar in place"
+  },
+  {
+    "id": 36,
+    "status": "DONE (harmonyos-verify-rive-mate70pro-api21.png: bar and strip one color)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Configuration with a translucent bar color (#17203ACC): the strip under the gesture bar looks gray / lighter than the bar",
+    "evidence": "Emulator check of the Rive demo (CYLTableViewPlaceHolder session, df8664f)",
+    "cause": "The bar row and its container both painted the translucent color: two layers over the bar, one under the gesture bar",
+    "fix": "Classic / FlatDesign: only the container paints tabBarBackgroundColor, the row is transparent (Liquid Glass keeps its capsule color)"
+  },
+  {
+    "id": 37,
+    "status": "DONE (harmonyos-verify-rive-mate70pro-api21.png: Rive page open, Messages tapped, no crash, emulator stayed up)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, entry)",
+    "title": "The emulator went down while the Rive demo (row \"Rive Tab 图标（配置文件）\") was opened and its Messages tab tapped, with the Canvas renderer already on the emulator",
+    "evidence": "2026-11-16 ~17:47, emulator CYL TabBar Test (127.0.0.1:5559), HAP of df8664f: hdc lost the target, kernel.log shows a fresh boot at ~17:48 and hdc did not reconnect for 3+ minutes; no screenshot of the Rive page",
+    "cause": "Most likely the host, not Rive: after a restart the same emulator dropped twice more before reaching the Rive page (while scrolling Home and before the first Home screenshot, a page with Lottie and no Rive); no jscrash or cppcrash of com.cyl.tabbar.harmony, only sceneboard sysfreeze logs; the Mac ran 3 HarmonyOS emulators and an Android one at about 130% CPU each. Earlier the same build showed the Rive page and 3 tab switches without a crash",
+    "fix": "Retest the Rive demo on a less loaded host (one HarmonyOS emulator running)"
+  },
+  {
+    "id": 38,
+    "status": "DONE (harmonyos-verify-skin-row-picker.jpeg: 太空 / 海洋 / 网络图标 / 默认; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "The skin picker lists the skins' English names (Ocean, Network, Default, Grapefruit) in the Chinese UI",
+    "evidence": "Emulator check 2026-11-16 (skin picker opened from 换肤)",
+    "cause": "showSkinPicker passed theme.name (the English identifier) as the picker range",
+    "fix": "The range is the localized titles (CYLLocalizedString(theme.titleKey)), as the skin rows"
+  },
+  {
+    "id": 39,
+    "status": "DONE (harmonyos-verify-skin-row-picker.jpeg: 当前：海洋 after Ocean; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, eba8c44, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "The skin row's subtitle stays at 当前：默认 after another skin is applied",
+    "evidence": "Emulator check 2026-11-16 (Ocean applied, subtitle still 默认)",
+    "cause": "The section ForEach key was the section title only, so ArkUI kept the old rows when a subtitle changed",
+    "fix": "The section key includes its rows' keys (id, title, subtitle)"
+  },
+  {
+    "id": 40,
+    "status": "DONE (harmonyos-verify-language-picker.jpeg: 🇺🇸 English, 🇨🇳 简体中文, 🇮🇳 हिन्दी, 🇪🇸 Español, 🇸🇦 العربية, 跟随系统, 取消, and the row 🌐 语言：🇨🇳 简体中文; Spanish and Arabic in harmonyos-verify-spanish.jpeg, harmonyos-verify-arabic.jpeg; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5557, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "The language picker offers only 跟随系统 / English / 简体中文, and the language row does not show the current language, unlike iOS",
+    "evidence": "Emulator check 2026-11-16",
+    "cause": "DEMO_LANGUAGES had three entries and the row title was static; iOS -cyl_presentLanguagePicker lists en, zh-Hans, hi, es, ar with flags, then 跟随系统, and the row reads 🌐 语言：<current>",
+    "fix": "Picker as iOS: 🇺🇸 English, 🇨🇳 简体中文, 🇮🇳 हिन्दी, 🇪🇸 Español, 🇸🇦 العربية, 跟随系统 (CYLSetLocalizationLanguage); the row title shows 🌐 语言：<current>"
+  },
+  {
+    "id": 41,
+    "status": "DONE (harmonyos-verify-l10n-mate70pro-api21.png)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "German: the navigation title \"Start\" was drawn over the \"Liquid Glass\" button",
+    "evidence": "Emulator check 2026-11-16 (Deutsch)",
+    "cause": "The left buttons and 换肤 were positioned absolutely over a centred title",
+    "fix": "One row: buttons, title (layoutWeight, shrinks to 12 fp, then ellipsis), 换肤"
+  },
+  {
+    "id": 42,
+    "status": "DONE (harmonyos-verify-nav-title-mate70pro-api21.png: 首页 centred; Spanish moves aside, no overlap)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "Home: the title is centred between the left buttons and 换肤, not on the screen",
+    "evidence": "harmonyos-verify-l10n-mate70pro-api21.png (side effect of #41)",
+    "cause": "iOS centres the title when it fits and only then moves it aside",
+    "fix": "The title gets extra padding on the narrow side so it is centred on the bar when equal margins leave at least 48 vp; otherwise it uses the space between the buttons and 换肤"
+  },
+  {
+    "id": 43,
+    "status": "DONE (harmonyos-verify-scroll-sim-labels-mate70pro-api21.jpeg: 39. 自测：依次运行所有自动模拟… and the kind labels 恢复 / 自测 in Chinese; the case titles 1-38 stay English, as on iOS and Android)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (entry)",
+    "title": "Scroll simulation rows: \"Self-test: run every automatic simulation…\" and the kind labels (Restore, Keep, N/A, Manual, Self-test) are English in the Chinese UI",
+    "evidence": "Emulator check 2026-11-16 (Home, scroll simulation section)",
+    "cause": "The kind labels, the Manual / Real prefixes and the self-test title were English on all three platforms",
+    "fix": "Localized on iOS, Android and HarmonyOS from 8 new keys in CYLTabBarController.bundle (33 languages); the API or event a title names stays English"
+  },
+  {
+    "id": 44,
+    "status": "DONE (harmonyos-liquid-glass-lens.png: tap 消息, the lens stretches in flight and settles on it; drag from 消息 toward 同城, the lifted lens follows the finger and the capsule swells; on release 同城 is selected and the lens settles under it; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5559, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, entry)",
+    "title": "Liquid Glass has no liquid effect: a static blurred capsule with a flat blue pill behind the selected tab",
+    "evidence": "Maintainer review 2026-11-16, after 5a1a1db",
+    "cause": "Only a blur and a tint; no lens, no motion, no light; the pill was the demo's selectedBackgroundColor",
+    "fix": "CYLTabBarController (Liquid Glass): a glass lens (saturated backgroundEffect, bright rim, shadow) behind the selected tab that slides on a spring and stretches like jelly in flight; touching lifts the lens and swells the capsule; dragging moves the lens with the finger and selects the tab it ends on; vibrant capsule (backgroundEffect saturation 1.8), a specular band along the top edge and a glow along the bottom; lens and sheen are real children placed absolutely, so the tab nodes (Lottie, SVGA, Rive) are never rebuilt. The demo no longer sets the blue pill in Liquid Glass"
+  },
+  {
+    "id": 45,
+    "status": "DONE (harmonyos-liquid-glass-plus-raised.png: the raised plus button, its badge 1 and the badges 8 / NEW rise above the capsule whole, with no line across them; Mate 70 Pro emulator, HarmonyOS 6.0.1 (API 21), 127.0.0.1:5559, 2026-11-16)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Liquid Glass: the raised plus button (and badges above the bar) are cut by the capsule; expected as iOS, where the plus button rises above the bar",
+    "evidence": "Maintainer report 2026-11-16; harmonyos-liquid-glass-lens.png (plus and 8 cut at the capsule's top edge)",
+    "cause": "The capsule clipped its children (clip(true)), its highlight was drawn over the tabs, and ArkUI paints the row's border over its children",
+    "fix": "No clipping (unselected slots are hidden, not clipped, when minimized; the glass effect follows the radius by itself); the highlight and the rim are a layer under the tabs (cylGlassSheen), the row has no border"
+  },
+  {
+    "id": 46,
+    "status": "DONE (harmonyos-liquid-glass-ios-vs-harmonyos.png: top iOS 26 (Objective-C example, iPhone 17 Pro, ios-playback-controls-message-tab-iphone17pro-ios26.1-dc04439.png), bottom HarmonyOS (Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, 127.0.0.1:5559, 2026-11-17): same floating capsule, lens, raised plus button with an aligned title, label-colored unselected titles)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, entry)",
+    "title": "The HarmonyOS Liquid Glass must be a one-to-one copy of the iOS style (the reference project's look belongs to the example only)",
+    "evidence": "Maintainer request 2026-11-17",
+    "cause": "The library had taken the reference project's layout (b004370), then was reset to an opaque capsule below the pages (b5f9ea5); neither was the iOS look",
+    "fix": "Library Liquid Glass measured on iOS 26: floating capsule 21 vp from the sides and the bottom, 61 vp high; near-white (light) or dark grey (dark) glass with a soft shadow and a light rim; a neutral borderless lens 8 vp wider than its slot that slides, stretches, lifts and follows a drag; the raised plus button in its slot, never cut; minimize into a ball; new CYLLiquidGlassUnselectedColor (sys.color.font_primary) used by the demo, as iOS uses the label color; the demo no longer paints its own pill"
+  },
+  {
+    "id": 47,
+    "status": "DONE (harmonyos-liquid-glass-ios-vs-harmonyos.png, layout dump: capsule 2507-2721 px (center 2614); icons and titles 2538-2680 (center 2609), plus title 2640 vs tab titles 2639, cover and lens centered at 2614; Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, 127.0.0.1:5559, 2026-11-17)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Liquid Glass: the tab icons and titles are not aligned with the capsule and the lens: they sit about 7 vp high",
+    "evidence": "Maintainer report 2026-11-17; layout dump: content center 2588 px vs capsule and lens center 2614 px",
+    "cause": "The tabs lay out for tabBarHeight (49 vp) from the top, while the Liquid Glass capsule is 61 vp high (iOS)",
+    "fix": "cylGlassContentDy(): tabs get a top padding of (capsule height - tabBarHeight) / 2 and the plus button's image and title positions move by the same amount, so the content is centered in the capsule and stays aligned with the plus title (as iOS)"
+  },
+  {
+    "id": 48,
+    "status": "DONE (harmonyos-liquid-glass-badges-ios-vs-harmonyos.png, top iOS 26, bottom HarmonyOS at the same pt scale; layout dump: the plus badge center is now 10 px (2.9 vp) left of and 11 px (3.1 vp) below the plus image's top-right corner, iOS -3 / +3.7 pt; Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, 127.0.0.1:5559, 2026-11-17)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Liquid Glass badge misplaced: the plus button's badge sits inside the plus image instead of on its top-right corner",
+    "evidence": "Maintainer report 2026-11-17; layout dump: plus badge center 36 px (Liquid Glass) / 51 px (classic) left of the image's right edge",
+    "cause": "The plus badge was placed from the left of the plus slot (the image's Stack was the slot's width), not from the image, so it moved with the slot width",
+    "fix": "The plus image and its badge are in a box of the image's size, so the badge center is at the image's top-right corner plus cyl_badgeCenterOffset, as iOS (also fixes the classic style). Tab badges already use iOS's formula (host width + 2 + offset); what is left (up to 3.7 pt on 同城) comes from the icons' own padding inside the 26 vp Lottie box"
+  },
+  {
+    "id": 49,
+    "status": "DONE (harmonyos-liquid-glass-message-badge-before-after.png: left before, the dot about 13 vp below the icon's corner; right after, at the icon's top-right corner, 1.5 s and 3 s after selecting 消息; Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, 127.0.0.1:5559, 2026-11-17)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar)",
+    "title": "Liquid Glass: after selecting 消息, its badge (the dot) is drawn at the lower right of the icon instead of the top-right corner",
+    "evidence": "Maintainer report 2026-11-17; the layout dump had the dot in place while the screen showed it 45 px (13 vp) lower: a render-time transform",
+    "cause": "The badge was \"100\" with the Bounce animation, an infinite animateTo on translateY; selecting the tab turns it into a dot without animation, and cylPlay() reset translateY by plain assignment, which does not stop a running infinite animation in ArkUI, so it kept driving the dot's transform",
+    "fix": "cylPlay() resets scale, translate, opacity and rotation inside animateTo({ duration: 0 }), which stops running animations before the new badge plays its own (all styles)"
+  },
+  {
+    "id": 50,
+    "status": "DONE (harmonyos-badge-bounce-around-place.png: six shots of the 消息 \"99+\" and 我的 \"NEW\" badges; the green line is the badge's resting center; 99+ now moves above and below it; Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, 127.0.0.1:5559, 2026-11-17)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, core)",
+    "title": "Liquid Glass: the 消息 badge (\"100\", Bounce) sits too high: it bounces only upward, faster than iOS",
+    "evidence": "Maintainer report 2026-11-17 (消息 tab badge misplaced); iOS cyl_bounceAnimationRepeatTimes: 0, -h/4, 0, +h/4, 0 in 1 s",
+    "cause": "CYLBadge.ets animated Bounce from 0 to -8 vp and back every 250 ms (Shake ±6 vp every 125 ms, Breathe 600 ms ease), unlike iOS",
+    "fix": "Core fix in CYLBadge.ets (cyltabbar, published to ohpm), not in the example: Bounce and Shake use iOS's keyframes 0, -size/4, 0, +size/4, 0 over 1 s around the badge's place (h for Bounce, w for Shake); Breathe is opacity 1 to 0.1 and back, 1.4 s each way, linear, as iOS"
+  },
+  {
+    "id": 51,
+    "status": "DONE (harmonyos-tab-badge-top-left-before-after.png: top, before, the 8 / 99+ / NEW badges at the icons' top-left; bottom, after, at their top-right, badge center 10 px inside the icon's corner as the plus button's; both with badge animations off (CYL_BADGE_ANIMATION_DISABLED, local build only); harmonyos-tab-badge-animations-on.png: the normal build, animations on, 同城 tapped: its Lottie icon plays and the badges stay at the top-right; Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, 127.0.0.1:5559, 2026-11-18. Liquid Glass not checked separately: it uses the same tab icon Stack)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cylanimateditem, core)",
+    "title": "Tab badges sit at the icon's top-left instead of its top-right since animated tab icons are drawn by CYLAnimatedItemView",
+    "evidence": "Maintainer report 2026-11-17, verbatim: \"鸿蒙系统tabbaritem的badge坐标，预期是右上角现在变左上角了。排查原因\" (English: on HarmonyOS the tab bar item's badge should be at the top-right, it is now at the top-left; find the cause). Started with 760dfba2 (22:18), which draws Lottie, Rive and SVGA tab icons with CYLAnimatedItemView(isBare)",
+    "cause": "CYLAnimatedItemView's root is a Flex without a width, and an ArkUI Flex fills its parent: in the tab item it is as wide as the tab slot, with the icon centred in it, so the tab's icon Stack becomes that wide; the badge is placed at anchorWidth + 2 from the Stack's left edge, which is now left of the centred icon",
+    "fix": "Core fix in CYLAnimatedItemView (cylanimateditem, published to ohpm), not in the tab bar or the example: a bare item that shows only an icon (no title, no accessory) now has the icon's width and height, so a host can place things against the icon's edges; every other item keeps its default size (`undefined`). Measured with uitest dumpLayout: badge center vs icon top-right dx -96 px before, -10 px after, as the plus button"
+  },
+  {
+    "id": 52,
+    "status": "DONE (harmonyos-plus-button-top-line-before-after.png: top, the maintainer's screenshot, the line across the plus button; bottom, after the fix, the line stops at the button; harmonyos-plus-button-top-line-kept.png (wider, top before, bottom after): the line is kept on both sides at the same color and only hidden behind the button, which is drawn over it (pixels on the line's row: inside the button (166,161,143) before, the button's own (208,203,185) after; beside it (199,199,199) both times); harmonyos-plus-button-liquid-glass-no-line.png: Liquid Glass, the plus button over the capsule; Mate 70 Pro emulator, HarmonyOS 6.0.1, API 21, 127.0.0.1:5559, 2026-11-18)",
+    "scope": "CrossPlatform/harmonyos-cyltabbar (cyltabbar, core)",
+    "title": "The tab bar's top line runs across the raised plus button (classic and FlatDesign)",
+    "evidence": "Maintainer report 2026-11-18, verbatim: \"鸿蒙 液态dock的边框 黑线 遮挡了plus button，请确保plus button总是在顶端。不应该被黑线遮挡\" (English: HarmonyOS, the dock's border, a black line, covers the plus button; make sure the plus button is always on top, never covered by the black line); screenshot: the FlatDesign demo page, a dark line across the raised plus button",
+    "cause": "The 0.5 vp top line is the tab Row's top border (and a custom shadowImage its overlay); ArkUI paints a border and an overlay over the children, so the line crosses the raised plus button. Liquid Glass already has no row border for this reason (its rim is drawn under the tabs)",
+    "fix": "Core fix in CYLTabBarController.ets (cyltabbar): the classic / FlatDesign top line (0.5 vp of the shadow color, or shadowImage) is drawn by cylTopLine as the tab row's first child, absolutely positioned at its top, so the tabs and the raised plus button are drawn over it (the line is kept, not removed: the plus button is simply on top); the row has no border and no overlay in any style. Liquid Glass already drew its rim under the tabs"
+  }
+]

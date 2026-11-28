@@ -1,6 +1,18 @@
 #import "FlutterCyltabbarPlugin.h"
 
 #import <CYLTabBarController/CYLTabBarController.h>
+// [EN] CYLTabBarHostView is in Swift since step 36 of the migration; the umbrella header does not import the generated Swift
+//      header (docs/Swift-Migration.md). CocoaPods: the framework or the static library's "Swift Compatibility Header";
+//      Swift Package Manager: the module.
+// [CN] 自迁移第 36 步起 CYLTabBarHostView 为 Swift；伞头文件不导入生成的 Swift 头文件。CocoaPods：framework 或静态库的
+//      "Swift Compatibility Header"；Swift Package Manager：模块。
+#if __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
+#import <CYLTabBarController/CYLTabBarController-Swift.h>
+#elif __has_include("CYLTabBarController-Swift.h")
+#import "CYLTabBarController-Swift.h"
+#else
+@import CYLTabBarController;
+#endif
 #if __has_include(<CYLTabBarController/CYLTabBarItemAnimationFactory.h>)
 #import <CYLTabBarController/CYLTabBarItemAnimationFactory.h>
 #define CYL_FLUTTER_ANIMATION_AVAILABLE 1
@@ -81,7 +93,19 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         _hostView.loginStateDidChange = ^(BOOL loggedIn) {
             [weakChannel invokeMethod:@"onLoginStateChange" arguments:@(loggedIn)];
         };
+        _hostView.didApplyManifest = ^(NSString *source) {
+            [weakChannel invokeMethod:@"onManifestApply" arguments:source];
+        };
+        _hostView.didFailManifest = ^(NSString *message) {
+            [weakChannel invokeMethod:@"onManifestFail" arguments:message];
+        };
         [self applyLoggedIn:arguments[@"loggedIn"]];
+        // [EN] Before the configuration, so it is built once, in this language. [CN] 在配置之前，使 TabBar 以该语言只创建一次。
+        [self applyLanguage:arguments[@"language"]];
+        _hostView.tabBarHidden = [arguments[@"tabBarHidden"] isKindOfClass:[NSNumber class]] && [arguments[@"tabBarHidden"] boolValue];
+        _hostView.animationSpeed = [arguments[@"playbackSpeed"] isKindOfClass:[NSNumber class]] ? [arguments[@"playbackSpeed"] doubleValue] : 0;
+        _hostView.animationLoops = [arguments[@"playbackLoops"] isKindOfClass:[NSNumber class]] && [arguments[@"playbackLoops"] boolValue];
+        [self applyTitlePositionAdjustment:arguments[@"titlePositionAdjustment"]];
         id selectedIndex = arguments[@"selectedIndex"];
         _hostView.selectedIndex = [selectedIndex isKindOfClass:[NSNumber class]] ? [selectedIndex integerValue] : -1;
         id badgeValues = arguments[@"badgeValues"];
@@ -95,6 +119,12 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         [self applyTabCoverImages:arguments[@"tabCoverImages"]];
         id configuration = arguments[@"configuration"];
         [_hostView setConfigurationJSON:[configuration isKindOfClass:[NSString class]] ? configuration : nil];
+        // [EN] The manifest to download, after the configuration: the manifest's keys are under the app's own ones.
+        // [CN] 要下载的清单，在配置之后：清单的键位于 App 自己的键之下。
+        id manifestURL = arguments[@"manifestURL"];
+        if ([manifestURL isKindOfClass:[NSString class]] && [(NSString *)manifestURL length] > 0) {
+            _hostView.manifestURL = manifestURL;
+        }
         __weak __typeof(self) weakSelf = self;
         [channel setMethodCallHandler:^(FlutterMethodCall *call, FlutterResult result) {
             [weakSelf handleMethodCall:call result:result];
@@ -113,6 +143,19 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
 
 - (void)applyPlusButtonBadge:(id)value {
     _hostView.plusButtonBadgeAttributes = [value isKindOfClass:[NSDictionary class]] ? value : nil;
+}
+
+/// [EN] [horizontal, vertical], or null for the configuration's offset. [CN] [水平, 垂直]；null 时使用配置中的偏移。
+- (void)applyTitlePositionAdjustment:(id)value {
+    NSArray *offset = [value isKindOfClass:[NSArray class]] ? value : nil;
+    _hostView.titlePositionAdjustment = offset.count >= 2 && [offset[0] isKindOfClass:[NSNumber class]] && [offset[1] isKindOfClass:[NSNumber class]]
+        ? [NSValue valueWithUIOffset:UIOffsetMake([offset[0] doubleValue], [offset[1] doubleValue])]
+        : nil;
+}
+
+/// [EN] A language code, or null for the device language. [CN] 语言代码；null 表示设备语言。
+- (void)applyLanguage:(id)value {
+    _hostView.language = [value isKindOfClass:[NSString class]] && [value length] > 0 ? value : nil;
 }
 
 /// [EN] A bool sets the app's login state; null leaves it to the state the library cached. [CN] 布尔值设置 App 的登录状态；null 时使用库缓存的状态。
@@ -146,8 +189,27 @@ static UIImage *CYLFlutterAssetImage(NSString *asset, NSObject<FlutterPluginRegi
         [self applyPlusButtonBadge:arguments];
     } else if ([call.method isEqualToString:@"setTabCoverImages"]) {
         [self applyTabCoverImages:arguments];
+    } else if ([call.method isEqualToString:@"setTitlePositionAdjustment"]) {
+        [self applyTitlePositionAdjustment:arguments];
+    } else if ([call.method isEqualToString:@"simulateMemoryWarning"]) {
+        result([_hostView simulateMemoryWarning]);
+        return;
+    } else if ([call.method isEqualToString:@"setPlaybackSpeed"]) {
+        _hostView.animationSpeed = [arguments isKindOfClass:[NSNumber class]] ? [arguments doubleValue] : 0;
+    } else if ([call.method isEqualToString:@"setPlaybackLoops"]) {
+        _hostView.animationLoops = [arguments isKindOfClass:[NSNumber class]] && [arguments boolValue];
+    } else if ([call.method isEqualToString:@"playAllAnimations"]) {
+        [_hostView playAllAnimations];
+    } else if ([call.method isEqualToString:@"setTabBarHidden"]) {
+        _hostView.tabBarHidden = [arguments isKindOfClass:[NSNumber class]] && [arguments boolValue];
+    } else if ([call.method isEqualToString:@"setLanguage"]) {
+        [self applyLanguage:arguments];
     } else if ([call.method isEqualToString:@"setLoggedIn"]) {
         [self applyLoggedIn:arguments];
+    } else if ([call.method isEqualToString:@"setManifestURL"]) {
+        if ([arguments isKindOfClass:[NSString class]] && [(NSString *)arguments length] > 0) {
+            _hostView.manifestURL = arguments;
+        }
     } else {
         result(FlutterMethodNotImplemented);
         return;

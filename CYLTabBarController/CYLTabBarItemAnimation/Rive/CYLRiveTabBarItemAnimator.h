@@ -14,32 +14,41 @@
 //     https://github.com/ChenYilong/CYLTabBarController/blob/master/docs/Tab-Bar-Item-Animation.md
 // docs-binding:end
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] Declares the Rive animator, an Objective-C class because its `+load` registers it (Swift has no `+load`); its views are Swift. [CN] 声明 Rive animator：它的 `+load` 负责注册（Swift 没有 `+load`），因此是 Objective-C 类；其视图为 Swift。
+
 #import <Foundation/Foundation.h>
 #if __has_include("../CYLTabBarItemViewAnimator.h")
 #import "../CYLTabBarItemViewAnimator.h"
 #else
 #import "CYLTabBarItemViewAnimator.h"
 #endif
-// [EN] `CYLTabBarAnimationOption`. [CN] `CYLTabBarAnimationOption` 类型。
-#if __has_include("../../CYLTabBarController.h")
-#import "../../CYLTabBarController.h"
+// [EN] `CYLTabBarAnimationOption` and the keys, from CYLUtils: no Core. [CN] `CYLTabBarAnimationOption` 与 key，来自 CYLUtils：不依赖 Core。
+#if __has_include("../../CYLUtils/CYLAnimationKeys.h")
+#import "../../CYLUtils/CYLAnimationKeys.h"
 #else
-#import "CYLTabBarController.h"
+#import "CYLAnimationKeys.h"
 #endif
 
 /*!
- * [EN] 1 when RiveRuntime is part of the build, 0 otherwise. Everything below, the Rive keys and options included,
- *      exists only then: without RiveRuntime, using `CYLTabBarRiveURL` fails to build instead of being silently ignored.
- *      Use `#if CYL_RIVE_AVAILABLE` for Rive-only code of your own. CocoaPods: `pod 'CYLTabBarController/Rive'`.
- * [CN] 工程中引入了 RiveRuntime 时为 1，否则为 0。以下所有内容（包括 Rive 的 key 与选项）只在此时存在：没有 RiveRuntime 时，
- *      使用 `CYLTabBarRiveURL` 会编译失败，而不是被静默忽略。App 自己只用于 Rive 的代码可用 `#if CYL_RIVE_AVAILABLE` 包住。
- *      CocoaPods：`pod 'CYLTabBarController/Rive'`。
+ * [EN] `CYL_RIVE_AVAILABLE` (defined in the component's core, `CYLAnimatedItemMacros.h`) is 1 when this subspec and
+ *      RiveRuntime are part of the build, 0 otherwise. The animator below exists only then. The Rive keys
+ *      (`CYLTabBarRiveURL`…) are declared in the component's core and always exist: without the engine they get a compile
+ *      warning, a debug log at run time, and the tab shows its static image (or the placeholder). Use
+ *      `#if CYL_RIVE_AVAILABLE` for Rive-only code of your own. CocoaPods: `pod 'CYLAnimatedItem/Rive'` (tab bar:
+ *      `pod 'CYLTabBarController/Rive'`).
+ * [CN] `CYL_RIVE_AVAILABLE`（定义在组件核心 `CYLAnimatedItemMacros.h`）在本子库与 RiveRuntime 都参与构建时为 1，否则为 0。下面的 animator 只在此时
+ *      存在。Rive 的 key（`CYLTabBarRiveURL`……）声明在组件核心中，总是存在：没有引擎时会有编译警告与运行时的 debug 日志，Tab 显示静态图片
+ *      （或占位图）。App 自己只用于 Rive 的代码可用 `#if CYL_RIVE_AVAILABLE` 包住。CocoaPods：`pod 'CYLAnimatedItem/Rive'`（TabBar：
+ *      `pod 'CYLTabBarController/Rive'`）。
  */
-#if __has_include(<RiveRuntime/RiveRuntime.h>)
-#define CYL_RIVE_AVAILABLE 1
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItemMacros.h>)
+#import <CYLAnimatedItem/CYLAnimatedItemMacros.h>
+#elif __has_include("../../CYLAnimatedItem/CYLAnimatedItemMacros.h")
+#import "../../CYLAnimatedItem/CYLAnimatedItemMacros.h"
 #else
-#define CYL_RIVE_AVAILABLE 0
+#import "CYLAnimatedItemMacros.h"
 #endif
+// [EN] CYL_RIVE_AVAILABLE is defined in CYLAnimatedItemMacros.h (the component's core). [CN] CYL_RIVE_AVAILABLE 定义在 CYLAnimatedItemMacros.h（组件核心）中。
 
 #if CYL_RIVE_AVAILABLE
 NS_ASSUME_NONNULL_BEGIN
@@ -55,74 +64,14 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CYLRiveTabBarItemAnimator : NSObject
 
-/// [EN] The registered animator, e.g. to inject another view provider. [CN] 已注册的 animator，例如用于注入其他视图 provider。
+/*!
+ * [EN] The registered animator, e.g. to inject another view provider. [CN] 已注册的 animator，例如用于注入其他视图 provider。
+ */
 @property (class, nonatomic, readonly) CYLTabBarItemViewAnimator *animator;
 
 @end
 
-/*!
- * [EN] Keys for a tab's Rive animation, aliases of the generic `CYLTabBarAnimation…` keys (either works), like the Lottie
- *      and PAG keys. A Rive state machine has no playback speed, so `lottieAnimationSpeed` does not apply.
- *      - `CYLTabBarRiveURL`: an NSURL of a .riv file, usually with options (`CYLTabBarAnimationURLWithOptions()`);
- *        `CYLTabBarRiveFilePath`: its path (NSString, the default artboard). The URL wins.
- *      - `CYLTabBarRiveSize`: the view size, an NSValue of CGSize.
- *      - `CYLTabBarRiveDarkURL` / `CYLTabBarRiveDarkFilePath`: the Dark Mode version.
- *      - `CYLTabBarRiveDarkColors`: view model color property path -> UIColor for Dark Mode, e.g. @{ @"color" : UIColor.whiteColor }.
- * [CN] Tab 的 Rive 动画 key，是通用 key `CYLTabBarAnimation…` 的别名（两者都可以用），与 Lottie、PAG 的 key 相同。Rive 状态机没有播放速度，
- *      `lottieAnimationSpeed` 对其无效。
- *      - `CYLTabBarRiveURL`：.riv 文件的 NSURL，通常带有选项（`CYLTabBarAnimationURLWithOptions()`）；`CYLTabBarRiveFilePath`：其路径（NSString，
- *        使用默认画板）。URL 优先。
- *      - `CYLTabBarRiveSize`：视图尺寸，CGSize 的 NSValue。
- *      - `CYLTabBarRiveDarkURL` / `CYLTabBarRiveDarkFilePath`：深色模式版本。
- *      - `CYLTabBarRiveDarkColors`：深色模式下 view model 颜色属性路径 -> UIColor，例如 @{ @"color" : UIColor.whiteColor }。
- */
-FOUNDATION_EXTERN NSString *const CYLTabBarRiveURL;
-FOUNDATION_EXTERN NSString *const CYLTabBarRiveFilePath;
-FOUNDATION_EXTERN NSString *const CYLTabBarRiveSize;
-FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkURL;
-FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkFilePath;
-FOUNDATION_EXTERN NSString *const CYLTabBarRiveDarkColors;
 
-/*!
- * [EN] Rive's options for `CYLTabBarAnimationURLWithOptions()` (Swift: `.riveArtboard`, …). Every value is a string.
- *      - `CYLTabBarAnimationOptionRiveArtboard`: the artboard (default: the file's default); one .riv file can hold many icons.
- *      - `CYLTabBarAnimationOptionRiveStateMachine`: the state machine (default: the artboard's default).
- *      - `CYLTabBarAnimationOptionRiveActiveProperty`: the view model boolean set to YES when the tab is selected, then back
- *        to NO after `CYLTabBarAnimationOptionRiveActiveDuration` seconds (defaults @"active" and @"1").
- *      - `CYLTabBarAnimationOptionRiveTriggerProperty`: a view model trigger fired instead.
- *      - `CYLTabBarAnimationOptionRiveColor`: "#RRGGBB" or "#RRGGBBAA", set on the view model color @"color" (light mode).
- *      For files made before data binding, which have no view model (Rive's legacy runtime, see docs/Rive-Animation.md):
- *      - `CYLTabBarAnimationOptionRiveInput`: a state machine boolean input, set to YES when the tab plays and back to NO
- *        after `CYLTabBarAnimationOptionRiveActiveDuration` seconds, or when it stops.
- *      - `CYLTabBarAnimationOptionRiveTriggerInput`: a state machine trigger input fired when the tab plays.
- *      - `CYLTabBarAnimationOptionRiveAnimation`: a linear animation played when the tab plays (no state machine).
- *      - `CYLTabBarAnimationOptionRiveLegacyRuntime`: @"1" plays the file through the legacy runtime with none of the above,
- *        e.g. a file without a state machine, whose default animation then loops.
- *      `CYLTabBarAnimationOptionRiveActiveDuration` @"0" keeps the boolean (view model or input) YES until the animation stops.
- * [CN] Rive 用于 `CYLTabBarAnimationURLWithOptions()` 的选项（Swift：`.riveArtboard` 等），所有值都是字符串。
- *      - `CYLTabBarAnimationOptionRiveArtboard`：画板（默认为文件的默认画板）；一个 .riv 文件可以包含多个图标。
- *      - `CYLTabBarAnimationOptionRiveStateMachine`：状态机（默认为画板的默认状态机）。
- *      - `CYLTabBarAnimationOptionRiveActiveProperty`：选中 Tab 时设为 YES 的 view model 布尔属性，`CYLTabBarAnimationOptionRiveActiveDuration` 秒后
- *        恢复为 NO（默认 @"active" 与 @"1"）。
- *      - `CYLTabBarAnimationOptionRiveTriggerProperty`：改为触发的 view model trigger。
- *      - `CYLTabBarAnimationOptionRiveColor`："#RRGGBB" 或 "#RRGGBBAA"，设置到 view model 颜色 @"color"（浅色模式）。
- *      数据绑定出现之前制作、没有 view model 的文件（Rive 旧版运行时，见 docs/Rive-Animation.md）：
- *      - `CYLTabBarAnimationOptionRiveInput`：状态机布尔输入，播放时设为 YES，`CYLTabBarAnimationOptionRiveActiveDuration` 秒后或停止时恢复为 NO。
- *      - `CYLTabBarAnimationOptionRiveTriggerInput`：播放时触发的状态机 trigger 输入。
- *      - `CYLTabBarAnimationOptionRiveAnimation`：播放时播放的线性动画（不使用状态机）。
- *      - `CYLTabBarAnimationOptionRiveLegacyRuntime`：@"1" 表示不使用以上选项、直接通过旧版运行时播放文件，例如没有状态机的文件，其默认动画会循环播放。
- *      `CYLTabBarAnimationOptionRiveActiveDuration` 为 @"0" 时，布尔属性（view model 或输入）保持 YES，直到动画停止。
- */
-FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveArtboard;
-FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveStateMachine;
-FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveActiveProperty;
-FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveActiveDuration;
-FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveTriggerProperty;
-FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveColor;
-FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveInput;
-FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveTriggerInput;
-FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveAnimation;
-FOUNDATION_EXTERN CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveLegacyRuntime;
 
 NS_ASSUME_NONNULL_END
 #endif

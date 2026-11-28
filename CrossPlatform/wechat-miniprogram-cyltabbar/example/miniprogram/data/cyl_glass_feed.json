@@ -1,0 +1,11 @@
+{
+  "tags": ["All", "iOS", "Mini Program", "Design", "Animation", "Swift"],
+  "posts": [
+    { "id": 1, "author": "Lin", "avatar": "🦊", "time": "2 min ago", "title": "Liquid Glass on a tab bar", "preview": "A translucent capsule, a lens behind the selected item and a spring when it moves: the three things that make the tab bar feel like glass.", "tag": "Design", "color": "#5e5ce6", "likes": 128, "comments": 24 },
+    { "id": 2, "author": "Mia", "avatar": "🐼", "time": "18 min ago", "title": "One package per animation library", "preview": "Lottie, PAG, Rive and GIF each live in their own package, so the 2 MB main package only carries the runtime you use.", "tag": "Mini Program", "color": "#30b0c7", "likes": 96, "comments": 12 },
+    { "id": 3, "author": "Kai", "avatar": "🐯", "time": "1 h ago", "title": "Spring easing that feels native", "preview": "cubic-bezier(0.19, 1, 0.22, 1) overshoots just enough: use it for a lens that springs in and a card that scales in.", "tag": "Animation", "color": "#ff9f0a", "likes": 77, "comments": 9 },
+    { "id": 4, "author": "Ava", "avatar": "🐨", "time": "3 h ago", "title": "A raised plus button with its own page", "preview": "The plus button bulges above the bar and selects a page, like the iOS example: the same configuration file drives every platform.", "tag": "iOS", "color": "#34c759", "likes": 64, "comments": 7 },
+    { "id": 5, "author": "Leo", "avatar": "🦁", "time": "Yesterday", "title": "Swift names for underscored methods", "preview": "Add a method without the underscore and give it a Swift name, so the Objective-C API stays and Swift reads naturally.", "tag": "Swift", "color": "#ff375f", "likes": 51, "comments": 5 },
+    { "id": 6, "author": "Zoe", "avatar": "🐰", "time": "2 days ago", "title": "Badges read with their tab", "preview": "VoiceOver reads \"Discover, 3\": the badge is part of the tab's label, never a separate element.", "tag": "iOS", "color": "#64d2ff", "likes": 43, "comments": 3 }
+  ]
+}

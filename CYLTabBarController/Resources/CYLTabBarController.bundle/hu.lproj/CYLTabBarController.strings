@@ -124,6 +124,7 @@
 "有新内容" = "Új tartalom";
 "%@ 条新消息" = "%@ új üzenet";
 "加号按钮" = "Plusz gomb";
+"更多" = "Továbbiak";
 "模拟内存警告" = "Memóriafigyelmeztetés szimulálása";
 "卸载未选中的 Tab，切换时重新加载" = "Felszabadítja a nem kiválasztott lapokat; kiválasztáskor újratöltődnek";
 "内存警告" = "Memóriafigyelmeztetés";
@@ -368,3 +369,12 @@
 "网络图标、标题与配色" = "Hálózati ikonok, címek és színek";
 /* The settings group of the configuration file rows (docs/Configuration-File.md). */
 "配置文件" = "Konfigurációs fájl";
+/* Scroll hiding simulations (issue #13): kind labels and title prefixes; API names stay English. */
+"恢复" = "Visszaállítás";
+"保持" = "Megtartás";
+"不适用" = "N/A";
+"手动" = "Kézi";
+"自测" = "Önteszt";
+"手动：%@" = "Kézi: %@";
+"实测：%@" = "Valós: %@";
+"自测：依次运行所有自动模拟，报告 PASS / FAIL" = "Önteszt: az összes automatikus szimuláció futtatása, PASS / FAIL jelentése";

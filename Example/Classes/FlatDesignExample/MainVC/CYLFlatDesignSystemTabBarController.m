@@ -9,6 +9,7 @@
 #import "CYLFlatDesignSystemTabBarController.h"
 #import "CYLFlatDesignTableViewController.h"
 #import <CYLTabBarController/CYLLocalization.h>
+#import "CYLDemoLocalization.h"
 
 @interface CYLFlatDesignSystemTabBarController ()
 
@@ -20,7 +21,7 @@
     [super viewDidLoad];
     
     NSMutableArray<UIViewController *> *viewControllers = [NSMutableArray array];
-    NSArray *titles = @[CYLLocalizedString(@"首页"), CYLLocalizedString(@"同城"), CYLLocalizedString(@"发布"), CYLLocalizedString(@"消息"), CYLLocalizedString(@"我的")];
+    NSArray *titles = @[CYLDemoLocalizedString(@"首页"), CYLDemoLocalizedString(@"同城"), CYLDemoLocalizedString(@"发布"), CYLDemoLocalizedString(@"消息"), CYLDemoLocalizedString(@"我的")];
     NSArray *images = @[@"home_normal", @"fishpond_normal", @"post_highlight", @"message_normal" ,@"account_normal"];
     NSArray *selectedImages = @[@"home_highlight", @"fishpond_highlight", @"post_highlight", @"message_highlight", @"account_highlight"];
     for (NSInteger i = 0; i < titles.count; i++) {
@@ -36,7 +37,7 @@
         } else if (i == 2) {
 //            nav.tabBarItem.imagePositionAdjustment = UIOffsetMake(0, -12);
         } else if (i == 3) {
-            nav.tabBarItem.badgeValue = CYLLocalizedString(@"新消息");
+            nav.tabBarItem.badgeValue = CYLDemoLocalizedString(@"新消息");
             [nav.tabBarItem setBadgeTextAttributes:@{NSForegroundColorAttributeName:UIColor.greenColor} forState:UIControlStateNormal];
         } else if (i == 4) {
             nav.tabBarItem.badgeValue = @"11";

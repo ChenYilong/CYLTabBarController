@@ -35,7 +35,7 @@ final class RiveMenuButtonDemoView: UIView {
             .riveStateMachine: "State Machine",
             .riveInput: "isOpen",
             .riveActiveDuration: "0",
-        ]), let animationView = CYLTabBarItemAnimationFactory.animationView(url: url, size: Self.animationSize, contentMode: .scaleAspectFit) {
+        ] as [CYLTabBarAnimationOption: String]), let animationView = CYLTabBarItemAnimationFactory.animationView(url: url, size: Self.animationSize, contentMode: .scaleAspectFit) {
             animationView.frame = container.bounds
             animationView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             container.addSubview(animationView)
@@ -43,7 +43,7 @@ final class RiveMenuButtonDemoView: UIView {
         }
 
         let button = UIButton(type: .system)
-        button.setTitle(CYLLocalizedString("播放 / 停止"), for: .normal)
+        button.setTitle(cylDemoLocalizedString("播放 / 停止"), for: .normal)
         button.titleLabel?.font = .preferredFont(forTextStyle: .headline)
         button.addTarget(self, action: #selector(toggle), for: .touchUpInside)
 

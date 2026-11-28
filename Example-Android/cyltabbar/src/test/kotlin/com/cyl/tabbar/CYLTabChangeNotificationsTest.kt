@@ -26,19 +26,6 @@ class CYLTabChangeNotificationsTest {
 
     class Page : Fragment()
 
-    private fun attributes(vararg titles: String) = titles.map { mapOf(CYLConstants.CYLTabBarItemTitle to it, CYLConstants.CYLTabBarItemIdentifier to it.lowercase()) }
-
-    private fun idle() = shadowOf(Looper.getMainLooper()).idle()
-
-    private fun <T> withActivity(block: (FragmentActivity) -> T): T {
-        val controller = Robolectric.buildActivity(FragmentActivity::class.java).setup()
-        try {
-            return block(controller.get())
-        } finally {
-            controller.pause().stop().destroy()
-        }
-    }
-
     /** [EN] Records every notification posted while `block` runs. [CN] 记录 `block` 执行期间发送的所有通知。 */
     private fun recording(block: () -> Unit): List<CYLNotification> {
         val notes = ArrayList<CYLNotification>()

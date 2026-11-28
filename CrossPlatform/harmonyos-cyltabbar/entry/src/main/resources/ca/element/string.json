@@ -1,0 +1,40 @@
+{
+  "string": [
+    {
+      "name": "tab_home",
+      "value": "Inici"
+    },
+    {
+      "name": "tab_nearby",
+      "value": "A prop"
+    },
+    {
+      "name": "tab_messages",
+      "value": "Missatges"
+    },
+    {
+      "name": "tab_me",
+      "value": "Jo"
+    },
+    {
+      "name": "tab_post",
+      "value": "Publica"
+    },
+    {
+      "name": "tab_refresh",
+      "value": "Actualitza"
+    },
+    {
+      "name": "module_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "ability_desc",
+      "value": "CYLTabBarController example"
+    },
+    {
+      "name": "app_name",
+      "value": "CYLTabBar"
+    }
+  ]
+}

@@ -292,6 +292,91 @@ static NSString *const CYLHostTestsLoggedInKey = @"CYLTabBarControllerLoggedIn";
     [NSUserDefaults.standardUserDefaults setBool:saved forKey:CYLHostTestsLoggedInKey];
 }
 
+- (void)testALanguageTranslatesTheLibraryAndLaysARightToLeftOneOutRightToLeft {
+    CYLTabBarHostView *hostView = [self hostViewInWindow];
+    hostView.language = @"ar";
+    hostView.configuration = [self loginConfiguration];
+    [self waitForTabBarControllerOf:hostView];
+    XCTAssertEqualObjects(CYLLocalizationLanguage(), @"ar");
+    XCTAssertEqualObjects(CYLLocalizedString(@"加号按钮"), @"زر الإضافة");
+    XCTAssertEqual(hostView.tabBarController.tabBar.semanticContentAttribute, UISemanticContentAttributeForceRightToLeft);
+    // [EN] Another language builds the tab bar again, left to right. [CN] 切换语言会重新创建 TabBar，从左到右。
+    CYLTabBarController *arabic = hostView.tabBarController;
+    hostView.language = @"es";
+    NSPredicate *rebuilt = [NSPredicate predicateWithBlock:^BOOL(CYLTabBarHostView *view, NSDictionary *bindings) {
+        [view layoutIfNeeded];
+        return view.tabBarController && view.tabBarController != arabic;
+    }];
+    [self waitForExpectations:@[ [self expectationForPredicate:rebuilt evaluatedWithObject:hostView handler:nil] ] timeout:5];
+    XCTAssertEqualObjects(CYLLocalizedString(@"加号按钮"), @"Botón más");
+    XCTAssertEqual(hostView.tabBarController.tabBar.semanticContentAttribute, UISemanticContentAttributeUnspecified);
+    hostView.language = nil;
+    XCTAssertNotEqualObjects(CYLLocalizationLanguage(), @"es");
+}
+
+- (void)testAHiddenTabBarTakesNoTouches {
+    CYLTabBarHostView *hostView = [self hostViewInWindow];
+    hostView.configuration = [self loginConfiguration];
+    [self waitForTabBarControllerOf:hostView];
+    [hostView layoutIfNeeded];
+    XCTAssertGreaterThan(hostView.touchableRects.count, 0u);
+    hostView.tabBarHidden = YES;
+    XCTAssertTrue(hostView.tabBarController.isTabBarHidden);
+    XCTAssertEqual(hostView.touchableRects.count, 0u);
+    hostView.tabBarHidden = NO;
+    XCTAssertFalse(hostView.tabBarController.isTabBarHidden);
+    XCTAssertGreaterThan(hostView.touchableRects.count, 0u);
+}
+
+- (void)testAMemoryWarningUnloadsTheUnselectedTabsButTheOnesKeptLoaded {
+    CYLTabBarHostView *hostView = [self hostViewInWindow];
+    hostView.language = @"en";
+    hostView.configuration = @{ CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A", CYLTabBarItemIdentifier : @"a" },
+                                                                               @{ CYLTabBarItemTitle : @"B", CYLTabBarItemIdentifier : @"b" },
+                                                                               @{ CYLTabBarItemTitle : @"C", CYLTabBarItemIdentifier : @"c" },
+                                                                               @{ CYLTabBarItemTitle : @"D", CYLTabBarItemIdentifier : @"d" } ],
+                                CYLTabBarControllerUnloadsUnselectedViewsOnMemoryWarning : @"true",
+                                CYLTabBarControllerKeepsLoadedTabBarItemIdentifiers : @"a, b" };
+    [self waitForTabBarControllerOf:hostView];
+    CYLTabBarController *tabBarController = hostView.tabBarController;
+    XCTAssertTrue(tabBarController.unloadsUnselectedViewsOnMemoryWarning);
+    XCTAssertEqualObjects(tabBarController.cyl_keepsLoadedTabBarItemIdentifiers, (@[ @"a", @"b" ]));
+    // [EN] Load every tab but D, then select C. [CN] 加载除 D 以外的所有 Tab，然后选中 C。
+    for (NSInteger index = 0; index < 3; index++) {
+        hostView.selectedIndex = index;
+        [tabBarController.selectedViewController loadViewIfNeeded];
+    }
+    hostView.selectedIndex = 2;
+    NSString *report = [hostView simulateMemoryWarning];
+    // [EN] The host loads every (transparent) page when it builds the tab bar, as on Android: D, never selected, is unloaded.
+    // [CN] 宿主在创建 TabBar 时加载所有（透明的）页面，与 Android 相同：从未选中的 D 被卸载。
+    XCTAssertEqualObjects([report stringByReplacingOccurrencesOfString:@"\n" withString:@" | "],
+                          @"A: kept: shouldUnload returned NO | B: kept: shouldUnload returned NO | C: kept: selected | D: unloaded");
+    hostView.selectedIndex = 0;
+    [hostView simulateMemoryWarning];
+    XCTAssertFalse(tabBarController.viewControllers[2].isViewLoaded);
+    hostView.language = nil;
+}
+
+- (void)testTheTitleOffsetChangesAtRuntimeAndWinsOverTheConfiguration {
+    CYLTabBarHostView *hostView = [self hostViewInWindow];
+    NSMutableDictionary *configuration = [[self loginConfiguration] mutableCopy];
+    configuration[CYLTabBarControllerTitlePositionAdjustment] = @"{0, -3.5}";
+    hostView.configuration = configuration;
+    [self waitForTabBarControllerOf:hostView];
+    CYLTabBarController *tabBarController = hostView.tabBarController;
+    XCTAssertEqual(tabBarController.titlePositionAdjustment.vertical, -3.5);
+    hostView.titlePositionAdjustment = [NSValue valueWithUIOffset:UIOffsetMake(0, 4)];
+    // [EN] The same tab bar, its titles moved. [CN] 同一个 TabBar，标题已移动。
+    XCTAssertEqual(hostView.tabBarController, tabBarController);
+    XCTAssertEqual(tabBarController.titlePositionAdjustment.vertical, 4);
+    // [EN] A tab bar built again keeps the offset set at runtime. [CN] 重新创建的 TabBar 保留运行时设置的偏移。
+    hostView.configuration = nil;
+    hostView.configuration = configuration;
+    [self waitForTabBarControllerOf:hostView];
+    XCTAssertEqual(hostView.tabBarController.titlePositionAdjustment.vertical, 4);
+}
+
 - (void)testInvalidJSONChangesNothing {
     CYLTabBarHostView *hostView = [[CYLTabBarHostView alloc] init];
     XCTAssertFalse([hostView setConfigurationJSON:@"[1, 2]"]);
@@ -590,6 +675,39 @@ static NSString *const CYLHostTestsLoggedInKey = @"CYLTabBarControllerLoggedIn";
         ancestor = ancestor.superview;
     }
     XCTAssertNotNil(ancestor, @"the badge sits on a visible flat button, not on the hidden system tab button");
+}
+
+/// [EN] A tap as UIKit runs it (the delegate's should-select, then the selection, then didSelectViewController): the callback
+///      reports the tapped tab, not the one selected before (CYLSearchViewController's React Native report, 2026-11-19).
+/// [CN] 按 UIKit 的顺序模拟点击（代理的 should-select、修改选中、didSelectViewController）：回调上报被点击的 Tab，而不是之前选中的 Tab
+///      （CYLSearchViewController 的 React Native 报告，2026-11-19）。
+- (void)testATapAsUIKitRunsItReportsTheTappedTab {
+    CYLTabBarHostView *hostView = [self hostViewInWindow];
+    NSMutableArray<NSNumber *> *reported = [NSMutableArray array];
+    hostView.didSelectTab = ^(NSInteger index, NSString *identifier) {
+        [reported addObject:@(index)];
+    };
+    hostView.configuration = @{ CYLTabBarControllerTabBarItemsAttributes : @[ @{ CYLTabBarItemTitle : @"A", CYLTabBarItemIdentifier : @"a" },
+                                                                               @{ CYLTabBarItemTitle : @"B", CYLTabBarItemIdentifier : @"b" } ] };
+    [self waitForTabBarControllerOf:hostView];
+    CYLTabBarController *tabBarController = hostView.tabBarController;
+    XCTAssertEqual(tabBarController.selectedIndex, 0u);
+    [tabBarController.tabBar layoutIfNeeded];
+    UIViewController *second = tabBarController.viewControllers[1];
+    id<UITabBarControllerDelegate> delegate = tabBarController.delegate;
+    XCTAssertNotNil(delegate);
+    [reported removeAllObjects];
+    if ([delegate tabBarController:tabBarController shouldSelectViewController:second]) {
+        tabBarController.selectedViewController = second;
+        if ([delegate respondsToSelector:@selector(tabBarController:didSelectViewController:)]) {
+            [delegate tabBarController:tabBarController didSelectViewController:second];
+        }
+    }
+    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+    XCTAssertEqual(tabBarController.selectedIndex, 1u);
+    XCTAssertTrue(reported.count > 0, @"the tap is reported");
+    XCTAssertEqualObjects(reported.lastObject, @1, @"reported %@: the tapped tab, not the old one", reported);
+    XCTAssertFalse([reported containsObject:@0], @"never the tab selected before: %@", reported);
 }
 
 @end

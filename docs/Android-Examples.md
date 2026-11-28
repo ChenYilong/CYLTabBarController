@@ -67,7 +67,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 构建需要 UTF-8 区域设置（macOS 与桌面 Linux 的默认值）：Example-PAG 的资源目录中有中文名称的图片集（`屏幕全屏`），在 POSIX 区域设置下 Gradle 无法读取该文件名；CI 中请设置 `LC_ALL=C.UTF-8`。 | Building needs a UTF-8 locale (the default on macOS and desktop Linux): Example-PAG's asset catalog has an image set with a Chinese name (`屏幕全屏`), which Gradle cannot read under a POSIX locale; set `LC_ALL=C.UTF-8` on CI. |
+| 构建需要 UTF-8 区域设置（macOS 与常见桌面系统的默认值）：Example-PAG 的资源目录中有中文名称的图片集（`屏幕全屏`），在 POSIX 区域设置下 Gradle 无法读取该文件名；CI 中请设置 `LC_ALL=C.UTF-8`。 | Building needs a UTF-8 locale (the default on macOS and common desktop systems): Example-PAG's asset catalog has an image set with a Chinese name (`屏幕全屏`), which Gradle cannot read under a POSIX locale; set `LC_ALL=C.UTF-8` on CI. |
 | 在 Android Studio 中打开 `Example-Android`，运行 `example-gif`、`example-pag` 或 `example-rive`。`example-pag` 首次构建时下载 PAG 文件（需要 python3 与网络）；没有时构建继续，Tab 显示图片，也可以手动执行 `python3 scripts/fetch-animation-resources.py PAGResources`。 | Open `Example-Android` in Android Studio and run `example-gif`, `example-pag` or `example-rive`. `example-pag` downloads the PAG files on its first build (python3 and the network); without them the build goes on and the tabs show their images, or run `python3 scripts/fetch-animation-resources.py PAGResources` yourself. |
 | `gradle :example-gif:testDebugUnitTest :example-pag:testDebugUnitTest :example-rive:testDebugUnitTest`（Robolectric）检查 Tab、key、PlusButton、页面、引导页、皮肤互换与 PlusButton 角标；三个模块与 `demokit` 的 lint 没有问题。 | `gradle :example-gif:testDebugUnitTest :example-pag:testDebugUnitTest :example-rive:testDebugUnitTest` (Robolectric) checks the tabs, keys, plus buttons, pages, the guide, the skin swaps and the plus button badge; lint reports no issues in the three modules and `demokit`. |
 

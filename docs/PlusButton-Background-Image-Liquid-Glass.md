@@ -68,7 +68,7 @@ static func plusButton() -> Any {
     let button = CYLPlusButtonSubclass()
     // [EN] A background image: the title stays on it. [CN] 背景图：标题保留在图上。
     button.setBackgroundImage(UIImage(named: "tabbar_database"), for: .normal)
-    button.setTitle(CYLLocalizedString("菜单"), for: .normal)
+    button.setTitle(cylLocalizedString("菜单"), for: .normal)
     button.sizeToFit()
     return button
 }
@@ -133,7 +133,7 @@ class BackgroundPlusButton: CYLPlusButton, CYLPlusButtonSubclassing {
     static func plusButton() -> Any {
         let button = BackgroundPlusButton()
         button.setBackgroundImage(UIImage(named: "plus_circle"), for: .normal)
-        button.setTitle(CYLLocalizedString("菜单"), for: .normal)
+        button.setTitle(cylLocalizedString("菜单"), for: .normal)
         button.sizeToFit()
         return button
     }

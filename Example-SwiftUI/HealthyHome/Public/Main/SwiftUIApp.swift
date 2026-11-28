@@ -108,7 +108,7 @@ struct CYLTabBarControllerView: UIViewControllerRepresentable {
         // [CN] 与 Example-Swift-03 相同的标题和图标，并为每个 Tab 加上标识（#408）。
         let attributes = zip(TabBarCommon.tabBarItemsAttributesForController(), SwiftUITab.allCases).map { item, tab -> [AnyHashable: Any] in
             var item = item
-            item[CYLTabBarItemIdentifier] = tab.identifier
+            item[cylTabBarItemIdentifier] = tab.identifier
             return item
         }
         let tabBarController = RootTabBarController(viewControllers: viewControllers, tabBarItemsAttributes: attributes)

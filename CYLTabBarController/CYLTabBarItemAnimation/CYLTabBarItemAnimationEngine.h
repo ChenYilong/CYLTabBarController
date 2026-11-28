@@ -15,6 +15,21 @@
 // docs-binding:end
 
 #import <Foundation/Foundation.h>
+
+// [EN] Swift Package Manager: the protocols and C entry points this engine implements and calls are Swift (`CYLAnimatedItemSwift`,
+//      `CYLTabBarController`); the engine target sits above both. Not imported while the lower C module builds. [CN] Swift Package
+//      Manager：本引擎实现并调用的协议与 C 入口是 Swift 的（`CYLAnimatedItemSwift`、`CYLTabBarController`）；引擎目标位于两者之上。构建下层 C 模块时不导入。
+#if defined(SWIFT_PACKAGE) && !defined(CYL_OBJC_BASE_TARGET)
+#if defined(__building_module)
+#if !__building_module(CYLTabBarControllerObjC)
+#pragma clang module import CYLAnimatedItemSwift
+#pragma clang module import CYLTabBarController
+#endif
+#else
+#pragma clang module import CYLAnimatedItemSwift
+#pragma clang module import CYLTabBarController
+#endif
+#endif
 // Core, which this subspec depends on (the source tree, or flattened by CocoaPods). 本子库依赖的 Core（源码目录，或 CocoaPods 展平后）。
 #if __has_include("../CYLTabBarItemAnimationService.h")
 #import "../CYLTabBarItemAnimationService.h"
@@ -40,21 +55,33 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CYLTabBarItemAnimationEngine : NSObject <CYLTabBarItemAnimationService>
 
-/// [EN] Chooses the library of a tab. [CN] 选择 Tab 使用的动画库。
+/*!
+ * [EN] Chooses the library of a tab. [CN] 选择 Tab 使用的动画库。
+ */
 @property (nonatomic, strong, readonly) id<CYLTabBarItemAnimatorRegistering> registry;
-/// [EN] Makes the animation views and finds their players. [CN] 创建动画视图并查找其播放器。
+/*!
+ * [EN] Makes the animation views and finds their players. [CN] 创建动画视图并查找其播放器。
+ */
 @property (nonatomic, strong, readonly) id<CYLTabBarItemAnimationViewMaking> factory;
-/// [EN] The animation for the current style (#442). [CN] 当前风格下的动画（#442）。
+/*!
+ * [EN] The animation for the current style (#442). [CN] 当前风格下的动画（#442）。
+ */
 @property (nonatomic, strong, readonly) id<CYLTabBarItemAnimationStyleSource> styleSource;
-/// [EN] The tab bar: its state, layout and notifications. [CN] Tab 栏：其状态、布局与通知。
+/*!
+ * [EN] The tab bar: its state, layout and notifications. [CN] Tab 栏：其状态、布局与通知。
+ */
 @property (nonatomic, strong, readonly) id<CYLTabBarItemAnimationHost> host;
 
-/// [EN] An engine over the given dependencies (dependency injection). [CN] 基于给定依赖的引擎（依赖注入）。
+/*!
+ * [EN] An engine over the given dependencies (dependency injection). [CN] 基于给定依赖的引擎（依赖注入）。
+ */
 - (instancetype)initWithRegistry:(id<CYLTabBarItemAnimatorRegistering>)registry
                          factory:(id<CYLTabBarItemAnimationViewMaking>)factory
                      styleSource:(id<CYLTabBarItemAnimationStyleSource>)styleSource
                             host:(id<CYLTabBarItemAnimationHost>)host NS_DESIGNATED_INITIALIZER;
-/// [EN] The shared registry and factory, and Core's style source and host. [CN] 共享注册表与工厂，以及 Core 的风格来源与宿主。
+/*!
+ * [EN] The shared registry and factory, and Core's style source and host. [CN] 共享注册表与工厂，以及 Core 的风格来源与宿主。
+ */
 - (instancetype)init;
 
 @end

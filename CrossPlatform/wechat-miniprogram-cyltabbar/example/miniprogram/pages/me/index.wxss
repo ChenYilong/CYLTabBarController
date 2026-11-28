@@ -1,0 +1,6 @@
+
+/* [EN] A row with a slider between its title and value. [CN] 标题与数值之间带滑块的行。 */
+.cyl-row-slider .cyl-slider {
+  flex: 1;
+  margin: 0 12px;
+}

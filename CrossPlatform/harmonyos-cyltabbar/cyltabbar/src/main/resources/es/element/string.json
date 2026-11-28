@@ -1,0 +1,976 @@
+{
+  "string": [
+    {
+      "name": "cyl_l10n_bffed61338ea",
+      "value": "%@ CYLTabBarController en HarmonyOS"
+    },
+    {
+      "name": "cyl_l10n_9ecf653a3fc6",
+      "value": "%@ · otro contexto · toques del más: %@"
+    },
+    {
+      "name": "cyl_l10n_aaf9b7d7382d",
+      "value": "%@ mensajes nuevos"
+    },
+    {
+      "name": "cyl_l10n_81a05b6c1cf9",
+      "value": "%@, %@"
+    },
+    {
+      "name": "cyl_l10n_0b0ae9062c5a",
+      "value": "Un controlador de barra de pestañas de otro contexto, con un botón más cuadrado"
+    },
+    {
+      "name": "cyl_l10n_4d3d8ce4d921",
+      "value": "Animation ended: %d"
+    },
+    {
+      "name": "cyl_l10n_427131e7add2",
+      "value": "Otro botón más"
+    },
+    {
+      "name": "cyl_l10n_aa3e67bda3c0",
+      "value": "ArkUI Tabs, la barra de pestañas del sistema de HarmonyOS, con las mismas pestañas"
+    },
+    {
+      "name": "cyl_l10n_0557fa923dce",
+      "value": "Atrás"
+    },
+    {
+      "name": "cyl_l10n_8665e238c516",
+      "value": "Insignia: %@"
+    },
+    {
+      "name": "cyl_l10n_6b2186414c82",
+      "value": "Parpadear ×3"
+    },
+    {
+      "name": "cyl_l10n_070554647306",
+      "value": "Borde"
+    },
+    {
+      "name": "cyl_l10n_43d3e34b15fb",
+      "value": "Borde según el modo oscuro"
+    },
+    {
+      "name": "cyl_l10n_b67554192c50",
+      "value": "Abajo a la izquierda"
+    },
+    {
+      "name": "cyl_l10n_5968e3c37145",
+      "value": "Abajo a la derecha"
+    },
+    {
+      "name": "cyl_l10n_5d60263416c2",
+      "value": "Rebote (continuo)"
+    },
+    {
+      "name": "cyl_l10n_f3ce1baf4805",
+      "value": "Rebote ×3 (cyl_bounceAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_0875a57843a1",
+      "value": "Respiración (continuo)"
+    },
+    {
+      "name": "cyl_l10n_8795570ddeef",
+      "value": "CYLTabBarItemBackgroundColor / CYLTabBarItemSelectedBackgroundColor"
+    },
+    {
+      "name": "cyl_l10n_687f0fbab628",
+      "value": "CYLTabBarRiveURL: selecting a tab sets its state machine input active; deselecting resets it"
+    },
+    {
+      "name": "cyl_l10n_d7c01888e55e",
+      "value": "CYLTabBarSVGAFilePath: se reproduce una vez al seleccionar; si no, primer fotograma"
+    },
+    {
+      "name": "cyl_l10n_132201f60522",
+      "value": "CYLUtils: objetos asociados débiles y búsqueda del botón (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_fa3d06c1b1e9",
+      "value": "CYLFlatDesignTabBarItem sin centrar (estilo del sistema)"
+    },
+    {
+      "name": "cyl_l10n_5e74163d3804",
+      "value": "CYLFlatDesignTabBarItem centrado"
+    },
+    {
+      "name": "cyl_l10n_f6da70b584ae",
+      "value": "Archivo de configuración: %@"
+    },
+    {
+      "name": "cyl_l10n_158b3b19e868",
+      "value": "Radio de esquina"
+    },
+    {
+      "name": "cyl_l10n_4d242c36821c",
+      "value": "Colores personalizados"
+    },
+    {
+      "name": "cyl_l10n_4685555ab484",
+      "value": "Fuente personalizada"
+    },
+    {
+      "name": "cyl_l10n_a45350c25311",
+      "value": "Máximo personalizado (9)"
+    },
+    {
+      "name": "cyl_l10n_3924c958175e",
+      "value": "Modo oscuro"
+    },
+    {
+      "name": "cyl_l10n_b9c74f4cd786",
+      "value": "Atenuado"
+    },
+    {
+      "name": "cyl_l10n_abfc3a65538a",
+      "value": "Descubrir"
+    },
+    {
+      "name": "cyl_l10n_bf0576472e31",
+      "value": "Toca dos veces para abrir"
+    },
+    {
+      "name": "cyl_l10n_7e0a1ad9a767",
+      "value": "Aparecer gradualmente una vez"
+    },
+    {
+      "name": "cyl_l10n_153407d52fed",
+      "value": "Diseño plano"
+    },
+    {
+      "name": "cyl_l10n_5cfed317a99d",
+      "value": "Estilo de diseño plano"
+    },
+    {
+      "name": "cyl_l10n_026b984bb8d8",
+      "value": "Voltear ×2"
+    },
+    {
+      "name": "cyl_l10n_c5d4cd682981",
+      "value": "Icono GIF"
+    },
+    {
+      "name": "cyl_l10n_8cf04a973413",
+      "value": "Inicio"
+    },
+    {
+      "name": "cyl_l10n_d52d30723b2f",
+      "value": "De izquierda a derecha una vez"
+    },
+    {
+      "name": "cyl_l10n_1aae3277f8d3",
+      "value": "Liquid Glass (referencia)"
+    },
+    {
+      "name": "cyl_l10n_32f643a9aa26",
+      "value": "Liquid Glass: el efecto de transparencia de la referencia"
+    },
+    {
+      "name": "cyl_l10n_f201a4158727",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_af3acf6eb4a9",
+      "value": "Liquid Glass"
+    },
+    {
+      "name": "cyl_l10n_2e8e48a2ebfd",
+      "value": "Mantén pulsada una pestaña o el botón más"
+    },
+    {
+      "name": "cyl_l10n_983696096694",
+      "value": "Margen"
+    },
+    {
+      "name": "cyl_l10n_318b2739ddc2",
+      "value": "Yo"
+    },
+    {
+      "name": "cyl_l10n_4c2a8fe7eaf2",
+      "value": "Mensajes"
+    },
+    {
+      "name": "cyl_l10n_24d459a81449",
+      "value": "NUEVO"
+    },
+    {
+      "name": "cyl_l10n_03c2e7e41ffc",
+      "value": "Nuevo"
+    },
+    {
+      "name": "cyl_l10n_1e8f217bdf71",
+      "value": "Pestaña siguiente (cyl_selectNextTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_3826b8552c94",
+      "value": "Siguiente pista"
+    },
+    {
+      "name": "cyl_l10n_b2ee912b91d6",
+      "value": "Número"
+    },
+    {
+      "name": "cyl_l10n_ab7fa33c83b1",
+      "value": "Número por encima del máximo"
+    },
+    {
+      "name": "cyl_l10n_e0aa021e21dd",
+      "value": "Aceptar"
+    },
+    {
+      "name": "cyl_l10n_8a7b0e9c294e",
+      "value": "Activado: %@; desliza la página a izquierda / derecha"
+    },
+    {
+      "name": "cyl_l10n_06eb0a05de97",
+      "value": "Activado: %@; la nueva página entra desde el lado de su pestaña"
+    },
+    {
+      "name": "cyl_l10n_287e78fd65af",
+      "value": "Otro texto"
+    },
+    {
+      "name": "cyl_l10n_84432607fd87",
+      "value": "Página: %@"
+    },
+    {
+      "name": "cyl_l10n_105b296a83f9",
+      "value": "Pausa"
+    },
+    {
+      "name": "cyl_l10n_de3c731be563",
+      "value": "Reproducir"
+    },
+    {
+      "name": "cyl_l10n_41b77539cc64",
+      "value": "Imagen del PlusButton cargada después"
+    },
+    {
+      "name": "cyl_l10n_72a245189eaf",
+      "value": "Área táctil del PlusButton (issue #91)"
+    },
+    {
+      "name": "cyl_l10n_9a1d72fdd764",
+      "value": "Pestaña anterior (cyl_selectPreviousTab, issue #535)"
+    },
+    {
+      "name": "cyl_l10n_4b0282f4f1c6",
+      "value": "Push a un UITabBarController del sistema (otro botón más)"
+    },
+    {
+      "name": "cyl_l10n_e5416d3ed3c0",
+      "value": "Abrir otro CYLTabBarController (otro PlusButton)"
+    },
+    {
+      "name": "cyl_l10n_8c96672c9bc5",
+      "value": "Push de un TabBarController con el mismo context (misma clase de botón más)"
+    },
+    {
+      "name": "cyl_l10n_6166b27ea14b",
+      "value": "Mostrar un TabBarController con un contexto nuevo (PlusButton con una subvista X que se puede tocar, issue #202)"
+    },
+    {
+      "name": "cyl_l10n_a63e8b745e73",
+      "value": "Abre una página que oculta la barra de navegación, sin clase base"
+    },
+    {
+      "name": "cyl_l10n_79fe28f3a3ac",
+      "value": "Abre un controlador cuya imagen del botón más cambia 2 s después; el diseño no debe moverse"
+    },
+    {
+      "name": "cyl_l10n_c27618b1aa9d",
+      "value": "Punto rojo"
+    },
+    {
+      "name": "cyl_l10n_255c00a63f9d",
+      "value": "Radio del punto rojo"
+    },
+    {
+      "name": "cyl_l10n_56e8fac7007d",
+      "value": "Replay"
+    },
+    {
+      "name": "cyl_l10n_7aac5e07b16d",
+      "value": "De derecha a izquierda una vez"
+    },
+    {
+      "name": "cyl_l10n_e7d74cf8c9a3",
+      "value": "Rive tab icons (configuration file)"
+    },
+    {
+      "name": "cyl_l10n_9d01c837b4bc",
+      "value": "Rive tab icon: house.riv (number input Rooms)"
+    },
+    {
+      "name": "cyl_l10n_f0c792c049bc",
+      "value": "Rodar una vez"
+    },
+    {
+      "name": "cyl_l10n_401ea21c7a44",
+      "value": "Rotación (continuo)"
+    },
+    {
+      "name": "cyl_l10n_bd001817e373",
+      "value": "Iconos de pestaña SVGA (archivo de configuración)"
+    },
+    {
+      "name": "cyl_l10n_b5fcd68edd9f",
+      "value": "Escala (continuo)"
+    },
+    {
+      "name": "cyl_l10n_544d03258eaf",
+      "value": "Escala una vez"
+    },
+    {
+      "name": "cyl_l10n_dbd4f5e49888",
+      "value": "Escala ×3"
+    },
+    {
+      "name": "cyl_l10n_13348442cc6a",
+      "value": "Buscar"
+    },
+    {
+      "name": "cyl_l10n_9ae56cc36e81",
+      "value": "Agitar (continuo)"
+    },
+    {
+      "name": "cyl_l10n_e0a90124b72f",
+      "value": "Agitar ×3 (cyl_shakeAnimationRepeatTimes)"
+    },
+    {
+      "name": "cyl_l10n_b10d33d5ad4d",
+      "value": "Agitar, se detiene con «Reducir movimiento»"
+    },
+    {
+      "name": "cyl_l10n_6cbe015b00fb",
+      "value": "Mostrar / ocultar CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_ad30d6513b94",
+      "value": "Show the still image when it ends: off"
+    },
+    {
+      "name": "cyl_l10n_0d07e309ae6a",
+      "value": "Show the still image when it ends: on"
+    },
+    {
+      "name": "cyl_l10n_561582c1e7cc",
+      "value": "Muestra el área táctil en rojo translúcido: %@; escala %@x; toca para 1x, 1,5x, 2x, desactivado"
+    },
+    {
+      "name": "cyl_l10n_3cb58e0d546d",
+      "value": "Resorte (continuo)"
+    },
+    {
+      "name": "cyl_l10n_0a00b2238071",
+      "value": "Resorte una vez"
+    },
+    {
+      "name": "cyl_l10n_f1f3db859899",
+      "value": "Still image after the animation ends"
+    },
+    {
+      "name": "cyl_l10n_fee4a478923f",
+      "value": "Interacciones de las pestañas"
+    },
+    {
+      "name": "cyl_l10n_5ea7bf3d8e63",
+      "value": "Tab icon animations loop: off"
+    },
+    {
+      "name": "cyl_l10n_918aff638366",
+      "value": "Tab icon animations loop: on"
+    },
+    {
+      "name": "cyl_l10n_98559580dcc7",
+      "value": "Animación al tocar las pestañas (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_db89836d6e21",
+      "value": "Sonido y háptica al tocar pestañas (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_2f6e866d5219",
+      "value": "Páginas, selección e inicio de sesión"
+    },
+    {
+      "name": "cyl_l10n_6d067090c833",
+      "value": "Pestaña, %1$@ de %2$@"
+    },
+    {
+      "name": "cyl_l10n_456887f9731c",
+      "value": "Pestaña: %@"
+    },
+    {
+      "name": "cyl_l10n_ab5745daa734",
+      "value": "Galería de barras de pestañas"
+    },
+    {
+      "name": "cyl_l10n_75ccb7ef4864",
+      "value": "Apariencia de la barra"
+    },
+    {
+      "name": "cyl_l10n_7c4aecba91c3",
+      "value": "La imagen de la pestaña de esta página procede del rawfile de la app (el bundle de recursos de iOS); toca de nuevo para restaurar"
+    },
+    {
+      "name": "cyl_l10n_2e6d648945c0",
+      "value": "El botón más sobresale de la barra; su parte superior también responde (en rojo)"
+    },
+    {
+      "name": "cyl_l10n_9b6633b75bf2",
+      "value": "La pestaña «Yo» requiere iniciar sesión (issue #19); toca para alternar"
+    },
+    {
+      "name": "cyl_l10n_a4d0d101d6a3",
+      "value": "Arriba a la izquierda"
+    },
+    {
+      "name": "cyl_l10n_2306a585ae00",
+      "value": "cyl_itemEdgeInsets: 15 % del ancho de una pestaña libre en cada extremo"
+    },
+    {
+      "name": "cyl_l10n_6360bbdfb8ff",
+      "value": "cyl_itemEdgeInsets: cero, las pestañas llenan la barra"
+    },
+    {
+      "name": "cyl_l10n_fd15e88376df",
+      "value": "Demostración de los métodos cyl_pop / cyl_push"
+    },
+    {
+      "name": "cyl_l10n_ca3dcd2d62be",
+      "value": "cyl_popSelectTabBarChildViewControllerAtIndex: 1 (%@)"
+    },
+    {
+      "name": "cyl_l10n_3b06a9582640",
+      "value": "cyl_popSelectTabBarChildViewControllerForTabBarItemIdentifier: message"
+    },
+    {
+      "name": "cyl_l10n_59884403daf6",
+      "value": "cyl_pushOrPopToViewController: pages/Index (ya en la pila: vuelve)"
+    },
+    {
+      "name": "cyl_l10n_1ec113617309",
+      "value": "cyl_pushViewController, cyl_popSelectTabBarChildViewControllerAtIndex, cyl_pushOrPopToViewController"
+    },
+    {
+      "name": "cyl_l10n_9fb845377ee4",
+      "value": "cyl_pushViewController: una página verde"
+    },
+    {
+      "name": "cyl_l10n_ff5772993aee",
+      "value": "cyl_tabBarItemLongPressDuration = %@ ms, cyl_tabBarItemDoubleTapInterval = %@ ms; toca para cambiar; toca dos veces una pestaña para verlo"
+    },
+    {
+      "name": "cyl_l10n_f69c71bc581e",
+      "value": "cyl_tabBarMinimizeBehavior = %@; toca para elegir y desplaza esta lista"
+    },
+    {
+      "name": "cyl_l10n_4abddd944c2e",
+      "value": "harmonyos-liquid-glass-tabbar: cápsula de pestañas, bola de búsqueda y barra de música sobre contenido colorido; desplaza para minimizar"
+    },
+    {
+      "name": "cyl_l10n_3b4e07b5542e",
+      "value": "numberInput=Rooms: each select or tap again sets Rooms to the next value (3, 4, 5, 6)"
+    },
+    {
+      "name": "cyl_l10n_f3f4ecf4a4a6",
+      "value": "selectedIndex = %@ (la página del botón más es %@, nunca un índice de pestaña); toca para la siguiente pestaña"
+    },
+    {
+      "name": "cyl_l10n_ee5b6ac6461b",
+      "value": "selectedIndex y el PlusButton (issue #515)"
+    },
+    {
+      "name": "cyl_l10n_30be5f67de2b",
+      "value": "showsImageWhenAnimationEnds: a play-once Lottie icon, then its still image"
+    },
+    {
+      "name": "cyl_l10n_2de6d572f86b",
+      "value": "Tema de standardAppearance (compartido por Liquid Glass y FlatDesign)"
+    },
+    {
+      "name": "cyl_l10n_c4376b477be8",
+      "value": "tabBarHidden = %@; oculta, vuelve tras 2 s"
+    },
+    {
+      "name": "cyl_l10n_2a0608059131",
+      "value": "Actualiza los títulos de todas las pestañas a la vez; toca de nuevo para restaurar"
+    },
+    {
+      "name": "cyl_l10n_57196013d558",
+      "value": "Halloween"
+    },
+    {
+      "name": "cyl_l10n_0a58c230c3d9",
+      "value": "Descarga y actualiza los iconos de todas las pestañas; toca de nuevo para restaurar"
+    },
+    {
+      "name": "cyl_l10n_5e347d8ccb68",
+      "value": "Descargar icono de red"
+    },
+    {
+      "name": "cyl_l10n_2e0e84a0dcfb",
+      "value": "Ocultar la barra de navegación sin clase base (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_321ff794aab8",
+      "value": "N/D"
+    },
+    {
+      "name": "cyl_l10n_e1642a46b804",
+      "value": "Festival del Medio Otoño"
+    },
+    {
+      "name": "cyl_l10n_0c2817d10627",
+      "value": "Respuesta háptica media"
+    },
+    {
+      "name": "cyl_l10n_0f60774903e0",
+      "value": "Cargar imágenes de un bundle (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_0e1b02648a11",
+      "value": "Acercar"
+    },
+    {
+      "name": "cyl_l10n_83c39abd16cd",
+      "value": "Elegir del álbum"
+    },
+    {
+      "name": "cyl_l10n_cc03f47a389c",
+      "value": "Descarga el icono de la pestaña desde la red (en caché); toca de nuevo para restaurar"
+    },
+    {
+      "name": "cyl_l10n_e05f97c5159d",
+      "value": "Crear un TabBarController a partir de un archivo de configuración"
+    },
+    {
+      "name": "cyl_l10n_5f0c0bf32dc1",
+      "value": "Mantener"
+    },
+    {
+      "name": "cyl_l10n_24fb8692947a",
+      "value": "conservada"
+    },
+    {
+      "name": "cyl_l10n_b15d91274e9f",
+      "value": "Cerrar"
+    },
+    {
+      "name": "cyl_l10n_70922c50ef07",
+      "value": "Aviso de memoria"
+    },
+    {
+      "name": "cyl_l10n_cbed6b29761b",
+      "value": "Botón más"
+    },
+    {
+      "name": "cyl_l10n_18684d72945b",
+      "value": "Cargar la imagen"
+    },
+    {
+      "name": "cyl_l10n_b981b7b359a7",
+      "value": "Cargar una imagen de fondo"
+    },
+    {
+      "name": "cyl_l10n_7136049eb4c7",
+      "value": "Descarga las pestañas no seleccionadas; se recargan al seleccionarlas"
+    },
+    {
+      "name": "cyl_l10n_c7626d7d6194",
+      "value": "Cambia en el sitio el título de la pestaña de esta página; toca de nuevo para restaurar"
+    },
+    {
+      "name": "cyl_l10n_15fb093f6fff",
+      "value": "Actualizar pestañas en el sitio"
+    },
+    {
+      "name": "cyl_l10n_c1ecedab11bc",
+      "value": "Original"
+    },
+    {
+      "name": "cyl_l10n_83611abd5f80",
+      "value": "Publicar"
+    },
+    {
+      "name": "cyl_l10n_625fb26b4b33",
+      "value": "Cancelar"
+    },
+    {
+      "name": "cyl_l10n_d25efeb790bb",
+      "value": "Cerca"
+    },
+    {
+      "name": "cyl_l10n_7941d8987ff2",
+      "value": "Comparar con el UITabBar del sistema"
+    },
+    {
+      "name": "cyl_l10n_d0d78acf1941",
+      "value": "Navidad"
+    },
+    {
+      "name": "cyl_l10n_aa91e8ceec70",
+      "value": "Pascua"
+    },
+    {
+      "name": "cyl_l10n_3df20a295b39",
+      "value": "Verano"
+    },
+    {
+      "name": "cyl_l10n_0ef6dae7e80c",
+      "value": "Espacio"
+    },
+    {
+      "name": "cyl_l10n_2f383291bcf8",
+      "value": "Real: %@"
+    },
+    {
+      "name": "cyl_l10n_bccc798b577a",
+      "value": "Cápsula centrada"
+    },
+    {
+      "name": "cyl_l10n_f613681ddf31",
+      "value": "Mostrar las %@ simulaciones"
+    },
+    {
+      "name": "cyl_l10n_7c87af044929",
+      "value": "Deslizar para cambiar de pestaña (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_7a2261654d24",
+      "value": "descargada"
+    },
+    {
+      "name": "cyl_l10n_f79d05d929aa",
+      "value": "TabBarController creado de forma segura: %@ pestañas"
+    },
+    {
+      "name": "cyl_l10n_091885db07e4",
+      "value": "Rebote"
+    },
+    {
+      "name": "cyl_l10n_758903c327de",
+      "value": "Muestra un GIF animado como icono de la pestaña; toca de nuevo para restaurar"
+    },
+    {
+      "name": "cyl_l10n_56e6ecf97176",
+      "value": "Repetir"
+    },
+    {
+      "name": "cyl_l10n_c7db6d4f1a42",
+      "value": "Restaurar"
+    },
+    {
+      "name": "cyl_l10n_c4328f75476f",
+      "value": "San Valentín"
+    },
+    {
+      "name": "cyl_l10n_07b181184280",
+      "value": "Yo"
+    },
+    {
+      "name": "cyl_l10n_2a3e7f5c382c",
+      "value": "Manual"
+    },
+    {
+      "name": "cyl_l10n_97a6bedeb7fd",
+      "value": "Manual: toca para activar el ocultar al desplazar, desplázate hacia abajo para ocultar la TabBar y haz lo que dice el título. Esperado: la TabBar vuelve de inmediato."
+    },
+    {
+      "name": "cyl_l10n_f68e7e217ad1",
+      "value": "Manual: %@"
+    },
+    {
+      "name": "cyl_l10n_89246468f7fd",
+      "value": "Abrir la galería de barras de pestañas"
+    },
+    {
+      "name": "cyl_l10n_a01539048bb0",
+      "value": "Activa el interruptor y mantén pulsada cualquier pestaña o el PlusButton para ver su identificador."
+    },
+    {
+      "name": "cyl_l10n_633c2ee4dcc7",
+      "value": "Cambiar todos los iconos de red"
+    },
+    {
+      "name": "cyl_l10n_f75fe6720861",
+      "value": "Cambiar todos los iconos locales"
+    },
+    {
+      "name": "cyl_l10n_7fb5208a54d5",
+      "value": "Cambiar todos los títulos"
+    },
+    {
+      "name": "cyl_l10n_2f728e190695",
+      "value": "Muestra otras páginas en las pestañas a ambos lados de esta (issue #481); toca de nuevo para restaurar"
+    },
+    {
+      "name": "cyl_l10n_bed9ec1e8448",
+      "value": "Hacer una foto"
+    },
+    {
+      "name": "cyl_l10n_0be5a194844c",
+      "value": "Aspecto"
+    },
+    {
+      "name": "cyl_l10n_61a9cd33b1ff",
+      "value": "Aspecto (tema, issue #216)"
+    },
+    {
+      "name": "cyl_l10n_09d0fdddca66",
+      "value": "Aspectos: festividades y colores (%@)"
+    },
+    {
+      "name": "cyl_l10n_3de5855e2c7f",
+      "value": "Contraer la lista de simulaciones"
+    },
+    {
+      "name": "cyl_l10n_a0ffdf359138",
+      "value": "Cambiar la altura de CYLFlatDesignTabBar"
+    },
+    {
+      "name": "cyl_l10n_01e3254a92ba",
+      "value": "Ampliar y reducir"
+    },
+    {
+      "name": "cyl_l10n_d46d5bb15db1",
+      "value": "Año Nuevo"
+    },
+    {
+      "name": "cyl_l10n_79b5a6564585",
+      "value": "Girar"
+    },
+    {
+      "name": "cyl_l10n_d81bb206a889",
+      "value": "Ninguna"
+    },
+    {
+      "name": "cyl_l10n_14f433db2189",
+      "value": "Sin clase base y utilidades"
+    },
+    {
+      "name": "cyl_l10n_d2339bb4edaa",
+      "value": "Fiesta de la Primavera"
+    },
+    {
+      "name": "cyl_l10n_5f1de850fb46",
+      "value": "Cambiar título de la pestaña"
+    },
+    {
+      "name": "cyl_l10n_9d0d66f312b5",
+      "value": "Reemplazar por una imagen más grande"
+    },
+    {
+      "name": "cyl_l10n_b051a19ace76",
+      "value": "Reemplazar pestañas vecinas"
+    },
+    {
+      "name": "cyl_l10n_3e730a3320e9",
+      "value": "Página de reemplazo %@"
+    },
+    {
+      "name": "cyl_l10n_a131e4f178aa",
+      "value": "Contenido nuevo"
+    },
+    {
+      "name": "cyl_l10n_467b3e031441",
+      "value": "no cargada"
+    },
+    {
+      "name": "cyl_l10n_2c8d9e877a54",
+      "value": "Desplazamiento del título (titlePositionAdjustment)"
+    },
+    {
+      "name": "cyl_l10n_0787cd518387",
+      "value": "Simular aviso de memoria"
+    },
+    {
+      "name": "cyl_l10n_d76904d0e7ee",
+      "value": "Cada escena es una barra de pestañas creada con la API pública: estilos, animaciones, avisos, Lottie y las nuevas API de pestañas"
+    },
+    {
+      "name": "cyl_l10n_6a00c1ae99fa",
+      "value": "Océano"
+    },
+    {
+      "name": "cyl_l10n_ff692f04ace0",
+      "value": "Mensajes"
+    },
+    {
+      "name": "cyl_l10n_41e8e8b9935c",
+      "value": "Oscuro"
+    },
+    {
+      "name": "cyl_l10n_8dfe6bcdd6ec",
+      "value": "Transición deslizante (CYLTabBarSlideTransitionAnimator)"
+    },
+    {
+      "name": "cyl_l10n_9f44bafc75c6",
+      "value": "Minimizar / ocultar la TabBar al desplazar (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_8625f5f225d7",
+      "value": "Ocultar al desplazar: simular interrupciones (issue #13)"
+    },
+    {
+      "name": "cyl_l10n_678abebe6aac",
+      "value": "Toca la X arriba a la derecha del PlusButton: la X cambia a un color aleatorio y el PlusButton no reacciona"
+    },
+    {
+      "name": "cyl_l10n_7375af54db2a",
+      "value": "Toca para cambiar la animación al tocar las pestañas y el PlusButton. Ahora: %@"
+    },
+    {
+      "name": "cyl_l10n_5378f31b520c",
+      "value": "Toca para cambiar tabBar.standardAppearance, actual: %@"
+    },
+    {
+      "name": "cyl_l10n_4a986e4da535",
+      "value": "Toca para cambiar el desplazamiento vertical de los títulos de todas las pestañas, actual: %@"
+    },
+    {
+      "name": "cyl_l10n_3d0d9d3d7cc2",
+      "value": "Toca para cambiar el idioma"
+    },
+    {
+      "name": "cyl_l10n_f4e41dda1094",
+      "value": "Toca para cambiar y luego toca cualquier pestaña o el PlusButton para oírlo. La háptica solo vibra en un dispositivo real. Actual: %@"
+    },
+    {
+      "name": "cyl_l10n_15855ab96e87",
+      "value": "Clic + háptica"
+    },
+    {
+      "name": "cyl_l10n_cff8a9cded04",
+      "value": "Toca para elegir un tema: el fondo, los iconos y los colores del texto de la TabBar cambian en el sitio, en todos los estilos de TabBar. Actual: %@"
+    },
+    {
+      "name": "cyl_l10n_1c00c4fd1cea",
+      "value": "Rosa"
+    },
+    {
+      "name": "cyl_l10n_8483ed132b2c",
+      "value": "Cumpleaños"
+    },
+    {
+      "name": "cyl_l10n_feef14745f21",
+      "value": "Actualiza los iconos de todas las pestañas con imágenes locales (nombre, ruta, UIImage, URL de archivo); toca de nuevo para restaurar"
+    },
+    {
+      "name": "cyl_l10n_402d19e50fff",
+      "value": "Iniciar sesión"
+    },
+    {
+      "name": "cyl_l10n_833152116634",
+      "value": "Quitar la imagen"
+    },
+    {
+      "name": "cyl_l10n_a0676a7d84a9",
+      "value": "Línea verde"
+    },
+    {
+      "name": "cyl_l10n_16068b2ff3fd",
+      "value": "Iconos de red"
+    },
+    {
+      "name": "cyl_l10n_69ca6555a602",
+      "value": "Voltear"
+    },
+    {
+      "name": "cyl_l10n_4bd51044149f",
+      "value": "Archivo de sonido propio (cyl_tabButtonTapSoundURL)"
+    },
+    {
+      "name": "cyl_l10n_9d1c8a70d4da",
+      "value": "Autoprueba"
+    },
+    {
+      "name": "cyl_l10n_11858aeb1656",
+      "value": "Autoprueba: ejecutar todas las simulaciones automáticas e informar PASS / FAIL"
+    },
+    {
+      "name": "cyl_l10n_beabcd498b94",
+      "value": "Pomelo"
+    },
+    {
+      "name": "cyl_l10n_b8c467fce096",
+      "value": "Insignias"
+    },
+    {
+      "name": "cyl_l10n_200e65177369",
+      "value": "Definir el color de fondo de CYLFlatDesignTabBarItem"
+    },
+    {
+      "name": "cyl_l10n_295bb704f520",
+      "value": "Idioma"
+    },
+    {
+      "name": "cyl_l10n_d673e0eb5c1c",
+      "value": "Responder fuera de la supervista (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_71bbc726ace5",
+      "value": "Usar el del sistema"
+    },
+    {
+      "name": "cyl_l10n_d0914cf6acd2",
+      "value": "Navegación y comparaciones"
+    },
+    {
+      "name": "cyl_l10n_110abc875180",
+      "value": "Respuesta háptica ligera"
+    },
+    {
+      "name": "cyl_l10n_fad7c8a21fe3",
+      "value": "Seleccionado"
+    },
+    {
+      "name": "cyl_l10n_aa05fd09a619",
+      "value": "General"
+    },
+    {
+      "name": "cyl_l10n_15c64aa0b404",
+      "value": "Archivo de configuración"
+    },
+    {
+      "name": "cyl_l10n_d505958a042b",
+      "value": "Configuración: fallos simulados"
+    },
+    {
+      "name": "cyl_l10n_45158907e07f",
+      "value": "Respuesta háptica fuerte"
+    },
+    {
+      "name": "cyl_l10n_d6982fecc6a4",
+      "value": "Mantener pulsadas las pestañas (issue #535)"
+    },
+    {
+      "name": "cyl_l10n_aefae51d3c25",
+      "value": "Se mantuvo pulsado «%@»"
+    },
+    {
+      "name": "cyl_l10n_abad1baa5479",
+      "value": "Duración de la pulsación larga e intervalo del doble toque (issue #535 / #152)"
+    },
+    {
+      "name": "cyl_l10n_b146fc1a1531",
+      "value": "Hierba"
+    },
+    {
+      "name": "cyl_l10n_db1c89e0f6e6",
+      "value": "Inicio"
+    },
+    {
+      "name": "cyl_l10n_18c63459a2c0",
+      "value": "Predeterminado"
+    },
+    {
+      "name": "cyl_l10n_be354ee4263a",
+      "value": "Clic predeterminado"
+    }
+  ]
+}

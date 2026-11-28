@@ -5,6 +5,8 @@
 //  Copyright © 2026 https://github.com/ChenYilong . All rights reserved.
 //
 
+// CYL-SWIFT-MIGRATION: objc-required — [EN] The composition root of the Rive subspec: its `+load` registers the animator before any tab is built, and Swift has no `+load`. The views are Swift (RiveSwift/). [CN] Rive 子库的组合根：其 `+load` 在创建任何 Tab 之前注册 animator，而 Swift 没有 `+load`。视图为 Swift（RiveSwift/）。
+
 #import "CYLRiveTabBarItemAnimator.h"
 // [EN] The registry of the `CYLTabBarItemAnimation` subspec. [CN] `CYLTabBarItemAnimation` 子库的注册表。
 #if __has_include("../CYLTabBarItemAnimatorRegistry.h")
@@ -19,7 +21,13 @@
 #if CYL_RIVE_AVAILABLE
 // [EN] The Swift views of this subspec (RiveSwift/), through the module's generated header (framework or static library).
 // [CN] 本子库的 Swift 视图（RiveSwift/），通过模块生成的头文件引入（framework 或静态库）。
-#if __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
+#if __has_include(<CYLAnimatedItem/CYLAnimatedItem-Swift.h>)
+#import <CYLAnimatedItem/CYLAnimatedItem-Swift.h>
+#define CYL_RIVE_SWIFT_VIEWS_AVAILABLE 1
+#elif __has_include("CYLAnimatedItem-Swift.h")
+#import "CYLAnimatedItem-Swift.h"
+#define CYL_RIVE_SWIFT_VIEWS_AVAILABLE 1
+#elif __has_include(<CYLTabBarController/CYLTabBarController-Swift.h>)
 #import <CYLTabBarController/CYLTabBarController-Swift.h>
 #define CYL_RIVE_SWIFT_VIEWS_AVAILABLE 1
 #elif __has_include("CYLTabBarController-Swift.h")
@@ -27,23 +35,7 @@
 #define CYL_RIVE_SWIFT_VIEWS_AVAILABLE 1
 #endif
 
-NSString *const CYLTabBarRiveURL = @"CYLTabBarRiveURL";
-NSString *const CYLTabBarRiveFilePath = @"CYLTabBarRiveFilePath";
-NSString *const CYLTabBarRiveSize = @"CYLTabBarRiveSize";
-NSString *const CYLTabBarRiveDarkURL = @"CYLTabBarRiveDarkURL";
-NSString *const CYLTabBarRiveDarkFilePath = @"CYLTabBarRiveDarkFilePath";
-NSString *const CYLTabBarRiveDarkColors = @"CYLTabBarRiveDarkColors";
 
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveArtboard = @"artboard";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveStateMachine = @"stateMachine";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveActiveProperty = @"active";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveActiveDuration = @"duration";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveTriggerProperty = @"trigger";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveColor = @"color";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveInput = @"input";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveTriggerInput = @"triggerInput";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveAnimation = @"animation";
-CYLTabBarAnimationOption const CYLTabBarAnimationOptionRiveLegacyRuntime = @"legacy";
 
 @implementation CYLRiveTabBarItemAnimator
 

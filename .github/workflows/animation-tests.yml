@@ -8,7 +8,7 @@ on:
     paths:
       - "CYLTabBarController/CYLTabBarItemAnimation/**"
       - "CYLTabBarController/CYLTabBarItemAnimationService.h"
-      - "CYLTabBarController/UIControl+CYLTabBarItemAnimation.m"
+      - "CYLTabBarController/Swift/UIControl+CYLTabBarItemAnimation.swift"
       - "CYLTabBarController/CYLTabBarController.m"
       - "CYLTabBarController/CYLConstants.m"
       - "Tests/CYLTabBarItemAnimation/**"
@@ -18,13 +18,22 @@ on:
     paths:
       - "CYLTabBarController/CYLTabBarItemAnimation/**"
       - "CYLTabBarController/CYLTabBarItemAnimationService.h"
-      - "CYLTabBarController/UIControl+CYLTabBarItemAnimation.m"
+      - "CYLTabBarController/Swift/UIControl+CYLTabBarItemAnimation.swift"
       - "CYLTabBarController/CYLTabBarController.m"
       - "CYLTabBarController/CYLConstants.m"
       - "Tests/CYLTabBarItemAnimation/**"
 
 permissions:
   contents: read
+
+# [EN] A newer push cancels the older run, as in the other macOS workflows. Without it every push left a run queued on a
+#      macOS runner (five at once on 2026-11-19), and the iOS workflow, which cancels itself on each push, waited behind
+#      them and never completed.
+# [CN] 新的推送会取消旧的运行，与其他 macOS 工作流相同。没有它时，每次推送都会在 macOS runner 上留下一个排队的运行（2026-11-19 同时有五个），
+#      每次推送都会自我取消的 iOS 工作流排在它们后面，始终无法完成。
+concurrency:
+  group: animation-tests-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   tests:

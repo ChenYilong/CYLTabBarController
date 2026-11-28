@@ -65,24 +65,48 @@ const IMAGES: Record<string, ImageSourcePropType> = {
 // MARK: - The tab bar (TabItems.swift, RivePlusButton.swift, SceneDelegate.swift)
 
 const TABS = [
-  { id: 'chat', title: 'Chat', artboard: 'CHAT', symbol: 'message' },
-  { id: 'search', title: 'Search', artboard: 'SEARCH', symbol: 'magnifyingglass' },
-  { id: 'bell', title: 'Bell', artboard: 'BELL', symbol: 'bell' },
-  { id: 'user', title: 'User', artboard: 'USER', symbol: 'person' },
+  { id: 'chat', title: 'Chat', artboard: 'CHAT', symbol: 'message', svga: 'tab_chat.svga' },
+  { id: 'search', title: 'Search', artboard: 'SEARCH', symbol: 'magnifyingglass', svga: 'tab_search.svga' },
+  { id: 'bell', title: 'Bell', artboard: 'BELL', symbol: 'bell', svga: 'tab_list.svga' },
+  { id: 'user', title: 'User', artboard: 'USER', symbol: 'person', svga: 'tab_profile.svga' },
 ] as const;
 
-function tabItems(): CYLTabBarItem[] {
-  return TABS.map((tab) => ({
-    title: tab.title,
-    identifier: tab.id,
-    image: `system:${tab.symbol}`,
-    selectedImage: `system:${tab.symbol}`,
-    // [EN] The tab's artboard of icons.riv; icons.riv has no view model, so its state machine input "active" plays.
-    // [CN] icons.riv 中该 Tab 的画板；icons.riv 没有 view model，因此播放其状态机输入 "active"。
-    CYLTabBarRiveFilePath: 'icons.riv',
-    CYLTabBarAnimationOptions: { artboard: tab.artboard, stateMachine: `${tab.artboard}_Interactivity`, input: 'active' },
-    CYLTabBarRiveSize: '{32, 32}',
-  }));
+/**
+ * FIX: issue #415
+ * Where the tab icons come from, one for one with Example-Rive (SVGATabIcons.swift, `CYLDemoTabIconSource`): the Rive
+ * artboards, SVGA files given with the SVGA keys (`CYLTabBarSVGAFilePath`, `CYLTabBarSVGASize`), or the tabs of
+ * configurations/svga/cyl_tabbar_configuration_svga.json (`configurationRoute`). Chosen on the Bell page. The SVGA files
+ * are Example-SwiftUI-Rive's SVGAAssets, added to the iOS app and to the Android assets.
+ * Tab 图标来源，与 Example-Rive 一一对应：Rive 画板、用 SVGA key 提供的 SVGA 文件，或 configurations/svga/cyl_tabbar_configuration_svga.json
+ * 中的 Tab（`configurationRoute`）。在 Bell 页面选择。SVGA 文件来自 Example-SwiftUI-Rive 的 SVGAAssets，已加入 iOS App 与 Android assets。
+ */
+const ICON_SOURCES = [
+  { title: 'Rive', titleCN: 'Rive' },
+  { title: 'SVGA (initialization keys)', titleCN: 'SVGA（初始化 Key）' },
+  { title: 'SVGA (configuration file)', titleCN: 'SVGA（配置文件）' },
+] as const;
+const SVGA_CONFIGURATION_ROUTE = 'bundle:svga?name=cyl_tabbar_configuration_svga';
+
+function tabItems(iconSource: number): CYLTabBarItem[] {
+  return TABS.map((tab) => {
+    const item: CYLTabBarItem = {
+      title: tab.title,
+      identifier: tab.id,
+      image: `system:${tab.symbol}`,
+      selectedImage: `system:${tab.symbol}`,
+    };
+    if (iconSource === 1) {
+      return { ...item, CYLTabBarSVGAFilePath: tab.svga, CYLTabBarSVGASize: '{32, 32}' };
+    }
+    return {
+      ...item,
+      // [EN] The tab's artboard of icons.riv; icons.riv has no view model, so its state machine input "active" plays.
+      // [CN] icons.riv 中该 Tab 的画板；icons.riv 没有 view model，因此播放其状态机输入 "active"。
+      CYLTabBarRiveFilePath: 'icons.riv',
+      CYLTabBarAnimationOptions: { artboard: tab.artboard, stateMachine: `${tab.artboard}_Interactivity`, input: 'active' },
+      CYLTabBarRiveSize: '{32, 32}',
+    };
+  });
 }
 
 /**
@@ -277,8 +301,10 @@ function OnboardingPage() {
 
 // MARK: - Bell: menu_button.riv (RiveMenuButtonDemoView.swift) above the settings list
 
-function BellPage({ styleIndex, onStyle }: Readonly<{ styleIndex: number; onStyle: () => void }>) {
+function BellPage({ styleIndex, onStyle, iconSource, onIconSource }: Readonly<{ styleIndex: number; onStyle: () => void; iconSource: number; onIconSource: () => void }>) {
   const [open, setOpen] = useState(false);
+  const [svgaPlaying, setSVGAPlaying] = useState(false);
+  const source = ICON_SOURCES[iconSource]!;
   return (
     <View style={[styles.flex, styles.black]}>
       <NavigationBar title="Bell" />
@@ -287,6 +313,20 @@ function BellPage({ styleIndex, onStyle }: Readonly<{ styleIndex: number; onStyl
           <CYLAnimationView file="menu_button.riv" options={{ stateMachine: 'State Machine', input: 'isOpen', duration: 0 }} playing={open} style={styles.menuButton} />
           <Pressable onPress={() => setOpen((value) => !value)}>
             <Text style={styles.playStop}>{chinese ? '播放 / 停止' : 'Play / Stop'}</Text>
+          </Pressable>
+        </View>
+        {/* FIX: issue #415 — SVGATabIconDemoView: SVGA files through the same engine, and the tab icon source. */}
+        <View style={styles.bellHeader}>
+          <View style={styles.svgaIcons}>
+            {['tab_home.svga', 'tab_profile.svga', 'tab_activity.svga'].map((file) => (
+              <CYLAnimationView key={file} file={file} playing={svgaPlaying} style={styles.svgaIcon} accessible accessibilityRole="image" accessibilityLabel={`SVGA ${file.replace('.svga', '')}`} />
+            ))}
+          </View>
+          <Pressable onPress={() => setSVGAPlaying((value) => !value)} accessibilityRole="button" accessibilityHint="SVGA">
+            <Text style={styles.playStop}>{chinese ? '播放 / 停止' : 'Play / Stop'}</Text>
+          </Pressable>
+          <Pressable onPress={onIconSource} accessibilityRole="button" testID="SVGATabIconSourceSwitch">
+            <Text style={styles.playStop}>{chinese ? `Tab 图标来源：${source.titleCN}` : `Tab icon source: ${source.title}`}</Text>
           </Pressable>
         </View>
         <Text style={styles.sectionTitle}>{chinese ? 'TabBar 外观' : 'Tab bar appearance'}</Text>
@@ -382,7 +422,9 @@ export default function App() {
   const [selected, setSelected] = useState<string>('chat');
   const [styleIndex, setStyleIndex] = useState(0);
   const [plusBadge, setPlusBadge] = useState(0);
-  const items = useMemo(tabItems, []);
+  const [iconSource, setIconSource] = useState(0);
+  const items = useMemo(() => tabItems(iconSource), [iconSource]);
+  const usesConfigurationFile = iconSource === 2;
 
   // demoShowPlusButtonBadgeAfterLayout(): 1 after launch. 启动后显示 1。
   useEffect(() => {
@@ -400,7 +442,14 @@ export default function App() {
       page = <SideMenuPage />;
       break;
     case 'bell':
-      page = <BellPage styleIndex={styleIndex} onStyle={() => setStyleIndex((value) => (value + 1) % STYLES.length)} />;
+      page = (
+        <BellPage
+          styleIndex={styleIndex}
+          onStyle={() => setStyleIndex((value) => (value + 1) % STYLES.length)}
+          iconSource={iconSource}
+          onIconSource={() => setIconSource((value) => (value + 1) % ICON_SOURCES.length)}
+        />
+      );
       break;
     case 'user':
       page = <SignInPage />;
@@ -413,8 +462,12 @@ export default function App() {
     <View style={styles.black}>
       <View style={styles.flex}>{page}</View>
       <CYLTabBar
+        // [EN] A new source makes a new tab bar, as Example-Rive rebuilds its root view controller. [CN] 换来源时重建 TabBar，与 Example-Rive 重建根控制器相同。
+        key={iconSource}
         style={styles.tabBar}
-        items={items}
+        // [EN] With the configuration file, the tabs and their SVGA icons come from the file. [CN] 使用配置文件时，Tab 及其 SVGA 图标来自该文件。
+        items={usesConfigurationFile ? undefined : items}
+        configurationRoute={usesConfigurationFile ? SVGA_CONFIGURATION_ROUTE : undefined}
         styleType={STYLES[styleIndex]}
         userInterfaceStyle="dark"
         tapAnimation="bounce"
@@ -477,6 +530,8 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 15, fontWeight: '600', color: '#EBEBF5', marginHorizontal: 32, marginTop: 24, marginBottom: 8 },
   card: { borderRadius: 14, backgroundColor: '#1C1C1E', marginHorizontal: 16, overflow: 'hidden' },
   row: { minHeight: 52, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  svgaIcons: { flexDirection: 'row', gap: 24 },
+  svgaIcon: { width: 64, height: 64 },
   rowTitle: { fontSize: 16, color: '#FFFFFF' },
   rowDetail: { fontSize: 14, color: '#8E8E93' },
   signIn: { backgroundColor: '#F2F2F7', borderRadius: 20, padding: 30, gap: 12 },

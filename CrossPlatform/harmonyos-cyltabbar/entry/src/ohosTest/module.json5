@@ -1,0 +1,22 @@
+{
+  "module": {
+    "name": "entry_test",
+    "type": "feature",
+    "deviceTypes": ["phone", "tablet", "2in1"],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:test_pages",
+    "abilities": [
+      {
+        "name": "TestAbility",
+        "srcEntry": "./ets/testability/TestAbility.ets",
+        "description": "$string:TestAbility_desc",
+        "icon": "$media:startIcon",
+        "label": "$string:TestAbility_label",
+        "exported": true,
+        "startWindowIcon": "$media:startIcon",
+        "startWindowBackground": "$color:start_window_background"
+      }
+    ]
+  }
+}

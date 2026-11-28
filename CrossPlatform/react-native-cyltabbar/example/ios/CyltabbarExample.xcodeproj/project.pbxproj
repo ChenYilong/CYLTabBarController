@@ -14,6 +14,7 @@
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		761780EF2CA45674006654EF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EE2CA45674006654EF /* SceneDelegate.swift */; };
 		7C675A0A460E4FF4941C4455 /* green_lottie_tab_mine.json in Resources */ = {isa = PBXBuildFile; fileRef = 5745430701C14866B9ED5C41 /* green_lottie_tab_mine.json */; };
+		2864AFEEE4E24260ADF009B6 /* icons.riv in Resources */ = {isa = PBXBuildFile; fileRef = F27A7379AD944AAEAEE1F447 /* icons.riv */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		854F26919C5B48578653DD22 /* green_lottie_tab_home.json in Resources */ = {isa = PBXBuildFile; fileRef = 3B989A598E344D8D9C95E5A2 /* green_lottie_tab_home.json */; };
 		92AE3D56AA595020E5110757 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
@@ -32,6 +33,7 @@
 		3B989A598E344D8D9C95E5A2 /* green_lottie_tab_home.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_home.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_home.json; sourceTree = SOURCE_ROOT; };
 		5709B34CF0A7D63546082F79 /* Pods-CyltabbarExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CyltabbarExample.release.xcconfig"; path = "Target Support Files/Pods-CyltabbarExample/Pods-CyltabbarExample.release.xcconfig"; sourceTree = "<group>"; };
 		5745430701C14866B9ED5C41 /* green_lottie_tab_mine.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = green_lottie_tab_mine.json; path = ../../../../Example/Classes/Other/LottieResources/green_lottie_tab_mine.json; sourceTree = SOURCE_ROOT; };
+		F27A7379AD944AAEAEE1F447 /* icons.riv */ = {isa = PBXFileReference; lastKnownFileType = file; name = icons.riv; path = "../../../../Example-SwiftUI-Rive/AnimatedApp/RiveAssets/icons.riv"; sourceTree = SOURCE_ROOT; };
 		6470FDD302B9C2F6951F28CA /* Pods_CyltabbarExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CyltabbarExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = CyltabbarExample/AppDelegate.swift; sourceTree = "<group>"; };
 		761780EE2CA45674006654EF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = CyltabbarExample/SceneDelegate.swift; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 			children = (
 				B62AA363A7264B658C97E828 /* green_lottie_tab_mine_dark.json */,
 				5745430701C14866B9ED5C41 /* green_lottie_tab_mine.json */,
+				F27A7379AD944AAEAEE1F447 /* icons.riv */,
 				9DA7B521B8514204A8080998 /* green_lottie_tab_news_dark.json */,
 				E4F770CD0B504832962CF6F9 /* green_lottie_tab_news.json */,
 				ACDD9A07A8D94A4B9DB70058 /* green_lottie_tab_discover_dark.json */,
@@ -187,6 +190,7 @@
 			files = (
 				4E52BBE5327045E798685CB3 /* green_lottie_tab_mine_dark.json in Resources */,
 				7C675A0A460E4FF4941C4455 /* green_lottie_tab_mine.json in Resources */,
+				2864AFEEE4E24260ADF009B6 /* icons.riv in Resources */,
 				0D3076B2A7534FEFAD5D536E /* green_lottie_tab_news_dark.json in Resources */,
 				A98B3E8B491048B08DD3D6E0 /* green_lottie_tab_news.json in Resources */,
 				B1030FD6A43C4509A2E65E27 /* green_lottie_tab_discover_dark.json in Resources */,
