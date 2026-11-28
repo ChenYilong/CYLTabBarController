@@ -16,12 +16,12 @@ android {
         consumerProguardFiles("consumer-rules.pro")
         // [EN] Badge debugging build option (docs/Badge-Debugging.md): `-PcylBadgeAnimationDisabled=true` turns badge animations off. Moved here from `:cyltabbar`.
         // [CN] 角标调试编译选项（docs/Badge-Debugging.md）：`-PcylBadgeAnimationDisabled=true` 关闭角标动画。从 `:cyltabbar` 移到这里。
-        buildConfigField("boolean", "CYL_BADGE_ANIMATION_DISABLED",
+        resValue("bool", "cyl_badge_animation_disabled",
             (project.findProperty("cylBadgeAnimationDisabled")?.toString() == "true").toString())
     }
 
     buildFeatures {
-        buildConfig = true
+        resValues = true
     }
 
     testOptions {

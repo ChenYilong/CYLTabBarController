@@ -82,6 +82,13 @@ android {
                     java.srcDirs("$cylAndroidRoot/cylanimateditem/src/main/java", "$cylAndroidRoot/cylanimateditem/src/main/kotlin")
                     res.srcDirs("$cylAndroidRoot/cylanimateditem/src/main/res")
                     resources.srcDirs("$cylAndroidRoot/cylanimateditem/src/main/resources")
+                    // [EN] CYLAnimatedItem sits on CYLBadge and CYLUtils (D7, D8); with a provided :cylanimateditem they come through it.
+                    // [CN] CYLAnimatedItem 位于 CYLBadge 与 CYLUtils 之上（D7、D8）；使用已提供的 :cylanimateditem 时，它们随之带入。
+                    for (module in listOf("cylutils", "cylbadge")) {
+                        java.srcDirs("$cylAndroidRoot/$module/src/main/java", "$cylAndroidRoot/$module/src/main/kotlin")
+                        resources.srcDirs("$cylAndroidRoot/$module/src/main/resources")
+                    }
+                    res.srcDirs("$cylAndroidRoot/cylbadge/src/main/res")
                 }
             }
         }
@@ -95,15 +102,16 @@ android {
         //      Tab 只显示图片。
         if (cylUseLocalSources) consumerProguardFiles("$cylAndroidRoot/cyltabbar/consumer-rules.pro")
         if (cylCompilesAnimatedItem) consumerProguardFiles("$cylAndroidRoot/cylanimateditem/consumer-rules.pro")
-        // [EN] The library's CYLBadge reads BuildConfig.CYL_BADGE_ANIMATION_DISABLED, the badge debugging build option
+        // [EN] CYLBadge reads the bool resource cyl_badge_animation_disabled, the badge debugging build option
         //      (docs/Badge-Debugging.md): `-PcylBadgeAnimationDisabled=true` turns badge animations off.
-        // [CN] 库的 CYLBadge 读取角标调试编译选项 BuildConfig.CYL_BADGE_ANIMATION_DISABLED（docs/Badge-Debugging.md）。
-        if (cylUseLocalSources) buildConfigField("boolean", "CYL_BADGE_ANIMATION_DISABLED",
+        // [CN] CYLBadge 读取角标调试编译选项，即 bool 资源 cyl_badge_animation_disabled（docs/Badge-Debugging.md）。
+        if (cylCompilesAnimatedItem) resValue("bool", "cyl_badge_animation_disabled",
             (project.findProperty("cylBadgeAnimationDisabled")?.toString() == "true").toString())
     }
 
     buildFeatures {
         buildConfig = cylUseLocalSources
+        resValues = true
     }
 }
 

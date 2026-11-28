@@ -5,8 +5,6 @@ package com.cyl.tabbar
 
 import com.cyl.animateditem.CYLOffset
 import android.animation.ObjectAnimator
-import com.cyl.badge.BuildConfig
-import com.cyl.badge.R
 import com.chenyilong.cyldeallocblockexecutor.LifecycleRegistry
 import android.animation.PropertyValuesHolder
 import android.content.Context
@@ -20,6 +18,27 @@ import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
+
+/**
+ * [EN] The badge's resources are found by name, as CYLAnimatedItemResources does: the React Native and Flutter wrappers compile these
+ *      sources into their own namespace, where `com.cyl.badge.R` and `com.cyl.badge.BuildConfig` do not exist, while every build merges
+ *      the resources into the app. Ids are cached for the process.
+ * [CN] 与 CYLAnimatedItemResources 相同，角标按名字查找资源：React Native 与 Flutter 封装把这些源码编译进自己的命名空间，那里没有
+ *      `com.cyl.badge.R` 与 `com.cyl.badge.BuildConfig`，而所有构建都会把资源合并进 App。id 在进程内缓存。
+ */
+private val badgeResourceIds = java.util.concurrent.ConcurrentHashMap<String, Int>()
+
+private fun badgeResourceId(context: Context, name: String, type: String): Int =
+    badgeResourceIds.getOrPut("$type/$name") { context.resources.getIdentifier(name, type, context.packageName) }
+
+/**
+ * [EN] The badge debugging build option (docs/Badge-Debugging.md), a generated bool resource; false when it is absent.
+ * [CN] 角标调试编译选项（docs/Badge-Debugging.md），是一个生成的 bool 资源；不存在时为 false。
+ */
+private fun badgeAnimationDisabled(context: Context): Boolean {
+    val id = badgeResourceId(context, "cyl_badge_animation_disabled", "bool")
+    return id != 0 && context.resources.getBoolean(id)
+}
 
 /**
  * [EN] `CYLBadgeView`: the badge drawn over a view: a red dot, a number (capped at `cylBadgeMaximumBadgeNumber`, "99+")
@@ -161,7 +180,7 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
         // [EN] Badge debugging build option (docs/Badge-Debugging.md): `-PcylBadgeAnimationDisabled=true` turns badge
         //      animations off, so a screenshot shows the badge at its laid-out place. Never ship a release with it.
         // [CN] 角标调试编译选项（docs/Badge-Debugging.md）：`-PcylBadgeAnimationDisabled=true` 关闭角标动画，截图中的角标就在布局位置。不要在发布版本中开启。
-        if (BuildConfig.CYL_BADGE_ANIMATION_DISABLED) return
+        if (badgeAnimationDisabled(context)) return
         val forever = ObjectAnimator.INFINITE
         val animator: android.animation.Animator = when (type) {
             CYLEnums.CYLBadgeAnimationType.None -> return
@@ -202,7 +221,7 @@ class CYLBadgeView(context: Context) : View(context), CYLBadgeTextDisplaying {
      */
     fun playAnimator(animator: android.animation.Animator) {
         stopAnimation()
-        if (BuildConfig.CYL_BADGE_ANIMATION_DISABLED) return
+        if (badgeAnimationDisabled(context)) return
         runAndReport(animator, null)
     }
 
@@ -274,9 +293,9 @@ val View.cylBadgeState: CYLBadgeState
  */
 fun CYLBadgeAccessibilityDescription(context: Context, value: String?): String? = when {
     value == null -> null
-    value.isEmpty() -> CYLLocalization.string(context, R.string.cyl_badge_new_content)
+    value.isEmpty() -> CYLLocalization.string(context, badgeResourceId(context, "cyl_badge_new_content", "string"))
     Regex("^[0-9]+\\+?$").matches(value) ->
-        if ((value.trimEnd('+').toLongOrNull() ?: 0L) > 0L) CYLLocalization.string(context, R.string.cyl_badge_new_messages, value) else null
+        if ((value.trimEnd('+').toLongOrNull() ?: 0L) > 0L) CYLLocalization.string(context, badgeResourceId(context, "cyl_badge_new_messages", "string"), value) else null
     else -> value
 }
 
@@ -320,8 +339,8 @@ fun View.cylShowBadgeValue(value: String, animationType: CYLEnums.CYLBadgeAnimat
         number != null && number <= 0 -> null
         // [EN] "new" / "NEW" are tokens, shown in [CYLLocalization.language], as iOS `-cyl_showNewBadge:`.
         // [CN] "new" / "NEW" 是标记，使用 [CYLLocalization.language] 显示，与 iOS `-cyl_showNewBadge:` 相同。
-        value == "new" -> CYLLocalization.string(context, R.string.cyl_badge_new_lowercase)
-        value == "NEW" -> CYLLocalization.string(context, R.string.cyl_badge_new_uppercase)
+        value == "new" -> CYLLocalization.string(context, badgeResourceId(context, "cyl_badge_new_lowercase", "string"))
+        value == "NEW" -> CYLLocalization.string(context, badgeResourceId(context, "cyl_badge_new_uppercase", "string"))
         else -> value
     }
     if (number != null && number <= 0) {

@@ -95,6 +95,15 @@ class CYLBadgeStandaloneTest {
     }
 
     @Test
+    fun theStringsAreFoundByNameAndAnimationsAreOnByDefault() {
+        val context = hostView().context
+        assertEquals("New content", CYLBadgeAccessibilityDescription(context, ""))
+        val id = context.resources.getIdentifier("cyl_badge_animation_disabled", "bool", context.packageName)
+        assertTrue(id != 0)
+        assertFalse(context.resources.getBoolean(id))
+    }
+
+    @Test
     fun showAndClearPostTheBadgeEventsUnderTheCrossPlatformNames() {
         val view = hostView()
         val heard = ArrayList<String>()
