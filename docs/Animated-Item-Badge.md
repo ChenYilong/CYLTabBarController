@@ -13,7 +13,7 @@
 
 | 中文 | English |
 |:---|:---|
-| 状态：**设计第 3 版（2026-11-27）；2026-11-28 起静态实现：写作完整度 90 / 100，验证验收分约 41 / 100（估算，2026-11-29）**，没有任何验收项（AC1–AC13）通过，步骤 9 有缺陷、步骤 15 受阻（见"实施状态"）。决定见"负责人的决定"。 | Status: **design version 3 (2026-11-27); implemented statically since 2026-11-28: writing completeness 90 / 100, verified acceptance about 41 / 100 (an estimate, 2026-11-29)**; no acceptance item (AC1-AC13) has passed, step 9 has a defect and step 15 is blocked (see "Implementation status"). Decisions: "Owner decisions". |
+| 状态：**设计第 3 版（2026-11-27）；2026-11-28 起静态实现：写作完整度 90 / 100，验证验收分约 41 / 100（估算，2026-11-29）**，没有任何验收项（AC1–AC13）通过。2026-11-29 Mac 更新：步骤 9 已修复（本地验证），步骤 15 不再受阻但未做；iOS 部分在任务记录评分标准下为 67 / 100（见"实施状态"与任务记录）。决定见"负责人的决定"。 | Status: **design version 3 (2026-11-27); implemented statically since 2026-11-28: writing completeness 90 / 100, verified acceptance about 41 / 100 (an estimate, 2026-11-29)**; no acceptance item (AC1-AC13) has passed. Mac update, 2026-11-29: step 9 is fixed (verified locally), step 15 is no longer blocked but not done; the iOS part scores 67 / 100 on its task-log rubric (see "Implementation status" and the task log). Decisions: "Owner decisions". |
 
 ## [CN]目录
 ## [EN]Contents
