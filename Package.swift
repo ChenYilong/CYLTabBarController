@@ -20,10 +20,10 @@ let package = Package(
         // [CN] 单独的动效条目组件（CocoaPods `CYLAnimatedItem` pod，docs/Animated-Item.md）：视图、占位图资源包与动画引擎，不含 TabBar。
         .library(name: "CYLAnimatedItem", targets: ["CYLAnimatedItem", "CYLAnimatedItemViews"]),
         // [EN] The two layers below the component (docs/Animated-Item-Badge.md, step 9): CYLUtilsKit (macros' Swift side, themes, localization, the
-        //      library bundle; the only target that depends on the lifecycle library, D8) and CYLBadge on top of it. TODO: the SwiftPM build fails on Xcode 27.2 with a module
-        //      cycle, CYLAnimatedItem -> CYLTabBarControllerObjC -> CYLAnimatedItem (2026-11-29).
+        //      library bundle; the only target that depends on the lifecycle library, D8) and CYLBadge on top of it. Each layer's Objective-C
+        //      declarations are a C target of their own (CYLUtilsObjC, CYLBadgeObjC), so none of them reaches the tab bar.
         // [CN] 组件之下的两层（docs/Animated-Item-Badge.md，第 9 步）：CYLUtilsKit（主题、本地化、库资源包；唯一依赖生命周期库的 target，D8）与其上的 CYLBadge。
-        //      TODO：在 Xcode 27.2 上 SwiftPM 构建因模块循环失败（CYLAnimatedItem -> CYLTabBarControllerObjC -> CYLAnimatedItem，2026-11-29）。
+        //      每一层的 Objective-C 声明是各自独立的 C target（CYLUtilsObjC、CYLBadgeObjC），都不依赖 TabBar。
         .library(name: "CYLUtilsKit", targets: ["CYLUtilsKit"]),
         .library(name: "CYLBadge", targets: ["CYLBadge"]),
     ],
@@ -50,9 +50,12 @@ let package = Package(
         //      `CYLAnimatedItem/Core` and `CYLAnimatedItem/Engine` subspecs). It never depends on the tab bar.
         // [CN] CYLAnimatedItem 的 Objective-C 部分：CYLAnimatedItemView、动画 key 与引擎（CocoaPods 的 `CYLAnimatedItem/Core` 与
         //      `CYLAnimatedItem/Engine` 子库）。它从不依赖 TabBar。
+        // [EN] The Objective-C declarations of the two lower layers (headers only). [CN] 下面两层的 Objective-C 声明（只有头文件）。
+        .target(name: "CYLUtilsObjC", path: "CYLTabBarController/Package/Utils", publicHeadersPath: "include"),
+        .target(name: "CYLBadgeObjC", dependencies: ["CYLUtilsObjC"], path: "CYLTabBarController/Package/Badge", publicHeadersPath: "include"),
         .target(
             name: "CYLAnimatedItem",
-            dependencies: ["CYLAnimatedItemSwift"],
+            dependencies: ["CYLAnimatedItemSwift", "CYLUtilsObjC"],
             path: "CYLTabBarController",
             // [EN] The module map is read from `publicHeadersPath`; as a source file it only warns "no rule to process file". [CN] module map 从 `publicHeadersPath` 读取；作为源文件只会产生 "no rule to process file" 警告。
             exclude: ["CYLAnimatedItem/Resources", "CYLAnimatedItem/Swift", "CYLAnimatedItem/include/module.modulemap"],
@@ -79,14 +82,14 @@ let package = Package(
         // [CN] CYLAnimatedItem 的 Swift 视图：CYLAnimatedItemView 与 CYLAnimatedItemStackView（自第 60 步起为 Swift），位于 Objective-C 部分（引擎）
         //      之上并重新导出它；SwiftPM 用户需 `import CYLAnimatedItemViews`（CocoaPods 与 Xcode framework 把它们编进 `CYLAnimatedItem`）。
         // [EN] CYLUtilsKit, Swift half of the bottom layer: its Objective-C declarations (the theme typedefs, `CYLLocalizedString`) come through the
-        //      C target `CYLTabBarControllerObjC`. It owns the library's resource bundle, so `Bundle.module` in its localization code is that bundle,
+        //      C target `CYLUtilsObjC`. It owns the library's resource bundle, so `Bundle.module` in its localization code is that bundle,
         //      and the lifecycle library (re-exported).
-        // [CN] CYLUtilsKit，最底层的 Swift 部分：其 Objective-C 声明（主题 typedef、`CYLLocalizedString`）来自 C 目标 `CYLTabBarControllerObjC`。它拥有库的资源包，
+        // [CN] CYLUtilsKit，最底层的 Swift 部分：其 Objective-C 声明（主题 typedef、`CYLLocalizedString`）来自 C 目标 `CYLUtilsObjC`。它拥有库的资源包，
         //      因此其本地化代码中的 `Bundle.module` 就是该资源包，并重新导出生命周期库。
         .target(
             name: "CYLUtilsKit",
             dependencies: [
-                "CYLTabBarControllerObjC",
+                "CYLUtilsObjC",
                 .product(name: "CYLDeallocBlockExecutor", package: "CYLDeallocBlockExecutor"),
             ],
             path: "CYLTabBarController",
@@ -98,7 +101,7 @@ let package = Package(
         // [CN] CYLBadge：位于 CYLUtilsKit 之上的角标；看不到 TabBar，也看不到动效 item。
         .target(
             name: "CYLBadge",
-            dependencies: ["CYLUtilsKit", "CYLTabBarControllerObjC"],
+            dependencies: ["CYLUtilsKit", "CYLBadgeObjC"],
             path: "CYLTabBarController",
             sources: ["CYLBadgeView/Swift"],
             resources: [.copy("CYLBadgeView/Resources/CYLBadge.bundle")]
@@ -120,6 +123,8 @@ let package = Package(
             name: "CYLTabBarControllerLottieSwift",
             dependencies: [
                 "CYLAnimatedItem",
+                "CYLBadge",
+                "CYLUtilsKit",
                 .product(name: "Lottie", package: "lottie-spm"),
             ],
             path: "CYLTabBarController/LottieSwift"
@@ -135,7 +140,7 @@ let package = Package(
         //      目标（提供 Swift 导入的 Objective-C 声明：typedef、选项集、常量、C 全局变量），其上是动画引擎的 C 目标（它调用 Swift 的 `@_cdecl` 函数）。
         .target(
             name: "CYLTabBarControllerObjC",
-            dependencies: ["CYLAnimatedItem", "CYLAnimatedItemSwift"],
+            dependencies: ["CYLAnimatedItem", "CYLAnimatedItemSwift", "CYLUtilsObjC", "CYLBadgeObjC"],
             path: "CYLTabBarController",
             sources: ["CYLTabBarControllerGlobals.m", "NSObject+CYLTabBarControllerExtention.m"],
             publicHeadersPath: "Package/ObjC/include",

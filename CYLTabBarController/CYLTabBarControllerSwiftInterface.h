@@ -19,7 +19,7 @@
 #if defined(CYL_OBJC_BASE_TARGET)
 #define CYL_SKIP_SWIFT_INTERFACE 1
 #elif defined(__building_module)
-#if __building_module(CYLTabBarControllerObjC)
+#if __building_module(CYLTabBarControllerObjC) || __building_module(CYLUtilsObjC) || __building_module(CYLBadgeObjC)
 #define CYL_SKIP_SWIFT_INTERFACE 1
 #endif
 #endif
