@@ -20,7 +20,7 @@ target 'CYLTabBarController-Swift' do
   # [EN] The Badge page is a ClassifyMenu tag list (docs/instructions/examples.md, "Demo lists that need sections use a ClassifyMenu tag list"). Pinned by commit,
   #      the same pin as the root Podfile (Example/); no copy of its sources.
   # [CN] Badge 页面使用 ClassifyMenu 的 TagList（docs/instructions/examples.md）。按 commit 固定，与根目录 Podfile（Example/）的 pin 相同；不复制其源码。
-  pod 'CollectionViewClassifyMenu', :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :commit => '44f226c42441d22c74c6d9e37be5b899bf45f91f'
+  pod 'CollectionViewClassifyMenu', :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :commit => 'ae087167c9d109c96df12751f2d5607c5c7eba74'
 
   # Pods for CYLTabBarController-Swift
 

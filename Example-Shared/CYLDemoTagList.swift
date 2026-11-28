@@ -152,28 +152,20 @@ final class CYLDemoTagList: NSObject, CYLMenuDelegate {
     }
 
     /**
-     [EN] A badge sample's tag: the old row's icon with the library's own badge on it (`cylShowBadge(forRow:)`: the sample's text, colors, border,
-          font and offset), drawn into one image in the table's appearance; the icon alone, same size, once `cleared`. A badge animation shows its resting frame.
-     [CN] 角标样例的 Tag：旧行的图标，以及库自己的角标（`cylShowBadge(forRow:)`：样例的文字、颜色、描边、字体与偏移），按表格的外观绘制为一张图片；
-          `cleared` 后只有图标（尺寸不变）。角标动画显示其静止帧。
+     [EN] A badge sample's tag: the old row's title and subtitle, the plain icon, and the badge as values (`badgeValue`, `badgeAttributes`): the tag draws the
+          badge itself, so the icon is centred, keeps its size and stays the same once the badge is `cleared`. No image is rendered here.
+     [CN] 角标样例的 Tag：旧行的标题与副标题、原图标，以及作为值的角标（`badgeValue`、`badgeAttributes`）：角标由 Tag 自己绘制，因此图标居中、尺寸不变，
+          `cleared` 后也一样。这里不渲染任何图片。
      */
     private static func badgeItem(from cell: UITableViewCell, row: Int, cleared: Bool, traits: UITraitCollection) -> [String: Any] {
-        cell.overrideUserInterfaceStyle = traits.userInterfaceStyle
-        cell.cylShowBadge(forRow: row)
         var result = item(from: cell, identifier: "badge-\(row)")
-        guard let iconView = cell.imageView, let image = iconWithBadge(iconView, traits: traits, hidingBadge: cleared) else { return result }
-        result[CYLTagItemKey.image] = image
-        // [EN] At its own size, as on the old row: the default tag icon size would shrink the badge until it cannot be read. [CN] 按自身尺寸显示，与旧行相同：默认的 Tag 图标尺寸会把角标缩小到无法辨认。
-        result[CYLTagItemKey.style] = [CYLMenuStyleKey.imageSize: NSValue(cgSize: image.size)]
+        let sample = UITableViewCell.cylBadgeSampleItem(forRow: row)
+        result[CYLTagItemKey.image] = sample.icon
+        if !cleared {
+            result[CYLTagItemKey.badgeValue] = sample.value
+            result[CYLTagItemKey.badgeAttributes] = sample.attributes
+        }
         return result
-    }
-
-    /// [EN] `iconView` and its badge as one image, by the badge component (`cylBadgeSnapshotImage`): the image marks the icon with its
-    ///      `alignmentRectInsets`, so the tag aligns by the icon on its own; `hidingBadge`: the icon alone at the same size.
-    ///      [CN] 由角标组件（`cylBadgeSnapshotImage`）将 `iconView` 及其角标合成一张图片：图片用 `alignmentRectInsets` 标出图标，Tag 自动按图标对齐；
-    ///      `hidingBadge`：同尺寸下只画图标。
-    private static func iconWithBadge(_ iconView: UIImageView, traits: UITraitCollection, hidingBadge: Bool) -> UIImage? {
-        iconView.cylBadgeSnapshotImage(hidingBadge: hidingBadge, traitCollection: traits)
     }
 
     private static let styleConfiguration: [String: Any] = [
