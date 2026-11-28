@@ -51,3 +51,19 @@ public class CYLUtils: NSObject {
         return false
     }()
 }
+
+extension CYLUtils {
+
+    /**
+     * [EN] Posts a lifecycle event on `view` through CYLDeallocBlockExecutor. CYLUtils is the only layer that links the lifecycle
+     *      library (D8); CYLBadge calls this instead of importing the library, which its Xcode framework target could not resolve.
+     * [CN] 通过 CYLDeallocBlockExecutor 在 `view` 上发出生命周期事件。CYLUtils 是唯一链接生命周期库的层（D8）；CYLBadge 调用本方法，
+     *      而不再自己导入该库（其 Xcode framework target 无法解析它）。
+     */
+    @nonobjc
+    public class func postLifecycleEvent(_ name: String, userInfo: [String: Any]?, on view: UIView) {
+        #if canImport(CYLDeallocBlockExecutor)
+        view.cylPostLifecycleEvent(name, userInfo: userInfo)
+        #endif
+    }
+}

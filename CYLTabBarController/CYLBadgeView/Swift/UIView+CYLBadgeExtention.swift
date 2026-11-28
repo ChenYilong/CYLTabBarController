@@ -10,15 +10,8 @@ import UIKit
 #if canImport(CYLUtilsKit)
 import CYLUtilsKit
 #endif
-// [EN] CYLDeallocBlockExecutor comes through CYLUtilsKit (`@_exported import`) in the pod build. The Xcode framework target links the
-//      package product itself, and there the re-export alone left `cylPostLifecycleEvent` unresolved (Unit tests, Carthage and Framework
-//      build of run 46105314830), so it is imported directly, guarded: the pod build, which cannot see the module, skips it.
-// [CN] 在 pod 构建中 CYLDeallocBlockExecutor 经由 CYLUtilsKit（`@_exported import`）得到。Xcode framework target 自己链接该 package
-//      product，仅靠重新导出时 `cylPostLifecycleEvent` 无法解析（运行 46105314830 的 Unit tests、Carthage 与 Framework build），
-//      因此在此直接导入并加条件保护：看不到该模块的 pod 构建会跳过它。
-#if canImport(CYLDeallocBlockExecutor)
-import CYLDeallocBlockExecutor
-#endif
+// [EN] The lifecycle library is linked by CYLUtils only (D8): events are posted through `CYLUtils.postLifecycleEvent`.
+// [CN] 生命周期库只由 CYLUtils 链接（D8）：事件通过 `CYLUtils.postLifecycleEvent` 发出。
 
 /**
  * [EN] Badges on any view (`UIView (CYLBadgeExtention)`, `CYLBadgeProtocol`), the default badge view, the overlay used when
@@ -412,7 +405,7 @@ extension UIView {
      *      `CYLLifecycleCenter.addCallback(forCustomEvent:)` 监听所有角标）。
      */
     func cylPostBadgeEvent(_ name: String, _ userInfo: [String: Any]? = nil) {
-        cylPostLifecycleEvent(name, userInfo: userInfo)
+        CYLUtils.postLifecycleEvent(name, userInfo: userInfo, on: self)
     }
 
     private func cylPendingBadgeGeneration() -> UInt {
