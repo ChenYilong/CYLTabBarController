@@ -408,6 +408,9 @@
 		FD9F87B7AF2EF1118AEDFC0B /* CYLSettingsDemoRows.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8EC53F13DFB7439CFABA029 /* CYLSettingsDemoRows.swift */; };
 		FEC20E6965F91FAAF716B9C8 /* CYLTabBarController+CYLFlatDesignKeyValueObserving.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3946DA87998D8A7FD73ED60C /* CYLTabBarController+CYLFlatDesignKeyValueObserving.swift */; };
 		FEC9F8C46A3B167916110B50 /* CYLTabBarItemAnimationEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 5423B525B553B0DAE94BC048 /* CYLTabBarItemAnimationEngine.h */; };
+		B586E95663ABF7C17503FE97 /* CYLDeallocBlockExecutor in Frameworks */ = {isa = PBXBuildFile; productRef = 1ED5FD978C5501BB6EDA4C55 /* CYLDeallocBlockExecutor */; };
+		0E1AC5F295CCA45F26BFEC6A /* CYLDeallocBlockExecutor in Frameworks */ = {isa = PBXBuildFile; productRef = 2525B8E54AB6581AA09D2DFA /* CYLDeallocBlockExecutor */; };
+		83F86AA3252A71248D7ED210 /* CYLDeallocBlockExecutor in Frameworks */ = {isa = PBXBuildFile; productRef = B9C2B9E2D34CAD1165DD38DF /* CYLDeallocBlockExecutor */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -965,6 +968,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B586E95663ABF7C17503FE97 /* CYLDeallocBlockExecutor in Frameworks */,
 				ED0875579128CA38F0D72872 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -981,6 +985,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0E1AC5F295CCA45F26BFEC6A /* CYLDeallocBlockExecutor in Frameworks */,
 				B968EAAB1C70A49D7100F584 /* Foundation.framework in Frameworks */,
 				0F05B1E808A97ABB527C0DAF /* CYLUtilsKit.framework in Frameworks */,
 			);
@@ -990,6 +995,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				83F86AA3252A71248D7ED210 /* CYLDeallocBlockExecutor in Frameworks */,
 				1F5D1B2391F75B187117CF9E /* Foundation.framework in Frameworks */,
 				8E1A03BEA597FB2305A095A2 /* CYLBadge.framework in Frameworks */,
 			);
@@ -1914,6 +1920,9 @@
 			dependencies = (
 			);
 			name = CYLUtilsKit;
+			packageProductDependencies = (
+				1ED5FD978C5501BB6EDA4C55 /* CYLDeallocBlockExecutor */,
+			);
 			productName = CYLUtilsKit;
 			productReference = EE5645238D49F58F2C891809 /* CYLUtilsKit.framework */;
 			productType = "com.apple.product-type.framework";
@@ -1933,6 +1942,9 @@
 				1FB99E795F830222ABAF5D88 /* PBXTargetDependency */,
 			);
 			name = CYLBadge;
+			packageProductDependencies = (
+				2525B8E54AB6581AA09D2DFA /* CYLDeallocBlockExecutor */,
+			);
 			productName = CYLBadge;
 			productReference = 231955A2AA432D16AD7F77F6 /* CYLBadge.framework */;
 			productType = "com.apple.product-type.framework";
@@ -1997,6 +2009,9 @@
 				ABB79A8EF954CE7C32CFFDCC /* PBXTargetDependency */,
 			);
 			name = CYLAnimatedItem;
+			packageProductDependencies = (
+				B9C2B9E2D34CAD1165DD38DF /* CYLDeallocBlockExecutor */,
+			);
 			productName = CYLAnimatedItem;
 			productReference = B8E729FE6A6EC5674DC48A41 /* CYLAnimatedItem.framework */;
 			productType = "com.apple.product-type.framework";
@@ -3264,6 +3279,21 @@
 
 /* Begin XCSwiftPackageProductDependency section */
 		6C706BAB9FD9DEE0EBE1B730 /* CYLDeallocBlockExecutor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F7607EE5FE824189A50113F0 /* XCRemoteSwiftPackageReference "CYLDeallocBlockExecutor" */;
+			productName = CYLDeallocBlockExecutor;
+		};
+		1ED5FD978C5501BB6EDA4C55 /* CYLDeallocBlockExecutor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F7607EE5FE824189A50113F0 /* XCRemoteSwiftPackageReference "CYLDeallocBlockExecutor" */;
+			productName = CYLDeallocBlockExecutor;
+		};
+		2525B8E54AB6581AA09D2DFA /* CYLDeallocBlockExecutor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F7607EE5FE824189A50113F0 /* XCRemoteSwiftPackageReference "CYLDeallocBlockExecutor" */;
+			productName = CYLDeallocBlockExecutor;
+		};
+		B9C2B9E2D34CAD1165DD38DF /* CYLDeallocBlockExecutor */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F7607EE5FE824189A50113F0 /* XCRemoteSwiftPackageReference "CYLDeallocBlockExecutor" */;
 			productName = CYLDeallocBlockExecutor;
