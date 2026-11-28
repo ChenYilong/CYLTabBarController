@@ -186,7 +186,7 @@ static CYLTabBarItemAnimationColorKind CYLColorCountKindOfGIF(NSData *data) {
     NSMutableData *pixels = [NSMutableData dataWithLength:width * height * 4];
     CGColorSpaceRef space = CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
     CGContextRef context = CGBitmapContextCreate(pixels.mutableBytes, width, height, 8, width * 4, space,
-                                                 kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+                                                 (CGBitmapInfo)kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
     CGColorSpaceRelease(space);
     if (!context) {
         CGImageRelease(image);

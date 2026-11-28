@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 // FIX: issue #535 — shared with Core through CYLUtils. 通过 CYLUtils 与 Core 共用。
-#if __has_include("../CYLUtils/UIView+CYLUtils.h")
+#if __has_include(<CYLUtilsKit/UIView+CYLUtils.h>)
+#import <CYLUtilsKit/UIView+CYLUtils.h>
+#elif __has_include("../CYLUtils/UIView+CYLUtils.h")
 #import "../CYLUtils/UIView+CYLUtils.h"
 #else
 #import "UIView+CYLUtils.h"

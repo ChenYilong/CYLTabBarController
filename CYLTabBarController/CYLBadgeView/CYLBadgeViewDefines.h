@@ -23,7 +23,11 @@
 #define CYLBadgeViewDefines_h
 
 #import <UIKit/UIKit.h>
+#if __has_include(<CYLUtilsKit/CYLUtils.h>)
+#import <CYLUtilsKit/CYLUtils.h>
+#else
 #import "CYLUtils.h"
+#endif
 
 // [EN] D7 (docs/Animated-Item-Badge.md, step 4): CYLBadge sees only CYLUtils below it, so there is no `CYL_BADGE_CORE_AVAILABLE` and no import of
 //      CYLTabBarController.h (that would be a module cycle). What needs the tab bar is decided at run time by class name
