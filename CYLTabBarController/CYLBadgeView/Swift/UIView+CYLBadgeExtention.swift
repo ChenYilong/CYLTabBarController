@@ -10,7 +10,8 @@ import UIKit
 #if canImport(CYLUtilsKit)
 import CYLUtilsKit
 #endif
-internal import CYLDeallocBlockExecutor
+// [EN] CYLDeallocBlockExecutor comes through CYLUtilsKit (`@_exported import`); a direct import fails to resolve in framework builds.
+// [CN] CYLDeallocBlockExecutor 经由 CYLUtilsKit（`@_exported import`）得到；直接导入在 framework 编译中无法解析。
 
 /**
  * [EN] Badges on any view (`UIView (CYLBadgeExtention)`, `CYLBadgeProtocol`), the default badge view, the overlay used when

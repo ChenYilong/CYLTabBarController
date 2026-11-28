@@ -10,6 +10,7 @@
 
 package com.cyl.tabbar
 
+import com.cyl.animateditem.CYLOffset
 import android.graphics.Color
 import android.view.View
 

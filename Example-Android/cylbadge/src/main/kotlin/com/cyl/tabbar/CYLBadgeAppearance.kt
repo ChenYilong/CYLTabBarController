@@ -8,6 +8,7 @@ package com.cyl.tabbar
 // [CN] 从 CYLBadgeExtensions.kt 原样移入 `:cylbadge`（docs/Animated-Item-Badge-CrossPlatform.md，步骤 A3）：App 级外观、文字显示协议与
 //      `CYLTabBarBadgeView`，角标自身需要它们。尚未编译。
 
+import com.cyl.animateditem.CYLOffset
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface

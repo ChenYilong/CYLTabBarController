@@ -151,6 +151,12 @@ static CYLTestRiveView *CYLLastRiveView;
 
 #pragma mark - What Core provides (fakes)
 
+// [EN] `CYLLocalizedString` is Swift (`@_cdecl`, CYLUtils) and not linked here: the stand-in returns the key itself.
+// [CN] `CYLLocalizedString` 是 Swift（`@_cdecl`，CYLUtils），这里不链接：替身直接返回 key。
+NSString *CYLLocalizedString(NSString *key) {
+    return key ?: @"";
+}
+
 /// [EN] Core's service slot, as in Swift/UIControl+CYLTabBarItemAnimation.swift; the real engine fills it in +load.
 /// [CN] Core 的服务槽位，与 Swift/UIControl+CYLTabBarItemAnimation.swift 相同；真正的引擎在 +load 中填入。
 static id<CYLTabBarItemAnimationService> CYLTestCurrentService;
