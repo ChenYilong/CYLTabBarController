@@ -218,6 +218,7 @@ docs/
 ├── assets/
 │   ├── android-animated-item-badge-rtl-before-after.png
 │   ├── android-animated-item-badge-tags-ac13.png
+│   ├── android-animated-item-badge-tags-taglist-look.png
 │   ├── android-animated-item-stack-axis-tint.png
 │   ├── android-animated-item-stack-view.png
 │   ├── android-api37-20261118-rive-dark-mode-options.png

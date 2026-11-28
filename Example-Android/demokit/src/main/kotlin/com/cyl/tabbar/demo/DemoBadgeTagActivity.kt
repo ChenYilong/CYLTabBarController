@@ -1,15 +1,23 @@
 package com.cyl.tabbar.demo
 
+import android.content.Context
+import android.content.res.Configuration
+import android.graphics.Color
 import android.graphics.Rect
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ScrollView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.cyl.animateditem.CYLAnimatedItemBackgroundStyle
+import com.cyl.animateditem.CYLAnimatedItemCornerRadiusCapsule
 import com.cyl.animateditem.CYLAnimatedItemView
 import com.cyl.animateditem.CYLSize
 import com.cyl.tabbar.CYLBadgeAttributeKey
@@ -27,6 +35,42 @@ import com.cyl.tabbar.cylBadgeTitleForRow
  *      （"CYLBadgeTag"），用于验收测量（AC1-AC3、AC7）。
  */
 class DemoBadgeTagActivity : AppCompatActivity() {
+
+    /** [EN] Children at their own size, in rows from the start edge, `spacing` px apart. [CN] 子视图按自身尺寸从起始边逐行排列，间距为 `spacing` 像素。 */
+    private class FlowLayout(context: Context, private val spacing: Int) : ViewGroup(context) {
+        private val frames = mutableListOf<Rect>()
+
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+            val width = MeasureSpec.getSize(widthMeasureSpec)
+            val room = width - paddingLeft - paddingRight
+            var x = 0
+            var y = paddingTop
+            var row = 0
+            frames.clear()
+            for (index in 0 until childCount) {
+                val child = getChildAt(index)
+                measureChild(child, MeasureSpec.makeMeasureSpec(room, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+                if (x > 0 && x + child.measuredWidth > room) {
+                    y += row + spacing
+                    x = 0
+                    row = 0
+                }
+                frames += Rect(paddingLeft + x, y, paddingLeft + x + child.measuredWidth, y + child.measuredHeight)
+                x += child.measuredWidth + spacing
+                row = maxOf(row, child.measuredHeight)
+            }
+            setMeasuredDimension(width, y + row + paddingBottom)
+        }
+
+        override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+            val width = right - left
+            frames.forEachIndexed { index, frame ->
+                val child = getChildAt(index)
+                if (layoutDirection == View.LAYOUT_DIRECTION_RTL) child.layout(width - frame.right, frame.top, width - frame.left, frame.bottom)
+                else child.layout(frame.left, frame.top, frame.right, frame.bottom)
+            }
+        }
+    }
 
     private class Sample(
         val value: String?,
@@ -60,9 +104,9 @@ class DemoBadgeTagActivity : AppCompatActivity() {
         iconSizeDp = CYLSize(30f, 30f)
         image = cylBadgeIcon(this)
         spacingDp = 8f
-        itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.Flat
-        itemBackgroundColor = 0x33888888
-        itemCornerRadius = 14f
+        // [EN] The look of the example's tag lists: Liquid Glass capsules. [CN] 示例 TagList 的外观：液态玻璃胶囊。
+        itemBackgroundStyle = CYLAnimatedItemBackgroundStyle.LiquidGlass
+        itemCornerRadius = CYLAnimatedItemCornerRadiusCapsule
         itemContentHorizontalInset = 14f
         minimumHeight = dp(52f)
     }
@@ -121,12 +165,27 @@ class DemoBadgeTagActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         DemoText.attach(this)
         title = "CYLAnimatedItemView badges"
+        val dark = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
         val column = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             clipChildren = false
             setPadding(dp(16f), dp(12f), dp(16f), dp(24f))
         }
         fun add(view: View) = column.addView(view, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(8f) })
+        // [EN] The tags flow and wrap in a section card, as in a tag list. Nothing clips them, so a badge animation may leave its tag.
+        //      The pinned CYLTagButton draws its own badge (no `badgeAttributes`), so this page imitates the tag list's default look.
+        // [CN] 标签像 TagList 一样在分组卡片中流式换行。不做任何裁剪，角标动画可以超出标签。固定版本的 CYLTagButton 自行绘制角标
+        //      （没有 `badgeAttributes`），所以本页按 TagList 的默认外观排版。
+        val flow = FlowLayout(this, dp(10f)).apply {
+            setPadding(dp(14f), dp(18f), dp(14f), dp(14f))
+            clipChildren = false
+            clipToPadding = false
+            background = GradientDrawable().apply {
+                cornerRadius = dp(20f).toFloat()
+                setColor(if (dark) 0x1FFFFFFF else 0x99FFFFFF.toInt())
+                setStroke(dp(0.5f).coerceAtLeast(1), 0x40FFFFFF)
+            }
+        }
         add(Button(this).apply {
             isAllCaps = false
             text = "badgeValue = nil"
@@ -137,14 +196,21 @@ class DemoBadgeTagActivity : AppCompatActivity() {
                 column.postDelayed(::logFrames, 500)
             }
         })
+        add(TextView(this).apply {
+            text = "Badges"
+            textSize = 17f
+            typeface = Typeface.DEFAULT_BOLD
+            setPadding(dp(16f), dp(6f), 0, 0)
+        })
+        column.addView(flow, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { topMargin = dp(8f) })
         samples.forEachIndexed { index, sample ->
             val item = tag(DemoTagList.tagText(cylBadgeTitleForRow(index), null).first)
             tags += item
-            add(item)
+            flow.addView(item)
             apply(item, sample)
         }
         // [EN] The reference without a badge (AC1). [CN] 没有角标的对照（AC1）。
-        tag("badgeValue = nil").also { tags += it; add(it) }
+        tag("badgeValue = nil").also { tags += it; flow.addView(it) }
         // [EN] A badge on an animated icon (AC6): a tap plays it. [CN] 动画图标上的角标（AC6）：点按播放。
         tag("GIF · badgeValue = \"8\"").also { item ->
             item.animationURL = "file:///android_asset/cyl_tab_sample_animated.gif"
@@ -154,11 +220,15 @@ class DemoBadgeTagActivity : AppCompatActivity() {
             item.badgeValue = "8"
             item.post { item.restartAnimation() }
             tags += item
-            add(item)
+            flow.addView(item)
         }
         setContentView(ScrollView(this).apply {
             clipChildren = false
             fitsSystemWindows = true
+            // [EN] The gradient plate of the example's tag lists: the glass tags need colors behind them to show.
+            // [CN] 示例 TagList 的渐变背景板：玻璃标签需要背后有颜色才能看出来。
+            background = GradientDrawable(GradientDrawable.Orientation.TL_BR, (if (dark) listOf("#5B2A3C", "#1F4A63", "#3B2D5C")
+                else listOf("#FFB199", "#7EC8E3", "#C3AED6")).map(Color::parseColor).toIntArray())
             addView(column)
         })
         column.postDelayed(::logFrames, 1500)
