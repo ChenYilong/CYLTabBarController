@@ -16,6 +16,7 @@
     "pages/ContentInset",
     "pages/RiveColors",
     "pages/Released",
-    "pages/ResourceMissing"
+    "pages/ResourceMissing",
+    "pages/BadgeTags"
   ]
 }

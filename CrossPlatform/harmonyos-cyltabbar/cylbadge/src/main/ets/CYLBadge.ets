@@ -1,5 +1,6 @@
 import BuildProfile from '../../../BuildProfile';
 import { curves } from '@kit.ArkUI';
+import { i18n } from '@kit.LocalizationKit';
 import { BadgeEvents } from './CYLBadgeEvents';
 
 /**
@@ -268,6 +269,13 @@ export struct CYLBadgeView {
   @ObjectLink @Watch('cylPlay') badge: CYLBadge;
   /** [EN] The anchor's width (the icon), to find its right edge. [CN] 锚点（图标）宽度，用于定位其右边缘。 */
   anchorWidth: number = 26;
+  /**
+   * [EN] true: in a right-to-left language the badge is centred on the anchor's top LEFT corner, mirroring `centerOffset.horizontal` too
+   *      (AC8). `position` does not mirror on its own. false (default): always the top right corner, as before (tab bar badges).
+   * [CN] true：从右到左的语言中角标中心位于锚点的左上角，`centerOffset.horizontal` 一并镜像（AC8）。`position` 不会自行镜像。
+   *      false（默认）：始终位于右上角，与以往相同（TabBar 角标）。
+   */
+  mirrorsInRightToLeft: boolean = false;
   @State private scaleValue: number = 1;
   @State private translateX: number = 0;
   @State private translateY: number = 0;
@@ -438,6 +446,19 @@ export struct CYLBadgeView {
     return Math.max(height, Math.ceil(textWidth) + margin + border * 2);
   }
 
+  /** [EN] The badge centre's x in the anchor. [CN] 角标中心在锚点中的 x。 */
+  private cylCenterX(): number {
+    const x = this.anchorWidth + 2 + (this.badge.centerOffset ?? this.appearance().centerOffset).horizontal;
+    if (!this.mirrorsInRightToLeft) {
+      return x;
+    }
+    try {
+      return i18n.isRTL(i18n.System.getAppPreferredLanguage()) ? this.anchorWidth - x : x;
+    } catch (e) {
+      return x;
+    }
+  }
+
   build() {
     if (this.badge.value !== null) {
       Stack() {
@@ -471,7 +492,7 @@ export struct CYLBadgeView {
       // [CN] 所有角标（红点、数字、文字）的中心都在图标右上角右侧 2 vp 处，再加 centerOffset，与 iOS（宿主右边缘右侧 2 pt）和
       //      Android（badgeOrigin：anchorRight + 2 dp - 宽度 / 2）相同：宽角标向两侧延伸（问题 #25）。
       .markAnchor({ x: '50%', y: '50%' })
-      .position({ x: this.anchorWidth + 2 + (this.badge.centerOffset ?? this.appearance().centerOffset).horizontal,
+      .position({ x: this.cylCenterX(),
         y: (this.badge.centerOffset ?? this.appearance().centerOffset).vertical })
       .visibility(this.badge.paused ? Visibility.Hidden : Visibility.Visible)
       .scale({ x: this.scaleValue, y: this.scaleValue })
@@ -481,7 +502,15 @@ export struct CYLBadgeView {
       .rotate({ x: 0, y: this.rotateY !== 0 ? 1 : 0, z: this.rotateZ !== 0 ? 1 : 0,
         angle: this.rotateY !== 0 ? this.rotateY : this.rotateZ })
       // [EN] Read as part of its host (badgeAccessibilityText), not on its own. [CN] 作为宿主的一部分读出，不单独读出。
-      .accessibilityLevel('no')
+      .accessibilityLevel('no-hide-descendants')
+      // [EN] An overlay: never takes a touch, and is drawn above its siblings, also while an animation takes it past the host's
+      //      bounds. Set here so that a host places CYLBadgeView directly: a modifier chained on CYLBadgeView adds a layout
+      //      node as large as the badge, which the host's alignment moves, and the badge then lands off its corner by an
+      //      amount that depends on its width (a red dot the most).
+      // [CN] 浮层：不接收触摸，绘制在同级视图之上，动画超出宿主边界时也一样。在此设置，使宿主直接放置 CYLBadgeView：在 CYLBadgeView 上链式
+      //      添加修饰符会多出一个与角标等大的布局节点，它会随宿主的对齐方式移动，角标因此偏离角点，偏移量取决于角标宽度（红点偏得最多）。
+      .hitTestBehavior(HitTestMode.None)
+      .zIndex(1)
       .onAppear(() => this.cylPlay())
       .onAttach(() => this.cylPlay())
       .id('cyl-badge')

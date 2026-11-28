@@ -989,7 +989,11 @@ struct Index {
 
   private sections(page: string): DemoSection[] {
     return [
-      { title: CYLLocalizedString('通用'), rows: this.generalRows() },
+      { title: CYLLocalizedString('通用'), rows: page === DEMO_HOME ? [{
+        // [EN] docs/Animated-Item-Badge-CrossPlatform.md, step H10. [CN] 步骤 H10。
+        id: 'badge-tags', title: 'CYLAnimatedItemView badges', subtitle: 'badgeValue · badgeAttributes',
+        action: () => this.push('pages/BadgeTags', {} as DemoPushParams),
+      } as DemoRow, ...this.generalRows()] : this.generalRows() },
       { title: CYLLocalizedString('TabBar 外观'), rows: this.appearanceRows() },
       { title: CYLLocalizedString('滚动隐藏：模拟意外情况（issue #13）'), rows: this.scrollSimulationRows() },
       { title: CYLLocalizedString('原地更新 Tab'), rows: this.tabItemUpdateRows(page) },

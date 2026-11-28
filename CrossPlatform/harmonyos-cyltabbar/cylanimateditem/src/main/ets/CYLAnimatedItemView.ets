@@ -4,6 +4,7 @@ import { CYLAnimatedItemBackgroundStyle, CYLAnimatedItemBackgroundModifier } fro
 import { CYLAnimatedItemContrast, CYLAnimatedItemContrastKindIcon } from './CYLAnimatedItemContrast';
 import { CYLAnimatedItemColorInput, CYLAnimatedItemColorResolver } from './CYLAnimatedItemColorResolver';
 import { LifecycleCenter, LifecycleController } from 'cylutils';
+import { LengthMetrics } from '@kit.ArkUI';
 import { cylIsSymbolResource } from './CYLAnimatedItemResources';
 import { CYLBadge, CYLBadgeView, cylApplyBadgeAttributes, cylBadgeAnimationType, cylBadgeAccessibilityText } from 'cylbadge';
 import {
@@ -1571,6 +1572,28 @@ export struct CYLAnimatedItemView {
           .height(this.iconSize)
           .opacity(this.cylAnimationShows() ? 0 : 1)
           .accessibilityLevel('no')
+      } else if (!this.cylIsEmpty(this.cylFallbackImage()) && typeof this.cylExplicitIconColor() === 'object') {
+        // [EN] A resource color (`$r(...)`): `cylIconColorFilter` reads only hex strings, which left a bitmap icon untinted (a black
+        //      icon on a dark background). The color is painted over the icon's alpha (source in), so ArkUI resolves it for the
+        //      current light / dark mode, as for the animation tint below.
+        // [CN] 资源颜色（`$r(...)`）：`cylIconColorFilter` 只读取十六进制字符串，位图图标因此没有着色（深色背景上出现黑色图标）。这里把颜色绘制在
+        //      图标的透明度之上（source in），由 ArkUI 按当前深浅色解析，与下面的动画着色相同。
+        Stack() {
+          Image(this.cylFallbackImage())
+            .width(this.iconSize)
+            .height(this.iconSize)
+            .objectFit(ImageFit.Contain)
+          Column()
+            .width(this.iconSize)
+            .height(this.iconSize)
+            .backgroundColor(this.cylExplicitIconColor())
+            .blendMode(BlendMode.SRC_IN)
+        }
+        .width(this.iconSize)
+        .height(this.iconSize)
+        .blendMode(BlendMode.SRC_OVER, BlendApplyType.OFFSCREEN)
+        .opacity(this.cylAnimationShows() ? 0 : 1)
+        .accessibilityLevel('no')
       } else if (!this.cylIsEmpty(this.cylFallbackImage())) {
         Image(this.cylFallbackImage())
           .width(this.iconSize)
@@ -1625,9 +1648,8 @@ export struct CYLAnimatedItemView {
       // [EN] The badge, last but one in the stack so it is above the icon and the animation: not measured (an overlay), not touchable, hidden from accessibility.
       // [CN] 角标，位于 Stack 的倒数第二层，在图标与动画之上：不参与测量（浮层）、不可点击、对无障碍隐藏。
       if (this.cylBadge.value !== null) {
-        CYLBadgeView({ badge: this.cylBadge, anchorWidth: this.iconSize })
-          .hitTestBehavior(HitTestMode.None)
-          .accessibilityLevel('no-hide-descendants')
+        // [EN] No modifiers here (see CYLBadgeView): they would move the badge off the icon's corner. [CN] 此处不加修饰符（见 CYLBadgeView）：否则角标会偏离图标角点。
+        CYLBadgeView({ badge: this.cylBadge, anchorWidth: this.iconSize, mirrorsInRightToLeft: true })
       }
       if (this.accessoryPlacement === CYLAnimatedItemAccessoryPlacement.TopTrailing) {
         this.cylAccessory()
@@ -1635,6 +1657,8 @@ export struct CYLAnimatedItemView {
     }
     .alignContent(Alignment.TopEnd)
     .margin(this.cylBadgeReserve())
+    // [EN] The badge overlaps the title's side: the icon is drawn above it. [CN] 角标会伸到标题一侧：图标绘制在标题之上。
+    .zIndex(this.cylBadge.value !== null ? 1 : 0)
   }
 
   @Builder
@@ -1652,7 +1676,7 @@ export struct CYLAnimatedItemView {
       // [EN] An inline accessory keeps `spacing` from the icon and title, as on Android (B21). [CN] 行内附件与图标、标题保持 `spacing`，与 Android 相同（B21）。
       .margin(!this.cylShowsIconOrTitle() ? 0 :
         this.accessoryPlacement === CYLAnimatedItemAccessoryPlacement.Leading ?
-          (this.axis === CYLAnimatedItemAxis.Vertical ? { bottom: this.spacing } : { right: this.spacing }) :
+          (this.axis === CYLAnimatedItemAxis.Vertical ? { bottom: LengthMetrics.vp(this.spacing) } : { end: LengthMetrics.vp(this.spacing) }) :
           this.accessoryPlacement === CYLAnimatedItemAccessoryPlacement.Trailing ? this.cylLeadingGap(this.spacing) : 0)
       .accessibilityGroup(true)
       .accessibilityText(this.accessoryAccessibilityText.length > 0 ? this.accessoryAccessibilityText : this.accessoryText)
@@ -1680,9 +1704,12 @@ export struct CYLAnimatedItemView {
     }
   }
 
-  /** [EN] A gap before a part: above it on the vertical axis, before it on the horizontal one. [CN] 某部分之前的间距：纵向在其上方，横向在其前方。 */
-  private cylLeadingGap(gap: number): Margin {
-    return this.axis === CYLAnimatedItemAxis.Vertical ? { top: gap } : { left: gap };
+  /**
+   * [EN] A gap before a part: above it on the vertical axis, before it on the horizontal one. `start`, not `left`, so it stays between the
+   *      parts in right-to-left. [CN] 某部分之前的间距：纵向在其上方，横向在其前方。使用 `start` 而非 `left`，从右到左时间距仍在两部分之间。
+   */
+  private cylLeadingGap(gap: number): LocalizedMargin {
+    return this.axis === CYLAnimatedItemAxis.Vertical ? { top: LengthMetrics.vp(gap) } : { start: LengthMetrics.vp(gap) };
   }
 
   /** [EN] Whether the icon or the title shows (an inline accessory keeps `spacing` from them). [CN] 是否显示图标或标题（行内附件与它们保持 `spacing`）。 */
@@ -1787,7 +1814,12 @@ export struct CYLAnimatedItemView {
     .borderWidth(this.cylIsCountdown() ? 0.5 : this.itemBorderWidth)
     .borderColor(this.cylIsRunning() ? '#C7C7CC' : (this.cylUsesItemBackground() && this.itemBorderColor !== '' ?
       this.itemBorderColor : this.countdownBorderColor))
-    .clip(this.cylItemGlassDrawn())
+    // [EN] A badged item is not clipped: the badge and its animation may go past the item's bounds (iOS puts it above a host
+    //      that clips). The glass and the fill keep their round corners through `borderRadius`. It is also drawn above its siblings.
+    // [CN] 带角标的条目不裁剪：角标及其动画可以超出条目边界（iOS 把角标放在会裁剪的宿主之上）。玻璃与填充仍由 `borderRadius` 保持圆角。
+    //      它还绘制在同级视图之上。
+    .clip(this.cylItemGlassDrawn() && this.cylBadge.value === null)
+    .zIndex(this.cylBadge.value !== null ? 1 : 0)
     // [EN] A Flex without a size fills its parent. A bare icon (a host's tab icon, no title, no accessory) is exactly the
     //      icon, so a host can place things against its edges: the tab bar puts the badge at the icon's top-right, and an
     //      item as wide as the tab slot moved it to the icon's top-left (HarmonyOS issue list #51). `undefined` keeps the

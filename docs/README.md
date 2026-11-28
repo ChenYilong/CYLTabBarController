@@ -349,6 +349,9 @@ docs/
 │   ├── gif-liquid-glass.png
 │   ├── gif-tint-or-original-colors.png
 │   ├── glass-shared-edge-android-harmonyos.png
+│   ├── harmonyos-animated-item-badge-tags-before-after.png
+│   ├── harmonyos-animated-item-badge-tags-clear-reshow.png
+│   ├── harmonyos-animated-item-badge-tags-scale-overflow.png
 │   ├── harmonyos-animated-item-stack-axis-tint.png
 │   ├── harmonyos-animated-item-still-image-after-end-lottie-a7f8a3c7.png
 │   ├── harmonyos-animated-item-sys-symbol-b30.png
