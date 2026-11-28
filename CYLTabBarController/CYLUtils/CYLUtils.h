@@ -34,7 +34,14 @@
 // [EN] FIX: issue #216 — theme switching (skins), in `CYLComponents/CYLTheme/`; the frameworks built by CocoaPods and
 //      Carthage keep no folders, hence the second form.
 // [CN] FIX: issue #216 — 换肤（主题切换），位于 `CYLComponents/CYLTheme/`；CocoaPods 与 Carthage 构建的 framework 不保留文件夹，因此有第二种写法。
-#if __has_include("CYLComponents/CYLTheme/CYLTheme.h")
+// [EN] Importers such as CYLAnimatedItem put this folder on their quote-include path, so the folder form below also resolves there
+//      and is a non-modular include inside the framework module ("include of non-modular header inside framework module
+//      'CYLUtilsKit.CYLUtils'"): the framework form comes first.
+// [CN] CYLAnimatedItem 等引用方把本目录加入了引号引用路径，下面的目录写法在那里同样可解析，会成为 framework 模块内的非模块化引用
+//      （"include of non-modular header inside framework module 'CYLUtilsKit.CYLUtils'"）：因此 framework 写法优先。
+#if __has_include(<CYLUtilsKit/CYLTheme.h>)
+#import <CYLUtilsKit/CYLTheme.h>
+#elif __has_include("CYLComponents/CYLTheme/CYLTheme.h")
 #import "CYLComponents/CYLTheme/CYLTheme.h"
 #else
 #import "CYLTheme.h"
