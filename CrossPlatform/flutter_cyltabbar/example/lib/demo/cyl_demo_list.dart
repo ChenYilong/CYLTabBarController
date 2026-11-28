@@ -95,6 +95,7 @@ final Future<List<CYLDemoSection>> demoSections = rootBundle
             ),
         ]),
       );
+      sections.first.rows.insert(0, CYLDemoRow.custom(id: 'badgeTags', title: 'CYLAnimationView badges', subtitle: 'badgeValue · badgeAttributes'));
       return sections;
     });
 

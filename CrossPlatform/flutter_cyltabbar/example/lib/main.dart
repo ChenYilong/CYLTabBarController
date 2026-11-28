@@ -13,6 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cyltabbar/flutter_cyltabbar.dart';
 
+import 'demo/cyl_badge_tags_page.dart';
 import 'demo/cyl_badge_view.dart';
 import 'demo/cyl_demo_list.dart';
 import 'demo/cyl_localization.dart';
@@ -944,6 +945,10 @@ class _ExamplePageState extends State<CYLExamplePage> {
                           return widget.onChooseSkin(row.skin!.name);
                         }
                         if (row.id == 'skin') return _showSkinMenu(dark);
+                        if (row.id == 'badgeTags') {
+                          Navigator.of(context).push(MaterialPageRoute<void>(builder: (context) => const CYLBadgeTagsPage()));
+                          return;
+                        }
                         if (row.id == 'language') return _showLanguagePicker();
                         if (row.id == 'titleOffset') {
                           return setState(() => _titleOffset = _nextTitleOffset(_shownTitleOffset));
