@@ -24,8 +24,8 @@ pod 'CYLAnimatedItem', :path => './'
 #      the same pin as the HarmonyOS, Android and mini program examples (CrossPlatform/harmonyos-cyltabbar/classifymenu.pin); no copy of its sources.
 # [CN] 演示 section 使用 ClassifyMenu 的 TagList（docs/instructions/examples.md）。按 commit 固定，与 HarmonyOS、Android、小程序示例使用同一个 pin
 #      （CrossPlatform/harmonyos-cyltabbar/classifymenu.pin）；不复制其源码。
-# [EN] iOS pin 9f6f8073 (branch feat/harmony, the branch of the newest commit): callout closes on scroll, bubble below the tag, tag badges, an empty badgeText draws an 8 pt dot, a multi-character badge text grows the round badge into a capsule. [CN] iOS 的 pin 141740e8（分支 feat/tag-final-merge-plus）：滚动时关闭浮层、浮层位于 Tag 下方、Tag 角标、空 badgeText 绘制 8 pt 红点、多字符角标文字使圆形角标变为胶囊形。
-pod 'CollectionViewClassifyMenu', :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :commit => '9f6f80737a646fa3166e60ccac4c1897a3ab0950'
+# [EN] iOS pin e4d883a2 (branch feat/harmony, the branch of the newest commit): callout closes on scroll, bubble below the tag, tag badges, an empty badgeText draws an 8 pt dot, a multi-character badge text grows the round badge into a capsule. [CN] iOS 的 pin 141740e8（分支 feat/tag-final-merge-plus）：滚动时关闭浮层、浮层位于 Tag 下方、Tag 角标、空 badgeText 绘制 8 pt 红点、多字符角标文字使圆形角标变为胶囊形。
+pod 'CollectionViewClassifyMenu', :git => 'https://github.com/ChenYilong/CollectionViewClassifyMenu.git', :commit => 'e4d883a209878d4bf03b7d7db2cb9c1fa5293157'
 
 #only for test
 #pod 'CYLTabBarController/CYLFlatDesignTabBar', :git => 'https://github.com/ChenYilong/CYLTabBarController.git', :branch => 'fix/flatdesign-tabbar-position-during-transition'
