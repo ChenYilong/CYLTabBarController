@@ -107,11 +107,11 @@ build_xcframework() {
   (cd "$work" && carthage build --no-skip-current --use-xcframeworks --platform iOS)
   mkdir -p "$root/build"
   rm -f "$root/build/$CARTHAGE_ASSET"
-  # [EN] Both frameworks in one zip: CYLTabBarController links CYLAnimatedItem (docs/Animated-Item.md), and Carthage's binary
+  # [EN] All four frameworks in one zip: CYLTabBarController links CYLAnimatedItem, CYLBadge and CYLUtilsKit (docs/Animated-Item-Badge.md), and Carthage's binary
   #      spec extracts every framework of the archive.
-  # [CN] 两个 framework 放在同一个 zip 中：CYLTabBarController 链接 CYLAnimatedItem（docs/Animated-Item.md），Carthage 的二进制规格会解压
+  # [CN] 四个 framework 放在同一个 zip 中：CYLTabBarController 链接 CYLAnimatedItem、CYLBadge、CYLUtilsKit（docs/Animated-Item.md），Carthage 的二进制规格会解压
   #      压缩包中的每个 framework。
-  (cd "$work/Carthage/Build" && zip -qry "$root/build/$CARTHAGE_ASSET" CYLTabBarController.xcframework CYLAnimatedItem.xcframework)
+  (cd "$work/Carthage/Build" && zip -qry "$root/build/$CARTHAGE_ASSET" CYLTabBarController.xcframework CYLAnimatedItem.xcframework CYLBadge.xcframework CYLUtilsKit.xcframework)
   rm -rf "$work"
   echo "Carthage: build/$CARTHAGE_ASSET (upload it to the GitHub release of the tag)"
 }
