@@ -27,10 +27,7 @@
  */
 #import <objc/runtime.h>
 #if defined(SWIFT_PACKAGE)
-// [EN] TODO (docs/Animated-Item-Badge.md, step 9): SwiftPM still compiles CYLUtils' Swift into the `CYLTabBarController` module; this becomes
-//      `CYLUtilsKit` when that is a SwiftPM target of its own. [CN] TODO（docs/Animated-Item-Badge.md，第 9 步）：SwiftPM 仍把 CYLUtils 的 Swift
-//      编进 `CYLTabBarController` 模块；`CYLUtilsKit` 成为独立的 SwiftPM target 后改为它。
-#pragma clang module import CYLTabBarController
+#pragma clang module import CYLUtilsKit
 #elif __has_include(<CYLUtilsKit/CYLUtilsKit-Swift.h>)
 #import <CYLUtilsKit/CYLUtilsKit-Swift.h>
 #elif __has_include("CYLUtilsKit-Swift.h")

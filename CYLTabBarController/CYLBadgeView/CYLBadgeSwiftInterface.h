@@ -38,8 +38,7 @@
 #import "CYLBadgeProtocol.h"
 #endif
 #if defined(SWIFT_PACKAGE)
-// [EN] TODO (step 9): as in CYLUtils' interface, until `CYLBadge` is a SwiftPM target of its own. [CN] TODO（第 9 步）：与 CYLUtils 的接口相同，直到 `CYLBadge` 成为独立的 SwiftPM target。
-#pragma clang module import CYLTabBarController
+#pragma clang module import CYLBadge
 #elif __has_include(<CYLBadge/CYLBadge-Swift.h>)
 #import <CYLBadge/CYLBadge-Swift.h>
 #elif __has_include("CYLBadge-Swift.h")

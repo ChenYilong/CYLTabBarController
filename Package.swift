@@ -19,6 +19,13 @@ let package = Package(
         //      placeholder bundle and the animation engine, without the tab bar.
         // [CN] 单独的动效条目组件（CocoaPods `CYLAnimatedItem` pod，docs/Animated-Item.md）：视图、占位图资源包与动画引擎，不含 TabBar。
         .library(name: "CYLAnimatedItem", targets: ["CYLAnimatedItem", "CYLAnimatedItemViews"]),
+        // [EN] The two layers below the component (docs/Animated-Item-Badge.md, step 9): CYLUtilsKit (macros' Swift side, themes, localization, the
+        //      library bundle; the only target that depends on the lifecycle library, D8) and CYLBadge on top of it. Written statically: the manifest
+        //      could not be resolved here (no Swift toolchain).
+        // [CN] 组件之下的两层（docs/Animated-Item-Badge.md，第 9 步）：CYLUtilsKit（主题、本地化、库资源包；唯一依赖生命周期库的 target，D8）与其上的 CYLBadge。
+        //      静态编写：这里没有 Swift 工具链，无法解析 manifest。
+        .library(name: "CYLUtilsKit", targets: ["CYLUtilsKit"]),
+        .library(name: "CYLBadge", targets: ["CYLBadge"]),
     ],
     dependencies: [
         // Same requirement as the podspec's `LottieSwift` subspec: 'lottie-ios', '>= 4.5.1' (`removeValueProvider(for:)`).
@@ -71,9 +78,34 @@ let package = Package(
         //      the Xcode framework compile them into `CYLAnimatedItem`).
         // [CN] CYLAnimatedItem 的 Swift 视图：CYLAnimatedItemView 与 CYLAnimatedItemStackView（自第 60 步起为 Swift），位于 Objective-C 部分（引擎）
         //      之上并重新导出它；SwiftPM 用户需 `import CYLAnimatedItemViews`（CocoaPods 与 Xcode framework 把它们编进 `CYLAnimatedItem`）。
+        // [EN] CYLUtilsKit, Swift half of the bottom layer: its Objective-C declarations (the theme typedefs, `CYLLocalizedString`) come through the
+        //      C target `CYLTabBarControllerObjC`. It owns the library's resource bundle, so `Bundle.module` in its localization code is that bundle,
+        //      and the lifecycle library (re-exported).
+        // [CN] CYLUtilsKit，最底层的 Swift 部分：其 Objective-C 声明（主题 typedef、`CYLLocalizedString`）来自 C 目标 `CYLTabBarControllerObjC`。它拥有库的资源包，
+        //      因此其本地化代码中的 `Bundle.module` 就是该资源包，并重新导出生命周期库。
+        .target(
+            name: "CYLUtilsKit",
+            dependencies: [
+                "CYLTabBarControllerObjC",
+                .product(name: "CYLDeallocBlockExecutor", package: "CYLDeallocBlockExecutor"),
+            ],
+            path: "CYLTabBarController",
+            exclude: ["CYLUtils/Swift/CYLAnimationURLOptions.swift", "CYLUtils/Swift/CYLAnimationKeyLookup.swift"],
+            sources: ["CYLUtils/Swift"],
+            resources: [.copy("Resources/CYLTabBarController.bundle")]
+        ),
+        // [EN] CYLBadge: the badge on top of CYLUtilsKit; it sees no tab bar and no animated item.
+        // [CN] CYLBadge：位于 CYLUtilsKit 之上的角标；看不到 TabBar，也看不到动效 item。
+        .target(
+            name: "CYLBadge",
+            dependencies: ["CYLUtilsKit", "CYLTabBarControllerObjC"],
+            path: "CYLTabBarController",
+            sources: ["CYLBadgeView/Swift"],
+            resources: [.copy("CYLBadgeView/Resources/CYLBadge.bundle")]
+        ),
         .target(
             name: "CYLAnimatedItemViews",
-            dependencies: ["CYLAnimatedItem"],
+            dependencies: ["CYLAnimatedItem", "CYLBadge", "CYLUtilsKit"],
             path: "CYLTabBarController",
             // [EN] The views, plus the GIF view (the GIF animator, its Objective-C composition root, is in CYLTabBarControllerEngine).
             // [CN] 视图，以及 GIF 视图（GIF animator 这个 Objective-C 组合根位于 CYLTabBarControllerEngine）。
@@ -126,21 +158,23 @@ let package = Package(
                 "CYLAnimatedItem",
                 "CYLAnimatedItemSwift",
                 "CYLAnimatedItemViews",
+                "CYLBadge",
+                "CYLUtilsKit",
                 "CYLTabBarControllerLottieSwift",
                 .product(name: "Lottie", package: "lottie-spm"),
-                .product(name: "CYLDeallocBlockExecutor", package: "CYLDeallocBlockExecutor"),
             ],
             path: "CYLTabBarController",
-            exclude: ["CYLUtils/Swift/CYLAnimationURLOptions.swift", "CYLUtils/Swift/CYLAnimationKeyLookup.swift", "Package"],
-            sources: ["CYLUtils/Swift", "CYLBadgeView/Swift", "Swift", "CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/Swift"],
-            resources: [.copy("Resources/CYLTabBarController.bundle")],
+            exclude: ["Package"],
+            // [EN] The CYLUtils and CYLBadgeView Swift folders are the CYLUtilsKit and CYLBadge targets now; the resource bundle went with CYLUtilsKit; the lifecycle
+            //      library comes through it (D8). [CN] CYLUtils 与 CYLBadgeView 的 Swift 目录现在是 CYLUtilsKit 与 CYLBadge 两个 target；资源包随 CYLUtilsKit 走；生命周期库经由它得到（D8）。
+            sources: ["Swift", "CYLFlatDesignTabBar/CYLFlatDesignTabBar-ObjectiveC/Swift"],
             // [EN] SwiftPM always builds the engine: Core's engine-only Swift code (`#if CYL_ANIMATION_ENGINE_AVAILABLE`) is in.
             // [CN] SwiftPM 总是编译引擎：Core 中只在有引擎时编译的 Swift 代码（`#if CYL_ANIMATION_ENGINE_AVAILABLE`）参与编译。
             swiftSettings: [.define("CYL_ANIMATION_ENGINE_AVAILABLE")]
         ),
         .target(
             name: "CYLTabBarControllerEngine",
-            dependencies: ["CYLTabBarController", "CYLTabBarControllerObjC", "CYLAnimatedItem", "CYLAnimatedItemSwift", "CYLTabBarControllerLottieSwift"],
+            dependencies: ["CYLTabBarController", "CYLTabBarControllerObjC", "CYLAnimatedItem", "CYLAnimatedItemSwift", "CYLBadge", "CYLUtilsKit", "CYLTabBarControllerLottieSwift"],
             path: "CYLTabBarController",
             sources: [
                 "CYLTabBarItemAnimation/CYLTabBarItemAnimationEngine.m",

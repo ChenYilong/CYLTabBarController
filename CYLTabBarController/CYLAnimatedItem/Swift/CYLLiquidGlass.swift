@@ -12,9 +12,7 @@
 //
 
 import UIKit
-#if canImport(CYLUtilsKit)
 import CYLUtilsKit
-#endif
 
 /**
  * [EN] Whether the system draws Liquid Glass, the one rule every CYLTabBarController component asks (the tab bar's
@@ -24,7 +22,6 @@ import CYLUtilsKit
  *      CollectionViewClassifyMenu 的标签也是）：iOS 27 及以上总是；iOS 26 上 App 未在 Info.plist 中设置
  *      `UIDesignRequiresCompatibility` 时。只读取一次。
  */
-#if canImport(CYLUtilsKit)
 final class CYLLiquidGlass {
 
     /**
@@ -44,30 +41,6 @@ final class CYLLiquidGlass {
         CYLUtils.isLiquidGlassActive()
     }
 }
-#else
-// [EN] TODO (docs/Animated-Item-Badge.md, step 9): SwiftPM still builds CYLUtils inside the CYLTabBarController target, above this one, so
-//      until `CYLUtilsKit` is a SwiftPM target this target keeps its own copy of the rule (two caches, one answer). Delete this branch with step 9.
-// [CN] TODO（docs/Animated-Item-Badge.md，第 9 步）：SwiftPM 仍把 CYLUtils 编进本 target 之上的 CYLTabBarController target，因此在 `CYLUtilsKit`
-//      成为 SwiftPM target 之前，本 target 保留自己的一份规则（两份缓存，同一个答案）。第 9 步完成时删除此分支。
-final class CYLLiquidGlass {
-    nonisolated(unsafe) static var activeOverride: Bool?
-
-    class func isActive() -> Bool {
-        activeOverride ?? systemDrawsLiquidGlass
-    }
-
-    private static let systemDrawsLiquidGlass: Bool = {
-        if #available(iOS 27.0, *) {
-            return true
-        }
-        if #available(iOS 26.0, *) {
-            let requiresCompatibility = Bundle.main.object(forInfoDictionaryKey: "UIDesignRequiresCompatibility") as? Bool
-            return !(requiresCompatibility ?? false)
-        }
-        return false
-    }()
-}
-#endif
 
 /**
  * [EN] A Liquid Glass background for any view: a `UIVisualEffectView` with a `UIGlassEffect`, tinted with
